@@ -22,6 +22,7 @@ esp32-c3devkit-all-clusters
 esp32-devkitc-all-clusters
 esp32-devkitc-all-clusters-ipv6only
 esp32-devkitc-bridge
+esp32-devkitc-light
 esp32-devkitc-lock
 esp32-devkitc-shell
 esp32-devkitc-temperature-measurement

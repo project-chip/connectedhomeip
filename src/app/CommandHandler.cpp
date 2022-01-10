@@ -436,7 +436,7 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 
 FabricIndex CommandHandler::GetAccessingFabricIndex() const
 {
-    return mpExchangeCtx->GetSessionHandle().GetFabricIndex();
+    return mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
 }
 
 CommandHandler * CommandHandler::Handle::Get()

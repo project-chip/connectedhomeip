@@ -87,7 +87,7 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
 void ExchangeContext::UpdateSEDPollingMode()
 {
-    if (GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager())->GetTransportType() != Transport::Type::kBle)
+    if (GetSessionHandle()->AsSecureSession()->GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
         if (!IsResponseExpected() && !IsSendExpected() && (mExchangeMgr->GetNumActiveExchanges() == 1))
         {
@@ -125,10 +125,8 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // an error arising below. at the end, we have to close it.
     ExchangeHandle ref(*this);
 
-    bool isUDPTransport = IsUDPTransport();
-
-    // this check is ignored by the ExchangeMsgDispatch if !AutoRequestAck()
-    bool reliableTransmissionRequested = isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
+    // If session requires MRP and NoAutoRequestAck send flag is not specificed, request reliable transmission.
+    bool reliableTransmissionRequested = GetSessionHandle()->RequireMRP() && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
 
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kExpectResponse) && !IsGroupExchangeContext())
@@ -252,7 +250,8 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
 
 ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
                                  ExchangeDelegate * delegate) :
-    mDispatch((delegate != nullptr) ? delegate->GetMessageDispatch() : ApplicationExchangeDispatch::Instance())
+    mDispatch((delegate != nullptr) ? delegate->GetMessageDispatch() : ApplicationExchangeDispatch::Instance()),
+    mSession(*this)
 {
     VerifyOrDie(mExchangeMgr == nullptr);
 
@@ -267,7 +266,7 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, cons
     SetMsgRcvdFromPeer(false);
 
     // Do not request Ack for multicast
-    SetAutoRequestAck(!session.IsGroupSession());
+    SetAutoRequestAck(!session->IsGroupSession());
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogDetail(ExchangeManager, "ec++ id: " ChipLogFormatExchange, ChipLogValueExchange(this));
@@ -316,14 +315,8 @@ bool ExchangeContext::MatchExchange(const SessionHandle & session, const PacketH
         && (payloadHeader.IsInitiator() != IsInitiator());
 }
 
-void ExchangeContext::OnConnectionExpired()
+void ExchangeContext::OnSessionReleased()
 {
-    // Reset our mSession to a default-initialized (hence not matching any
-    // connection state) value, because it's still referencing the now-expired
-    // connection.  This will mean that no more messages can be sent via this
-    // exchange, which seems fine given the semantics of connection expiration.
-    mSession.Release();
-
     if (!IsResponseExpected())
     {
         // Nothing to do in this case
@@ -486,44 +479,6 @@ void ExchangeContext::MessageHandled()
     }
 
     Close();
-}
-
-bool ExchangeContext::IsUDPTransport()
-{
-    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
-    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
-}
-
-bool ExchangeContext::IsTCPTransport()
-{
-    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
-    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kTcp;
-}
-
-bool ExchangeContext::IsBLETransport()
-{
-    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
-    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kBle;
-}
-
-System::Clock::Milliseconds32 ExchangeContext::GetAckTimeout()
-{
-    System::Clock::Timeout timeout;
-    if (IsUDPTransport())
-    {
-        timeout = GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
-    }
-    else if (IsTCPTransport())
-    {
-        // TODO: issue 12009, need actual tcp margin value considering restransmission
-        timeout = System::Clock::Seconds16(30);
-    }
-    return timeout;
-}
-
-const ReliableMessageProtocolConfig & ExchangeContext::GetMRPConfig() const
-{
-    return GetSessionHandle().GetMRPConfig(GetExchangeMgr()->GetSessionManager());
 }
 
 } // namespace Messaging

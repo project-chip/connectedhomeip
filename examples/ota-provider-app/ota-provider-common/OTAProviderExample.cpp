@@ -114,7 +114,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     {
         // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the provider
         // supplying the response is not the provider supplying the OTA image.
-        FabricIndex fabricIndex = commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
+        FabricIndex fabricIndex = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
         FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
         NodeId nodeId           = fabricInfo->GetPeerId().GetNodeId();
 

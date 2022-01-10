@@ -143,6 +143,7 @@ public:
         printf("TestDelayCommands\n");
         printf("TestLogCommands\n");
         printf("TestSaveAs\n");
+        printf("TestConfigVariables\n");
         printf("TestDescriptorCluster\n");
         printf("TestBasicInformation\n");
         printf("TestIdentifyCluster\n");
@@ -151,9 +152,9 @@ public:
         printf("TestOperationalCredentialsCluster\n");
         printf("TestModeSelectCluster\n");
         printf("TestGroupMessaging\n");
-        printf("Test_TC_DIAGSW_1_1\n");
-        printf("Test_TC_DIAGSW_2_1\n");
-        printf("Test_TC_DIAGSW_3_2\n");
+        printf("Test_TC_SWDIAG_1_1\n");
+        printf("Test_TC_SWDIAG_2_1\n");
+        printf("Test_TC_SWDIAG_3_1\n");
         printf("TestSubscribe_OnOff\n");
 
         return CHIP_NO_ERROR;
@@ -163,7 +164,11 @@ public:
 class Test_TC_BI_1_1 : public TestCommand
 {
 public:
-    Test_TC_BI_1_1() : TestCommand("Test_TC_BI_1_1"), mTestIndex(0) {}
+    Test_TC_BI_1_1() : TestCommand("Test_TC_BI_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -224,6 +229,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_BI_1_1 *>(context))->OnFailureResponse_1(status);
@@ -273,7 +281,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -293,7 +301,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -312,7 +320,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -334,7 +342,7 @@ private:
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -356,7 +364,11 @@ private:
 class Test_TC_BI_2_1 : public TestCommand
 {
 public:
-    Test_TC_BI_2_1() : TestCommand("Test_TC_BI_2_1"), mTestIndex(0) {}
+    Test_TC_BI_2_1() : TestCommand("Test_TC_BI_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -446,6 +458,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 12;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -560,7 +575,7 @@ private:
 
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeOutOfService_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -580,7 +595,7 @@ private:
 
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsOutOfService_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -599,7 +614,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeOutOfService_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -617,7 +632,7 @@ private:
 
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeOutOfService_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -637,7 +652,7 @@ private:
 
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsPresentValue_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -656,7 +671,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryNonGlobalAttributePresentValue_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -674,7 +689,7 @@ private:
 
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributePresentValue_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -694,7 +709,7 @@ private:
 
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeStatusFlags_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -714,7 +729,7 @@ private:
 
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsStatusFlags_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -734,7 +749,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryNonGlobalAttributeStatusFlags_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -756,7 +771,7 @@ private:
 
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeStatusFlags_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -778,7 +793,11 @@ private:
 class Test_TC_BI_2_2 : public TestCommand
 {
 public:
-    Test_TC_BI_2_2() : TestCommand("Test_TC_BI_2_2"), mTestIndex(0) {}
+    Test_TC_BI_2_2() : TestCommand("Test_TC_BI_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -853,6 +872,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 9;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -946,7 +968,7 @@ private:
 
     CHIP_ERROR TestReadsPresentValueAttributeFromDut_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -966,7 +988,7 @@ private:
 
     CHIP_ERROR TestReadsOutOfServiceAttributeFromDut_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -986,7 +1008,7 @@ private:
 
     CHIP_ERROR TestReadsStatusFlagsAttributeFromDut_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1006,7 +1028,7 @@ private:
 
     CHIP_ERROR TestReadsPresentValueAttributeFromDut_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1026,7 +1048,7 @@ private:
 
     CHIP_ERROR TestReadsOutOfServiceAttributeFromDut_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1046,7 +1068,7 @@ private:
 
     CHIP_ERROR TestReadsStatusFlagsAttributeFromDut_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1066,7 +1088,7 @@ private:
 
     CHIP_ERROR TestReadsStatusFlagsAttributeFromDut_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1086,7 +1108,7 @@ private:
 
     CHIP_ERROR TestReadsStatusFlagsAttributeFromDut_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1108,7 +1130,11 @@ private:
 class Test_TC_BOOL_1_1 : public TestCommand
 {
 public:
-    Test_TC_BOOL_1_1() : TestCommand("Test_TC_BOOL_1_1"), mTestIndex(0) {}
+    Test_TC_BOOL_1_1() : TestCommand("Test_TC_BOOL_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -1169,6 +1195,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_BOOL_1_1 *>(context))->OnFailureResponse_1(status);
@@ -1218,7 +1247,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1238,7 +1267,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1257,7 +1286,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1279,7 +1308,7 @@ private:
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1301,7 +1330,11 @@ private:
 class Test_TC_BOOL_2_1 : public TestCommand
 {
 public:
-    Test_TC_BOOL_2_1() : TestCommand("Test_TC_BOOL_2_1"), mTestIndex(0) {}
+    Test_TC_BOOL_2_1() : TestCommand("Test_TC_BOOL_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -1362,6 +1395,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_BOOL_2_1 *>(context))->OnFailureResponse_1(status);
@@ -1411,7 +1447,7 @@ private:
 
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeStateValue_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1431,7 +1467,7 @@ private:
 
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeConstraintsStateValue_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1450,7 +1486,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValueToMandatoryNonGlobalAttributeStateValue_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1472,7 +1508,7 @@ private:
 
     CHIP_ERROR TestReadsBackTheMandatoryNonGlobalAttributeStateValue_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1494,7 +1530,11 @@ private:
 class Test_TC_CC_1_1 : public TestCommand
 {
 public:
-    Test_TC_CC_1_1() : TestCommand("Test_TC_CC_1_1"), mTestIndex(0) {}
+    Test_TC_CC_1_1() : TestCommand("Test_TC_CC_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -1547,6 +1587,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_1_1 *>(context))->OnFailureResponse_1(status);
@@ -1576,7 +1619,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1595,7 +1638,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -1619,7 +1662,11 @@ private:
 class Test_TC_CC_2_1 : public TestCommand
 {
 public:
-    Test_TC_CC_2_1() : TestCommand("Test_TC_CC_2_1"), mTestIndex(0) {}
+    Test_TC_CC_2_1() : TestCommand("Test_TC_CC_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -2251,6 +2298,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 146;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -3597,7 +3647,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributeCurrentHue_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3617,7 +3667,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeCurrentHue_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3637,7 +3687,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValueToMandatoryAttributeCurrentHue_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3659,7 +3709,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentHue_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3679,7 +3729,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributeCurrentSaturation_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3699,7 +3749,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeCurrentSaturation_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3719,7 +3769,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValueToMandatoryAttributeCurrentSaturation_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3741,7 +3791,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentSaturation_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3761,7 +3811,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeCurrentX_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3781,7 +3831,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeCurrentX_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3801,7 +3851,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValueToMandatoryAttributeCurrentX_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3823,7 +3873,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentX_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3843,7 +3893,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeCurrentY_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3863,7 +3913,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeCurrentY_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3883,7 +3933,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeCurrentY_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3905,7 +3955,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeCurrentY_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3925,7 +3975,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeColorTemperatureMireds_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3945,7 +3995,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeColorMode_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3965,7 +4015,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeOptions_19()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -3985,7 +4035,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeOptions_20()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4004,7 +4054,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeOptions_21()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4022,7 +4072,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeOptions_22()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4042,7 +4092,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeEnhancedCurrentHue_23()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4062,7 +4112,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeEnhancedCurrentHue_24()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4081,7 +4131,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeEnhancedCurrentHue_25()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4103,7 +4153,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeEnhancedCurrentHue_26()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4123,7 +4173,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeEnhancedColorMode_27()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4142,7 +4192,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeColorLoopActive_28()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4162,7 +4212,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopActive_29()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4181,7 +4231,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopActive_30()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4203,7 +4253,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopActive_31()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4223,7 +4273,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeColorLoopDirection_32()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4243,7 +4293,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopDirection_33()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4262,7 +4312,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopDirection_34()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4284,7 +4334,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopDirection_35()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4304,7 +4354,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeColorLoopTime_36()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4324,7 +4374,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopTime_37()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4343,7 +4393,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopTime_38()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4365,7 +4415,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopTime_39()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4385,7 +4435,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeColorLoopStartEnhancedHue_40()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4406,7 +4456,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopStartEnhancedHue_41()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4426,7 +4476,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopStartEnhancedHue_42()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4449,7 +4499,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopStartEnhancedHue_43()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4470,7 +4520,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeColorLoopStoredEnhancedHue_44()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4491,7 +4541,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeColorLoopStoredEnhancedHue_45()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4511,7 +4561,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorLoopStoredEnhancedHue_46()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4534,7 +4584,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorLoopStoredEnhancedHue_47()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4555,7 +4605,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeColorCapabilities_48()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4575,7 +4625,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeColorCapabilities_49()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4595,7 +4645,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorCapabilities_50()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4617,7 +4667,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorCapabilities_51()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4637,7 +4687,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeColorTempPhysicalMinMireds_52()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4657,7 +4707,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeColorTempPhysicalMinMireds_53()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4677,7 +4727,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorTempPhysicalMinMireds_54()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4699,7 +4749,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorTempPhysicalMinMireds_55()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4719,7 +4769,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeColorTempPhysicalMaxMireds_56()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4739,7 +4789,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeColorTempPhysicalMaxMireds_57()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4759,7 +4809,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeColorTempPhysicalMaxMireds_58()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4781,7 +4831,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeColorTempPhysicalMaxMireds_59()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4801,7 +4851,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeCoupleColorTempToLevelMinMireds_60()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4811,7 +4861,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_60(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_60(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_60(uint16_t coupleColorTempToLevelMinMireds)
     {
@@ -4821,7 +4874,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeCoupleColorTempToLevelMinMireds_61()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4844,7 +4897,7 @@ private:
 
     CHIP_ERROR TestReadsBackOptionalAttributeCoupleColorTempToLevelMinMireds_62()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4854,7 +4907,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_62(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_62(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_62(uint16_t coupleColorTempToLevelMinMireds)
     {
@@ -4865,7 +4921,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeStartUpColorTemperatureMireds_63()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4875,7 +4931,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_63(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_63(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_63(uint16_t startUpColorTemperatureMireds)
     {
@@ -4886,7 +4945,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeStartUpColorTemperatureMireds_64()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4899,13 +4958,16 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_64(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_64(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_64() { NextTest(); }
 
     CHIP_ERROR TestReadsBackOptionalAttributeStartUpColorTemperatureMireds_65()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4915,7 +4977,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_65(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_65(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_65(uint16_t startUpColorTemperatureMireds)
     {
@@ -4926,7 +4991,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeRemainingTime_66()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4935,7 +5000,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_66(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_66(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_66(uint16_t remainingTime)
     {
@@ -4946,7 +5014,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributeRemainingTime_67()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4955,7 +5023,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_67(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_67(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_67(uint16_t remainingTime)
     {
@@ -4966,7 +5037,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeRemainingTime_68()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4988,7 +5059,7 @@ private:
 
     CHIP_ERROR TestReadsBackOptionalAttributeRemainingTime_69()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -4997,7 +5068,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_69(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_69(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_69(uint16_t remainingTime)
     {
@@ -5008,7 +5082,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeDriftCompensation_70()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5017,7 +5091,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_70(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_70(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_70(uint8_t driftCompensation)
     {
@@ -5028,7 +5105,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToOptionalAttributeDriftCompensation_71()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5050,7 +5127,7 @@ private:
 
     CHIP_ERROR TestReadsBackOptionalAttributeDriftCompensation_72()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5059,7 +5136,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_72(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_72(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_72(uint8_t driftCompensation)
     {
@@ -5070,7 +5150,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeCompensationText_73()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5079,7 +5159,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_73(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_73(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_73(chip::CharSpan compensationText)
     {
@@ -5090,7 +5173,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeNumberOfPrimaries_74()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5110,7 +5193,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributeNumberOfPrimaries_75()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5132,7 +5215,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributeNumberOfPrimaries_76()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5152,7 +5235,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary1X_77()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5172,7 +5255,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary1X_78()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5194,7 +5277,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary1X_79()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5214,7 +5297,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary1Y_80()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5234,7 +5317,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary1Y_81()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5256,7 +5339,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary1Y_82()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5276,7 +5359,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary1Intensity_83()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5295,7 +5378,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary2X_84()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5315,7 +5398,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary2X_85()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5337,7 +5420,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary2X_86()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5357,7 +5440,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary2Y_87()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5377,7 +5460,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary2Y_88()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5399,7 +5482,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary2Y_89()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5419,7 +5502,7 @@ private:
 
     CHIP_ERROR TestValidateConstraintsOfAttributePrimary2Intensity_90()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5438,7 +5521,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary3X_91()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5458,7 +5541,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary3X_92()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5480,7 +5563,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary3X_93()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5500,7 +5583,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary3Y_94()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5520,7 +5603,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary3Y_95()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5542,7 +5625,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary3Y_96()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5562,7 +5645,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary3Intensity_97()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5581,7 +5664,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary4X_98()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5601,7 +5684,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary4X_99()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5623,7 +5706,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary4X_100()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5643,7 +5726,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary4Y_101()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5663,7 +5746,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary4Y_102()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5685,7 +5768,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary4Y_103()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5705,7 +5788,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary4Intensity_104()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5724,7 +5807,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary5X_105()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5744,7 +5827,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary5X_106()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5766,7 +5849,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary5X_107()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5786,7 +5869,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary5Y_108()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5806,7 +5889,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary5Y_109()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5828,7 +5911,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary5Y_110()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5848,7 +5931,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary5Intensity_111()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5867,7 +5950,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary6X_112()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5887,7 +5970,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary6X_113()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5909,7 +5992,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary6X_114()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5929,7 +6012,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary6Y_115()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5949,7 +6032,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultMandatoryAttributePrimary6Y_116()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5971,7 +6054,7 @@ private:
 
     CHIP_ERROR TestReadBackTheMandatoryAttributePrimary6Y_117()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -5991,7 +6074,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributePrimary6Intensity_118()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6010,7 +6093,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeWhitePointX_119()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6019,7 +6102,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_119(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_119(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_119(uint16_t whitePointX)
     {
@@ -6030,7 +6116,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeWhitePointX_120()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6042,13 +6128,16 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_120(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_120(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_120() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeWhitePointX_121()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6057,7 +6146,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_121(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_121(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_121(uint16_t whitePointX)
     {
@@ -6068,7 +6160,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeWhitePointY_122()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6077,7 +6169,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_122(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_122(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_122(uint16_t whitePointY)
     {
@@ -6088,7 +6183,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeWhitePointY_123()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6100,13 +6195,16 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_123(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_123(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_123() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeWhitePointY_124()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6115,7 +6213,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_124(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_124(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_124(uint16_t whitePointY)
     {
@@ -6126,7 +6227,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeColorPointRX_125()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6135,7 +6236,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_125(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_125(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_125(uint16_t colorPointRX)
     {
@@ -6146,7 +6250,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointRX_126()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6158,13 +6262,16 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_126(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_126(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_126() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointRX_127()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6173,7 +6280,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_127(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_127(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_127(uint16_t colorPointRX)
     {
@@ -6184,7 +6294,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeColorPointRY_128()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6193,7 +6303,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_128(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_128(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_128(uint16_t colorPointRY)
     {
@@ -6204,7 +6317,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointRY_129()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6216,13 +6329,16 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_129(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_129(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_129() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointRY_130()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6231,7 +6347,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_130(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_130(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_130(uint16_t colorPointRY)
     {
@@ -6242,7 +6361,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeColorPointRIntensity_131()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6251,7 +6370,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_131(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_131(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_131(uint8_t colorPointRIntensity)
     {
@@ -6261,7 +6383,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeColorPointGX_132()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6270,7 +6392,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_132(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_132(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_132(uint16_t colorPointGX)
     {
@@ -6281,7 +6406,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointGX_133()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6293,13 +6418,16 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_133(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_133(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_133() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointGX_134()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6308,7 +6436,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_134(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_134(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_134(uint16_t colorPointGX)
     {
@@ -6319,7 +6450,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeColorPointGY_135()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6328,7 +6459,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_135(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_135(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_135(uint16_t colorPointGY)
     {
@@ -6339,7 +6473,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointGY_136()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6351,13 +6485,16 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_136(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_136(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_136() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointGY_137()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6366,7 +6503,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_137(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_137(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_137(uint16_t colorPointGY)
     {
@@ -6377,7 +6517,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeColorPointGIntensity_138()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6386,7 +6526,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_138(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_138(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_138(uint8_t colorPointGIntensity)
     {
@@ -6396,7 +6539,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeColorPointBX_139()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6405,7 +6548,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_139(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_139(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_139(uint16_t colorPointBX)
     {
@@ -6416,7 +6562,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointBX_140()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6428,13 +6574,16 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_140(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_140(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_140() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointBX_141()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6443,7 +6592,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_141(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_141(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_141(uint16_t colorPointBX)
     {
@@ -6454,7 +6606,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeColorPointBY_142()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6463,7 +6615,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_142(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_142(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_142(uint16_t colorPointBY)
     {
@@ -6474,7 +6629,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultOptionalAttributeColorPointBY_143()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6486,13 +6641,16 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_143(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_143(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_143() { NextTest(); }
 
     CHIP_ERROR TestReadBackTheOptionalAttributeColorPointBY_144()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6501,7 +6659,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_144(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_144(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_144(uint16_t colorPointBY)
     {
@@ -6512,7 +6673,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeColorPointBIntensity_145()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6521,7 +6682,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_145(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_145(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_145(uint8_t colorPointBIntensity)
     {
@@ -6533,7 +6697,11 @@ private:
 class Test_TC_CC_3_1 : public TestCommand
 {
 public:
-    Test_TC_CC_3_1() : TestCommand("Test_TC_CC_3_1"), mTestIndex(0) {}
+    Test_TC_CC_3_1() : TestCommand("Test_TC_CC_3_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -6609,6 +6777,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 9;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_2(status);
@@ -6641,7 +6812,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -6664,7 +6835,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6684,7 +6855,7 @@ private:
 
     CHIP_ERROR TestMoveToHueShortestDistanceCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
         RequestType request;
@@ -6712,7 +6883,7 @@ private:
 
     CHIP_ERROR TestMoveToHueLongestDistanceCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
         RequestType request;
@@ -6740,7 +6911,7 @@ private:
 
     CHIP_ERROR TestMoveToHueUpCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
         RequestType request;
@@ -6768,7 +6939,7 @@ private:
 
     CHIP_ERROR TestMoveToHueDownCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveToHue::Type;
 
         RequestType request;
@@ -6796,7 +6967,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -6819,7 +6990,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6841,7 +7012,11 @@ private:
 class Test_TC_CC_3_2 : public TestCommand
 {
 public:
-    Test_TC_CC_3_2() : TestCommand("Test_TC_CC_3_2"), mTestIndex(0) {}
+    Test_TC_CC_3_2() : TestCommand("Test_TC_CC_3_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -6917,6 +7092,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 9;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_2(status);
@@ -6949,7 +7127,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -6972,7 +7150,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -6992,7 +7170,7 @@ private:
 
     CHIP_ERROR TestMoveHueUpCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
         RequestType request;
@@ -7019,7 +7197,7 @@ private:
 
     CHIP_ERROR TestMoveHueStopCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
         RequestType request;
@@ -7046,7 +7224,7 @@ private:
 
     CHIP_ERROR TestMoveHueDownCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
         RequestType request;
@@ -7073,7 +7251,7 @@ private:
 
     CHIP_ERROR TestMoveHueStopCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveHue::Type;
 
         RequestType request;
@@ -7100,7 +7278,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -7123,7 +7301,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -7145,7 +7323,11 @@ private:
 class Test_TC_CC_3_3 : public TestCommand
 {
 public:
-    Test_TC_CC_3_3() : TestCommand("Test_TC_CC_3_3"), mTestIndex(0) {}
+    Test_TC_CC_3_3() : TestCommand("Test_TC_CC_3_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -7213,6 +7395,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_2(status);
@@ -7245,7 +7430,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -7268,7 +7453,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -7288,7 +7473,7 @@ private:
 
     CHIP_ERROR TestStepHueUpCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
 
         RequestType request;
@@ -7316,7 +7501,7 @@ private:
 
     CHIP_ERROR TestStepHueDownCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::StepHue::Type;
 
         RequestType request;
@@ -7344,7 +7529,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -7367,7 +7552,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -7389,7 +7574,11 @@ private:
 class Test_TC_CC_4_1 : public TestCommand
 {
 public:
-    Test_TC_CC_4_1() : TestCommand("Test_TC_CC_4_1"), mTestIndex(0) {}
+    Test_TC_CC_4_1() : TestCommand("Test_TC_CC_4_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -7453,6 +7642,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_2(status);
@@ -7485,7 +7677,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -7508,7 +7700,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -7528,7 +7720,7 @@ private:
 
     CHIP_ERROR TestMoveToSaturationCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type;
 
         RequestType request;
@@ -7555,7 +7747,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -7578,7 +7770,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -7600,7 +7792,11 @@ private:
 class Test_TC_CC_4_2 : public TestCommand
 {
 public:
-    Test_TC_CC_4_2() : TestCommand("Test_TC_CC_4_2"), mTestIndex(0) {}
+    Test_TC_CC_4_2() : TestCommand("Test_TC_CC_4_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -7684,6 +7880,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 11;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_2(status);
@@ -7716,7 +7915,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -7739,7 +7938,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -7759,7 +7958,7 @@ private:
 
     CHIP_ERROR TestMoveSaturationUpCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
 
         RequestType request;
@@ -7786,7 +7985,7 @@ private:
 
     CHIP_ERROR TestMoveSaturationDownCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
 
         RequestType request;
@@ -7813,7 +8012,7 @@ private:
 
     CHIP_ERROR TestMoveSaturationUpCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
 
         RequestType request;
@@ -7840,7 +8039,7 @@ private:
 
     CHIP_ERROR TestMoveSaturationStopCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
 
         RequestType request;
@@ -7867,7 +8066,7 @@ private:
 
     CHIP_ERROR TestMoveSaturationDownCommand_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
 
         RequestType request;
@@ -7894,7 +8093,7 @@ private:
 
     CHIP_ERROR TestMoveSaturationStopCommand_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
 
         RequestType request;
@@ -7921,7 +8120,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -7944,7 +8143,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -7966,7 +8165,11 @@ private:
 class Test_TC_CC_4_3 : public TestCommand
 {
 public:
-    Test_TC_CC_4_3() : TestCommand("Test_TC_CC_4_3"), mTestIndex(0) {}
+    Test_TC_CC_4_3() : TestCommand("Test_TC_CC_4_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -8034,6 +8237,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_2(status);
@@ -8066,7 +8272,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -8089,7 +8295,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -8109,7 +8315,7 @@ private:
 
     CHIP_ERROR TestStepSaturationUpCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
 
         RequestType request;
@@ -8137,7 +8343,7 @@ private:
 
     CHIP_ERROR TestStepSaturationDownCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::StepSaturation::Type;
 
         RequestType request;
@@ -8165,7 +8371,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -8188,7 +8394,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -8210,7 +8416,11 @@ private:
 class Test_TC_CC_4_4 : public TestCommand
 {
 public:
-    Test_TC_CC_4_4() : TestCommand("Test_TC_CC_4_4"), mTestIndex(0) {}
+    Test_TC_CC_4_4() : TestCommand("Test_TC_CC_4_4"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -8274,6 +8484,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_2(status);
@@ -8306,7 +8519,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -8329,7 +8542,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -8349,7 +8562,7 @@ private:
 
     CHIP_ERROR TestMoveToCurrentHueAndSaturationCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type;
 
         RequestType request;
@@ -8377,7 +8590,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -8400,7 +8613,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -8422,7 +8635,11 @@ private:
 class Test_TC_CC_5_1 : public TestCommand
 {
 public:
-    Test_TC_CC_5_1() : TestCommand("Test_TC_CC_5_1"), mTestIndex(0) {}
+    Test_TC_CC_5_1() : TestCommand("Test_TC_CC_5_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -8486,6 +8703,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_2(status);
@@ -8518,7 +8738,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -8541,7 +8761,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -8561,7 +8781,7 @@ private:
 
     CHIP_ERROR TestMoveToColorCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveToColor::Type;
 
         RequestType request;
@@ -8589,7 +8809,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -8612,7 +8832,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -8634,7 +8854,11 @@ private:
 class Test_TC_CC_5_2 : public TestCommand
 {
 public:
-    Test_TC_CC_5_2() : TestCommand("Test_TC_CC_5_2"), mTestIndex(0) {}
+    Test_TC_CC_5_2() : TestCommand("Test_TC_CC_5_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -8702,6 +8926,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_2(status);
@@ -8734,7 +8961,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -8757,7 +8984,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -8777,7 +9004,7 @@ private:
 
     CHIP_ERROR TestMoveColorCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveColor::Type;
 
         RequestType request;
@@ -8804,7 +9031,7 @@ private:
 
     CHIP_ERROR TestStopMoveStepCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type;
 
         RequestType request;
@@ -8829,7 +9056,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -8852,7 +9079,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -8874,7 +9101,11 @@ private:
 class Test_TC_CC_5_3 : public TestCommand
 {
 public:
-    Test_TC_CC_5_3() : TestCommand("Test_TC_CC_5_3"), mTestIndex(0) {}
+    Test_TC_CC_5_3() : TestCommand("Test_TC_CC_5_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -8938,6 +9169,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_2(status);
@@ -8970,7 +9204,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -8993,7 +9227,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -9013,7 +9247,7 @@ private:
 
     CHIP_ERROR TestStepColorCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::StepColor::Type;
 
         RequestType request;
@@ -9041,7 +9275,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -9064,7 +9298,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -9086,7 +9320,11 @@ private:
 class Test_TC_CC_6_1 : public TestCommand
 {
 public:
-    Test_TC_CC_6_1() : TestCommand("Test_TC_CC_6_1"), mTestIndex(0) {}
+    Test_TC_CC_6_1() : TestCommand("Test_TC_CC_6_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -9150,6 +9388,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_2(status);
@@ -9182,7 +9423,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -9205,7 +9446,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -9225,7 +9466,7 @@ private:
 
     CHIP_ERROR TestMoveToColorTemperatureCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type;
 
         RequestType request;
@@ -9252,7 +9493,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -9275,7 +9516,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -9297,7 +9538,11 @@ private:
 class Test_TC_CC_6_2 : public TestCommand
 {
 public:
-    Test_TC_CC_6_2() : TestCommand("Test_TC_CC_6_2"), mTestIndex(0) {}
+    Test_TC_CC_6_2() : TestCommand("Test_TC_CC_6_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -9369,6 +9614,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 8;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_2(status);
@@ -9401,7 +9649,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -9424,7 +9672,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -9444,7 +9692,7 @@ private:
 
     CHIP_ERROR TestMoveUpColorTemperatureCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
 
         RequestType request;
@@ -9473,7 +9721,7 @@ private:
 
     CHIP_ERROR TestStopColorTemperatureCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
 
         RequestType request;
@@ -9502,7 +9750,7 @@ private:
 
     CHIP_ERROR TestMoveDownColorTemperatureCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type;
 
         RequestType request;
@@ -9531,7 +9779,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -9554,7 +9802,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -9576,7 +9824,11 @@ private:
 class Test_TC_CC_6_3 : public TestCommand
 {
 public:
-    Test_TC_CC_6_3() : TestCommand("Test_TC_CC_6_3"), mTestIndex(0) {}
+    Test_TC_CC_6_3() : TestCommand("Test_TC_CC_6_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -9644,6 +9896,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_2(status);
@@ -9676,7 +9931,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -9699,7 +9954,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -9719,7 +9974,7 @@ private:
 
     CHIP_ERROR TestStepUpColorTemperatureCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
 
         RequestType request;
@@ -9749,7 +10004,7 @@ private:
 
     CHIP_ERROR TestStepDownColorTemperatureCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type;
 
         RequestType request;
@@ -9779,7 +10034,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -9802,7 +10057,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -9824,7 +10079,11 @@ private:
 class Test_TC_CC_7_1 : public TestCommand
 {
 public:
-    Test_TC_CC_7_1() : TestCommand("Test_TC_CC_7_1"), mTestIndex(0) {}
+    Test_TC_CC_7_1() : TestCommand("Test_TC_CC_7_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -9893,6 +10152,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_2(status);
@@ -9935,7 +10197,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -9958,7 +10220,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -9978,7 +10240,7 @@ private:
 
     CHIP_ERROR TestEnhancedMoveToHueCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
 
         RequestType request;
@@ -10006,7 +10268,7 @@ private:
 
     CHIP_ERROR TestCheckRemainingTimeAttributeValueMatchedTheValueSentByTheLastCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -10026,7 +10288,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -10049,7 +10311,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -10071,7 +10333,11 @@ private:
 class Test_TC_CC_7_2 : public TestCommand
 {
 public:
-    Test_TC_CC_7_2() : TestCommand("Test_TC_CC_7_2"), mTestIndex(0) {}
+    Test_TC_CC_7_2() : TestCommand("Test_TC_CC_7_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -10147,6 +10413,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 9;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_2(status);
@@ -10179,7 +10448,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -10202,7 +10471,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -10222,7 +10491,7 @@ private:
 
     CHIP_ERROR TestEnhancedMoveHueDownCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
         RequestType request;
@@ -10249,7 +10518,7 @@ private:
 
     CHIP_ERROR TestEnhancedMoveHueStopCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
         RequestType request;
@@ -10276,7 +10545,7 @@ private:
 
     CHIP_ERROR TestEnhancedMoveHueUpCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
         RequestType request;
@@ -10303,7 +10572,7 @@ private:
 
     CHIP_ERROR TestEnhancedMoveHueStopCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type;
 
         RequestType request;
@@ -10330,7 +10599,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -10353,7 +10622,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -10375,7 +10644,11 @@ private:
 class Test_TC_CC_7_3 : public TestCommand
 {
 public:
-    Test_TC_CC_7_3() : TestCommand("Test_TC_CC_7_3"), mTestIndex(0) {}
+    Test_TC_CC_7_3() : TestCommand("Test_TC_CC_7_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -10443,6 +10716,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_2(status);
@@ -10475,7 +10751,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -10498,7 +10774,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -10518,7 +10794,7 @@ private:
 
     CHIP_ERROR TestEnhancedStepHueUpCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
 
         RequestType request;
@@ -10546,7 +10822,7 @@ private:
 
     CHIP_ERROR TestEnhancedStepHueDownCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type;
 
         RequestType request;
@@ -10574,7 +10850,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -10597,7 +10873,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -10619,7 +10895,11 @@ private:
 class Test_TC_CC_7_4 : public TestCommand
 {
 public:
-    Test_TC_CC_7_4() : TestCommand("Test_TC_CC_7_4"), mTestIndex(0) {}
+    Test_TC_CC_7_4() : TestCommand("Test_TC_CC_7_4"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -10683,6 +10963,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 6;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_2(status);
@@ -10715,7 +10998,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -10738,7 +11021,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -10758,7 +11041,7 @@ private:
 
     CHIP_ERROR TestEnhancedMoveToHueAndSaturationCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type;
 
         RequestType request;
@@ -10786,7 +11069,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -10809,7 +11092,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -10831,7 +11114,11 @@ private:
 class Test_TC_CC_8_1 : public TestCommand
 {
 public:
-    Test_TC_CC_8_1() : TestCommand("Test_TC_CC_8_1"), mTestIndex(0) {}
+    Test_TC_CC_8_1() : TestCommand("Test_TC_CC_8_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -10938,6 +11225,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 17;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
@@ -11051,7 +11341,7 @@ private:
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -11074,7 +11364,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11094,7 +11384,7 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -11124,7 +11414,7 @@ private:
 
     CHIP_ERROR TestCheckColorLoopDirectionValue_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11144,7 +11434,7 @@ private:
 
     CHIP_ERROR TestCheckColorLoopTimeValue_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11164,7 +11454,7 @@ private:
 
     CHIP_ERROR TestCheckColorLoopStartEnhancedHueValue_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11185,7 +11475,7 @@ private:
 
     CHIP_ERROR TestCheckColorLoopActiveValue_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11205,7 +11495,7 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -11235,7 +11525,7 @@ private:
 
     CHIP_ERROR TestCheckColorLoopActiveValue_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11255,7 +11545,7 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandSetDirectionAndTimeWhileRunning_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -11285,7 +11575,7 @@ private:
 
     CHIP_ERROR TestCheckColorLoopDirectionValue_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11305,7 +11595,7 @@ private:
 
     CHIP_ERROR TestCheckColorLoopTimeValue_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11325,7 +11615,7 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandSetDirectionWhileRunning_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -11355,7 +11645,7 @@ private:
 
     CHIP_ERROR TestCheckColorLoopDirectionValue_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11375,7 +11665,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightThatWeTurnedOn_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -11398,7 +11688,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11420,7 +11710,11 @@ private:
 class Test_TC_CC_9_1 : public TestCommand
 {
 public:
-    Test_TC_CC_9_1() : TestCommand("Test_TC_CC_9_1"), mTestIndex(0) {}
+    Test_TC_CC_9_1() : TestCommand("Test_TC_CC_9_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -11609,6 +11903,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 37;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_2(status);
@@ -11791,7 +12088,7 @@ private:
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -11814,7 +12111,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11834,7 +12131,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -11864,7 +12161,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11884,7 +12181,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -11914,7 +12211,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11934,7 +12231,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -11964,7 +12261,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -11984,7 +12281,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12014,7 +12311,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopStartEnhancedHueAttributeFromDut_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12035,7 +12332,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12065,7 +12362,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12085,7 +12382,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12115,7 +12412,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12135,7 +12432,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12165,7 +12462,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12185,7 +12482,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12215,7 +12512,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12235,7 +12532,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_19()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12265,7 +12562,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_20()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12285,7 +12582,7 @@ private:
 
     CHIP_ERROR TestEnhancedMoveToHueCommand10_21()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
 
         RequestType request;
@@ -12319,7 +12616,7 @@ private:
 
     CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_23()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12339,7 +12636,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_24()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12369,7 +12666,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_25()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12389,7 +12686,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_26()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12419,7 +12716,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_27()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12439,7 +12736,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_28()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12469,7 +12766,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_29()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12489,7 +12786,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_30()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12519,7 +12816,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_31()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12539,7 +12836,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_32()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12569,7 +12866,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_33()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12589,7 +12886,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_34()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12619,7 +12916,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_35()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12639,7 +12936,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightForColorControlTests_36()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -12664,7 +12961,11 @@ private:
 class Test_TC_CC_9_2 : public TestCommand
 {
 public:
-    Test_TC_CC_9_2() : TestCommand("Test_TC_CC_9_2"), mTestIndex(0) {}
+    Test_TC_CC_9_2() : TestCommand("Test_TC_CC_9_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -12764,6 +13065,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 15;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_2(status);
@@ -12856,7 +13160,7 @@ private:
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -12879,7 +13183,7 @@ private:
 
     CHIP_ERROR TestPreconditionCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12899,7 +13203,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -12929,7 +13233,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12949,7 +13253,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12969,7 +13273,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -12989,7 +13293,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopStartEnhancedHueAttributeFromDut_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13010,7 +13314,7 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -13040,7 +13344,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13060,7 +13364,7 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -13090,7 +13394,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13110,7 +13414,7 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -13140,7 +13444,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13160,7 +13464,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightForColorControlTests_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -13185,7 +13489,11 @@ private:
 class Test_TC_CC_9_3 : public TestCommand
 {
 public:
-    Test_TC_CC_9_3() : TestCommand("Test_TC_CC_9_3"), mTestIndex(0) {}
+    Test_TC_CC_9_3() : TestCommand("Test_TC_CC_9_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -13285,6 +13593,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 15;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_2(status);
@@ -13377,7 +13688,7 @@ private:
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -13400,7 +13711,7 @@ private:
 
     CHIP_ERROR TestPreconditionCheckOnOffAttributeValueIsTrueAfterOnCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13420,7 +13731,7 @@ private:
 
     CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -13450,7 +13761,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13470,7 +13781,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13490,7 +13801,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13510,7 +13821,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopStartEnhancedHueAttributeFromDut_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13531,7 +13842,7 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandSetAllAttributes_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -13561,7 +13872,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13581,7 +13892,7 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -13611,7 +13922,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopTimeAttributeFromDut_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13631,7 +13942,7 @@ private:
 
     CHIP_ERROR TestColorLoopSetCommandStartColorLoop_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
@@ -13661,7 +13972,7 @@ private:
 
     CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -13681,7 +13992,7 @@ private:
 
     CHIP_ERROR TestTurnOffLightForColorControlTests_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -13706,7 +14017,11 @@ private:
 class Test_TC_DD_1_5 : public TestCommand
 {
 public:
-    Test_TC_DD_1_5() : TestCommand("Test_TC_DD_1_5"), mTestIndex(0) {}
+    Test_TC_DD_1_5() : TestCommand("Test_TC_DD_1_5"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -13750,6 +14065,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -13765,7 +14083,11 @@ private:
 class Test_TC_DD_1_6 : public TestCommand
 {
 public:
-    Test_TC_DD_1_6() : TestCommand("Test_TC_DD_1_6"), mTestIndex(0) {}
+    Test_TC_DD_1_6() : TestCommand("Test_TC_DD_1_6"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -13817,6 +14139,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -13845,7 +14170,11 @@ private:
 class Test_TC_DD_1_7 : public TestCommand
 {
 public:
-    Test_TC_DD_1_7() : TestCommand("Test_TC_DD_1_7"), mTestIndex(0) {}
+    Test_TC_DD_1_7() : TestCommand("Test_TC_DD_1_7"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -13893,6 +14222,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -13914,7 +14246,11 @@ private:
 class Test_TC_DD_1_8 : public TestCommand
 {
 public:
-    Test_TC_DD_1_8() : TestCommand("Test_TC_DD_1_8"), mTestIndex(0) {}
+    Test_TC_DD_1_8() : TestCommand("Test_TC_DD_1_8"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -13962,6 +14298,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -13982,7 +14321,11 @@ private:
 class Test_TC_DD_1_9 : public TestCommand
 {
 public:
-    Test_TC_DD_1_9() : TestCommand("Test_TC_DD_1_9"), mTestIndex(0) {}
+    Test_TC_DD_1_9() : TestCommand("Test_TC_DD_1_9"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -14034,6 +14377,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -14061,7 +14407,11 @@ private:
 class Test_TC_DM_1_1 : public TestCommand
 {
 public:
-    Test_TC_DM_1_1() : TestCommand("Test_TC_DM_1_1"), mTestIndex(0) {}
+    Test_TC_DM_1_1() : TestCommand("Test_TC_DM_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -14180,6 +14530,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 20;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -14383,7 +14736,7 @@ private:
 
     CHIP_ERROR TestQueryInteractionModelVersion_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14402,7 +14755,7 @@ private:
 
     CHIP_ERROR TestQueryVendorName_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14422,7 +14775,7 @@ private:
 
     CHIP_ERROR TestQueryVendorID_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14441,7 +14794,7 @@ private:
 
     CHIP_ERROR TestQueryProductName_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14461,7 +14814,7 @@ private:
 
     CHIP_ERROR TestQueryProductID_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14480,7 +14833,7 @@ private:
 
     CHIP_ERROR TestQueryNodeLabel_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14500,7 +14853,7 @@ private:
 
     CHIP_ERROR TestQueryUserLocation_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14521,7 +14874,7 @@ private:
 
     CHIP_ERROR TestQueryHardwareVersion_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14540,7 +14893,7 @@ private:
 
     CHIP_ERROR TestQueryHardwareVersionString_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14561,7 +14914,7 @@ private:
 
     CHIP_ERROR TestQuerySoftwareVersion_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14580,7 +14933,7 @@ private:
 
     CHIP_ERROR TestQuerySoftwareVersionString_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14602,7 +14955,7 @@ private:
 
     CHIP_ERROR TestQueryManufacturingDate_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14627,7 +14980,7 @@ private:
 
     CHIP_ERROR TestQueryPartNumber_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14650,7 +15003,7 @@ private:
 
     CHIP_ERROR TestQueryProductURL_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14674,7 +15027,7 @@ private:
 
     CHIP_ERROR TestQueryProductLabel_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14697,7 +15050,7 @@ private:
 
     CHIP_ERROR TestQuerySerialNumber_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14720,7 +15073,7 @@ private:
 
     CHIP_ERROR TestQueryLocalConfigDisabled_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14742,7 +15095,7 @@ private:
 
     CHIP_ERROR TestQueryReachable_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14764,7 +15117,7 @@ private:
 
     CHIP_ERROR TestQueryUniqueID_19()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14789,7 +15142,11 @@ private:
 class Test_TC_DM_3_1 : public TestCommand
 {
 public:
-    Test_TC_DM_3_1() : TestCommand("Test_TC_DM_3_1"), mTestIndex(0) {}
+    Test_TC_DM_3_1() : TestCommand("Test_TC_DM_3_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -14833,6 +15190,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -14847,7 +15207,11 @@ private:
 class Test_TC_DM_2_2 : public TestCommand
 {
 public:
-    Test_TC_DM_2_2() : TestCommand("Test_TC_DM_2_2"), mTestIndex(0) {}
+    Test_TC_DM_2_2() : TestCommand("Test_TC_DM_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -14907,6 +15271,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_DM_2_2 *>(context))->OnFailureResponse_1(status);
@@ -14963,7 +15330,7 @@ private:
 
     CHIP_ERROR TestQueryFabricsList_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -14989,7 +15356,7 @@ private:
 
     CHIP_ERROR TestQuerySupportedFabrics_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15010,7 +15377,7 @@ private:
 
     CHIP_ERROR TestQueryCommissionedFabrics_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15031,7 +15398,7 @@ private:
 
     CHIP_ERROR TestQueryUserTrustedRootCertificates_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15053,7 +15420,11 @@ private:
 class Test_TC_EMR_1_1 : public TestCommand
 {
 public:
-    Test_TC_EMR_1_1() : TestCommand("Test_TC_EMR_1_1"), mTestIndex(0) {}
+    Test_TC_EMR_1_1() : TestCommand("Test_TC_EMR_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -15114,6 +15485,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_EMR_1_1 *>(context))->OnFailureResponse_1(status);
@@ -15163,7 +15537,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ElectricalMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15184,7 +15558,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ElectricalMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15204,7 +15578,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ElectricalMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15227,7 +15601,7 @@ private:
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ElectricalMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15250,7 +15624,11 @@ private:
 class Test_TC_FLW_1_1 : public TestCommand
 {
 public:
-    Test_TC_FLW_1_1() : TestCommand("Test_TC_FLW_1_1"), mTestIndex(0) {}
+    Test_TC_FLW_1_1() : TestCommand("Test_TC_FLW_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -15303,6 +15681,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_FLW_1_1 *>(context))->OnFailureResponse_1(status);
@@ -15332,7 +15713,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15351,7 +15732,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15375,7 +15756,11 @@ private:
 class Test_TC_FLW_2_1 : public TestCommand
 {
 public:
-    Test_TC_FLW_2_1() : TestCommand("Test_TC_FLW_2_1"), mTestIndex(0) {}
+    Test_TC_FLW_2_1() : TestCommand("Test_TC_FLW_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -15419,24 +15804,44 @@ public:
             err = TestReadTheMandatoryAttributeMaxMeasuredValue_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : write the default value to optional attribute: MinMeasuredValue\n");
-            err = TestWriteTheDefaultValueToOptionalAttributeMinMeasuredValue_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : write the default value to optional attribute: MeasuredValue\n");
+            err = TestWriteTheDefaultValueToOptionalAttributeMeasuredValue_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : write the default value to optional attribute: MaxMeasuredValue\n");
-            err = TestWriteTheDefaultValueToOptionalAttributeMaxMeasuredValue_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : write the default value to optional attribute: MinMeasuredValue\n");
+            err = TestWriteTheDefaultValueToOptionalAttributeMinMeasuredValue_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : read the mandatory attribute: MeasuredValue\n");
-            err = TestReadTheMandatoryAttributeMeasuredValue_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : write the default value to optional attribute: MaxMeasuredValue\n");
+            err = TestWriteTheDefaultValueToOptionalAttributeMaxMeasuredValue_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : read the mandatory attribute: MinMeasuredValue\n");
-            err = TestReadTheMandatoryAttributeMinMeasuredValue_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : read the mandatory attribute: MeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMeasuredValue_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : read the mandatory attribute: MaxMeasuredValue\n");
-            err = TestReadTheMandatoryAttributeMaxMeasuredValue_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : read the mandatory attribute: MinMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMinMeasuredValue_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : read the mandatory attribute: MaxMeasuredValue\n");
+            err = TestReadTheMandatoryAttributeMaxMeasuredValue_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : read the optional attribute: Tolerance\n");
+            err = TestReadTheOptionalAttributeTolerance_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : read the optional attribute: Tolerance\n");
+            err = TestReadTheOptionalAttributeTolerance_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : write the default value to optional attribute: Tolerance\n");
+            err = TestWriteTheDefaultValueToOptionalAttributeTolerance_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : read the optional attribute: Tolerance\n");
+            err = TestReadTheOptionalAttributeTolerance_13();
             break;
         }
 
@@ -15449,7 +15854,10 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
+    const uint16_t mTestCount = 14;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -15500,19 +15908,16 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, int16_t measuredValue)
-    {
-        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_6(measuredValue);
-    }
+    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_6(); }
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, int16_t minMeasuredValue)
+    static void OnSuccessCallback_7(void * context, int16_t measuredValue)
     {
-        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_7(minMeasuredValue);
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_7(measuredValue);
     }
 
     static void OnFailureCallback_8(void * context, EmberAfStatus status)
@@ -15520,9 +15925,56 @@ private:
         (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, int16_t maxMeasuredValue)
+    static void OnSuccessCallback_8(void * context, int16_t minMeasuredValue)
     {
-        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_8(maxMeasuredValue);
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_8(minMeasuredValue);
+    }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_9(status);
+    }
+
+    static void OnSuccessCallback_9(void * context, int16_t maxMeasuredValue)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_9(maxMeasuredValue);
+    }
+
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, uint16_t tolerance)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_10(tolerance);
+    }
+
+    static void OnFailureCallback_11(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_11(status);
+    }
+
+    static void OnSuccessCallback_11(void * context, uint16_t tolerance)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_11(tolerance);
+    }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_12(status);
+    }
+
+    static void OnSuccessCallback_12(void * context) { (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_12(); }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context, uint16_t tolerance)
+    {
+        (static_cast<Test_TC_FLW_2_1 *>(context))->OnSuccessResponse_13(tolerance);
     }
 
     //
@@ -15537,7 +15989,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15556,7 +16008,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeMinMeasuredValue_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15575,7 +16027,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeMaxMeasuredValue_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15592,17 +16044,17 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMinMeasuredValue_4()
+    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMeasuredValue_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        int16_t minMeasuredValueArgument;
-        minMeasuredValueArgument = 0;
+        int16_t measuredValueArgument;
+        measuredValueArgument = 0;
 
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-            minMeasuredValueArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
+            measuredValueArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
         return CHIP_NO_ERROR;
     }
 
@@ -15614,17 +16066,17 @@ private:
 
     void OnSuccessResponse_4() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMaxMeasuredValue_5()
+    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMinMeasuredValue_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        int16_t maxMeasuredValueArgument;
-        maxMeasuredValueArgument = 0;
+        int16_t minMeasuredValueArgument;
+        minMeasuredValueArgument = 0;
 
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-            maxMeasuredValueArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
+            minMeasuredValueArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
         return CHIP_NO_ERROR;
     }
 
@@ -15636,60 +16088,173 @@ private:
 
     void OnSuccessResponse_5() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_6()
+    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeMaxMeasuredValue_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        int16_t maxMeasuredValueArgument;
+        maxMeasuredValueArgument = 0;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+            maxMeasuredValueArgument, this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
-            this, OnSuccessCallback_6, OnFailureCallback_6));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_6(int16_t measuredValue)
-    {
-        VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheMandatoryAttributeMinMeasuredValue_7()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(int16_t minMeasuredValue)
+    void OnSuccessResponse_7(int16_t measuredValue)
     {
-        VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
+        VerifyOrReturn(CheckConstraintType("measuredValue", "", "uint16"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeMaxMeasuredValue_8()
+    CHIP_ERROR TestReadTheMandatoryAttributeMinMeasuredValue_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(int16_t maxMeasuredValue)
+    void OnSuccessResponse_8(int16_t minMeasuredValue)
+    {
+        VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxMeasuredValue_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+            this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(int16_t maxMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("maxMeasuredValue", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeTolerance_10()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
+            this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_10(uint16_t tolerance)
+    {
+        VerifyOrReturn(CheckValue("tolerance", tolerance, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeTolerance_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
+            this, OnSuccessCallback_11, OnFailureCallback_11));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_11(uint16_t tolerance)
+    {
+        VerifyOrReturn(CheckConstraintType("tolerance", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("tolerance", tolerance, 2048U));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValueToOptionalAttributeTolerance_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint16_t toleranceArgument;
+        toleranceArgument = 0U;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
+            toleranceArgument, this, OnSuccessCallback_12, OnFailureCallback_12));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(EmberAfStatus status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_12() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadTheOptionalAttributeTolerance_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
+            this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_13(uint16_t tolerance)
+    {
+        VerifyOrReturn(CheckValue("tolerance", tolerance, 0U));
+
         NextTest();
     }
 };
@@ -15697,7 +16262,11 @@ private:
 class Test_TC_FLW_2_2 : public TestCommand
 {
 public:
-    Test_TC_FLW_2_2() : TestCommand("Test_TC_FLW_2_2"), mTestIndex(0) {}
+    Test_TC_FLW_2_2() : TestCommand("Test_TC_FLW_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -15749,6 +16318,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_FLW_2_2 *>(context))->OnFailureResponse_1(status);
@@ -15781,7 +16353,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15800,7 +16372,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15821,7 +16393,11 @@ private:
 class Test_TC_ILL_1_1 : public TestCommand
 {
 public:
-    Test_TC_ILL_1_1() : TestCommand("Test_TC_ILL_1_1"), mTestIndex(0) {}
+    Test_TC_ILL_1_1() : TestCommand("Test_TC_ILL_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -15882,6 +16458,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_ILL_1_1 *>(context))->OnFailureResponse_1(status);
@@ -15931,7 +16510,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::IlluminanceMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15952,7 +16531,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::IlluminanceMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15972,7 +16551,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::IlluminanceMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -15995,7 +16574,7 @@ private:
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::IlluminanceMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16018,7 +16597,11 @@ private:
 class Test_TC_LVL_1_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_1_1() : TestCommand("Test_TC_LVL_1_1"), mTestIndex(0) {}
+    Test_TC_LVL_1_1() : TestCommand("Test_TC_LVL_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -16071,6 +16654,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_LVL_1_1 *>(context))->OnFailureResponse_1(status);
@@ -16100,7 +16686,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16119,7 +16705,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16143,7 +16729,11 @@ private:
 class Test_TC_LVL_2_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_2_1() : TestCommand("Test_TC_LVL_2_1"), mTestIndex(0) {}
+    Test_TC_LVL_2_1() : TestCommand("Test_TC_LVL_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -16239,6 +16829,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 14;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_1(status);
@@ -16301,7 +16894,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16321,7 +16914,7 @@ private:
 
     CHIP_ERROR TestSendsAMoveToLevelCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
         RequestType request;
@@ -16354,7 +16947,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16374,7 +16967,7 @@ private:
 
     CHIP_ERROR TestSendsAMoveToLevelCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
         RequestType request;
@@ -16407,7 +17000,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16427,7 +17020,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffTransitionTimeAttributeFromDut_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16447,7 +17040,7 @@ private:
 
     CHIP_ERROR TestSendsAMoveToLevelCommand_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
         RequestType request;
@@ -16480,7 +17073,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16500,7 +17093,7 @@ private:
 
     CHIP_ERROR TestResetLevelTo254_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
         RequestType request;
@@ -16535,7 +17128,11 @@ private:
 class Test_TC_LVL_3_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_3_1() : TestCommand("Test_TC_LVL_3_1"), mTestIndex(0) {}
+    Test_TC_LVL_3_1() : TestCommand("Test_TC_LVL_3_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -16643,6 +17240,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 17;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_1(status);
@@ -16732,7 +17332,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16752,7 +17352,7 @@ private:
 
     CHIP_ERROR TestReadsMaxLevelAttributeFromDut_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16772,7 +17372,7 @@ private:
 
     CHIP_ERROR TestSendsAMoveUpCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
         RequestType request;
@@ -16805,7 +17405,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16825,7 +17425,7 @@ private:
 
     CHIP_ERROR TestReadsMinLevelAttributeFromDut_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16845,7 +17445,7 @@ private:
 
     CHIP_ERROR TestSendsAMoveDownCommand_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
         RequestType request;
@@ -16878,7 +17478,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16898,7 +17498,7 @@ private:
 
     CHIP_ERROR TestWriteDefaultMoveRateAttributeFromDut_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16917,7 +17517,7 @@ private:
 
     CHIP_ERROR TestReadsDefaultMoveRateAttributeFromDut_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16938,7 +17538,7 @@ private:
 
     CHIP_ERROR TestSendsAMoveUpCommandAtDefaultMoveRate_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
         RequestType request;
@@ -16971,7 +17571,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -16991,7 +17591,7 @@ private:
 
     CHIP_ERROR TestResetLevelTo254_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
         RequestType request;
@@ -17026,7 +17626,11 @@ private:
 class Test_TC_LVL_4_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_4_1() : TestCommand("Test_TC_LVL_4_1"), mTestIndex(0) {}
+    Test_TC_LVL_4_1() : TestCommand("Test_TC_LVL_4_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -17114,6 +17718,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 12;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_4(status);
@@ -17156,7 +17763,7 @@ private:
 
     CHIP_ERROR TestSendingOnCommand_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -17179,7 +17786,7 @@ private:
 
     CHIP_ERROR TestPreconditionDutLevelIsSetTo0x80_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
         RequestType request;
@@ -17213,7 +17820,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -17233,7 +17840,7 @@ private:
 
     CHIP_ERROR TestSendsStepDownCommandToDut_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
         RequestType request;
@@ -17267,7 +17874,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -17287,7 +17894,7 @@ private:
 
     CHIP_ERROR TestSendsAStepUpCommand_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
         RequestType request;
@@ -17321,7 +17928,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -17341,7 +17948,7 @@ private:
 
     CHIP_ERROR TestSendingOffCommand_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -17366,7 +17973,11 @@ private:
 class Test_TC_LVL_5_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_5_1() : TestCommand("Test_TC_LVL_5_1"), mTestIndex(0) {}
+    Test_TC_LVL_5_1() : TestCommand("Test_TC_LVL_5_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -17438,6 +18049,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 8;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -17450,7 +18064,7 @@ private:
 
     CHIP_ERROR TestSendingOnCommand_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -17473,7 +18087,7 @@ private:
 
     CHIP_ERROR TestPreconditionDutLevelIsSetTo0x80_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Step::Type;
 
         RequestType request;
@@ -17507,7 +18121,7 @@ private:
 
     CHIP_ERROR TestSendsAMoveUpCommandToDut_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Move::Type;
 
         RequestType request;
@@ -17540,7 +18154,7 @@ private:
 
     CHIP_ERROR TestSendsStopCommandToDut_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Stop::Type;
 
         RequestType request;
@@ -17565,7 +18179,7 @@ private:
 
     CHIP_ERROR TestSendingOffCommand_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -17590,7 +18204,11 @@ private:
 class Test_TC_MC_1_1 : public TestCommand
 {
 public:
-    Test_TC_MC_1_1() : TestCommand("Test_TC_MC_1_1"), mTestIndex(0) {}
+    Test_TC_MC_1_1() : TestCommand("Test_TC_MC_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -17643,6 +18261,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_MC_1_1 *>(context))->OnFailureResponse_1(status);
@@ -17672,7 +18293,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -17691,7 +18312,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -17715,7 +18336,11 @@ private:
 class Test_TC_MC_2_1 : public TestCommand
 {
 public:
-    Test_TC_MC_2_1() : TestCommand("Test_TC_MC_2_1"), mTestIndex(0) {}
+    Test_TC_MC_2_1() : TestCommand("Test_TC_MC_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -17763,6 +18388,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -17775,7 +18403,7 @@ private:
 
     CHIP_ERROR TestPutTheDeviceIntoLowPowerMode_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LowPower::Commands::Sleep::Type;
 
         RequestType request;
@@ -17800,7 +18428,11 @@ private:
 class Test_TC_MC_3_1 : public TestCommand
 {
 public:
-    Test_TC_MC_3_1() : TestCommand("Test_TC_MC_3_1"), mTestIndex(0) {}
+    Test_TC_MC_3_1() : TestCommand("Test_TC_MC_3_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -17844,6 +18476,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -17858,7 +18493,11 @@ private:
 class Test_TC_MC_3_2 : public TestCommand
 {
 public:
-    Test_TC_MC_3_2() : TestCommand("Test_TC_MC_3_2"), mTestIndex(0) {}
+    Test_TC_MC_3_2() : TestCommand("Test_TC_MC_3_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -17902,6 +18541,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -17916,7 +18558,11 @@ private:
 class Test_TC_MC_3_3 : public TestCommand
 {
 public:
-    Test_TC_MC_3_3() : TestCommand("Test_TC_MC_3_3"), mTestIndex(0) {}
+    Test_TC_MC_3_3() : TestCommand("Test_TC_MC_3_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -17960,6 +18606,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -17974,7 +18623,11 @@ private:
 class Test_TC_MC_3_4 : public TestCommand
 {
 public:
-    Test_TC_MC_3_4() : TestCommand("Test_TC_MC_3_4"), mTestIndex(0) {}
+    Test_TC_MC_3_4() : TestCommand("Test_TC_MC_3_4"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -18018,6 +18671,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -18032,7 +18688,11 @@ private:
 class Test_TC_MC_3_5 : public TestCommand
 {
 public:
-    Test_TC_MC_3_5() : TestCommand("Test_TC_MC_3_5"), mTestIndex(0) {}
+    Test_TC_MC_3_5() : TestCommand("Test_TC_MC_3_5"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -18076,6 +18736,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -18090,7 +18753,11 @@ private:
 class Test_TC_MC_3_6 : public TestCommand
 {
 public:
-    Test_TC_MC_3_6() : TestCommand("Test_TC_MC_3_6"), mTestIndex(0) {}
+    Test_TC_MC_3_6() : TestCommand("Test_TC_MC_3_6"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -18134,6 +18801,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -18148,7 +18818,11 @@ private:
 class Test_TC_MC_3_7 : public TestCommand
 {
 public:
-    Test_TC_MC_3_7() : TestCommand("Test_TC_MC_3_7"), mTestIndex(0) {}
+    Test_TC_MC_3_7() : TestCommand("Test_TC_MC_3_7"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -18192,6 +18866,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -18206,7 +18883,11 @@ private:
 class Test_TC_MC_3_8 : public TestCommand
 {
 public:
-    Test_TC_MC_3_8() : TestCommand("Test_TC_MC_3_8"), mTestIndex(0) {}
+    Test_TC_MC_3_8() : TestCommand("Test_TC_MC_3_8"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -18250,6 +18931,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -18264,7 +18948,11 @@ private:
 class Test_TC_MC_3_9 : public TestCommand
 {
 public:
-    Test_TC_MC_3_9() : TestCommand("Test_TC_MC_3_9"), mTestIndex(0) {}
+    Test_TC_MC_3_9() : TestCommand("Test_TC_MC_3_9"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -18308,6 +18996,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -18322,7 +19013,11 @@ private:
 class Test_TC_MC_3_10 : public TestCommand
 {
 public:
-    Test_TC_MC_3_10() : TestCommand("Test_TC_MC_3_10"), mTestIndex(0) {}
+    Test_TC_MC_3_10() : TestCommand("Test_TC_MC_3_10"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -18366,6 +19061,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -18380,7 +19078,11 @@ private:
 class Test_TC_MC_3_11 : public TestCommand
 {
 public:
-    Test_TC_MC_3_11() : TestCommand("Test_TC_MC_3_11"), mTestIndex(0) {}
+    Test_TC_MC_3_11() : TestCommand("Test_TC_MC_3_11"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -18424,6 +19126,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -18438,7 +19143,11 @@ private:
 class Test_TC_OCC_1_1 : public TestCommand
 {
 public:
-    Test_TC_OCC_1_1() : TestCommand("Test_TC_OCC_1_1"), mTestIndex(0) {}
+    Test_TC_OCC_1_1() : TestCommand("Test_TC_OCC_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -18495,6 +19204,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_OCC_1_1 *>(context))->OnFailureResponse_1(status);
@@ -18534,7 +19246,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18554,7 +19266,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18573,7 +19285,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18597,7 +19309,11 @@ private:
 class Test_TC_OCC_2_1 : public TestCommand
 {
 public:
-    Test_TC_OCC_2_1() : TestCommand("Test_TC_OCC_2_1"), mTestIndex(0) {}
+    Test_TC_OCC_2_1() : TestCommand("Test_TC_OCC_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -18680,6 +19396,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -18774,7 +19493,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancy_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18794,7 +19513,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancy_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18816,7 +19535,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeOccupancy_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18836,7 +19555,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancySensorType_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18857,7 +19576,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancySensorType_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18880,7 +19599,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeOccupancySensorType_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18901,7 +19620,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancySensorTypeBitmap_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18923,7 +19642,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributeOccupancySensorTypeBitmap_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18946,7 +19665,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeOccupancySensorTypeBitmap_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -18969,7 +19688,11 @@ private:
 class Test_TC_OCC_2_2 : public TestCommand
 {
 public:
-    Test_TC_OCC_2_2() : TestCommand("Test_TC_OCC_2_2"), mTestIndex(0) {}
+    Test_TC_OCC_2_2() : TestCommand("Test_TC_OCC_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -19021,6 +19744,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_OCC_2_2 *>(context))->OnFailureResponse_1(status);
@@ -19053,7 +19779,7 @@ private:
 
     CHIP_ERROR TestReadsOccupancyAttributeFromDut_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19072,7 +19798,7 @@ private:
 
     CHIP_ERROR TestReadsOccupancyAttributeFromDut_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19093,7 +19819,11 @@ private:
 class Test_TC_OO_1_1 : public TestCommand
 {
 public:
-    Test_TC_OO_1_1() : TestCommand("Test_TC_OO_1_1"), mTestIndex(0) {}
+    Test_TC_OO_1_1() : TestCommand("Test_TC_OO_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -19173,6 +19903,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
@@ -19266,7 +19999,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19286,7 +20019,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19305,7 +20038,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19327,7 +20060,7 @@ private:
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19347,7 +20080,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19367,7 +20100,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19386,7 +20119,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19408,7 +20141,7 @@ private:
 
     CHIP_ERROR TestReadsBackOptionalGlobalAttributeFeatureMap_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19430,7 +20163,11 @@ private:
 class Test_TC_OO_2_1 : public TestCommand
 {
 public:
-    Test_TC_OO_2_1() : TestCommand("Test_TC_OO_2_1"), mTestIndex(0) {}
+    Test_TC_OO_2_1() : TestCommand("Test_TC_OO_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -19466,48 +20203,60 @@ public:
             err = TestReadTheMandatoryAttributeOnOff_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : reads back mandatory attribute: OnOff\n");
-            err = TestReadsBackMandatoryAttributeOnOff_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : write the default value of mandatory attribute: OnOff\n");
+            err = TestWriteTheDefaultValueOfMandatoryAttributeOnOff_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : read LT attribute: GlobalSceneControl\n");
-            err = TestReadLtAttributeGlobalSceneControl_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : reads back mandatory attribute: OnOff\n");
+            err = TestReadsBackMandatoryAttributeOnOff_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : read LT attribute: OnTime\n");
-            err = TestReadLtAttributeOnTime_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : read LT attribute: GlobalSceneControl\n");
+            err = TestReadLtAttributeGlobalSceneControl_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : read LT attribute: OffWaitTime\n");
-            err = TestReadLtAttributeOffWaitTime_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : read LT attribute: OnTime\n");
+            err = TestReadLtAttributeOnTime_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : read LT attribute: StartUpOnOff\n");
-            err = TestReadLtAttributeStartUpOnOff_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : read LT attribute: OffWaitTime\n");
+            err = TestReadLtAttributeOffWaitTime_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : write the default value to LT attribute: OnTime\n");
-            err = TestWriteTheDefaultValueToLtAttributeOnTime_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : read LT attribute: StartUpOnOff\n");
+            err = TestReadLtAttributeStartUpOnOff_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : write the default value to LT attribute: OffWaitTime\n");
-            err = TestWriteTheDefaultValueToLtAttributeOffWaitTime_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : write the default value to LT attribute: GlobalSceneControl\n");
+            err = TestWriteTheDefaultValueToLtAttributeGlobalSceneControl_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : write the default value to LT attribute: StartUpOnOff\n");
-            err = TestWriteTheDefaultValueToLtAttributeStartUpOnOff_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : write the default value to LT attribute: OnTime\n");
+            err = TestWriteTheDefaultValueToLtAttributeOnTime_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : reads back LT attribute: OnTime\n");
-            err = TestReadsBackLtAttributeOnTime_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : write the default value to LT attribute: OffWaitTime\n");
+            err = TestWriteTheDefaultValueToLtAttributeOffWaitTime_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : reads back LT attribute: OffWaitTime\n");
-            err = TestReadsBackLtAttributeOffWaitTime_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : write the default value to LT attribute: StartUpOnOff\n");
+            err = TestWriteTheDefaultValueToLtAttributeStartUpOnOff_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : reads back LT attribute: StartUpOnOff\n");
-            err = TestReadsBackLtAttributeStartUpOnOff_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : reads back LT attribute: GlobalSceneControl\n");
+            err = TestReadsBackLtAttributeGlobalSceneControl_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : reads back LT attribute: OnTime\n");
+            err = TestReadsBackLtAttributeOnTime_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : reads back LT attribute: OffWaitTime\n");
+            err = TestReadsBackLtAttributeOffWaitTime_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : reads back LT attribute: StartUpOnOff\n");
+            err = TestReadsBackLtAttributeStartUpOnOff_15();
             break;
         }
 
@@ -19520,7 +20269,10 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 13;
+    const uint16_t mTestCount = 16;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -19537,19 +20289,16 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, bool onOff)
-    {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_2(onOff);
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_2(); }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, bool globalSceneControl)
+    static void OnSuccessCallback_3(void * context, bool onOff)
     {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_3(globalSceneControl);
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_3(onOff);
     }
 
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
@@ -19557,9 +20306,9 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, uint16_t onTime)
+    static void OnSuccessCallback_4(void * context, bool globalSceneControl)
     {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_4(onTime);
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_4(globalSceneControl);
     }
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
@@ -19567,9 +20316,9 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, uint16_t offWaitTime)
+    static void OnSuccessCallback_5(void * context, uint16_t onTime)
     {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_5(offWaitTime);
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_5(onTime);
     }
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
@@ -19577,9 +20326,9 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, uint8_t startUpOnOff)
+    static void OnSuccessCallback_6(void * context, uint16_t offWaitTime)
     {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_6(startUpOnOff);
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_6(offWaitTime);
     }
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
@@ -19587,7 +20336,10 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_7(); }
+    static void OnSuccessCallback_7(void * context, uint8_t startUpOnOff)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_7(startUpOnOff);
+    }
 
     static void OnFailureCallback_8(void * context, EmberAfStatus status)
     {
@@ -19608,29 +20360,53 @@ private:
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context, uint16_t onTime)
-    {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_10(onTime);
-    }
+    static void OnSuccessCallback_10(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_10(); }
 
     static void OnFailureCallback_11(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_11(status);
     }
 
-    static void OnSuccessCallback_11(void * context, uint16_t offWaitTime)
-    {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_11(offWaitTime);
-    }
+    static void OnSuccessCallback_11(void * context) { (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_11(); }
 
     static void OnFailureCallback_12(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_12(status);
     }
 
-    static void OnSuccessCallback_12(void * context, uint8_t startUpOnOff)
+    static void OnSuccessCallback_12(void * context, bool globalSceneControl)
     {
-        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_12(startUpOnOff);
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_12(globalSceneControl);
+    }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context, uint16_t onTime)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_13(onTime);
+    }
+
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_14(status);
+    }
+
+    static void OnSuccessCallback_14(void * context, uint16_t offWaitTime)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_14(offWaitTime);
+    }
+
+    static void OnFailureCallback_15(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnFailureResponse_15(status);
+    }
+
+    static void OnSuccessCallback_15(void * context, uint8_t startUpOnOff)
+    {
+        (static_cast<Test_TC_OO_2_1 *>(context))->OnSuccessResponse_15(startUpOnOff);
     }
 
     //
@@ -19645,7 +20421,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeOnOff_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19663,109 +20439,153 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestReadsBackMandatoryAttributeOnOff_2()
+    CHIP_ERROR TestWriteTheDefaultValueOfMandatoryAttributeOnOff_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool onOffArgument;
+        onOffArgument = 0;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
+            onOffArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackMandatoryAttributeOnOff_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_2(bool onOff)
-    {
-        VerifyOrReturn(CheckValue("onOff", onOff, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadLtAttributeGlobalSceneControl_3()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(bool globalSceneControl)
+    void OnSuccessResponse_3(bool onOff)
     {
-        VerifyOrReturn(CheckValue("globalSceneControl", globalSceneControl, 1));
+        VerifyOrReturn(CheckValue("onOff", onOff, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadLtAttributeOnTime_4()
+    CHIP_ERROR TestReadLtAttributeGlobalSceneControl_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(uint16_t onTime)
+    void OnSuccessResponse_4(bool globalSceneControl)
     {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+        VerifyOrReturn(CheckValue("globalSceneControl", globalSceneControl, 1));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadLtAttributeOffWaitTime_5()
+    CHIP_ERROR TestReadLtAttributeOnTime_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(uint16_t offWaitTime)
+    void OnSuccessResponse_5(uint16_t onTime)
     {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadLtAttributeStartUpOnOff_6()
+    CHIP_ERROR TestReadLtAttributeOffWaitTime_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(uint8_t startUpOnOff)
+    void OnSuccessResponse_6(uint16_t offWaitTime)
+    {
+        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadLtAttributeStartUpOnOff_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(uint8_t startUpOnOff)
     {
         VerifyOrReturn(CheckValue("startUpOnOff", startUpOnOff, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOnTime_7()
+    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeGlobalSceneControl_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool globalSceneControlArgument;
+        globalSceneControlArgument = 0;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
+            globalSceneControlArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(EmberAfStatus status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOnTime_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -19773,43 +20593,7 @@ private:
         onTimeArgument = 0U;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            onTimeArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_7() { NextTest(); }
-
-    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOffWaitTime_8()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        uint16_t offWaitTimeArgument;
-        offWaitTimeArgument = 0U;
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            offWaitTimeArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_8() { NextTest(); }
-
-    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeStartUpOnOff_9()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        uint8_t startUpOnOffArgument;
-        startUpOnOffArgument = 0;
-
-        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
-            startUpOnOffArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
+            onTimeArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
         return CHIP_NO_ERROR;
     }
 
@@ -19817,60 +20601,116 @@ private:
 
     void OnSuccessResponse_9() { NextTest(); }
 
-    CHIP_ERROR TestReadsBackLtAttributeOnTime_10()
+    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeOffWaitTime_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            this, OnSuccessCallback_10, OnFailureCallback_10));
+        uint16_t offWaitTimeArgument;
+        offWaitTimeArgument = 0U;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
+            offWaitTimeArgument, this, OnSuccessCallback_10, OnFailureCallback_10));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_10(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(uint16_t onTime)
-    {
-        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+    void OnSuccessResponse_10() { NextTest(); }
 
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadsBackLtAttributeOffWaitTime_11()
+    CHIP_ERROR TestWriteTheDefaultValueToLtAttributeStartUpOnOff_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            this, OnSuccessCallback_11, OnFailureCallback_11));
+        uint8_t startUpOnOffArgument;
+        startUpOnOffArgument = 0;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+            startUpOnOffArgument, this, OnSuccessCallback_11, OnFailureCallback_11));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_11(uint16_t offWaitTime)
-    {
-        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+    void OnSuccessResponse_11() { NextTest(); }
 
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadsBackLtAttributeStartUpOnOff_12()
+    CHIP_ERROR TestReadsBackLtAttributeGlobalSceneControl_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
             this, OnSuccessCallback_12, OnFailureCallback_12));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_12(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_12(uint8_t startUpOnOff)
+    void OnSuccessResponse_12(bool globalSceneControl)
+    {
+        VerifyOrReturn(CheckValue("globalSceneControl", globalSceneControl, 1));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsBackLtAttributeOnTime_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
+            this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13(uint16_t onTime)
+    {
+        VerifyOrReturn(CheckValue("onTime", onTime, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsBackLtAttributeOffWaitTime_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
+            this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14(uint16_t offWaitTime)
+    {
+        VerifyOrReturn(CheckValue("offWaitTime", offWaitTime, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsBackLtAttributeStartUpOnOff_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+            this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15(uint8_t startUpOnOff)
     {
         VerifyOrReturn(CheckValue("startUpOnOff", startUpOnOff, 0));
 
@@ -19881,7 +20721,11 @@ private:
 class Test_TC_OO_2_2 : public TestCommand
 {
 public:
-    Test_TC_OO_2_2() : TestCommand("Test_TC_OO_2_2"), mTestIndex(0) {}
+    Test_TC_OO_2_2() : TestCommand("Test_TC_OO_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -19981,6 +20825,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 15;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_2(status);
@@ -20063,7 +20910,7 @@ private:
 
     CHIP_ERROR TestSendOffCommand_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -20086,7 +20933,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -20106,7 +20953,7 @@ private:
 
     CHIP_ERROR TestSendOnCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -20129,7 +20976,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -20149,7 +20996,7 @@ private:
 
     CHIP_ERROR TestSendOffCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -20172,7 +21019,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -20192,7 +21039,7 @@ private:
 
     CHIP_ERROR TestSendToggleCommand_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Toggle::Type;
 
         RequestType request;
@@ -20215,7 +21062,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterToggleCommand_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -20235,7 +21082,7 @@ private:
 
     CHIP_ERROR TestSendToggleCommand_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Toggle::Type;
 
         RequestType request;
@@ -20258,7 +21105,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterToggleCommand_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -20278,7 +21125,7 @@ private:
 
     CHIP_ERROR TestSendOnCommand_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -20301,7 +21148,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsTrueAfterOnCommand_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -20321,7 +21168,7 @@ private:
 
     CHIP_ERROR TestSendOffCommand_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -20344,7 +21191,7 @@ private:
 
     CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -20366,7 +21213,11 @@ private:
 class Test_TC_OO_2_3 : public TestCommand
 {
 public:
-    Test_TC_OO_2_3() : TestCommand("Test_TC_OO_2_3"), mTestIndex(0) {}
+    Test_TC_OO_2_3() : TestCommand("Test_TC_OO_2_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -20593,6 +21444,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 47;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
@@ -20936,7 +21790,7 @@ private:
 
     CHIP_ERROR TestSendOnCommand_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -20965,7 +21819,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -20985,7 +21839,7 @@ private:
 
     CHIP_ERROR TestReadsGlobalSceneControlAttributeFromDut_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21005,7 +21859,7 @@ private:
 
     CHIP_ERROR TestSendOnCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -21034,7 +21888,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21054,7 +21908,7 @@ private:
 
     CHIP_ERROR TestReadsGlobalSceneControlAttributeFromDut_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21074,7 +21928,7 @@ private:
 
     CHIP_ERROR TestSendOnCommand_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -21103,7 +21957,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21123,7 +21977,7 @@ private:
 
     CHIP_ERROR TestReadsGlobalSceneControlAttributeFromDut_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21143,7 +21997,7 @@ private:
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21163,7 +22017,7 @@ private:
 
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21183,7 +22037,7 @@ private:
 
     CHIP_ERROR TestSendOnCommand_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -21206,7 +22060,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21226,7 +22080,7 @@ private:
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21246,7 +22100,7 @@ private:
 
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21266,7 +22120,7 @@ private:
 
     CHIP_ERROR TestSendOffCommand_19()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -21289,7 +22143,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_20()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21309,7 +22163,7 @@ private:
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_21()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21329,7 +22183,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_22()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21349,7 +22203,7 @@ private:
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_23()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21369,7 +22223,7 @@ private:
 
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_24()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21389,7 +22243,7 @@ private:
 
     CHIP_ERROR TestSendOnCommand_25()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -21412,7 +22266,7 @@ private:
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_26()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21432,7 +22286,7 @@ private:
 
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_27()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21452,7 +22306,7 @@ private:
 
     CHIP_ERROR TestSendOffCommand_28()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -21475,7 +22329,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_29()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21495,7 +22349,7 @@ private:
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_30()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21515,7 +22369,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_31()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21535,7 +22389,7 @@ private:
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_32()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21555,7 +22409,7 @@ private:
 
     CHIP_ERROR TestSendOnCommand_33()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -21578,7 +22432,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_34()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21598,7 +22452,7 @@ private:
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_35()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21618,7 +22472,7 @@ private:
 
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_36()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21638,7 +22492,7 @@ private:
 
     CHIP_ERROR TestSendOffCommand_37()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -21661,7 +22515,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_38()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21681,7 +22535,7 @@ private:
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_39()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21701,7 +22555,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_40()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21721,7 +22575,7 @@ private:
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_41()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21741,7 +22595,7 @@ private:
 
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_42()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21761,7 +22615,7 @@ private:
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_43()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21781,7 +22635,7 @@ private:
 
     CHIP_ERROR TestReadsOnTimeAttributeFromDut_44()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21801,7 +22655,7 @@ private:
 
     CHIP_ERROR TestReadsOffWaitTimeAttributeFromDut_45()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21821,7 +22675,7 @@ private:
 
     CHIP_ERROR TestSendOffCommand_46()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -21846,7 +22700,11 @@ private:
 class Test_TC_PRS_1_1 : public TestCommand
 {
 public:
-    Test_TC_PRS_1_1() : TestCommand("Test_TC_PRS_1_1"), mTestIndex(0) {}
+    Test_TC_PRS_1_1() : TestCommand("Test_TC_PRS_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -21899,6 +22757,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_1(status);
@@ -21928,7 +22789,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21947,7 +22808,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -21972,7 +22833,11 @@ private:
 class Test_TC_PRS_2_1 : public TestCommand
 {
 public:
-    Test_TC_PRS_2_1() : TestCommand("Test_TC_PRS_2_1"), mTestIndex(0) {}
+    Test_TC_PRS_2_1() : TestCommand("Test_TC_PRS_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -22051,6 +22916,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 10;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -22145,7 +23013,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeConstraintsMeasuredValue_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22164,7 +23032,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMeasuredValue_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22186,7 +23054,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeMeasuredValue_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22206,7 +23074,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeConstraintsMinMeasuredValue_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22226,7 +23094,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMinMeasuredValue_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22249,7 +23117,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeMinMeasuredValue_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22270,7 +23138,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeConstraintsMaxMeasuredValue_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22290,7 +23158,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryAttributeMaxMeasuredValue_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22313,7 +23181,7 @@ private:
 
     CHIP_ERROR TestReadsBackMandatoryAttributeMaxMeasuredValue_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22336,7 +23204,11 @@ private:
 class Test_TC_PCC_1_1 : public TestCommand
 {
 public:
-    Test_TC_PCC_1_1() : TestCommand("Test_TC_PCC_1_1"), mTestIndex(0) {}
+    Test_TC_PCC_1_1() : TestCommand("Test_TC_PCC_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -22393,6 +23265,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_PCC_1_1 *>(context))->OnFailureResponse_1(status);
@@ -22432,7 +23307,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22452,7 +23327,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22475,7 +23350,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22497,7 +23372,11 @@ private:
 class Test_TC_PCC_2_1 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_1() : TestCommand("Test_TC_PCC_2_1"), mTestIndex(0) {}
+    Test_TC_PCC_2_1() : TestCommand("Test_TC_PCC_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -22533,32 +23412,196 @@ public:
             err = TestReadTheMandatoryAttributeMaxPressure_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : read the mandatory attribute: EffectiveOperationMode\n");
-            err = TestReadTheMandatoryAttributeEffectiveOperationMode_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : read the mandatory attribute: MaxSpeed\n");
+            err = TestReadTheMandatoryAttributeMaxSpeed_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : read the mandatory attribute: EffectiveControlMode\n");
-            err = TestReadTheMandatoryAttributeEffectiveControlMode_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : read the mandatory attribute: MaxFlow\n");
+            err = TestReadTheMandatoryAttributeMaxFlow_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : read the mandatory attribute: Capacity\n");
-            err = TestReadTheMandatoryAttributeCapacity_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : read the mandatory attribute: EffectiveOperationMode\n");
+            err = TestReadTheMandatoryAttributeEffectiveOperationMode_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : read the mandatory attribute: MaxPressure\n");
-            err = TestReadTheMandatoryAttributeMaxPressure_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : read the mandatory attribute: EffectiveControlMode\n");
+            err = TestReadTheMandatoryAttributeEffectiveControlMode_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : read the mandatory attribute: EffectiveOperationMode\n");
-            err = TestReadTheMandatoryAttributeEffectiveOperationMode_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : read the mandatory attribute: Capacity\n");
+            err = TestReadTheMandatoryAttributeCapacity_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : read the mandatory attribute: EffectiveControlMode\n");
-            err = TestReadTheMandatoryAttributeEffectiveControlMode_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : read the mandatory attribute: MaxPressure\n");
+            err = TestReadTheMandatoryAttributeMaxPressure_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : read the mandatory attribute: Capacity\n");
-            err = TestReadTheMandatoryAttributeCapacity_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : read the mandatory attribute: MaxSpeed\n");
+            err = TestReadTheMandatoryAttributeMaxSpeed_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : read the mandatory attribute: MaxFlow\n");
+            err = TestReadTheMandatoryAttributeMaxFlow_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : read the mandatory attribute: EffectiveOperationMode\n");
+            err = TestReadTheMandatoryAttributeEffectiveOperationMode_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : read the mandatory attribute: EffectiveControlMode\n");
+            err = TestReadTheMandatoryAttributeEffectiveControlMode_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : read the mandatory attribute: Capacity\n");
+            err = TestReadTheMandatoryAttributeCapacity_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : read the optional attribute: MinConstPressure\n");
+            err = TestReadTheOptionalAttributeMinConstPressure_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : read the optional attribute: MaxConstPressure\n");
+            err = TestReadTheOptionalAttributeMaxConstPressure_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : read the optional attribute: MinCompPressure\n");
+            err = TestReadTheOptionalAttributeMinCompPressure_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : read the optional attribute: MaxCompPressure\n");
+            err = TestReadTheOptionalAttributeMaxCompPressure_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : read the optional attribute: MinConstSpeed\n");
+            err = TestReadTheOptionalAttributeMinConstSpeed_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : read the optional attribute: MaxConstSpeed\n");
+            err = TestReadTheOptionalAttributeMaxConstSpeed_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : read the optional attribute: MinConstFlow\n");
+            err = TestReadTheOptionalAttributeMinConstFlow_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : read the optional attribute: MaxConstFlow\n");
+            err = TestReadTheOptionalAttributeMaxConstFlow_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : read the optional attribute: MinConstTemp\n");
+            err = TestReadTheOptionalAttributeMinConstTemp_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : read the optional attribute: MaxConstTemp\n");
+            err = TestReadTheOptionalAttributeMaxConstTemp_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : read the optional attribute: PumpStatus\n");
+            err = TestReadTheOptionalAttributePumpStatus_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : read the optional attribute: PumpStatus\n");
+            err = TestReadTheOptionalAttributePumpStatus_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : read the optional attribute: Speed\n");
+            err = TestReadTheOptionalAttributeSpeed_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : read the optional attribute: LifetimeRunningHours\n");
+            err = TestReadTheOptionalAttributeLifetimeRunningHours_26();
+            break;
+        case 27:
+            ChipLogProgress(chipTool, " ***** Test Step 27 : read the optional attribute: LifetimeRunningHours\n");
+            err = TestReadTheOptionalAttributeLifetimeRunningHours_27();
+            break;
+        case 28:
+            ChipLogProgress(chipTool, " ***** Test Step 28 : read the optional attribute: Power\n");
+            err = TestReadTheOptionalAttributePower_28();
+            break;
+        case 29:
+            ChipLogProgress(chipTool, " ***** Test Step 29 : read the optional attribute: LifetimeEnergyConsumed\n");
+            err = TestReadTheOptionalAttributeLifetimeEnergyConsumed_29();
+            break;
+        case 30:
+            ChipLogProgress(chipTool, " ***** Test Step 30 : read the optional attribute: LifetimeEnergyConsumed\n");
+            err = TestReadTheOptionalAttributeLifetimeEnergyConsumed_30();
+            break;
+        case 31:
+            ChipLogProgress(chipTool, " ***** Test Step 31 : write to the optional attribute: LifetimeEnergyConsumed\n");
+            err = TestWriteToTheOptionalAttributeLifetimeEnergyConsumed_31();
+            break;
+        case 32:
+            ChipLogProgress(chipTool, " ***** Test Step 32 : read the optional attribute: MinConstPressure\n");
+            err = TestReadTheOptionalAttributeMinConstPressure_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : read the optional attribute: MaxConstPressure\n");
+            err = TestReadTheOptionalAttributeMaxConstPressure_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool, " ***** Test Step 34 : read the optional attribute: MinCompPressure\n");
+            err = TestReadTheOptionalAttributeMinCompPressure_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : read the optional attribute: MaxCompPressure\n");
+            err = TestReadTheOptionalAttributeMaxCompPressure_35();
+            break;
+        case 36:
+            ChipLogProgress(chipTool, " ***** Test Step 36 : read the optional attribute: MinConstSpeed\n");
+            err = TestReadTheOptionalAttributeMinConstSpeed_36();
+            break;
+        case 37:
+            ChipLogProgress(chipTool, " ***** Test Step 37 : read the optional attribute: MaxConstSpeed\n");
+            err = TestReadTheOptionalAttributeMaxConstSpeed_37();
+            break;
+        case 38:
+            ChipLogProgress(chipTool, " ***** Test Step 38 : read the optional attribute: MinConstFlow\n");
+            err = TestReadTheOptionalAttributeMinConstFlow_38();
+            break;
+        case 39:
+            ChipLogProgress(chipTool, " ***** Test Step 39 : read the optional attribute: MaxConstFlow\n");
+            err = TestReadTheOptionalAttributeMaxConstFlow_39();
+            break;
+        case 40:
+            ChipLogProgress(chipTool, " ***** Test Step 40 : read the optional attribute: MinConstTemp\n");
+            err = TestReadTheOptionalAttributeMinConstTemp_40();
+            break;
+        case 41:
+            ChipLogProgress(chipTool, " ***** Test Step 41 : read the optional attribute: MaxConstTemp\n");
+            err = TestReadTheOptionalAttributeMaxConstTemp_41();
+            break;
+        case 42:
+            ChipLogProgress(chipTool, " ***** Test Step 42 : read the optional attribute: PumpStatus\n");
+            err = TestReadTheOptionalAttributePumpStatus_42();
+            break;
+        case 43:
+            ChipLogProgress(chipTool, " ***** Test Step 43 : read the optional attribute: PumpStatus\n");
+            err = TestReadTheOptionalAttributePumpStatus_43();
+            break;
+        case 44:
+            ChipLogProgress(chipTool, " ***** Test Step 44 : read the optional attribute: Speed\n");
+            err = TestReadTheOptionalAttributeSpeed_44();
+            break;
+        case 45:
+            ChipLogProgress(chipTool, " ***** Test Step 45 : read the optional attribute: LifetimeRunningHours\n");
+            err = TestReadTheOptionalAttributeLifetimeRunningHours_45();
+            break;
+        case 46:
+            ChipLogProgress(chipTool, " ***** Test Step 46 : read the optional attribute: LifetimeRunningHours\n");
+            err = TestReadTheOptionalAttributeLifetimeRunningHours_46();
+            break;
+        case 47:
+            ChipLogProgress(chipTool, " ***** Test Step 47 : read the optional attribute: Power\n");
+            err = TestReadTheOptionalAttributePower_47();
+            break;
+        case 48:
+            ChipLogProgress(chipTool, " ***** Test Step 48 : read the optional attribute: LifetimeEnergyConsumed\n");
+            err = TestReadTheOptionalAttributeLifetimeEnergyConsumed_48();
+            break;
+        case 49:
+            ChipLogProgress(chipTool, " ***** Test Step 49 : read the optional attribute: LifetimeEnergyConsumed\n");
+            err = TestReadTheOptionalAttributeLifetimeEnergyConsumed_49();
             break;
         }
 
@@ -22571,7 +23614,10 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 9;
+    const uint16_t mTestCount = 50;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -22588,9 +23634,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context, uint8_t effectiveOperationMode)
+    static void OnSuccessCallback_2(void * context, uint16_t maxSpeed)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_2(effectiveOperationMode);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_2(maxSpeed);
     }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
@@ -22598,9 +23644,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_3(status);
     }
 
-    static void OnSuccessCallback_3(void * context, uint8_t effectiveControlMode)
+    static void OnSuccessCallback_3(void * context, uint16_t maxFlow)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_3(effectiveControlMode);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_3(maxFlow);
     }
 
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
@@ -22608,9 +23654,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, int16_t capacity)
+    static void OnSuccessCallback_4(void * context, uint8_t effectiveOperationMode)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_4(capacity);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_4(effectiveOperationMode);
     }
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
@@ -22618,9 +23664,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_5(status);
     }
 
-    static void OnSuccessCallback_5(void * context, int16_t maxPressure)
+    static void OnSuccessCallback_5(void * context, uint8_t effectiveControlMode)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_5(maxPressure);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_5(effectiveControlMode);
     }
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
@@ -22628,9 +23674,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_6(status);
     }
 
-    static void OnSuccessCallback_6(void * context, uint8_t effectiveOperationMode)
+    static void OnSuccessCallback_6(void * context, int16_t capacity)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_6(effectiveOperationMode);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_6(capacity);
     }
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
@@ -22638,9 +23684,9 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, uint8_t effectiveControlMode)
+    static void OnSuccessCallback_7(void * context, int16_t maxPressure)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_7(effectiveControlMode);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_7(maxPressure);
     }
 
     static void OnFailureCallback_8(void * context, EmberAfStatus status)
@@ -22648,9 +23694,416 @@ private:
         (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, int16_t capacity)
+    static void OnSuccessCallback_8(void * context, uint16_t maxSpeed)
     {
-        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_8(capacity);
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_8(maxSpeed);
+    }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_9(status);
+    }
+
+    static void OnSuccessCallback_9(void * context, uint16_t maxFlow)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_9(maxFlow);
+    }
+
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, uint8_t effectiveOperationMode)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_10(effectiveOperationMode);
+    }
+
+    static void OnFailureCallback_11(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_11(status);
+    }
+
+    static void OnSuccessCallback_11(void * context, uint8_t effectiveControlMode)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_11(effectiveControlMode);
+    }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_12(status);
+    }
+
+    static void OnSuccessCallback_12(void * context, int16_t capacity)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_12(capacity);
+    }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context, int16_t minConstPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_13(minConstPressure);
+    }
+
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_14(status);
+    }
+
+    static void OnSuccessCallback_14(void * context, int16_t maxConstPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_14(maxConstPressure);
+    }
+
+    static void OnFailureCallback_15(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_15(status);
+    }
+
+    static void OnSuccessCallback_15(void * context, int16_t minCompPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_15(minCompPressure);
+    }
+
+    static void OnFailureCallback_16(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_16(status);
+    }
+
+    static void OnSuccessCallback_16(void * context, int16_t maxCompPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_16(maxCompPressure);
+    }
+
+    static void OnFailureCallback_17(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_17(status);
+    }
+
+    static void OnSuccessCallback_17(void * context, uint16_t minConstSpeed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_17(minConstSpeed);
+    }
+
+    static void OnFailureCallback_18(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_18(status);
+    }
+
+    static void OnSuccessCallback_18(void * context, uint16_t maxConstSpeed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_18(maxConstSpeed);
+    }
+
+    static void OnFailureCallback_19(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_19(status);
+    }
+
+    static void OnSuccessCallback_19(void * context, uint16_t minConstFlow)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_19(minConstFlow);
+    }
+
+    static void OnFailureCallback_20(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_20(status);
+    }
+
+    static void OnSuccessCallback_20(void * context, uint16_t maxConstFlow)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_20(maxConstFlow);
+    }
+
+    static void OnFailureCallback_21(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_21(status);
+    }
+
+    static void OnSuccessCallback_21(void * context, int16_t minConstTemp)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_21(minConstTemp);
+    }
+
+    static void OnFailureCallback_22(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_22(status);
+    }
+
+    static void OnSuccessCallback_22(void * context, int16_t maxConstTemp)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_22(maxConstTemp);
+    }
+
+    static void OnFailureCallback_23(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_23(status);
+    }
+
+    static void OnSuccessCallback_23(void * context, uint16_t pumpStatus)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_23(pumpStatus);
+    }
+
+    static void OnFailureCallback_24(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_24(status);
+    }
+
+    static void OnSuccessCallback_24(void * context, uint16_t pumpStatus)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_24(pumpStatus);
+    }
+
+    static void OnFailureCallback_25(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_25(status);
+    }
+
+    static void OnSuccessCallback_25(void * context, uint16_t speed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_25(speed);
+    }
+
+    static void OnFailureCallback_26(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_26(status);
+    }
+
+    static void OnSuccessCallback_26(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_26(lifetimeRunningHours);
+    }
+
+    static void OnFailureCallback_27(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_27(status);
+    }
+
+    static void OnSuccessCallback_27(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_27(lifetimeRunningHours);
+    }
+
+    static void OnFailureCallback_28(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_28(status);
+    }
+
+    static void OnSuccessCallback_28(void * context, uint32_t power)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_28(power);
+    }
+
+    static void OnFailureCallback_29(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_29(status);
+    }
+
+    static void OnSuccessCallback_29(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_29(lifetimeEnergyConsumed);
+    }
+
+    static void OnFailureCallback_30(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_30(status);
+    }
+
+    static void OnSuccessCallback_30(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_30(lifetimeEnergyConsumed);
+    }
+
+    static void OnFailureCallback_31(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_31(status);
+    }
+
+    static void OnSuccessCallback_31(void * context) { (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_31(); }
+
+    static void OnFailureCallback_32(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_32(status);
+    }
+
+    static void OnSuccessCallback_32(void * context, int16_t minConstPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_32(minConstPressure);
+    }
+
+    static void OnFailureCallback_33(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_33(status);
+    }
+
+    static void OnSuccessCallback_33(void * context, int16_t maxConstPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_33(maxConstPressure);
+    }
+
+    static void OnFailureCallback_34(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_34(status);
+    }
+
+    static void OnSuccessCallback_34(void * context, int16_t minCompPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_34(minCompPressure);
+    }
+
+    static void OnFailureCallback_35(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_35(status);
+    }
+
+    static void OnSuccessCallback_35(void * context, int16_t maxCompPressure)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_35(maxCompPressure);
+    }
+
+    static void OnFailureCallback_36(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_36(status);
+    }
+
+    static void OnSuccessCallback_36(void * context, uint16_t minConstSpeed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_36(minConstSpeed);
+    }
+
+    static void OnFailureCallback_37(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_37(status);
+    }
+
+    static void OnSuccessCallback_37(void * context, uint16_t maxConstSpeed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_37(maxConstSpeed);
+    }
+
+    static void OnFailureCallback_38(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_38(status);
+    }
+
+    static void OnSuccessCallback_38(void * context, uint16_t minConstFlow)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_38(minConstFlow);
+    }
+
+    static void OnFailureCallback_39(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_39(status);
+    }
+
+    static void OnSuccessCallback_39(void * context, uint16_t maxConstFlow)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_39(maxConstFlow);
+    }
+
+    static void OnFailureCallback_40(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_40(status);
+    }
+
+    static void OnSuccessCallback_40(void * context, int16_t minConstTemp)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_40(minConstTemp);
+    }
+
+    static void OnFailureCallback_41(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_41(status);
+    }
+
+    static void OnSuccessCallback_41(void * context, int16_t maxConstTemp)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_41(maxConstTemp);
+    }
+
+    static void OnFailureCallback_42(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_42(status);
+    }
+
+    static void OnSuccessCallback_42(void * context, uint16_t pumpStatus)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_42(pumpStatus);
+    }
+
+    static void OnFailureCallback_43(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_43(status);
+    }
+
+    static void OnSuccessCallback_43(void * context, uint16_t pumpStatus)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_43(pumpStatus);
+    }
+
+    static void OnFailureCallback_44(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_44(status);
+    }
+
+    static void OnSuccessCallback_44(void * context, uint16_t speed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_44(speed);
+    }
+
+    static void OnFailureCallback_45(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_45(status);
+    }
+
+    static void OnSuccessCallback_45(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_45(lifetimeRunningHours);
+    }
+
+    static void OnFailureCallback_46(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_46(status);
+    }
+
+    static void OnSuccessCallback_46(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_46(lifetimeRunningHours);
+    }
+
+    static void OnFailureCallback_47(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_47(status);
+    }
+
+    static void OnSuccessCallback_47(void * context, uint32_t power)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_47(power);
+    }
+
+    static void OnFailureCallback_48(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_48(status);
+    }
+
+    static void OnSuccessCallback_48(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_48(lifetimeEnergyConsumed);
+    }
+
+    static void OnFailureCallback_49(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnFailureResponse_49(status);
+    }
+
+    static void OnSuccessCallback_49(void * context, const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        (static_cast<Test_TC_PCC_2_1 *>(context))->OnSuccessResponse_49(lifetimeEnergyConsumed);
     }
 
     //
@@ -22665,7 +24118,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeMaxPressure_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22683,143 +24136,1079 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveOperationMode_2()
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxSpeed_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxSpeed::TypeInfo>(
                 this, OnSuccessCallback_2, OnFailureCallback_2));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2(uint8_t effectiveOperationMode)
+    void OnSuccessResponse_2(uint16_t maxSpeed)
     {
-        VerifyOrReturn(CheckConstraintType("effectiveOperationMode", "", "enum8"));
+        VerifyOrReturn(CheckConstraintType("maxSpeed", "", "uint16"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveControlMode_3()
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxFlow_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
-                this, OnSuccessCallback_3, OnFailureCallback_3));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxFlow::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint8_t effectiveControlMode)
+    void OnSuccessResponse_3(uint16_t maxFlow)
     {
-        VerifyOrReturn(CheckConstraintType("effectiveControlMode", "", "enum8"));
+        VerifyOrReturn(CheckConstraintType("maxFlow", "", "uint16"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeCapacity_4()
+    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveOperationMode_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
                 this, OnSuccessCallback_4, OnFailureCallback_4));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(int16_t capacity)
+    void OnSuccessResponse_4(uint8_t effectiveOperationMode)
     {
-        VerifyOrReturn(CheckConstraintType("capacity", "", "int16"));
+        VerifyOrReturn(CheckConstraintType("effectiveOperationMode", "", "enum8"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeMaxPressure_5()
+    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveControlMode_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxPressure::TypeInfo>(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
                 this, OnSuccessCallback_5, OnFailureCallback_5));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(int16_t maxPressure)
+    void OnSuccessResponse_5(uint8_t effectiveControlMode)
     {
-        VerifyOrReturn(CheckConstraintType("maxPressure", "", "int16"));
+        VerifyOrReturn(CheckConstraintType("effectiveControlMode", "", "enum8"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveOperationMode_6()
+    CHIP_ERROR TestReadTheMandatoryAttributeCapacity_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
                 this, OnSuccessCallback_6, OnFailureCallback_6));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(uint8_t effectiveOperationMode)
+    void OnSuccessResponse_6(int16_t capacity)
     {
-        VerifyOrReturn(CheckConstraintType("effectiveOperationMode", "", "enum8"));
+        VerifyOrReturn(CheckConstraintType("capacity", "", "int16"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveControlMode_7()
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxPressure_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxPressure::TypeInfo>(
                 this, OnSuccessCallback_7, OnFailureCallback_7));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(uint8_t effectiveControlMode)
+    void OnSuccessResponse_7(int16_t maxPressure)
     {
-        VerifyOrReturn(CheckConstraintType("effectiveControlMode", "", "enum8"));
+        VerifyOrReturn(CheckConstraintType("maxPressure", "", "int16"));
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheMandatoryAttributeCapacity_8()
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxSpeed_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(
-            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxSpeed::TypeInfo>(
                 this, OnSuccessCallback_8, OnFailureCallback_8));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(int16_t capacity)
+    void OnSuccessResponse_8(uint16_t maxSpeed)
+    {
+        VerifyOrReturn(CheckConstraintType("maxSpeed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeMaxFlow_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxFlow::TypeInfo>(
+            this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(uint16_t maxFlow)
+    {
+        VerifyOrReturn(CheckConstraintType("maxFlow", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveOperationMode_10()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
+                this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(uint8_t effectiveOperationMode)
+    {
+        VerifyOrReturn(CheckConstraintType("effectiveOperationMode", "", "enum8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeEffectiveControlMode_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
+                this, OnSuccessCallback_11, OnFailureCallback_11));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11(uint8_t effectiveControlMode)
+    {
+        VerifyOrReturn(CheckConstraintType("effectiveControlMode", "", "enum8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheMandatoryAttributeCapacity_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
+                this, OnSuccessCallback_12, OnFailureCallback_12));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12(int16_t capacity)
     {
         VerifyOrReturn(CheckConstraintType("capacity", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstPressure_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstPressure::TypeInfo>(
+                this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_13(int16_t minConstPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstPressure_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstPressure::TypeInfo>(
+                this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_14(int16_t maxConstPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinCompPressure_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinCompPressure::TypeInfo>(
+                this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_15(int16_t minCompPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("minCompPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxCompPressure_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxCompPressure::TypeInfo>(
+                this, OnSuccessCallback_16, OnFailureCallback_16));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_16(int16_t maxCompPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("maxCompPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstSpeed_17()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstSpeed::TypeInfo>(
+                this, OnSuccessCallback_17, OnFailureCallback_17));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_17(uint16_t minConstSpeed)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstSpeed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstSpeed_18()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstSpeed::TypeInfo>(
+                this, OnSuccessCallback_18, OnFailureCallback_18));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_18(uint16_t maxConstSpeed)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstSpeed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstFlow_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstFlow::TypeInfo>(
+                this, OnSuccessCallback_19, OnFailureCallback_19));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_19(uint16_t minConstFlow)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstFlow", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstFlow_20()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstFlow::TypeInfo>(
+                this, OnSuccessCallback_20, OnFailureCallback_20));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_20(uint16_t maxConstFlow)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstFlow", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstTemp_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstTemp::TypeInfo>(
+                this, OnSuccessCallback_21, OnFailureCallback_21));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_21(int16_t minConstTemp)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstTemp", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minConstTemp", minConstTemp, -27315));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstTemp_22()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstTemp::TypeInfo>(
+                this, OnSuccessCallback_22, OnFailureCallback_22));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_22(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_22(int16_t maxConstTemp)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstTemp", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxConstTemp", maxConstTemp, -27315));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePumpStatus_23()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
+                this, OnSuccessCallback_23, OnFailureCallback_23));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_23(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_23(uint16_t pumpStatus)
+    {
+        VerifyOrReturn(CheckValue("pumpStatus", pumpStatus, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePumpStatus_24()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
+                this, OnSuccessCallback_24, OnFailureCallback_24));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_24(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_24(uint16_t pumpStatus)
+    {
+        VerifyOrReturn(CheckConstraintType("pumpStatus", "", "map16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeSpeed_25()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Speed::TypeInfo>(
+            this, OnSuccessCallback_25, OnFailureCallback_25));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_25(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_25(uint16_t speed)
+    {
+        VerifyOrReturn(CheckConstraintType("speed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeRunningHours_26()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
+                this, OnSuccessCallback_26, OnFailureCallback_26));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_26(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_26(const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        VerifyOrReturn(CheckValueNonNull("lifetimeRunningHours", lifetimeRunningHours));
+        VerifyOrReturn(CheckValue("lifetimeRunningHours.Value()", lifetimeRunningHours.Value(), 0UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeRunningHours_27()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
+                this, OnSuccessCallback_27, OnFailureCallback_27));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_27(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_27(const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        VerifyOrReturn(CheckConstraintType("lifetimeRunningHours", "", "uint24"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePower_28()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Power::TypeInfo>(
+            this, OnSuccessCallback_28, OnFailureCallback_28));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_28(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_28(uint32_t power)
+    {
+        VerifyOrReturn(CheckConstraintType("power", "", "uint24"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeEnergyConsumed_29()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+                this, OnSuccessCallback_29, OnFailureCallback_29));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_29(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_29(const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        VerifyOrReturn(CheckValueNonNull("lifetimeEnergyConsumed", lifetimeEnergyConsumed));
+        VerifyOrReturn(CheckValue("lifetimeEnergyConsumed.Value()", lifetimeEnergyConsumed.Value(), 0UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeEnergyConsumed_30()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+                this, OnSuccessCallback_30, OnFailureCallback_30));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_30(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_30(const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        VerifyOrReturn(CheckConstraintType("lifetimeEnergyConsumed", "", "uint32"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteToTheOptionalAttributeLifetimeEnergyConsumed_31()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<uint32_t> lifetimeEnergyConsumedArgument;
+        lifetimeEnergyConsumedArgument.SetNonNull();
+        lifetimeEnergyConsumedArgument.Value() = 0UL;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+                lifetimeEnergyConsumedArgument, this, OnSuccessCallback_31, OnFailureCallback_31));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_31(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_31() { NextTest(); }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstPressure_32()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstPressure::TypeInfo>(
+                this, OnSuccessCallback_32, OnFailureCallback_32));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_32(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_32(int16_t minConstPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstPressure_33()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstPressure::TypeInfo>(
+                this, OnSuccessCallback_33, OnFailureCallback_33));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_33(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_33(int16_t maxConstPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinCompPressure_34()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinCompPressure::TypeInfo>(
+                this, OnSuccessCallback_34, OnFailureCallback_34));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_34(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_34(int16_t minCompPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("minCompPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxCompPressure_35()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxCompPressure::TypeInfo>(
+                this, OnSuccessCallback_35, OnFailureCallback_35));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_35(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_35(int16_t maxCompPressure)
+    {
+        VerifyOrReturn(CheckConstraintType("maxCompPressure", "", "int16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstSpeed_36()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstSpeed::TypeInfo>(
+                this, OnSuccessCallback_36, OnFailureCallback_36));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_36(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_36(uint16_t minConstSpeed)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstSpeed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstSpeed_37()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstSpeed::TypeInfo>(
+                this, OnSuccessCallback_37, OnFailureCallback_37));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_37(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_37(uint16_t maxConstSpeed)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstSpeed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstFlow_38()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstFlow::TypeInfo>(
+                this, OnSuccessCallback_38, OnFailureCallback_38));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_38(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_38(uint16_t minConstFlow)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstFlow", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstFlow_39()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstFlow::TypeInfo>(
+                this, OnSuccessCallback_39, OnFailureCallback_39));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_39(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_39(uint16_t maxConstFlow)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstFlow", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMinConstTemp_40()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstTemp::TypeInfo>(
+                this, OnSuccessCallback_40, OnFailureCallback_40));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_40(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_40(int16_t minConstTemp)
+    {
+        VerifyOrReturn(CheckConstraintType("minConstTemp", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minConstTemp", minConstTemp, -27315));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeMaxConstTemp_41()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstTemp::TypeInfo>(
+                this, OnSuccessCallback_41, OnFailureCallback_41));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_41(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_41(int16_t maxConstTemp)
+    {
+        VerifyOrReturn(CheckConstraintType("maxConstTemp", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxConstTemp", maxConstTemp, -27315));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePumpStatus_42()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
+                this, OnSuccessCallback_42, OnFailureCallback_42));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_42(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_42(uint16_t pumpStatus)
+    {
+        VerifyOrReturn(CheckValue("pumpStatus", pumpStatus, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePumpStatus_43()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
+                this, OnSuccessCallback_43, OnFailureCallback_43));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_43(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_43(uint16_t pumpStatus)
+    {
+        VerifyOrReturn(CheckConstraintType("pumpStatus", "", "map16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeSpeed_44()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Speed::TypeInfo>(
+            this, OnSuccessCallback_44, OnFailureCallback_44));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_44(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_44(uint16_t speed)
+    {
+        VerifyOrReturn(CheckConstraintType("speed", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeRunningHours_45()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
+                this, OnSuccessCallback_45, OnFailureCallback_45));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_45(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_45(const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        VerifyOrReturn(CheckValueNonNull("lifetimeRunningHours", lifetimeRunningHours));
+        VerifyOrReturn(CheckValue("lifetimeRunningHours.Value()", lifetimeRunningHours.Value(), 0UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeRunningHours_46()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
+                this, OnSuccessCallback_46, OnFailureCallback_46));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_46(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_46(const chip::app::DataModel::Nullable<uint32_t> & lifetimeRunningHours)
+    {
+        VerifyOrReturn(CheckConstraintType("lifetimeRunningHours", "", "uint24"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributePower_47()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Power::TypeInfo>(
+            this, OnSuccessCallback_47, OnFailureCallback_47));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_47(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_47(uint32_t power)
+    {
+        VerifyOrReturn(CheckConstraintType("power", "", "uint24"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeEnergyConsumed_48()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+                this, OnSuccessCallback_48, OnFailureCallback_48));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_48(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_48(const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        VerifyOrReturn(CheckValueNonNull("lifetimeEnergyConsumed", lifetimeEnergyConsumed));
+        VerifyOrReturn(CheckValue("lifetimeEnergyConsumed.Value()", lifetimeEnergyConsumed.Value(), 0UL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheOptionalAttributeLifetimeEnergyConsumed_49()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+                this, OnSuccessCallback_49, OnFailureCallback_49));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_49(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_49(const chip::app::DataModel::Nullable<uint32_t> & lifetimeEnergyConsumed)
+    {
+        VerifyOrReturn(CheckConstraintType("lifetimeEnergyConsumed", "", "uint32"));
         NextTest();
     }
 };
@@ -22827,7 +25216,11 @@ private:
 class Test_TC_PCC_2_2 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_2() : TestCommand("Test_TC_PCC_2_2"), mTestIndex(0) {}
+    Test_TC_PCC_2_2() : TestCommand("Test_TC_PCC_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -22883,6 +25276,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_PCC_2_2 *>(context))->OnFailureResponse_1(status);
@@ -22916,7 +25312,7 @@ private:
 
     CHIP_ERROR TestWrite1ToTheOperationModeAttributeToDutOperationMode_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22935,7 +25331,7 @@ private:
 
     CHIP_ERROR TestWrite2ToTheOperationModeAttributeToDutOperationMode_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22954,7 +25350,7 @@ private:
 
     CHIP_ERROR TestWrite3ToTheOperationModeAttributeToDutOperationMode_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -22975,7 +25371,11 @@ private:
 class Test_TC_PCC_2_3 : public TestCommand
 {
 public:
-    Test_TC_PCC_2_3() : TestCommand("Test_TC_PCC_2_3"), mTestIndex(0) {}
+    Test_TC_PCC_2_3() : TestCommand("Test_TC_PCC_2_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -23014,6 +25414,34 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the attribute: EffectiveOperationMode\n");
             err = ShouldSkip("A_EFFECTIVEOPERATIONMODE") ? CHIP_NO_ERROR : TestReadsTheAttributeEffectiveOperationMode_2();
             break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Write 0 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite0ToTheControlModeAttributeToDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads the attribute: EffectiveControlMode\n");
+            err = ShouldSkip("A_EFFECTIVECONTROLMODE") ? CHIP_NO_ERROR : TestReadsTheAttributeEffectiveControlMode_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Write 1 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite1ToTheControlModeAttributeToDut_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Write 2 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite2ToTheControlModeAttributeToDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Write 3 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite3ToTheControlModeAttributeToDut_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Write 5 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite5ToTheControlModeAttributeToDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Write 7 to the ControlMode attribute to DUT\n");
+            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite7ToTheControlModeAttributeToDut_9();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -23025,7 +25453,10 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 10;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -23044,6 +25475,58 @@ private:
         (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_2(effectiveOperationMode);
     }
 
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint8_t effectiveControlMode)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_4(effectiveControlMode);
+    }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_5(); }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_6(); }
+
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_7(status);
+    }
+
+    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_7(); }
+
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_8(); }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_2_3 *>(context))->OnFailureResponse_9(status);
+    }
+
+    static void OnSuccessCallback_9(void * context) { (static_cast<Test_TC_PCC_2_3 *>(context))->OnSuccessResponse_9(); }
+
     //
     // Tests methods
     //
@@ -23056,7 +25539,7 @@ private:
 
     CHIP_ERROR TestWrite0ToTheOperationModeAttributeToDut_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23075,7 +25558,7 @@ private:
 
     CHIP_ERROR TestReadsTheAttributeEffectiveOperationMode_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23093,12 +25576,151 @@ private:
 
         NextTest();
     }
+
+    CHIP_ERROR TestWrite0ToTheControlModeAttributeToDut_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 0;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3() { NextTest(); }
+
+    CHIP_ERROR TestReadsTheAttributeEffectiveControlMode_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
+                this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint8_t effectiveControlMode)
+    {
+        VerifyOrReturn(CheckValue("effectiveControlMode", effectiveControlMode, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWrite1ToTheControlModeAttributeToDut_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 1;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestWrite2ToTheControlModeAttributeToDut_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 2;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6() { NextTest(); }
+
+    CHIP_ERROR TestWrite3ToTheControlModeAttributeToDut_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 3;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7() { NextTest(); }
+
+    CHIP_ERROR TestWrite5ToTheControlModeAttributeToDut_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 5;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8() { NextTest(); }
+
+    CHIP_ERROR TestWrite7ToTheControlModeAttributeToDut_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t controlModeArgument;
+        controlModeArgument = 7;
+
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+                controlModeArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9() { NextTest(); }
 };
 
 class Test_TC_RH_1_1 : public TestCommand
 {
 public:
-    Test_TC_RH_1_1() : TestCommand("Test_TC_RH_1_1"), mTestIndex(0) {}
+    Test_TC_RH_1_1() : TestCommand("Test_TC_RH_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -23151,6 +25773,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_RH_1_1 *>(context))->OnFailureResponse_1(status);
@@ -23180,7 +25805,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23200,7 +25825,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23225,7 +25850,11 @@ private:
 class Test_TC_RH_2_1 : public TestCommand
 {
 public:
-    Test_TC_RH_2_1() : TestCommand("Test_TC_RH_2_1"), mTestIndex(0) {}
+    Test_TC_RH_2_1() : TestCommand("Test_TC_RH_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -23277,6 +25906,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_RH_2_1 *>(context))->OnFailureResponse_1(status);
@@ -23309,7 +25941,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfAttributeMeasuredValue_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23329,7 +25961,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfAttributeMinMeasuredValue_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23352,7 +25984,11 @@ private:
 class Test_TC_RH_2_2 : public TestCommand
 {
 public:
-    Test_TC_RH_2_2() : TestCommand("Test_TC_RH_2_2"), mTestIndex(0) {}
+    Test_TC_RH_2_2() : TestCommand("Test_TC_RH_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -23404,6 +26040,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_RH_2_2 *>(context))->OnFailureResponse_1(status);
@@ -23436,7 +26075,7 @@ private:
 
     CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23456,7 +26095,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23478,7 +26117,11 @@ private:
 class Test_TC_TM_1_1 : public TestCommand
 {
 public:
-    Test_TC_TM_1_1() : TestCommand("Test_TC_TM_1_1"), mTestIndex(0) {}
+    Test_TC_TM_1_1() : TestCommand("Test_TC_TM_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -23539,6 +26182,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_TM_1_1 *>(context))->OnFailureResponse_1(status);
@@ -23588,7 +26234,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23609,7 +26255,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23629,7 +26275,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23652,7 +26298,7 @@ private:
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23675,7 +26321,11 @@ private:
 class Test_TC_TM_2_1 : public TestCommand
 {
 public:
-    Test_TC_TM_2_1() : TestCommand("Test_TC_TM_2_1"), mTestIndex(0) {}
+    Test_TC_TM_2_1() : TestCommand("Test_TC_TM_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -23723,6 +26373,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_TM_2_1 *>(context))->OnFailureResponse_1(status);
@@ -23745,7 +26398,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23767,7 +26420,11 @@ private:
 class Test_TC_TM_2_2 : public TestCommand
 {
 public:
-    Test_TC_TM_2_2() : TestCommand("Test_TC_TM_2_2"), mTestIndex(0) {}
+    Test_TC_TM_2_2() : TestCommand("Test_TC_TM_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -23819,6 +26476,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_TM_2_2 *>(context))->OnFailureResponse_1(status);
@@ -23851,7 +26511,7 @@ private:
 
     CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23871,7 +26531,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -23893,7 +26553,11 @@ private:
 class Test_TC_TSTAT_1_1 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_1_1() : TestCommand("Test_TC_TSTAT_1_1"), mTestIndex(0) {}
+    Test_TC_TSTAT_1_1() : TestCommand("Test_TC_TSTAT_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -23950,6 +26614,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnFailureResponse_1(status);
@@ -23989,7 +26656,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -24008,7 +26675,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -24030,7 +26697,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalGlobalAttributeConstraintsFeatureMap_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -24051,7 +26718,11 @@ private:
 class Test_TC_TSTAT_2_1 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_2_1() : TestCommand("Test_TC_TSTAT_2_1"), mTestIndex(0) {}
+    Test_TC_TSTAT_2_1() : TestCommand("Test_TC_TSTAT_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -24380,6 +27051,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 61;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -24945,7 +27619,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutLocalTemperature_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -24964,7 +27638,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutAbsMinHeatSetpointLimit_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -24984,7 +27658,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMinHeatSetpointLimit_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25005,7 +27679,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMinHeatSetpointLimit_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25027,7 +27701,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMinHeatSetpointLimit_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25047,7 +27721,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25067,7 +27741,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25088,7 +27762,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMaxHeatSetpointLimit_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25110,7 +27784,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMaxHeatSetpointLimit_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25130,7 +27804,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutAbsMinCoolSetpointLimit_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25150,7 +27824,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMinCoolSetpointLimit_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25171,7 +27845,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMinCoolSetpointLimit_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25193,7 +27867,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMinCoolSetpointLimit_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25213,7 +27887,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25233,7 +27907,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25254,7 +27928,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutAbsMaxCoolSetpointLimit_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25276,7 +27950,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutAbsMaxCoolSetpointLimit_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25296,7 +27970,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutOccupiedCoolingSetpoint_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25316,7 +27990,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutOccupiedCoolingSetpoint_19()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25337,7 +28011,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutOccupiedCoolingSetpoint_20()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25355,7 +28029,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutOccupiedCoolingSetpoint_21()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25375,7 +28049,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutOccupiedHeatingSetpoint_22()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25395,7 +28069,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutOccupiedHeatingSetpoint_23()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25416,7 +28090,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutOccupiedHeatingSetpoint_24()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25434,7 +28108,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutOccupiedHeatingSetpoint_25()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25454,7 +28128,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutMinHeatSetpointLimit_26()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25474,7 +28148,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMinHeatSetpointLimit_27()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25495,7 +28169,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMinHeatSetpointLimit_28()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25513,7 +28187,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutMinHeatSetpointLimit_29()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25533,7 +28207,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutMaxHeatSetpointLimit_30()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25553,7 +28227,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMaxHeatSetpointLimit_31()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25574,7 +28248,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMaxHeatSetpointLimit_32()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25592,7 +28266,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutMaxHeatSetpointLimit_33()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25612,7 +28286,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutMinCoolSetpointLimit_34()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25632,7 +28306,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMinCoolSetpointLimit_35()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25653,7 +28327,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMinCoolSetpointLimit_36()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25671,7 +28345,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutMinCoolSetpointLimit_37()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25691,7 +28365,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutMaxCoolSetpointLimit_38()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25711,7 +28385,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutMaxCoolSetpointLimit_39()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25732,7 +28406,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutMaxCoolSetpointLimit_40()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25750,7 +28424,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutMaxCoolSetpointLimit_41()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25770,7 +28444,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutControlSequenceOfOperation_42()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25791,7 +28465,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutControlSequenceOfOperation_43()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25812,7 +28486,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutControlSequenceOfOperation_44()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25831,7 +28505,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutControlSequenceOfOperation_45()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25852,7 +28526,7 @@ private:
 
     CHIP_ERROR TestReadsMandatoryAttributesFromDutSystemMode_46()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25872,7 +28546,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutSystemMode_47()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25892,7 +28566,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToMandatoryAttributesToDutSystemMode_48()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25910,7 +28584,7 @@ private:
 
     CHIP_ERROR TestReadBackMandatoryAttributesFromDutSystemMode_49()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25930,7 +28604,7 @@ private:
 
     CHIP_ERROR TestReadsOptionalAttributesFromDutMinSetpointDeadBand_50()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25939,7 +28613,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_50(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_50(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_50(int8_t minSetpointDeadBand)
     {
@@ -25950,7 +28627,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutMinSetpointDeadBand_51()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25959,7 +28636,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_51(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_51(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_51(int8_t minSetpointDeadBand)
     {
@@ -25970,7 +28650,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutMinSetpointDeadBand_52()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25982,13 +28662,16 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_52(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_52(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_52() { NextTest(); }
 
     CHIP_ERROR TestReadBackOptionalAttributesFromDutMinSetpointDeadBand_53()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -25997,7 +28680,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_53(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_53(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_53(int8_t minSetpointDeadBand)
     {
@@ -26008,7 +28694,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutStartOfWeek_54()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -26017,7 +28703,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_54(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_54(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_54(uint8_t startOfWeek)
     {
@@ -26028,7 +28717,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutStartOfWeek_55()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -26050,7 +28739,7 @@ private:
 
     CHIP_ERROR TestReadBackOptionalAttributesFromDutStartOfWeek_56()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -26059,7 +28748,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_56(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_56(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_56(uint8_t startOfWeek)
     {
@@ -26070,7 +28762,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutNumberOfWeeklyTransitions_57()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -26080,7 +28772,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_57(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_57(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_57(uint8_t numberOfWeeklyTransitions)
     {
@@ -26090,7 +28785,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutNumberOfWeeklyTransitions_58()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -26113,7 +28808,7 @@ private:
 
     CHIP_ERROR TestReadsConstraintsOfOptionalAttributesFromDutNumberOfDailyTransitions_59()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -26122,7 +28817,10 @@ private:
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_59(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_59(EmberAfStatus status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
 
     void OnSuccessResponse_59(uint8_t numberOfDailyTransitions)
     {
@@ -26132,7 +28830,7 @@ private:
 
     CHIP_ERROR TestWritesTheRespectiveDefaultValueToOptionalAttributesToDutNumberOfDailyTransitions_60()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -26157,7 +28855,11 @@ private:
 class Test_TC_TSTAT_2_2 : public TestCommand
 {
 public:
-    Test_TC_TSTAT_2_2() : TestCommand("Test_TC_TSTAT_2_2"), mTestIndex(0) {}
+    Test_TC_TSTAT_2_2() : TestCommand("Test_TC_TSTAT_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -26543,6 +29245,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 50;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -26941,7 +29646,7 @@ private:
 
     CHIP_ERROR TestReadsOccupiedCoolingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -26961,7 +29666,7 @@ private:
 
     CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForOccupiedCoolingSetpointAttribute_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -26979,7 +29684,7 @@ private:
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedCoolingSetpointAttribute_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -26999,7 +29704,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfMinCoolSetpointLimitToOccupiedCoolingSetpointAttribute_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27017,7 +29722,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfMaxCoolSetpointLimitToOccupiedCoolingSetpointAttribute_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27035,7 +29740,7 @@ private:
 
     CHIP_ERROR TestReadsOccupiedHeatingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27055,7 +29760,7 @@ private:
 
     CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForOccupiedHeatingSetpointAttribute_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27073,7 +29778,7 @@ private:
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedHeatingSetpointAttribute_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27093,7 +29798,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfMinHeatSetpointLimitToOccupiedHeatingSetpointAttribute_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27111,7 +29816,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfMaxHeatSetpointLimitToOccupiedHeatingSetpointAttribute_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27129,7 +29834,7 @@ private:
 
     CHIP_ERROR TestReadsMinHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27149,7 +29854,7 @@ private:
 
     CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForMinHeatSetpointLimitAttribute_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27167,7 +29872,7 @@ private:
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinHeatSetpointLimitAttribute_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27187,7 +29892,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfAbsMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27205,7 +29910,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27223,7 +29928,7 @@ private:
 
     CHIP_ERROR TestReadsMaxHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27243,7 +29948,7 @@ private:
 
     CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForMaxHeatSetpointLimitAttribute_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27261,7 +29966,7 @@ private:
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxHeatSetpointLimitAttribute_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27281,7 +29986,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfAbsMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_19()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27299,7 +30004,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_20()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27317,7 +30022,7 @@ private:
 
     CHIP_ERROR TestReadsMinCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_21()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27337,7 +30042,7 @@ private:
 
     CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForMinCoolSetpointLimitAttribute_22()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27355,7 +30060,7 @@ private:
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinCoolSetpointLimitAttribute_23()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27375,7 +30080,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfAbsMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_24()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27393,7 +30098,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_25()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27411,7 +30116,7 @@ private:
 
     CHIP_ERROR TestReadsMaxCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_26()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27431,7 +30136,7 @@ private:
 
     CHIP_ERROR TestWritesAValueBackThatIsDifferentButValidForMaxCoolSetpointLimitAttribute_27()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27449,7 +30154,7 @@ private:
 
     CHIP_ERROR TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxCoolSetpointLimitAttribute_28()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27469,7 +30174,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfAbsMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_29()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27487,7 +30192,7 @@ private:
 
     CHIP_ERROR TestWritesTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_30()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27505,7 +30210,7 @@ private:
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_31()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27523,7 +30228,7 @@ private:
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_32()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27541,7 +30246,7 @@ private:
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_33()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27559,7 +30264,7 @@ private:
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_34()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27577,7 +30282,7 @@ private:
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_35()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27595,7 +30300,7 @@ private:
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_36()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27613,7 +30318,7 @@ private:
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_37()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27631,7 +30336,7 @@ private:
 
     CHIP_ERROR TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_38()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27649,7 +30354,7 @@ private:
 
     CHIP_ERROR TestReadsControlSequenceOfOperationFromServerDutAndVerifiesThatTheValueIsValid_39()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27670,7 +30375,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeCommandForControlSequenceOfOperationWithANewValidValue_40()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27689,7 +30394,7 @@ private:
 
     CHIP_ERROR TestReadItBackAgainToConfirmTheSuccessfulWrite_41()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27710,7 +30415,7 @@ private:
 
     CHIP_ERROR TestSetsOccupiedHeatingSetpointToDefaultValue_42()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27728,7 +30433,7 @@ private:
 
     CHIP_ERROR TestSetsOccupiedHeatingSetpointToDefaultValue_43()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27746,7 +30451,7 @@ private:
 
     CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_44()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27764,7 +30469,7 @@ private:
 
     CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_45()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27782,7 +30487,7 @@ private:
 
     CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_46()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27800,7 +30505,7 @@ private:
 
     CHIP_ERROR TestSetsOccupiedHeatingSetpointToDefaultValue_47()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27818,7 +30523,7 @@ private:
 
     CHIP_ERROR TestSetsOccupiedCoolingSetpointToDefaultValue_48()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27836,7 +30541,7 @@ private:
 
     CHIP_ERROR TestSetsOccupiedHeatingSetpointToDefaultValue_49()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27856,7 +30561,11 @@ private:
 class Test_TC_TSUIC_1_1 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_1_1() : TestCommand("Test_TC_TSUIC_1_1"), mTestIndex(0) {}
+    Test_TC_TSUIC_1_1() : TestCommand("Test_TC_TSUIC_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -27909,6 +30618,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_TSUIC_1_1 *>(context))->OnFailureResponse_1(status);
@@ -27938,7 +30650,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27958,7 +30670,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -27984,7 +30696,11 @@ private:
 class Test_TC_TSUIC_2_1 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_2_1() : TestCommand("Test_TC_TSUIC_2_1"), mTestIndex(0) {}
+    Test_TC_TSUIC_2_1() : TestCommand("Test_TC_TSUIC_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -28087,6 +30803,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 16;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -28241,7 +30960,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28263,7 +30982,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28284,7 +31003,7 @@ private:
 
     CHIP_ERROR TestWriteToTheMandatoryAttributeTemperatureDisplayMode_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28304,7 +31023,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28326,7 +31045,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28347,7 +31066,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28368,7 +31087,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28388,7 +31107,7 @@ private:
 
     CHIP_ERROR TestWriteToTheMandatoryAttributeKeypadLockout_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28407,7 +31126,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28428,7 +31147,7 @@ private:
 
     CHIP_ERROR TestReadTheMandatoryAttributeKeypadLockout_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28448,7 +31167,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28470,7 +31189,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28491,7 +31210,7 @@ private:
 
     CHIP_ERROR TestWriteToTheMandatoryAttributeScheduleProgrammingVisibility_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28511,7 +31230,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28533,7 +31252,7 @@ private:
 
     CHIP_ERROR TestReadTheOptionalAttributeScheduleProgrammingVisibility_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28556,7 +31275,11 @@ private:
 class Test_TC_TSUIC_2_2 : public TestCommand
 {
 public:
-    Test_TC_TSUIC_2_2() : TestCommand("Test_TC_TSUIC_2_2"), mTestIndex(0) {}
+    Test_TC_TSUIC_2_2() : TestCommand("Test_TC_TSUIC_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -28648,6 +31371,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 11;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_TSUIC_2_2 *>(context))->OnFailureResponse_1(status);
@@ -28730,7 +31456,7 @@ private:
 
     CHIP_ERROR TestWritesAValueOf0ToTemperatureDisplayModeAttributeOfDut_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28750,7 +31476,7 @@ private:
 
     CHIP_ERROR TestWritesAValueOf1ToTemperatureDisplayModeAttributeOfDut_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28770,7 +31496,7 @@ private:
 
     CHIP_ERROR TestWritesAValueOf0ToKeypadLockoutAttributeOfDut_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28789,7 +31515,7 @@ private:
 
     CHIP_ERROR TestWritesAValueOf1ToKeypadLockoutAttributeOfDut_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28808,7 +31534,7 @@ private:
 
     CHIP_ERROR TestWritesAValueOf2ToKeypadLockoutAttributeOfDut_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28827,7 +31553,7 @@ private:
 
     CHIP_ERROR TestWritesAValueOf3ToKeypadLockoutAttributeOfDut_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28846,7 +31572,7 @@ private:
 
     CHIP_ERROR TestWritesAValueOf4ToKeypadLockoutAttributeOfDut_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28865,7 +31591,7 @@ private:
 
     CHIP_ERROR TestWritesAValueOf5ToKeypadLockoutAttributeOfDut_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28884,7 +31610,7 @@ private:
 
     CHIP_ERROR TestWritesAValueOf0ToScheduleProgrammingVisibilityAttributeOfDut_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28904,7 +31630,7 @@ private:
 
     CHIP_ERROR TestWritesAValueOf1ToScheduleProgrammingVisibilityAttributeOfDut_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -28926,7 +31652,11 @@ private:
 class Test_TC_DIAGTH_1_1 : public TestCommand
 {
 public:
-    Test_TC_DIAGTH_1_1() : TestCommand("Test_TC_DIAGTH_1_1"), mTestIndex(0) {}
+    Test_TC_DIAGTH_1_1() : TestCommand("Test_TC_DIAGTH_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -28987,6 +31717,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnFailureResponse_1(status);
@@ -29036,7 +31769,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -29057,7 +31790,7 @@ private:
 
     CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -29077,7 +31810,7 @@ private:
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -29100,7 +31833,7 @@ private:
 
     CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -29123,7 +31856,11 @@ private:
 class Test_TC_WNCV_1_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_1_1() : TestCommand("Test_TC_WNCV_1_1"), mTestIndex(0) {}
+    Test_TC_WNCV_1_1() : TestCommand("Test_TC_WNCV_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -29193,6 +31930,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_WNCV_1_1 *>(context))->OnFailureResponse_1(status);
@@ -29259,7 +31999,7 @@ private:
 
     CHIP_ERROR Test2ReadTheGlobalAttributeClusterRevision_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -29280,7 +32020,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryGlobalAttributeClusterRevision_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -29302,7 +32042,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackGlobalAttributeClusterRevision_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -29323,7 +32063,7 @@ private:
 
     CHIP_ERROR Test2ReadTheGlobalAttributeFeatureMap_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -29343,7 +32083,7 @@ private:
 
     CHIP_ERROR Test3aWriteTheDefaultValueToOptionalGlobalAttributeFeatureMap_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -29365,7 +32105,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackGlobalAttributeFeatureMap_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -29388,7 +32128,11 @@ private:
 class Test_TC_WNCV_2_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_1() : TestCommand("Test_TC_WNCV_2_1"), mTestIndex(0) {}
+    Test_TC_WNCV_2_1() : TestCommand("Test_TC_WNCV_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -29680,6 +32424,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 55;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -30191,7 +32938,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultType_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30211,7 +32958,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeType_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30233,7 +32980,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeType_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30254,7 +33001,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultConfigStatus_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30274,7 +33021,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeConfigStatus_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30296,7 +33043,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeConfigStatus_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30317,7 +33064,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultOperationalStatus_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30337,7 +33084,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeOperationalStatus_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30359,7 +33106,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeOperationalStatus_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30380,7 +33127,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultEndProductType_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30400,7 +33147,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoMandatoryAttributeEndProductType_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30422,7 +33169,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoMandatoryAttributeEndProductType_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30443,7 +33190,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRwMandatoryAttributeDefaultMode_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30463,7 +33210,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRwMandatoryAttributeMode_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30481,7 +33228,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRwMandatoryAttributeMode_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30501,7 +33248,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultTargetPositionLiftPercent100ths_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30523,7 +33270,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionLiftPercent100ths_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30547,7 +33294,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeTargetPositionLiftPercent100ths_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30569,7 +33316,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultTargetPositionTiltPercent100ths_19()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30591,7 +33338,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeTargetPositionTiltPercent100ths_20()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30615,7 +33362,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeTargetPositionTiltPercent100ths_21()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30637,7 +33384,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercent100ths_22()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30659,7 +33406,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercent100ths_23()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30683,7 +33430,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercent100ths_24()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30705,7 +33452,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercent100ths_25()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30727,7 +33474,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercent100ths_26()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30751,7 +33498,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercent100ths_27()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30773,7 +33520,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitLift_28()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30794,7 +33541,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitLift_29()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30817,7 +33564,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitLift_30()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30838,7 +33585,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitLift_31()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30859,7 +33606,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitLift_32()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30882,7 +33629,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitLift_33()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30903,7 +33650,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledOpenLimitTilt_34()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30924,7 +33671,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledOpenLimitTilt_35()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30947,7 +33694,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledOpenLimitTilt_36()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30968,7 +33715,7 @@ private:
 
     CHIP_ERROR Test2ReadTheRoOptionalAttributeDefaultInstalledClosedLimitTilt_37()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -30989,7 +33736,7 @@ private:
 
     CHIP_ERROR Test3aWriteAValueIntoTheRoOptionalAttributeInstalledClosedLimitTilt_38()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31012,7 +33759,7 @@ private:
 
     CHIP_ERROR Test3bReadsBackTheRoOptionalAttributeInstalledClosedLimitTilt_39()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31033,7 +33780,7 @@ private:
 
     CHIP_ERROR Test4ReadTheRoMandatoryAttributeDefaultSafetyStatus_40()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31053,7 +33800,7 @@ private:
 
     CHIP_ERROR Test5aWriteAValueIntoTheRoMandatoryAttributeSafetyStatus_41()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31075,7 +33822,7 @@ private:
 
     CHIP_ERROR Test5bReadsBackTheRoMandatoryAttributeSafetyStatus_42()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31096,7 +33843,7 @@ private:
 
     CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLift_43()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31116,7 +33863,7 @@ private:
 
     CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLift_44()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31139,7 +33886,7 @@ private:
 
     CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionLift_45()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31159,7 +33906,7 @@ private:
 
     CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTilt_46()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31179,7 +33926,7 @@ private:
 
     CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTilt_47()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31202,7 +33949,7 @@ private:
 
     CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionTilt_48()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31222,7 +33969,7 @@ private:
 
     CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionLiftPercentage_49()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31243,7 +33990,7 @@ private:
 
     CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionLiftPercentage_50()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31267,7 +34014,7 @@ private:
 
     CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionLiftPercentage_51()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31289,7 +34036,7 @@ private:
 
     CHIP_ERROR Test4ReadTheRoOptionalAttributeDefaultCurrentPositionTiltPercentage_52()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31310,7 +34057,7 @@ private:
 
     CHIP_ERROR Test5aWriteAValueIntoTheRoOptionalAttributeCurrentPositionTiltPercentage_53()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31334,7 +34081,7 @@ private:
 
     CHIP_ERROR Test5bReadsBackTheRoOptionalAttributeCurrentPositionTiltPercentage_54()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31358,7 +34105,11 @@ private:
 class Test_TC_WNCV_2_2 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_2() : TestCommand("Test_TC_WNCV_2_2"), mTestIndex(0) {}
+    Test_TC_WNCV_2_2() : TestCommand("Test_TC_WNCV_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -31402,6 +34153,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -31416,7 +34170,11 @@ private:
 class Test_TC_WNCV_2_4 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_4() : TestCommand("Test_TC_WNCV_2_4"), mTestIndex(0) {}
+    Test_TC_WNCV_2_4() : TestCommand("Test_TC_WNCV_2_4"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -31468,6 +34226,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_WNCV_2_4 *>(context))->OnFailureResponse_1(status);
@@ -31500,7 +34261,7 @@ private:
 
     CHIP_ERROR TestReadsTypeAttributeFromDut_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31520,7 +34281,7 @@ private:
 
     CHIP_ERROR TestReadsTypeAttributeConstraints_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31542,7 +34303,11 @@ private:
 class Test_TC_WNCV_2_5 : public TestCommand
 {
 public:
-    Test_TC_WNCV_2_5() : TestCommand("Test_TC_WNCV_2_5"), mTestIndex(0) {}
+    Test_TC_WNCV_2_5() : TestCommand("Test_TC_WNCV_2_5"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -31594,6 +34359,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_WNCV_2_5 *>(context))->OnFailureResponse_1(status);
@@ -31626,7 +34394,7 @@ private:
 
     CHIP_ERROR TestReadsEndProductTypeAttributeFromDut_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31646,7 +34414,7 @@ private:
 
     CHIP_ERROR TestReadsEndProductTypeAttributeConstraintsFromDut_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31668,7 +34436,11 @@ private:
 class Test_TC_WNCV_3_1 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_1() : TestCommand("Test_TC_WNCV_3_1"), mTestIndex(0) {}
+    Test_TC_WNCV_3_1() : TestCommand("Test_TC_WNCV_3_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -31724,6 +34496,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_3(status);
@@ -31746,7 +34521,7 @@ private:
 
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonOpenPosition_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
 
         RequestType request;
@@ -31769,7 +34544,7 @@ private:
 
     CHIP_ERROR Test2aThSendsUpOrOpenCommandToDut_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
         RequestType request;
@@ -31792,7 +34567,7 @@ private:
 
     CHIP_ERROR Test3aThReadsOperationalStatusAttributeFromDut_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31814,7 +34589,11 @@ private:
 class Test_TC_WNCV_3_2 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_2() : TestCommand("Test_TC_WNCV_3_2"), mTestIndex(0) {}
+    Test_TC_WNCV_3_2() : TestCommand("Test_TC_WNCV_3_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -31870,6 +34649,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_3(status);
@@ -31892,7 +34674,7 @@ private:
 
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonClosedPosition_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
         RequestType request;
@@ -31915,7 +34697,7 @@ private:
 
     CHIP_ERROR Test2aThSendsDownOrCloseCommandToDut_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type;
 
         RequestType request;
@@ -31938,7 +34720,7 @@ private:
 
     CHIP_ERROR Test3aThReadsOperationalStatusAttributeFromDut_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -31960,7 +34742,11 @@ private:
 class Test_TC_WNCV_3_3 : public TestCommand
 {
 public:
-    Test_TC_WNCV_3_3() : TestCommand("Test_TC_WNCV_3_3"), mTestIndex(0) {}
+    Test_TC_WNCV_3_3() : TestCommand("Test_TC_WNCV_3_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -32016,6 +34802,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_3(status);
@@ -32038,7 +34827,7 @@ private:
 
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonOpenPosition_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type;
 
         RequestType request;
@@ -32061,7 +34850,7 @@ private:
 
     CHIP_ERROR Test2aThSendsStopMotionCommandToDut_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::WindowCovering::Commands::StopMotion::Type;
 
         RequestType request;
@@ -32084,7 +34873,7 @@ private:
 
     CHIP_ERROR Test2bThReadsOperationalStatusAttributeFromDut_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -32106,7 +34895,11 @@ private:
 class TV_TargetNavigatorCluster : public TestCommand
 {
 public:
-    TV_TargetNavigatorCluster() : TestCommand("TV_TargetNavigatorCluster"), mTestIndex(0) {}
+    TV_TargetNavigatorCluster() : TestCommand("TV_TargetNavigatorCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -32162,6 +34955,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TV_TargetNavigatorCluster *>(context))->OnFailureResponse_1(status);
@@ -32197,7 +34993,7 @@ private:
 
     CHIP_ERROR TestReadAttributeTargetNavigatorList_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TargetNavigatorClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -32230,7 +35026,7 @@ private:
 
     CHIP_ERROR TestReadAttributeCurrentNavigatorTarget_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TargetNavigatorClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -32251,7 +35047,7 @@ private:
 
     CHIP_ERROR TestNavigateTargetRequestCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TargetNavigator::Commands::NavigateTargetRequest::Type;
 
         RequestType request;
@@ -32285,7 +35081,11 @@ private:
 class TV_AudioOutputCluster : public TestCommand
 {
 public:
-    TV_AudioOutputCluster() : TestCommand("TV_AudioOutputCluster"), mTestIndex(0) {}
+    TV_AudioOutputCluster() : TestCommand("TV_AudioOutputCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -32345,6 +35145,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_1(status);
@@ -32380,7 +35183,7 @@ private:
 
     CHIP_ERROR TestReadAttributeAudioOutputList_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 2;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 2;
         chip::Controller::AudioOutputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -32420,7 +35223,7 @@ private:
 
     CHIP_ERROR TestReadAttributeCurrentAudioOutput_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 2;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 2;
         chip::Controller::AudioOutputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -32440,7 +35243,7 @@ private:
 
     CHIP_ERROR TestSelectOutputCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 2;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 2;
         using RequestType               = chip::app::Clusters::AudioOutput::Commands::SelectOutputRequest::Type;
 
         RequestType request;
@@ -32464,7 +35267,7 @@ private:
 
     CHIP_ERROR TestRenameOutputCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 2;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 2;
         using RequestType               = chip::app::Clusters::AudioOutput::Commands::RenameOutputRequest::Type;
 
         RequestType request;
@@ -32491,7 +35294,11 @@ private:
 class TV_ApplicationLauncherCluster : public TestCommand
 {
 public:
-    TV_ApplicationLauncherCluster() : TestCommand("TV_ApplicationLauncherCluster"), mTestIndex(0) {}
+    TV_ApplicationLauncherCluster() : TestCommand("TV_ApplicationLauncherCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -32551,6 +35358,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_1(status);
@@ -32573,7 +35383,7 @@ private:
 
     CHIP_ERROR TestReadAttributeApplicationLauncherList_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ApplicationLauncherClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -32601,7 +35411,7 @@ private:
 
     CHIP_ERROR TestLaunchAppCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type;
 
         RequestType request;
@@ -32637,7 +35447,7 @@ private:
 
     CHIP_ERROR TestStopAppCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Type;
 
         RequestType request;
@@ -32672,7 +35482,7 @@ private:
 
     CHIP_ERROR TestHideAppCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Type;
 
         RequestType request;
@@ -32709,7 +35519,11 @@ private:
 class TV_KeypadInputCluster : public TestCommand
 {
 public:
-    TV_KeypadInputCluster() : TestCommand("TV_KeypadInputCluster"), mTestIndex(0) {}
+    TV_KeypadInputCluster() : TestCommand("TV_KeypadInputCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -32757,6 +35571,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -32769,7 +35586,7 @@ private:
 
     CHIP_ERROR TestSendKeyCommand_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::KeypadInput::Commands::SendKeyRequest::Type;
 
         RequestType request;
@@ -32800,7 +35617,11 @@ private:
 class TV_AccountLoginCluster : public TestCommand
 {
 public:
-    TV_AccountLoginCluster() : TestCommand("TV_AccountLoginCluster"), mTestIndex(0) {}
+    TV_AccountLoginCluster() : TestCommand("TV_AccountLoginCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -32856,6 +35677,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -32868,7 +35692,7 @@ private:
 
     CHIP_ERROR TestGetSetupPinCommand_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::AccountLogin::Commands::GetSetupPINRequest::Type;
 
         RequestType request;
@@ -32898,7 +35722,7 @@ private:
 
     CHIP_ERROR TestLoginCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::AccountLogin::Commands::LoginRequest::Type;
 
         RequestType request;
@@ -32924,7 +35748,7 @@ private:
 
     CHIP_ERROR TestLogoutCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::AccountLogin::Commands::LogoutRequest::Type;
 
         RequestType request;
@@ -32950,7 +35774,11 @@ private:
 class TV_WakeOnLanCluster : public TestCommand
 {
 public:
-    TV_WakeOnLanCluster() : TestCommand("TV_WakeOnLanCluster"), mTestIndex(0) {}
+    TV_WakeOnLanCluster() : TestCommand("TV_WakeOnLanCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -32998,6 +35826,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TV_WakeOnLanCluster *>(context))->OnFailureResponse_1(status);
@@ -33020,7 +35851,7 @@ private:
 
     CHIP_ERROR TestReadMacAddress_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::WakeOnLanClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33042,7 +35873,11 @@ private:
 class TV_ApplicationBasicCluster : public TestCommand
 {
 public:
-    TV_ApplicationBasicCluster() : TestCommand("TV_ApplicationBasicCluster"), mTestIndex(0) {}
+    TV_ApplicationBasicCluster() : TestCommand("TV_ApplicationBasicCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -33109,6 +35944,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -33182,7 +36020,7 @@ private:
 
     CHIP_ERROR TestReadAttributeVendorName_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33202,7 +36040,7 @@ private:
 
     CHIP_ERROR TestReadAttributeVendorId_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33222,7 +36060,7 @@ private:
 
     CHIP_ERROR TestReadAttributeApplicationName_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33242,7 +36080,7 @@ private:
 
     CHIP_ERROR TestReadAttributeProductId_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33262,7 +36100,7 @@ private:
 
     CHIP_ERROR TestReadAttributeApplicationStatus_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33282,7 +36120,7 @@ private:
 
     CHIP_ERROR TestReadAttributeApplicationVersion_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33304,7 +36142,11 @@ private:
 class TV_MediaPlaybackCluster : public TestCommand
 {
 public:
-    TV_MediaPlaybackCluster() : TestCommand("TV_MediaPlaybackCluster"), mTestIndex(0) {}
+    TV_MediaPlaybackCluster() : TestCommand("TV_MediaPlaybackCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -33416,6 +36258,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 18;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_1(status);
@@ -33488,7 +36333,7 @@ private:
 
     CHIP_ERROR TestReadAttributePlaybackState_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33508,7 +36353,7 @@ private:
 
     CHIP_ERROR TestReadAttributeStartTime_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33528,7 +36373,7 @@ private:
 
     CHIP_ERROR TestReadAttributeDuration_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33548,7 +36393,7 @@ private:
 
     CHIP_ERROR TestReadAttributePlaybackSpeed_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33568,7 +36413,7 @@ private:
 
     CHIP_ERROR TestReadAttributeSeekRangeEnd_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33588,7 +36433,7 @@ private:
 
     CHIP_ERROR TestReadAttributeSeekRangeStart_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         chip::Controller::MediaPlaybackClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -33608,7 +36453,7 @@ private:
 
     CHIP_ERROR TestMediaPlaybackPlayCommand_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::MediaPlayback::Commands::PlayRequest::Type;
 
         RequestType request;
@@ -33636,7 +36481,7 @@ private:
 
     CHIP_ERROR TestMediaPlaybackPauseCommand_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::MediaPlayback::Commands::PauseRequest::Type;
 
         RequestType request;
@@ -33664,7 +36509,7 @@ private:
 
     CHIP_ERROR TestMediaPlaybackStopCommand_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StopRequest::Type;
 
         RequestType request;
@@ -33692,7 +36537,7 @@ private:
 
     CHIP_ERROR TestMediaPlaybackStartOverCommand_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::MediaPlayback::Commands::StartOverRequest::Type;
 
         RequestType request;
@@ -33720,7 +36565,7 @@ private:
 
     CHIP_ERROR TestMediaPlaybackPreviousCommand_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::MediaPlayback::Commands::PreviousRequest::Type;
 
         RequestType request;
@@ -33748,7 +36593,7 @@ private:
 
     CHIP_ERROR TestMediaPlaybackNextCommand_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::MediaPlayback::Commands::NextRequest::Type;
 
         RequestType request;
@@ -33776,7 +36621,7 @@ private:
 
     CHIP_ERROR TestMediaPlaybackRewindCommand_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::MediaPlayback::Commands::RewindRequest::Type;
 
         RequestType request;
@@ -33804,7 +36649,7 @@ private:
 
     CHIP_ERROR TestMediaPlaybackFastForwardCommand_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::MediaPlayback::Commands::FastForwardRequest::Type;
 
         RequestType request;
@@ -33832,7 +36677,7 @@ private:
 
     CHIP_ERROR TestMediaPlaybackSkipForwardCommand_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipForwardRequest::Type;
 
         RequestType request;
@@ -33861,7 +36706,7 @@ private:
 
     CHIP_ERROR TestMediaPlaybackSkipBackwardCommand_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SkipBackwardRequest::Type;
 
         RequestType request;
@@ -33890,7 +36735,7 @@ private:
 
     CHIP_ERROR TestMediaPlaybackSeekCommand_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 3;
         using RequestType               = chip::app::Clusters::MediaPlayback::Commands::SeekRequest::Type;
 
         RequestType request;
@@ -33921,7 +36766,11 @@ private:
 class TV_ChannelCluster : public TestCommand
 {
 public:
-    TV_ChannelCluster() : TestCommand("TV_ChannelCluster"), mTestIndex(0) {}
+    TV_ChannelCluster() : TestCommand("TV_ChannelCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -33981,6 +36830,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TV_ChannelCluster *>(context))->OnFailureResponse_1(status);
@@ -34005,7 +36857,7 @@ private:
 
     CHIP_ERROR TestReadAttributeChannelList_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ChannelClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -34045,7 +36897,7 @@ private:
 
     CHIP_ERROR TestChangeChannelCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelRequest::Type;
 
         RequestType request;
@@ -34082,7 +36934,7 @@ private:
 
     CHIP_ERROR TestChangeChannelByNumberCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Channel::Commands::ChangeChannelByNumberRequest::Type;
 
         RequestType request;
@@ -34107,7 +36959,7 @@ private:
 
     CHIP_ERROR TestSkipChannelCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Channel::Commands::SkipChannelRequest::Type;
 
         RequestType request;
@@ -34133,7 +36985,11 @@ private:
 class TV_LowPowerCluster : public TestCommand
 {
 public:
-    TV_LowPowerCluster() : TestCommand("TV_LowPowerCluster"), mTestIndex(0) {}
+    TV_LowPowerCluster() : TestCommand("TV_LowPowerCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -34181,6 +37037,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -34193,7 +37052,7 @@ private:
 
     CHIP_ERROR TestSleepInputStatusCommand_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LowPower::Commands::Sleep::Type;
 
         RequestType request;
@@ -34218,7 +37077,11 @@ private:
 class TV_ContentLauncherCluster : public TestCommand
 {
 public:
-    TV_ContentLauncherCluster() : TestCommand("TV_ContentLauncherCluster"), mTestIndex(0) {}
+    TV_ContentLauncherCluster() : TestCommand("TV_ContentLauncherCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -34278,6 +37141,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TV_ContentLauncherCluster *>(context))->OnFailureResponse_1(status);
@@ -34310,7 +37176,7 @@ private:
 
     CHIP_ERROR TestReadAttributeAcceptHeaderList_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ContentLauncherClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -34337,7 +37203,7 @@ private:
 
     CHIP_ERROR TestReadAttributeSupportedStreamingProtocols_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ContentLauncherClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -34358,7 +37224,7 @@ private:
 
     CHIP_ERROR TestLaunchContentCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Type;
 
         RequestType request;
@@ -34392,7 +37258,7 @@ private:
 
     CHIP_ERROR TestLaunchUrlCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Type;
 
         RequestType request;
@@ -34464,7 +37330,11 @@ private:
 class TV_MediaInputCluster : public TestCommand
 {
 public:
-    TV_MediaInputCluster() : TestCommand("TV_MediaInputCluster"), mTestIndex(0) {}
+    TV_MediaInputCluster() : TestCommand("TV_MediaInputCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -34532,6 +37402,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 7;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_1(status);
@@ -34567,7 +37440,7 @@ private:
 
     CHIP_ERROR TestReadAttributeMediaInputList_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -34604,7 +37477,7 @@ private:
 
     CHIP_ERROR TestReadCurrentMediaInput_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -34624,7 +37497,7 @@ private:
 
     CHIP_ERROR TestSelectInputCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::MediaInput::Commands::SelectInputRequest::Type;
 
         RequestType request;
@@ -34648,7 +37521,7 @@ private:
 
     CHIP_ERROR TestHideInputStatusCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::MediaInput::Commands::HideInputStatusRequest::Type;
 
         RequestType request;
@@ -34671,7 +37544,7 @@ private:
 
     CHIP_ERROR TestShowInputStatusCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::MediaInput::Commands::ShowInputStatusRequest::Type;
 
         RequestType request;
@@ -34694,7 +37567,7 @@ private:
 
     CHIP_ERROR TestRenameInputCommand_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::MediaInput::Commands::RenameInputRequest::Type;
 
         RequestType request;
@@ -34721,7 +37594,11 @@ private:
 class TestCluster : public TestCommand
 {
 public:
-    TestCluster() : TestCommand("TestCluster"), mTestIndex(0) {}
+    TestCluster() : TestCommand("TestCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -36764,6 +39641,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 472;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     typedef void (*Test_TestCluster_list_int8u_ReportCallback)(void * context,
                                                                const chip::app::DataModel::DecodableList<uint8_t> & value);
@@ -40642,7 +43522,7 @@ private:
 
     CHIP_ERROR TestSendTestCommand_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::Test::Type;
 
         RequestType request;
@@ -40665,7 +43545,7 @@ private:
 
     CHIP_ERROR TestSendTestNotHandledCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type;
 
         RequestType request;
@@ -40692,7 +43572,7 @@ private:
 
     CHIP_ERROR TestSendTestSpecificCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestSpecific::Type;
 
         RequestType request;
@@ -40720,7 +43600,7 @@ private:
 
     CHIP_ERROR TestSendTestAddArgumentsCommand_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
         RequestType request;
@@ -40750,7 +43630,7 @@ private:
 
     CHIP_ERROR TestSendFailingTestAddArgumentsCommand_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
         RequestType request;
@@ -40779,7 +43659,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBooleanDefaultValue_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -40799,7 +43679,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBooleanTrue_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -40817,7 +43697,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBooleanTrue_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -40837,7 +43717,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBooleanFalse_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -40855,7 +43735,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBooleanFalse_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -40875,7 +43755,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap8DefaultValue_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -40895,7 +43775,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap8MaxValue_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -40913,7 +43793,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap8MaxValue_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -40933,7 +43813,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap8MinValue_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -40951,7 +43831,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap8MinValue_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -40971,7 +43851,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap16DefaultValue_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -40991,7 +43871,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap16MaxValue_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41009,7 +43889,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap16MaxValue_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41029,7 +43909,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap16MinValue_19()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41047,7 +43927,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap16MinValue_20()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41067,7 +43947,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap32DefaultValue_21()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41087,7 +43967,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap32MaxValue_22()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41105,7 +43985,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap32MaxValue_23()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41125,7 +44005,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap32MinValue_24()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41143,7 +44023,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap32MinValue_25()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41163,7 +44043,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap64DefaultValue_26()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41183,7 +44063,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap64MaxValue_27()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41201,7 +44081,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap64MaxValue_28()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41221,7 +44101,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap64MinValue_29()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41239,7 +44119,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap64MinValue_30()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41259,7 +44139,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8uDefaultValue_31()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41279,7 +44159,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt8uMaxValue_32()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41297,7 +44177,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8uMaxValue_33()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41317,7 +44197,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt8uMinValue_34()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41335,7 +44215,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8uMinValue_35()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41355,7 +44235,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16uDefaultValue_36()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41375,7 +44255,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt16uMaxValue_37()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41393,7 +44273,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16uMaxValue_38()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41413,7 +44293,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt16uMinValue_39()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41431,7 +44311,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16uMinValue_40()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41451,7 +44331,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32uDefaultValue_41()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41471,7 +44351,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt32uMaxValue_42()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41489,7 +44369,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32uMaxValue_43()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41509,7 +44389,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt32uMinValue_44()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41527,7 +44407,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32uMinValue_45()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41547,7 +44427,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64uDefaultValue_46()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41567,7 +44447,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt64uMaxValue_47()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41585,7 +44465,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64uMaxValue_48()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41605,7 +44485,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt64uMinValue_49()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41623,7 +44503,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64uMinValue_50()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41643,7 +44523,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8sDefaultValue_51()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41663,7 +44543,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt8sMaxValue_52()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41681,7 +44561,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8sMaxValue_53()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41701,7 +44581,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt8sMinValue_54()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41719,7 +44599,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8sMinValue_55()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41739,7 +44619,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt8sDefaultValue_56()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41757,7 +44637,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8sDefaultValue_57()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41777,7 +44657,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16sDefaultValue_58()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41797,7 +44677,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt16sMaxValue_59()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41815,7 +44695,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16sMaxValue_60()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41835,7 +44715,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt16sMinValue_61()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41853,7 +44733,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16sMinValue_62()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41873,7 +44753,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt16sDefaultValue_63()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41891,7 +44771,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16sDefaultValue_64()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41911,7 +44791,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32sDefaultValue_65()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41931,7 +44811,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt32sMaxValue_66()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41949,7 +44829,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32sMaxValue_67()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41969,7 +44849,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt32sMinValue_68()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -41987,7 +44867,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32sMinValue_69()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42007,7 +44887,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt32sDefaultValue_70()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42025,7 +44905,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32sDefaultValue_71()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42045,7 +44925,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64sDefaultValue_72()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42065,7 +44945,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt64sMaxValue_73()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42083,7 +44963,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64sMaxValue_74()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42103,7 +44983,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt64sMinValue_75()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42121,7 +45001,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64sMinValue_76()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42141,7 +45021,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt64sDefaultValue_77()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42159,7 +45039,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64sDefaultValue_78()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42179,7 +45059,7 @@ private:
 
     CHIP_ERROR TestReadAttributeSingleDefaultValue_79()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42199,7 +45079,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeSingleMediumValue_80()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42217,7 +45097,7 @@ private:
 
     CHIP_ERROR TestReadAttributeSingleMediumValue_81()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42237,7 +45117,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeSingleLargeValue_82()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42255,7 +45135,7 @@ private:
 
     CHIP_ERROR TestReadAttributeSingleLargeValue_83()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42275,7 +45155,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeSingleSmallValue_84()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42293,7 +45173,7 @@ private:
 
     CHIP_ERROR TestReadAttributeSingleSmallValue_85()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42313,7 +45193,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeSingleDefaultValue_86()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42331,7 +45211,7 @@ private:
 
     CHIP_ERROR TestReadAttributeSingleDefaultValue_87()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42351,7 +45231,7 @@ private:
 
     CHIP_ERROR TestReadAttributeDoubleDefaultValue_88()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42371,7 +45251,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeDoubleMediumValue_89()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42389,7 +45269,7 @@ private:
 
     CHIP_ERROR TestReadAttributeDoubleMediumValue_90()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42409,7 +45289,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeDoubleLargeValue_91()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42427,7 +45307,7 @@ private:
 
     CHIP_ERROR TestReadAttributeDoubleLargeValue_92()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42447,7 +45327,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeDoubleSmallValue_93()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42465,7 +45345,7 @@ private:
 
     CHIP_ERROR TestReadAttributeDoubleSmallValue_94()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42485,7 +45365,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeDoubleDefaultValue_95()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42503,7 +45383,7 @@ private:
 
     CHIP_ERROR TestReadAttributeDoubleDefaultValue_96()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42523,7 +45403,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum8DefaultValue_97()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42543,7 +45423,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEnum8MaxValue_98()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42561,7 +45441,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum8MaxValue_99()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42581,7 +45461,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEnum8MinValue_100()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42599,7 +45479,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum8MinValue_101()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42619,7 +45499,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum16DefaultValue_102()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42639,7 +45519,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEnum16MaxValue_103()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42657,7 +45537,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum16MaxValue_104()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42677,7 +45557,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEnum16MinValue_105()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42695,7 +45575,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum16MinValue_106()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42715,7 +45595,7 @@ private:
 
     CHIP_ERROR TestReadAttributeOctetStringDefaultValue_107()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42735,7 +45615,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeOctetStringWithEmbeddedNull_108()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42753,7 +45633,7 @@ private:
 
     CHIP_ERROR TestReadAttributeOctetStringWithEmbeddedNull_109()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42774,7 +45654,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeOctetStringWithWeirdChars_110()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42793,7 +45673,7 @@ private:
 
     CHIP_ERROR TestReadAttributeOctetStringWithWeirdChars_111()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42814,7 +45694,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeOctetString_112()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42832,7 +45712,7 @@ private:
 
     CHIP_ERROR TestReadAttributeOctetString_113()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42853,7 +45733,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeOctetString_114()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42876,7 +45756,7 @@ private:
 
     CHIP_ERROR TestReadAttributeOctetString_115()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42897,7 +45777,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeOctetString_116()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42915,7 +45795,7 @@ private:
 
     CHIP_ERROR TestReadAttributeLongOctetStringDefaultValue_117()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42935,7 +45815,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeLongOctetString_118()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42958,7 +45838,7 @@ private:
 
     CHIP_ERROR TestReadAttributeLongOctetString_119()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -42985,7 +45865,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeLongOctetString_120()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43003,7 +45883,7 @@ private:
 
     CHIP_ERROR TestReadAttributeCharStringDefaultValue_121()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43023,7 +45903,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeCharString_122()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43041,7 +45921,7 @@ private:
 
     CHIP_ERROR TestReadAttributeCharString_123()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43061,7 +45941,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeCharStringValueTooLong_124()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43083,7 +45963,7 @@ private:
 
     CHIP_ERROR TestReadAttributeCharString_125()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43103,7 +45983,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeCharStringEmpty_126()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43121,7 +46001,7 @@ private:
 
     CHIP_ERROR TestReadAttributeLongCharStringDefaultValue_127()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43141,7 +46021,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeLongCharString_128()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43163,7 +46043,7 @@ private:
 
     CHIP_ERROR TestReadAttributeLongCharString_129()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43188,7 +46068,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeLongCharString_130()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43206,7 +46086,7 @@ private:
 
     CHIP_ERROR TestReadAttributeListLongOctetString_131()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43273,7 +46153,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochUsDefaultValue_132()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43293,7 +46173,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEpochUsMaxValue_133()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43311,7 +46191,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochUsMaxValue_134()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43331,7 +46211,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEpochUsMinValue_135()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43349,7 +46229,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochUsMinValue_136()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43369,7 +46249,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochSDefaultValue_137()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43389,7 +46269,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEpochSMaxValue_138()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43407,7 +46287,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochSMaxValue_139()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43427,7 +46307,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEpochSMinValue_140()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43445,7 +46325,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochSMinValue_141()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43465,7 +46345,7 @@ private:
 
     CHIP_ERROR TestReadAttributeUnsupported_142()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43488,7 +46368,7 @@ private:
 
     CHIP_ERROR TestWriteattributeUnsupported_143()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43509,7 +46389,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandToUnsupportedEndpoint_144()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 200;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 200;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::Test::Type;
 
         RequestType request;
@@ -43536,7 +46416,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandToUnsupportedCluster_145()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::Test::Type;
 
         RequestType request;
@@ -43563,7 +46443,7 @@ private:
 
     CHIP_ERROR TestReadAttributeVendorIdDefaultValue_146()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43583,7 +46463,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeVendorId_147()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43601,7 +46481,7 @@ private:
 
     CHIP_ERROR TestReadAttributeVendorId_148()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43621,7 +46501,7 @@ private:
 
     CHIP_ERROR TestRestoreAttributeVendorId_149()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -43639,7 +46519,7 @@ private:
 
     CHIP_ERROR TestSendACommandWithAVendorIdAndEnum_150()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type;
 
         RequestType request;
@@ -43671,7 +46551,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithStructArgumentAndArg1bIsTrue_151()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
 
         RequestType request;
@@ -43708,7 +46588,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithStructArgumentAndArg1bIsFalse_152()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
 
         RequestType request;
@@ -43745,7 +46625,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithNestedStructArgumentAndArg1cbIsTrue_153()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type;
 
         RequestType request;
@@ -43785,7 +46665,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithNestedStructArgumentArg1cbIsFalse_154()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type;
 
         RequestType request;
@@ -43825,7 +46705,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithNestedStructListArgumentAndAllFieldsBOfArg1dAreTrue_155()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type;
 
         RequestType request;
@@ -43904,7 +46784,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithNestedStructListArgumentAndSomeFieldsBOfArg1dAreFalse_156()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type;
 
         RequestType request;
@@ -43983,7 +46863,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithStructArgumentAndSeeWhatWeGetBack_157()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type;
 
         RequestType request;
@@ -44027,7 +46907,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndNoneOfThemIsSetTo0_158()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
 
         RequestType request;
@@ -44067,7 +46947,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndOneOfThemIsSetTo0_159()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
 
         RequestType request;
@@ -44108,7 +46988,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithListOfInt8uAndGetItReversed_160()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
 
         RequestType request;
@@ -44169,7 +47049,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithEmptyListOfInt8uAndGetAnEmptyListBack_161()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
 
         RequestType request;
@@ -44202,7 +47082,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_162()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
 
         RequestType request;
@@ -44252,7 +47132,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_163()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
 
         RequestType request;
@@ -44302,7 +47182,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithListOfNestedStructListArgumentAndAllFieldsBOfElementsOfArg1dAreTrue_164()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type;
 
         RequestType request;
@@ -44385,7 +47265,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithNestedStructListArgumentAndSomeFieldsBOfElementsOfArg1dAreFalse_165()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type;
 
         RequestType request;
@@ -44468,7 +47348,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeListWithListOfInt8uAndNoneOfThemIsSetTo0_166()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44492,7 +47372,7 @@ private:
 
     CHIP_ERROR TestReadAttributeListWithListOfInt8u_167()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44523,7 +47403,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeListWithListOfOctetString_168()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44547,7 +47427,7 @@ private:
 
     CHIP_ERROR TestReadAttributeListWithListOfOctetString_169()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44582,7 +47462,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeListWithListOfListStructOctetString_170()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44620,7 +47500,7 @@ private:
 
     CHIP_ERROR TestReadAttributeListWithListOfListStructOctetString_171()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44661,7 +47541,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithOptionalArgSet_172()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
 
         RequestType request;
@@ -44704,7 +47584,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithoutItsOptionalArg_173()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
 
         RequestType request;
@@ -44734,7 +47614,7 @@ private:
 
     CHIP_ERROR TestReadListOfStructsContainingNullablesAndOptionals_174()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44767,7 +47647,7 @@ private:
 
     CHIP_ERROR TestWriteListOfStructsContainingNullablesAndOptionals_175()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44800,7 +47680,7 @@ private:
 
     CHIP_ERROR TestReadListOfStructsContainingNullablesAndOptionalsAfterWriting_176()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44844,7 +47724,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBooleanNull_177()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44862,7 +47742,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBooleanNull_178()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44882,7 +47762,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBooleanTrue_179()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44901,7 +47781,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBooleanTrue_180()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44922,7 +47802,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap8MaxValue_181()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44941,7 +47821,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap8MaxValue_182()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44962,7 +47842,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap8InvalidValue_183()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -44985,7 +47865,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap8UnchangedValue_184()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45006,7 +47886,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap8NullValue_185()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45024,7 +47904,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap8NullValue_186()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45044,7 +47924,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap16MaxValue_187()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45063,7 +47943,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap16MaxValue_188()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45084,7 +47964,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap16InvalidValue_189()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45107,7 +47987,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap16UnchangedValue_190()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45128,7 +48008,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap16NullValue_191()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45146,7 +48026,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap16NullValue_192()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45166,7 +48046,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap32MaxValue_193()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45185,7 +48065,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap32MaxValue_194()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45206,7 +48086,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap32InvalidValue_195()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45229,7 +48109,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap32UnchangedValue_196()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45250,7 +48130,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap32NullValue_197()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45268,7 +48148,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap32NullValue_198()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45288,7 +48168,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap64MaxValue_199()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45307,7 +48187,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap64MaxValue_200()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45328,7 +48208,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap64InvalidValue_201()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45351,7 +48231,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap64UnchangedValue_202()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45372,7 +48252,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableBitmap64NullValue_203()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45390,7 +48270,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableBitmap64NullValue_204()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45410,7 +48290,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt8uMinValue_205()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45429,7 +48309,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8uMinValue_206()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45450,7 +48330,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt8uMaxValue_207()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45469,7 +48349,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8uMaxValue_208()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45490,7 +48370,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt8uInvalidValue_209()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45513,7 +48393,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8uUnchangedValue_210()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45534,7 +48414,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8uUnchangedValueWithConstraint_211()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45554,7 +48434,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt8uNullValue_212()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45572,7 +48452,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8uNullValue_213()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45592,7 +48472,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8uNullValueRange_214()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45611,7 +48491,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8uNullValueNot_215()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45631,7 +48511,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt8uValue_216()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45650,7 +48530,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8uValueInRange_217()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45669,7 +48549,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8uNotValueOk_218()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45689,7 +48569,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt16uMinValue_219()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45708,7 +48588,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16uMinValue_220()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45729,7 +48609,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt16uMaxValue_221()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45748,7 +48628,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16uMaxValue_222()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45769,7 +48649,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt16uInvalidValue_223()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45792,7 +48672,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16uUnchangedValue_224()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45813,7 +48693,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt16uNullValue_225()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45831,7 +48711,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16uNullValue_226()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45851,7 +48731,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16uNullValueRange_227()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45870,7 +48750,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16uNullValueNot_228()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45890,7 +48770,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt16uValue_229()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45909,7 +48789,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16uValueInRange_230()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45928,7 +48808,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16uNotValueOk_231()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45948,7 +48828,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt32uMinValue_232()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45967,7 +48847,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32uMinValue_233()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -45988,7 +48868,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt32uMaxValue_234()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46007,7 +48887,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32uMaxValue_235()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46028,7 +48908,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt32uInvalidValue_236()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46051,7 +48931,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32uUnchangedValue_237()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46072,7 +48952,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt32uNullValue_238()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46090,7 +48970,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32uNullValue_239()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46110,7 +48990,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32uNullValueRange_240()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46129,7 +49009,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32uNullValueNot_241()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46149,7 +49029,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt32uValue_242()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46168,7 +49048,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32uValueInRange_243()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46187,7 +49067,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32uNotValueOk_244()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46207,7 +49087,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt64uMinValue_245()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46226,7 +49106,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64uMinValue_246()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46247,7 +49127,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt64uMaxValue_247()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46266,7 +49146,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64uMaxValue_248()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46287,7 +49167,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt64uInvalidValue_249()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46310,7 +49190,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64uUnchangedValue_250()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46331,7 +49211,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt64uNullValue_251()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46349,7 +49229,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64uNullValue_252()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46369,7 +49249,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64uNullValueRange_253()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46388,7 +49268,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64uNullValueNot_254()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46408,7 +49288,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt64uValue_255()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46427,7 +49307,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64uValueInRange_256()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46446,7 +49326,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64uNotValueOk_257()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46466,7 +49346,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt8sMinValue_258()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46485,7 +49365,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8sMinValue_259()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46506,7 +49386,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt8sInvalidValue_260()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46529,7 +49409,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8sUnchangedValue_261()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46550,7 +49430,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt8sNullValue_262()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46568,7 +49448,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8sNullValue_263()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46588,7 +49468,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8sNullValueRange_264()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46608,7 +49488,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8sNullValueNot_265()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46628,7 +49508,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt8sValue_266()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46647,7 +49527,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8sValueInRange_267()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46667,7 +49547,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt8sNotValueOk_268()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46687,7 +49567,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt16sMinValue_269()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46706,7 +49586,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16sMinValue_270()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46727,7 +49607,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt16sInvalidValue_271()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46750,7 +49630,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16sUnchangedValue_272()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46771,7 +49651,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt16sNullValue_273()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46789,7 +49669,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16sNullValue_274()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46809,7 +49689,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16sNullValueRange_275()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46829,7 +49709,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16sNullValueNot_276()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46849,7 +49729,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt16sValue_277()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46868,7 +49748,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16sValueInRange_278()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46888,7 +49768,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt16sNotValueOk_279()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46908,7 +49788,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt32sMinValue_280()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46927,7 +49807,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32sMinValue_281()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46948,7 +49828,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt32sInvalidValue_282()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46971,7 +49851,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32sUnchangedValue_283()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -46992,7 +49872,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt32sNullValue_284()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47010,7 +49890,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32sNullValue_285()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47030,7 +49910,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32sNullValueRange_286()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47050,7 +49930,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32sNullValueNot_287()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47070,7 +49950,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt32sValue_288()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47089,7 +49969,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32sValueInRange_289()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47109,7 +49989,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt32sNotValueOk_290()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47129,7 +50009,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt64sMinValue_291()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47148,7 +50028,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64sMinValue_292()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47169,7 +50049,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt64sInvalidValue_293()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47192,7 +50072,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64sUnchangedValue_294()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47213,7 +50093,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt64sNullValue_295()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47231,7 +50111,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64sNullValue_296()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47251,7 +50131,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64sNullValueRange_297()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47271,7 +50151,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64sNullValueNot_298()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47291,7 +50171,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableInt64sValue_299()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47310,7 +50190,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64sValueInRange_300()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47330,7 +50210,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableInt64sNotValueOk_301()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47350,7 +50230,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableSingleMediumValue_302()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47369,7 +50249,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableSingleMediumValue_303()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47390,7 +50270,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableSingleLargestValue_304()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47409,7 +50289,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableSingleLargestValue_305()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47430,7 +50310,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableSingleSmallestValue_306()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47449,7 +50329,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableSingleSmallestValue_307()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47470,7 +50350,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableSingleNullValue_308()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47488,7 +50368,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableSingleNullValue_309()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47508,7 +50388,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableSingle0Value_310()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47527,7 +50407,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableSingle0Value_311()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47548,7 +50428,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableDoubleMediumValue_312()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47567,7 +50447,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableDoubleMediumValue_313()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47588,7 +50468,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableDoubleLargestValue_314()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47607,7 +50487,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableDoubleLargestValue_315()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47628,7 +50508,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableDoubleSmallestValue_316()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47647,7 +50527,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableDoubleSmallestValue_317()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47668,7 +50548,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableDoubleNullValue_318()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47686,7 +50566,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableDoubleNullValue_319()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47706,7 +50586,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableDouble0Value_320()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47725,7 +50605,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableDouble0Value_321()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47746,7 +50626,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableEnum8MinValue_322()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47765,7 +50645,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableEnum8MinValue_323()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47786,7 +50666,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableEnum8MaxValue_324()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47805,7 +50685,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableEnum8MaxValue_325()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47826,7 +50706,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableEnum8InvalidValue_326()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47849,7 +50729,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableEnum8UnchangedValue_327()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47870,7 +50750,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableEnum8NullValue_328()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47888,7 +50768,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableEnum8NullValue_329()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47908,7 +50788,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableEnum16MinValue_330()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47927,7 +50807,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableEnum16MinValue_331()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47948,7 +50828,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableEnum16MaxValue_332()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47967,7 +50847,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableEnum16MaxValue_333()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -47988,7 +50868,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableEnum16InvalidValue_334()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48011,7 +50891,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableEnum16UnchangedValue_335()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48032,7 +50912,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableEnum16NullValue_336()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48050,7 +50930,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableEnum16NullValue_337()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48070,7 +50950,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableSimpleEnumMinValue_338()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48089,7 +50969,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableSimpleEnumMinValue_339()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48111,7 +50991,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableSimpleEnumMaxValue_340()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48130,7 +51010,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableSimpleEnumMaxValue_341()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48152,7 +51032,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableSimpleEnumInvalidValue_342()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48175,7 +51055,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableSimpleEnumUnchangedValue_343()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48197,7 +51077,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableSimpleEnumNullValue_344()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48215,7 +51095,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableSimpleEnumNullValue_345()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48236,7 +51116,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableOctetStringDefaultValue_346()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48258,7 +51138,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableOctetString_347()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48278,7 +51158,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableOctetString_348()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48300,7 +51180,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableOctetString_349()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48318,7 +51198,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableOctetString_350()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48338,7 +51218,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableOctetString_351()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48357,7 +51237,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableOctetString_352()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48379,7 +51259,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableCharStringDefaultValue_353()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48400,7 +51280,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableCharString_354()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48419,7 +51299,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableCharString_355()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48440,7 +51320,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableCharStringValueTooLong_356()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48458,7 +51338,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableCharString_357()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48478,7 +51358,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeNullableCharStringEmpty_358()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48497,7 +51377,7 @@ private:
 
     CHIP_ERROR TestReadAttributeNullableCharString_359()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48518,7 +51398,7 @@ private:
 
     CHIP_ERROR TestReadAttributeFromNonexistentEndpoint_360()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 200;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 200;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48537,7 +51417,7 @@ private:
 
     CHIP_ERROR TestReadAttributeFromNonexistentCluster_361()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48556,7 +51436,7 @@ private:
 
     CHIP_ERROR TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_362()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type;
 
         RequestType request;
@@ -48583,7 +51463,7 @@ private:
 
     CHIP_ERROR TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_363()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type;
 
         RequestType request;
@@ -48608,7 +51488,7 @@ private:
 
     CHIP_ERROR TestReportSubscribeToListAttribute_364()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48638,7 +51518,7 @@ private:
 
     CHIP_ERROR TestSubscribeToListAttribute_365()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48673,7 +51553,7 @@ private:
 
     CHIP_ERROR TestWriteSubscribedToListAttribute_366()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48697,7 +51577,7 @@ private:
 
     CHIP_ERROR TestCheckForListAttributeReport_367()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48729,7 +51609,7 @@ private:
 
     CHIP_ERROR TestReadRangeRestrictedUnsigned8BitInteger_368()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48749,7 +51629,7 @@ private:
 
     CHIP_ERROR TestWriteMinValueToARangeRestrictedUnsigned8BitInteger_369()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48771,7 +51651,7 @@ private:
 
     CHIP_ERROR TestWriteJustBelowRangeValueToARangeRestrictedUnsigned8BitInteger_370()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48793,7 +51673,7 @@ private:
 
     CHIP_ERROR TestWriteJustAboveRangeValueToARangeRestrictedUnsigned8BitInteger_371()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48815,7 +51695,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValueToARangeRestrictedUnsigned8BitInteger_372()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48837,7 +51717,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned8BitIntegerValueHasNotChanged_373()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48857,7 +51737,7 @@ private:
 
     CHIP_ERROR TestWriteMinValidValueToARangeRestrictedUnsigned8BitInteger_374()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48875,7 +51755,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned8BitIntegerValueIsAtMinValid_375()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48895,7 +51775,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValidValueToARangeRestrictedUnsigned8BitInteger_376()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48913,7 +51793,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned8BitIntegerValueIsAtMaxValid_377()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48933,7 +51813,7 @@ private:
 
     CHIP_ERROR TestWriteMiddleValidValueToARangeRestrictedUnsigned8BitInteger_378()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48951,7 +51831,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned8BitIntegerValueIsAtMidValid_379()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48971,7 +51851,7 @@ private:
 
     CHIP_ERROR TestReadRangeRestrictedUnsigned16BitInteger_380()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -48991,7 +51871,7 @@ private:
 
     CHIP_ERROR TestWriteMinValueToARangeRestrictedUnsigned16BitInteger_381()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49013,7 +51893,7 @@ private:
 
     CHIP_ERROR TestWriteJustBelowRangeValueToARangeRestrictedUnsigned16BitInteger_382()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49035,7 +51915,7 @@ private:
 
     CHIP_ERROR TestWriteJustAboveRangeValueToARangeRestrictedUnsigned16BitInteger_383()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49057,7 +51937,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValueToARangeRestrictedUnsigned16BitInteger_384()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49079,7 +51959,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned16BitIntegerValueHasNotChanged_385()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49099,7 +51979,7 @@ private:
 
     CHIP_ERROR TestWriteMinValidValueToARangeRestrictedUnsigned16BitInteger_386()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49117,7 +51997,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned16BitIntegerValueIsAtMinValid_387()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49137,7 +52017,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValidValueToARangeRestrictedUnsigned16BitInteger_388()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49155,7 +52035,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned16BitIntegerValueIsAtMaxValid_389()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49175,7 +52055,7 @@ private:
 
     CHIP_ERROR TestWriteMiddleValidValueToARangeRestrictedUnsigned16BitInteger_390()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49193,7 +52073,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedUnsigned16BitIntegerValueIsAtMidValid_391()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49213,7 +52093,7 @@ private:
 
     CHIP_ERROR TestReadRangeRestrictedSigned8BitInteger_392()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49233,7 +52113,7 @@ private:
 
     CHIP_ERROR TestWriteMinValueToARangeRestrictedSigned8BitInteger_393()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49255,7 +52135,7 @@ private:
 
     CHIP_ERROR TestWriteJustBelowRangeValueToARangeRestrictedSigned8BitInteger_394()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49277,7 +52157,7 @@ private:
 
     CHIP_ERROR TestWriteJustAboveRangeValueToARangeRestrictedSigned8BitInteger_395()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49299,7 +52179,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValueToARangeRestrictedSigned8BitInteger_396()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49321,7 +52201,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned8BitIntegerValueHasNotChanged_397()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49341,7 +52221,7 @@ private:
 
     CHIP_ERROR TestWriteMinValidValueToARangeRestrictedSigned8BitInteger_398()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49359,7 +52239,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned8BitIntegerValueIsAtMinValid_399()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49379,7 +52259,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValidValueToARangeRestrictedSigned8BitInteger_400()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49397,7 +52277,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned8BitIntegerValueIsAtMaxValid_401()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49417,7 +52297,7 @@ private:
 
     CHIP_ERROR TestWriteMiddleValidValueToARangeRestrictedSigned8BitInteger_402()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49435,7 +52315,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned8BitIntegerValueIsAtMidValid_403()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49455,7 +52335,7 @@ private:
 
     CHIP_ERROR TestReadRangeRestrictedSigned16BitInteger_404()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49475,7 +52355,7 @@ private:
 
     CHIP_ERROR TestWriteMinValueToARangeRestrictedSigned16BitInteger_405()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49497,7 +52377,7 @@ private:
 
     CHIP_ERROR TestWriteJustBelowRangeValueToARangeRestrictedSigned16BitInteger_406()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49519,7 +52399,7 @@ private:
 
     CHIP_ERROR TestWriteJustAboveRangeValueToARangeRestrictedSigned16BitInteger_407()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49541,7 +52421,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValueToARangeRestrictedSigned16BitInteger_408()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49563,7 +52443,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned16BitIntegerValueHasNotChanged_409()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49583,7 +52463,7 @@ private:
 
     CHIP_ERROR TestWriteMinValidValueToARangeRestrictedSigned16BitInteger_410()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49601,7 +52481,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned16BitIntegerValueIsAtMinValid_411()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49621,7 +52501,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValidValueToARangeRestrictedSigned16BitInteger_412()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49639,7 +52519,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned16BitIntegerValueIsAtMaxValid_413()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49659,7 +52539,7 @@ private:
 
     CHIP_ERROR TestWriteMiddleValidValueToARangeRestrictedSigned16BitInteger_414()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49677,7 +52557,7 @@ private:
 
     CHIP_ERROR TestVerifyRangeRestrictedSigned16BitIntegerValueIsAtMidValid_415()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49697,7 +52577,7 @@ private:
 
     CHIP_ERROR TestReadNullableRangeRestrictedUnsigned8BitInteger_416()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49719,7 +52599,7 @@ private:
 
     CHIP_ERROR TestWriteMinValueToANullableRangeRestrictedUnsigned8BitInteger_417()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49743,7 +52623,7 @@ private:
 
     CHIP_ERROR TestWriteJustBelowRangeValueToANullableRangeRestrictedUnsigned8BitInteger_418()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49767,7 +52647,7 @@ private:
 
     CHIP_ERROR TestWriteJustAboveRangeValueToANullableRangeRestrictedUnsigned8BitInteger_419()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49791,7 +52671,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValueToANullableRangeRestrictedUnsigned8BitInteger_420()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49815,7 +52695,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned8BitIntegerValueHasNotChanged_421()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49837,7 +52717,7 @@ private:
 
     CHIP_ERROR TestWriteMinValidValueToANullableRangeRestrictedUnsigned8BitInteger_422()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49857,7 +52737,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned8BitIntegerValueIsAtMinValid_423()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49879,7 +52759,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValidValueToANullableRangeRestrictedUnsigned8BitInteger_424()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49899,7 +52779,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned8BitIntegerValueIsAtMaxValid_425()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49921,7 +52801,7 @@ private:
 
     CHIP_ERROR TestWriteMiddleValidValueToANullableRangeRestrictedUnsigned8BitInteger_426()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49941,7 +52821,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned8BitIntegerValueIsAtMidValid_427()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49963,7 +52843,7 @@ private:
 
     CHIP_ERROR TestWriteNullValueToANullableRangeRestrictedUnsigned8BitInteger_428()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -49982,7 +52862,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned8BitIntegerValueIsNull_429()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50003,7 +52883,7 @@ private:
 
     CHIP_ERROR TestReadNullableRangeRestrictedUnsigned16BitInteger_430()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50025,7 +52905,7 @@ private:
 
     CHIP_ERROR TestWriteMinValueToANullableRangeRestrictedUnsigned16BitInteger_431()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50049,7 +52929,7 @@ private:
 
     CHIP_ERROR TestWriteJustBelowRangeValueToANullableRangeRestrictedUnsigned16BitInteger_432()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50073,7 +52953,7 @@ private:
 
     CHIP_ERROR TestWriteJustAboveRangeValueToANullableRangeRestrictedUnsigned16BitInteger_433()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50097,7 +52977,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValueToANullableRangeRestrictedUnsigned16BitInteger_434()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50121,7 +53001,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned16BitIntegerValueHasNotChanged_435()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50143,7 +53023,7 @@ private:
 
     CHIP_ERROR TestWriteMinValidValueToANullableRangeRestrictedUnsigned16BitInteger_436()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50163,7 +53043,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned16BitIntegerValueIsAtMinValid_437()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50185,7 +53065,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValidValueToANullableRangeRestrictedUnsigned16BitInteger_438()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50205,7 +53085,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned16BitIntegerValueIsAtMaxValid_439()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50227,7 +53107,7 @@ private:
 
     CHIP_ERROR TestWriteMiddleValidValueToANullableRangeRestrictedUnsigned16BitInteger_440()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50247,7 +53127,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned16BitIntegerValueIsAtMidValid_441()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50269,7 +53149,7 @@ private:
 
     CHIP_ERROR TestWriteNullValueToANullableRangeRestrictedUnsigned16BitInteger_442()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50288,7 +53168,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedUnsigned16BitIntegerValueIsNull_443()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50309,7 +53189,7 @@ private:
 
     CHIP_ERROR TestReadNullableRangeRestrictedSigned8BitInteger_444()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50331,7 +53211,7 @@ private:
 
     CHIP_ERROR TestWriteMinValueToANullableRangeRestrictedSigned8BitInteger_445()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50355,7 +53235,7 @@ private:
 
     CHIP_ERROR TestWriteJustBelowRangeValueToANullableRangeRestrictedSigned8BitInteger_446()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50379,7 +53259,7 @@ private:
 
     CHIP_ERROR TestWriteJustAboveRangeValueToANullableRangeRestrictedSigned8BitInteger_447()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50403,7 +53283,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValueToANullableRangeRestrictedSigned8BitInteger_448()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50427,7 +53307,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned8BitIntegerValueHasNotChanged_449()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50449,7 +53329,7 @@ private:
 
     CHIP_ERROR TestWriteMinValidValueToANullableRangeRestrictedSigned8BitInteger_450()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50469,7 +53349,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned8BitIntegerValueIsAtMinValid_451()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50491,7 +53371,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValidValueToANullableRangeRestrictedSigned8BitInteger_452()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50511,7 +53391,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned8BitIntegerValueIsAtMaxValid_453()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50533,7 +53413,7 @@ private:
 
     CHIP_ERROR TestWriteMiddleValidValueToANullableRangeRestrictedSigned8BitInteger_454()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50553,7 +53433,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned8BitIntegerValueIsAtMidValid_455()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50575,7 +53455,7 @@ private:
 
     CHIP_ERROR TestWriteNullValueToANullableRangeRestrictedSigned8BitInteger_456()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50594,7 +53474,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned8BitIntegerValueIsAtNull_457()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50615,7 +53495,7 @@ private:
 
     CHIP_ERROR TestReadNullableRangeRestrictedSigned16BitInteger_458()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50637,7 +53517,7 @@ private:
 
     CHIP_ERROR TestWriteMinValueToANullableRangeRestrictedSigned16BitInteger_459()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50661,7 +53541,7 @@ private:
 
     CHIP_ERROR TestWriteJustBelowRangeValueToANullableRangeRestrictedSigned16BitInteger_460()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50685,7 +53565,7 @@ private:
 
     CHIP_ERROR TestWriteJustAboveRangeValueToANullableRangeRestrictedSigned16BitInteger_461()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50709,7 +53589,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValueToANullableRangeRestrictedSigned16BitInteger_462()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50733,7 +53613,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned16BitIntegerValueHasNotChanged_463()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50755,7 +53635,7 @@ private:
 
     CHIP_ERROR TestWriteMinValidValueToANullableRangeRestrictedSigned16BitInteger_464()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50775,7 +53655,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned16BitIntegerValueIsAtMinValid_465()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50797,7 +53677,7 @@ private:
 
     CHIP_ERROR TestWriteMaxValidValueToANullableRangeRestrictedSigned16BitInteger_466()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50817,7 +53697,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned16BitIntegerValueIsAtMaxValid_467()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50839,7 +53719,7 @@ private:
 
     CHIP_ERROR TestWriteMiddleValidValueToANullableRangeRestrictedSigned16BitInteger_468()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50859,7 +53739,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned16BitIntegerValueIsAtMidValid_469()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50881,7 +53761,7 @@ private:
 
     CHIP_ERROR TestWriteNullValueToANullableRangeRestrictedSigned16BitInteger_470()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50900,7 +53780,7 @@ private:
 
     CHIP_ERROR TestVerifyNullableRangeRestrictedSigned16BitIntegerValueIsNull_471()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -50923,7 +53803,11 @@ private:
 class TestClusterComplexTypes : public TestCommand
 {
 public:
-    TestClusterComplexTypes() : TestCommand("TestClusterComplexTypes"), mTestIndex(0) {}
+    TestClusterComplexTypes() : TestCommand("TestClusterComplexTypes"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -51051,6 +53935,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 21;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
     {
@@ -51183,7 +54070,7 @@ private:
 
     CHIP_ERROR TestSendTestCommandWithOptionalArgSetToNull_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
 
         RequestType request;
@@ -51221,7 +54108,7 @@ private:
 
     CHIP_ERROR TestSendCommandThatNeedsTimedInvokeWithoutATimeoutValue_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type;
 
         RequestType request;
@@ -51249,7 +54136,7 @@ private:
 
     CHIP_ERROR TestSendCommandThatNeedsTimedInvokeWithALongTimeoutValue_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type;
 
         RequestType request;
@@ -51273,7 +54160,7 @@ private:
 
     CHIP_ERROR TestSendCommandThatNeedsTimedInvokeWithATooShortTimeoutValue_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type;
 
         RequestType request;
@@ -51309,7 +54196,7 @@ private:
 
     CHIP_ERROR TestSendCommandThatDoesNotNeedTimedInvokeWithALongTimeoutValue_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::Test::Type;
 
         RequestType request;
@@ -51333,7 +54220,7 @@ private:
 
     CHIP_ERROR TestSendCommandThatDoesNotNeedTimedInvokeWithATooShortTimeoutValue_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::Test::Type;
 
         RequestType request;
@@ -51369,7 +54256,7 @@ private:
 
     CHIP_ERROR TestReadAttributeThatNeedsTimedWriteInitialState_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51389,7 +54276,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeThatNeedsTimedWriteWithoutATimeoutValue_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51411,7 +54298,7 @@ private:
 
     CHIP_ERROR TestReadAttributeThatNeedsTimedWriteStateUnchanged1_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51431,7 +54318,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeThatNeedsTimedWriteWithATooShortTimeoutValue_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51461,7 +54348,7 @@ private:
 
     CHIP_ERROR TestReadAttributeThatNeedsTimedWriteStateUnchanged2_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51481,7 +54368,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeThatNeedsTimedWriteWithALongTimeoutValue_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51499,7 +54386,7 @@ private:
 
     CHIP_ERROR TestReadAttributeThatNeedsTimedWriteStateChanged_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51519,7 +54406,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeThatNeedsTimedWriteResetToDefault_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51537,7 +54424,7 @@ private:
 
     CHIP_ERROR TestReadAttributeThatDoesNotNeedTimedWriteInitialValue_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51557,7 +54444,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeThatDoesNotNeedTimedWriteWithATooShortTimeoutValue_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51587,7 +54474,7 @@ private:
 
     CHIP_ERROR TestReadAttributeThatDoesNotNeedTimedWriteUnchangedValue_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51607,7 +54494,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeThatDoesNotNeedTimedWriteWithALongTimeoutValue_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51625,7 +54512,7 @@ private:
 
     CHIP_ERROR TestReadAttributeThatDoesNotNeedTimedWriteChangedValue_19()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51645,7 +54532,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeThatDoesNotNeedTimedWriteResetToDefault_20()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51665,7 +54552,11 @@ private:
 class TestConstraints : public TestCommand
 {
 public:
-    TestConstraints() : TestCommand("TestConstraints"), mTestIndex(0) {}
+    TestConstraints() : TestCommand("TestConstraints"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -51752,6 +54643,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 12;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -51863,7 +54757,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt32uValue_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51881,7 +54775,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32uValueMinValueConstraints_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51900,7 +54794,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32uValueMaxValueConstraints_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51919,7 +54813,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32uValueNotValueConstraints_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51939,7 +54833,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt32uValueBackToDefaultValue_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51957,7 +54851,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeCharStringValue_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51975,7 +54869,7 @@ private:
 
     CHIP_ERROR TestReadAttributeCharStringValueMinLengthConstraints_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -51994,7 +54888,7 @@ private:
 
     CHIP_ERROR TestReadAttributeCharStringValueMaxLengthConstraints_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -52013,7 +54907,7 @@ private:
 
     CHIP_ERROR TestReadAttributeCharStringValueStartsWithConstraints_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -52032,7 +54926,7 @@ private:
 
     CHIP_ERROR TestReadAttributeCharStringValueEndsWithConstraints_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -52051,7 +54945,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeCharStringValueBackToDefaultValue_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -52071,7 +54965,11 @@ private:
 class TestDelayCommands : public TestCommand
 {
 public:
-    TestDelayCommands() : TestCommand("TestDelayCommands"), mTestIndex(0) {}
+    TestDelayCommands() : TestCommand("TestDelayCommands"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -52119,6 +55017,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -52139,7 +55040,11 @@ private:
 class TestLogCommands : public TestCommand
 {
 public:
-    TestLogCommands() : TestCommand("TestLogCommands"), mTestIndex(0) {}
+    TestLogCommands() : TestCommand("TestLogCommands"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -52191,6 +55096,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -52217,7 +55125,11 @@ private:
 class TestSaveAs : public TestCommand
 {
 public:
-    TestSaveAs() : TestCommand("TestSaveAs"), mTestIndex(0) {}
+    TestSaveAs() : TestCommand("TestSaveAs"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -52632,6 +55544,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 94;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     uint8_t TestAddArgumentDefaultValue;
     bool readAttributeBooleanDefaultValue;
@@ -53457,7 +56372,7 @@ private:
 
     CHIP_ERROR TestSendTestAddArgumentsCommand_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
         RequestType request;
@@ -53488,7 +56403,7 @@ private:
 
     CHIP_ERROR TestSendTestAddArgumentsCommand_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
         RequestType request;
@@ -53518,7 +56433,7 @@ private:
 
     CHIP_ERROR TestSendTestAddArgumentsCommand_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
 
         RequestType request;
@@ -53548,7 +56463,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBooleanDefaultValue_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53569,7 +56484,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBooleanNotDefaultValue_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53587,7 +56502,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBooleanNotDefaultValue_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53607,7 +56522,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBooleanDefaultValue_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53625,7 +56540,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBooleanFalse_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53645,7 +56560,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap8DefaultValue_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53666,7 +56581,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap8NotDefaultValue_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53684,7 +56599,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap8NotDefaultValue_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53704,7 +56619,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap8DefaultValue_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53722,7 +56637,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap8DefaultValue_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53742,7 +56657,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap16DefaultValue_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53763,7 +56678,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap16NotDefaultValue_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53781,7 +56696,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap16NotDefaultValue_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53801,7 +56716,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap16DefaultValue_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53819,7 +56734,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap16DefaultValue_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53839,7 +56754,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap32DefaultValue_19()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53860,7 +56775,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap32NotDefaultValue_20()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53878,7 +56793,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap32NotDefaultValue_21()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53898,7 +56813,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap32DefaultValue_22()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53916,7 +56831,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap32DefaultValue_23()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53936,7 +56851,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap64DefaultValue_24()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53957,7 +56872,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap64NotDefaultValue_25()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53975,7 +56890,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap64DefaultValue_26()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -53995,7 +56910,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeBitmap64DefaultValue_27()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54013,7 +56928,7 @@ private:
 
     CHIP_ERROR TestReadAttributeBitmap64DefaultValue_28()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54033,7 +56948,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8uDefaultValue_29()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54054,7 +56969,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt8uNotDefaultValue_30()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54072,7 +56987,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8uNotDefaultValue_31()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54092,7 +57007,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt8uDefaultValue_32()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54110,7 +57025,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8uDefaultValue_33()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54130,7 +57045,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16uDefaultValue_34()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54151,7 +57066,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt16uNotDefaultValue_35()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54169,7 +57084,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16uNotDefaultValue_36()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54189,7 +57104,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt16uDefaultValue_37()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54207,7 +57122,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16uDefaultValue_38()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54227,7 +57142,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32uDefaultValue_39()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54248,7 +57163,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt32uNotDefaultValue_40()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54266,7 +57181,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32uNotDefaultValue_41()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54286,7 +57201,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt32uDefaultValue_42()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54304,7 +57219,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32uDefaultValue_43()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54324,7 +57239,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64uDefaultValue_44()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54345,7 +57260,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt64uNotDefaultValue_45()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54363,7 +57278,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64uNotDefaultValue_46()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54383,7 +57298,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt64uDefaultValue_47()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54401,7 +57316,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64uDefaultValue_48()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54421,7 +57336,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8sDefaultValue_49()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54442,7 +57357,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt8sNotDefaultValue_50()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54460,7 +57375,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8sNotDefaultValue_51()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54480,7 +57395,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt8sDefaultValue_52()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54498,7 +57413,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt8sDefaultValue_53()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54518,7 +57433,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16sDefaultValue_54()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54539,7 +57454,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt16sNotDefaultValue_55()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54557,7 +57472,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16sNotDefaultValue_56()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54577,7 +57492,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt16sDefaultValue_57()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54595,7 +57510,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt16sDefaultValue_58()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54615,7 +57530,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32sDefaultValue_59()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54636,7 +57551,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt32sNotDefaultValue_60()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54654,7 +57569,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32sNotDefaultValue_61()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54674,7 +57589,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt32sDefaultValue_62()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54692,7 +57607,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt32sDefaultValue_63()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54712,7 +57627,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64sDefaultValue_64()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54733,7 +57648,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeIntsNotDefaultValue_65()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54751,7 +57666,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64sNotDefaultValue_66()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54771,7 +57686,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeInt64sDefaultValue_67()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54789,7 +57704,7 @@ private:
 
     CHIP_ERROR TestReadAttributeInt64sDefaultValue_68()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54809,7 +57724,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum8DefaultValue_69()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54830,7 +57745,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEnum8NotDefaultValue_70()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54848,7 +57763,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum8NotDefaultValue_71()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54868,7 +57783,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEnum8DefaultValue_72()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54886,7 +57801,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum8DefaultValue_73()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54906,7 +57821,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum16DefaultValue_74()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54927,7 +57842,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEnum16NotDefaultValue_75()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54945,7 +57860,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum16NotDefaultValue_76()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54965,7 +57880,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEnum16DefaultValue_77()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -54983,7 +57898,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEnum16DefaultValue_78()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55003,7 +57918,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochUsDefaultValue_79()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55024,7 +57939,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEpochUsNotDefaultValue_80()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55042,7 +57957,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochUsNotDefaultValue_81()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55062,7 +57977,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEpochUsDefaultValue_82()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55080,7 +57995,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochUsDefaultValue_83()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55100,7 +58015,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochSDefaultValue_84()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55121,7 +58036,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEpochSNotDefaultValue_85()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55139,7 +58054,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochSNotDefaultValue_86()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55159,7 +58074,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeEpochSDefaultValue_87()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55177,7 +58092,7 @@ private:
 
     CHIP_ERROR TestReadAttributeEpochSDefaultValue_88()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55197,7 +58112,7 @@ private:
 
     CHIP_ERROR TestReadAttributeVendorIdDefaultValue_89()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55218,7 +58133,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeVendorIdNotDefaultValue_90()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55236,7 +58151,7 @@ private:
 
     CHIP_ERROR TestReadAttributeVendorIdNotDefaultValue_91()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55256,7 +58171,7 @@ private:
 
     CHIP_ERROR TestWriteAttributeVendorIdDefaultValue_92()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55274,7 +58189,7 @@ private:
 
     CHIP_ERROR TestReadAttributeVendorIdDefaultValue_93()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55293,10 +58208,154 @@ private:
     }
 };
 
+class TestConfigVariables : public TestCommand
+{
+public:
+    TestConfigVariables() : TestCommand("TestConfigVariables"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+        AddArgument("arg1", 0, UINT8_MAX, &mArg1);
+        AddArgument("returnValueWithArg1", 0, UINT8_MAX, &mReturnValueWithArg1);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestConfigVariables\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestConfigVariables\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Send Test Add Arguments Command\n");
+            err = TestSendTestAddArgumentsCommand_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Send Test Add Arguments Command\n");
+            err = TestSendTestAddArgumentsCommand_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+    chip::Optional<uint8_t> mArg1;
+    chip::Optional<uint8_t> mReturnValueWithArg1;
+
+    uint8_t TestAddArgumentDefaultValue;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestSendTestAddArgumentsCommand_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
+
+        RequestType request;
+        request.arg1 = 3;
+        request.arg2 = 17;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestConfigVariables *>(context))->OnSuccessResponse_1(data.returnValue);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestConfigVariables *>(context))->OnFailureResponse_1(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t returnValue)
+    {
+        VerifyOrReturn(CheckValue("returnValue", returnValue, 20));
+
+        TestAddArgumentDefaultValue = returnValue;
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendTestAddArgumentsCommand_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type;
+
+        RequestType request;
+        request.arg1 = mArg1.HasValue() ? mArg1.Value() : 5;
+        request.arg2 = TestAddArgumentDefaultValue;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestConfigVariables *>(context))->OnSuccessResponse_2(data.returnValue);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestConfigVariables *>(context))->OnFailureResponse_2(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint8_t returnValue)
+    {
+        VerifyOrReturn(CheckValue("returnValue", returnValue, mReturnValueWithArg1.HasValue() ? mReturnValueWithArg1.Value() : 25));
+
+        NextTest();
+    }
+};
+
 class TestDescriptorCluster : public TestCommand
 {
 public:
-    TestDescriptorCluster() : TestCommand("TestDescriptorCluster"), mTestIndex(0) {}
+    TestDescriptorCluster() : TestCommand("TestDescriptorCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -55356,6 +58415,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 5;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TestDescriptorCluster *>(context))->OnFailureResponse_1(status);
@@ -55410,7 +58472,7 @@ private:
 
     CHIP_ERROR TestReadAttributeDeviceList_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::DescriptorClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55437,7 +58499,7 @@ private:
 
     CHIP_ERROR TestReadAttributeServerList_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::DescriptorClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55506,7 +58568,7 @@ private:
 
     CHIP_ERROR TestReadAttributeClientList_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::DescriptorClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55529,7 +58591,7 @@ private:
 
     CHIP_ERROR TestReadAttributePartsList_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::DescriptorClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55558,7 +58620,11 @@ private:
 class TestBasicInformation : public TestCommand
 {
 public:
-    TestBasicInformation() : TestCommand("TestBasicInformation"), mTestIndex(0) {}
+    TestBasicInformation() : TestCommand("TestBasicInformation"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -55614,6 +58680,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TestBasicInformation *>(context))->OnFailureResponse_1(status);
@@ -55650,7 +58719,7 @@ private:
 
     CHIP_ERROR TestWriteLocation_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55668,7 +58737,7 @@ private:
 
     CHIP_ERROR TestRestoreInitialLocationValue_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55686,7 +58755,7 @@ private:
 
     CHIP_ERROR TestReadAttributeListValue_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -55753,7 +58822,11 @@ private:
 class TestIdentifyCluster : public TestCommand
 {
 public:
-    TestIdentifyCluster() : TestCommand("TestIdentifyCluster"), mTestIndex(0) {}
+    TestIdentifyCluster() : TestCommand("TestIdentifyCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -55801,6 +58874,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 2;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -55813,7 +58889,7 @@ private:
 
     CHIP_ERROR TestSendIdentifyCommandAndExpectSuccessResponse_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         using RequestType               = chip::app::Clusters::Identify::Commands::Identify::Type;
 
         RequestType request;
@@ -55839,7 +58915,11 @@ private:
 class TestGroupsCluster : public TestCommand
 {
 public:
-    TestGroupsCluster() : TestCommand("TestGroupsCluster"), mTestIndex(0) {}
+    TestGroupsCluster() : TestCommand("TestGroupsCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -55955,6 +59035,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 19;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -55967,7 +59050,7 @@ private:
 
     CHIP_ERROR TestViewGroup0Invalid_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
@@ -55998,7 +59081,7 @@ private:
 
     CHIP_ERROR TestViewGroup1NotFound_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
@@ -56029,7 +59112,7 @@ private:
 
     CHIP_ERROR TestAddGroup1New_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
 
         RequestType request;
@@ -56061,7 +59144,7 @@ private:
 
     CHIP_ERROR TestViewGroup1New_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
@@ -56094,7 +59177,7 @@ private:
 
     CHIP_ERROR TestViewGroup2NotFound_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
@@ -56125,7 +59208,7 @@ private:
 
     CHIP_ERROR TestGetGroupMembership1All_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
 
         RequestType request;
@@ -56162,7 +59245,7 @@ private:
 
     CHIP_ERROR TestViewGroup3NotFound_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
@@ -56193,7 +59276,7 @@ private:
 
     CHIP_ERROR TestViewGroup1Existing_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
@@ -56226,7 +59309,7 @@ private:
 
     CHIP_ERROR TestRemoveGroup0Invalid_9()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
 
         RequestType request;
@@ -56257,7 +59340,7 @@ private:
 
     CHIP_ERROR TestRemoveGroup4NotFound_10()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
 
         RequestType request;
@@ -56288,7 +59371,7 @@ private:
 
     CHIP_ERROR TestViewGroup1NotRemoved_11()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
@@ -56321,7 +59404,7 @@ private:
 
     CHIP_ERROR TestViewGroup2Removed_12()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
@@ -56352,7 +59435,7 @@ private:
 
     CHIP_ERROR TestGetGroupMembership3_13()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
 
         RequestType request;
@@ -56394,7 +59477,7 @@ private:
 
     CHIP_ERROR TestRemoveAll_14()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type;
 
         RequestType request;
@@ -56417,7 +59500,7 @@ private:
 
     CHIP_ERROR TestViewGroup1Removed_15()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
@@ -56448,7 +59531,7 @@ private:
 
     CHIP_ERROR TestViewGroup2StillRemoved_16()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
@@ -56479,7 +59562,7 @@ private:
 
     CHIP_ERROR TestViewGroup3Removed_17()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
@@ -56510,7 +59593,7 @@ private:
 
     CHIP_ERROR TestGetGroupMembership4_18()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
 
         RequestType request;
@@ -56553,7 +59636,11 @@ private:
 class TestGroupKeyManagementCluster : public TestCommand
 {
 public:
-    TestGroupKeyManagementCluster() : TestCommand("TestGroupKeyManagementCluster"), mTestIndex(0) {}
+    TestGroupKeyManagementCluster() : TestCommand("TestGroupKeyManagementCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -56605,6 +59692,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_1(status);
@@ -56637,7 +59727,7 @@ private:
 
     CHIP_ERROR TestReadMaxGroupsPerFabric_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::GroupKeyManagementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -56658,7 +59748,7 @@ private:
 
     CHIP_ERROR TestReadMaxGroupKeysPerFabric_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::GroupKeyManagementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -56681,7 +59771,11 @@ private:
 class TestOperationalCredentialsCluster : public TestCommand
 {
 public:
-    TestOperationalCredentialsCluster() : TestCommand("TestOperationalCredentialsCluster"), mTestIndex(0) {}
+    TestOperationalCredentialsCluster() : TestCommand("TestOperationalCredentialsCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -56737,6 +59831,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<TestOperationalCredentialsCluster *>(context))->OnFailureResponse_1(status);
@@ -56779,7 +59876,7 @@ private:
 
     CHIP_ERROR TestReadNumberOfSupportedFabrics_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -56800,7 +59897,7 @@ private:
 
     CHIP_ERROR TestReadNumberOfCommissionedFabrics_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -56821,7 +59918,7 @@ private:
 
     CHIP_ERROR TestReadCurrentFabricIndex_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -56844,7 +59941,11 @@ private:
 class TestModeSelectCluster : public TestCommand
 {
 public:
-    TestModeSelectCluster() : TestCommand("TestModeSelectCluster"), mTestIndex(0) {}
+    TestModeSelectCluster() : TestCommand("TestModeSelectCluster"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -56919,6 +60020,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 9;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -56995,7 +60099,7 @@ private:
 
     CHIP_ERROR TestReadCurrentMode_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57015,7 +60119,7 @@ private:
 
     CHIP_ERROR TestReadOnMode_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57035,7 +60139,7 @@ private:
 
     CHIP_ERROR TestReadStartUpMode_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57055,7 +60159,7 @@ private:
 
     CHIP_ERROR TestReadDescription_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57075,7 +60179,7 @@ private:
 
     CHIP_ERROR TestReadSupportedModes_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57113,7 +60217,7 @@ private:
 
     CHIP_ERROR TestChangeToSupportedMode_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
 
         RequestType request;
@@ -57137,7 +60241,7 @@ private:
 
     CHIP_ERROR TestVerifyCurrentModeChange_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57157,7 +60261,7 @@ private:
 
     CHIP_ERROR TestChangeToUnsupportedMode_8()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type;
 
         RequestType request;
@@ -57187,7 +60291,11 @@ private:
 class TestGroupMessaging : public TestCommand
 {
 public:
-    TestGroupMessaging() : TestCommand("TestGroupMessaging"), mTestIndex(0) {}
+    TestGroupMessaging() : TestCommand("TestGroupMessaging"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -57238,6 +60346,9 @@ public:
 private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnDoneCallback_1(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_1(); }
 
@@ -57308,10 +60419,14 @@ private:
     void OnDoneResponse_2() { NextTest(); }
 };
 
-class Test_TC_DIAGSW_1_1 : public TestCommand
+class Test_TC_SWDIAG_1_1 : public TestCommand
 {
 public:
-    Test_TC_DIAGSW_1_1() : TestCommand("Test_TC_DIAGSW_1_1"), mTestIndex(0) {}
+    Test_TC_SWDIAG_1_1() : TestCommand("Test_TC_SWDIAG_1_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -57320,12 +60435,12 @@ public:
 
         if (0 == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGSW_1_1\n");
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_1_1\n");
         }
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGSW_1_1\n");
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_1_1\n");
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -57368,34 +60483,37 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 4;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnFailureResponse_1(status);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_1(status);
     }
 
     static void OnSuccessCallback_1(void * context, uint64_t currentHeapFree)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnSuccessResponse_1(currentHeapFree);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_1(currentHeapFree);
     }
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnFailureResponse_2(status);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_2(status);
     }
 
     static void OnSuccessCallback_2(void * context, uint64_t currentHeapUsed)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnSuccessResponse_2(currentHeapUsed);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_2(currentHeapUsed);
     }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnFailureResponse_3(status);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnFailureResponse_3(status);
     }
 
     static void OnSuccessCallback_3(void * context, uint64_t currentHeapHighWatermark)
     {
-        (static_cast<Test_TC_DIAGSW_1_1 *>(context))->OnSuccessResponse_3(currentHeapHighWatermark);
+        (static_cast<Test_TC_SWDIAG_1_1 *>(context))->OnSuccessResponse_3(currentHeapHighWatermark);
     }
 
     //
@@ -57410,7 +60528,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57432,7 +60550,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57454,7 +60572,7 @@ private:
 
     CHIP_ERROR TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57476,10 +60594,14 @@ private:
     }
 };
 
-class Test_TC_DIAGSW_2_1 : public TestCommand
+class Test_TC_SWDIAG_2_1 : public TestCommand
 {
 public:
-    Test_TC_DIAGSW_2_1() : TestCommand("Test_TC_DIAGSW_2_1"), mTestIndex(0) {}
+    Test_TC_SWDIAG_2_1() : TestCommand("Test_TC_SWDIAG_2_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -57488,12 +60610,12 @@ public:
 
         if (0 == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGSW_2_1\n");
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_2_1\n");
         }
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGSW_2_1\n");
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_2_1\n");
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -57519,15 +60641,22 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 0;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
 };
 
-class Test_TC_DIAGSW_3_2 : public TestCommand
+class Test_TC_SWDIAG_3_1 : public TestCommand
 {
 public:
-    Test_TC_DIAGSW_3_2() : TestCommand("Test_TC_DIAGSW_3_2"), mTestIndex(0) {}
+    Test_TC_SWDIAG_3_1() : TestCommand("Test_TC_SWDIAG_3_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -57536,12 +60665,12 @@ public:
 
         if (0 == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGSW_3_2\n");
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_SWDIAG_3_1\n");
         }
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGSW_3_2\n");
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_SWDIAG_3_1\n");
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -57571,6 +60700,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 1;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     //
     // Tests methods
     //
@@ -57585,7 +60717,11 @@ private:
 class TestSubscribe_OnOff : public TestCommand
 {
 public:
-    TestSubscribe_OnOff() : TestCommand("TestSubscribe_OnOff"), mTestIndex(0) {}
+    TestSubscribe_OnOff() : TestCommand("TestSubscribe_OnOff"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -57657,6 +60793,9 @@ private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = 8;
 
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
     typedef void (*Test_TestSubscribe_OnOff_OnOff_ReportCallback)(void * context, bool value);
     Test_TestSubscribe_OnOff_OnOff_ReportCallback mTest_TestSubscribe_OnOff_OnOff_Reported = nullptr;
 
@@ -57723,7 +60862,7 @@ private:
 
     CHIP_ERROR TestSetOnOffAttributeToFalse_1()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -57746,7 +60885,7 @@ private:
 
     CHIP_ERROR TestReportSubscribeOnOffAttribute_2()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57765,7 +60904,7 @@ private:
 
     CHIP_ERROR TestSubscribeOnOffAttribute_3()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57799,7 +60938,7 @@ private:
 
     CHIP_ERROR TestTurnOnTheLightToSeeAttributeChange_4()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::On::Type;
 
         RequestType request;
@@ -57822,7 +60961,7 @@ private:
 
     CHIP_ERROR TestCheckForAttributeReport_5()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -57843,7 +60982,7 @@ private:
 
     CHIP_ERROR TestTurnOffTheLightToSeeAttributeChange_6()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
 
         RequestType request;
@@ -57866,7 +61005,7 @@ private:
 
     CHIP_ERROR TestCheckForAttributeReport_7()
     {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
@@ -58003,6 +61142,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestDelayCommands>(),
         make_unique<TestLogCommands>(),
         make_unique<TestSaveAs>(),
+        make_unique<TestConfigVariables>(),
         make_unique<TestDescriptorCluster>(),
         make_unique<TestBasicInformation>(),
         make_unique<TestIdentifyCluster>(),
@@ -58011,9 +61151,9 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestModeSelectCluster>(),
         make_unique<TestGroupMessaging>(),
-        make_unique<Test_TC_DIAGSW_1_1>(),
-        make_unique<Test_TC_DIAGSW_2_1>(),
-        make_unique<Test_TC_DIAGSW_3_2>(),
+        make_unique<Test_TC_SWDIAG_1_1>(),
+        make_unique<Test_TC_SWDIAG_2_1>(),
+        make_unique<Test_TC_SWDIAG_3_1>(),
         make_unique<TestSubscribe_OnOff>(),
     };
 

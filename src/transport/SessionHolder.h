@@ -17,6 +17,7 @@
 #pragma once
 
 #include <lib/core/Optional.h>
+#include <lib/support/IntrusiveList.h>
 #include <transport/SessionDelegate.h>
 #include <transport/SessionHandle.h>
 
@@ -26,42 +27,59 @@ namespace chip {
  *    Managed session reference. The object is used to store a session, the stored session will be automatically
  *    released when the underlying session is released. One must verify it is available before use. The object can be
  *    created using SessionHandle.Grab()
- *
- *    TODO: release holding session when the session is released. This will be implemented by following PRs
  */
-class SessionHolder : public SessionReleaseDelegate
+class SessionHolder : public SessionReleaseDelegate, public IntrusiveListNodeBase
 {
 public:
     SessionHolder() {}
-    SessionHolder(const SessionHandle & session) : mSession(session) {}
-    ~SessionHolder() { Release(); }
+    ~SessionHolder();
 
     SessionHolder(const SessionHolder &);
-    SessionHolder operator=(const SessionHolder &);
     SessionHolder(SessionHolder && that);
-    SessionHolder operator=(SessionHolder && that);
+    SessionHolder & operator=(const SessionHolder &);
+    SessionHolder & operator=(SessionHolder && that);
 
-    void Grab(const SessionHandle & sessionHandle)
+    // Implement SessionReleaseDelegate
+    void OnSessionReleased() override { Release(); }
+
+    bool Contains(const SessionHandle & session) const
     {
-        Release();
-        mSession.SetValue(sessionHandle);
+        return mSession.HasValue() && &mSession.Value().Get() == &session.mSession.Get();
     }
 
-    void Release() { mSession.ClearValue(); }
-
-    // TODO: call this function when the underlying session is released
-    // Implement SessionReleaseDelegate
-    void OnSessionReleased(const SessionHandle & session) override { Release(); }
-
-    // Check whether the SessionHolder contains a session matching given session
-    bool Contains(const SessionHandle & session) const { return mSession.HasValue() && mSession.Value() == session; }
+    void Grab(const SessionHandle & session);
+    void Release();
 
     operator bool() const { return mSession.HasValue(); }
-    const SessionHandle & Get() const { return mSession.Value(); }
-    Optional<SessionHandle> ToOptional() const { return mSession; }
+    SessionHandle Get() const { return SessionHandle{ mSession.Value().Get() }; }
+    Optional<SessionHandle> ToOptional() const
+    {
+        return mSession.HasValue() ? chip::MakeOptional<SessionHandle>(Get()) : chip::Optional<SessionHandle>::Missing();
+    }
+
+    Transport::Session * operator->() const { return &mSession.Value().Get(); }
 
 private:
-    Optional<SessionHandle> mSession;
+    Optional<ReferenceCountedHandle<Transport::Session>> mSession;
+};
+
+// @brief Extends SessionHolder to allow propagate OnSessionReleased event to an extra given destination
+class SessionHolderWithDelegate : public SessionHolder
+{
+public:
+    SessionHolderWithDelegate(SessionReleaseDelegate & delegate) : mDelegate(delegate) {}
+    operator bool() const { return SessionHolder::operator bool(); }
+
+    void OnSessionReleased() override
+    {
+        Release();
+
+        // Note, the session is already cleared during mDelegate.OnSessionReleased
+        mDelegate.OnSessionReleased();
+    }
+
+private:
+    SessionReleaseDelegate & mDelegate;
 };
 
 } // namespace chip

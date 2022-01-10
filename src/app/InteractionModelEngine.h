@@ -308,7 +308,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *
  *  @param[in]    aSubjectDescriptor    The subject descriptor for the read.
  *  @param[in]    aPath                 The concrete path of the data being read.
- *  @param[in]    aAttributeReport      The TLV Builder for Cluter attribute builder.
+ *  @param[in]    aAttributeReports      The TLV Builder for Cluter attribute builder.
  *
  *  @retval  CHIP_NO_ERROR on success
  */

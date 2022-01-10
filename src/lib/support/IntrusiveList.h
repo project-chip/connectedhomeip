@@ -202,7 +202,7 @@ protected:
     void InsertAfter(IteratorBase pos, IntrusiveListNodeBase * node) { pos.mCurrent->Append(node); }
     void Remove(IntrusiveListNodeBase * node) { node->Remove(); }
 
-    bool Contains(IntrusiveListNodeBase * node) const
+    bool Contains(const IntrusiveListNodeBase * node) const
     {
         for (auto & iter : *this)
         {
@@ -225,8 +225,12 @@ class IntrusiveListBaseHook
 {
 public:
     static_assert(std::is_base_of<IntrusiveListNodeBase, T>::value, "T must be derived from IntrusiveListNodeBase");
+
     static T * ToObject(IntrusiveListNodeBase * node) { return static_cast<T *>(node); }
+    static const T * ToObject(const IntrusiveListNodeBase * node) { return static_cast<T *>(node); }
+
     static IntrusiveListNodeBase * ToNode(T * object) { return static_cast<IntrusiveListNodeBase *>(object); }
+    static const IntrusiveListNodeBase * ToNode(const T * object) { return static_cast<const IntrusiveListNodeBase *>(object); }
 };
 
 /// A double-linked list where the data is stored together with the previous/next pointers for cache efficiency / and compactness.
@@ -289,7 +293,7 @@ public:
     void InsertBefore(Iterator pos, T * value) { IntrusiveListBase::InsertBefore(pos, Hook::ToNode(value)); }
     void InsertAfter(Iterator pos, T * value) { IntrusiveListBase::InsertAfter(pos, Hook::ToNode(value)); }
     void Remove(T * value) { IntrusiveListBase::Remove(Hook::ToNode(value)); }
-    bool Contains(T * value) const { return IntrusiveListBase::Contains(Hook::ToNode(value)); }
+    bool Contains(const T * value) const { return IntrusiveListBase::Contains(Hook::ToNode(value)); }
 };
 
 } // namespace chip

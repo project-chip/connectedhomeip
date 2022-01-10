@@ -9624,9 +9624,6 @@ enum class GeneralCommissioningError : uint8_t
     kInvalidAuthentication = 0x02,
     kNotCommissioning      = 0x03,
 };
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RegulatoryLocationType
 enum class RegulatoryLocationType : uint8_t
 {
@@ -9634,9 +9631,6 @@ enum class RegulatoryLocationType : uint8_t
     kOutdoor       = 0x01,
     kIndoorOutdoor = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RegulatoryLocationType          = EmberAfRegulatoryLocationType;
-#endif
 
 namespace Structs {
 namespace BasicCommissioningInfoType {

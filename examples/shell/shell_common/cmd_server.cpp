@@ -29,19 +29,23 @@
 #include <app/util/attribute-storage.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <transport/Session.h>
+
 using namespace chip;
 using namespace chip::Shell;
 using namespace chip::Credentials;
 using namespace chip::ArgParser;
+using namespace chip::Transport;
 
-bool lowPowerClusterSleep()
-{
-    return true;
-}
+// Anonymous namespace for file-scoped, static variables.
+namespace {
 
-static chip::Shell::Engine sShellServerSubcommands;
-static uint16_t sServerPortOperational   = CHIP_PORT;
-static uint16_t sServerPortCommissioning = CHIP_UDC_PORT;
+chip::Shell::Engine sShellServerSubcommands;
+uint16_t sServerPortOperational   = CHIP_PORT;
+uint16_t sServerPortCommissioning = CHIP_UDC_PORT;
+bool sServerEnabled               = false;
+
+} // namespace
 
 static CHIP_ERROR CmdAppServerHelp(int argc, char ** argv)
 {
@@ -57,12 +61,17 @@ static CHIP_ERROR CmdAppServerStart(int argc, char ** argv)
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
+    sServerEnabled = true;
+
     return CHIP_NO_ERROR;
 }
 
 static CHIP_ERROR CmdAppServerStop(int argc, char ** argv)
 {
+    if (sServerEnabled == false)
+        return CHIP_NO_ERROR;
     chip::Server::GetInstance().Shutdown();
+    sServerEnabled = false;
     return CHIP_NO_ERROR;
 }
 
@@ -100,9 +109,35 @@ static CHIP_ERROR CmdAppServerUdcPort(int argc, char ** argv)
 
 static bool PrintServerSession(void * context, SessionHandle & session)
 {
-    streamer_printf(streamer_get(), "session id=0x%04x peerSessionId=0x%04x peerNodeId=0x%016" PRIx64 " fabricIdx=%d\r\n",
-                    session.GetLocalSessionId().Value(), session.GetPeerSessionId().Value(), session.GetPeerNodeId(),
-                    session.GetFabricIndex());
+    switch (session->GetSessionType())
+    {
+    case Session::SessionType::kSecure: {
+        SecureSession * secureSession         = session->AsSecureSession();
+        SecureSession::Type secureSessionType = secureSession->GetSecureSessionType();
+        streamer_printf(
+            streamer_get(), "session type=SECURE %s id=0x%04x peerSessionId=0x%04x peerNodeId=0x%016" PRIx64 " fabricIdx=%d\r\n",
+            secureSessionType == SecureSession::Type::kCASE ? "CASE" : "PASE", secureSession->GetLocalSessionId(),
+            secureSession->AsSecureSession()->GetPeerSessionId(), secureSession->GetPeerNodeId(), secureSession->GetFabricIndex());
+        break;
+    }
+
+    case Session::SessionType::kUnauthenticated: {
+        UnauthenticatedSession * unsecuredSession = session->AsUnauthenticatedSession();
+        streamer_printf(streamer_get(), "session type=UNSECURED id=0x0000 peerNodeId=0x%016\r\n",
+                        unsecuredSession->GetPeerNodeId());
+        break;
+    }
+
+    case Session::SessionType::kGroup: {
+        GroupSession * groupSession = session->AsGroupSession();
+        streamer_printf(streamer_get(), "session type=GROUP id=0x%04x fabricIdx=%d\r\n", groupSession->GetGroupId(),
+                        groupSession->GetFabricIndex());
+        break;
+    }
+
+    default:
+        streamer_printf(streamer_get(), "session type=UNDEFINED\r\n");
+    }
     return true;
 }
 

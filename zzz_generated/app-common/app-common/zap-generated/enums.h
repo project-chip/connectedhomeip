@@ -413,14 +413,6 @@ enum EmberAfRadioFaultType : uint8_t
     EMBER_ZCL_RADIO_FAULT_TYPE_ETHERNET_FAULT = 6,
 };
 
-// Enum for RegulatoryLocationType
-enum EmberAfRegulatoryLocationType : uint8_t
-{
-    EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR         = 0,
-    EMBER_ZCL_REGULATORY_LOCATION_TYPE_OUTDOOR        = 1,
-    EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR_OUTDOOR = 2,
-};
-
 // Enum for RoutingRole
 enum EmberAfRoutingRole : uint8_t
 {

@@ -141,7 +141,8 @@ void ReliableMessageMgr::ExecuteActions()
                       " Send Cnt %d",
                       messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
         // TODO: Choose active/idle timeout corresponding to the activity of exchanges of the session.
-        entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + entry->ec->GetMRPConfig().mActiveRetransTimeout;
+        entry->nextRetransTime =
+            System::SystemClock().GetMonotonicTimestamp() + entry->ec->GetSessionHandle()->GetMRPConfig().mActiveRetransTimeout;
         SendFromRetransTable(entry);
         // For test not using async IO loop, the entry may have been removed after send, do not use entry below
 
@@ -185,7 +186,8 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
     // TODO: Choose active/idle timeout corresponding to the activity of exchanges of the session.
-    entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + entry->ec->GetMRPConfig().mIdleRetransTimeout;
+    entry->nextRetransTime =
+        System::SystemClock().GetMonotonicTimestamp() + entry->ec->GetSessionHandle()->GetMRPConfig().mIdleRetransTimeout;
     StartTimer();
 }
 

@@ -28,6 +28,7 @@ const templateUtil = require(zapPath + 'dist/src-electron/generator/template-uti
 
 const { getClusters, getCommands, getAttributes, isTestOnlyCluster } = require('./simulated-clusters/SimulatedClusters.js');
 const { asBlocks, ensureClusters }                                   = require('./ClustersHelper.js');
+const { Variables }                                                  = require('./variables/Variables.js');
 
 const kIdentityName           = 'identity';
 const kClusterName            = 'cluster';
@@ -99,6 +100,7 @@ function setDefaultTypeForWaitCommand(test)
     break;
   default:
     test.isCommand = true;
+    test.command   = test.wait
     break;
   }
 
@@ -440,7 +442,9 @@ async function chip_tests(list, options)
   const items = Array.isArray(list) ? list : list.split(',');
   const names = items.map(name => name.trim());
   let tests   = names.map(item => parse(item));
-  tests       = await Promise.all(tests.map(async function(test) {
+
+  const context = this;
+  tests         = await Promise.all(tests.map(async function(test) {
     test.tests = await Promise.all(test.tests.map(async function(item) {
       item.global = global;
       if (item.isCommand) {
@@ -452,6 +456,12 @@ async function chip_tests(list, options)
       }
       return item;
     }));
+
+    const variables = await Variables(context, test);
+    test.variables  = {
+      config : variables.config,
+      tests : variables.tests,
+    };
     return test;
   }));
   return templateUtil.collectBlocks(tests, options, this);
@@ -460,6 +470,51 @@ async function chip_tests(list, options)
 function chip_tests_items(options)
 {
   return templateUtil.collectBlocks(this.tests, options, this);
+}
+
+function chip_tests_config(options)
+{
+  return templateUtil.collectBlocks(this.variables.config, options, this);
+}
+
+function getConfigVariable(context, name)
+{
+  while (!('variables' in context) && context.parent) {
+    context = context.parent;
+  }
+
+  if (typeof context === 'undefined' || !('variables' in context)) {
+    return null;
+  }
+
+  return context.variables.config.find(variable => variable.name == name);
+}
+
+function getConfigVariableOrThrow(context, name)
+{
+  const variable = getConfigVariable(context, name);
+  if (variable == null) {
+    throw new Error(`Variable ${name} can not be found`);
+  }
+  return variable;
+}
+
+function chip_tests_config_has(name, options)
+{
+  const variable = getConfigVariable(this, name);
+  return !!variable;
+}
+
+function chip_tests_config_get_default_value(name, options)
+{
+  const variable = getConfigVariableOrThrow(this, name);
+  return variable.defaultValue;
+}
+
+function chip_tests_config_get_type(name, options)
+{
+  const variable = getConfigVariableOrThrow(this, name);
+  return variable.type;
 }
 
 // test_cluster_command_value and test_cluster_value-equals are recursive partials using #each. At some point the |global|
@@ -632,6 +687,10 @@ exports.chip_tests_items                    = chip_tests_items;
 exports.chip_tests_item_parameters          = chip_tests_item_parameters;
 exports.chip_tests_item_response_parameters = chip_tests_item_response_parameters;
 exports.chip_tests_pics                     = chip_tests_pics;
+exports.chip_tests_config                   = chip_tests_config;
+exports.chip_tests_config_has               = chip_tests_config_has;
+exports.chip_tests_config_get_default_value = chip_tests_config_get_default_value;
+exports.chip_tests_config_get_type          = chip_tests_config_get_type;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
 exports.expectedValueHasProp                = expectedValueHasProp;
