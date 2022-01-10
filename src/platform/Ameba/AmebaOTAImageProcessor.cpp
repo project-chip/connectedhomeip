@@ -46,7 +46,7 @@ CHIP_ERROR AmebaOTAImageProcessor::Finalize()
 CHIP_ERROR AmebaOTAImageProcessor::Apply()
 {
     ChipLogProgress(SoftwareUpdate, "Apply");
-    
+
     DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
@@ -94,7 +94,7 @@ void AmebaOTAImageProcessor::HandlePrepareDownload(intptr_t context)
 
     // Get OTA update partition
 #if defined(CONFIG_PLATFORM_8721D)
-    if (ota_get_cur_index() == OTA_INDEX_1) 
+    if (ota_get_cur_index() == OTA_INDEX_1)
         imageProcessor->ota_target_index = OTA_INDEX_2;
     else if (ota_get_cur_index() == OTA_INDEX_2)
         imageProcessor->ota_target_index = OTA_INDEX_1;
@@ -104,7 +104,7 @@ void AmebaOTAImageProcessor::HandlePrepareDownload(intptr_t context)
     ChipLogProgress(SoftwareUpdate, "New Flash Address: 0x%X", imageProcessor->flash_addr);
 #endif
 
-    
+
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
@@ -141,7 +141,7 @@ void AmebaOTAImageProcessor::HandleFinalize(intptr_t context)
         return;
     }
 #endif
-    
+
     imageProcessor->ReleaseBlock();
 
     ChipLogProgress(SoftwareUpdate, "OTA image downloaded and written to flash");
@@ -157,7 +157,7 @@ void AmebaOTAImageProcessor::HandleAbort(intptr_t context)
     }
 
     // Abort OTA procedure
-    
+
     imageProcessor->ReleaseBlock();
 }
 
@@ -184,7 +184,7 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         memcpy(tempBuf, imageProcessor->mBlock.data(), 32);
         memcpy(imageProcessor->pOtaTgtHdr, tempBuf, 8); // Store FwVer, HdrNum
         memcpy(&(imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgHdrLen), tempBuf+12, 16); // Store ImgHdrLen, Checksum, ImgLen, Offset
-        memcpy(&(imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgId), tempBuf+8, 4); // Store OTA id 
+        memcpy(&(imageProcessor->pOtaTgtHdr->FileImgHdr[0].ImgId), tempBuf+8, 4); // Store OTA id
 
         if(imageProcessor->ota_target_index == OTA_INDEX_1)
             imageProcessor->pOtaTgtHdr->FileImgHdr[0].FlashAddr = LS_IMG2_OTA1_ADDR;
@@ -219,13 +219,13 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
 
         // Set flash address, incremented by 8bytes to account for signature
         imageProcessor->flash_addr = imageProcessor->pOtaTgtHdr->FileImgHdr[0].FlashAddr - SPI_FLASH_BASE + 8;
-        
+
         // Set signature to point to pOtaTgtHdr->Sign
         imageProcessor->signature = &(imageProcessor->pOtaTgtHdr->Sign[0][0]);
 
         // Store the signature temporarily
         uint8_t *tempbufptr = imageProcessor->mBlock.data() + imageProcessor->pOtaTgtHdr->FileImgHdr[0].Offset;
-        memcpy(imageProcessor->signature, tempbufptr, 8); 
+        memcpy(imageProcessor->signature, tempbufptr, 8);
         tempbufptr += 8;
 
         // Write remaining downloaded bytes to flash_addr
@@ -297,7 +297,7 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         {
             ChipLogError(SoftwareUpdate, "Invalid size");
             return;
-        } 
+        }
 
         imageProcessor->readHeader = true;
     }
@@ -325,7 +325,7 @@ void AmebaOTAImageProcessor::HandleProcessBlock(intptr_t context)
         {
             ChipLogError(SoftwareUpdate, "Invalid size");
             return;
-        } 
+        }
     }
 #endif
     imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();

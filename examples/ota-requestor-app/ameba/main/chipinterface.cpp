@@ -84,7 +84,7 @@ void ApplyUpdateTimerHandler(Layer * systemLayer, void * appState)
 extern "C" void amebaQueryImageCmdHandler(uint32_t nodeId, uint32_t fabricId)
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd 
+    // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd
     gRequestorCore.TestModeSetProviderParameters(nodeId, fabricId, chip::kRootEndpointId);
 
     /* Start one shot timer with 1 second timeout to send QueryImage Request command */
