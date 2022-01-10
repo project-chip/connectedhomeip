@@ -1017,7 +1017,7 @@ tests:
         - name: "credential"
           value: { CredentialType: 1, CredentialIndex: 3 }
         - name: "credentialData"
-          value: "1234567"
+          value: "123456789"
         - name: "userIndex"
           value: 0
         - name: "userStatus"
