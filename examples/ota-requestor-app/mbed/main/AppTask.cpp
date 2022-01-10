@@ -35,7 +35,7 @@
 #endif
 
 #ifdef CHIP_OTA_REQUESTOR
-#include "OTARequestorDriverImpl.h"
+#include "GenericOTARequestorDriver.h"
 #include <BDXDownloader.h>
 #include <OTAImageProcessorImpl.h>
 #include <OTARequestor.h>
@@ -156,7 +156,7 @@ int AppTask::Init()
     requestor->SetServerInstance(server);
 
     // Initialize an instance of the Requestor Driver
-    OTARequestorDriverImpl * requestorDriver = new OTARequestorDriverImpl;
+    GenericOTARequestorDriver * requestorDriver = new GenericOTARequestorDriver;
     if (requestorDriver == nullptr)
     {
         ChipLogError(NotSpecified, "Create OTA Requestor driver failed");
@@ -186,6 +186,8 @@ int AppTask::Init()
     downloader->SetImageProcessorDelegate(imageProcessor);
 
     requestor->SetBDXDownloader(downloader);
+
+    requestorDriver->Init(requestor, imageProcessor);
 #endif // CHIP_OTA_REQUESTOR
 
     return 0;

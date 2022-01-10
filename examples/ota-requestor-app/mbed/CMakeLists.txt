@@ -55,7 +55,6 @@ target_include_directories(${APP_TARGET} PRIVATE
 target_sources(${APP_TARGET} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/main/OTARequestorDriverImpl.cpp
     ${MBED_COMMON}/util/LEDWidget.cpp
 )
 

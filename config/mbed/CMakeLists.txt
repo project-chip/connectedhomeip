@@ -456,6 +456,7 @@ if (CONFIG_CHIP_OTA_REQUESTOR)
     target_include_directories(${APP_TARGET} PRIVATE
         ${CHIP_ROOT}/zzz_generated/ota-requestor-app
         ${CHIP_ROOT}/src/app/clusters/ota-requestor
+        ${CHIP_ROOT}/src/platform
         ${CHIP_ROOT}/src/platform/mbed
         ${CHIP_ROOT}/src/include/platform
     )
