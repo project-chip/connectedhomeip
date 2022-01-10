@@ -63,10 +63,14 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Integrity check failed.", nil) }];
     }
 
-    if (errorCode == CHIP_NO_ERROR) {
+    if (errorCode == CHIP_ERROR_IM_CONSTRAINT_ERROR) {
         return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPSuccess
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Success.", nil) }];
+                                   code:CHIPErrorCodeConstraintError
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Value out of range.", nil) }];
+    }
+
+    if (errorCode == CHIP_NO_ERROR) {
+        return nil;
     }
 
     return [NSError errorWithDomain:CHIPErrorDomain
@@ -132,8 +136,12 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
     }
 }
 
-+ (CHIP_ERROR)errorToCHIPErrorCode:(NSError *)error
++ (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error
 {
+    if (error == nil) {
+        return CHIP_NO_ERROR;
+    }
+
     if (error.domain != CHIPErrorDomain) {
         return CHIP_ERROR_INTERNAL;
     }
@@ -151,8 +159,8 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
         return CHIP_ERROR_INCORRECT_STATE;
     case CHIPErrorCodeIntegrityCheckFailed:
         return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-    case CHIPSuccess:
-        return CHIP_NO_ERROR;
+    case CHIPErrorCodeConstraintError:
+        return CHIP_ERROR_IM_CONSTRAINT_ERROR;
     default:
         return CHIP_ERROR_INTERNAL;
     }
@@ -165,6 +173,7 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
     if (error == nil) {
         return EMBER_ZCL_STATUS_SUCCESS;
     }
+
     if (error.domain != CHIPErrorDomain) {
         return EMBER_ZCL_STATUS_FAILURE;
     }
@@ -186,8 +195,6 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
         return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
     case CHIPErrorCodeUnsupportedCluster:
         return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
-    case CHIPSuccess:
-        return EMBER_ZCL_STATUS_SUCCESS;
     default:
         return EMBER_ZCL_STATUS_FAILURE;
     }
