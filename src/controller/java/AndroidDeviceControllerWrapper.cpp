@@ -330,12 +330,12 @@ CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Control
     else if (threadCredentialsJava != nullptr)
     {
         jmethodID getOperationalDataset;
-        err = chip::JniReferences::GetInstance().FindMethod(env, wifiCredentialsJava, "getOperationalDataset", "()[B",
+        err = chip::JniReferences::GetInstance().FindMethod(env, threadCredentialsJava, "getOperationalDataset", "()[B",
                                                             &getOperationalDataset);
         VerifyOrReturnError(err == CHIP_NO_ERROR, err);
         operationalDatasetBytes =
             static_cast<jbyteArray>(env->NewGlobalRef(env->CallObjectMethod(threadCredentialsJava, getOperationalDataset)));
-        VerifyOrReturnError(ssidStr != nullptr && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        VerifyOrReturnError(operationalDatasetBytes != nullptr && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
 
         operationalDataset = env->GetByteArrayElements(operationalDatasetBytes, nullptr);
         jsize length       = env->GetArrayLength(operationalDatasetBytes);
