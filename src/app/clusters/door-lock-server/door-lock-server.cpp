@@ -472,9 +472,6 @@ void DoorLockServer::SetCredentialCommandHandler(
             sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
             return;
         }
-        emberAfDoorLockClusterPrintln("comparing credentials (%d) type=%hhu,data_size=%zu (looking for type=%hhu,data_size=%zu)", i,
-                                      currentCredential.credentialType, currentCredential.credentialData.size(), credentialType,
-                                      credentialData.size());
         if (DlCredentialStatus::kAvailable != currentCredential.status && currentCredential.credentialType == credentialType &&
             currentCredential.credentialData.data_equal(credentialData))
         {
