@@ -185,6 +185,8 @@ public:
 
     TransportMgrBase & GetTransportMgr() { return mTransportManager; }
 
+    IOContext & GetIOContext() { return mIOContext; }
+
     /*
      * For unit-tests that simulate end-to-end transmission and reception of messages in loopback mode,
      * this mode better replicates a real-functioning stack that correctly handles the processing

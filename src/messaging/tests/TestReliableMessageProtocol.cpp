@@ -227,9 +227,8 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // sleep 65 ms to trigger first re-transmit
-    chip::test_utils::SleepMillis(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    // Wait for the first re-transmit (should take 64ms)
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 2; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
@@ -238,9 +237,8 @@ void CheckResendApplicationMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // sleep another 65 ms to trigger second re-transmit
-    chip::test_utils::SleepMillis(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    // Wait for the second re-transmit (should take 64ms)
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 3; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
@@ -290,9 +288,8 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // sleep 65 ms to trigger first re-transmit
-    chip::test_utils::SleepMillis(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    // Wait for the first re-transmit (should take 64ms)
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 2; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was dropped, and is still there in the retransmit table
@@ -301,9 +298,8 @@ void CheckCloseExchangeAndResendApplicationMessage(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 2);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    // sleep another 65 ms to trigger second re-transmit
-    chip::test_utils::SleepMillis(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    // Wait for the second re-transmit (should take 64ms)
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 3; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was NOT dropped, and the retransmit table is empty, as we should have gotten an ack
@@ -349,9 +345,8 @@ void CheckFailedMessageRetainOnSend(nlTestSuite * inSuite, void * inContext)
     // Ensure the message was dropped
     NL_TEST_ASSERT(inSuite, gLoopback.mDroppedMessageCount == 1);
 
-    // sleep 65 ms to trigger first re-transmit
-    chip::test_utils::SleepMillis(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    // Wait for the first re-transmit (should take 64ms)
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 2; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit table is empty, as we did not provide a message to retain
@@ -441,9 +436,8 @@ void CheckResendApplicationMessageWithPeerExchange(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
 
-    // sleep 65 ms to trigger first re-transmit
-    chip::test_utils::SleepMillis(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    // Wait for the first re-transmit (should take 64ms)
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 2; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
@@ -513,9 +507,8 @@ void CheckDuplicateMessageClosedExchange(nlTestSuite * inSuite, void * inContext
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Echo::MsgType::EchoRequest);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // sleep 65 ms to trigger first re-transmit
-    chip::test_utils::SleepMillis(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    // Wait for the first re-transmit and ack (should take 64ms)
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 3; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was sent and the ack was sent
@@ -574,9 +567,8 @@ void CheckResendSessionEstablishmentMessageWithPeerExchange(nlTestSuite * inSuit
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     NL_TEST_ASSERT(inSuite, !mockReceiver.IsOnMessageReceivedCalled);
 
-    // sleep 65 ms to trigger first re-transmit
-    chip::test_utils::SleepMillis(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    // Wait for the first re-transmit (should take 64ms)
+    inctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 2; });
     inctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was not dropped, and is no longer in the retransmit table
@@ -649,9 +641,8 @@ void CheckDuplicateMessage(nlTestSuite * inSuite, void * inContext)
     mockReceiver.mDropAckResponse = false;
     mockReceiver.mRetainExchange  = false;
 
-    // sleep 65 ms to trigger first re-transmit
-    chip::test_utils::SleepMillis(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    // Wait for the first re-transmit and ack (should take 64ms)
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 3; });
     ctx.DrainAndServiceIO();
 
     // Ensure the retransmit message was sent and the ack was sent
@@ -1186,9 +1177,8 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
     mockSender.IsOnMessageReceivedCalled   = false;
     mockSender.mReceivedPiggybackAck       = false;
 
-    // sleep 65 ms to trigger re-transmit from sender
-    chip::test_utils::SleepMillis(65);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    // Wait for re-transmit from sender and ack (should take 64ms)
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 4; });
     ctx.DrainAndServiceIO();
 
     // We resent our first message, which did not make it to the app-level
@@ -1216,9 +1206,8 @@ void CheckLostResponseWithPiggyback(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
     }
 
-    // sleep 65*3 ms to trigger re-transmit from receiver
-    chip::test_utils::SleepMillis(65 * 3);
-    ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), rm);
+    // Wait for re-transmit from receiver (should take 256ms)
+    ctx.GetIOContext().DriveIOUntil(1000_ms32, [] { return gLoopback.mSentMessageCount >= 6; });
     ctx.DrainAndServiceIO();
 
     // And now we've definitely resent our response message, which should show
@@ -1355,6 +1344,14 @@ void CheckLostStandaloneAck(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
 
+int InitializeTestCase(void * inContext)
+{
+    TestContext & ctx = *static_cast<TestContext *>(inContext);
+    ctx.GetSessionAliceToBob()->AsSecureSession()->SetMRPConfig(gDefaultMRPConfig);
+    ctx.GetSessionBobToAlice()->AsSecureSession()->SetMRPConfig(gDefaultMRPConfig);
+    return SUCCESS;
+}
+
 /**
  * TODO: A test that we should have but can't write with the existing
  * infrastructure we have:
@@ -1403,7 +1400,8 @@ nlTestSuite sSuite =
     "Test-CHIP-ReliableMessageProtocol",
     &sTests[0],
     TestContext::InitializeAsync,
-    TestContext::Finalize
+    TestContext::Finalize,
+    InitializeTestCase,
 };
 // clang-format on
 
