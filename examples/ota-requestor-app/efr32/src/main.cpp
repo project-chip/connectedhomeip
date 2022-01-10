@@ -172,12 +172,7 @@ int main(void)
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
-    // Set server instance used for session establishment
-    chip::Server * server = &(chip::Server::GetInstance());
-    gRequestorCore.SetServerInstance(server);
-
-    // Connect the Requestor and Requestor Driver objects
-    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
+    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
 
     OTAImageProcessorParams ipParams;
     ipParams.imageFile = CharSpan("test.txt");
@@ -186,8 +181,6 @@ int main(void)
 
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-
-    gRequestorCore.SetBDXDownloader(&gDownloader);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 
     EFR32_LOG("Starting Platform Manager Event Loop");

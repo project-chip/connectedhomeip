@@ -20,7 +20,9 @@
  * to the OTA Requestor object that handles them
  */
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <platform/OTARequestorInterface.h>
@@ -29,6 +31,7 @@ using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor;
+using namespace chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes;
 
 namespace {
 
@@ -77,6 +80,67 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Write(const ConcreteDataAttribu
 }
 
 } // namespace
+
+namespace chip {
+
+// -----------------------------------------------------------------------------
+// OtaRequestorServer implementation
+
+static OtaRequestorServer sInstance;
+
+OtaRequestorServer & OtaRequestorServer::GetInstance(void)
+{
+    return sInstance;
+}
+
+EmberAfStatus OtaRequestorServer::SetUpdateState(OTAUpdateStateEnum value)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    // Find all endpoints that has OtaSoftwareUpdateRequestor implemented
+    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
+    {
+        OTAUpdateStateEnum currentValue;
+        status = Attributes::UpdateState::Get(endpoint, &currentValue);
+        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+
+        if (currentValue != value)
+        {
+            status = Attributes::UpdateState::Set(endpoint, value);
+            VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+        }
+    }
+
+    return status;
+}
+
+EmberAfStatus OtaRequestorServer::SetUpdateStateProgress(uint8_t value)
+{
+    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+
+    // Find all endpoints that has OtaSoftwareUpdateRequestor implemented
+    for (auto endpoint : EnabledEndpointsWithServerCluster(OtaSoftwareUpdateRequestor::Id))
+    {
+        app::DataModel::Nullable<uint8_t> currentValue;
+        status = Attributes::UpdateStateProgress::Get(endpoint, currentValue);
+        VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+        if (!currentValue.IsNull())
+        {
+            if (currentValue.Value() != value)
+            {
+                status = Attributes::UpdateStateProgress::Set(endpoint, value);
+                VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
+            }
+        }
+    }
+
+    return status;
+}
+
+} // namespace chip
+
+// -----------------------------------------------------------------------------
+// Callbacks implementation
 
 bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,

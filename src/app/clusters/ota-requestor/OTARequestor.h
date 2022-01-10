@@ -23,6 +23,7 @@
 #pragma once
 
 #include <app/CASESessionManager.h>
+#include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/server/Server.h>
 #include <platform/OTARequestorDriver.h>
 #include <platform/OTARequestorInterface.h>
@@ -46,7 +47,10 @@ public:
 
     OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
 
-    // Application interface declarations -- start
+    //////////// OTARequestorInterface Implementation ///////////////
+    EmberAfStatus HandleAnnounceOTAProvider(
+        app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
 
     // Application directs the Requestor to start the Image Query process
     // and download the new image if available
@@ -58,53 +62,26 @@ public:
     // Send ApplyImage
     void ApplyUpdate() override;
 
-    // Handle download state change
+    //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state) override;
+    void OnUpdateProgressChanged(uint8_t percent) override;
 
-    // A setter for the delegate class pointer
-    void SetOtaRequestorDriver(OTARequestorDriver * driver) { mOtaRequestorDriver = driver; }
-
-    // TODO: this should really be OTADownloader, but right now OTARequestor has information that we need to initialize a
-    // BDXDownloader specifically.
-    // The BDXDownloader instance should already have the ImageProcessingDelegate set.
-    void SetBDXDownloader(chip::BDXDownloader * downloader) { mBdxDownloader = downloader; }
-
-    // Application directs the Requestor to abort the download in progress. All the Requestor state (such
-    // as the QueryImageResponse content) is preserved
-    void AbortImageUpdate();
-
-    // Application directs the Requestor to abort the download in progress. All the Requestor state is
-    // cleared, UploadState is reset to Idle
-    void AbortAndResetState();
-
-    // Application notifies the Requestor on the user consent action, TRUE if consent is given,
-    // FALSE otherwise
-    void OnUserConsent(bool result);
-
-    /* Commented out until the API is supported
-    // Application directs the Requestor to download the image using the suppiled parameter and without
-    // issuing QueryImage
-    OTATriggerResult ResumeImageDownload(const BdxDownloadParameters & bdxParameters){ return kTriggerSuccessful;}
-    */
-
-    // Application interface declarations -- end
-
-    // Virtual functions from OTARequestorInterface -- start
-
-    // Handler for the AnnounceOTAProvider command
-    EmberAfStatus HandleAnnounceOTAProvider(
-        app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) override;
-
-    // Virtual functions from OTARequestorInterface -- end
     /**
-     * Called to set the server instance which used to get access to the system resources necessary to open CASE sessions and drive
-     * BDX transfers
+     * Called to perform some initialization including:
+     *   - Set server instance used to get access to the system resources necessary to open CASE sessions and drive
+     *     BDX transfers
+     *   - Set the OTA requestor driver instance used to communicate download progress and errors
+     *   - Set the BDX downloader instance used for initiating BDX downloads
      */
-    void SetServerInstance(Server * server)
+    void Init(Server * server, OTARequestorDriver * driver, BDXDownloader * downloader)
     {
         mServer             = server;
         mCASESessionManager = server->GetCASESessionManager();
+        mOtaRequestorDriver = driver;
+        mBdxDownloader      = downloader;
+
+        OtaRequestorServer::GetInstance().SetUpdateState(app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle);
+        OtaRequestorServer::GetInstance().SetUpdateStateProgress(0);
     }
 
     /**
@@ -125,6 +102,18 @@ public:
         mProviderFabricIndex = fabIndex;
         mProviderEndpointId  = endpointId;
     }
+
+    // Application directs the Requestor to abort the download in progress. All the Requestor state (such
+    // as the QueryImageResponse content) is preserved
+    void AbortImageUpdate();
+
+    // Application directs the Requestor to abort the download in progress. All the Requestor state is
+    // cleared, UploadState is reset to Idle
+    void AbortAndResetState();
+
+    // Application notifies the Requestor on the user consent action, TRUE if consent is given,
+    // FALSE otherwise
+    void OnUserConsent(bool result);
 
 private:
     using QueryImageResponseDecodableType  = app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
