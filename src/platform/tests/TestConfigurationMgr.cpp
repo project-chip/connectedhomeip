@@ -227,6 +227,24 @@ static void TestConfigurationMgr_GetPrimaryMACAddress(nlTestSuite * inSuite, voi
     }
 }
 
+static void TestConfigurationMgr_ActiveLocale(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    char buf[8];
+    size_t activeLocaleLen    = 0;
+    const char * activeLocale = "en-US";
+
+    err = ConfigurationMgr().StoreActiveLocale(activeLocale, strlen(activeLocale));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetActiveLocale(buf, 8, activeLocaleLen);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, activeLocaleLen == strlen(activeLocale));
+    NL_TEST_ASSERT(inSuite, strcmp(buf, activeLocale) == 0);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -244,6 +262,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::CountryCode", TestConfigurationMgr_CountryCode),
     NL_TEST_DEF("Test ConfigurationMgr::Breadcrumb", TestConfigurationMgr_Breadcrumb),
     NL_TEST_DEF("Test ConfigurationMgr::GetPrimaryMACAddress", TestConfigurationMgr_GetPrimaryMACAddress),
+    NL_TEST_DEF("Test ConfigurationMgr::ActiveLocale", TestConfigurationMgr_ActiveLocale),
     NL_TEST_SENTINEL()
 };
 
