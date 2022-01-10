@@ -35,9 +35,6 @@ struct Commissionee
     chip::Optional<chip::Transport::PeerAddress> mOperationalAddress;
     chip::Optional<chip::ReliableMessageProtocolConfig> mMrpConfig;
     chip::Optional<chip::PeerId> mOperationalId;
-#if CONFIG_NETWORK_LAYER_BLE
-    chip::Optional<BLE_CONNECTION_OBJECT> mBleConnection;
-#endif
 
     void Init(DeviceControllerSystemState * systemState)
     {
@@ -67,6 +64,8 @@ struct Commissionee
         mBleConnection.ClearValue();
         return CHIP_NO_ERROR;
     }
+
+    chip::Optional<BLE_CONNECTION_OBJECT> mBleConnection;
 #endif // CONFIG_NETWORK_LAYER_BLE
 
     CHIP_ERROR ClosePase()
