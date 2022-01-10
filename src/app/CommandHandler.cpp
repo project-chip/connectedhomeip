@@ -124,7 +124,7 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     invokeRequests.GetReader(&invokeRequestsReader);
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))
     {
-        VerifyOrReturnError(TLV::AnonymousTag == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(TLV::AnonymousTag() == invokeRequestsReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         CommandDataIB::Parser commandData;
         ReturnErrorOnFailure(commandData.Init(invokeRequestsReader));
         ReturnErrorOnFailure(ProcessCommandDataIB(commandData));
@@ -436,7 +436,7 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 
 FabricIndex CommandHandler::GetAccessingFabricIndex() const
 {
-    return mpExchangeCtx->GetSessionHandle().GetFabricIndex();
+    return mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
 }
 
 CommandHandler * CommandHandler::Handle::Get()

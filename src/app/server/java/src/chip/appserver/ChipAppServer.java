@@ -22,4 +22,6 @@ public class ChipAppServer {
   private static final String TAG = ChipAppServer.class.getSimpleName();
 
   public native boolean startApp();
+
+  public native boolean stopApp();
 }

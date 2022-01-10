@@ -25,7 +25,7 @@ import("device.gni")
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 
-  if (chip_device_platform == "linux" || chip_device_platform == "Darwin") {
+  if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
     import("//build_overrides/ot_br_posix.gni")
   }
 }
@@ -54,7 +54,7 @@ if (chip_device_platform != "none") {
     chip_bypass_rendezvous = false
 
     # Enable including the additional data in the advertisement packets
-    chip_enable_additional_data_advertising = true
+    chip_enable_additional_data_advertising = false
 
     # Enable adding optional rotating device id to the additional data.
     chip_enable_rotating_device_id = false
@@ -295,6 +295,13 @@ if (chip_device_platform != "none") {
       "PersistedStorage.cpp",
       "PlatformEventSupport.cpp",
     ]
+
+    if (chip_enable_ota_requestor) {
+      sources += [
+        "GenericOTARequestorDriver.cpp",
+        "GenericOTARequestorDriver.h",
+      ]
+    }
 
     cflags = [ "-Wconversion" ]
 

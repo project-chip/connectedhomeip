@@ -112,7 +112,7 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
 
     while (CHIP_NO_ERROR == (err = attributeStatusesReader.Next()))
     {
-        VerifyOrExit(TLV::AnonymousTag == attributeStatusesReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrExit(TLV::AnonymousTag() == attributeStatusesReader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
 
         AttributeStatusIB::Parser element;
 
@@ -245,7 +245,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DataManagement, "Write client failed to SendWriteRequest");
+        ChipLogError(DataManagement, "Write client failed to SendWriteRequest: %s", ErrorStr(err));
         ClearExistingExchangeContext();
     }
     else
@@ -254,7 +254,7 @@ exit:
         // handle this object dying (e.g. due to IM enging shutdown) while the
         // async bits are pending we'd need to malloc some state bit that we can
         // twiddle if we die.  For now just do the OnDone callback sync.
-        if (session.IsGroupSession())
+        if (session->IsGroupSession())
         {
             // Always shutdown on Group communication
             ChipLogDetail(DataManagement, "Closing on group Communication ");

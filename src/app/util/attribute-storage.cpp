@@ -40,6 +40,7 @@
  ******************************************************************************/
 
 #include "app/util/common.h"
+#include <app/AttributePersistenceProvider.h>
 #include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
@@ -1200,13 +1201,15 @@ void emberAfResetAttributes(EndpointId endpoint)
     emAfLoadAttributeDefaults(endpoint, true);
 }
 
-void emAfLoadAttributeDefaults(EndpointId endpoint, bool writeTokens)
+void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage)
 {
     uint16_t ep;
     uint8_t clusterI, curNetwork = 0 /* emberGetCurrentNetwork() */;
     uint16_t attr;
     uint8_t * ptr;
     uint16_t epCount = emberAfEndpointCount();
+    uint8_t attrData[ATTRIBUTE_LARGEST];
+    auto * attrStorage = ignoreStorage ? nullptr : app::GetAttributePersistenceProvider();
 
     for (ep = 0; ep < epCount; ep++)
     {
@@ -1241,7 +1244,30 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool writeTokens)
             for (attr = 0; attr < cluster->attributeCount; attr++)
             {
                 EmberAfAttributeMetadata * am = &(cluster->attributes[attr]);
-                if (!(am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE))
+                ptr                           = nullptr; // Will get set to the value to write, as needed.
+
+                // First check for a persisted value.
+                if (!ignoreStorage && am->IsNonVolatile())
+                {
+                    MutableByteSpan bytes(attrData);
+                    CHIP_ERROR err = attrStorage->ReadValue(
+                        app::ConcreteAttributePath(de->endpoint, cluster->clusterId, am->attributeId), am, bytes);
+                    if (err == CHIP_NO_ERROR)
+                    {
+                        ptr = attrData;
+                    }
+                    else
+                    {
+                        ChipLogDetail(DataManagement,
+                                      "Failed to read stored attribute (%" PRIu16 ", " ChipLogFormatMEI ", " ChipLogFormatMEI
+                                      ": %" CHIP_ERROR_FORMAT,
+                                      de->endpoint, ChipLogValueMEI(cluster->clusterId), ChipLogValueMEI(am->attributeId),
+                                      err.Format());
+                        // Just fall back to default value.
+                    }
+                }
+
+                if (!am->IsExternal())
                 {
                     EmberAfAttributeSearchRecord record;
                     record.endpoint         = de->endpoint;
@@ -1249,49 +1275,54 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool writeTokens)
                     record.clusterMask      = (emberAfAttributeIsClient(am) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER);
                     record.attributeId      = am->attributeId;
                     record.manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE;
-                    if ((am->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
+
+                    if (ptr == nullptr)
                     {
-                        if (emberAfAttributeSize(am) <= 2)
+                        if ((am->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
                         {
-                            ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
+                            if (emberAfAttributeSize(am) <= 2)
+                            {
+                                ptr = (uint8_t *) &(am->defaultValue.ptrToMinMaxValue->defaultValue.defaultValue);
+                            }
+                            else
+                            {
+                                ptr = (uint8_t *) am->defaultValue.ptrToMinMaxValue->defaultValue.ptrToDefaultValue;
+                            }
                         }
                         else
                         {
-                            ptr = (uint8_t *) am->defaultValue.ptrToMinMaxValue->defaultValue.ptrToDefaultValue;
+                            if (emberAfAttributeSize(am) <= 2)
+                            {
+                                ptr = (uint8_t *) &(am->defaultValue.defaultValue);
+                            }
+                            else
+                            {
+                                ptr = (uint8_t *) am->defaultValue.ptrToDefaultValue;
+                            }
                         }
-                    }
-                    else
-                    {
-                        if (emberAfAttributeSize(am) <= 2)
-                        {
-                            ptr = (uint8_t *) &(am->defaultValue.defaultValue);
-                        }
-                        else
-                        {
-                            ptr = (uint8_t *) am->defaultValue.ptrToDefaultValue;
-                        }
-                    }
-                    // At this point, ptr either points to a default value, or is NULL, in which case
-                    // it should be treated as if it is pointing to an array of all zeroes.
+                        // At this point, ptr either points to a default value, or is NULL, in which case
+                        // it should be treated as if it is pointing to an array of all zeroes.
 
 #if (BIGENDIAN_CPU)
-                    // The default value for one- and two-byte attributes is stored in an
-                    // uint16_t.  On big-endian platforms, a pointer to the default value of
-                    // a one-byte attribute will point to the wrong byte.  So, for those
-                    // cases, nudge the pointer forward so it points to the correct byte.
-                    if (emberAfAttributeSize(am) == 1 && ptr != NULL)
-                    {
-                        *ptr++;
-                    }
+                        // The default value for one- and two-byte attributes is stored in an
+                        // uint16_t.  On big-endian platforms, a pointer to the default value of
+                        // a one-byte attribute will point to the wrong byte.  So, for those
+                        // cases, nudge the pointer forward so it points to the correct byte.
+                        if (emberAfAttributeSize(am) == 1 && ptr != NULL)
+                        {
+                            *ptr++;
+                        }
 #endif // BIGENDIAN
+                    }
+
                     emAfReadOrWriteAttribute(&record,
                                              NULL, // metadata - unused
                                              ptr,
                                              0,     // buffer size - unused
                                              true); // write?
-                    if (writeTokens)
+                    if (ignoreStorage)
                     {
-                        emAfSaveAttributeToToken(ptr, de->endpoint, record.clusterId, am);
+                        emAfSaveAttributeToStorageIfNeeded(ptr, de->endpoint, record.clusterId, am);
                     }
                 }
             }
@@ -1301,38 +1332,46 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool writeTokens)
             break;
         }
     }
-
-    if (!writeTokens)
-    {
-        emAfLoadAttributesFromTokens(endpoint);
-    }
-}
-
-void emAfLoadAttributesFromTokens(EndpointId endpoint)
-{
-    // On EZSP host we currently do not support this. We need to come up with some
-    // callbacks.
-#ifndef EZSP_HOST
-    GENERATED_TOKEN_LOADER(endpoint);
-#endif // EZSP_HOST
 }
 
 // 'data' argument may be null, since we changed the ptrToDefaultValue
 // to be null instead of pointing to all zeroes.
 // This function has to be able to deal with that.
-void emAfSaveAttributeToToken(uint8_t * data, EndpointId endpoint, ClusterId clusterId, EmberAfAttributeMetadata * metadata)
+void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, EndpointId endpoint, ClusterId clusterId,
+                                        EmberAfAttributeMetadata * metadata)
 {
-    // Get out of here if this attribute doesn't have a token.
-    if (!emberAfAttributeIsTokenized(metadata))
+    // Get out of here if this attribute isn't marked non-volatile.
+    if (!metadata->IsNonVolatile())
     {
         return;
     }
 
-// On EZSP host we currently do not support this. We need to come up with some
-// callbacks.
-#ifndef EZSP_HOST
-    GENERATED_TOKEN_SAVER;
-#endif // EZSP_HOST
+    // TODO: Maybe we should have a separate constant for the size of the
+    // largest non-volatile attribute?
+    uint8_t allZeroData[ATTRIBUTE_LARGEST] = { 0 };
+    if (data == nullptr)
+    {
+        data = allZeroData;
+    }
+
+    size_t dataSize;
+    EmberAfAttributeType type = metadata->attributeType;
+    if (emberAfIsStringAttributeType(type))
+    {
+        dataSize = emberAfStringLength(data) + 1;
+    }
+    else if (emberAfIsLongStringAttributeType(type))
+    {
+        dataSize = emberAfLongStringLength(data) + 2;
+    }
+    else
+    {
+        dataSize = metadata->size;
+    }
+
+    auto * attrStorage = app::GetAttributePersistenceProvider();
+    attrStorage->WriteValue(app::ConcreteAttributePath(endpoint, clusterId, metadata->attributeId), metadata,
+                            ByteSpan(data, dataSize));
 }
 
 // This function returns the actual function point from the array,

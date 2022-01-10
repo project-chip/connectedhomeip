@@ -273,7 +273,7 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 }
 
 CHIP_ERROR PlatformManagerImpl::_GetFixedLabelList(
-    EndpointId endpoint, LabelList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
+    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
 {
     // In Linux simulation, return following hardcoded labelList on all endpoints.
     FixedLabel::Structs::LabelStruct::Type room;
@@ -302,8 +302,16 @@ CHIP_ERROR PlatformManagerImpl::_GetFixedLabelList(
 }
 
 CHIP_ERROR
-PlatformManagerImpl::_GetUserLabelList(EndpointId endpoint,
-                                       LabelList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+PlatformManagerImpl::_SetUserLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    // TODO:: store the user labelList, and read back stored user labelList if it has been set. Add yaml test to verify this.
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PlatformManagerImpl::_GetUserLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
     // In Linux simulation, return following hardcoded labelList on all endpoints.
     UserLabel::Structs::LabelStruct::Type room;

@@ -115,7 +115,7 @@ public interface MediaPlaybackManager {
   long getAttributes(int attributesId);
 
   /**
-   * Request for cmd in REQUEST_XXX, the paramters for request is defined in REQUEST_XXX
+   * Request for cmd in REQUEST_XXX, the parameters for request is defined in REQUEST_XXX
    *
    * @param parameter The means of parameter is defined in RESPONSE_STATUS_XXX or meaningless if not
    *     defined.

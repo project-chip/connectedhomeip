@@ -722,6 +722,18 @@ tests:
       response:
           value: "Tes\x00ti\x00ng"
 
+    - label: "Write attribute OCTET_STRING with weird chars"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "\r\n\xff\"\xa0"
+
+    - label: "Read attribute OCTET_STRING with weird chars"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "\r\n\xff\"\xa0"
+
     - label: "Write attribute OCTET_STRING"
       command: "writeAttribute"
       attribute: "octet_string"
@@ -1555,6 +1567,50 @@ tests:
               - name: "wasPresent"
                 value: false
 
+    - label: "Read list of structs containing nullables and optionals"
+      command: "readAttribute"
+      attribute: "list_nullables_and_optionals_struct"
+      response:
+          # By default, just one item, with everything default-initialized
+          value:
+              [
+                  {
+                      NullableInt: null,
+                      NullableString: null,
+                      NullableStruct: null,
+                      NullableList: null,
+                  },
+              ]
+
+    - label: "Write list of structs containing nullables and optionals"
+      command: "writeAttribute"
+      attribute: "list_nullables_and_optionals_struct"
+      arguments:
+          value:
+              [
+                  {
+                      NullableInt: null,
+                      NullableString: null,
+                      NullableStruct: null,
+                      NullableList: [1, 2],
+                  },
+              ]
+
+    - label:
+          "Read list of structs containing nullables and optionals after writing"
+      command: "readAttribute"
+      attribute: "list_nullables_and_optionals_struct"
+      response:
+          value:
+              [
+                  {
+                      NullableInt: null,
+                      NullableString: null,
+                      NullableStruct: null,
+                      NullableList: [1, 2],
+                  },
+              ]
+
     # Nullable attributes
 
     # Tests for nullable Boolean attribute
@@ -1745,6 +1801,18 @@ tests:
 
     # Tests for nullable UInt8 attribute
 
+    - label: "Write attribute NULLABLE_INT8U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT8U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          value: 0
+
     - label: "Write attribute NULLABLE_INT8U Max Value"
       command: "writeAttribute"
       attribute: "nullable_int8u"
@@ -1770,6 +1838,13 @@ tests:
       attribute: "nullable_int8u"
       response:
           value: 254
+
+    - label: "Read attribute NULLABLE_INT8U unchanged Value with constraint"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              notValue: null
 
     - label: "Write attribute NULLABLE_INT8U null Value"
       command: "writeAttribute"
@@ -1820,6 +1895,18 @@ tests:
               notValue: 129
 
     # Tests for nullable UInt16 attribute
+
+    - label: "Write attribute NULLABLE_INT16U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int16u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT16U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int16u"
+      response:
+          value: 0
 
     - label: "Write attribute NULLABLE_INT16U Max Value"
       command: "writeAttribute"
@@ -1897,6 +1984,18 @@ tests:
 
     # Tests for nullable UInt32 attribute
 
+    - label: "Write attribute NULLABLE_INT32U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int32u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT32U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int32u"
+      response:
+          value: 0
+
     - label: "Write attribute NULLABLE_INT32U Max Value"
       command: "writeAttribute"
       attribute: "nullable_int32u"
@@ -1972,6 +2071,18 @@ tests:
               notValue: 2147483648
 
     # Tests for nullable UInt64 attribute
+
+    - label: "Write attribute NULLABLE_INT64U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int64u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT64U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int64u"
+      response:
+          value: 0
 
     - label: "Write attribute NULLABLE_INT64U Max Value"
       command: "writeAttribute"
@@ -2480,6 +2591,18 @@ tests:
 
     # Tests for Enum8 attribute
 
+    - label: "Write attribute NULLABLE_ENUM8 Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum8"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_ENUM8 Min Value"
+      command: "readAttribute"
+      attribute: "nullable_enum8"
+      response:
+          value: 0
+
     - label: "Write attribute NULLABLE_ENUM8 Max Value"
       command: "writeAttribute"
       attribute: "nullable_enum8"
@@ -2520,6 +2643,18 @@ tests:
 
     # Tests for Enum16 attribute
 
+    - label: "Write attribute NULLABLE_ENUM16 Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum16"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_ENUM16 Min Value"
+      command: "readAttribute"
+      attribute: "nullable_enum16"
+      response:
+          value: 0
+
     - label: "Write attribute NULLABLE_ENUM16 Max Value"
       command: "writeAttribute"
       attribute: "nullable_enum16"
@@ -2555,6 +2690,58 @@ tests:
     - label: "Read attribute NULLABLE_ENUM16 null Value"
       command: "readAttribute"
       attribute: "nullable_enum16"
+      response:
+          value: null
+
+    # Tests for named enum attribute
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM Min Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          value: 0
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: 254
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM Max Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: 255
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM null Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM null Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
       response:
           value: null
 
@@ -2886,7 +3073,7 @@ tests:
       command: "readAttribute"
       attribute: "range_restricted_int8s"
       response:
-          value: 0 # ZAP won't allow setting a negative default!
+          value: -20
 
     - label: "Write min value to a range-restricted signed 8-bit integer"
       command: "writeAttribute"
@@ -2929,7 +3116,7 @@ tests:
       command: "readAttribute"
       attribute: "range_restricted_int8s"
       response:
-          value: 0
+          value: -20
 
     - label: "Write min valid value to a range-restricted signed 8-bit integer"
       command: "writeAttribute"
@@ -2975,7 +3162,7 @@ tests:
       command: "readAttribute"
       attribute: "range_restricted_int16s"
       response:
-          value: 0 # ZAP won't allow setting a negative default!
+          value: -100
 
     - label: "Write min value to a range-restricted signed 16-bit integer"
       command: "writeAttribute"
@@ -3018,7 +3205,7 @@ tests:
       command: "readAttribute"
       attribute: "range_restricted_int16s"
       response:
-          value: 0
+          value: -100
 
     - label: "Write min valid value to a range-restricted signed 16-bit integer"
       command: "writeAttribute"
@@ -3298,7 +3485,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_range_restricted_int8s"
       response:
-          value: 0 # ZAP won't allow setting a negative default!
+          value: -20
 
     - label:
           "Write min value to a nullable range-restricted signed 8-bit integer"
@@ -3344,7 +3531,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_range_restricted_int8s"
       response:
-          value: 0
+          value: -20
 
     - label:
           "Write min valid value to a nullable range-restricted signed 8-bit
@@ -3413,7 +3600,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_range_restricted_int16s"
       response:
-          value: 0 # ZAP won't allow setting a negative default!
+          value: -100
 
     - label:
           "Write min value to a nullable range-restricted signed 16-bit integer"
@@ -3459,7 +3646,7 @@ tests:
       command: "readAttribute"
       attribute: "nullable_range_restricted_int16s"
       response:
-          value: 0
+          value: -100
 
     - label:
           "Write min valid value to a nullable range-restricted signed 16-bit

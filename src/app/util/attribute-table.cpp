@@ -287,11 +287,10 @@ void emberAfPrintAttributeTable(void)
                                        (emberAfAttributeIsClient(metaData) ? "clnt" : "srvr"),
                                        ChipLogValueMEI(metaData->attributeId));
                 emberAfAttributesPrint("----");
-                emberAfAttributesPrint(" / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
-                                       (metaData->IsReadOnly() ? "RO" : "RW"),
-                                       (emberAfAttributeIsTokenized(metaData)
-                                            ? " token "
-                                            : (emberAfAttributeIsExternal(metaData) ? "extern " : "  RAM  ")));
+                emberAfAttributesPrint(
+                    " / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
+                    (metaData->IsReadOnly() ? "RO" : "RW"),
+                    (metaData->IsNonVolatile() ? " nonvolatile " : (metaData->IsExternal() ? " extern " : "  RAM  ")));
                 emberAfAttributesFlush();
                 status = emAfReadAttribute(ep->endpoint, cluster->clusterId, metaData->attributeId,
                                            (emberAfAttributeIsClient(metaData) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER),
@@ -655,9 +654,9 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
             return status;
         }
 
-        // Save the attribute to token if needed
-        // Function itself will weed out tokens that are not tokenized.
-        emAfSaveAttributeToToken(data, endpoint, cluster, metadata);
+        // Save the attribute to persistent storage if needed
+        // The callee will weed out attributes that do not need to be stored.
+        emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
 
         MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType, data);
 

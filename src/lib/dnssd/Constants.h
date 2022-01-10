@@ -37,7 +37,7 @@ constexpr size_t kHostNameMaxLength = 16; // MAC or 802.15.4 Extended Address in
 
 constexpr size_t kSubTypeShortDiscriminatorMaxLength      = 4;  // _S<dd>
 constexpr size_t kSubTypeLongDiscriminatorMaxLength       = 6;  // _L<dddd>
-constexpr size_t kSubTypeVendorMaxLength                  = 7;  // _V<ddddd>
+constexpr size_t kSubTypeVendorIdMaxLength                = 7;  // _V<ddddd>
 constexpr size_t kSubTypeDeviceTypeMaxLength              = 5;  // _T<ddd>
 constexpr size_t kSubTypeCommissioningModeMaxLength       = 3;  // _C<d>
 constexpr size_t kSubTypeAdditionalCommissioningMaxLength = 3;  // _A<d>
@@ -64,11 +64,11 @@ constexpr size_t kSubTypeTotalLength    = chip::Sum(SUBTYPES);
  * Matter commissionable/commissioner node service constants.
  */
 
-namespace Commissionable {
+namespace Commission {
 
 #define SUBTYPES                                                                                                                   \
     (std::initializer_list<size_t>{ kSubTypeShortDiscriminatorMaxLength, kSubTypeLongDiscriminatorMaxLength,                       \
-                                    kSubTypeVendorMaxLength, kSubTypeDeviceTypeMaxLength, kSubTypeCommissioningModeMaxLength,      \
+                                    kSubTypeVendorIdMaxLength, kSubTypeDeviceTypeMaxLength, kSubTypeCommissioningModeMaxLength,    \
                                     kSubTypeAdditionalCommissioningMaxLength })
 
 constexpr size_t kInstanceNameMaxLength = 16; // 64-bit random number in hex
@@ -78,7 +78,7 @@ constexpr size_t kSubTypeTotalLength    = chip::Sum(SUBTYPES);
 
 #undef SUBTYPES
 
-} // namespace Commissionable
+} // namespace Commission
 
 /*
  * Constants for any Matter service.
@@ -86,10 +86,10 @@ constexpr size_t kSubTypeTotalLength    = chip::Sum(SUBTYPES);
 
 namespace Common {
 
-constexpr size_t kInstanceNameMaxLength = std::max(Operational::kInstanceNameMaxLength, Commissionable::kInstanceNameMaxLength);
-constexpr size_t kSubTypeMaxNumber      = std::max(Operational::kSubTypeMaxNumber, Commissionable::kSubTypeMaxNumber);
-constexpr size_t kSubTypeMaxLength      = std::max(Operational::kSubTypeMaxLength, Commissionable::kSubTypeMaxLength);
-constexpr size_t kSubTypeTotalLength    = std::max(Operational::kSubTypeTotalLength, Commissionable::kSubTypeTotalLength);
+constexpr size_t kInstanceNameMaxLength = std::max(Operational::kInstanceNameMaxLength, Commission::kInstanceNameMaxLength);
+constexpr size_t kSubTypeMaxNumber      = std::max(Operational::kSubTypeMaxNumber, Commission::kSubTypeMaxNumber);
+constexpr size_t kSubTypeMaxLength      = std::max(Operational::kSubTypeMaxLength, Commission::kSubTypeMaxLength);
+constexpr size_t kSubTypeTotalLength    = std::max(Operational::kSubTypeTotalLength, Commission::kSubTypeTotalLength);
 
 } // namespace Common
 

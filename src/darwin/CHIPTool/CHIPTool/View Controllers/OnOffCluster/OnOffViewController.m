@@ -244,7 +244,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
                                                                     queue:dispatch_get_main_queue()];
                     [onOff onWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
-                            ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                            ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
                             : @"On command success";
                         [self updateResult:resultString];
                     }];
@@ -273,7 +273,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
                                                                     queue:dispatch_get_main_queue()];
                     [onOff offWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
-                            ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                            ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
                             : @"Off command success";
                         [self updateResult:resultString];
                     }];
@@ -302,7 +302,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
                                                                     queue:dispatch_get_main_queue()];
                     [onOff toggleWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
-                            ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
+                            ? [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code]
                             : @"Toggle command success";
                         [self updateResult:resultString];
                     }];

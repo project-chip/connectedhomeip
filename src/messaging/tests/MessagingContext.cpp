@@ -29,20 +29,18 @@ CHIP_ERROR MessagingContext::Init(TransportMgrBase * transport, IOContext * ioCo
     mInitialized = true;
 
     mIOContext = ioContext;
+    mTransport = transport;
 
     ReturnErrorOnFailure(mSessionManager.Init(&GetSystemLayer(), transport, &mMessageCounterManager));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSessionManager));
     ReturnErrorOnFailure(mMessageCounterManager.Init(&mExchangeManager));
 
-    mSessionBobToFriends.Grab(mSessionManager.CreateGroupSession(GetBobKeyId(), GetFriendsGroupId(), GetFabricIndex()).Value());
+    ReturnErrorOnFailure(CreateSessionBobToAlice());
+    ReturnErrorOnFailure(CreateSessionAliceToBob());
+    ReturnErrorOnFailure(CreateSessionBobToFriends());
 
-    ReturnErrorOnFailure(mSessionManager.NewPairing(mSessionBobToAlice, Optional<Transport::PeerAddress>::Value(mAliceAddress),
-                                                    GetAliceNodeId(), &mPairingBobToAlice, CryptoContext::SessionRole::kInitiator,
-                                                    mSrcFabricIndex));
-
-    return mSessionManager.NewPairing(mSessionAliceToBob, Optional<Transport::PeerAddress>::Value(mBobAddress), GetBobNodeId(),
-                                      &mPairingAliceToBob, CryptoContext::SessionRole::kResponder, mDestFabricIndex);
+    return CHIP_NO_ERROR;
 }
 
 // Shutdown all layers, finalize operations
@@ -53,6 +51,38 @@ CHIP_ERROR MessagingContext::Shutdown()
 
     mExchangeManager.Shutdown();
     mSessionManager.Shutdown();
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MessagingContext::InitFromExisting(const MessagingContext & existing)
+{
+    return Init(existing.mTransport, existing.mIOContext);
+}
+
+CHIP_ERROR MessagingContext::ShutdownAndRestoreExisting(MessagingContext & existing)
+{
+    CHIP_ERROR err = Shutdown();
+    // Point the transport back to the original session manager, since we had
+    // pointed it to ours.
+    existing.mTransport->SetSessionManager(&existing.GetSecureSessionManager());
+    return err;
+}
+
+CHIP_ERROR MessagingContext::CreateSessionBobToAlice()
+{
+    return mSessionManager.NewPairing(mSessionBobToAlice, Optional<Transport::PeerAddress>::Value(mAliceAddress), GetAliceNodeId(),
+                                      &mPairingBobToAlice, CryptoContext::SessionRole::kInitiator, mSrcFabricIndex);
+}
+
+CHIP_ERROR MessagingContext::CreateSessionAliceToBob()
+{
+    return mSessionManager.NewPairing(mSessionAliceToBob, Optional<Transport::PeerAddress>::Value(mBobAddress), GetBobNodeId(),
+                                      &mPairingAliceToBob, CryptoContext::SessionRole::kResponder, mDestFabricIndex);
+}
+
+CHIP_ERROR MessagingContext::CreateSessionBobToFriends()
+{
+    mSessionBobToFriends.Grab(mSessionManager.CreateGroupSession(GetFriendsGroupId()).Value());
     return CHIP_NO_ERROR;
 }
 
@@ -71,6 +101,21 @@ SessionHandle MessagingContext::GetSessionBobToFriends()
     return mSessionBobToFriends.Get();
 }
 
+void MessagingContext::ExpireSessionBobToAlice()
+{
+    mSessionManager.ExpirePairing(mSessionBobToAlice.Get());
+}
+
+void MessagingContext::ExpireSessionAliceToBob()
+{
+    mSessionManager.ExpirePairing(mSessionAliceToBob.Get());
+}
+
+void MessagingContext::ExpireSessionBobToFriends()
+{
+    // TODO: expire the group session
+}
+
 Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
     return mExchangeManager.NewContext(mSessionManager.CreateUnauthenticatedSession(mAliceAddress, gDefaultMRPConfig).Value(),
@@ -85,13 +130,11 @@ Messaging::ExchangeContext * MessagingContext::NewUnauthenticatedExchangeToBob(M
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToAlice(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
     return mExchangeManager.NewContext(GetSessionBobToAlice(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToBob(Messaging::ExchangeDelegate * delegate)
 {
-    // TODO: temprary create a SessionHandle from node id, will be fix in PR 3602
     return mExchangeManager.NewContext(GetSessionAliceToBob(), delegate);
 }
 

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 60.2.1. [TC-BOOL-2.1] Attributes with server as DUT
+name: 68.2.1. [TC-BOOL-2.1] Attributes with server as DUT
 
 config:
     cluster: "Boolean State"

@@ -161,11 +161,6 @@ async function asObjectiveCType(type, cluster, options)
   return typeStr;
 }
 
-function incrementDepth(depth)
-{
-  return depth + 1;
-}
-
 function asStructPropertyName(prop)
 {
   prop = appHelper.asLowerCamelCase(prop);
@@ -206,7 +201,6 @@ exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;
 exports.asObjectiveCClass            = asObjectiveCClass;
 exports.asObjectiveCType             = asObjectiveCType;
-exports.incrementDepth               = incrementDepth;
 exports.asStructPropertyName         = asStructPropertyName;
 exports.asGetterName                 = asGetterName;
 exports.commandHasRequiredField      = commandHasRequiredField;

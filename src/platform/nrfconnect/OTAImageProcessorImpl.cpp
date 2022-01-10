@@ -17,7 +17,9 @@
 
 #include "OTAImageProcessorImpl.h"
 
+#include <app/clusters/ota-requestor/OTADownloader.h>
 #include <lib/support/CodeUtils.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemError.h>
 
 #include <dfu/dfu_target.h>
@@ -27,6 +29,13 @@ namespace chip {
 namespace DeviceLayer {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
+{
+    VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    return DeviceLayer::SystemLayer().ScheduleLambda([this] { mDownloader->OnPreparedForDownload(PrepareDownloadImpl()); });
+}
+
+CHIP_ERROR OTAImageProcessorImpl::PrepareDownloadImpl()
 {
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_mcuboot_set_buf(mBuffer, sizeof(mBuffer))));
     ReturnErrorOnFailure(System::MapErrorZephyr(dfu_target_reset()));
@@ -50,7 +59,18 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
-    return System::MapErrorZephyr(dfu_target_write(block.data(), block.size()));
+    VerifyOrReturnError(mDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    // DFU target library buffers data internally, so do not clone the block data.
+    CHIP_ERROR error = System::MapErrorZephyr(dfu_target_write(block.data(), block.size()));
+
+    // Report the result back to the downloader asynchronously.
+    return DeviceLayer::SystemLayer().ScheduleLambda([this, error] {
+        if (error == CHIP_NO_ERROR)
+            mDownloader->FetchNextData();
+        else
+            mDownloader->EndDownload(error);
+    });
 }
 
 } // namespace DeviceLayer

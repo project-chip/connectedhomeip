@@ -232,7 +232,7 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredN
     case TxtFieldKey::kMrpRetryIntervalActive:
         nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(val);
         break;
-    case TxtFieldKey::kTcpSupport:
+    case TxtFieldKey::kTcpSupported:
         nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(val);
         break;
     default:
@@ -250,7 +250,7 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedN
     case TxtFieldKey::kMrpRetryIntervalActive:
         nodeData.mMrpRetryIntervalActive = Internal::GetRetryInterval(value);
         break;
-    case TxtFieldKey::kTcpSupport:
+    case TxtFieldKey::kTcpSupported:
         nodeData.mSupportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
         break;
     default:

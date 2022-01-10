@@ -185,7 +185,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecSimpleStruc
 
         t.f.Set(TestCluster::SimpleBitmap::kValueC);
 
-        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
+        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = _this->mWriter.Finalize();
@@ -246,7 +246,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecNestedStruc
 
         t.c.e = Span<char>{ strbuf, strlen(strbuf) };
 
-        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
+        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = _this->mWriter.Finalize();
@@ -331,7 +331,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableNe
         t.c.e = Span<char>{ strbuf, strlen(strbuf) };
         t.d   = structList;
 
-        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
+        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = _this->mWriter.Finalize();
@@ -460,7 +460,7 @@ void TestDataModelSerialization::TestDataModelSerialization_EncAndDecDecodableDo
             item.d = structList;
         }
 
-        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, t);
+        err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), t);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = _this->mWriter.Finalize();
@@ -532,7 +532,7 @@ void TestDataModelSerialization::TestDataModelSerialization_OptionalFields(nlTes
         // Encode every field manually except a.
         {
             err =
-                EncodeStruct(_this->mWriter, TLV::AnonymousTag,
+                EncodeStruct(_this->mWriter, TLV::AnonymousTag(),
                              MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kB)), t.b),
                              MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kC)), t.c),
                              MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kD)), t.d),
@@ -603,7 +603,7 @@ void TestDataModelSerialization::TestDataModelSerialization_ExtraField(nlTestSui
         // Encode every field + an extra field.
         {
             err = EncodeStruct(
-                _this->mWriter, TLV::AnonymousTag,
+                _this->mWriter, TLV::AnonymousTag(),
                 MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kA)), t.a),
                 MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kB)), t.b),
                 MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kC)), t.c),
@@ -676,7 +676,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
             // Encode every field manually except a.
             {
                 err = EncodeStruct(
-                    _this->mWriter, TLV::AnonymousTag,
+                    _this->mWriter, TLV::AnonymousTag(),
                     MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kA)), t.b),
                     MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kB)), t.b),
                     MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kC)), t.c),
@@ -728,7 +728,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidSimpleFieldTy
             // Encode every field manually except a.
             {
                 err = EncodeStruct(
-                    _this->mWriter, TLV::AnonymousTag,
+                    _this->mWriter, TLV::AnonymousTag(),
                     MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kA)), t.a),
                     MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kB)), t.b),
                     MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::SimpleStruct::Fields::kC)), t.c),
@@ -777,7 +777,7 @@ void TestDataModelSerialization::TestDataModelSerialization_InvalidListType(nlTe
         // Encode a list of integers for field d instead of a list of structs.
         {
             err = EncodeStruct(
-                _this->mWriter, TLV::AnonymousTag,
+                _this->mWriter, TLV::AnonymousTag(),
                 MakeTagValuePair(TLV::ContextTag(to_underlying(TestCluster::Structs::NestedStructList::Fields::kD)), t.e));
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         }
@@ -922,7 +922,7 @@ void TestDataModelSerialization::NullablesOptionalsEncodeDecodeCheck(nlTestSuite
             encodable.nullableList.SetNull();
         }
 
-        CHIP_ERROR err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag, encodable);
+        CHIP_ERROR err = DataModel::Encode(_this->mWriter, TLV::AnonymousTag(), encodable);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         err = _this->mWriter.Finalize();
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);

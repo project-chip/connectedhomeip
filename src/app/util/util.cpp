@@ -294,15 +294,12 @@ void emberAfTick(void)
 void MatterBooleanStatePluginServerInitCallback() {}
 void MatterBridgedDeviceBasicPluginServerInitCallback() {}
 void MatterElectricalMeasurementPluginServerInitCallback() {}
-void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback() {}
-void MatterGroupKeyManagementPluginServerInitCallback() {}
 void MatterRelativeHumidityMeasurementPluginServerInitCallback() {}
 void MatterIlluminanceMeasurementPluginServerInitCallback() {}
 void MatterBinaryInputBasicPluginServerInitCallback() {}
 void MatterPressureMeasurementPluginServerInitCallback() {}
 void MatterTemperatureMeasurementPluginServerInitCallback() {}
 void MatterFlowMeasurementPluginServerInitCallback() {}
-void MatterWakeOnLanPluginServerInitCallback() {}
 void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
 void MatterPowerSourcePluginServerInitCallback() {}
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}
@@ -451,7 +448,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
     }
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
     else if ((cmd->type == EMBER_INCOMING_MULTICAST || cmd->type == EMBER_INCOMING_MULTICAST_LOOPBACK) &&
-             !emberAfGroupsClusterEndpointInGroupCallback(cmd->source->GetSessionHandle().GetFabricIndex(),
+             !emberAfGroupsClusterEndpointInGroupCallback(cmd->source->GetSessionHandle()->AsSecureSession()->GetFabricIndex(),
                                                           cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
     {
         emberAfDebugPrint("Drop cluster " ChipLogFormatMEI " command " ChipLogFormatMEI, ChipLogValueMEI(cmd->apsFrame->clusterId),

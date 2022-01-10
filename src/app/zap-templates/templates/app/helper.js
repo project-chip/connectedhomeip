@@ -109,7 +109,7 @@ var endpointClusterWithInit = [
   'Thermostat',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
-var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Thermostat User Interface Configuration' ];
+var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration' ];
 var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
 
 /**
@@ -352,6 +352,16 @@ function asMEI(prefix, suffix)
   return cHelper.asHex((prefix << 16) + suffix, 8);
 }
 
+// Not to be exported.
+function nsValueToNamespace(ns)
+{
+  if (ns == "detail") {
+    return ns;
+  }
+
+  return asUpperCamelCase(ns);
+}
+
 /*
  * @brief
  *
@@ -372,7 +382,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
   let passByReference = false;
   async function fn(pkgId)
   {
-    const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
+    const ns          = options.hash.ns ? ('chip::app::Clusters::' + nsValueToNamespace(options.hash.ns) + '::') : '';
     const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
     if (await typeChecker('isEnum')) {
@@ -611,13 +621,10 @@ async function getResponseCommandName(responseRef, options)
 function isWeaklyTypedEnum(label)
 {
   return [
-    "ApplicationLauncherStatus",
     "AttributeWritePermission",
-    "AudioOutputType",
     "BarrierControlBarrierPosition",
     "BarrierControlMovingState",
     "BootReasonType",
-    "ChangeReasonEnum",
     "ColorControlOptions",
     "ColorLoopAction",
     "ColorLoopDirection",
@@ -645,26 +652,17 @@ function isWeaklyTypedEnum(label)
     "IdentifyEffectVariant",
     "IdentifyIdentifyType",
     "InterfaceType",
-    "KeypadInputCecKeyCode",
-    "KeypadInputStatus",
     "KeypadLockout",
     "LevelControlOptions",
-    "MediaInputType",
-    "MediaPlaybackState",
-    "MediaPlaybackStatus",
     "MoveMode",
     "NetworkFaultType",
     "NodeOperationalCertStatus",
-    "OTAAnnouncementReason",
-    "OTAApplyUpdateAction",
-    "OTADownloadProtocol",
     "OnOffDelayedAllOffEffectVariant",
     "OnOffDyingLightEffectVariant",
     "OnOffEffectIdentifier",
     "PHYRateType",
     "RadioFaultType",
     "RoutingRole",
-    "RegulatoryLocationType",
     "SaturationMoveMode",
     "SaturationStepMode",
     "SecurityType",
@@ -676,11 +674,15 @@ function isWeaklyTypedEnum(label)
     "ThermostatControlSequence",
     "ThermostatRunningMode",
     "ThermostatSystemMode",
-    "UpdateStateEnum",
     "WcEndProductType",
     "WcType",
     "WiFiVersionType",
   ].includes(label);
+}
+
+function incrementDepth(depth)
+{
+  return depth + 1;
 }
 
 //
@@ -701,3 +703,4 @@ exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
 exports.getResponseCommandName              = getResponseCommandName;
 exports.isWeaklyTypedEnum                   = isWeaklyTypedEnum;
 exports.getPythonFieldDefault               = getPythonFieldDefault;
+exports.incrementDepth                      = incrementDepth;

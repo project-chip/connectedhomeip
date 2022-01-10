@@ -1060,13 +1060,21 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace OtaSoftwareUpdateRequestor {
 namespace Attributes {
 
-namespace DefaultOtaProvider {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace DefaultOtaProvider
+namespace DefaultOtaProviders {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace DefaultOtaProviders
 
 namespace UpdatePossible {
-static constexpr AttributeId Id = 0x00000002;
+static constexpr AttributeId Id = 0x00000001;
 } // namespace UpdatePossible
+
+namespace UpdateState {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace UpdateState
+
+namespace UpdateStateProgress {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace UpdateStateProgress
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -1086,6 +1094,14 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace LocalizationConfiguration {
 namespace Attributes {
 
+namespace ActiveLocale {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace ActiveLocale
+
+namespace SupportedLocales {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedLocales
+
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
@@ -1104,6 +1120,18 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace LocalizationTimeFormat {
 namespace Attributes {
 
+namespace HourFormat {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace HourFormat
+
+namespace CalendarType {
+static constexpr AttributeId Id = 0x00000001;
+} // namespace CalendarType
+
+namespace SupportedCalendarTypes {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace SupportedCalendarTypes
+
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
 } // namespace AttributeList
@@ -1121,6 +1149,10 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 namespace LocalizationUnit {
 namespace Attributes {
+
+namespace TemperatureUnit {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace TemperatureUnit
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2078,13 +2110,21 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace GroupKeyManagement {
 namespace Attributes {
 
-namespace Groups {
+namespace GroupKeyMap {
 static constexpr AttributeId Id = 0x00000000;
-} // namespace Groups
+} // namespace GroupKeyMap
 
-namespace GroupKeys {
+namespace GroupTable {
 static constexpr AttributeId Id = 0x00000001;
-} // namespace GroupKeys
+} // namespace GroupTable
+
+namespace MaxGroupsPerFabric {
+static constexpr AttributeId Id = 0x00000002;
+} // namespace MaxGroupsPerFabric
+
+namespace MaxGroupKeysPerFabric {
+static constexpr AttributeId Id = 0x00000003;
+} // namespace MaxGroupKeysPerFabric
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;
@@ -2578,29 +2618,9 @@ namespace InstalledClosedLimitTilt {
 static constexpr AttributeId Id = 0x00000013;
 } // namespace InstalledClosedLimitTilt
 
-namespace VelocityLift {
-static constexpr AttributeId Id = 0x00000014;
-} // namespace VelocityLift
-
-namespace AccelerationTimeLift {
-static constexpr AttributeId Id = 0x00000015;
-} // namespace AccelerationTimeLift
-
-namespace DecelerationTimeLift {
-static constexpr AttributeId Id = 0x00000016;
-} // namespace DecelerationTimeLift
-
 namespace Mode {
 static constexpr AttributeId Id = 0x00000017;
 } // namespace Mode
-
-namespace IntermediateSetpointsLift {
-static constexpr AttributeId Id = 0x00000018;
-} // namespace IntermediateSetpointsLift
-
-namespace IntermediateSetpointsTilt {
-static constexpr AttributeId Id = 0x00000019;
-} // namespace IntermediateSetpointsTilt
 
 namespace SafetyStatus {
 static constexpr AttributeId Id = 0x0000001A;
@@ -5057,6 +5077,10 @@ static constexpr AttributeId Id = 0x00000005;
 namespace ApplicationVersion {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace ApplicationVersion
+
+namespace AllowedVendorList {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace AllowedVendorList
 
 namespace AttributeList {
 static constexpr AttributeId Id = Globals::Attributes::AttributeList::Id;

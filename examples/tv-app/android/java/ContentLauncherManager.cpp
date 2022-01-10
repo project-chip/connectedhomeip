@@ -18,38 +18,33 @@
 
 #include "ContentLauncherManager.h"
 
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app/util/attribute-storage.h>
-
-#include <app/CommandHandler.h>
-#include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
-#include <cstddef>
-#include <cstdint>
 #include <jni.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPJNIError.h>
-#include <lib/support/CHIPMemString.h>
-#include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <map>
 
 using namespace std;
 using namespace chip;
+using namespace chip::app::Clusters::ContentLauncher;
 
 ContentLauncherManager ContentLauncherManager::sInstance;
 
-ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
-                                                                  const std::list<ContentLaunchParamater> & parameterList,
-                                                                  bool autoplay, const chip::CharSpan & data)
+namespace {
+static ContentLauncherManager contentLauncherManager;
+} // namespace
+
+void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
-    ContentLaunchResponse response;
+    ChipLogProgress(Zcl, "TV Linux App: ContentLauncher::SetDelegate");
+    chip::app::Clusters::ContentLauncher::SetDelegate(endpoint, &contentLauncherManager);
+}
+
+Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
+                                                                           const std::list<Parameter> & parameterList,
+                                                                           bool autoplay, const chip::CharSpan & data)
+{
+    Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -86,12 +81,11 @@ ContentLaunchResponse ContentLauncherManager::HandleLaunchContent(chip::Endpoint
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(status);
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = dataStr.charSpan();
     }
 
 exit:
-    response.err = err;
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "ContentLauncherManager::LaunchContent status error: %s", err.AsString());
@@ -100,11 +94,11 @@ exit:
     return response;
 }
 
-ContentLaunchResponse
-ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                        const std::list<ContentLaunchBrandingInformation> & brandingInformation)
+Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
+                                                                       const chip::CharSpan & displayString,
+                                                                       const std::list<BrandingInformation> & brandingInformation)
 {
-    ContentLaunchResponse response;
+    Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -142,12 +136,11 @@ ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl, const
         jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
         JniUtfString dataStr(env, jdataStr);
 
-        response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(status);
+        response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = dataStr.charSpan();
     }
 
 exit:
-    response.err = err;
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "ContentLauncherManager::LaunchUrl status error: %s", err.AsString());
@@ -247,29 +240,29 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
     mGetAcceptHeaderMethod = env->GetMethodID(ContentLauncherClass, "getAcceptHeader", "()[Ljava/lang/String;");
     if (mGetAcceptHeaderMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access MediaInputManager 'getInputList' method");
+        ChipLogError(Zcl, "Failed to access ContentLauncherManager 'getInputList' method");
         env->ExceptionClear();
     }
 
     mGetSupportedStreamingProtocolsMethod = env->GetMethodID(ContentLauncherClass, "getSupportedStreamingProtocols", "()[I");
     if (mGetSupportedStreamingProtocolsMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access MediaInputManager 'getSupportedStreamingProtocols' method");
+        ChipLogError(Zcl, "Failed to access ContentLauncherManager 'getSupportedStreamingProtocols' method");
         env->ExceptionClear();
     }
 
     mLaunchContentMethod = env->GetMethodID(
         ContentLauncherClass, "launchContent",
-        "([Lcom/tcl/chip/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
+        "([Lcom/tcl/chip/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/tcl/chip/tvapp/LaunchResponse;");
     if (mLaunchContentMethod == nullptr)
     {
-        ChipLogError(Zcl, "Failed to access MediaInputManager 'launchContent' method");
+        ChipLogError(Zcl, "Failed to access ContentLauncherManager 'launchContent' method");
         env->ExceptionClear();
     }
 
     mLaunchUrlMethod = env->GetMethodID(ContentLauncherClass, "launchUrl",
                                         "(Ljava/lang/String;Ljava/lang/String;Lcom/tcl/chip/tvapp/"
-                                        "ContentLaunchBrandingInformation;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
+                                        "ContentLaunchBrandingInformation;)Lcom/tcl/chip/tvapp/LaunchResponse;");
     if (mLaunchUrlMethod == nullptr)
     {
         ChipLogError(AppServer, "Failed to access 'launchUrl' method");

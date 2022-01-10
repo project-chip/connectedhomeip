@@ -65,6 +65,7 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target linux-arm64-all-clusters \
                         --target linux-arm64-chip-tool-ipv6only \
+                        --target linux-arm64-door-lock \
                         --target linux-arm64-minmdns \
                         --target linux-arm64-thermostat-no-ble \
                         build \

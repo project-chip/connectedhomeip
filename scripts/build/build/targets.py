@@ -151,6 +151,7 @@ def HostTargets():
         app_targets.append(target.Extend('chip-tool', app=HostApp.CHIP_TOOL))
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
+        app_targets.append(target.Extend('door-lock', app=HostApp.LOCK))
 
     # Possible build variants. Note that number of potential
     # builds is exponential here
@@ -216,9 +217,12 @@ def Esp32Targets():
     yield devkitc.Extend('all-clusters', app=Esp32App.ALL_CLUSTERS)
     yield devkitc.Extend('all-clusters-ipv6only', app=Esp32App.ALL_CLUSTERS, enable_ipv4=False)
     yield devkitc.Extend('shell', app=Esp32App.SHELL)
+    yield devkitc.Extend('light', app=Esp32App.LIGHT)
     yield devkitc.Extend('lock', app=Esp32App.LOCK)
     yield devkitc.Extend('bridge', app=Esp32App.BRIDGE)
     yield devkitc.Extend('temperature-measurement', app=Esp32App.TEMPERATURE_MEASUREMENT)
+
+    yield esp32_target.Extend('qemu-tests', board=Esp32Board.QEMU, app=Esp32App.TESTS)
 
 
 def Efr32Targets():
@@ -262,9 +266,12 @@ def NrfTargets():
     yield target.Extend('native-posix-64-tests', board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS)
 
     targets = [
-        target.Extend('nrf5340', board=NrfBoard.NRF5340),
-        target.Extend('nrf52840', board=NrfBoard.NRF52840),
+        target.Extend('nrf5340dk', board=NrfBoard.NRF5340DK),
+        target.Extend('nrf52840dk', board=NrfBoard.NRF52840DK),
     ]
+
+    # Enable nrf52840dongle for lighting app only
+    yield target.Extend('nrf52840dongle-light', board=NrfBoard.NRF52840DONGLE, app=NrfApp.LIGHT)
 
     for target in targets:
         yield target.Extend('lock', app=NrfApp.LOCK)
@@ -275,7 +282,7 @@ def NrfTargets():
 
         rpc = target.Extend('light-rpc', app=NrfApp.LIGHT, enable_rpcs=True)
 
-        if '-nrf5340-' in rpc.name:
+        if '-nrf5340dk-' in rpc.name:
             rpc = rpc.GlobBlacklist(
                 'Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760')
 
@@ -334,6 +341,7 @@ def AmebaTargets():
 
     yield ameba_target.Extend('amebad-all-clusters', board=AmebaBoard.AMEBAD, app=AmebaApp.ALL_CLUSTERS)
     yield ameba_target.Extend('amebad-light', board=AmebaBoard.AMEBAD, app=AmebaApp.LIGHT)
+    yield ameba_target.Extend('amebad-pigweed', board=AmebaBoard.AMEBAD, app=AmebaApp.PIGWEED)
 
 
 def K32WTargets():

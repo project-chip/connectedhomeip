@@ -87,14 +87,15 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/software-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/switch-server/switch-server.cpp
                ${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/general-diagnostics-server.cpp               	                                    
+               ${CHIP_ROOT}/src/app/clusters/group-key-mgmt-server/group-key-mgmt-server.cpp
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
                ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
                ${CHIP_ROOT}/src/app/clusters/color-control-server/color-control-server.cpp
                ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
+               ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-ember.cpp
+               ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-old.cpp
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)

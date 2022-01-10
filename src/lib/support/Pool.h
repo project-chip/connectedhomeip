@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemConfig.h>
 
@@ -90,7 +91,12 @@ protected:
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
     size_t IndexOf(void * element);
 
-    Loop ForEachActiveObjectInner(void * context, Loop lambda(void * context, void * object));
+    using Lambda = Loop (*)(void * context, void * object);
+    Loop ForEachActiveObjectInner(void * context, Lambda lambda);
+    Loop ForEachActiveObjectInner(void * context, Loop lambda(void * context, const void * object)) const
+    {
+        return const_cast<StaticAllocatorBitmap *>(this)->ForEachActiveObjectInner(context, reinterpret_cast<Lambda>(lambda));
+    }
 
 private:
     void * mElements;
@@ -118,6 +124,10 @@ public:
     static Loop Call(void * context, void * target)
     {
         return static_cast<LambdaProxy *>(context)->mFunction(static_cast<T *>(target));
+    }
+    static Loop ConstCall(void * context, const void * target)
+    {
+        return static_cast<LambdaProxy *>(context)->mFunction(static_cast<const T *>(target));
     }
 
 private:
@@ -153,7 +163,12 @@ struct HeapObjectList : HeapObjectListNode
 
     HeapObjectListNode * FindNode(void * object) const;
 
-    Loop ForEachNode(void * context, Loop lambda(void * context, void * object));
+    using Lambda = Loop (*)(void *, void *);
+    Loop ForEachNode(void * context, Lambda lambda);
+    Loop ForEachNode(void * context, Loop lambda(void * context, const void * object)) const
+    {
+        return const_cast<HeapObjectList *>(this)->ForEachNode(context, reinterpret_cast<Lambda>(lambda));
+    }
 
     size_t mIterationDepth;
 };
@@ -241,6 +256,14 @@ public:
         internal::LambdaProxy<T, Function> proxy(std::forward<Function>(function));
         return ForEachActiveObjectInner(&proxy, &internal::LambdaProxy<T, Function>::Call);
     }
+    template <typename Function>
+    Loop ForEachActiveObject(Function && function) const
+    {
+        static_assert(std::is_same<Loop, decltype(function(std::declval<const T *>()))>::value,
+                      "The function must take const T* and return Loop");
+        internal::LambdaProxy<T, Function> proxy(std::forward<Function>(function));
+        return ForEachActiveObjectInner(&proxy, &internal::LambdaProxy<T, Function>::ConstCall);
+    }
 
 private:
     static Loop ReleaseObject(void * context, void * object)
@@ -276,10 +299,10 @@ public:
     template <typename... Args>
     T * CreateObject(Args &&... args)
     {
-        T * object = new T(std::forward<Args>(args)...);
+        T * object = Platform::New<T>(std::forward<Args>(args)...);
         if (object != nullptr)
         {
-            auto node = new internal::HeapObjectListNode();
+            auto node = Platform::New<internal::HeapObjectListNode>();
             if (node != nullptr)
             {
                 node->mObject = object;
@@ -300,7 +323,7 @@ public:
             {
                 // Note that the node is not removed here; that is deferred until the end of the next pool iteration.
                 node->mObject = nullptr;
-                delete object;
+                Platform::Delete(object);
                 DecreaseUsage();
             }
         }
@@ -323,6 +346,14 @@ public:
         internal::LambdaProxy<T, Function> proxy(std::forward<Function>(function));
         return mObjects.ForEachNode(&proxy, &internal::LambdaProxy<T, Function>::Call);
     }
+    template <typename Function>
+    Loop ForEachActiveObject(Function && function) const
+    {
+        static_assert(std::is_same<Loop, decltype(function(std::declval<const T *>()))>::value,
+                      "The function must take const T* and return Loop");
+        internal::LambdaProxy<const T, Function> proxy(std::forward<Function>(function));
+        return mObjects.ForEachNode(&proxy, &internal::LambdaProxy<const T, Function>::ConstCall);
+    }
 
 private:
     static Loop ReleaseObject(void * context, void * object)
@@ -336,14 +367,25 @@ private:
 
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
+/**
+ * Specify ObjectPool storage allocation.
+ */
 enum class ObjectPoolMem
 {
-    kStatic,
+    /**
+     * Use storage inside the containing scope for both objects and pool management state.
+     */
+    kInline,
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    kDynamic,
-    kDefault = kDynamic
+    /**
+     * Allocate objects from the heap, with only pool management state in the containing scope.
+     *
+     * For this case, the ObjectPool size parameter is ignored.
+     */
+    kHeap,
+    kDefault = kHeap
 #else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-    kDefault = kStatic
+    kDefault = kInline
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 };
 
@@ -351,13 +393,13 @@ template <typename T, size_t N, ObjectPoolMem P = ObjectPoolMem::kDefault>
 class ObjectPool;
 
 template <typename T, size_t N>
-class ObjectPool<T, N, ObjectPoolMem::kStatic> : public BitMapObjectPool<T, N>
+class ObjectPool<T, N, ObjectPoolMem::kInline> : public BitMapObjectPool<T, N>
 {
 };
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 template <typename T, size_t N>
-class ObjectPool<T, N, ObjectPoolMem::kDynamic> : public HeapObjectPool<T>
+class ObjectPool<T, N, ObjectPoolMem::kHeap> : public HeapObjectPool<T>
 {
 };
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP

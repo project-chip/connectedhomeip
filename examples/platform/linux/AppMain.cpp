@@ -22,6 +22,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <lib/core/CHIPError.h>
@@ -54,6 +55,7 @@
 #include <CommonRpc.h>
 #endif
 
+#include "AppMain.h"
 #include "Options.h"
 
 using namespace chip;
@@ -68,13 +70,13 @@ using chip::Shell::Engine;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 /*
- * The device shall check every kWifiStartCheckTimeUsec whether Wi-Fi management
- * has been fully initialized. If after kWifiStartCheckAttempts Wi-Fi management
+ * The device shall check every kWiFiStartCheckTimeUsec whether Wi-Fi management
+ * has been fully initialized. If after kWiFiStartCheckAttempts Wi-Fi management
  * still hasn't been initialized, the device configuration is reset, and device
  * needs to be paired again.
  */
-static constexpr useconds_t kWifiStartCheckTimeUsec = 100 * 1000; // 100 ms
-static constexpr uint8_t kWifiStartCheckAttempts    = 5;
+static constexpr useconds_t kWiFiStartCheckTimeUsec = 100 * 1000; // 100 ms
+static constexpr uint8_t kWiFiStartCheckAttempts    = 5;
 #endif
 
 namespace {
@@ -89,16 +91,16 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-static bool EnsureWifiIsStarted()
+static bool EnsureWiFiIsStarted()
 {
-    for (int cnt = 0; cnt < kWifiStartCheckAttempts; cnt++)
+    for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
     {
         if (chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
         {
             return true;
         }
 
-        usleep(kWifiStartCheckTimeUsec);
+        usleep(kWiFiStartCheckTimeUsec);
     }
 
     return chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted();
@@ -151,7 +153,7 @@ int ChipLinuxAppInit(int argc, char ** argv)
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
         chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
-        if (!EnsureWifiIsStarted())
+        if (!EnsureWiFiIsStarted())
         {
             ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
         }
@@ -401,7 +403,7 @@ void ChipLinuxAppMainLoop()
     uint16_t securePort   = CHIP_PORT;
     uint16_t unsecurePort = CHIP_UDC_PORT;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     // use a different service port to make testing possible with other sample devices running on same host
     securePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
     unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
@@ -426,6 +428,8 @@ void ChipLinuxAppMainLoop()
     chip::Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    ApplicationInit();
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

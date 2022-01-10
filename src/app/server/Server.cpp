@@ -92,7 +92,8 @@ Server::Server() :
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
-    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage)
+    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage),
+    mAttributePersister(mServerStorage)
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
@@ -106,6 +107,11 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     mCommissioningWindowManager.SetAppDelegate(delegate);
     mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
+
+    // Set up attribute persistence before we try to bring up the data model
+    // handler.
+    SetAttributePersistenceProvider(&mAttributePersister);
+
     InitDataModelHandler(&mExchangeMgr);
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -194,12 +200,13 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
         ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
         SuccessOrExit(err = AddTestCommissioning());
     }
-    else if ((DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned()) &&
-             (GetFabricTable().FabricCount() != 0))
+    else if (GetFabricTable().FabricCount() != 0)
     {
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
+#if CONFIG_NETWORK_LAYER_BLE
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+#endif
     }
     else
     {
@@ -260,7 +267,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
 
     CHIP_ERROR err;
-    char nameBuffer[chip::Dnssd::Commissionable::kInstanceNameMaxLength + 1];
+    char nameBuffer[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
     err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {

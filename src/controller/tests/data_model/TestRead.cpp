@@ -274,15 +274,13 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
 
     ctx.DrainAndServiceIO();
 
-    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 1);
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 2);
 
-    ctx.GetExchangeManager().ExpireExchangesForSession(ctx.GetSessionBobToAlice());
+    ctx.ExpireSessionBobToAlice();
 
     ctx.DrainAndServiceIO();
 
     NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
-    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
 
     //
     // TODO: Figure out why I cannot enable this line below.
@@ -293,7 +291,7 @@ void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void *
     chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     ctx.DrainAndServiceIO();
 
-    ctx.GetExchangeManager().ExpireExchangesForSession(ctx.GetSessionAliceToBob());
+    ctx.ExpireSessionAliceToBob();
 
     NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
 

@@ -153,7 +153,7 @@ void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
     DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
+CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWiFiStatsCounters(void)
 {
     cy_wcm_associated_ap_info_t ap_info;
     cy_rslt_t result = CY_RSLT_SUCCESS;
@@ -166,7 +166,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
     }
 
     ChipLogProgress(DeviceLayer,
-                    "Wifi-Telemetry\n"
+                    "WiFi-Telemetry\n"
                     "BSSID: %02x:%02x:%02x:%02x:%02x:%02x\n"
                     "RSSI: %d\n"
                     "Channel: %d\n"

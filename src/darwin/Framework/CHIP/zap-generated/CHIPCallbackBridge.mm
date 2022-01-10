@@ -989,6 +989,45 @@ void CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptio
     }
 }
 
+void CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedShort:chip::to_underlying(entry_0)];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPApplicationBasicAllowedVendorListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -1108,15 +1147,15 @@ void CHIPApplicationLauncherAttributeListListAttributeCallbackSubscriptionBridge
 }
 
 void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPAudioOutputClusterAudioOutputInfo * newElement_0;
-        newElement_0 = [CHIPAudioOutputClusterAudioOutputInfo new];
+        CHIPAudioOutputClusterOutputInfo * newElement_0;
+        newElement_0 = [CHIPAudioOutputClusterOutputInfo new];
         newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
         newElement_0.outputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputType)];
         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
@@ -2143,12 +2182,6 @@ void CHIPFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * cont
         newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                       length:entry_0.label.size()
                                                     encoding:NSUTF8StringEncoding];
-        newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                      length:entry_0.label.size()
-                                                    encoding:NSUTF8StringEncoding];
-        newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                      length:entry_0.value.size()
-                                                    encoding:NSUTF8StringEncoding];
         newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
                                                       length:entry_0.value.size()
                                                     encoding:NSUTF8StringEncoding];
@@ -2544,19 +2577,19 @@ void CHIPGeneralDiagnosticsAttributeListListAttributeCallbackSubscriptionBridge:
     }
 }
 
-void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & value)
+void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPGroupKeyManagementClusterGroupState * newElement_0;
-        newElement_0 = [CHIPGroupKeyManagementClusterGroupState new];
-        newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
-        newElement_0.vendorGroupId = [NSNumber numberWithUnsignedShort:entry_0.vendorGroupId];
-        newElement_0.groupKeySetIndex = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetIndex];
+        CHIPGroupKeyManagementClusterGroupKey * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+        newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -2570,9 +2603,9 @@ void CHIPGroupKeyManagementGroupsListAttributeCallbackBridge::OnSuccessFn(void *
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPGroupKeyManagementGroupsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPGroupKeyManagementGroupsListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2586,21 +2619,37 @@ void CHIPGroupKeyManagementGroupsListAttributeCallbackSubscriptionBridge::OnSubs
     }
 }
 
-void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & value)
+void CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPGroupKeyManagementClusterGroupKey * newElement_0;
-        newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
-        newElement_0.vendorId = [NSNumber numberWithUnsignedShort:entry_0.vendorId];
-        newElement_0.groupKeyIndex = [NSNumber numberWithUnsignedShort:entry_0.groupKeyIndex];
-        newElement_0.groupKeyRoot = [NSData dataWithBytes:entry_0.groupKeyRoot.data() length:entry_0.groupKeyRoot.size()];
-        newElement_0.groupKeyEpochStartTime = [NSNumber numberWithUnsignedLongLong:entry_0.groupKeyEpochStartTime];
-        newElement_0.groupKeySecurityPolicy = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.groupKeySecurityPolicy)];
+        CHIPGroupKeyManagementClusterGroupInfo * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupInfo new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedShort:entry_0.fabricIndex];
+        newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+        auto * array_2 = [NSMutableArray new];
+        auto iter_2 = entry_0.endpoints.begin();
+        while (iter_2.Next()) {
+            auto & entry_2 = iter_2.GetValue();
+            NSNumber * newElement_2;
+            newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
+            [array_2 addObject:newElement_2];
+        }
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_2.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
+        }
+        newElement_0.endpoints = array_2;
+        newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.data()
+                                                          length:entry_0.groupName.size()
+                                                        encoding:NSUTF8StringEncoding];
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -2614,9 +2663,9 @@ void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(voi
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPGroupKeyManagementGroupKeysListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPGroupKeyManagementGroupKeysListAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPGroupKeyManagementGroupTableListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -2904,15 +2953,15 @@ void CHIPLowPowerAttributeListListAttributeCallbackSubscriptionBridge::OnSubscri
 }
 
 void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPMediaInputClusterMediaInputInfo * newElement_0;
-        newElement_0 = [CHIPMediaInputClusterMediaInputInfo new];
+        CHIPMediaInputClusterInputInfo * newElement_0;
+        newElement_0 = [CHIPMediaInputClusterInputInfo new];
         newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
         newElement_0.inputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputType)];
         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
@@ -3179,6 +3228,50 @@ void CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackBridge::OnSu
 void CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPOtaSoftwareUpdateProviderAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPOtaSoftwareUpdateRequestorClusterProviderLocation * newElement_0;
+        newElement_0 = [CHIPOtaSoftwareUpdateRequestorClusterProviderLocation new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.providerNodeID = [NSNumber numberWithUnsignedLongLong:entry_0.providerNodeID];
+        newElement_0.endpoint = [NSNumber numberWithUnsignedShort:entry_0.endpoint];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -3913,16 +4006,15 @@ void CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
 }
 
 void CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        CHIPTargetNavigatorClusterNavigateTargetTargetInfo * newElement_0;
-        newElement_0 = [CHIPTargetNavigatorClusterNavigateTargetTargetInfo new];
+        CHIPTargetNavigatorClusterTargetInfo * newElement_0;
+        newElement_0 = [CHIPTargetNavigatorClusterTargetInfo new];
         newElement_0.identifier = [NSNumber numberWithUnsignedChar:entry_0.identifier];
         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                      length:entry_0.name.size()
@@ -4813,12 +4905,6 @@ void CHIPUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * conte
         newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                       length:entry_0.label.size()
                                                     encoding:NSUTF8StringEncoding];
-        newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                      length:entry_0.label.size()
-                                                    encoding:NSUTF8StringEncoding];
-        newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                      length:entry_0.value.size()
-                                                    encoding:NSUTF8StringEncoding];
         newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
                                                       length:entry_0.value.size()
                                                     encoding:NSUTF8StringEncoding];
@@ -4980,36 +5066,10 @@ void CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPApplicationLauncherClusterHideAppResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType & data)
+void CHIPApplicationLauncherClusterLauncherResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType & data)
 {
-    auto * response = [CHIPApplicationLauncherClusterHideAppResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data)
-{
-    auto * response = [CHIPApplicationLauncherClusterLaunchAppResponseParams new];
-    {
-        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-    }
-    {
-        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPApplicationLauncherClusterStopAppResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType & data)
-{
-    auto * response = [CHIPApplicationLauncherClusterStopAppResponseParams new];
+    auto * response = [CHIPApplicationLauncherClusterLauncherResponseParams new];
     {
         response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
@@ -5043,25 +5103,12 @@ void CHIPChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPContentLauncherClusterLaunchContentResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType & data)
+void CHIPContentLauncherClusterLaunchResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType & data)
 {
-    auto * response = [CHIPContentLauncherClusterLaunchContentResponseParams new];
+    auto * response = [CHIPContentLauncherClusterLaunchResponseParams new];
     {
-        response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
-    }
-    {
-        response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPContentLauncherClusterLaunchURLResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType & data)
-{
-    auto * response = [CHIPContentLauncherClusterLaunchURLResponseParams new];
-    {
-        response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     {
         response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
@@ -5269,6 +5316,53 @@ void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::O
     DispatchSuccess(context, response);
 };
 
+void CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data)
+{
+    auto * response = [CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams new];
+    {
+        auto * array_0 = [NSMutableArray new];
+        auto iter_0 = data.groupKeySetIDs.begin();
+        while (iter_0.Next()) {
+            auto & entry_0 = iter_0.GetValue();
+            NSNumber * newElement_0;
+            newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+            [array_0 addObject:newElement_0];
+        }
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_0.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                return;
+            }
+        }
+        response.groupKeySetIDs = array_0;
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data)
+{
+    auto * response = [CHIPGroupKeyManagementClusterKeySetReadResponseParams new];
+    {
+        response.groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+        response.groupKeySet.groupKeySetID = [NSNumber numberWithUnsignedShort:data.groupKeySet.groupKeySetID];
+        response.groupKeySet.securityPolicy =
+            [NSNumber numberWithUnsignedChar:chip::to_underlying(data.groupKeySet.securityPolicy)];
+        response.groupKeySet.epochKey0 = [NSData dataWithBytes:data.groupKeySet.epochKey0.data()
+                                                        length:data.groupKeySet.epochKey0.size()];
+        response.groupKeySet.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime0];
+        response.groupKeySet.epochKey1 = [NSData dataWithBytes:data.groupKeySet.epochKey1.data()
+                                                        length:data.groupKeySet.epochKey1.size()];
+        response.groupKeySet.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime1];
+        response.groupKeySet.epochKey2 = [NSData dataWithBytes:data.groupKeySet.epochKey2.data()
+                                                        length:data.groupKeySet.epochKey2.size()];
+        response.groupKeySet.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime2];
+    }
+    DispatchSuccess(context, response);
+};
+
 void CHIPGroupsClusterAddGroupResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & data)
 {
@@ -5361,112 +5455,12 @@ void CHIPKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType & data)
+void CHIPMediaPlaybackClusterPlaybackResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType & data)
 {
-    auto * response = [CHIPMediaPlaybackClusterMediaFastForwardResponseParams new];
+    auto * response = [CHIPMediaPlaybackClusterPlaybackResponseParams new];
     {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaNextResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaNextResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaPauseResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaPauseResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaPlayResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaPlayResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaPreviousResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaPreviousResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaRewindResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaRewindResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaSeekResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaSeekResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaSkipBackwardResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaSkipForwardResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaStartOverResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaStartOverResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType & data)
-{
-    auto * response = [CHIPMediaPlaybackClusterMediaStopResponseParams new];
-    {
-        response.mediaPlaybackStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
+        response.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
     }
     DispatchSuccess(context, response);
 };
@@ -5517,56 +5511,64 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge::OnSucces
                                                     encoding:NSUTF8StringEncoding];
     }
     {
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = data.wiFiScanResults.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_0;
-            newElement_0 = [CHIPNetworkCommissioningClusterWiFiInterfaceScanResult new];
-            newElement_0.security = [NSNumber numberWithUnsignedChar:entry_0.security];
-            newElement_0.ssid = [NSData dataWithBytes:entry_0.ssid.data() length:entry_0.ssid.size()];
-            newElement_0.bssid = [NSData dataWithBytes:entry_0.bssid.data() length:entry_0.bssid.size()];
-            newElement_0.channel = [NSNumber numberWithUnsignedChar:entry_0.channel];
-            newElement_0.wiFiBand = [NSNumber numberWithUnsignedInt:entry_0.wiFiBand];
-            newElement_0.rssi = [NSNumber numberWithChar:entry_0.rssi];
-            [array_0 addObject:newElement_0];
-        }
-        { // Scope for the error so we will know what it's named
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-                return;
+        if (data.wiFiScanResults.HasValue()) {
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = data.wiFiScanResults.Value().begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                CHIPNetworkCommissioningClusterWiFiInterfaceScanResult * newElement_1;
+                newElement_1 = [CHIPNetworkCommissioningClusterWiFiInterfaceScanResult new];
+                newElement_1.security = [NSNumber numberWithUnsignedChar:entry_1.security];
+                newElement_1.ssid = [NSData dataWithBytes:entry_1.ssid.data() length:entry_1.ssid.size()];
+                newElement_1.bssid = [NSData dataWithBytes:entry_1.bssid.data() length:entry_1.bssid.size()];
+                newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
+                newElement_1.wiFiBand = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.wiFiBand)];
+                newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
+                [array_1 addObject:newElement_1];
             }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    return;
+                }
+            }
+            response.wiFiScanResults = array_1;
+        } else {
+            response.wiFiScanResults = nil;
         }
-        response.wiFiScanResults = array_0;
     }
     {
-        auto * array_0 = [NSMutableArray new];
-        auto iter_0 = data.threadScanResults.begin();
-        while (iter_0.Next()) {
-            auto & entry_0 = iter_0.GetValue();
-            CHIPNetworkCommissioningClusterThreadInterfaceScanResult * newElement_0;
-            newElement_0 = [CHIPNetworkCommissioningClusterThreadInterfaceScanResult new];
-            newElement_0.panId = [NSNumber numberWithUnsignedLongLong:entry_0.panId];
-            newElement_0.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_0.extendedPanId];
-            newElement_0.networkName = [[NSString alloc] initWithBytes:entry_0.networkName.data()
-                                                                length:entry_0.networkName.size()
-                                                              encoding:NSUTF8StringEncoding];
-            newElement_0.channel = [NSNumber numberWithUnsignedShort:entry_0.channel];
-            newElement_0.version = [NSNumber numberWithUnsignedChar:entry_0.version];
-            newElement_0.extendedAddress = [NSNumber numberWithUnsignedLongLong:entry_0.extendedAddress];
-            newElement_0.rssi = [NSNumber numberWithChar:entry_0.rssi];
-            newElement_0.lqi = [NSNumber numberWithUnsignedChar:entry_0.lqi];
-            [array_0 addObject:newElement_0];
-        }
-        { // Scope for the error so we will know what it's named
-            CHIP_ERROR err = iter_0.GetStatus();
-            if (err != CHIP_NO_ERROR) {
-                OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-                return;
+        if (data.threadScanResults.HasValue()) {
+            auto * array_1 = [NSMutableArray new];
+            auto iter_1 = data.threadScanResults.Value().begin();
+            while (iter_1.Next()) {
+                auto & entry_1 = iter_1.GetValue();
+                CHIPNetworkCommissioningClusterThreadInterfaceScanResult * newElement_1;
+                newElement_1 = [CHIPNetworkCommissioningClusterThreadInterfaceScanResult new];
+                newElement_1.panId = [NSNumber numberWithUnsignedLongLong:entry_1.panId];
+                newElement_1.extendedPanId = [NSNumber numberWithUnsignedLongLong:entry_1.extendedPanId];
+                newElement_1.networkName = [[NSString alloc] initWithBytes:entry_1.networkName.data()
+                                                                    length:entry_1.networkName.size()
+                                                                  encoding:NSUTF8StringEncoding];
+                newElement_1.channel = [NSNumber numberWithUnsignedShort:entry_1.channel];
+                newElement_1.version = [NSNumber numberWithUnsignedChar:entry_1.version];
+                newElement_1.extendedAddress = [NSNumber numberWithUnsignedLongLong:entry_1.extendedAddress];
+                newElement_1.rssi = [NSNumber numberWithChar:entry_1.rssi];
+                newElement_1.lqi = [NSNumber numberWithUnsignedChar:entry_1.lqi];
+                [array_1 addObject:newElement_1];
             }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_1.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+                    return;
+                }
+            }
+            response.threadScanResults = array_1;
+        } else {
+            response.threadScanResults = nil;
         }
-        response.threadScanResults = array_0;
     }
     DispatchSuccess(context, response);
 };
@@ -7102,61 +7104,6 @@ void CHIPNullableOtaSoftwareUpdateProviderClusterOTAQueryStatusAttributeCallback
     }
 }
 
-void CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self = static_cast<CHIPOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::ChangeReasonEnum> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
-{
-    auto * self
-        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
 void CHIPOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAAnnouncementReason value)
 {
@@ -7214,18 +7161,19 @@ void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAAnnouncementReasonAttribute
     }
 }
 
-void CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum value)
+void CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self
+        = static_cast<CHIPOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -7239,8 +7187,8 @@ void CHIPOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscr
     }
 }
 
-void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum> & value)
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAChangeReasonEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -7251,11 +7199,226 @@ void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterOTAChangeReasonEnumAttributeCallbackSubscriptionBridge *>(
+            context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self
+        = static_cast<CHIPOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::Nullable<chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCallbackSubscriptionBridge *>(
+        context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LocalizationTimeFormat::CalendarType value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationTimeFormat::CalendarType> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LocalizationTimeFormat::HourFormat value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationTimeFormat::HourFormat> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+    void * context)
+{
+    auto * self = static_cast<CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPLocalizationUnitClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::LocalizationUnit::TempUnit value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationUnit::TempUnit> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -7425,6 +7588,58 @@ void CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeC
     auto * self
         = static_cast<CHIPNullableNetworkCommissioningClusterNetworkCommissioningStatusAttributeCallbackSubscriptionBridge *>(
             context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::NetworkCommissioning::WiFiBand value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableNetworkCommissioningClusterWiFiBandAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::NetworkCommissioning::WiFiBand> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableNetworkCommissioningClusterWiFiBandAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10717,17 +10932,17 @@ void CHIPNullableIasAceClusterIasZoneTypeAttributeCallbackSubscriptionBridge::On
     }
 }
 
-void CHIPChannelClusterChannelErrorTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Channel::ChannelErrorType value)
+void CHIPChannelClusterErrorTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Channel::ErrorTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPChannelClusterErrorTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPChannelClusterErrorTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10741,8 +10956,8 @@ void CHIPChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge::OnSu
     }
 }
 
-void CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelErrorType> & value)
+void CHIPNullableChannelClusterErrorTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ErrorTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10753,9 +10968,9 @@ void CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackBridge::OnSucces
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPNullableChannelClusterErrorTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableChannelClusterErrorTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10769,17 +10984,17 @@ void CHIPNullableChannelClusterChannelErrorTypeAttributeCallbackSubscriptionBrid
     }
 }
 
-void CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::Channel::ChannelLineupInfoType value)
+void CHIPChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::Channel::LineupInfoTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10793,8 +11008,8 @@ void CHIPChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge:
     }
 }
 
-void CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::ChannelLineupInfoType> & value)
+void CHIPNullableChannelClusterLineupInfoTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::Channel::LineupInfoTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10805,9 +11020,9 @@ void CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableChannelClusterLineupInfoTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10821,17 +11036,17 @@ void CHIPNullableChannelClusterChannelLineupInfoTypeAttributeCallbackSubscriptio
     }
 }
 
-void CHIPTargetNavigatorClusterNavigateTargetStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::TargetNavigator::NavigateTargetStatus value)
+void CHIPTargetNavigatorClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TargetNavigator::StatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPTargetNavigatorClusterNavigateTargetStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPTargetNavigatorClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPTargetNavigatorClusterNavigateTargetStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPTargetNavigatorClusterStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10845,8 +11060,8 @@ void CHIPTargetNavigatorClusterNavigateTargetStatusAttributeCallbackSubscription
     }
 }
 
-void CHIPNullableTargetNavigatorClusterNavigateTargetStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::NavigateTargetStatus> & value)
+void CHIPNullableTargetNavigatorClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TargetNavigator::StatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10857,10 +11072,9 @@ void CHIPNullableTargetNavigatorClusterNavigateTargetStatusAttributeCallbackBrid
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableTargetNavigatorClusterNavigateTargetStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPNullableTargetNavigatorClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableTargetNavigatorClusterNavigateTargetStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableTargetNavigatorClusterStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10874,17 +11088,17 @@ void CHIPNullableTargetNavigatorClusterNavigateTargetStatusAttributeCallbackSubs
     }
 }
 
-void CHIPMediaPlaybackClusterMediaPlaybackStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::MediaPlayback::MediaPlaybackState value)
+void CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPMediaPlaybackClusterMediaPlaybackStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPMediaPlaybackClusterMediaPlaybackStateAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10898,8 +11112,8 @@ void CHIPMediaPlaybackClusterMediaPlaybackStateAttributeCallbackSubscriptionBrid
     }
 }
 
-void CHIPNullableMediaPlaybackClusterMediaPlaybackStateAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::MediaPlaybackState> & value)
+void CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::PlaybackStateEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10910,10 +11124,9 @@ void CHIPNullableMediaPlaybackClusterMediaPlaybackStateAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableMediaPlaybackClusterMediaPlaybackStateAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableMediaPlaybackClusterMediaPlaybackStateAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableMediaPlaybackClusterPlaybackStateEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10927,17 +11140,17 @@ void CHIPNullableMediaPlaybackClusterMediaPlaybackStateAttributeCallbackSubscrip
     }
 }
 
-void CHIPMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::MediaPlayback::MediaPlaybackStatus value)
+void CHIPMediaPlaybackClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::MediaPlayback::StatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPMediaPlaybackClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPMediaPlaybackClusterStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10951,8 +11164,8 @@ void CHIPMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPNullableMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus> & value)
+void CHIPNullableMediaPlaybackClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaPlayback::StatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -10963,10 +11176,9 @@ void CHIPNullableMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPNullableMediaPlaybackClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableMediaPlaybackClusterStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -10980,17 +11192,17 @@ void CHIPNullableMediaPlaybackClusterMediaPlaybackStatusAttributeCallbackSubscri
     }
 }
 
-void CHIPMediaInputClusterMediaInputTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::MediaInput::MediaInputType value)
+void CHIPMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::MediaInput::InputTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPMediaInputClusterMediaInputTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPMediaInputClusterMediaInputTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11004,8 +11216,8 @@ void CHIPMediaInputClusterMediaInputTypeAttributeCallbackSubscriptionBridge::OnS
     }
 }
 
-void CHIPNullableMediaInputClusterMediaInputTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaInput::MediaInputType> & value)
+void CHIPNullableMediaInputClusterInputTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::MediaInput::InputTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11016,9 +11228,9 @@ void CHIPNullableMediaInputClusterMediaInputTypeAttributeCallbackBridge::OnSucce
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableMediaInputClusterMediaInputTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableMediaInputClusterMediaInputTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableMediaInputClusterInputTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11032,17 +11244,17 @@ void CHIPNullableMediaInputClusterMediaInputTypeAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::KeypadInput::KeypadInputCecKeyCode value)
+void CHIPKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::KeypadInput::CecKeyCode value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11056,8 +11268,8 @@ void CHIPKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPNullableKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputCecKeyCode> & value)
+void CHIPNullableKeypadInputClusterCecKeyCodeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::CecKeyCode> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11068,10 +11280,9 @@ void CHIPNullableKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableKeypadInputClusterCecKeyCodeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11085,17 +11296,17 @@ void CHIPNullableKeypadInputClusterKeypadInputCecKeyCodeAttributeCallbackSubscri
     }
 }
 
-void CHIPKeypadInputClusterKeypadInputStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::KeypadInput::KeypadInputStatus value)
+void CHIPKeypadInputClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::KeypadInput::StatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPKeypadInputClusterKeypadInputStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPKeypadInputClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPKeypadInputClusterKeypadInputStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPKeypadInputClusterStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11109,8 +11320,8 @@ void CHIPKeypadInputClusterKeypadInputStatusAttributeCallbackSubscriptionBridge:
     }
 }
 
-void CHIPNullableKeypadInputClusterKeypadInputStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::KeypadInputStatus> & value)
+void CHIPNullableKeypadInputClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::KeypadInput::StatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11121,9 +11332,9 @@ void CHIPNullableKeypadInputClusterKeypadInputStatusAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableKeypadInputClusterKeypadInputStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPNullableKeypadInputClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableKeypadInputClusterKeypadInputStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableKeypadInputClusterStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11137,17 +11348,17 @@ void CHIPNullableKeypadInputClusterKeypadInputStatusAttributeCallbackSubscriptio
     }
 }
 
-void CHIPContentLauncherClusterContentLaunchMetricTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchMetricType value)
+void CHIPContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ContentLauncher::MetricTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPContentLauncherClusterContentLaunchMetricTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPContentLauncherClusterContentLaunchMetricTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11161,8 +11372,8 @@ void CHIPContentLauncherClusterContentLaunchMetricTypeAttributeCallbackSubscript
     }
 }
 
-void CHIPNullableContentLauncherClusterContentLaunchMetricTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchMetricType> & value)
+void CHIPNullableContentLauncherClusterMetricTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::MetricTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11173,11 +11384,9 @@ void CHIPNullableContentLauncherClusterContentLaunchMetricTypeAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableContentLauncherClusterContentLaunchMetricTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self
-        = static_cast<CHIPNullableContentLauncherClusterContentLaunchMetricTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableContentLauncherClusterMetricTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11191,18 +11400,17 @@ void CHIPNullableContentLauncherClusterContentLaunchMetricTypeAttributeCallbackS
     }
 }
 
-void CHIPContentLauncherClusterContentLaunchParameterEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchParameterEnum value)
+void CHIPContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ContentLauncher::ParameterEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPContentLauncherClusterContentLaunchParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPContentLauncherClusterContentLaunchParameterEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11216,8 +11424,8 @@ void CHIPContentLauncherClusterContentLaunchParameterEnumAttributeCallbackSubscr
     }
 }
 
-void CHIPNullableContentLauncherClusterContentLaunchParameterEnumAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchParameterEnum> & value)
+void CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ParameterEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11228,11 +11436,9 @@ void CHIPNullableContentLauncherClusterContentLaunchParameterEnumAttributeCallba
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableContentLauncherClusterContentLaunchParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self
-        = static_cast<CHIPNullableContentLauncherClusterContentLaunchParameterEnumAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableContentLauncherClusterParameterEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11246,17 +11452,17 @@ void CHIPNullableContentLauncherClusterContentLaunchParameterEnumAttributeCallba
     }
 }
 
-void CHIPContentLauncherClusterContentLaunchStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStatus value)
+void CHIPContentLauncherClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ContentLauncher::StatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPContentLauncherClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPContentLauncherClusterStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11270,8 +11476,8 @@ void CHIPContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionB
     }
 }
 
-void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatus> & value)
+void CHIPNullableContentLauncherClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::StatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11282,10 +11488,9 @@ void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPNullableContentLauncherClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableContentLauncherClusterStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11299,17 +11504,17 @@ void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackSubsc
     }
 }
 
-void CHIPAudioOutputClusterAudioOutputTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::AudioOutput::AudioOutputType value)
+void CHIPAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::AudioOutput::OutputTypeEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPAudioOutputClusterAudioOutputTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPAudioOutputClusterAudioOutputTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11323,8 +11528,8 @@ void CHIPAudioOutputClusterAudioOutputTypeAttributeCallbackSubscriptionBridge::O
     }
 }
 
-void CHIPNullableAudioOutputClusterAudioOutputTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::AudioOutputType> & value)
+void CHIPNullableAudioOutputClusterOutputTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::OutputTypeEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11335,9 +11540,9 @@ void CHIPNullableAudioOutputClusterAudioOutputTypeAttributeCallbackBridge::OnSuc
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableAudioOutputClusterAudioOutputTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableAudioOutputClusterAudioOutputTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableAudioOutputClusterOutputTypeEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11351,19 +11556,17 @@ void CHIPNullableAudioOutputClusterAudioOutputTypeAttributeCallbackSubscriptionB
     }
 }
 
-void CHIPApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus value)
+void CHIPApplicationLauncherClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ApplicationLauncher::StatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPApplicationLauncherClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self
-        = static_cast<CHIPApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPApplicationLauncherClusterStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11377,8 +11580,8 @@ void CHIPApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackSub
     }
 }
 
-void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus> & value)
+void CHIPNullableApplicationLauncherClusterStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationLauncher::StatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11389,11 +11592,9 @@ void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusAttributeCal
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
-    void * context)
+void CHIPNullableApplicationLauncherClusterStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPNullableApplicationLauncherClusterApplicationLauncherStatusAttributeCallbackSubscriptionBridge *>(
-        context);
+    auto * self = static_cast<CHIPNullableApplicationLauncherClusterStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11407,17 +11608,17 @@ void CHIPNullableApplicationLauncherClusterApplicationLauncherStatusAttributeCal
     }
 }
 
-void CHIPApplicationBasicClusterApplicationBasicStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus value)
+void CHIPApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPApplicationBasicClusterApplicationBasicStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPApplicationBasicClusterApplicationBasicStatusAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -11431,8 +11632,8 @@ void CHIPApplicationBasicClusterApplicationBasicStatusAttributeCallbackSubscript
     }
 }
 
-void CHIPNullableApplicationBasicClusterApplicationBasicStatusAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus> & value)
+void CHIPNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -11443,11 +11644,11 @@ void CHIPNullableApplicationBasicClusterApplicationBasicStatusAttributeCallbackB
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableApplicationBasicClusterApplicationBasicStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
     auto * self
-        = static_cast<CHIPNullableApplicationBasicClusterApplicationBasicStatusAttributeCallbackSubscriptionBridge *>(context);
+        = static_cast<CHIPNullableApplicationBasicClusterApplicationStatusEnumAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

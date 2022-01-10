@@ -1330,7 +1330,7 @@
  *          1 -- Message Type
  *          2 -- Exchange Id
  *          4 -- Profile Id
- *          4 -- Acknowleged Message Id
+ *          4 -- Acknowledged Message Id
  *
  *    @note A number of these fields are optional or not presently used.
  *          So most headers will be considerably smaller than this.
@@ -2305,6 +2305,15 @@
 #ifndef CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
 #define CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE 4
 #endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
+
+/**
+ * @def CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
+ *
+ * @brief Define the size of the pool used for tracking CHIP groups.
+ */
+#ifndef CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
+#define CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE 8
+#endif // CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
 
 /**
  * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE

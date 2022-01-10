@@ -18,10 +18,10 @@
 
 #pragma once
 
-#include <controller/ExampleOperationalCredentialsIssuer.h>
-
 #include "../../config/PersistentStorage.h"
 #include "Command.h"
+#include <commands/common/CredentialIssuerCommands.h>
+#include <commands/example/ExampleCredentialIssuerCommands.h>
 
 #pragma once
 
@@ -49,6 +49,11 @@ public:
         AddArgument("trace_file", &mTraceFile);
         AddArgument("trace_log", 0, 1, &mTraceLog);
 #endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    }
+
+    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) : CHIPCommand(commandName)
+    {
+        mCredIssuerCmds = credIssuerCmds;
     }
 
     /////////// Command Interface /////////
@@ -79,13 +84,14 @@ protected:
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
     chip::SimpleFabricStorage mFabricStorage;
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
+    ExampleCredentialIssuerCommands mExampleCredentialIssuerCmds;
+    CredentialIssuerCommands * mCredIssuerCmds = &mExampleCredentialIssuerCmds;
 
     std::string GetIdentity();
     void SetIdentity(const char * name);
 
     // This method returns the commissioner instance to be used for running the command.
-    // The default commissioner instance name is "alpha", but it can be overriden by passing
+    // The default commissioner instance name is "alpha", but it can be overridden by passing
     // --identity "instance name" when running a command.
     ChipDeviceCommissioner & CurrentCommissioner();
 

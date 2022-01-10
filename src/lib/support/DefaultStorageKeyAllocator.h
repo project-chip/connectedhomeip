@@ -16,7 +16,10 @@
  */
 #pragma once
 
+#include <app/ConcreteAttributePath.h>
 #include <app/util/basic-types.h>
+#include <lib/support/EnforceFormat.h>
+#include <lib/support/logging/Constants.h>
 #include <string.h>
 
 namespace chip {
@@ -45,10 +48,19 @@ public:
     }
     const char * FabricKeyset(chip::FabricIndex fabric, uint16_t keyset) { return Format("f/%x/k/%x", fabric, keyset); }
 
+    const char * AttributeValue(const app::ConcreteAttributePath & aPath)
+    {
+        // Needs at most 24 chars: 4 for "a///", 4 for the endpoint id, 8 each
+        // for the cluster and attribute ids.
+        return Format("a/%" PRIx16 "/%" PRIx32 "/%" PRIx32, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
+    }
+
 private:
     static const size_t kKeyLengthMax = 32;
 
-    const char * Format(const char * format...)
+    // The ENFORCE_FORMAT args are "off by one" because this is a class method,
+    // with an implicit "this" as first arg.
+    const char * ENFORCE_FORMAT(2, 3) Format(const char * format, ...)
     {
         va_list args;
         va_start(args, format);

@@ -257,7 +257,7 @@ void TestWriteInteraction::TestWriteClientGroup(nlTestSuite * apSuite, void * ap
     AddAttributeDataIB(apSuite, apContext, writeClientHandle);
 
     SessionHandle groupSession = ctx.GetSessionBobToFriends();
-    NL_TEST_ASSERT(apSuite, groupSession.IsGroupSession());
+    NL_TEST_ASSERT(apSuite, groupSession->IsGroupSession());
 
     err = writeClientHandle.SendWriteRequest(groupSession);
 
@@ -317,7 +317,7 @@ CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDesc
 {
     TLV::TLVWriter writer;
     writer.Init(attributeDataTLV);
-    writer.CopyElement(TLV::AnonymousTag, aReader);
+    writer.CopyElement(TLV::AnonymousTag(), aReader);
     attributeDataTLVLen = writer.GetLengthWritten();
     return aWriteHandler->AddStatus(
         AttributePathParams(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId),

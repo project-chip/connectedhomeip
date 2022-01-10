@@ -162,7 +162,7 @@ tests:
       attribute: "TargetPositionLiftPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -183,7 +183,7 @@ tests:
       attribute: "TargetPositionLiftPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               notValue: 20000
 
     ### Attribute[ 12]: TargetPositionTiltPercent100ths  ====================
@@ -194,7 +194,7 @@ tests:
       attribute: "TargetPositionTiltPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -215,7 +215,7 @@ tests:
       attribute: "TargetPositionTiltPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               notValue: 20000
 
     ### Attribute[ 14]: CurrentPositionLiftPercent100ths  ====================
@@ -226,7 +226,7 @@ tests:
       attribute: "CurrentPositionLiftPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -247,7 +247,7 @@ tests:
       attribute: "CurrentPositionLiftPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               notValue: 20000
 
     ### Attribute[ 15]: CurrentPositionTiltPercent100ths  ====================
@@ -258,7 +258,7 @@ tests:
       attribute: "CurrentPositionTiltPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -279,7 +279,7 @@ tests:
       attribute: "CurrentPositionTiltPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               notValue: 20000
 
     ### Attribute[ 16]: InstalledOpenLimitLift  ====================
@@ -623,7 +623,7 @@ tests:
       attribute: "CurrentPositionLiftPercentage"
       response:
           constraints:
-              type: uint8
+              type: Percent
               minValue: 0
               maxValue: 100
 
@@ -644,7 +644,7 @@ tests:
       attribute: "CurrentPositionLiftPercentage"
       response:
           constraints:
-              type: uint8
+              type: Percent
               notValue: 200
 
     ### Attribute[  9]: CurrentPositionTiltPercentage  ====================
@@ -655,7 +655,7 @@ tests:
       attribute: "CurrentPositionTiltPercentage"
       response:
           constraints:
-              type: uint8
+              type: Percent
               minValue: 0
               maxValue: 100
 
@@ -676,7 +676,7 @@ tests:
       attribute: "CurrentPositionTiltPercentage"
       response:
           constraints:
-              type: uint8
+              type: Percent
               notValue: 200
     ###################################################
     # FYI Non Tested deprecated attributes

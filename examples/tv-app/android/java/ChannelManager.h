@@ -17,25 +17,21 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
-#include <app/AttributeAccessInterface.h>
-
+#include <app/clusters/channel-server/channel-server.h>
 #include <jni.h>
-#include <lib/core/CHIPError.h>
-#include <string>
-#include <vector>
 
-class ChannelManager
+class ChannelManager : public chip::app::Clusters::Channel::Delegate
 {
 public:
     void InitializeWithObjects(jobject managerObject);
-    CHIP_ERROR getChannelList(chip::app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR getChannelLineup(chip::app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR getCurrentChannel(chip::app::AttributeValueEncoder & aEncoder);
 
-    ChannelInfo ChangeChannelByMatch(std::string name);
-    bool changeChannelByNumber(uint16_t majorNumber, uint16_t minorNumber);
-    bool skipChannnel(uint16_t count);
+    std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> HandleGetChannelList() override;
+    chip::app::Clusters::Channel::Structs::LineupInfo::Type HandleGetLineup() override;
+    chip::app::Clusters::Channel::Structs::ChannelInfo::Type HandleGetCurrentChannel() override;
+
+    chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type HandleChangeChannel(const chip::CharSpan & match) override;
+    bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) override;
+    bool HandleSkipChannel(const uint16_t & count) override;
 
 private:
     friend ChannelManager & ChannelMgr();
@@ -47,8 +43,8 @@ private:
     jmethodID mGetCurrentChannelMethod = nullptr;
 
     jmethodID mChangeChannelMethod         = nullptr;
-    jmethodID mchangeChannelByNumberMethod = nullptr;
-    jmethodID mskipChannelMethod           = nullptr;
+    jmethodID mChangeChannelByNumberMethod = nullptr;
+    jmethodID mSkipChannelMethod           = nullptr;
 };
 
 inline class ChannelManager & ChannelMgr()

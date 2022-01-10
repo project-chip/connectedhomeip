@@ -26,7 +26,7 @@
 
 #include <cstdint>
 
-#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/PersistedStorage.h>
@@ -77,7 +77,8 @@ public:
 #else
         kPrimaryMACAddressLength = 6,
 #endif
-        kMaxMACAddressLength = 8,
+        kMaxMACAddressLength  = 8,
+        kMaxLanguageTagLength = 5 // ISO 639-1 standard language codes
     };
 
     virtual CHIP_ERROR GetVendorName(char * buf, size_t bufSize)                                    = 0;
@@ -99,6 +100,7 @@ public:
     virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter)                  = 0;
     virtual CHIP_ERROR GetRegulatoryLocation(uint8_t & location)                       = 0;
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
+    virtual CHIP_ERROR GetActiveLocale(char * buf, size_t bufSize, size_t & codeLen)   = 0;
     virtual CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb)                            = 0;
     virtual CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen)  = 0;
     virtual CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf)                 = 0;
@@ -109,6 +111,7 @@ public:
     virtual CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator)            = 0;
     virtual CHIP_ERROR StoreRegulatoryLocation(uint8_t location)                       = 0;
     virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen)             = 0;
+    virtual CHIP_ERROR StoreActiveLocale(const char * code, size_t codeLen)            = 0;
     virtual CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb)                            = 0;
     virtual CHIP_ERROR GetRebootCount(uint32_t & rebootCount)                          = 0;
     virtual CHIP_ERROR StoreRebootCount(uint32_t rebootCount)                          = 0;
@@ -191,7 +194,7 @@ extern void SetConfigurationMgr(ConfigurationManager * configurationManager);
 
 inline CHIP_ERROR ConfigurationManager::GetLocationCapability(uint8_t & location)
 {
-    location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR;
+    location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
     return CHIP_NO_ERROR;
 }
 

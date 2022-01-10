@@ -16,7 +16,10 @@
  *    limitations under the License.
  */
 
-bool lowPowerClusterSleep()
+#include "LowPowerManager.h"
+
+bool LowPowerManager::HandleSleep()
 {
+    // TODO: Insert code here
     return true;
 }

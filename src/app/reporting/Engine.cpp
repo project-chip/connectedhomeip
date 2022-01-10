@@ -314,7 +314,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     ReportDataMessage::Builder reportDataBuilder;
     chip::System::PacketBufferHandle bufHandle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     uint16_t reservedSize                      = 0;
-    bool hasMoreChunks;
+    bool hasMoreChunks                         = false;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -432,16 +432,24 @@ CHIP_ERROR Engine::ScheduleRun()
         return CHIP_NO_ERROR;
     }
 
-    if (InteractionModelEngine::GetInstance()->GetExchangeManager() != nullptr)
-    {
-        mRunScheduled = true;
-        return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->ScheduleWork(Run,
-                                                                                                                             this);
-    }
-    else
+    Messaging::ExchangeManager * exchangeManager = InteractionModelEngine::GetInstance()->GetExchangeManager();
+    if (exchangeManager == nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
+    SessionManager * sessionManager = exchangeManager->GetSessionManager();
+    if (sessionManager == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    System::Layer * systemLayer = sessionManager->SystemLayer();
+    if (systemLayer == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    ReturnErrorOnFailure(systemLayer->ScheduleWork(Run, this));
+    mRunScheduled = true;
+    return CHIP_NO_ERROR;
 }
 
 void Engine::Run()

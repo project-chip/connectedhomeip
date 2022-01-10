@@ -1512,7 +1512,7 @@ using CHIP_ERROR = ::chip::ChipError;
  *  @def CHIP_ERROR_INVALID_TAKE_PARAMETER
  *
  *  @brief
- *    Received an invalid TAKE paramter.
+ *    Received an invalid TAKE parameter.
  *
  */
 #define CHIP_ERROR_INVALID_TAKE_PARAMETER                      CHIP_CORE_ERROR(0x7c)
@@ -2011,13 +2011,13 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION     CHIP_CORE_ERROR(0xb3)
 
 /**
- *  @def CHIP_ERROR_MDNS_COLLISSION
+ *  @def CHIP_ERROR_MDNS_COLLISION
  *
  *  @brief
  *    The registered service name has collision on the LAN.
  *
  */
-#define CHIP_ERROR_MDNS_COLLISSION                             CHIP_CORE_ERROR(0xb4)
+#define CHIP_ERROR_MDNS_COLLISION                             CHIP_CORE_ERROR(0xb4)
 
 /**
  * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH
@@ -2356,6 +2356,15 @@ using CHIP_ERROR = ::chip::ChipError;
  *   The URI separator is missing
  */
 #define CHIP_ERROR_MISSING_URI_SEPARATOR             CHIP_CORE_ERROR(0xd7)
+
+/**
+ * @def CHIP_ERROR_IM_CONSTRAINT_ERROR
+ *
+ * @brief
+ *   The equivalent of a CONSTRAINT_ERROR status: a value was out of the valid
+ *   range.
+ */
+#define CHIP_ERROR_IM_CONSTRAINT_ERROR               CHIP_CORE_ERROR(0xd8)
 
 /**
  *  @}

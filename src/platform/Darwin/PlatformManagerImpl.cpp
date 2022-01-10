@@ -126,5 +126,12 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+PlatformManagerImpl::_SetUserLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    return CHIP_NO_ERROR;
+}
+
 } // namespace DeviceLayer
 } // namespace chip

@@ -88,6 +88,7 @@ tests:
 
     - label: "Read the optional attribute: Tolerance"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:
@@ -95,6 +96,7 @@ tests:
 
     - label: "Write the default values to optional attribute: Tolerance"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "Tolerance"
       arguments:
@@ -104,6 +106,7 @@ tests:
 
     - label: "Reads back optional attribute: Tolerance"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:
@@ -112,6 +115,7 @@ tests:
     #Following attributes are based on the value of the extended feature in the cluster feature map
     - label: "Read the optional attribute: ScaledValue"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "ScaledValue"
       response:
@@ -119,6 +123,7 @@ tests:
 
     - label: "Write the default values to optional attribute: ScaledValue"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "ScaledValue"
       arguments:
@@ -128,6 +133,7 @@ tests:
 
     - label: "Reads back optional attribute: ScaledValue"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "ScaledValue"
       response:
@@ -135,6 +141,7 @@ tests:
 
     - label: "Read the optional attribute: MinScaledValue"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "MinScaledValue"
       response:
@@ -142,6 +149,7 @@ tests:
 
     - label: "Write the default values to optional attribute: MinScaledValue"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "MinScaledValue"
       arguments:
@@ -151,6 +159,7 @@ tests:
 
     - label: "Reads back optional attribute: MinScaledValue"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "MinScaledValue"
       response:
@@ -158,6 +167,7 @@ tests:
 
     - label: "Read the optional attribute: MaxScaledValue"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "MaxScaledValue"
       response:
@@ -165,6 +175,7 @@ tests:
 
     - label: "Write the default values to optional attribute: MaxScaledValue"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "MaxScaledValue"
       arguments:
@@ -174,6 +185,7 @@ tests:
 
     - label: "Reads back optional attribute: MaxScaledValue"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "MaxScaledValue"
       response:
@@ -181,6 +193,7 @@ tests:
 
     - label: "Read the optional attribute: ScaledTolerance"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "ScaledTolerance"
       response:
@@ -188,6 +201,7 @@ tests:
 
     - label: "Write the default values to optional attribute: ScaledTolerance"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "ScaledTolerance"
       arguments:
@@ -197,6 +211,7 @@ tests:
 
     - label: "Reads back optional attribute: ScaledTolerance"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "ScaledTolerance"
       response:
@@ -204,6 +219,7 @@ tests:
 
     - label: "Read the optional attribute: Scale"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Scale"
       response:
@@ -211,6 +227,7 @@ tests:
 
     - label: "Write the default values to optional attribute: Scale"
       disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "Scale"
       arguments:
@@ -220,6 +237,7 @@ tests:
 
     - label: "Reads back optional attribute: Scale"
       disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Scale"
       response:

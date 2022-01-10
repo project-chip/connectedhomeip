@@ -327,11 +327,11 @@ void WindowAppImpl::UpdateLEDs()
         {
             mActionLED.Blink(100);
         }
-        else if (IsOpen(cover.mEndpoint))
+        else if (IsLiftOpen(cover.mEndpoint))
         {
             mActionLED.Set(true);
         }
-        else if (IsClosed(cover.mEndpoint))
+        else if (IsLiftClosed(cover.mEndpoint))
         {
             mActionLED.Set(false);
         }
@@ -350,11 +350,15 @@ void WindowAppImpl::UpdateLCD()
     {
         Cover & cover      = GetCover();
         EmberAfWcType type = TypeGet(cover.mEndpoint);
-        uint16_t lift      = 0;
-        uint16_t tilt      = 0;
-        Attributes::CurrentPositionLift::Get(cover.mEndpoint, &lift);
-        Attributes::CurrentPositionTilt::Get(cover.mEndpoint, &tilt);
-        LcdPainter::Paint(type, static_cast<uint8_t>(lift), static_cast<uint8_t>(tilt), mIcon);
+        chip::app::DataModel::Nullable<uint16_t> lift;
+        chip::app::DataModel::Nullable<uint16_t> tilt;
+        Attributes::CurrentPositionLift::Get(cover.mEndpoint, lift);
+        Attributes::CurrentPositionTilt::Get(cover.mEndpoint, tilt);
+
+        if (!tilt.IsNull() && !lift.IsNull())
+        {
+            LcdPainter::Paint(type, static_cast<uint8_t>(lift.Value()), static_cast<uint8_t>(tilt.Value()), mIcon);
+        }
     }
     else
     {

@@ -23,8 +23,8 @@
 class OpenCommissioningWindowCommand : public CHIPCommand
 {
 public:
-    OpenCommissioningWindowCommand() :
-        CHIPCommand("open-commissioning-window"), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
+    OpenCommissioningWindowCommand(CredentialIssuerCommands * credIssuerCommands) :
+        CHIPCommand("open-commissioning-window", credIssuerCommands), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
         mOnDeviceConnectionFailureCallback(OnDeviceConnectionFailureFn, this),
         mOnOpenCommissioningWindowCallback(OnOpenCommissioningWindowResponse, this)
     {

@@ -118,6 +118,9 @@ protected:
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
     CHIP_ERROR _DnsBrowse(const char * aServiceName, DnsBrowseCallback aCallback, void * aContext);
     CHIP_ERROR _DnsResolve(const char * aServiceName, const char * aInstanceName, DnsResolveCallback aCallback, void * aContext);
+    static void DispatchResolve(intptr_t context);
+    static void DispatchBrowseEmpty(intptr_t context);
+    static void DispatchBrowse(intptr_t context);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_DNS_CLIENT
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT
 
@@ -226,8 +229,16 @@ private:
 
     struct DnsResult
     {
+        void * context;
         chip::Dnssd::DnssdService mMdnsService;
         DnsServiceTxtEntries mServiceTxtEntry;
+        CHIP_ERROR error;
+
+        DnsResult(void * cbContext, CHIP_ERROR aError)
+        {
+            context = cbContext;
+            error   = aError;
+        }
     };
 
     static void OnDnsBrowseResult(otError aError, const otDnsBrowseResponse * aResponse, void * aContext);

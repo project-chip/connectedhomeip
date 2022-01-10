@@ -37,7 +37,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'FLOW_MEASUREMENT_CLUSTER': [],
     'GENERAL_COMMISSIONING_CLUSTER': ['general-commissioning-server'],
     'GENERAL_DIAGNOSTICS_CLUSTER': ['general-diagnostics-server'],
-    'GROUP_KEY_MANAGEMENT_CLUSTER': [],
+    'GROUP_KEY_MANAGEMENT_CLUSTER': ['group-key-mgmt-server'],
     'GROUPS_CLUSTER': ['groups-server'],
     'IAS_ZONE_CLUSTER': ['ias-zone-server'],
     'IDENTIFY_CLUSTER': ['identify-server'],
@@ -51,7 +51,8 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'MEDIA_INPUT_CLUSTER': ['media-input-server'],
     'MEDIA_PLAYBACK_CLUSTER': ['media-playback-server'],
     'MODE_SELECT_CLUSTER': ['mode-select-server'],
-    'NETWORK_COMMISSIONING_CLUSTER': ['network-commissioning'],
+    # network-commissioning-old is the old, not spec compliant implementation.
+    'NETWORK_COMMISSIONING_CLUSTER': ['network-commissioning', 'network-commissioning-old'],
     'OCCUPANCY_SENSING_CLUSTER': ['occupancy-sensor-server'],
     'ON_OFF_CLUSTER': ['on-off-server'],
     'ON_OFF_SWITCH_CONFIG_CLUSTER': [],
@@ -83,7 +84,7 @@ SERVER_CLUSTERS: typing.Dict[str, typing.List[str]] = {
     'TIME_CLUSTER': [],
     'TIME_SYNCHRONIZATION_CLUSTER': [],
     'USER_LABEL_CLUSTER': ['user-label-server'],
-    'WAKE_ON_LAN_CLUSTER': [],
+    'WAKE_ON_LAN_CLUSTER': ['wake-on-lan-server'],
     'WIFI_NETWORK_DIAGNOSTICS_CLUSTER': ['wifi-network-diagnostics-server'],
     'WINDOW_COVERING_CLUSTER': ['window-covering-server'],
     'ZLL_COMMISSIONING_CLUSTER': []

@@ -467,40 +467,9 @@ void TCPEndPoint::ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut)
     GetSystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeOut), TCPUserTimeoutHandler, this);
 }
 
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-void TCPEndPoint::SetTCPSendIdleAndNotifyChange(bool aIsTCPSendIdle)
-{
-    if (mIsTCPSendIdle != aIsTCPSendIdle)
-    {
-        ChipLogDetail(Inet, "TCP con send channel idle state changed : %s", aIsTCPSendIdle ? "false->true" : "true->false");
-
-        // Set the current Idle state
-        mIsTCPSendIdle = aIsTCPSendIdle;
-
-        if (OnTCPSendIdleChanged)
-        {
-            OnTCPSendIdleChanged(this, mIsTCPSendIdle);
-        }
-    }
-}
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
 void TCPEndPoint::StartTCPUserTimeoutTimer()
 {
-    uint32_t timeOut = mUserTimeoutMillis;
-
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    // Set timeout to the poll interval
-
-    timeOut = mTCPSendQueuePollPeriodMillis;
-
-    // Reset the poll count
-
-    mTCPSendQueueRemainingPollCount = MaxTCPSendQueuePolls();
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
-    ScheduleNextTCPUserTimeoutPoll(timeOut);
-
+    ScheduleNextTCPUserTimeoutPoll(mUserTimeoutMillis);
     mUserTimeoutTimerRunning = true;
 }
 

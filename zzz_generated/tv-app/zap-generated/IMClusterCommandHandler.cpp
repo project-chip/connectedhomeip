@@ -54,30 +54,40 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::GetSetupPIN::Id: {
-            Commands::GetSetupPIN::DecodableType commandData;
+        case Commands::GetSetupPINRequest::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
+            Commands::GetSetupPINRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfAccountLoginClusterGetSetupPINCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfAccountLoginClusterGetSetupPINRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::Login::Id: {
-            Commands::Login::DecodableType commandData;
+        case Commands::LoginRequest::Id: {
+            Commands::LoginRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfAccountLoginClusterLoginCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfAccountLoginClusterLoginRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::Logout::Id: {
-            Commands::Logout::DecodableType commandData;
+        case Commands::LogoutRequest::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
+            Commands::LogoutRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfAccountLoginClusterLogoutCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfAccountLoginClusterLogoutRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -162,47 +172,6 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
 
 } // namespace AdministratorCommissioning
 
-namespace ApplicationBasic {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    // We are using TLVUnpackError and TLVError here since both of them can be CHIP_END_OF_TLV
-    // When TLVError is CHIP_END_OF_TLV, it means we have iterated all of the items, which is not a real error.
-    // Any error value TLVUnpackError means we have received an illegal value.
-    // The following variables are used for all commands to save code size.
-    CHIP_ERROR TLVError = CHIP_NO_ERROR;
-    bool wasHandled     = false;
-    {
-        switch (aCommandPath.mCommandId)
-        {
-        case Commands::ChangeStatus::Id: {
-            Commands::ChangeStatus::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfApplicationBasicClusterChangeStatusCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-            ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                         ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-            return;
-        }
-        }
-    }
-
-    if (CHIP_NO_ERROR != TLVError || !wasHandled)
-    {
-        apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
-        ChipLogProgress(Zcl, "Failed to dispatch command, TLVError=%" CHIP_ERROR_FORMAT, TLVError.Format());
-    }
-}
-
-} // namespace ApplicationBasic
-
 namespace ApplicationLauncher {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
@@ -216,30 +185,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::HideApp::Id: {
-            Commands::HideApp::DecodableType commandData;
+        case Commands::HideAppRequest::Id: {
+            Commands::HideAppRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfApplicationLauncherClusterHideAppCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfApplicationLauncherClusterHideAppRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::LaunchApp::Id: {
-            Commands::LaunchApp::DecodableType commandData;
+        case Commands::LaunchAppRequest::Id: {
+            Commands::LaunchAppRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfApplicationLauncherClusterLaunchAppCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfApplicationLauncherClusterLaunchAppRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::StopApp::Id: {
-            Commands::StopApp::DecodableType commandData;
+        case Commands::StopAppRequest::Id: {
+            Commands::StopAppRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfApplicationLauncherClusterStopAppCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfApplicationLauncherClusterStopAppRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -275,21 +244,21 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::RenameOutput::Id: {
-            Commands::RenameOutput::DecodableType commandData;
+        case Commands::RenameOutputRequest::Id: {
+            Commands::RenameOutputRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfAudioOutputClusterRenameOutputCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfAudioOutputClusterRenameOutputRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::SelectOutput::Id: {
-            Commands::SelectOutput::DecodableType commandData;
+        case Commands::SelectOutputRequest::Id: {
+            Commands::SelectOutputRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfAudioOutputClusterSelectOutputCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfAudioOutputClusterSelectOutputRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -386,30 +355,30 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::ChangeChannel::Id: {
-            Commands::ChangeChannel::DecodableType commandData;
+        case Commands::ChangeChannelByNumberRequest::Id: {
+            Commands::ChangeChannelByNumberRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfChannelClusterChangeChannelCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfChannelClusterChangeChannelByNumberRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::ChangeChannelByNumber::Id: {
-            Commands::ChangeChannelByNumber::DecodableType commandData;
+        case Commands::ChangeChannelRequest::Id: {
+            Commands::ChangeChannelRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfChannelClusterChangeChannelByNumberCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfChannelClusterChangeChannelRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::SkipChannel::Id: {
-            Commands::SkipChannel::DecodableType commandData;
+        case Commands::SkipChannelRequest::Id: {
+            Commands::SkipChannelRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfChannelClusterSkipChannelCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfChannelClusterSkipChannelRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -445,21 +414,21 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::LaunchContent::Id: {
-            Commands::LaunchContent::DecodableType commandData;
+        case Commands::LaunchContentRequest::Id: {
+            Commands::LaunchContentRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfContentLauncherClusterLaunchContentCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfContentLauncherClusterLaunchContentRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::LaunchURL::Id: {
-            Commands::LaunchURL::DecodableType commandData;
+        case Commands::LaunchURLRequest::Id: {
+            Commands::LaunchURLRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfContentLauncherClusterLaunchURLCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfContentLauncherClusterLaunchURLRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -823,12 +792,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::SendKey::Id: {
-            Commands::SendKey::DecodableType commandData;
+        case Commands::SendKeyRequest::Id: {
+            Commands::SendKeyRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfKeypadInputClusterSendKeyCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfKeypadInputClusterSendKeyRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1009,39 +978,39 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::HideInputStatus::Id: {
-            Commands::HideInputStatus::DecodableType commandData;
+        case Commands::HideInputStatusRequest::Id: {
+            Commands::HideInputStatusRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaInputClusterHideInputStatusCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaInputClusterHideInputStatusRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::RenameInput::Id: {
-            Commands::RenameInput::DecodableType commandData;
+        case Commands::RenameInputRequest::Id: {
+            Commands::RenameInputRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaInputClusterRenameInputCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaInputClusterRenameInputRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::SelectInput::Id: {
-            Commands::SelectInput::DecodableType commandData;
+        case Commands::SelectInputRequest::Id: {
+            Commands::SelectInputRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaInputClusterSelectInputCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaInputClusterSelectInputRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::ShowInputStatus::Id: {
-            Commands::ShowInputStatus::DecodableType commandData;
+        case Commands::ShowInputStatusRequest::Id: {
+            Commands::ShowInputStatusRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaInputClusterShowInputStatusCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaInputClusterShowInputStatusRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -1077,102 +1046,102 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::MediaFastForward::Id: {
-            Commands::MediaFastForward::DecodableType commandData;
+        case Commands::FastForwardRequest::Id: {
+            Commands::FastForwardRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaFastForwardCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaPlaybackClusterFastForwardRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::MediaNext::Id: {
-            Commands::MediaNext::DecodableType commandData;
+        case Commands::NextRequest::Id: {
+            Commands::NextRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaNextCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaPlaybackClusterNextRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::MediaPause::Id: {
-            Commands::MediaPause::DecodableType commandData;
+        case Commands::PauseRequest::Id: {
+            Commands::PauseRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaPauseCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaPlaybackClusterPauseRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::MediaPlay::Id: {
-            Commands::MediaPlay::DecodableType commandData;
+        case Commands::PlayRequest::Id: {
+            Commands::PlayRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaPlayCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaPlaybackClusterPlayRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::MediaPrevious::Id: {
-            Commands::MediaPrevious::DecodableType commandData;
+        case Commands::PreviousRequest::Id: {
+            Commands::PreviousRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaPreviousCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaPlaybackClusterPreviousRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::MediaRewind::Id: {
-            Commands::MediaRewind::DecodableType commandData;
+        case Commands::RewindRequest::Id: {
+            Commands::RewindRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaRewindCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaPlaybackClusterRewindRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::MediaSeek::Id: {
-            Commands::MediaSeek::DecodableType commandData;
+        case Commands::SeekRequest::Id: {
+            Commands::SeekRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaSeekCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaPlaybackClusterSeekRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::MediaSkipBackward::Id: {
-            Commands::MediaSkipBackward::DecodableType commandData;
+        case Commands::SkipBackwardRequest::Id: {
+            Commands::SkipBackwardRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaSkipBackwardCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaPlaybackClusterSkipBackwardRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::MediaSkipForward::Id: {
-            Commands::MediaSkipForward::DecodableType commandData;
+        case Commands::SkipForwardRequest::Id: {
+            Commands::SkipForwardRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaSkipForwardCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaPlaybackClusterSkipForwardRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::MediaStartOver::Id: {
-            Commands::MediaStartOver::DecodableType commandData;
+        case Commands::StartOverRequest::Id: {
+            Commands::StartOverRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaStartOverCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaPlaybackClusterStartOverRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
-        case Commands::MediaStop::Id: {
-            Commands::MediaStop::DecodableType commandData;
+        case Commands::StopRequest::Id: {
+            Commands::StopRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfMediaPlaybackClusterMediaStopCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfMediaPlaybackClusterStopRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -2064,12 +2033,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::NavigateTarget::Id: {
-            Commands::NavigateTarget::DecodableType commandData;
+        case Commands::NavigateTargetRequest::Id: {
+            Commands::NavigateTargetRequest::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
-                wasHandled = emberAfTargetNavigatorClusterNavigateTargetCallback(apCommandObj, aCommandPath, commandData);
+                wasHandled = emberAfTargetNavigatorClusterNavigateTargetRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
@@ -2105,9 +2074,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         break;
     case Clusters::AdministratorCommissioning::Id:
         Clusters::AdministratorCommissioning::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
-    case Clusters::ApplicationBasic::Id:
-        Clusters::ApplicationBasic::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::ApplicationLauncher::Id:
         Clusters::ApplicationLauncher::DispatchServerCommand(apCommandObj, aCommandPath, aReader);

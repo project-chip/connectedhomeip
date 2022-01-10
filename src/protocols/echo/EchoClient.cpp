@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements an object for a CHIP Echo unsolicitied
+ *      This file implements an object for a CHIP Echo unsolicited
  *      initiator (client).
  *
  */
@@ -39,7 +39,7 @@ CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, const Sess
         return CHIP_ERROR_INCORRECT_STATE;
 
     mExchangeMgr = exchangeMgr;
-    mSecureSession.SetValue(session);
+    mSecureSession.Grab(session);
     OnEchoResponseReceived = nullptr;
     mExchangeCtx           = nullptr;
 
@@ -71,7 +71,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle && payload, Me
     }
 
     // Create a new exchange context.
-    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession.Value(), this);
+    mExchangeCtx = mExchangeMgr->NewContext(mSecureSession.Get(), this);
     if (mExchangeCtx == nullptr)
     {
         return CHIP_ERROR_NO_MEMORY;
