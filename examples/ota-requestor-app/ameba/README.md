@@ -37,20 +37,26 @@ A prototype application that demonstrates OTA Requestor capabilities.
 
 ## Testing the Example Application
 
-Launch the linux [ota-provider-app](../../ota-provider-app/linux) and provide the SW_IMAGE_FILE
+Launch the linux [ota-provider-app](../../ota-provider-app/linux) and provide
+the SW_IMAGE_FILE
 
     $ ./chip-ota-provider-app -f ${SW_IMAGE_FILE}
-    
-Commission the ota-provider-app using [chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+
+Commission the ota-provider-app using
+[chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
 
     $ ./chip-tool pairing onnetwork 1 20202021
 
-Input `ATS$` command to start the CHIP ota-requestor task, then use chip-tool to commission it
+Input `ATS$` command to start the CHIP ota-requestor task, then use chip-tool to
+commission it
 
     $ ./chip-tool pairing ble-wifi 2 <SSID> <PASSWORD> 20202021 3840
-    
-After commissioning the ota-requestor, use the chip-tool to announce the ota-provider-app to start the OTA process
 
-    $ ./chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0 
-    
-The OTA process should include downloading the image, verification of image header, erasing upgraded flash partition, writing to flash and checksum verification
+After commissioning the ota-requestor, use the chip-tool to announce the
+ota-provider-app to start the OTA process
+
+    $ ./chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+
+The OTA process should include downloading the image, verification of image
+header, erasing upgraded flash partition, writing to flash and checksum
+verification
