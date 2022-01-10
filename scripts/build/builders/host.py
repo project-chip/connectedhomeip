@@ -81,8 +81,8 @@ class HostApp(Enum):
         elif self == HostApp.TESTS:
             pass
         elif self == HostApp.SHELL:
-            yield 'chip-shell-app'
-            yield 'chip-shell-app.map'
+            yield 'chip-shell'
+            yield 'chip-shell.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
