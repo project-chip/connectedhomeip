@@ -87,24 +87,30 @@ void ExchangeContext::SetResponseTimeout(Timeout timeout)
 #if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
 void ExchangeContext::UpdateSEDPollingMode()
 {
-    SessionHandle sessionHandle              = GetSessionHandle();
-    Transport::Session::SessionType sessType = sessionHandle->GetSessionType();
+    Transport::PeerAddress address;
 
-    // During PASE session, which happen on BLE, the session is kUnauthenticated
-    // So AsSecureSession() ends up faulting the system
-    if (sessType != Transport::Session::SessionType::kUnauthenticated)
+    switch (GetSessionHandle()->GetSessionType())
     {
-        if (sessionHandle->AsSecureSession()->GetPeerAddress().GetTransportType() != Transport::Type::kBle)
-        {
-            if (!IsResponseExpected() && !IsSendExpected() && (mExchangeMgr->GetNumActiveExchanges() == 1))
-            {
-                chip::DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
-            }
-            else
-            {
-                chip::DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
-            }
-        }
+    case Transport::Session::SessionType::kSecure:
+        address = GetSessionHandle()->AsSecureSession()->GetPeerAddress();
+        break;
+    case Transport::Session::SessionType::kUnauthenticated:
+        address = GetSessionHandle()->AsUnauthenticatedSession()->GetPeerAddress();
+        break;
+    default:
+        return;
+    }
+
+    VerifyOrReturn(address.GetTransportType() != Transport::Type::kBle);
+    UpdateSEDPollingMode(IsResponseExpected() || IsSendExpected() || IsMessageNotAcked() || IsAckPending());
+}
+
+void ExchangeContext::UpdateSEDPollingMode(bool fastPollingMode)
+{
+    if (fastPollingMode != IsRequestingFastPollingMode())
+    {
+        SetRequestingFastPollingMode(fastPollingMode);
+        DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(fastPollingMode);
     }
 }
 #endif
@@ -286,6 +292,11 @@ ExchangeContext::~ExchangeContext()
 {
     VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
     VerifyOrDie(!IsAckPending());
+
+#if CONFIG_DEVICE_LAYER && CHIP_DEVICE_CONFIG_ENABLE_SED
+    // Make sure that the exchange withdraws the request for Sleepy End Device fast-polling mode.
+    UpdateSEDPollingMode(false);
+#endif
 
     // Ideally, in this scenario, the retransmit table should
     // be clear of any outstanding messages for this context and

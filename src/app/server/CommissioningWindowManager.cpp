@@ -22,6 +22,8 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
+using namespace chip::app::Clusters;
+
 namespace {
 
 // As per specifications (Section 13.3), Nodes SHALL exit commissioning mode after 20 failed commission attempts.
@@ -259,7 +261,7 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t 
 
 void CommissioningWindowManager::CloseCommissioningWindow()
 {
-    if (mWindowStatus != app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
+    if (mWindowStatus != AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
     {
         ChipLogProgress(AppServer, "Closing pairing window");
         Cleanup();
@@ -273,10 +275,18 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     DeviceLayer::ConfigurationMgr().NotifyOfAdvertisementStart();
 #endif
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    if (!mIsBLE && mWindowStatus == AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
+    {
+        DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
+    }
+#endif
+
     if (mIsBLE)
     {
         ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true));
     }
+
     if (mAppDelegate != nullptr)
     {
         mAppDelegate->OnPairingWindowOpened();
@@ -285,21 +295,17 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     Dnssd::CommissioningMode commissioningMode;
     if (mUseECM)
     {
-        mWindowStatus     = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
+        mWindowStatus     = AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
         commissioningMode = Dnssd::CommissioningMode::kEnabledEnhanced;
     }
     else
     {
-        mWindowStatus     = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
+        mWindowStatus     = AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
         commissioningMode = Dnssd::CommissioningMode::kEnabledBasic;
     }
 
     // reset all advertising, indicating we are in commissioningMode
     app::DnssdServer::Instance().StartServer(commissioningMode);
-
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
-#endif
 
     return CHIP_NO_ERROR;
 }
@@ -311,11 +317,14 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement(bool aShuttingDown)
     mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     mPairingSession.Clear();
 
-    mWindowStatus = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
-    DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
+    if (!mIsBLE && mWindowStatus != AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
+    {
+        DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);
+    }
 #endif
+
+    mWindowStatus = AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
 
     // If aShuttingDown, don't try to change our DNS-SD advertisements.
     if (!aShuttingDown)
