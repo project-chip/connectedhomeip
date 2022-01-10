@@ -95,13 +95,12 @@ public class ChipClusters {
     public native long initWithDevice(long devicePtr, int endpointId);
   {{#chip_cluster_commands}}
 
-    {{#if mustUseTimedInvoke}}
-    {{else}}
+    {{#unless mustUseTimedInvoke}}
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
       {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}) {
       {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}, {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}, null);
     }
-    {{/if}}
+    {{/unless}}
 
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
       {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}, int timedInvokeTimeoutMs) {
@@ -250,12 +249,11 @@ public class ChipClusters {
   {{#if isWritableAttribute}}
   {{! TODO: Lists not supported in attribute writes yet. }}
   {{#unless isList}}
-    {{#if mustUseTimedWrite}}
-    {{else}}
+    {{#unless mustUseTimedWrite}}
     public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback{{>java_type_for_argument}} value) {
       write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value, null);
     }
-    {{/if}}
+    {{/unless}}
 
     public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback{{>java_type_for_argument}} value, int timedWriteTimeoutMs) {
       write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
