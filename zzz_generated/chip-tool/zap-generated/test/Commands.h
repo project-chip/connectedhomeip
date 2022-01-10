@@ -58583,7 +58583,9 @@ private:
     {
         {
             auto iter_0 = clientList.begin();
-            VerifyOrReturn(CheckNoMoreListItems<decltype(clientList)>("clientList", iter_0, 0));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientList)>("clientList", iter_0, 0));
+            VerifyOrReturn(CheckValue("clientList[0]", iter_0.GetValue(), 41UL));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(clientList)>("clientList", iter_0, 1));
         }
 
         NextTest();
