@@ -40,7 +40,6 @@ tests:
           value: 0
 
     - label: "Reads CurrentHeapUsed attribute value from DUT"
-      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
@@ -49,7 +48,6 @@ tests:
           value: 0
 
     - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
-      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
