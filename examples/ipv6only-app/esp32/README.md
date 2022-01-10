@@ -100,10 +100,10 @@ Start the console:
 
 An example flow of performing a scan, connecting, and getting the IPv6 address:
 
-    scan = rpcs.chip.rpc.Wifi.StartScan(pw_rpc_timeout_s=5)
+    scan = rpcs.chip.rpc.WiFi.StartScan(pw_rpc_timeout_s=5)
     ap = next(filter(lambda a: b"SSID\000" in a.ssid, next(scan.responses()).aps))
 
     connect = protos.chip.rpc.ConnectionData(ssid=ap.ssid,security_type=ap.security_type,secret=b"PASSWORD")
-    rpcs.chip.rpc.Wifi.Connect(connect, pw_rpc_timeout_s=10)
+    rpcs.chip.rpc.WiFi.Connect(connect, pw_rpc_timeout_s=10)
 
-    rpcs.chip.rpc.Wifi.GetIP6Address()
+    rpcs.chip.rpc.WiFi.GetIP6Address()

@@ -21,42 +21,155 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app-common/zap-generated/attributes/Accessors.h>
-#include <app-common/zap-generated/cluster-objects.h>
+#include "media-input-server.h"
+#include "media-input-delegate.h"
+
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/util/af.h>
-#include <string>
+#include <app/data-model/Encode.h>
+#include <app/util/attribute-storage.h>
 
 using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::MediaInput;
 
-bool mediaInputClusterSelectInput(uint8_t input);
-bool mediaInputClusterShowInputStatus();
-bool mediaInputClusterHideInputStatus();
-bool mediaInputClusterRenameInput(uint8_t input, std::string name);
+// -----------------------------------------------------------------------------
+// Delegate Implementation
 
-static void storeCurrentInput(EndpointId endpoint, uint8_t currentInput)
+using chip::app::Clusters::MediaInput::Delegate;
+
+namespace {
+
+Delegate * gDelegateTable[EMBER_AF_MEDIA_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+
+Delegate * GetDelegate(EndpointId endpoint)
 {
-    EmberAfStatus status = Attributes::CurrentMediaInput::Set(endpoint, currentInput);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::MediaInput::Id);
+    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+}
+
+bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
+{
+    if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Failed to store media playback attribute.");
+        ChipLogError(Zcl, "Media Input has no delegate set for endpoint:%" PRIu16, endpoint);
+        return true;
+    }
+    return false;
+}
+} // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace MediaInput {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::MediaInput::Id);
+    if (ep != 0xFFFF)
+    {
+        gDelegateTable[ep] = delegate;
+    }
+    else
+    {
     }
 }
+
+} // namespace MediaInput
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+// -----------------------------------------------------------------------------
+// Attribute Accessor Implementation
+
+namespace {
+
+class MediaInputAttrAccess : public app::AttributeAccessInterface
+{
+public:
+    MediaInputAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::MediaInput::Id) {}
+
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadInputListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadCurrentInputAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+};
+
+MediaInputAttrAccess gMediaInputAttrAccess;
+
+CHIP_ERROR MediaInputAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
+{
+    EndpointId endpoint = aPath.mEndpointId;
+    Delegate * delegate = GetDelegate(endpoint);
+
+    if (isDelegateNull(delegate, endpoint))
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case app::Clusters::MediaInput::Attributes::MediaInputList::Id: {
+        return ReadInputListAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::MediaInput::Attributes::CurrentMediaInput::Id: {
+        return ReadCurrentInputAttribute(aEncoder, delegate);
+    }
+    default: {
+        break;
+    }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR MediaInputAttrAccess::ReadInputListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    std::list<Structs::InputInfo::Type> inputList = delegate->HandleGetInputList();
+    return aEncoder.EncodeList([inputList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & input : inputList)
+        {
+            ReturnErrorOnFailure(encoder.Encode(input));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
+
+CHIP_ERROR MediaInputAttrAccess::ReadCurrentInputAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    uint8_t currentInput = delegate->HandleGetCurrentInput();
+    return aEncoder.Encode(currentInput);
+}
+
+} // anonymous namespace
+
+// -----------------------------------------------------------------------------
+// Matter Framework Callbacks Implementation
 
 bool emberAfMediaInputClusterSelectInputRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                         const Commands::SelectInputRequest::DecodableType & commandData)
 {
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+
     auto & input = commandData.index;
 
-    bool success         = mediaInputClusterSelectInput(input);
-    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
-    if (success)
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+exit:
+    if (err != CHIP_NO_ERROR)
     {
-        storeCurrentInput(emberAfCurrentEndpoint(), input);
+        ChipLogError(Zcl, "emberAfMediaInputClusterSelectInputRequestCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
+
+    bool success         = delegate->HandleSelectInput(input);
+    EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
@@ -65,7 +178,20 @@ bool emberAfMediaInputClusterShowInputStatusRequestCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::ShowInputStatusRequest::DecodableType & commandData)
 {
-    bool success         = mediaInputClusterShowInputStatus();
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaInputClusterShowInputStatusRequestCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
+    bool success         = delegate->HandleShowInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
@@ -75,7 +201,20 @@ bool emberAfMediaInputClusterHideInputStatusRequestCallback(app::CommandHandler 
                                                             const app::ConcreteCommandPath & commandPath,
                                                             const Commands::HideInputStatusRequest::DecodableType & commandData)
 {
-    bool success         = mediaInputClusterHideInputStatus();
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaInputClusterHideInputStatusRequestCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
+    bool success         = delegate->HandleHideInputStatus();
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
@@ -84,15 +223,28 @@ bool emberAfMediaInputClusterHideInputStatusRequestCallback(app::CommandHandler 
 bool emberAfMediaInputClusterRenameInputRequestCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
                                                         const Commands::RenameInputRequest::DecodableType & commandData)
 {
-    auto & input = commandData.index;
-    auto & name  = commandData.name;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    auto & index        = commandData.index;
+    auto & name         = commandData.name;
 
-    // TODO: char is not null terminated, verify this code once #7963 gets merged.
-    std::string nameString(name.data(), name.size());
-    bool success         = mediaInputClusterRenameInput(input, nameString);
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfMediaInputClusterRenameInputRequestCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
+    bool success         = delegate->HandleRenameInput(index, name);
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
 
-void MatterMediaInputPluginServerInitCallback() {}
+void MatterMediaInputPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gMediaInputAttrAccess);
+}

@@ -35,7 +35,7 @@ public:
     void Init(void);
     void Deinit(void);
 
-    CHIP_ERROR IsActivated(bool * isWifiActivated);
+    CHIP_ERROR IsActivated(bool * isWiFiActivated);
     CHIP_ERROR Activate(void);
     CHIP_ERROR Deactivate(void);
     CHIP_ERROR Connect(const char * ssid, const char * key);

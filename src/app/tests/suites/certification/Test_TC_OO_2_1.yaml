@@ -30,7 +30,6 @@ tests:
           value: 0
 
     - label: "write the default value of mandatory attribute: OnOff"
-      disabled: true
       command: "writeAttribute"
       attribute: "OnOff"
       arguments:
@@ -69,7 +68,6 @@ tests:
           value: 0
 
     - label: "write the default value to LT attribute: GlobalSceneControl"
-      disabled: true
       command: "writeAttribute"
       attribute: "GlobalSceneControl"
       arguments:
@@ -96,7 +94,6 @@ tests:
           value: 0
 
     - label: "reads back LT attribute: GlobalSceneControl"
-      disabled: true
       command: "readAttribute"
       attribute: "GlobalSceneControl"
       response:

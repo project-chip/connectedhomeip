@@ -5,6 +5,7 @@
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/CHIPPlatformMemory.h>
+#include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -42,7 +43,7 @@ namespace Platform {
  * CHIP log output function.
  */
 
-void LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     char formattedMsg[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
     size_t prefixLen;

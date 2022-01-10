@@ -30,6 +30,7 @@ class Esp32Board(Enum):
 
 class Esp32App(Enum):
     ALL_CLUSTERS = auto()
+    LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
     BRIDGE = auto()
@@ -40,6 +41,8 @@ class Esp32App(Enum):
     def ExamplePath(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'examples/all-clusters-app'
+        elif self == Esp32App.LIGHT:
+            return 'examples/lighting-app'
         elif self == Esp32App.LOCK:
             return 'examples/lock-app'
         elif self == Esp32App.SHELL:
@@ -57,6 +60,8 @@ class Esp32App(Enum):
     def AppNamePrefix(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'chip-all-clusters-app'
+        elif self == Esp32App.LIGHT:
+            return 'chip-lighting-app'
         elif self == Esp32App.LOCK:
             return 'chip-lock-app'
         elif self == Esp32App.SHELL:

@@ -17,15 +17,16 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/clusters/channel-server/channel-server.h>
 
-#include <lib/core/CHIPError.h>
-#include <string>
-#include <vector>
-
-class ChannelManager
+class ChannelManager : public chip::app::Clusters::Channel::Delegate
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR proxyGetChannelList(chip::EndpointId mEndpointId, chip::app::AttributeValueEncoder & aEncoder);
+    std::list<chip::app::Clusters::Channel::Structs::ChannelInfo::Type> HandleGetChannelList() override;
+    chip::app::Clusters::Channel::Structs::LineupInfo::Type HandleGetLineup() override;
+    chip::app::Clusters::Channel::Structs::ChannelInfo::Type HandleGetCurrentChannel() override;
+
+    chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type HandleChangeChannel(const chip::CharSpan & match) override;
+    bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) override;
+    bool HandleSkipChannel(const uint16_t & count) override;
 };

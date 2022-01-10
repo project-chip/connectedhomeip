@@ -237,20 +237,21 @@ CHIP_ERROR TargetNavigator::GetTargetInfoList(chip::app::AttributeValueEncoder &
     });
 }
 
-TargetNavigatorResponse TargetNavigator::NavigateTarget(uint8_t target, std::string data)
+app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type TargetNavigator::NavigateTarget(uint8_t target,
+                                                                                                       std::string data)
 {
     ChipLogProgress(DeviceLayer, "TargetNavigator: NavigateTarget target=%d data=\"%s\"", target, data.c_str());
 
-    TargetNavigatorResponse response;
-    const char * testData = "data response";
-    response.data         = (uint8_t *) testData;
+    app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type response;
+    response.data = chip::CharSpan("data response", strlen("data response"));
+
     if (target >= mTargets.size())
     {
-        response.status = to_underlying(app::Clusters::TargetNavigator::StatusEnum::kAppNotAvailable);
+        response.status = app::Clusters::TargetNavigator::StatusEnum::kAppNotAvailable;
     }
     else
     {
-        response.status = to_underlying(app::Clusters::TargetNavigator::StatusEnum::kSuccess);
+        response.status = app::Clusters::TargetNavigator::StatusEnum::kSuccess;
         mCurrentTarget  = target;
     }
     return response;

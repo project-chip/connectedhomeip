@@ -17,66 +17,50 @@
  */
 
 #include "ApplicationLauncherManager.h"
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/clusters/application-launcher-server/application-launcher-server.h>
-#include <app/util/af.h>
-#include <app/util/basic-types.h>
-#include <utility>
 
 using namespace std;
+using namespace chip::app::Clusters::ApplicationLauncher;
 
-CHIP_ERROR ApplicationLauncherManager::Init()
+Structs::ApplicationEP::Type ApplicationLauncherManager::HandleGetCurrentApp()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    SuccessOrExit(err);
-exit:
-    return err;
+    Structs::ApplicationEP::Type currentApp;
+    currentApp.application.catalogVendorId = 123;
+    currentApp.application.applicationId   = chip::CharSpan("applicationId", strlen("applicationId"));
+    currentApp.endpoint                    = chip::CharSpan("endpointId", strlen("endpointId"));
+    return currentApp;
 }
 
-CHIP_ERROR ApplicationLauncherManager::proxyGetApplicationList(chip::app::AttributeValueEncoder & aEncoder)
+std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList()
 {
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        ReturnErrorOnFailure(encoder.Encode(123u));
-        ReturnErrorOnFailure(encoder.Encode(456u));
-        return CHIP_NO_ERROR;
-    });
+    return { 123, 456 };
 }
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(chip::EndpointId endpoint, Application application,
-                                                                std::string data)
+Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(
+    const chip::CharSpan & data, const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
 {
-    // TODO: Insert your code
-    ApplicationLauncherResponse response;
-    const char * testData = "data";
-    response.data         = (uint8_t *) testData;
-    response.status       = chip::to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
-    // TODO: Update once storing a structure attribute is supported
-    // emberAfWriteServerAttribute(endpoint, ZCL_APPLICATION_LAUNCH_CLUSTER_ID, ZCL_APPLICATION_LAUNCHER_CURRENT_APP_APPLICATION_ID,
-    //                             (uint8_t *) &application, ZCL_STRUCT_ATTRIBUTE_TYPE);
-
+    // TODO: Insert code here
+    Commands::LauncherResponse::Type response;
+    response.data   = chip::CharSpan("data", strlen("data"));
+    response.status = StatusEnum::kSuccess;
     return response;
 }
 
-ApplicationLauncherResponse applicationLauncherClusterStopApp(chip::EndpointId endpoint, Application application, std::string data)
+Commands::LauncherResponse::Type
+ApplicationLauncherManager::HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncherManager::applicationLauncherClusterStopApp");
-
-    ApplicationLauncherResponse response;
-    const char * testData = "data";
-    response.data         = (uint8_t *) testData;
-    response.status       = chip::to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
+    // TODO: Insert code here
+    Commands::LauncherResponse::Type response;
+    response.data   = chip::CharSpan("data", strlen("data"));
+    response.status = StatusEnum::kSuccess;
     return response;
 }
 
-ApplicationLauncherResponse applicationLauncherClusterHideApp(chip::EndpointId endpoint, Application application, std::string data)
+Commands::LauncherResponse::Type
+ApplicationLauncherManager::HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
 {
-    ChipLogProgress(Zcl, "ApplicationLauncherManager::applicationLauncherClusterHideApp");
-
-    ApplicationLauncherResponse response;
-    const char * testData = "data";
-    response.data         = (uint8_t *) testData;
-    response.status       = chip::to_underlying(chip::app::Clusters::ApplicationLauncher::StatusEnum::kSuccess);
+    // TODO: Insert code here
+    Commands::LauncherResponse::Type response;
+    response.data   = chip::CharSpan("data", strlen("data"));
+    response.status = StatusEnum::kSuccess;
     return response;
 }

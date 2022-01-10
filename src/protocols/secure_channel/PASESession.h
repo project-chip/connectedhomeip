@@ -90,8 +90,8 @@ public:
 
     virtual ~PASESession();
 
-    // TODO: The SetPeerNodeId method should not be exposed; we should not need
-    // to associate a node ID with a PASE session.
+    // TODO: The SetPeerNodeId method should not be exposed; PASE sessions
+    // should not need to be told their peer node ID
     using PairingSession::SetPeerNodeId;
 
     /**
@@ -262,6 +262,12 @@ private:
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
     void CloseExchange();
+
+    /**
+     * Clear our reference to our exchange context pointer so that it can close
+     * itself at some later time.
+     */
+    void DiscardExchange();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 

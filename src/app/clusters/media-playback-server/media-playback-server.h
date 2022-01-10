@@ -14,7 +14,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 /****************************************************************************
  * @file
  * @brief Routines for the Media Playback plugin, the
@@ -24,19 +23,17 @@
 
 #pragma once
 
-#include <stdint.h>
+#include "media-playback-delegate.h"
+#include <app-common/zap-generated/cluster-objects.h>
 
-enum MediaPlaybackRequest : uint8_t
-{
-    MEDIA_PLAYBACK_REQUEST_PLAY          = 0,
-    MEDIA_PLAYBACK_REQUEST_PAUSE         = 1,
-    MEDIA_PLAYBACK_REQUEST_STOP          = 2,
-    MEDIA_PLAYBACK_REQUEST_START_OVER    = 3,
-    MEDIA_PLAYBACK_REQUEST_PREVIOUS      = 4,
-    MEDIA_PLAYBACK_REQUEST_NEXT          = 5,
-    MEDIA_PLAYBACK_REQUEST_REWIND        = 6,
-    MEDIA_PLAYBACK_REQUEST_FAST_FORWARD  = 7,
-    MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD  = 8,
-    MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD = 9,
-    MEDIA_PLAYBACK_REQUEST_SEEK          = 10,
-};
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace MediaPlayback {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate);
+
+} // namespace MediaPlayback
+} // namespace Clusters
+} // namespace app
+} // namespace chip

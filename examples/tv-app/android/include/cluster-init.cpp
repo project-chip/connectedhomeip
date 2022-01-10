@@ -32,24 +32,11 @@
 using namespace chip;
 
 namespace {
-template <typename Manager, typename AttrTypeInfo, CHIP_ERROR (Manager::*Getter)(app::AttributeValueEncoder &)>
-class TvAttrAccess : public app::AttributeAccessInterface
-{
-public:
-    TvAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), AttrTypeInfo::GetClusterId()) {}
-
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
-    {
-        if (aPath.mAttributeId == AttrTypeInfo::GetAttributeId())
-        {
-            return (Manager().*Getter)(aEncoder);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-} // anonymous namespace
+static ApplicationBasicManager applicationBasicManager;
+static ApplicationLauncherManager applicationLauncherManager;
+static AudioOutputManager audioOutputManager;
+static TargetNavigatorManager targetNavigatorManager;
+} // namespace
 
 /** @brief Application Basic Cluster Init
  *
@@ -62,27 +49,9 @@ public:
  */
 void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
 {
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    ApplicationBasicManager & aManager = ApplicationBasicManager::GetInstance();
-    err                                = aManager.Init();
-    if (CHIP_NO_ERROR == err)
-    {
-        chip::app::Clusters::ApplicationBasic::Application application = aManager.getApplicationForEndpoint(endpoint);
-        aManager.store(endpoint, &application);
-    }
-    else
-    {
-        ChipLogError(Zcl, "Failed to store application for endpoint: %d. Error:%s", endpoint, chip::ErrorStr(err));
-    }
+    ChipLogProgress(Zcl, "TV Linux App: ApplicationBasic::SetDefaultDelegate");
+    chip::app::Clusters::ApplicationBasic::SetDefaultDelegate(endpoint, &applicationBasicManager);
 }
-
-namespace {
-
-TvAttrAccess<ApplicationLauncherManager, app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherList::TypeInfo,
-             &ApplicationLauncherManager::proxyGetApplicationList>
-    gApplicationLauncherAttrAccess;
-
-} // anonymous namespace
 
 /** @brief Application Launcher  Cluster Init
  *
@@ -95,21 +64,9 @@ TvAttrAccess<ApplicationLauncherManager, app::Clusters::ApplicationLauncher::Att
  */
 void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
 {
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gApplicationLauncherAttrAccess);
-        attrAccessRegistered = true;
-    }
+    ChipLogProgress(Zcl, "TV Linux App: ApplicationLauncher::SetDefaultDelegate");
+    chip::app::Clusters::ApplicationLauncher::SetDefaultDelegate(endpoint, &applicationLauncherManager);
 }
-
-namespace {
-
-TvAttrAccess<AudioOutputManager, app::Clusters::AudioOutput::Attributes::AudioOutputList::TypeInfo,
-             &AudioOutputManager::proxyGetListOfAudioOutputInfo>
-    gAudioOutputAttrAccess;
-
-} // anonymous namespace
 
 /** @brief Audio Output Cluster Init
  *
@@ -122,21 +79,9 @@ TvAttrAccess<AudioOutputManager, app::Clusters::AudioOutput::Attributes::AudioOu
  */
 void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
 {
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gAudioOutputAttrAccess);
-        attrAccessRegistered = true;
-    }
+    ChipLogProgress(Zcl, "TV Linux App: AudioOutput::SetDefaultDelegate");
+    chip::app::Clusters::AudioOutput::SetDefaultDelegate(endpoint, &audioOutputManager);
 }
-
-namespace {
-
-TvAttrAccess<TargetNavigatorManager, app::Clusters::TargetNavigator::Attributes::TargetNavigatorList::TypeInfo,
-             &TargetNavigatorManager::proxyGetTargetInfoList>
-    gTargetNavigatorAttrAccess;
-
-} // anonymous namespace
 
 /** @brief Target Navigator Cluster Init
  *
@@ -149,10 +94,6 @@ TvAttrAccess<TargetNavigatorManager, app::Clusters::TargetNavigator::Attributes:
  */
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
 {
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gTargetNavigatorAttrAccess);
-        attrAccessRegistered = true;
-    }
+    ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
+    chip::app::Clusters::TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
 }

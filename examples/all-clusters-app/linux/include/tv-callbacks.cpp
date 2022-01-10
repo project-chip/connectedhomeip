@@ -22,10 +22,9 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <list>
-#include <string>
+#include "tv-callbacks.h"
 
-bool lowPowerClusterSleep()
+bool LowPowerManager::HandleSleep()
 {
     return true;
 }

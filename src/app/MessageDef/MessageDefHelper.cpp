@@ -41,7 +41,7 @@ char gLineBuffer[256];
 size_t gCurLineBufferSize = 0;
 } // namespace
 
-void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
+void ENFORCE_FORMAT(2, 3) PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
 {
     va_list args;
     size_t ret;

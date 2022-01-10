@@ -192,6 +192,7 @@ function getTests()
     'TestDelayCommands',
     'TestLogCommands',
     'TestSaveAs',
+    'TestConfigVariables',
     'TestDescriptorCluster',
     'TestBasicInformation',
     'TestIdentifyCluster',
@@ -203,9 +204,9 @@ function getTests()
   ];
 
   const SoftwareDiagnostics = [
-    'Test_TC_DIAGSW_1_1',
-    'Test_TC_DIAGSW_2_1',
-    'Test_TC_DIAGSW_3_2',
+    'Test_TC_SWDIAG_1_1',
+    'Test_TC_SWDIAG_2_1',
+    'Test_TC_SWDIAG_3_1',
   ];
 
   const Subscriptions = [

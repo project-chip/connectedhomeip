@@ -69,7 +69,7 @@ static FabricIndex GetFabricIndex(app::CommandHandler * commandObj)
 {
     VerifyOrReturnError(nullptr != commandObj, 0);
     VerifyOrReturnError(nullptr != commandObj->GetExchangeContext(), 0);
-    return commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
+    return commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
 }
 
 static bool readServerAttribute(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, const char * name,

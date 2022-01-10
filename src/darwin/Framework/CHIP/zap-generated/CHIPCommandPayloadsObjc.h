@@ -672,8 +672,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPNetworkCommissioningClusterScanNetworksResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull networkingStatus;
 @property (strong, nonatomic) NSString * _Nonnull debugText;
-@property (strong, nonatomic) NSArray * _Nonnull wiFiScanResults;
-@property (strong, nonatomic) NSArray * _Nonnull threadScanResults;
+@property (strong, nonatomic) NSArray * _Nullable wiFiScanResults;
+@property (strong, nonatomic) NSArray * _Nullable threadScanResults;
 - (instancetype)init;
 @end
 

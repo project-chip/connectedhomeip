@@ -424,7 +424,7 @@ static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
     return frequency;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
+CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWiFiStatsCounters(void)
 {
     return CHIP_NO_ERROR;
 }

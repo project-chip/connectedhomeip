@@ -111,7 +111,7 @@ CHIP_ERROR WriteAttribute(const SessionHandle & sessionHandle, chip::EndpointId 
     // called.
     callback.release();
 
-    if (sessionHandle.IsGroupSession())
+    if (sessionHandle->IsGroupSession())
     {
         ReturnErrorOnFailure(
             handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(clusterId, attributeId), requestData));

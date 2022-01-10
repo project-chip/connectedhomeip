@@ -81,4 +81,10 @@ limitations under the License.
     <item name="NoMatches" value="0x01"/>
   </enum>
 
+  <bitmap name="ChannelFeature" type="BITMAP32">
+    <cluster code="0x050c"/>
+    <field name="ChannelList" mask="0x1"/>
+    <field name="LineupInfo" mask="0x2"/>
+  </bitmap>
+
 </configurator>

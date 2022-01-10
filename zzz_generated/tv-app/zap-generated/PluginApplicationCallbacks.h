@@ -28,6 +28,7 @@
     MatterApplicationLauncherPluginServerInitCallback();                                                                           \
     MatterAudioOutputPluginServerInitCallback();                                                                                   \
     MatterBasicPluginServerInitCallback();                                                                                         \
+    MatterBindingPluginClientInitCallback();                                                                                       \
     MatterBindingPluginServerInitCallback();                                                                                       \
     MatterChannelPluginServerInitCallback();                                                                                       \
     MatterContentLauncherPluginServerInitCallback();                                                                               \

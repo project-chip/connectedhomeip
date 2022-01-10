@@ -182,7 +182,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         ReturnErrorOnFailure(writer.Finalize(&msgBuf));
     }
 
-    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHandle, this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get(), this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     mpExchangeCtx->SetResponseTimeout(aReadPrepareParams.mTimeout);
@@ -190,8 +190,8 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::ReadRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
-    mPeerNodeId  = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
-    mFabricIndex = aReadPrepareParams.mSessionHandle.GetFabricIndex();
+    mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
+    mFabricIndex = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetFabricIndex();
 
     MoveToState(ClientState::AwaitingInitialReport);
 
@@ -576,8 +576,10 @@ CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
     CHIP_ERROR err = CHIP_NO_ERROR;
     CancelLivenessCheckTimer();
     VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mpExchangeCtx->HasSessionHandle(), err = CHIP_ERROR_INCORRECT_STATE);
 
-    System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxIntervalCeilingSeconds) + mpExchangeCtx->GetAckTimeout();
+    System::Clock::Timeout timeout =
+        System::Clock::Seconds16(mMaxIntervalCeilingSeconds) + mpExchangeCtx->GetSessionHandle()->GetAckTimeout();
     // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
     ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %lu milliseconds", static_cast<long unsigned>(timeout.count()));
     err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
@@ -699,21 +701,15 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     ReturnErrorOnFailure(writer.Finalize(&msgBuf));
 
-    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHandle, this);
+    mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHolder.Get(), this);
     VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
-    if (mpExchangeCtx->IsBLETransport())
-    {
-        ChipLogError(DataManagement, "IM Subscribe cannot work with BLE");
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
 
     ReturnErrorOnFailure(mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse)));
 
-    mPeerNodeId  = aReadPrepareParams.mSessionHandle.GetPeerNodeId();
-    mFabricIndex = aReadPrepareParams.mSessionHandle.GetFabricIndex();
+    mPeerNodeId  = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetPeerNodeId();
+    mFabricIndex = aReadPrepareParams.mSessionHolder->AsSecureSession()->GetFabricIndex();
 
     MoveToState(ClientState::AwaitingInitialReport);
 

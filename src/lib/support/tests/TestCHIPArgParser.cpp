@@ -26,8 +26,10 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
+#include <lib/support/EnforceFormat.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <lib/support/logging/Constants.h>
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 
@@ -730,7 +732,7 @@ static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
     return true;
 }
 
-static void HandleArgError(const char * msg, ...)
+static void ENFORCE_FORMAT(1, 2) HandleArgError(const char * msg, ...)
 {
     size_t msgLen;
     int status;

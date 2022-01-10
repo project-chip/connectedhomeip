@@ -125,4 +125,8 @@ config APP_LINK_WITH_CHIP
 	  Add Connected Home over IP header files to the 'app' include path
 	  and link the 'app' with Connected Home over IP libraries.
 
+module = MATTER
+module-str = Matter
+source "${ZEPHYR_BASE}/subsys/logging/Kconfig.template.log_config"
+
 endif

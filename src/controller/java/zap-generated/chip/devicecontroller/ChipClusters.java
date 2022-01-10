@@ -929,6 +929,14 @@ public class ChipClusters {
 
     private native void mfgSpecificPing(long chipClusterPtr, DefaultClusterCallback Callback);
 
+    public interface VendorIDAttributeCallback {
+      void onSuccess(Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface AttributeListAttributeCallback {
       void onSuccess(List<Object> valueList);
 
@@ -955,12 +963,12 @@ public class ChipClusters {
       subscribeVendorNameAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readVendorIDAttribute(IntegerAttributeCallback callback) {
+    public void readVendorIDAttribute(VendorIDAttributeCallback callback) {
       readVendorIDAttribute(chipClusterPtr, callback);
     }
 
     public void subscribeVendorIDAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        VendorIDAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeVendorIDAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -1144,10 +1152,10 @@ public class ChipClusters {
         int maxInterval);
 
     private native void readVendorIDAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, VendorIDAttributeCallback callback);
 
     private native void subscribeVendorIDAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr, VendorIDAttributeCallback callback, int minInterval, int maxInterval);
 
     private native void readProductNameAttribute(
         long chipClusterPtr, CharStringAttributeCallback callback);

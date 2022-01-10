@@ -18,56 +18,10 @@
 
 #include "WakeOnLanManager.h"
 
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/util/af.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/basic-types.h>
-#include <lib/support/ZclString.h>
-
-#include <inipp/inipp.h>
-
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
 using namespace chip;
-using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::WakeOnLan;
 
-CHIP_ERROR WakeOnLanManager::Init()
+chip::CharSpan WakeOnLanManager::HandleGetMacAddress()
 {
-    CHIP_ERROR err                                       = CHIP_NO_ERROR;
-    EndpointConfigurationStorage & endpointConfiguration = EndpointConfigurationStorage::GetInstance();
-    err                                                  = endpointConfiguration.Init();
-    SuccessOrExit(err);
-    es = &endpointConfiguration;
-exit:
-    return err;
-}
-
-void WakeOnLanManager::store(chip::EndpointId endpoint, char macAddress[32])
-{
-    uint8_t bufferMemory[32];
-    MutableByteSpan zclString(bufferMemory);
-    MakeZclCharString(zclString, macAddress);
-    EmberAfStatus macAddressStatus = emberAfWriteServerAttribute(
-        endpoint, WakeOnLan::Id, WakeOnLan::Attributes::WakeOnLanMacAddress::Id, zclString.data(), ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
-    if (macAddressStatus != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        ChipLogError(Zcl, "Failed to store mac address attribute.");
-    }
-}
-
-void WakeOnLanManager::setMacAddress(chip::EndpointId endpoint, char * macAddress)
-{
-    char address[18];
-    uint16_t size = static_cast<uint16_t>(sizeof(address));
-
-    std::string section = "endpoint" + std::to_string(endpoint);
-    CHIP_ERROR err      = es->get(section, "macAddress", macAddress, size);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Zcl, "Failed to get mac address. Error:%s", chip::ErrorStr(err));
-    }
+    return chip::CharSpan("00:00:00:00:00", strlen("00:00:00:00:00"));
 }

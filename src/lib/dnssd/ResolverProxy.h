@@ -68,7 +68,7 @@ public:
         ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(udpEndPoint));
         VerifyOrReturnError(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
         mDelegate = chip::Platform::New<ResolverDelegateProxy>();
-        return CHIP_NO_ERROR;
+        return mDelegate != nullptr ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
     }
 
     void SetResolverDelegate(ResolverDelegate * delegate) override
