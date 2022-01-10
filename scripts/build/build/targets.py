@@ -266,9 +266,12 @@ def NrfTargets():
     yield target.Extend('native-posix-64-tests', board=NrfBoard.NATIVE_POSIX_64, app=NrfApp.UNIT_TESTS)
 
     targets = [
-        target.Extend('nrf5340', board=NrfBoard.NRF5340),
-        target.Extend('nrf52840', board=NrfBoard.NRF52840),
+        target.Extend('nrf5340dk', board=NrfBoard.NRF5340DK),
+        target.Extend('nrf52840dk', board=NrfBoard.NRF52840DK),
     ]
+
+    # Enable nrf52840dongle for lighting app only
+    yield target.Extend('nrf52840dongle-light', board=NrfBoard.NRF52840DONGLE, app=NrfApp.LIGHT)
 
     for target in targets:
         yield target.Extend('lock', app=NrfApp.LOCK)
@@ -279,7 +282,7 @@ def NrfTargets():
 
         rpc = target.Extend('light-rpc', app=NrfApp.LIGHT, enable_rpcs=True)
 
-        if '-nrf5340-' in rpc.name:
+        if '-nrf5340dk-' in rpc.name:
             rpc = rpc.GlobBlacklist(
                 'Compile failure due to pw_build args not forwarded to proto compiler. https://pigweed-review.googlesource.com/c/pigweed/pigweed/+/66760')
 
