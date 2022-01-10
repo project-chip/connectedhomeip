@@ -60,5 +60,5 @@ static_library("Ameba") {
       "AmebaOTAImageProcessor.cpp",
       "AmebaOTAImageProcessor.h",
     ]
-  } 
+  }
 }
