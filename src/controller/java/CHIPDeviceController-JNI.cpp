@@ -187,7 +187,7 @@ JNI_METHOD(void, commissionDevice)
     ChipLogProgress(Controller, "commissionDevice() called");
 
     CommissioningParameters commissioningParams = CommissioningParameters();
-    err = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
+    err                                         = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
     VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (csrNonce != nullptr)
@@ -295,7 +295,8 @@ JNI_METHOD(void, establishPaseConnection)(JNIEnv * env, jobject self, jlong hand
     }
 }
 
-JNI_METHOD(void, establishPaseConnectionByAddress)(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jlong pinCode)
+JNI_METHOD(void, establishPaseConnectionByAddress)
+(JNIEnv * env, jobject self, jlong handle, jlong deviceId, jstring address, jint port, jlong pinCode)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -307,9 +308,8 @@ JNI_METHOD(void, establishPaseConnectionByAddress)(JNIEnv * env, jobject self, j
                    ChipLogError(Controller, "Failed to parse IP address."),
                    JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT));
 
-    RendezvousParameters rendezvousParams = RendezvousParameters()
-                                                .SetSetupPINCode(pinCode)
-                                                .SetPeerAddress(Transport::PeerAddress::UDP(addr, port));
+    RendezvousParameters rendezvousParams =
+        RendezvousParameters().SetSetupPINCode(pinCode).SetPeerAddress(Transport::PeerAddress::UDP(addr, port));
 
     err = wrapper->Controller()->EstablishPASEConnection(deviceId, rendezvousParams);
 
