@@ -29,19 +29,19 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 
-#include "platform/Ameba/AmebaOTAImageProcessor.h"
-#include "platform/GenericOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
+#include "platform/Ameba/AmebaOTAImageProcessor.h"
+#include "platform/GenericOTARequestorDriver.h"
 
 void * __dso_handle = 0;
 
+using chip::AmebaOTAImageProcessor;
 using chip::BDXDownloader;
 using chip::ByteSpan;
 using chip::EndpointId;
 using chip::FabricIndex;
 using chip::GetRequestorInstance;
-using chip::AmebaOTAImageProcessor;
 using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
@@ -84,7 +84,7 @@ void ApplyUpdateTimerHandler(Layer * systemLayer, void * appState)
 extern "C" void amebaQueryImageCmdHandler(uint32_t nodeId, uint32_t fabricId)
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
-    // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd 
+    // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd
     gRequestorCore.TestModeSetProviderParameters(nodeId, fabricId, chip::kRootEndpointId);
 
     /* Start one shot timer with 1 second timeout to send QueryImage Request command */
@@ -107,7 +107,7 @@ extern "C" void ChipTest(void)
     initPref();
 
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
-    err = deviceMgr.Init(&EchoCallbacks);
+    err                           = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "DeviceManagerInit() - ERROR!\r\n");
