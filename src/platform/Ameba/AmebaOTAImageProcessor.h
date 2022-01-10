@@ -19,15 +19,15 @@
 #pragma once
 
 #include <app/clusters/ota-requestor/OTADownloader.h>
+#include <cstring>
+#include <device_lock.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
-#include <device_lock.h>
-#include <cstring>
 
 #if defined(CONFIG_PLATFORM_8710C)
-#include "sys_api.h"
 #include "ota_8710c.h"
 #include "sys.h"
+#include "sys_api.h"
 #elif defined(CONFIG_PLATFORM_8721D)
 #include "rtl8721d_ota.h"
 #endif
@@ -67,20 +67,20 @@ private:
     OTADownloader * mDownloader;
 
 #if defined(CONFIG_PLATFORM_8721D)
-    bool readHeader = false;
+    bool readHeader           = false;
     uint32_t ota_target_index = OTA_INDEX_2;
-    update_ota_target_hdr *pOtaTgtHdr;
+    update_ota_target_hdr * pOtaTgtHdr;
     uint32_t flash_addr;
     uint32_t size = 0;
     uint32_t RemainBytes;
-    uint8_t *signature;
+    uint8_t * signature;
 #elif defined(CONFIG_PLATFORM_8710C)
     bool readHeader = false;
     uint32_t ota_target_index;
     uint32_t flash_addr;
     uint32_t NewFWBlkSize = 0;
-    uint32_t block_len = 0;
-    uint32_t size = 0;
+    uint32_t block_len    = 0;
+    uint32_t size         = 0;
     uint8_t signature[32];
 #endif
 };
