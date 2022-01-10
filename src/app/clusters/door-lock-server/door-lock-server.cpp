@@ -26,7 +26,6 @@
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/util/af.h>
-#include <app/util/time-util.h>
 #include <cinttypes>
 
 #include <app/CommandHandler.h>
@@ -198,7 +197,7 @@ void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandOb
     }
 
     auto fabricIdx = getFabricIndex(commandObj);
-    if (kUndefinedFabricIndex == fabricIdx)
+    if (chip::kUndefinedFabricIndex == fabricIdx)
     {
         ChipLogError(Zcl, "[SetUser] Unable to get the fabric IDX [endpointId=%d,userIndex=%d]", commandPath.mEndpointId,
                      userIndex);
@@ -251,8 +250,9 @@ void DoorLockServer::SetUserCommandHandler(chip::app::CommandHandler * commandOb
     emberAfSendImmediateDefaultResponse(status);
 }
 
-void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                           const Commands::GetUser::DecodableType & commandData)
+void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandObj,
+                                           const chip::app::ConcreteCommandPath & commandPath,
+                                           const chip::app::Clusters::DoorLock::Commands::GetUser::DecodableType & commandData)
 {
     auto & userIndex = commandData.userIndex;
 
@@ -278,11 +278,12 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
     EmberAfPluginDoorLockUserInfo user;
     VerifyOrExit(emberAfPluginDoorLockGetUser(commandPath.mEndpointId, userIndex, user), err = CHIP_ERROR_INTERNAL);
     {
-        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), DoorLock::Id, Commands::GetUserResponse::Id };
-        TLV::TLVWriter * writer;
+        chip::app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ::Id, Commands::GetUserResponse::Id };
+        chip::TLV::TLVWriter * writer;
         SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(Commands::GetUserResponse::Fields::kUserIndex)), userIndex));
+        SuccessOrExit(
+            err = writer->Put(chip::TLV::ContextTag(to_underlying(Commands::GetUserResponse::Fields::kUserIndex)), userIndex));
 
         using ResponseFields = Commands::GetUserResponse::Fields;
 
@@ -307,7 +308,8 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
                                                            TLV::kTLVType_Array, credentialsContainer));
                 for (size_t i = 0; i < user.credentials.size(); ++i)
                 {
-                    DoorLock::Structs::DlCredential::Type credential;
+                    using DlCredentialStruct = chip::app::Clusters::DoorLock::Structs::DlCredential::Type;
+                    DlCredentialStruct credential;
                     credential.credentialIndex = user.credentials.data()[i].CredentialIndex;
                     credential.credentialType  = static_cast<DlCredentialType>(user.credentials.data()[i].CredentialType);
                     SuccessOrExit(err = credential.Encode(*writer, TLV::AnonymousTag()));
@@ -342,8 +344,9 @@ exit:
     }
 }
 
-void DoorLockServer::ClearUserCommandHandler(chip::app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                             const Commands::ClearUser::DecodableType & commandData)
+void DoorLockServer::ClearUserCommandHandler(chip::app::CommandHandler * commandObj,
+                                             const chip::app::ConcreteCommandPath & commandPath,
+                                             const chip::app::Clusters::DoorLock::Commands::ClearUser::DecodableType & commandData)
 {
     auto & userIndex = commandData.userIndex;
     emberAfDoorLockClusterPrintln("[ClearUser] Incoming command [endpointId=%d,userIndex=%d]", commandPath.mEndpointId, userIndex);
@@ -393,9 +396,9 @@ void DoorLockServer::ClearUserCommandHandler(chip::app::CommandHandler * command
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
-void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * commandObj,
-                                                 const app::ConcreteCommandPath & commandPath,
-                                                 const Commands::SetCredential::DecodableType & commandData)
+void DoorLockServer::SetCredentialCommandHandler(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::SetCredential::DecodableType & commandData)
 {
     emberAfDoorLockClusterPrintln("[SetCredential] Incoming command [endpointId=%d]", commandPath.mEndpointId);
 
@@ -616,9 +619,9 @@ void DoorLockServer::SetCredentialCommandHandler(chip::app::CommandHandler * com
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
-void DoorLockServer::GetCredentialStatusCommandHandler(chip::app::CommandHandler * commandObj,
-                                                       const app::ConcreteCommandPath & commandPath,
-                                                       const Commands::GetCredentialStatus::DecodableType & commandData)
+void DoorLockServer::GetCredentialStatusCommandHandler(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::DecodableType & commandData)
 {
     emberAfDoorLockClusterPrintln("[GetCredentialStatus] Incoming command [endpointId=%d]", commandPath.mEndpointId);
 
@@ -674,7 +677,7 @@ void DoorLockServer::GetCredentialStatusCommandHandler(chip::app::CommandHandler
 
     CHIP_ERROR err                = CHIP_NO_ERROR;
     using ResponseFields          = Commands::GetCredentialStatusResponse::Fields;
-    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), DoorLock::Id, Commands::GetCredentialStatusResponse::Id };
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ::Id, Commands::GetCredentialStatusResponse::Id };
     TLV::TLVWriter * writer       = nullptr;
     SuccessOrExit(err = commandObj->PrepareCommand(path));
     VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -706,9 +709,9 @@ exit:
     }
 }
 
-void DoorLockServer::ClearCredentialCommandHandler(chip::app::CommandHandler * commandObj,
-                                                   const app::ConcreteCommandPath & commandPath,
-                                                   const Commands::ClearCredential::DecodableType & commandData)
+void DoorLockServer::ClearCredentialCommandHandler(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData)
 {
     emberAfDoorLockClusterPrintln("[ClearCredential] Incoming command [endpointId=%d]", commandPath.mEndpointId);
 
@@ -716,7 +719,7 @@ void DoorLockServer::ClearCredentialCommandHandler(chip::app::CommandHandler * c
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 }
 
-bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLock::DoorLockFeature feature)
+bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLockFeature feature)
 {
     uint32_t featureMap = 0;
     if (EMBER_ZCL_STATUS_SUCCESS != Attributes::FeatureMap::Get(endpointId, &featureMap))
@@ -763,13 +766,13 @@ bool DoorLockServer::userIndexValid(chip::EndpointId endpointId, uint16_t userIn
     return true;
 }
 
-bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DoorLock::DlCredentialType type, uint16_t credentialIndex)
+bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DlCredentialType type, uint16_t credentialIndex)
 {
     uint16_t maxCredentials = 0;
     return credentialIndexValid(endpointId, type, credentialIndex, maxCredentials);
 }
 
-bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DoorLock::DlCredentialType type, uint16_t credentialIndex,
+bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DlCredentialType type, uint16_t credentialIndex,
                                           uint16_t & maxNumberOfCredentials)
 {
     if (!getMaxNumberOfCredentials(endpointId, type, maxNumberOfCredentials))
@@ -785,8 +788,7 @@ bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DoorLock:
     return true;
 }
 
-bool DoorLockServer::getCredentialRange(chip::EndpointId endpointId, DoorLock::DlCredentialType type, size_t & minSize,
-                                        size_t & maxSize)
+bool DoorLockServer::getCredentialRange(chip::EndpointId endpointId, DlCredentialType type, size_t & minSize, size_t & maxSize)
 {
     EmberAfStatus statusMin = EMBER_ZCL_STATUS_SUCCESS, statusMax = EMBER_ZCL_STATUS_SUCCESS;
     uint8_t minLen, maxLen;
@@ -818,7 +820,7 @@ bool DoorLockServer::getCredentialRange(chip::EndpointId endpointId, DoorLock::D
     return true;
 }
 
-bool DoorLockServer::getMaxNumberOfCredentials(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType,
+bool DoorLockServer::getMaxNumberOfCredentials(chip::EndpointId endpointId, DlCredentialType credentialType,
                                                uint16_t & maxNumberOfCredentials)
 {
     maxNumberOfCredentials = 0;
@@ -883,8 +885,8 @@ bool DoorLockServer::findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_
     return false;
 }
 
-bool DoorLockServer::findUnoccupiedCredentialSlot(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType,
-                                                  uint16_t startIndex, uint16_t & credentialIndex)
+bool DoorLockServer::findUnoccupiedCredentialSlot(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t startIndex,
+                                                  uint16_t & credentialIndex)
 {
     uint16_t maxNumberOfCredentials = 0;
     if (!getMaxNumberOfCredentials(endpointId, credentialType, maxNumberOfCredentials))
@@ -912,7 +914,7 @@ bool DoorLockServer::findUnoccupiedCredentialSlot(chip::EndpointId endpointId, D
     return false;
 }
 
-bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType,
+bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, DlCredentialType credentialType,
                                                uint16_t credentialIndex, uint16_t & userIndex)
 {
     uint16_t maxNumberOfUsers = 0;
@@ -950,12 +952,11 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, Door
     return false;
 }
 
-EmberAfStatus DoorLockServer::createUser(EndpointId endpointId, FabricIndex creatorFabricIdx, uint16_t userIndex,
+EmberAfStatus DoorLockServer::createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, uint16_t userIndex,
                                          const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                                         const Nullable<DoorLock::DlUserStatus> & userStatus,
-                                         const Nullable<DoorLock::DlUserType> & userType,
-                                         const Nullable<DoorLock::DlCredentialRule> & credentialRule,
-                                         const Nullable<DlCredential> & credentials)
+                                         const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
+                                         const Nullable<DlCredentialRule> & credentialRule,
+                                         const Nullable<DlCredential> & credential)
 {
     EmberAfPluginDoorLockUserInfo user;
     if (!emberAfPluginDoorLockGetUser(endpointId, userIndex, user))
@@ -980,9 +981,9 @@ EmberAfStatus DoorLockServer::createUser(EndpointId endpointId, FabricIndex crea
     auto newCredentialRule              = credentialRule.IsNull() ? DlCredentialRule::kSingle : credentialRule.Value();
     const DlCredential * newCredentials = nullptr;
     size_t newTotalCredentials          = 0;
-    if (!credentials.IsNull())
+    if (!credential.IsNull())
     {
-        newCredentials      = &credentials.Value();
+        newCredentials      = &credential.Value();
         newTotalCredentials = 1;
     }
 
@@ -1008,11 +1009,10 @@ EmberAfStatus DoorLockServer::createUser(EndpointId endpointId, FabricIndex crea
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus DoorLockServer::modifyUser(EndpointId endpointId, FabricIndex modifierFabricIndex, uint16_t userIndex,
+EmberAfStatus DoorLockServer::modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, uint16_t userIndex,
                                          const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                                         const Nullable<DoorLock::DlUserStatus> & userStatus,
-                                         const Nullable<DoorLock::DlUserType> & userType,
-                                         const Nullable<DoorLock::DlCredentialRule> & credentialRule)
+                                         const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
+                                         const Nullable<DlCredentialRule> & credentialRule)
 {
     // We should get the user by that index first
     EmberAfPluginDoorLockUserInfo user;
@@ -1091,11 +1091,10 @@ EmberAfStatus DoorLockServer::clearUser(chip::EndpointId endpointId, uint16_t us
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-DoorLock::DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId, FabricIndex creatorFabricIdx,
-                                                              const Nullable<DoorLock::DlUserStatus> & userStatus,
-                                                              const Nullable<DoorLock::DlUserType> & userType,
-                                                              const DlCredential & credential,
-                                                              const chip::ByteSpan & credentialData, uint16_t & createdUserIndex)
+DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx,
+                                                    const Nullable<DlUserStatus> & userStatus,
+                                                    const Nullable<DlUserType> & userType, const DlCredential & credential,
+                                                    const chip::ByteSpan & credentialData, uint16_t & createdUserIndex)
 {
     uint16_t availableUserIndex = 0;
     if (!findUnoccupiedUserSlot(endpointId, availableUserIndex))
@@ -1135,10 +1134,9 @@ DoorLock::DlStatus DoorLockServer::createNewCredentialAndUser(chip::EndpointId e
     return DlStatus::kSuccess;
 }
 
-DoorLock::DlStatus DoorLockServer::createNewCredentialAndAddItToUser(chip::EndpointId endpointId,
-                                                                     chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
-                                                                     const DlCredential & credential,
-                                                                     const chip::ByteSpan & credentialData)
+DlStatus DoorLockServer::createNewCredentialAndAddItToUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx,
+                                                           uint16_t userIndex, const DlCredential & credential,
+                                                           const chip::ByteSpan & credentialData)
 {
     if (!userIndexValid(endpointId, userIndex))
     {
@@ -1191,8 +1189,8 @@ DoorLock::DlStatus DoorLockServer::createNewCredentialAndAddItToUser(chip::Endpo
     return DlStatus::kSuccess;
 }
 
-DoorLock::DlStatus DoorLockServer::addCredentialToUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx,
-                                                       uint16_t userIndex, const DlCredential & credential)
+DlStatus DoorLockServer::addCredentialToUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
+                                             const DlCredential & credential)
 {
     // We should get the user by that index first
     EmberAfPluginDoorLockUserInfo user;
@@ -1262,8 +1260,8 @@ DoorLock::DlStatus DoorLockServer::addCredentialToUser(chip::EndpointId endpoint
     return DlStatus::kSuccess;
 }
 
-DoorLock::DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx,
-                                                           uint16_t userIndex, const DlCredential & credential)
+DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx,
+                                                 uint16_t userIndex, const DlCredential & credential)
 {
     // We should get the user by that index first
     EmberAfPluginDoorLockUserInfo user;
@@ -1327,7 +1325,7 @@ CHIP_ERROR DoorLockServer::sendSetCredentialResponse(chip::app::CommandHandler *
 
     using ResponseFields = Commands::SetCredentialResponse::Fields;
 
-    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), DoorLock::Id, Commands::SetCredentialResponse::Id };
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ::Id, Commands::SetCredentialResponse::Id };
     TLV::TLVWriter * writer       = nullptr;
     SuccessOrExit(err = commandObj->PrepareCommand(path));
     VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -1348,7 +1346,7 @@ exit:
     return err;
 }
 
-bool DoorLockServer::credentialTypeSupported(chip::EndpointId endpointId, DoorLock::DlCredentialType type)
+bool DoorLockServer::credentialTypeSupported(chip::EndpointId endpointId, DlCredentialType type)
 {
     switch (type)
     {
@@ -1819,9 +1817,9 @@ struct UserInfo
     DlCredential credentials[DOOR_LOCK_MAX_CREDENTIALS_PER_USER];
     size_t totalCredentials;
     uint32_t userUniqueId;
-    DoorLock::DlUserStatus userStatus;
-    DoorLock::DlUserType userType;
-    DoorLock::DlCredentialRule credentialRule;
+    DlUserStatus userStatus;
+    DlUserType userType;
+    DlCredentialRule credentialRule;
     chip::FabricIndex createdBy;
     chip::FabricIndex lastModifiedBy;
 };
@@ -1849,9 +1847,8 @@ bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userInde
 }
 
 bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
-                                  chip::FabricIndex modifier, const CharSpan & userName, uint32_t uniqueId,
-                                  DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
-                                  DoorLock::DlCredentialRule credentialRule, const DlCredential * credentials,
+                                  chip::FabricIndex modifier, const CharSpan & userName, uint32_t uniqueId, DlUserStatus userStatus,
+                                  DlUserType usertype, DlCredentialRule credentialRule, const DlCredential * credentials,
                                   size_t totalCredentials)
 {
     strncpy(gs_users[userIndex].userName, userName.data(), userName.size());
@@ -1876,15 +1873,15 @@ static constexpr size_t DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE = 20;
 struct CredentialInfo
 {
     DlCredentialStatus status;
-    DoorLock::DlCredentialType credentialType;
+    DlCredentialType credentialType;
     uint8_t credentialData[DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE];
     size_t credentialDataSize;
 };
 
 static CredentialInfo gs_credentials[10];
 
-bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
-                                        DoorLock::DlCredentialType credentialType, EmberAfPluginDoorLockCredentialInfo & credential)
+bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
+                                        EmberAfPluginDoorLockCredentialInfo & credential)
 {
     auto & credentialInStorage = gs_credentials[credentialIndex];
 
@@ -1898,7 +1895,7 @@ bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cr
 }
 
 bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
-                                        DoorLock::DlCredentialType credentialType, const chip::ByteSpan & credentialData)
+                                        DlCredentialType credentialType, const chip::ByteSpan & credentialData)
 {
     auto & credentialInStorage = gs_credentials[credentialIndex];
 

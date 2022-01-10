@@ -37,8 +37,15 @@
 #define DOOR_LOCK_SERVER_ENABLE_DEFAULT_USERS_CREDENTIALS_IMPLEMENTATION 1
 #endif
 
-using namespace chip::app::DataModel;
-using namespace chip::app::Clusters;
+using chip::app::Clusters::DoorLock::DlCredentialRule;
+using chip::app::Clusters::DoorLock::DlCredentialType;
+using chip::app::Clusters::DoorLock::DlDoorState;
+using chip::app::Clusters::DoorLock::DlLockState;
+using chip::app::Clusters::DoorLock::DlStatus;
+using chip::app::Clusters::DoorLock::DlUserStatus;
+using chip::app::Clusters::DoorLock::DlUserType;
+using chip::app::Clusters::DoorLock::DoorLockFeature;
+using chip::app::DataModel::Nullable;
 
 static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10; /**< Maximum size of the user name (in characters). */
 static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
@@ -56,9 +63,9 @@ public:
 
     void InitServer(chip::EndpointId endpointId);
 
-    bool SetLockState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState newLockState);
+    bool SetLockState(chip::EndpointId endpointId, DlLockState newLockState);
     bool SetActuatorEnabled(chip::EndpointId endpointId, bool newActuatorState);
-    bool SetDoorState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlDoorState newDoorState);
+    bool SetDoorState(chip::EndpointId endpointId, DlDoorState newDoorState);
 
     bool SetLanguage(chip::EndpointId endpointId, chip::CharSpan newLanguage);
     bool SetAutoRelockTime(chip::EndpointId endpointId, uint32_t newAutoRelockTimeSec);
@@ -86,23 +93,17 @@ public:
     void ClearCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                        const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
 
-    bool HasFeature(chip::EndpointId endpointId, DoorLock::DoorLockFeature feature);
+    bool HasFeature(chip::EndpointId endpointId, DoorLockFeature feature);
 
-    inline bool SupportsPIN(chip::EndpointId endpointId)
-    {
-        return HasFeature(endpointId, DoorLock::DoorLockFeature::kPINCredentials);
-    }
+    inline bool SupportsPIN(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kPINCredentials); }
 
-    inline bool SupportsPFID(chip::EndpointId endpointId)
-    {
-        return HasFeature(endpointId, DoorLock::DoorLockFeature::kRFIDCredentials);
-    }
+    inline bool SupportsPFID(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kRFIDCredentials); }
 
     inline bool SupportsUSR(chip::EndpointId endpointId)
     {
         // appclusters, 5.2.2: USR feature has conformance [PIN | RID | FGP | FACE]
         // TODO: Add missing functions to check if RID, FGP or FACE are supported
-        return HasFeature(endpointId, DoorLock::DoorLockFeature::kUsersManagement) && SupportsPIN(endpointId);
+        return HasFeature(endpointId, DoorLockFeature::kUsersManagement) && SupportsPIN(endpointId);
     }
 
 private:
@@ -111,51 +112,49 @@ private:
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex);
     bool userIndexValid(chip::EndpointId endpointId, uint16_t userIndex, uint16_t & maxNumberOfUser);
 
-    bool credentialIndexValid(chip::EndpointId endpointId, DoorLock::DlCredentialType type, uint16_t credentialIndex);
-    bool credentialIndexValid(chip::EndpointId endpointId, DoorLock::DlCredentialType type, uint16_t credentialIndex,
+    bool credentialIndexValid(chip::EndpointId endpointId, DlCredentialType type, uint16_t credentialIndex);
+    bool credentialIndexValid(chip::EndpointId endpointId, DlCredentialType type, uint16_t credentialIndex,
                               uint16_t & maxNumberOfCredentials);
-    bool getCredentialRange(chip::EndpointId endpointId, DoorLock::DlCredentialType type, size_t & minSize, size_t & maxSize);
-    bool getMaxNumberOfCredentials(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType,
-                                   uint16_t & maxNumberOfCredentials);
+    bool getCredentialRange(chip::EndpointId endpointId, DlCredentialType type, size_t & minSize, size_t & maxSize);
+    bool getMaxNumberOfCredentials(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t & maxNumberOfCredentials);
 
     bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t & userIndex);
     bool findUnoccupiedUserSlot(chip::EndpointId endpointId, uint16_t startIndex, uint16_t & userIndex);
 
-    bool findUnoccupiedCredentialSlot(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType, uint16_t startIndex,
+    bool findUnoccupiedCredentialSlot(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t startIndex,
                                       uint16_t & credentialIndex);
 
-    bool findUserIndexByCredential(chip::EndpointId endpointId, DoorLock::DlCredentialType credentialType, uint16_t credentialIndex,
+    bool findUserIndexByCredential(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t credentialIndex,
                                    uint16_t & userIndex);
 
     EmberAfStatus createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, uint16_t userIndex,
                              const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                             const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
-                             const Nullable<DoorLock::DlCredentialRule> & credentialRule,
-                             const Nullable<DlCredential> & credentials = Nullable<DlCredential>());
+                             const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
+                             const Nullable<DlCredentialRule> & credentialRule,
+                             const Nullable<DlCredential> & credential = Nullable<DlCredential>());
     EmberAfStatus modifyUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, uint16_t userIndex,
                              const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
-                             const Nullable<DoorLock::DlUserStatus> & userStatus, const Nullable<DoorLock::DlUserType> & userType,
-                             const Nullable<DoorLock::DlCredentialRule> & credentialRule);
+                             const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
+                             const Nullable<DlCredentialRule> & credentialRule);
     EmberAfStatus clearUser(chip::EndpointId endpointId, uint16_t userIndex);
 
-    DoorLock::DlStatus createNewCredentialAndUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx,
-                                                  const Nullable<DoorLock::DlUserStatus> & userStatus,
-                                                  const Nullable<DoorLock::DlUserType> & userType, const DlCredential & credential,
-                                                  const chip::ByteSpan & credentialData, uint16_t & createdUserIndex);
-    DoorLock::DlStatus createNewCredentialAndAddItToUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx,
-                                                         uint16_t userIndex, const DlCredential & credential,
-                                                         const chip::ByteSpan & credentialData);
+    DlStatus createNewCredentialAndUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx,
+                                        const Nullable<DlUserStatus> & userStatus, const Nullable<DlUserType> & userType,
+                                        const DlCredential & credential, const chip::ByteSpan & credentialData,
+                                        uint16_t & createdUserIndex);
+    DlStatus createNewCredentialAndAddItToUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
+                                               const DlCredential & credential, const chip::ByteSpan & credentialData);
 
-    DoorLock::DlStatus addCredentialToUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
-                                           const DlCredential & credential);
-    DoorLock::DlStatus modifyCredentialForUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
-                                               const DlCredential & credential);
+    DlStatus addCredentialToUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
+                                 const DlCredential & credential);
+    DlStatus modifyCredentialForUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
+                                     const DlCredential & credential);
 
-    CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DoorLock::DlStatus status, uint16_t userIndex,
+    CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DlStatus status, uint16_t userIndex,
                                          uint16_t nextCredentialIndex);
 
     // TODO: Maybe use CHIP_APPLICATION_ERROR instead of boolean in class methods?
-    bool credentialTypeSupported(chip::EndpointId endpointId, DoorLock::DlCredentialType type);
+    bool credentialTypeSupported(chip::EndpointId endpointId, DlCredentialType type);
 
     static DoorLockServer instance;
 };
@@ -174,9 +173,9 @@ enum class DlCredentialStatus : uint8_t
  */
 struct EmberAfPluginDoorLockCredentialInfo
 {
-    DlCredentialStatus status;                 /**< Indicates if credential slot is occupied or not. */
-    DoorLock::DlCredentialType credentialType; /**< Specifies the type of the credential (PIN, RFID, etc.). */
-    chip::ByteSpan credentialData;             /**< Credential data bytes. */
+    DlCredentialStatus status;       /**< Indicates if credential slot is occupied or not. */
+    DlCredentialType credentialType; /**< Specifies the type of the credential (PIN, RFID, etc.). */
+    chip::ByteSpan credentialData;   /**< Credential data bytes. */
 };
 
 /**
@@ -187,9 +186,9 @@ struct EmberAfPluginDoorLockUserInfo
     chip::CharSpan userName;                    /**< Name of the user. */
     chip::Span<const DlCredential> credentials; /**< Credentials that are associated with user (without data).*/
     uint32_t userUniqueId;                      /**< Unique user identifier. */
-    DoorLock::DlUserStatus userStatus;          /**< Status of the user slot (available/occupied). */
-    DoorLock::DlUserType userType;              /**< Type of the user. */
-    DoorLock::DlCredentialRule credentialRule;  /**< Number of supported credentials. */
+    DlUserStatus userStatus;                    /**< Status of the user slot (available/occupied). */
+    DlUserType userType;                        /**< Type of the user. */
+    DlCredentialRule credentialRule;            /**< Number of supported credentials. */
     chip::FabricIndex createdBy;                /**< ID of the fabric that created the user. */
     chip::FabricIndex lastModifiedBy;           /**< ID of the fabric that modified the user. */
 };
@@ -344,9 +343,8 @@ bool emberAfPluginDoorLockGetUser(chip::EndpointId endpointId, uint16_t userInde
  */
 bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userIndex, chip::FabricIndex creator,
                                   chip::FabricIndex modifier, const chip::CharSpan & userName, uint32_t uniqueId,
-                                  DoorLock::DlUserStatus userStatus, DoorLock::DlUserType usertype,
-                                  DoorLock::DlCredentialRule credentialRule, const DlCredential * credentials,
-                                  size_t totalCredentials);
+                                  DlUserStatus userStatus, DlUserType usertype, DlCredentialRule credentialRule,
+                                  const DlCredential * credentials, size_t totalCredentials);
 
 /**
  * @brief This callback is called when Door Lock cluster needs to access the credential in credentials database.
@@ -364,8 +362,7 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
  * @retval true, if the credential pointed by \p credentialIndex was found and \p credential parameter was written with valid data.
  * @retval false, if error occurred.
  */
-bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex,
-                                        DoorLock::DlCredentialType credentialType,
+bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialType credentialType,
                                         EmberAfPluginDoorLockCredentialInfo & credential);
 
 /**
@@ -387,4 +384,4 @@ bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cr
  * @retval false, if error occurred.
  */
 bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, uint16_t credentialIndex, DlCredentialStatus credentialStatus,
-                                        DoorLock::DlCredentialType credentialType, const chip::ByteSpan & credentialData);
+                                        DlCredentialType credentialType, const chip::ByteSpan & credentialData);
