@@ -27,6 +27,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/EventLogging.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/core/CHIPTLV.h>
@@ -84,6 +85,7 @@ private:
     CHIP_ERROR WriteStructAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadNullableStruct(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteNullableStruct(AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder);
 };
 
 TestAttrAccess gAttrAccess;
@@ -121,6 +123,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
     case ListLongOctetString::Id: {
         return ReadListLongOctetStringAttribute(aEncoder);
+    }
+    case ListFabricScoped::Id: {
+        return ReadListFabricScopedAttribute(aEncoder);
     }
     case NullableStruct::Id: {
         return ReadNullableStruct(aEncoder);
@@ -402,6 +407,27 @@ CHIP_ERROR TestAttrAccess::ReadStructAttribute(AttributeValueEncoder & aEncoder)
 CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder)
 {
     return aDecoder.Decode(gStructAttributeValue);
+}
+
+CHIP_ERROR TestAttrAccess::ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        // Just encode our one struct for now.
+        auto fabricTable = Server::GetInstance().GetFabricTable();
+
+        chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type val;
+
+        for (const auto & fb : fabricTable)
+        {
+            val.fabricIndex = fb.GetFabricIndex();
+            ReturnErrorOnFailure(encoder.Encode(val));
+        }
+
+        // Always append a fake fabric index so we can test fabric filter even when there is only one fabric provisioned.
+        val.fabricIndex = 0xFF;
+        ReturnErrorOnFailure(encoder.Encode(val));
+        return CHIP_NO_ERROR;
+    });
 }
 
 } // namespace
