@@ -219,6 +219,8 @@ int main(void)
     // Connect the Requestor and Requestor Driver objects
     gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
 
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
     OTAImageProcessorParams ipParams;
     ipParams.imageFile = CharSpan("test.txt");
     gImageProcessor.SetOTAImageProcessorParams(ipParams);
