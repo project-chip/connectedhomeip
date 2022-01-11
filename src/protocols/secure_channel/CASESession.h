@@ -226,8 +226,9 @@ private:
      */
     void DiscardExchange();
 
-    // TODO: Remove this and replace with system method to retrieve current time
-    CHIP_ERROR SetEffectiveTime(void);
+    CHIP_ERROR GetHardcodedTime();
+
+    CHIP_ERROR SetEffectiveTime();
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                        System::PacketBufferHandle & msg);
