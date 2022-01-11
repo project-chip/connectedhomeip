@@ -93,11 +93,10 @@ struct CommissionableNodeDiscovery : Base<TContext>, CommissionableNodeDiscovere
     void Enter()
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        mDiscoverer =
-            Platform::MakeShared<CommissionableNodeDiscoverer::Discoverer>(*this->mCommissionee.mSystemState, mPayload, this);
+        mDiscoverer    = Platform::MakeShared<CommissionableNodeDiscoverer::Discoverer>(*this->mCommissionee.mSystemState, this);
         VerifyOrExit(mDiscoverer.get() != nullptr, err = CHIP_ERROR_NO_MEMORY);
         SuccessOrExit(err = mDiscoverer.get()->Init());
-        SuccessOrExit(err = mDiscoverer.get()->Discover());
+        SuccessOrExit(err = mDiscoverer.get()->Discover(*mPayload.get()));
     exit:
         if (err != CHIP_NO_ERROR)
         {
@@ -107,7 +106,7 @@ struct CommissionableNodeDiscovery : Base<TContext>, CommissionableNodeDiscovere
 
 protected:
     void OnDiscovery() override { this->mCtx.Dispatch(TContext::Event::template Create<Events::Success>()); }
-    void OnDiscovererShutdown() override {}
+    void OnShutdownComplete() override {}
 
     Platform::SharedPtr<SetupPayload> mPayload;
     Platform::SharedPtr<CommissionableNodeDiscoverer::Discoverer> mDiscoverer;
@@ -125,7 +124,7 @@ struct AwaitingCommissionableDiscovery : CommissionableNodeDiscovery<TContext>
 
 protected:
     void OnDiscovery() override { this->mCtx.Dispatch(TContext::Event::template Create<Events::Success>()); }
-    void OnDiscovererShutdown() override {}
+    void OnShutdownComplete() override {}
 };
 
 template <typename TContext>
@@ -228,7 +227,7 @@ protected:
     }
 
     void OnDiscovery() override {}
-    void OnDiscovererShutdown() override
+    void OnShutdownComplete() override
     {
         if (mStatus == CHIP_NO_ERROR)
         {
