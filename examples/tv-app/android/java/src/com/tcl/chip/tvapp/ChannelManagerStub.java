@@ -20,7 +20,7 @@ package com.tcl.chip.tvapp;
 import android.util.Log;
 
 public class ChannelManagerStub implements ChannelManager {
-  private static final String TAG = "ChannelManagerStub";
+  private static final String TAG = ChannelManagerStub.class.getSimpleName();
 
   private int endpoint;
 
@@ -52,7 +52,13 @@ public class ChannelManagerStub implements ChannelManager {
   @Override
   public ChannelInfo changeChannel(String match) {
     Log.d(TAG, "changeChannel: " + match + " at " + endpoint);
-    return new ChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
+    if ("no".equals(match)) {
+      return new ChannelInfo(ChannelInfo.kNoMatches);
+    } else if ("multiple".equals(match)) {
+      return new ChannelInfo(ChannelInfo.kMultipleMatches);
+    } else {
+      return new ChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
+    }
   }
 
   @Override
@@ -65,12 +71,22 @@ public class ChannelManagerStub implements ChannelManager {
             + minorNumber
             + " at "
             + endpoint);
+
+    // for failed test
+    if (majorNumber == 1 && minorNumber == 1) {
+      return false;
+    }
     return true;
   }
 
   @Override
   public boolean skipChannel(int count) {
     Log.d(TAG, "skipChannel: count = " + count + " at " + endpoint);
+
+    // for failed test
+    if (count == 100) {
+      return false;
+    }
     return true;
   }
 }
