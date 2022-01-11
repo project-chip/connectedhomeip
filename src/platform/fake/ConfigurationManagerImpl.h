@@ -97,6 +97,10 @@ private:
     CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetReachable(bool & reachable) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetHourFormat(uint8_t & format) override { return CHIP_ERROR_NOT_IMPLEMENTED; };
+    CHIP_ERROR StoreHourFormat(uint8_t format) override { return CHIP_ERROR_NOT_IMPLEMENTED; };
+    CHIP_ERROR GetCalendarType(uint8_t & type) override { return CHIP_ERROR_NOT_IMPLEMENTED; };
+    CHIP_ERROR StoreCalendarType(uint8_t type) override { return CHIP_ERROR_NOT_IMPLEMENTED; };
 #if !defined(NDEBUG)
     CHIP_ERROR RunUnitTests(void) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif

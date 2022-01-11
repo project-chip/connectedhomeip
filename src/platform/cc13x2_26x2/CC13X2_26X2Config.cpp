@@ -89,12 +89,16 @@ const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_Breadcrumb         = 
                                                                             .itemID   = 0x001c } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_ActiveLocale       = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
                                                                               .itemID   = 0x001d } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_HourFormat         = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+                                                                            .itemID   = 0x001e } };
+const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_CalendarType       = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
+                                                                              .itemID   = 0x001f } };
 
 /* Internal for the KVS interface. */
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS_key   = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                         .itemID   = 0x001e } };
+                                                                         .itemID   = 0x0020 } };
 const CC13X2_26X2Config::Key CC13X2_26X2Config::kConfigKey_KVS_value = { { .systemID = kCC13X2_26X2ChipFactory_Sysid,
-                                                                           .itemID   = 0x001f } };
+                                                                           .itemID   = 0x0021 } };
 
 /* Static local variables */
 static NVINTF_nvFuncts_t sNvoctpFps = { 0 };
