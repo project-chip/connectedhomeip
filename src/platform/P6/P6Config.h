@@ -76,6 +76,10 @@ public:
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_ActiveLocale;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_HourFormat;
+    static const Key kConfigKey_CalendarType;
+
+    // CHIP Counter keys
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_UpTime;
     static const Key kCounterKey_TotalOperationalHours;

@@ -86,9 +86,11 @@ public:
     static constexpr Key kConfigKey_CountryCode        = QorvoConfigKey(kFileId_ChipConfig, 0x0A);
     static constexpr Key kConfigKey_Breadcrumb         = QorvoConfigKey(kFileId_ChipConfig, 0x0B);
     static constexpr Key kConfigKey_ActiveLocale       = QorvoConfigKey(kFileId_ChipConfig, 0x0C);
+    static constexpr Key kConfigKey_HourFormat         = QorvoConfigKey(kFileId_ChipConfig, 0x0D);
+    static constexpr Key kConfigKey_CalendarType       = QorvoConfigKey(kFileId_ChipConfig, 0x0E);
 
-    static constexpr Key kConfigKey_GroupKeyBase = QorvoConfigKey(kFileId_ChipConfig, 0x0D);
-    static constexpr Key kConfigKey_GroupKeyMax  = QorvoConfigKey(kFileId_ChipConfig, 0x1C); // Allows 16 Group Keys to be created.
+    static constexpr Key kConfigKey_GroupKeyBase = QorvoConfigKey(kFileId_ChipConfig, 0x0F);
+    static constexpr Key kConfigKey_GroupKeyMax  = QorvoConfigKey(kFileId_ChipConfig, 0x1E); // Allows 16 Group Keys to be created.
 
     static constexpr Key kConfigKey_CounterKeyBase = QorvoConfigKey(kFileId_ChipCounter, 0x00);
     static constexpr Key kConfigKey_CounterKeyMax =
