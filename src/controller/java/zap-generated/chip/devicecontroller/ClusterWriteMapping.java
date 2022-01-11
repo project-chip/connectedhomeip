@@ -2104,4 +2104,3 @@ public class ClusterWriteMapping {
     return writeAttributeMap;
   }
 }
-

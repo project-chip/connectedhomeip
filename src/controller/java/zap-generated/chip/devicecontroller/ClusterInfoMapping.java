@@ -270,7 +270,7 @@ public class ClusterInfoMapping {
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -314,7 +314,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -336,7 +336,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -358,7 +358,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -379,7 +379,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -426,7 +426,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -447,7 +447,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -491,7 +491,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -513,7 +513,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -535,7 +535,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -557,7 +557,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -579,7 +579,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -601,7 +601,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -667,7 +667,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -689,7 +689,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -759,7 +759,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -781,7 +781,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -849,7 +849,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -893,7 +893,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -914,7 +914,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -935,7 +935,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -956,7 +956,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1009,7 +1009,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1068,7 +1068,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
   Integer userType,
   @Nullable
   Integer credentialRule,
-  // credentials: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // credentials: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
   @Nullable
   Integer creatorFabricIndex,
@@ -1089,7 +1089,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
                responseValues.put(userTypeResponseValue, userType);
                CommandResponseInfo credentialRuleResponseValue = new CommandResponseInfo("credentialRule", "int");
                responseValues.put(credentialRuleResponseValue, credentialRule);
-               // credentials: /* TYPE WARNING: array array defaults to */ uint8_t * 
+               // credentials: /* TYPE WARNING: array array defaults to */ uint8_t *
                // Conversion from this type to Java is not properly implemented yet
                CommandResponseInfo creatorFabricIndexResponseValue = new CommandResponseInfo("creatorFabricIndex", "int");
                responseValues.put(creatorFabricIndexResponseValue, creatorFabricIndex);
@@ -1148,7 +1148,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1170,7 +1170,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1192,7 +1192,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1236,7 +1236,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1258,7 +1258,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1377,7 +1377,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1421,7 +1421,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1442,7 +1442,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1463,7 +1463,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1484,7 +1484,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1502,11 +1502,11 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
         }
 
         @Override
-        public void onSuccess(  // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t * 
+        public void onSuccess(  // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 ) {
            Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-               // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t * 
+               // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
                // Conversion from this type to Java is not properly implemented yet
            callback.onSuccess(responseValues);
         }
@@ -1596,7 +1596,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1640,13 +1640,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 
         @Override
         public void onSuccess(  Integer capacity
-  // groupList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 ) {
            Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
                CommandResponseInfo capacityResponseValue = new CommandResponseInfo("capacity", "int");
                responseValues.put(capacityResponseValue, capacity);
-               // groupList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+               // groupList: /* TYPE WARNING: array array defaults to */ uint8_t *
                // Conversion from this type to Java is not properly implemented yet
            callback.onSuccess(responseValues);
         }
@@ -1722,7 +1722,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1766,7 +1766,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1788,7 +1788,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1832,7 +1832,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1854,7 +1854,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1898,7 +1898,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1942,7 +1942,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -1986,7 +1986,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2030,7 +2030,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2103,9 +2103,9 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
         @Override
         public void onSuccess(  Integer NetworkingStatus,
   String DebugText
-  // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
-  // ThreadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // ThreadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 ) {
            Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
@@ -2113,9 +2113,9 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
                responseValues.put(NetworkingStatusResponseValue, NetworkingStatus);
                CommandResponseInfo DebugTextResponseValue = new CommandResponseInfo("DebugText", "String");
                responseValues.put(DebugTextResponseValue, DebugText);
-               // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+               // WiFiScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
                // Conversion from this type to Java is not properly implemented yet
-               // ThreadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t * 
+               // ThreadScanResults: /* TYPE WARNING: array array defaults to */ uint8_t *
                // Conversion from this type to Java is not properly implemented yet
            callback.onSuccess(responseValues);
         }
@@ -2229,7 +2229,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2273,7 +2273,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2295,7 +2295,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2317,7 +2317,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2339,7 +2339,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2504,7 +2504,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2526,7 +2526,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2547,7 +2547,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2569,7 +2569,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2590,7 +2590,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2612,7 +2612,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2634,7 +2634,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2656,7 +2656,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2706,7 +2706,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
   Integer capacity,
   Integer groupId,
   Integer sceneCount
-  // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 ) {
            Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
@@ -2718,7 +2718,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
                responseValues.put(groupIdResponseValue, groupId);
                CommandResponseInfo sceneCountResponseValue = new CommandResponseInfo("sceneCount", "int");
                responseValues.put(sceneCountResponseValue, sceneCount);
-               // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t * 
+               // sceneList: /* TYPE WARNING: array array defaults to */ uint8_t *
                // Conversion from this type to Java is not properly implemented yet
            callback.onSuccess(responseValues);
         }
@@ -2823,7 +2823,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
   Integer sceneId,
   Integer transitionTime,
   String sceneName
-  // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 ) {
            Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
@@ -2837,7 +2837,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
                responseValues.put(transitionTimeResponseValue, transitionTime);
                CommandResponseInfo sceneNameResponseValue = new CommandResponseInfo("sceneName", "String");
                responseValues.put(sceneNameResponseValue, sceneName);
-               // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t * 
+               // extensionFieldSets: /* TYPE WARNING: array array defaults to */ uint8_t *
                // Conversion from this type to Java is not properly implemented yet
            callback.onSuccess(responseValues);
         }
@@ -2860,7 +2860,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2904,7 +2904,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2926,7 +2926,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -2995,7 +2995,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -3017,7 +3017,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -3127,11 +3127,11 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
         }
 
         @Override
-        public void onSuccess(  // arg1: /* TYPE WARNING: array array defaults to */ uint8_t * 
+        public void onSuccess(  // arg1: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 ) {
            Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-               // arg1: /* TYPE WARNING: array array defaults to */ uint8_t * 
+               // arg1: /* TYPE WARNING: array array defaults to */ uint8_t *
                // Conversion from this type to Java is not properly implemented yet
            callback.onSuccess(responseValues);
         }
@@ -3207,7 +3207,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -3314,7 +3314,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -3372,7 +3372,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
         public void onSuccess(  Integer numberOfTransitionsForSequence,
   Integer dayOfWeekForSequence,
   Integer modeForSequence
-  // payload: /* TYPE WARNING: array array defaults to */ uint8_t * 
+  // payload: /* TYPE WARNING: array array defaults to */ uint8_t *
   // Conversion from this type to Java is not properly implemented yet
 ) {
            Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
@@ -3382,7 +3382,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
                responseValues.put(dayOfWeekForSequenceResponseValue, dayOfWeekForSequence);
                CommandResponseInfo modeForSequenceResponseValue = new CommandResponseInfo("modeForSequence", "int");
                responseValues.put(modeForSequenceResponseValue, modeForSequence);
-               // payload: /* TYPE WARNING: array array defaults to */ uint8_t * 
+               // payload: /* TYPE WARNING: array array defaults to */ uint8_t *
                // Conversion from this type to Java is not properly implemented yet
            callback.onSuccess(responseValues);
         }
@@ -3405,7 +3405,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -3427,7 +3427,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -3537,7 +3537,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Integer>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -3558,7 +3558,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -3603,7 +3603,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -3625,7 +3625,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -3647,7 +3647,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
 > valueList) {
           Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
 CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-            
+
           responseValues.put(commandResponseInfo, valueList);
           callback.onSuccess(responseValues);
         }
@@ -3930,7 +3930,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> accountLogingetSetupPINRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo accountLogingetSetupPINRequesttempAccountIdentifierCommandParameterInfo = new CommandParameterInfo("tempAccountIdentifier", String.class);
        accountLogingetSetupPINRequestCommandParams.put("tempAccountIdentifier",accountLogingetSetupPINRequesttempAccountIdentifierCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo accountLogingetSetupPINRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -3948,10 +3948,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> accountLoginloginRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo accountLoginloginRequesttempAccountIdentifierCommandParameterInfo = new CommandParameterInfo("tempAccountIdentifier", String.class);
        accountLoginloginRequestCommandParams.put("tempAccountIdentifier",accountLoginloginRequesttempAccountIdentifierCommandParameterInfo);
-      
+
        CommandParameterInfo accountLoginloginRequestsetupPINCommandParameterInfo = new CommandParameterInfo("setupPIN", String.class);
        accountLoginloginRequestCommandParams.put("setupPIN",accountLoginloginRequestsetupPINCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo accountLoginloginRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -3986,7 +3986,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> administratorCommissioningopenBasicCommissioningWindowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo administratorCommissioningopenBasicCommissioningWindowcommissioningTimeoutCommandParameterInfo = new CommandParameterInfo("commissioningTimeout", int.class);
        administratorCommissioningopenBasicCommissioningWindowCommandParams.put("commissioningTimeout",administratorCommissioningopenBasicCommissioningWindowcommissioningTimeoutCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo administratorCommissioningopenBasicCommissioningWindowInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4004,22 +4004,22 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> administratorCommissioningopenCommissioningWindowCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo administratorCommissioningopenCommissioningWindowcommissioningTimeoutCommandParameterInfo = new CommandParameterInfo("commissioningTimeout", int.class);
        administratorCommissioningopenCommissioningWindowCommandParams.put("commissioningTimeout",administratorCommissioningopenCommissioningWindowcommissioningTimeoutCommandParameterInfo);
-      
+
        CommandParameterInfo administratorCommissioningopenCommissioningWindowPAKEVerifierCommandParameterInfo = new CommandParameterInfo("PAKEVerifier", byte[].class);
        administratorCommissioningopenCommissioningWindowCommandParams.put("PAKEVerifier",administratorCommissioningopenCommissioningWindowPAKEVerifierCommandParameterInfo);
-      
+
        CommandParameterInfo administratorCommissioningopenCommissioningWindowdiscriminatorCommandParameterInfo = new CommandParameterInfo("discriminator", int.class);
        administratorCommissioningopenCommissioningWindowCommandParams.put("discriminator",administratorCommissioningopenCommissioningWindowdiscriminatorCommandParameterInfo);
-      
+
        CommandParameterInfo administratorCommissioningopenCommissioningWindowiterationsCommandParameterInfo = new CommandParameterInfo("iterations", long.class);
        administratorCommissioningopenCommissioningWindowCommandParams.put("iterations",administratorCommissioningopenCommissioningWindowiterationsCommandParameterInfo);
-      
+
        CommandParameterInfo administratorCommissioningopenCommissioningWindowsaltCommandParameterInfo = new CommandParameterInfo("salt", byte[].class);
        administratorCommissioningopenCommissioningWindowCommandParams.put("salt",administratorCommissioningopenCommissioningWindowsaltCommandParameterInfo);
-      
+
        CommandParameterInfo administratorCommissioningopenCommissioningWindowpasscodeIDCommandParameterInfo = new CommandParameterInfo("passcodeID", int.class);
        administratorCommissioningopenCommissioningWindowCommandParams.put("passcodeID",administratorCommissioningopenCommissioningWindowpasscodeIDCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo administratorCommissioningopenCommissioningWindowInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4068,10 +4068,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> applicationLauncherhideAppRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo applicationLauncherhideAppRequestcatalogVendorIdCommandParameterInfo = new CommandParameterInfo("catalogVendorId", int.class);
        applicationLauncherhideAppRequestCommandParams.put("catalogVendorId",applicationLauncherhideAppRequestcatalogVendorIdCommandParameterInfo);
-      
+
        CommandParameterInfo applicationLauncherhideAppRequestapplicationIdCommandParameterInfo = new CommandParameterInfo("applicationId", String.class);
        applicationLauncherhideAppRequestCommandParams.put("applicationId",applicationLauncherhideAppRequestapplicationIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo applicationLauncherhideAppRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4092,13 +4092,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> applicationLauncherlaunchAppRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo applicationLauncherlaunchAppRequestdataCommandParameterInfo = new CommandParameterInfo("data", String.class);
        applicationLauncherlaunchAppRequestCommandParams.put("data",applicationLauncherlaunchAppRequestdataCommandParameterInfo);
-      
+
        CommandParameterInfo applicationLauncherlaunchAppRequestcatalogVendorIdCommandParameterInfo = new CommandParameterInfo("catalogVendorId", int.class);
        applicationLauncherlaunchAppRequestCommandParams.put("catalogVendorId",applicationLauncherlaunchAppRequestcatalogVendorIdCommandParameterInfo);
-      
+
        CommandParameterInfo applicationLauncherlaunchAppRequestapplicationIdCommandParameterInfo = new CommandParameterInfo("applicationId", String.class);
        applicationLauncherlaunchAppRequestCommandParams.put("applicationId",applicationLauncherlaunchAppRequestapplicationIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo applicationLauncherlaunchAppRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4122,10 +4122,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> applicationLauncherstopAppRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo applicationLauncherstopAppRequestcatalogVendorIdCommandParameterInfo = new CommandParameterInfo("catalogVendorId", int.class);
        applicationLauncherstopAppRequestCommandParams.put("catalogVendorId",applicationLauncherstopAppRequestcatalogVendorIdCommandParameterInfo);
-      
+
        CommandParameterInfo applicationLauncherstopAppRequestapplicationIdCommandParameterInfo = new CommandParameterInfo("applicationId", String.class);
        applicationLauncherstopAppRequestCommandParams.put("applicationId",applicationLauncherstopAppRequestapplicationIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo applicationLauncherstopAppRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4148,10 +4148,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> audioOutputrenameOutputRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo audioOutputrenameOutputRequestindexCommandParameterInfo = new CommandParameterInfo("index", int.class);
        audioOutputrenameOutputRequestCommandParams.put("index",audioOutputrenameOutputRequestindexCommandParameterInfo);
-      
+
        CommandParameterInfo audioOutputrenameOutputRequestnameCommandParameterInfo = new CommandParameterInfo("name", String.class);
        audioOutputrenameOutputRequestCommandParams.put("name",audioOutputrenameOutputRequestnameCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo audioOutputrenameOutputRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4172,7 +4172,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> audioOutputselectOutputRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo audioOutputselectOutputRequestindexCommandParameterInfo = new CommandParameterInfo("index", int.class);
        audioOutputselectOutputRequestCommandParams.put("index",audioOutputselectOutputRequestindexCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo audioOutputselectOutputRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4192,7 +4192,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> barrierControlbarrierControlGoToPercentCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo barrierControlbarrierControlGoToPercentpercentOpenCommandParameterInfo = new CommandParameterInfo("percentOpen", int.class);
        barrierControlbarrierControlGoToPercentCommandParams.put("percentOpen",barrierControlbarrierControlGoToPercentpercentOpenCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo barrierControlbarrierControlGoToPercentInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4240,16 +4240,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bindingbindCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bindingbindnodeIdCommandParameterInfo = new CommandParameterInfo("nodeId", long.class);
        bindingbindCommandParams.put("nodeId",bindingbindnodeIdCommandParameterInfo);
-      
+
        CommandParameterInfo bindingbindgroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        bindingbindCommandParams.put("groupId",bindingbindgroupIdCommandParameterInfo);
-      
+
        CommandParameterInfo bindingbindendpointIdCommandParameterInfo = new CommandParameterInfo("endpointId", int.class);
        bindingbindCommandParams.put("endpointId",bindingbindendpointIdCommandParameterInfo);
-      
+
        CommandParameterInfo bindingbindclusterIdCommandParameterInfo = new CommandParameterInfo("clusterId", long.class);
        bindingbindCommandParams.put("clusterId",bindingbindclusterIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bindingbindInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4276,16 +4276,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bindingunbindCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bindingunbindnodeIdCommandParameterInfo = new CommandParameterInfo("nodeId", long.class);
        bindingunbindCommandParams.put("nodeId",bindingunbindnodeIdCommandParameterInfo);
-      
+
        CommandParameterInfo bindingunbindgroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        bindingunbindCommandParams.put("groupId",bindingunbindgroupIdCommandParameterInfo);
-      
+
        CommandParameterInfo bindingunbindendpointIdCommandParameterInfo = new CommandParameterInfo("endpointId", int.class);
        bindingunbindCommandParams.put("endpointId",bindingunbindendpointIdCommandParameterInfo);
-      
+
        CommandParameterInfo bindingunbindclusterIdCommandParameterInfo = new CommandParameterInfo("clusterId", long.class);
        bindingunbindCommandParams.put("clusterId",bindingunbindclusterIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bindingunbindInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4316,10 +4316,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionsdisableActionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionsdisableActionactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionsdisableActionCommandParams.put("actionID",bridgedActionsdisableActionactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsdisableActioninvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionsdisableActionCommandParams.put("invokeID",bridgedActionsdisableActioninvokeIDCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionsdisableActionInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4340,13 +4340,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionsdisableActionWithDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionsdisableActionWithDurationactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionsdisableActionWithDurationCommandParams.put("actionID",bridgedActionsdisableActionWithDurationactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsdisableActionWithDurationinvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionsdisableActionWithDurationCommandParams.put("invokeID",bridgedActionsdisableActionWithDurationinvokeIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsdisableActionWithDurationdurationCommandParameterInfo = new CommandParameterInfo("duration", long.class);
        bridgedActionsdisableActionWithDurationCommandParams.put("duration",bridgedActionsdisableActionWithDurationdurationCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionsdisableActionWithDurationInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4370,10 +4370,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionsenableActionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionsenableActionactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionsenableActionCommandParams.put("actionID",bridgedActionsenableActionactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsenableActioninvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionsenableActionCommandParams.put("invokeID",bridgedActionsenableActioninvokeIDCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionsenableActionInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4394,13 +4394,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionsenableActionWithDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionsenableActionWithDurationactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionsenableActionWithDurationCommandParams.put("actionID",bridgedActionsenableActionWithDurationactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsenableActionWithDurationinvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionsenableActionWithDurationCommandParams.put("invokeID",bridgedActionsenableActionWithDurationinvokeIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsenableActionWithDurationdurationCommandParameterInfo = new CommandParameterInfo("duration", long.class);
        bridgedActionsenableActionWithDurationCommandParams.put("duration",bridgedActionsenableActionWithDurationdurationCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionsenableActionWithDurationInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4424,10 +4424,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionsinstantActionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionsinstantActionactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionsinstantActionCommandParams.put("actionID",bridgedActionsinstantActionactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsinstantActioninvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionsinstantActionCommandParams.put("invokeID",bridgedActionsinstantActioninvokeIDCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionsinstantActionInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4448,13 +4448,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionsinstantActionWithTransitionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionsinstantActionWithTransitionactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionsinstantActionWithTransitionCommandParams.put("actionID",bridgedActionsinstantActionWithTransitionactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsinstantActionWithTransitioninvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionsinstantActionWithTransitionCommandParams.put("invokeID",bridgedActionsinstantActionWithTransitioninvokeIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsinstantActionWithTransitiontransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        bridgedActionsinstantActionWithTransitionCommandParams.put("transitionTime",bridgedActionsinstantActionWithTransitiontransitionTimeCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionsinstantActionWithTransitionInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4478,10 +4478,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionspauseActionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionspauseActionactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionspauseActionCommandParams.put("actionID",bridgedActionspauseActionactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionspauseActioninvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionspauseActionCommandParams.put("invokeID",bridgedActionspauseActioninvokeIDCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionspauseActionInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4502,13 +4502,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionspauseActionWithDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionspauseActionWithDurationactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionspauseActionWithDurationCommandParams.put("actionID",bridgedActionspauseActionWithDurationactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionspauseActionWithDurationinvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionspauseActionWithDurationCommandParams.put("invokeID",bridgedActionspauseActionWithDurationinvokeIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionspauseActionWithDurationdurationCommandParameterInfo = new CommandParameterInfo("duration", long.class);
        bridgedActionspauseActionWithDurationCommandParams.put("duration",bridgedActionspauseActionWithDurationdurationCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionspauseActionWithDurationInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4532,10 +4532,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionsresumeActionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionsresumeActionactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionsresumeActionCommandParams.put("actionID",bridgedActionsresumeActionactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsresumeActioninvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionsresumeActionCommandParams.put("invokeID",bridgedActionsresumeActioninvokeIDCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionsresumeActionInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4556,10 +4556,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionsstartActionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionsstartActionactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionsstartActionCommandParams.put("actionID",bridgedActionsstartActionactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsstartActioninvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionsstartActionCommandParams.put("invokeID",bridgedActionsstartActioninvokeIDCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionsstartActionInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4580,13 +4580,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionsstartActionWithDurationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionsstartActionWithDurationactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionsstartActionWithDurationCommandParams.put("actionID",bridgedActionsstartActionWithDurationactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsstartActionWithDurationinvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionsstartActionWithDurationCommandParams.put("invokeID",bridgedActionsstartActionWithDurationinvokeIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsstartActionWithDurationdurationCommandParameterInfo = new CommandParameterInfo("duration", long.class);
        bridgedActionsstartActionWithDurationCommandParams.put("duration",bridgedActionsstartActionWithDurationdurationCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionsstartActionWithDurationInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4610,10 +4610,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> bridgedActionsstopActionCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo bridgedActionsstopActionactionIDCommandParameterInfo = new CommandParameterInfo("actionID", int.class);
        bridgedActionsstopActionCommandParams.put("actionID",bridgedActionsstopActionactionIDCommandParameterInfo);
-      
+
        CommandParameterInfo bridgedActionsstopActioninvokeIDCommandParameterInfo = new CommandParameterInfo("invokeID", long.class);
        bridgedActionsstopActionCommandParams.put("invokeID",bridgedActionsstopActioninvokeIDCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo bridgedActionsstopActionInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4638,10 +4638,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> channelchangeChannelByNumberRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo channelchangeChannelByNumberRequestmajorNumberCommandParameterInfo = new CommandParameterInfo("majorNumber", int.class);
        channelchangeChannelByNumberRequestCommandParams.put("majorNumber",channelchangeChannelByNumberRequestmajorNumberCommandParameterInfo);
-      
+
        CommandParameterInfo channelchangeChannelByNumberRequestminorNumberCommandParameterInfo = new CommandParameterInfo("minorNumber", int.class);
        channelchangeChannelByNumberRequestCommandParams.put("minorNumber",channelchangeChannelByNumberRequestminorNumberCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo channelchangeChannelByNumberRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4662,7 +4662,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> channelchangeChannelRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo channelchangeChannelRequestmatchCommandParameterInfo = new CommandParameterInfo("match", String.class);
        channelchangeChannelRequestCommandParams.put("match",channelchangeChannelRequestmatchCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo channelchangeChannelRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4680,7 +4680,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> channelskipChannelRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo channelskipChannelRequestcountCommandParameterInfo = new CommandParameterInfo("count", int.class);
        channelskipChannelRequestCommandParams.put("count",channelskipChannelRequestcountCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo channelskipChannelRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4700,25 +4700,25 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlcolorLoopSetCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlcolorLoopSetupdateFlagsCommandParameterInfo = new CommandParameterInfo("updateFlags", int.class);
        colorControlcolorLoopSetCommandParams.put("updateFlags",colorControlcolorLoopSetupdateFlagsCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlcolorLoopSetactionCommandParameterInfo = new CommandParameterInfo("action", int.class);
        colorControlcolorLoopSetCommandParams.put("action",colorControlcolorLoopSetactionCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlcolorLoopSetdirectionCommandParameterInfo = new CommandParameterInfo("direction", int.class);
        colorControlcolorLoopSetCommandParams.put("direction",colorControlcolorLoopSetdirectionCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlcolorLoopSettimeCommandParameterInfo = new CommandParameterInfo("time", int.class);
        colorControlcolorLoopSetCommandParams.put("time",colorControlcolorLoopSettimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlcolorLoopSetstartHueCommandParameterInfo = new CommandParameterInfo("startHue", int.class);
        colorControlcolorLoopSetCommandParams.put("startHue",colorControlcolorLoopSetstartHueCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlcolorLoopSetoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlcolorLoopSetCommandParams.put("optionsMask",colorControlcolorLoopSetoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlcolorLoopSetoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlcolorLoopSetCommandParams.put("optionsOverride",colorControlcolorLoopSetoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlcolorLoopSetInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4754,16 +4754,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlenhancedMoveHueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlenhancedMoveHuemoveModeCommandParameterInfo = new CommandParameterInfo("moveMode", int.class);
        colorControlenhancedMoveHueCommandParams.put("moveMode",colorControlenhancedMoveHuemoveModeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedMoveHuerateCommandParameterInfo = new CommandParameterInfo("rate", int.class);
        colorControlenhancedMoveHueCommandParams.put("rate",colorControlenhancedMoveHuerateCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedMoveHueoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlenhancedMoveHueCommandParams.put("optionsMask",colorControlenhancedMoveHueoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedMoveHueoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlenhancedMoveHueCommandParams.put("optionsOverride",colorControlenhancedMoveHueoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlenhancedMoveHueInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4790,19 +4790,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlenhancedMoveToHueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlenhancedMoveToHueenhancedHueCommandParameterInfo = new CommandParameterInfo("enhancedHue", int.class);
        colorControlenhancedMoveToHueCommandParams.put("enhancedHue",colorControlenhancedMoveToHueenhancedHueCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedMoveToHuedirectionCommandParameterInfo = new CommandParameterInfo("direction", int.class);
        colorControlenhancedMoveToHueCommandParams.put("direction",colorControlenhancedMoveToHuedirectionCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedMoveToHuetransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlenhancedMoveToHueCommandParams.put("transitionTime",colorControlenhancedMoveToHuetransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedMoveToHueoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlenhancedMoveToHueCommandParams.put("optionsMask",colorControlenhancedMoveToHueoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedMoveToHueoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlenhancedMoveToHueCommandParams.put("optionsOverride",colorControlenhancedMoveToHueoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlenhancedMoveToHueInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4832,19 +4832,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlenhancedMoveToHueAndSaturationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlenhancedMoveToHueAndSaturationenhancedHueCommandParameterInfo = new CommandParameterInfo("enhancedHue", int.class);
        colorControlenhancedMoveToHueAndSaturationCommandParams.put("enhancedHue",colorControlenhancedMoveToHueAndSaturationenhancedHueCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedMoveToHueAndSaturationsaturationCommandParameterInfo = new CommandParameterInfo("saturation", int.class);
        colorControlenhancedMoveToHueAndSaturationCommandParams.put("saturation",colorControlenhancedMoveToHueAndSaturationsaturationCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedMoveToHueAndSaturationtransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlenhancedMoveToHueAndSaturationCommandParams.put("transitionTime",colorControlenhancedMoveToHueAndSaturationtransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedMoveToHueAndSaturationoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlenhancedMoveToHueAndSaturationCommandParams.put("optionsMask",colorControlenhancedMoveToHueAndSaturationoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedMoveToHueAndSaturationoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlenhancedMoveToHueAndSaturationCommandParams.put("optionsOverride",colorControlenhancedMoveToHueAndSaturationoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlenhancedMoveToHueAndSaturationInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4874,19 +4874,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlenhancedStepHueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlenhancedStepHuestepModeCommandParameterInfo = new CommandParameterInfo("stepMode", int.class);
        colorControlenhancedStepHueCommandParams.put("stepMode",colorControlenhancedStepHuestepModeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedStepHuestepSizeCommandParameterInfo = new CommandParameterInfo("stepSize", int.class);
        colorControlenhancedStepHueCommandParams.put("stepSize",colorControlenhancedStepHuestepSizeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedStepHuetransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlenhancedStepHueCommandParams.put("transitionTime",colorControlenhancedStepHuetransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedStepHueoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlenhancedStepHueCommandParams.put("optionsMask",colorControlenhancedStepHueoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlenhancedStepHueoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlenhancedStepHueCommandParams.put("optionsOverride",colorControlenhancedStepHueoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlenhancedStepHueInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4916,16 +4916,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlmoveColorCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlmoveColorrateXCommandParameterInfo = new CommandParameterInfo("rateX", int.class);
        colorControlmoveColorCommandParams.put("rateX",colorControlmoveColorrateXCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveColorrateYCommandParameterInfo = new CommandParameterInfo("rateY", int.class);
        colorControlmoveColorCommandParams.put("rateY",colorControlmoveColorrateYCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveColoroptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlmoveColorCommandParams.put("optionsMask",colorControlmoveColoroptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveColoroptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlmoveColorCommandParams.put("optionsOverride",colorControlmoveColoroptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlmoveColorInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -4952,22 +4952,22 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlmoveColorTemperatureCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlmoveColorTemperaturemoveModeCommandParameterInfo = new CommandParameterInfo("moveMode", int.class);
        colorControlmoveColorTemperatureCommandParams.put("moveMode",colorControlmoveColorTemperaturemoveModeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveColorTemperaturerateCommandParameterInfo = new CommandParameterInfo("rate", int.class);
        colorControlmoveColorTemperatureCommandParams.put("rate",colorControlmoveColorTemperaturerateCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveColorTemperaturecolorTemperatureMinimumCommandParameterInfo = new CommandParameterInfo("colorTemperatureMinimum", int.class);
        colorControlmoveColorTemperatureCommandParams.put("colorTemperatureMinimum",colorControlmoveColorTemperaturecolorTemperatureMinimumCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveColorTemperaturecolorTemperatureMaximumCommandParameterInfo = new CommandParameterInfo("colorTemperatureMaximum", int.class);
        colorControlmoveColorTemperatureCommandParams.put("colorTemperatureMaximum",colorControlmoveColorTemperaturecolorTemperatureMaximumCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveColorTemperatureoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlmoveColorTemperatureCommandParams.put("optionsMask",colorControlmoveColorTemperatureoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveColorTemperatureoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlmoveColorTemperatureCommandParams.put("optionsOverride",colorControlmoveColorTemperatureoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlmoveColorTemperatureInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5000,16 +5000,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlmoveHueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlmoveHuemoveModeCommandParameterInfo = new CommandParameterInfo("moveMode", int.class);
        colorControlmoveHueCommandParams.put("moveMode",colorControlmoveHuemoveModeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveHuerateCommandParameterInfo = new CommandParameterInfo("rate", int.class);
        colorControlmoveHueCommandParams.put("rate",colorControlmoveHuerateCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveHueoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlmoveHueCommandParams.put("optionsMask",colorControlmoveHueoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveHueoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlmoveHueCommandParams.put("optionsOverride",colorControlmoveHueoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlmoveHueInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5036,16 +5036,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlmoveSaturationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlmoveSaturationmoveModeCommandParameterInfo = new CommandParameterInfo("moveMode", int.class);
        colorControlmoveSaturationCommandParams.put("moveMode",colorControlmoveSaturationmoveModeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveSaturationrateCommandParameterInfo = new CommandParameterInfo("rate", int.class);
        colorControlmoveSaturationCommandParams.put("rate",colorControlmoveSaturationrateCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveSaturationoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlmoveSaturationCommandParams.put("optionsMask",colorControlmoveSaturationoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveSaturationoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlmoveSaturationCommandParams.put("optionsOverride",colorControlmoveSaturationoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlmoveSaturationInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5072,19 +5072,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlmoveToColorCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlmoveToColorcolorXCommandParameterInfo = new CommandParameterInfo("colorX", int.class);
        colorControlmoveToColorCommandParams.put("colorX",colorControlmoveToColorcolorXCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToColorcolorYCommandParameterInfo = new CommandParameterInfo("colorY", int.class);
        colorControlmoveToColorCommandParams.put("colorY",colorControlmoveToColorcolorYCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToColortransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlmoveToColorCommandParams.put("transitionTime",colorControlmoveToColortransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToColoroptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlmoveToColorCommandParams.put("optionsMask",colorControlmoveToColoroptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToColoroptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlmoveToColorCommandParams.put("optionsOverride",colorControlmoveToColoroptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlmoveToColorInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5114,16 +5114,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlmoveToColorTemperatureCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlmoveToColorTemperaturecolorTemperatureCommandParameterInfo = new CommandParameterInfo("colorTemperature", int.class);
        colorControlmoveToColorTemperatureCommandParams.put("colorTemperature",colorControlmoveToColorTemperaturecolorTemperatureCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToColorTemperaturetransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlmoveToColorTemperatureCommandParams.put("transitionTime",colorControlmoveToColorTemperaturetransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToColorTemperatureoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlmoveToColorTemperatureCommandParams.put("optionsMask",colorControlmoveToColorTemperatureoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToColorTemperatureoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlmoveToColorTemperatureCommandParams.put("optionsOverride",colorControlmoveToColorTemperatureoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlmoveToColorTemperatureInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5150,19 +5150,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlmoveToHueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlmoveToHuehueCommandParameterInfo = new CommandParameterInfo("hue", int.class);
        colorControlmoveToHueCommandParams.put("hue",colorControlmoveToHuehueCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToHuedirectionCommandParameterInfo = new CommandParameterInfo("direction", int.class);
        colorControlmoveToHueCommandParams.put("direction",colorControlmoveToHuedirectionCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToHuetransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlmoveToHueCommandParams.put("transitionTime",colorControlmoveToHuetransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToHueoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlmoveToHueCommandParams.put("optionsMask",colorControlmoveToHueoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToHueoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlmoveToHueCommandParams.put("optionsOverride",colorControlmoveToHueoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlmoveToHueInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5192,19 +5192,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlmoveToHueAndSaturationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlmoveToHueAndSaturationhueCommandParameterInfo = new CommandParameterInfo("hue", int.class);
        colorControlmoveToHueAndSaturationCommandParams.put("hue",colorControlmoveToHueAndSaturationhueCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToHueAndSaturationsaturationCommandParameterInfo = new CommandParameterInfo("saturation", int.class);
        colorControlmoveToHueAndSaturationCommandParams.put("saturation",colorControlmoveToHueAndSaturationsaturationCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToHueAndSaturationtransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlmoveToHueAndSaturationCommandParams.put("transitionTime",colorControlmoveToHueAndSaturationtransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToHueAndSaturationoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlmoveToHueAndSaturationCommandParams.put("optionsMask",colorControlmoveToHueAndSaturationoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToHueAndSaturationoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlmoveToHueAndSaturationCommandParams.put("optionsOverride",colorControlmoveToHueAndSaturationoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlmoveToHueAndSaturationInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5234,16 +5234,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlmoveToSaturationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlmoveToSaturationsaturationCommandParameterInfo = new CommandParameterInfo("saturation", int.class);
        colorControlmoveToSaturationCommandParams.put("saturation",colorControlmoveToSaturationsaturationCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToSaturationtransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlmoveToSaturationCommandParams.put("transitionTime",colorControlmoveToSaturationtransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToSaturationoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlmoveToSaturationCommandParams.put("optionsMask",colorControlmoveToSaturationoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlmoveToSaturationoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlmoveToSaturationCommandParams.put("optionsOverride",colorControlmoveToSaturationoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlmoveToSaturationInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5270,19 +5270,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlstepColorCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlstepColorstepXCommandParameterInfo = new CommandParameterInfo("stepX", int.class);
        colorControlstepColorCommandParams.put("stepX",colorControlstepColorstepXCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepColorstepYCommandParameterInfo = new CommandParameterInfo("stepY", int.class);
        colorControlstepColorCommandParams.put("stepY",colorControlstepColorstepYCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepColortransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlstepColorCommandParams.put("transitionTime",colorControlstepColortransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepColoroptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlstepColorCommandParams.put("optionsMask",colorControlstepColoroptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepColoroptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlstepColorCommandParams.put("optionsOverride",colorControlstepColoroptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlstepColorInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5312,25 +5312,25 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlstepColorTemperatureCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlstepColorTemperaturestepModeCommandParameterInfo = new CommandParameterInfo("stepMode", int.class);
        colorControlstepColorTemperatureCommandParams.put("stepMode",colorControlstepColorTemperaturestepModeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepColorTemperaturestepSizeCommandParameterInfo = new CommandParameterInfo("stepSize", int.class);
        colorControlstepColorTemperatureCommandParams.put("stepSize",colorControlstepColorTemperaturestepSizeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepColorTemperaturetransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlstepColorTemperatureCommandParams.put("transitionTime",colorControlstepColorTemperaturetransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepColorTemperaturecolorTemperatureMinimumCommandParameterInfo = new CommandParameterInfo("colorTemperatureMinimum", int.class);
        colorControlstepColorTemperatureCommandParams.put("colorTemperatureMinimum",colorControlstepColorTemperaturecolorTemperatureMinimumCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepColorTemperaturecolorTemperatureMaximumCommandParameterInfo = new CommandParameterInfo("colorTemperatureMaximum", int.class);
        colorControlstepColorTemperatureCommandParams.put("colorTemperatureMaximum",colorControlstepColorTemperaturecolorTemperatureMaximumCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepColorTemperatureoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlstepColorTemperatureCommandParams.put("optionsMask",colorControlstepColorTemperatureoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepColorTemperatureoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlstepColorTemperatureCommandParams.put("optionsOverride",colorControlstepColorTemperatureoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlstepColorTemperatureInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5366,19 +5366,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlstepHueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlstepHuestepModeCommandParameterInfo = new CommandParameterInfo("stepMode", int.class);
        colorControlstepHueCommandParams.put("stepMode",colorControlstepHuestepModeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepHuestepSizeCommandParameterInfo = new CommandParameterInfo("stepSize", int.class);
        colorControlstepHueCommandParams.put("stepSize",colorControlstepHuestepSizeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepHuetransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlstepHueCommandParams.put("transitionTime",colorControlstepHuetransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepHueoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlstepHueCommandParams.put("optionsMask",colorControlstepHueoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepHueoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlstepHueCommandParams.put("optionsOverride",colorControlstepHueoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlstepHueInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5408,19 +5408,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlstepSaturationCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlstepSaturationstepModeCommandParameterInfo = new CommandParameterInfo("stepMode", int.class);
        colorControlstepSaturationCommandParams.put("stepMode",colorControlstepSaturationstepModeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepSaturationstepSizeCommandParameterInfo = new CommandParameterInfo("stepSize", int.class);
        colorControlstepSaturationCommandParams.put("stepSize",colorControlstepSaturationstepSizeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepSaturationtransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        colorControlstepSaturationCommandParams.put("transitionTime",colorControlstepSaturationtransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepSaturationoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlstepSaturationCommandParams.put("optionsMask",colorControlstepSaturationoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstepSaturationoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlstepSaturationCommandParams.put("optionsOverride",colorControlstepSaturationoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlstepSaturationInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5450,10 +5450,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> colorControlstopMoveStepCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo colorControlstopMoveStepoptionsMaskCommandParameterInfo = new CommandParameterInfo("optionsMask", int.class);
        colorControlstopMoveStepCommandParams.put("optionsMask",colorControlstopMoveStepoptionsMaskCommandParameterInfo);
-      
+
        CommandParameterInfo colorControlstopMoveStepoptionsOverrideCommandParameterInfo = new CommandParameterInfo("optionsOverride", int.class);
        colorControlstopMoveStepCommandParams.put("optionsOverride",colorControlstopMoveStepoptionsOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo colorControlstopMoveStepInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5476,10 +5476,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> contentLauncherlaunchContentRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo contentLauncherlaunchContentRequestautoPlayCommandParameterInfo = new CommandParameterInfo("autoPlay", boolean.class);
        contentLauncherlaunchContentRequestCommandParams.put("autoPlay",contentLauncherlaunchContentRequestautoPlayCommandParameterInfo);
-      
+
        CommandParameterInfo contentLauncherlaunchContentRequestdataCommandParameterInfo = new CommandParameterInfo("data", String.class);
        contentLauncherlaunchContentRequestCommandParams.put("data",contentLauncherlaunchContentRequestdataCommandParameterInfo);
-      
+
      // Populate commands
        InteractionInfo contentLauncherlaunchContentRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5500,13 +5500,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> contentLauncherlaunchURLRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo contentLauncherlaunchURLRequestcontentURLCommandParameterInfo = new CommandParameterInfo("contentURL", String.class);
        contentLauncherlaunchURLRequestCommandParams.put("contentURL",contentLauncherlaunchURLRequestcontentURLCommandParameterInfo);
-      
+
        CommandParameterInfo contentLauncherlaunchURLRequestdisplayStringCommandParameterInfo = new CommandParameterInfo("displayString", String.class);
        contentLauncherlaunchURLRequestCommandParams.put("displayString",contentLauncherlaunchURLRequestdisplayStringCommandParameterInfo);
-      
+
        CommandParameterInfo contentLauncherlaunchURLRequestproviderNameCommandParameterInfo = new CommandParameterInfo("providerName", String.class);
        contentLauncherlaunchURLRequestCommandParams.put("providerName",contentLauncherlaunchURLRequestproviderNameCommandParameterInfo);
-      
+
      // Populate commands
        InteractionInfo contentLauncherlaunchURLRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5534,13 +5534,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> diagnosticLogsretrieveLogsRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo diagnosticLogsretrieveLogsRequestintentCommandParameterInfo = new CommandParameterInfo("intent", int.class);
        diagnosticLogsretrieveLogsRequestCommandParams.put("intent",diagnosticLogsretrieveLogsRequestintentCommandParameterInfo);
-      
+
        CommandParameterInfo diagnosticLogsretrieveLogsRequestrequestedProtocolCommandParameterInfo = new CommandParameterInfo("requestedProtocol", int.class);
        diagnosticLogsretrieveLogsRequestCommandParams.put("requestedProtocol",diagnosticLogsretrieveLogsRequestrequestedProtocolCommandParameterInfo);
-      
+
        CommandParameterInfo diagnosticLogsretrieveLogsRequesttransferFileDesignatorCommandParameterInfo = new CommandParameterInfo("transferFileDesignator", byte[].class);
        diagnosticLogsretrieveLogsRequestCommandParams.put("transferFileDesignator",diagnosticLogsretrieveLogsRequesttransferFileDesignatorCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo diagnosticLogsretrieveLogsRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5566,10 +5566,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> doorLockclearCredentialCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo doorLockclearCredentialcredentialTypeCommandParameterInfo = new CommandParameterInfo("credentialType", int.class);
        doorLockclearCredentialCommandParams.put("credentialType",doorLockclearCredentialcredentialTypeCommandParameterInfo);
-      
+
        CommandParameterInfo doorLockclearCredentialcredentialIndexCommandParameterInfo = new CommandParameterInfo("credentialIndex", int.class);
        doorLockclearCredentialCommandParams.put("credentialIndex",doorLockclearCredentialcredentialIndexCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo doorLockclearCredentialInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5590,7 +5590,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> doorLockclearUserCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo doorLockclearUseruserIndexCommandParameterInfo = new CommandParameterInfo("userIndex", int.class);
        doorLockclearUserCommandParams.put("userIndex",doorLockclearUseruserIndexCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo doorLockclearUserInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5608,10 +5608,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> doorLockgetCredentialStatusCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo doorLockgetCredentialStatuscredentialTypeCommandParameterInfo = new CommandParameterInfo("credentialType", int.class);
        doorLockgetCredentialStatusCommandParams.put("credentialType",doorLockgetCredentialStatuscredentialTypeCommandParameterInfo);
-      
+
        CommandParameterInfo doorLockgetCredentialStatuscredentialIndexCommandParameterInfo = new CommandParameterInfo("credentialIndex", int.class);
        doorLockgetCredentialStatusCommandParams.put("credentialIndex",doorLockgetCredentialStatuscredentialIndexCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo doorLockgetCredentialStatusInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5632,7 +5632,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> doorLockgetUserCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo doorLockgetUseruserIndexCommandParameterInfo = new CommandParameterInfo("userIndex", int.class);
        doorLockgetUserCommandParams.put("userIndex",doorLockgetUseruserIndexCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo doorLockgetUserInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5650,7 +5650,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> doorLocklockDoorCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo doorLocklockDoorpinCodeCommandParameterInfo = new CommandParameterInfo("pinCode", byte[].class);
        doorLocklockDoorCommandParams.put("pinCode",doorLocklockDoorpinCodeCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo doorLocklockDoorInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5668,22 +5668,22 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> doorLocksetCredentialCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo doorLocksetCredentialoperationTypeCommandParameterInfo = new CommandParameterInfo("operationType", int.class);
        doorLocksetCredentialCommandParams.put("operationType",doorLocksetCredentialoperationTypeCommandParameterInfo);
-      
+
        CommandParameterInfo doorLocksetCredentialcredentialTypeCommandParameterInfo = new CommandParameterInfo("credentialType", int.class);
        doorLocksetCredentialCommandParams.put("credentialType",doorLocksetCredentialcredentialTypeCommandParameterInfo);
-      
+
        CommandParameterInfo doorLocksetCredentialcredentialIndexCommandParameterInfo = new CommandParameterInfo("credentialIndex", int.class);
        doorLocksetCredentialCommandParams.put("credentialIndex",doorLocksetCredentialcredentialIndexCommandParameterInfo);
-      
+
        CommandParameterInfo doorLocksetCredentialcredentialDataCommandParameterInfo = new CommandParameterInfo("credentialData", byte[].class);
        doorLocksetCredentialCommandParams.put("credentialData",doorLocksetCredentialcredentialDataCommandParameterInfo);
-      
+
        CommandParameterInfo doorLocksetCredentialuserIndexCommandParameterInfo = new CommandParameterInfo("userIndex", int.class);
        doorLocksetCredentialCommandParams.put("userIndex",doorLocksetCredentialuserIndexCommandParameterInfo);
-      
+
        CommandParameterInfo doorLocksetCredentialuserStatusCommandParameterInfo = new CommandParameterInfo("userStatus", int.class);
        doorLocksetCredentialCommandParams.put("userStatus",doorLocksetCredentialuserStatusCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo doorLocksetCredentialInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5716,25 +5716,25 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> doorLocksetUserCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo doorLocksetUseroperationTypeCommandParameterInfo = new CommandParameterInfo("operationType", int.class);
        doorLocksetUserCommandParams.put("operationType",doorLocksetUseroperationTypeCommandParameterInfo);
-      
+
        CommandParameterInfo doorLocksetUseruserIndexCommandParameterInfo = new CommandParameterInfo("userIndex", int.class);
        doorLocksetUserCommandParams.put("userIndex",doorLocksetUseruserIndexCommandParameterInfo);
-      
+
        CommandParameterInfo doorLocksetUseruserNameCommandParameterInfo = new CommandParameterInfo("userName", String.class);
        doorLocksetUserCommandParams.put("userName",doorLocksetUseruserNameCommandParameterInfo);
-      
+
        CommandParameterInfo doorLocksetUseruserUniqueIdCommandParameterInfo = new CommandParameterInfo("userUniqueId", long.class);
        doorLocksetUserCommandParams.put("userUniqueId",doorLocksetUseruserUniqueIdCommandParameterInfo);
-      
+
        CommandParameterInfo doorLocksetUseruserStatusCommandParameterInfo = new CommandParameterInfo("userStatus", int.class);
        doorLocksetUserCommandParams.put("userStatus",doorLocksetUseruserStatusCommandParameterInfo);
-      
+
        CommandParameterInfo doorLocksetUseruserTypeCommandParameterInfo = new CommandParameterInfo("userType", int.class);
        doorLocksetUserCommandParams.put("userType",doorLocksetUseruserTypeCommandParameterInfo);
-      
+
        CommandParameterInfo doorLocksetUsercredentialRuleCommandParameterInfo = new CommandParameterInfo("credentialRule", int.class);
        doorLocksetUserCommandParams.put("credentialRule",doorLocksetUsercredentialRuleCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo doorLocksetUserInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5770,7 +5770,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> doorLockunlockDoorCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo doorLockunlockDoorpinCodeCommandParameterInfo = new CommandParameterInfo("pinCode", byte[].class);
        doorLockunlockDoorCommandParams.put("pinCode",doorLockunlockDoorpinCodeCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo doorLockunlockDoorInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5810,13 +5810,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> generalCommissioningarmFailSafeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo generalCommissioningarmFailSafeexpiryLengthSecondsCommandParameterInfo = new CommandParameterInfo("expiryLengthSeconds", int.class);
        generalCommissioningarmFailSafeCommandParams.put("expiryLengthSeconds",generalCommissioningarmFailSafeexpiryLengthSecondsCommandParameterInfo);
-      
+
        CommandParameterInfo generalCommissioningarmFailSafebreadcrumbCommandParameterInfo = new CommandParameterInfo("breadcrumb", long.class);
        generalCommissioningarmFailSafeCommandParams.put("breadcrumb",generalCommissioningarmFailSafebreadcrumbCommandParameterInfo);
-      
+
        CommandParameterInfo generalCommissioningarmFailSafetimeoutMsCommandParameterInfo = new CommandParameterInfo("timeoutMs", long.class);
        generalCommissioningarmFailSafeCommandParams.put("timeoutMs",generalCommissioningarmFailSafetimeoutMsCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo generalCommissioningarmFailSafeInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5852,16 +5852,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> generalCommissioningsetRegulatoryConfigCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo generalCommissioningsetRegulatoryConfiglocationCommandParameterInfo = new CommandParameterInfo("location", int.class);
        generalCommissioningsetRegulatoryConfigCommandParams.put("location",generalCommissioningsetRegulatoryConfiglocationCommandParameterInfo);
-      
+
        CommandParameterInfo generalCommissioningsetRegulatoryConfigcountryCodeCommandParameterInfo = new CommandParameterInfo("countryCode", String.class);
        generalCommissioningsetRegulatoryConfigCommandParams.put("countryCode",generalCommissioningsetRegulatoryConfigcountryCodeCommandParameterInfo);
-      
+
        CommandParameterInfo generalCommissioningsetRegulatoryConfigbreadcrumbCommandParameterInfo = new CommandParameterInfo("breadcrumb", long.class);
        generalCommissioningsetRegulatoryConfigCommandParams.put("breadcrumb",generalCommissioningsetRegulatoryConfigbreadcrumbCommandParameterInfo);
-      
+
        CommandParameterInfo generalCommissioningsetRegulatoryConfigtimeoutMsCommandParameterInfo = new CommandParameterInfo("timeoutMs", long.class);
        generalCommissioningsetRegulatoryConfigCommandParams.put("timeoutMs",generalCommissioningsetRegulatoryConfigtimeoutMsCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo generalCommissioningsetRegulatoryConfigInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5892,7 +5892,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> groupKeyManagementkeySetReadCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo groupKeyManagementkeySetReadgroupKeySetIDCommandParameterInfo = new CommandParameterInfo("groupKeySetID", int.class);
        groupKeyManagementkeySetReadCommandParams.put("groupKeySetID",groupKeyManagementkeySetReadgroupKeySetIDCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo groupKeyManagementkeySetReadInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5910,7 +5910,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> groupKeyManagementkeySetReadAllIndicesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo = new CommandParameterInfo("groupKeySetIDs", int.class);
        groupKeyManagementkeySetReadAllIndicesCommandParams.put("groupKeySetIDs",groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo groupKeyManagementkeySetReadAllIndicesInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5928,7 +5928,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> groupKeyManagementkeySetRemoveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo groupKeyManagementkeySetRemovegroupKeySetIDCommandParameterInfo = new CommandParameterInfo("groupKeySetID", int.class);
        groupKeyManagementkeySetRemoveCommandParams.put("groupKeySetID",groupKeyManagementkeySetRemovegroupKeySetIDCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo groupKeyManagementkeySetRemoveInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -5946,28 +5946,28 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> groupKeyManagementkeySetWriteCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo groupKeyManagementkeySetWritegroupKeySetIDCommandParameterInfo = new CommandParameterInfo("groupKeySetID", int.class);
        groupKeyManagementkeySetWriteCommandParams.put("groupKeySetID",groupKeyManagementkeySetWritegroupKeySetIDCommandParameterInfo);
-      
+
        CommandParameterInfo groupKeyManagementkeySetWritesecurityPolicyCommandParameterInfo = new CommandParameterInfo("securityPolicy", int.class);
        groupKeyManagementkeySetWriteCommandParams.put("securityPolicy",groupKeyManagementkeySetWritesecurityPolicyCommandParameterInfo);
-      
+
        CommandParameterInfo groupKeyManagementkeySetWriteepochKey0CommandParameterInfo = new CommandParameterInfo("epochKey0", byte[].class);
        groupKeyManagementkeySetWriteCommandParams.put("epochKey0",groupKeyManagementkeySetWriteepochKey0CommandParameterInfo);
-      
+
        CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime0CommandParameterInfo = new CommandParameterInfo("epochStartTime0", long.class);
        groupKeyManagementkeySetWriteCommandParams.put("epochStartTime0",groupKeyManagementkeySetWriteepochStartTime0CommandParameterInfo);
-      
+
        CommandParameterInfo groupKeyManagementkeySetWriteepochKey1CommandParameterInfo = new CommandParameterInfo("epochKey1", byte[].class);
        groupKeyManagementkeySetWriteCommandParams.put("epochKey1",groupKeyManagementkeySetWriteepochKey1CommandParameterInfo);
-      
+
        CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime1CommandParameterInfo = new CommandParameterInfo("epochStartTime1", long.class);
        groupKeyManagementkeySetWriteCommandParams.put("epochStartTime1",groupKeyManagementkeySetWriteepochStartTime1CommandParameterInfo);
-      
+
        CommandParameterInfo groupKeyManagementkeySetWriteepochKey2CommandParameterInfo = new CommandParameterInfo("epochKey2", byte[].class);
        groupKeyManagementkeySetWriteCommandParams.put("epochKey2",groupKeyManagementkeySetWriteepochKey2CommandParameterInfo);
-      
+
        CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime2CommandParameterInfo = new CommandParameterInfo("epochStartTime2", long.class);
        groupKeyManagementkeySetWriteCommandParams.put("epochStartTime2",groupKeyManagementkeySetWriteepochStartTime2CommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo groupKeyManagementkeySetWriteInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6008,10 +6008,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> groupsaddGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo groupsaddGroupgroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        groupsaddGroupCommandParams.put("groupId",groupsaddGroupgroupIdCommandParameterInfo);
-      
+
        CommandParameterInfo groupsaddGroupgroupNameCommandParameterInfo = new CommandParameterInfo("groupName", String.class);
        groupsaddGroupCommandParams.put("groupName",groupsaddGroupgroupNameCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo groupsaddGroupInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6032,10 +6032,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> groupsaddGroupIfIdentifyingCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo groupsaddGroupIfIdentifyinggroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        groupsaddGroupIfIdentifyingCommandParams.put("groupId",groupsaddGroupIfIdentifyinggroupIdCommandParameterInfo);
-      
+
        CommandParameterInfo groupsaddGroupIfIdentifyinggroupNameCommandParameterInfo = new CommandParameterInfo("groupName", String.class);
        groupsaddGroupIfIdentifyingCommandParams.put("groupName",groupsaddGroupIfIdentifyinggroupNameCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo groupsaddGroupIfIdentifyingInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6056,7 +6056,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> groupsgetGroupMembershipCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo groupsgetGroupMembershipgroupListCommandParameterInfo = new CommandParameterInfo("groupList", int.class);
        groupsgetGroupMembershipCommandParams.put("groupList",groupsgetGroupMembershipgroupListCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo groupsgetGroupMembershipInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6086,7 +6086,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> groupsremoveGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo groupsremoveGroupgroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        groupsremoveGroupCommandParams.put("groupId",groupsremoveGroupgroupIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo groupsremoveGroupInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6104,7 +6104,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> groupsviewGroupCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo groupsviewGroupgroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        groupsviewGroupCommandParams.put("groupId",groupsviewGroupgroupIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo groupsviewGroupInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6124,7 +6124,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> identifyidentifyCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo identifyidentifyidentifyTimeCommandParameterInfo = new CommandParameterInfo("identifyTime", int.class);
        identifyidentifyCommandParams.put("identifyTime",identifyidentifyidentifyTimeCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo identifyidentifyInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6154,10 +6154,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> identifytriggerEffectCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo identifytriggerEffecteffectIdentifierCommandParameterInfo = new CommandParameterInfo("effectIdentifier", int.class);
        identifytriggerEffectCommandParams.put("effectIdentifier",identifytriggerEffecteffectIdentifierCommandParameterInfo);
-      
+
        CommandParameterInfo identifytriggerEffecteffectVariantCommandParameterInfo = new CommandParameterInfo("effectVariant", int.class);
        identifytriggerEffectCommandParams.put("effectVariant",identifytriggerEffecteffectVariantCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo identifytriggerEffectInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6182,7 +6182,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> keypadInputsendKeyRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo keypadInputsendKeyRequestkeyCodeCommandParameterInfo = new CommandParameterInfo("keyCode", int.class);
        keypadInputsendKeyRequestCommandParams.put("keyCode",keypadInputsendKeyRequestkeyCodeCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo keypadInputsendKeyRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6202,16 +6202,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> levelControlmoveCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo levelControlmovemoveModeCommandParameterInfo = new CommandParameterInfo("moveMode", int.class);
        levelControlmoveCommandParams.put("moveMode",levelControlmovemoveModeCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlmoverateCommandParameterInfo = new CommandParameterInfo("rate", int.class);
        levelControlmoveCommandParams.put("rate",levelControlmoverateCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlmoveoptionMaskCommandParameterInfo = new CommandParameterInfo("optionMask", int.class);
        levelControlmoveCommandParams.put("optionMask",levelControlmoveoptionMaskCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlmoveoptionOverrideCommandParameterInfo = new CommandParameterInfo("optionOverride", int.class);
        levelControlmoveCommandParams.put("optionOverride",levelControlmoveoptionOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo levelControlmoveInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6238,16 +6238,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> levelControlmoveToLevelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo levelControlmoveToLevellevelCommandParameterInfo = new CommandParameterInfo("level", int.class);
        levelControlmoveToLevelCommandParams.put("level",levelControlmoveToLevellevelCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlmoveToLeveltransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        levelControlmoveToLevelCommandParams.put("transitionTime",levelControlmoveToLeveltransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlmoveToLeveloptionMaskCommandParameterInfo = new CommandParameterInfo("optionMask", int.class);
        levelControlmoveToLevelCommandParams.put("optionMask",levelControlmoveToLeveloptionMaskCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlmoveToLeveloptionOverrideCommandParameterInfo = new CommandParameterInfo("optionOverride", int.class);
        levelControlmoveToLevelCommandParams.put("optionOverride",levelControlmoveToLeveloptionOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo levelControlmoveToLevelInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6274,10 +6274,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> levelControlmoveToLevelWithOnOffCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo levelControlmoveToLevelWithOnOfflevelCommandParameterInfo = new CommandParameterInfo("level", int.class);
        levelControlmoveToLevelWithOnOffCommandParams.put("level",levelControlmoveToLevelWithOnOfflevelCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlmoveToLevelWithOnOfftransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        levelControlmoveToLevelWithOnOffCommandParams.put("transitionTime",levelControlmoveToLevelWithOnOfftransitionTimeCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo levelControlmoveToLevelWithOnOffInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6298,10 +6298,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> levelControlmoveWithOnOffCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo levelControlmoveWithOnOffmoveModeCommandParameterInfo = new CommandParameterInfo("moveMode", int.class);
        levelControlmoveWithOnOffCommandParams.put("moveMode",levelControlmoveWithOnOffmoveModeCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlmoveWithOnOffrateCommandParameterInfo = new CommandParameterInfo("rate", int.class);
        levelControlmoveWithOnOffCommandParams.put("rate",levelControlmoveWithOnOffrateCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo levelControlmoveWithOnOffInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6322,19 +6322,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> levelControlstepCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo levelControlstepstepModeCommandParameterInfo = new CommandParameterInfo("stepMode", int.class);
        levelControlstepCommandParams.put("stepMode",levelControlstepstepModeCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlstepstepSizeCommandParameterInfo = new CommandParameterInfo("stepSize", int.class);
        levelControlstepCommandParams.put("stepSize",levelControlstepstepSizeCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlsteptransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        levelControlstepCommandParams.put("transitionTime",levelControlsteptransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlstepoptionMaskCommandParameterInfo = new CommandParameterInfo("optionMask", int.class);
        levelControlstepCommandParams.put("optionMask",levelControlstepoptionMaskCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlstepoptionOverrideCommandParameterInfo = new CommandParameterInfo("optionOverride", int.class);
        levelControlstepCommandParams.put("optionOverride",levelControlstepoptionOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo levelControlstepInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6364,13 +6364,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> levelControlstepWithOnOffCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo levelControlstepWithOnOffstepModeCommandParameterInfo = new CommandParameterInfo("stepMode", int.class);
        levelControlstepWithOnOffCommandParams.put("stepMode",levelControlstepWithOnOffstepModeCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlstepWithOnOffstepSizeCommandParameterInfo = new CommandParameterInfo("stepSize", int.class);
        levelControlstepWithOnOffCommandParams.put("stepSize",levelControlstepWithOnOffstepSizeCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlstepWithOnOfftransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        levelControlstepWithOnOffCommandParams.put("transitionTime",levelControlstepWithOnOfftransitionTimeCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo levelControlstepWithOnOffInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6394,10 +6394,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> levelControlstopCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo levelControlstopoptionMaskCommandParameterInfo = new CommandParameterInfo("optionMask", int.class);
        levelControlstopCommandParams.put("optionMask",levelControlstopoptionMaskCommandParameterInfo);
-      
+
        CommandParameterInfo levelControlstopoptionOverrideCommandParameterInfo = new CommandParameterInfo("optionOverride", int.class);
        levelControlstopCommandParams.put("optionOverride",levelControlstopoptionOverrideCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo levelControlstopInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6460,10 +6460,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> mediaInputrenameInputRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo mediaInputrenameInputRequestindexCommandParameterInfo = new CommandParameterInfo("index", int.class);
        mediaInputrenameInputRequestCommandParams.put("index",mediaInputrenameInputRequestindexCommandParameterInfo);
-      
+
        CommandParameterInfo mediaInputrenameInputRequestnameCommandParameterInfo = new CommandParameterInfo("name", String.class);
        mediaInputrenameInputRequestCommandParams.put("name",mediaInputrenameInputRequestnameCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo mediaInputrenameInputRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6484,7 +6484,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> mediaInputselectInputRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo mediaInputselectInputRequestindexCommandParameterInfo = new CommandParameterInfo("index", int.class);
        mediaInputselectInputRequestCommandParams.put("index",mediaInputselectInputRequestindexCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo mediaInputselectInputRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6588,7 +6588,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> mediaPlaybackseekRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo mediaPlaybackseekRequestpositionCommandParameterInfo = new CommandParameterInfo("position", long.class);
        mediaPlaybackseekRequestCommandParams.put("position",mediaPlaybackseekRequestpositionCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo mediaPlaybackseekRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6606,7 +6606,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> mediaPlaybackskipBackwardRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo mediaPlaybackskipBackwardRequestdeltaPositionMillisecondsCommandParameterInfo = new CommandParameterInfo("deltaPositionMilliseconds", long.class);
        mediaPlaybackskipBackwardRequestCommandParams.put("deltaPositionMilliseconds",mediaPlaybackskipBackwardRequestdeltaPositionMillisecondsCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo mediaPlaybackskipBackwardRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6624,7 +6624,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> mediaPlaybackskipForwardRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo mediaPlaybackskipForwardRequestdeltaPositionMillisecondsCommandParameterInfo = new CommandParameterInfo("deltaPositionMilliseconds", long.class);
        mediaPlaybackskipForwardRequestCommandParams.put("deltaPositionMilliseconds",mediaPlaybackskipForwardRequestdeltaPositionMillisecondsCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo mediaPlaybackskipForwardRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6668,7 +6668,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> modeSelectchangeToModeCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo modeSelectchangeToModenewModeCommandParameterInfo = new CommandParameterInfo("newMode", int.class);
        modeSelectchangeToModeCommandParams.put("newMode",modeSelectchangeToModenewModeCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo modeSelectchangeToModeInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6688,10 +6688,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> networkCommissioningaddOrUpdateThreadNetworkCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo networkCommissioningaddOrUpdateThreadNetworkoperationalDatasetCommandParameterInfo = new CommandParameterInfo("operationalDataset", byte[].class);
        networkCommissioningaddOrUpdateThreadNetworkCommandParams.put("operationalDataset",networkCommissioningaddOrUpdateThreadNetworkoperationalDatasetCommandParameterInfo);
-      
+
        CommandParameterInfo networkCommissioningaddOrUpdateThreadNetworkbreadcrumbCommandParameterInfo = new CommandParameterInfo("breadcrumb", long.class);
        networkCommissioningaddOrUpdateThreadNetworkCommandParams.put("breadcrumb",networkCommissioningaddOrUpdateThreadNetworkbreadcrumbCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo networkCommissioningaddOrUpdateThreadNetworkInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6712,13 +6712,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> networkCommissioningaddOrUpdateWiFiNetworkCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworkssidCommandParameterInfo = new CommandParameterInfo("ssid", byte[].class);
        networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put("ssid",networkCommissioningaddOrUpdateWiFiNetworkssidCommandParameterInfo);
-      
+
        CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworkcredentialsCommandParameterInfo = new CommandParameterInfo("credentials", byte[].class);
        networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put("credentials",networkCommissioningaddOrUpdateWiFiNetworkcredentialsCommandParameterInfo);
-      
+
        CommandParameterInfo networkCommissioningaddOrUpdateWiFiNetworkbreadcrumbCommandParameterInfo = new CommandParameterInfo("breadcrumb", long.class);
        networkCommissioningaddOrUpdateWiFiNetworkCommandParams.put("breadcrumb",networkCommissioningaddOrUpdateWiFiNetworkbreadcrumbCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo networkCommissioningaddOrUpdateWiFiNetworkInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6742,10 +6742,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> networkCommissioningconnectNetworkCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo networkCommissioningconnectNetworknetworkIDCommandParameterInfo = new CommandParameterInfo("networkID", byte[].class);
        networkCommissioningconnectNetworkCommandParams.put("networkID",networkCommissioningconnectNetworknetworkIDCommandParameterInfo);
-      
+
        CommandParameterInfo networkCommissioningconnectNetworkbreadcrumbCommandParameterInfo = new CommandParameterInfo("breadcrumb", long.class);
        networkCommissioningconnectNetworkCommandParams.put("breadcrumb",networkCommissioningconnectNetworkbreadcrumbCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo networkCommissioningconnectNetworkInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6766,10 +6766,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> networkCommissioningremoveNetworkCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo networkCommissioningremoveNetworknetworkIDCommandParameterInfo = new CommandParameterInfo("networkID", byte[].class);
        networkCommissioningremoveNetworkCommandParams.put("networkID",networkCommissioningremoveNetworknetworkIDCommandParameterInfo);
-      
+
        CommandParameterInfo networkCommissioningremoveNetworkbreadcrumbCommandParameterInfo = new CommandParameterInfo("breadcrumb", long.class);
        networkCommissioningremoveNetworkCommandParams.put("breadcrumb",networkCommissioningremoveNetworkbreadcrumbCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo networkCommissioningremoveNetworkInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6790,13 +6790,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> networkCommissioningreorderNetworkCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo networkCommissioningreorderNetworknetworkIDCommandParameterInfo = new CommandParameterInfo("networkID", byte[].class);
        networkCommissioningreorderNetworkCommandParams.put("networkID",networkCommissioningreorderNetworknetworkIDCommandParameterInfo);
-      
+
        CommandParameterInfo networkCommissioningreorderNetworknetworkIndexCommandParameterInfo = new CommandParameterInfo("networkIndex", int.class);
        networkCommissioningreorderNetworkCommandParams.put("networkIndex",networkCommissioningreorderNetworknetworkIndexCommandParameterInfo);
-      
+
        CommandParameterInfo networkCommissioningreorderNetworkbreadcrumbCommandParameterInfo = new CommandParameterInfo("breadcrumb", long.class);
        networkCommissioningreorderNetworkCommandParams.put("breadcrumb",networkCommissioningreorderNetworkbreadcrumbCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo networkCommissioningreorderNetworkInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6820,10 +6820,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> networkCommissioningscanNetworksCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo networkCommissioningscanNetworksssidCommandParameterInfo = new CommandParameterInfo("ssid", byte[].class);
        networkCommissioningscanNetworksCommandParams.put("ssid",networkCommissioningscanNetworksssidCommandParameterInfo);
-      
+
        CommandParameterInfo networkCommissioningscanNetworksbreadcrumbCommandParameterInfo = new CommandParameterInfo("breadcrumb", long.class);
        networkCommissioningscanNetworksCommandParams.put("breadcrumb",networkCommissioningscanNetworksbreadcrumbCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo networkCommissioningscanNetworksInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6846,10 +6846,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> otaSoftwareUpdateProviderapplyUpdateRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo otaSoftwareUpdateProviderapplyUpdateRequestupdateTokenCommandParameterInfo = new CommandParameterInfo("updateToken", byte[].class);
        otaSoftwareUpdateProviderapplyUpdateRequestCommandParams.put("updateToken",otaSoftwareUpdateProviderapplyUpdateRequestupdateTokenCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateProviderapplyUpdateRequestnewVersionCommandParameterInfo = new CommandParameterInfo("newVersion", long.class);
        otaSoftwareUpdateProviderapplyUpdateRequestCommandParams.put("newVersion",otaSoftwareUpdateProviderapplyUpdateRequestnewVersionCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo otaSoftwareUpdateProviderapplyUpdateRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6870,10 +6870,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> otaSoftwareUpdateProvidernotifyUpdateAppliedCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo otaSoftwareUpdateProvidernotifyUpdateAppliedupdateTokenCommandParameterInfo = new CommandParameterInfo("updateToken", byte[].class);
        otaSoftwareUpdateProvidernotifyUpdateAppliedCommandParams.put("updateToken",otaSoftwareUpdateProvidernotifyUpdateAppliedupdateTokenCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateProvidernotifyUpdateAppliedsoftwareVersionCommandParameterInfo = new CommandParameterInfo("softwareVersion", long.class);
        otaSoftwareUpdateProvidernotifyUpdateAppliedCommandParams.put("softwareVersion",otaSoftwareUpdateProvidernotifyUpdateAppliedsoftwareVersionCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo otaSoftwareUpdateProvidernotifyUpdateAppliedInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6894,28 +6894,28 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> otaSoftwareUpdateProviderqueryImageCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo otaSoftwareUpdateProviderqueryImagevendorIdCommandParameterInfo = new CommandParameterInfo("vendorId", int.class);
        otaSoftwareUpdateProviderqueryImageCommandParams.put("vendorId",otaSoftwareUpdateProviderqueryImagevendorIdCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateProviderqueryImageproductIdCommandParameterInfo = new CommandParameterInfo("productId", int.class);
        otaSoftwareUpdateProviderqueryImageCommandParams.put("productId",otaSoftwareUpdateProviderqueryImageproductIdCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateProviderqueryImagesoftwareVersionCommandParameterInfo = new CommandParameterInfo("softwareVersion", long.class);
        otaSoftwareUpdateProviderqueryImageCommandParams.put("softwareVersion",otaSoftwareUpdateProviderqueryImagesoftwareVersionCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateProviderqueryImageprotocolsSupportedCommandParameterInfo = new CommandParameterInfo("protocolsSupported", int.class);
        otaSoftwareUpdateProviderqueryImageCommandParams.put("protocolsSupported",otaSoftwareUpdateProviderqueryImageprotocolsSupportedCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateProviderqueryImagehardwareVersionCommandParameterInfo = new CommandParameterInfo("hardwareVersion", int.class);
        otaSoftwareUpdateProviderqueryImageCommandParams.put("hardwareVersion",otaSoftwareUpdateProviderqueryImagehardwareVersionCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateProviderqueryImagelocationCommandParameterInfo = new CommandParameterInfo("location", String.class);
        otaSoftwareUpdateProviderqueryImageCommandParams.put("location",otaSoftwareUpdateProviderqueryImagelocationCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateProviderqueryImagerequestorCanConsentCommandParameterInfo = new CommandParameterInfo("requestorCanConsent", boolean.class);
        otaSoftwareUpdateProviderqueryImageCommandParams.put("requestorCanConsent",otaSoftwareUpdateProviderqueryImagerequestorCanConsentCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateProviderqueryImagemetadataForProviderCommandParameterInfo = new CommandParameterInfo("metadataForProvider", byte[].class);
        otaSoftwareUpdateProviderqueryImageCommandParams.put("metadataForProvider",otaSoftwareUpdateProviderqueryImagemetadataForProviderCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo otaSoftwareUpdateProviderqueryImageInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -6956,19 +6956,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> otaSoftwareUpdateRequestorannounceOtaProviderCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProviderproviderNodeIdCommandParameterInfo = new CommandParameterInfo("providerNodeId", long.class);
        otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put("providerNodeId",otaSoftwareUpdateRequestorannounceOtaProviderproviderNodeIdCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProvidervendorIdCommandParameterInfo = new CommandParameterInfo("vendorId", int.class);
        otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put("vendorId",otaSoftwareUpdateRequestorannounceOtaProvidervendorIdCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProviderannouncementReasonCommandParameterInfo = new CommandParameterInfo("announcementReason", int.class);
        otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put("announcementReason",otaSoftwareUpdateRequestorannounceOtaProviderannouncementReasonCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProvidermetadataForNodeCommandParameterInfo = new CommandParameterInfo("metadataForNode", byte[].class);
        otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put("metadataForNode",otaSoftwareUpdateRequestorannounceOtaProvidermetadataForNodeCommandParameterInfo);
-      
+
        CommandParameterInfo otaSoftwareUpdateRequestorannounceOtaProviderendpointCommandParameterInfo = new CommandParameterInfo("endpoint", int.class);
        otaSoftwareUpdateRequestorannounceOtaProviderCommandParams.put("endpoint",otaSoftwareUpdateRequestorannounceOtaProviderendpointCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo otaSoftwareUpdateRequestorannounceOtaProviderInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7014,10 +7014,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> onOffoffWithEffectCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo onOffoffWithEffecteffectIdCommandParameterInfo = new CommandParameterInfo("effectId", int.class);
        onOffoffWithEffectCommandParams.put("effectId",onOffoffWithEffecteffectIdCommandParameterInfo);
-      
+
        CommandParameterInfo onOffoffWithEffecteffectVariantCommandParameterInfo = new CommandParameterInfo("effectVariant", int.class);
        onOffoffWithEffectCommandParams.put("effectVariant",onOffoffWithEffecteffectVariantCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo onOffoffWithEffectInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7062,13 +7062,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> onOffonWithTimedOffCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo onOffonWithTimedOffonOffControlCommandParameterInfo = new CommandParameterInfo("onOffControl", int.class);
        onOffonWithTimedOffCommandParams.put("onOffControl",onOffonWithTimedOffonOffControlCommandParameterInfo);
-      
+
        CommandParameterInfo onOffonWithTimedOffonTimeCommandParameterInfo = new CommandParameterInfo("onTime", int.class);
        onOffonWithTimedOffCommandParams.put("onTime",onOffonWithTimedOffonTimeCommandParameterInfo);
-      
+
        CommandParameterInfo onOffonWithTimedOffoffWaitTimeCommandParameterInfo = new CommandParameterInfo("offWaitTime", int.class);
        onOffonWithTimedOffCommandParams.put("offWaitTime",onOffonWithTimedOffoffWaitTimeCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo onOffonWithTimedOffInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7108,19 +7108,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> operationalCredentialsaddNOCCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo operationalCredentialsaddNOCNOCValueCommandParameterInfo = new CommandParameterInfo("NOCValue", byte[].class);
        operationalCredentialsaddNOCCommandParams.put("NOCValue",operationalCredentialsaddNOCNOCValueCommandParameterInfo);
-      
+
        CommandParameterInfo operationalCredentialsaddNOCICACValueCommandParameterInfo = new CommandParameterInfo("ICACValue", byte[].class);
        operationalCredentialsaddNOCCommandParams.put("ICACValue",operationalCredentialsaddNOCICACValueCommandParameterInfo);
-      
+
        CommandParameterInfo operationalCredentialsaddNOCIPKValueCommandParameterInfo = new CommandParameterInfo("IPKValue", byte[].class);
        operationalCredentialsaddNOCCommandParams.put("IPKValue",operationalCredentialsaddNOCIPKValueCommandParameterInfo);
-      
+
        CommandParameterInfo operationalCredentialsaddNOCcaseAdminNodeCommandParameterInfo = new CommandParameterInfo("caseAdminNode", long.class);
        operationalCredentialsaddNOCCommandParams.put("caseAdminNode",operationalCredentialsaddNOCcaseAdminNodeCommandParameterInfo);
-      
+
        CommandParameterInfo operationalCredentialsaddNOCadminVendorIdCommandParameterInfo = new CommandParameterInfo("adminVendorId", int.class);
        operationalCredentialsaddNOCCommandParams.put("adminVendorId",operationalCredentialsaddNOCadminVendorIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo operationalCredentialsaddNOCInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7150,7 +7150,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> operationalCredentialsaddTrustedRootCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo operationalCredentialsaddTrustedRootCertificaterootCertificateCommandParameterInfo = new CommandParameterInfo("rootCertificate", byte[].class);
        operationalCredentialsaddTrustedRootCertificateCommandParams.put("rootCertificate",operationalCredentialsaddTrustedRootCertificaterootCertificateCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo operationalCredentialsaddTrustedRootCertificateInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7168,7 +7168,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> operationalCredentialsattestationRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo operationalCredentialsattestationRequestattestationNonceCommandParameterInfo = new CommandParameterInfo("attestationNonce", byte[].class);
        operationalCredentialsattestationRequestCommandParams.put("attestationNonce",operationalCredentialsattestationRequestattestationNonceCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo operationalCredentialsattestationRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7186,7 +7186,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> operationalCredentialscertificateChainRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo operationalCredentialscertificateChainRequestcertificateTypeCommandParameterInfo = new CommandParameterInfo("certificateType", int.class);
        operationalCredentialscertificateChainRequestCommandParams.put("certificateType",operationalCredentialscertificateChainRequestcertificateTypeCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo operationalCredentialscertificateChainRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7204,7 +7204,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> operationalCredentialsopCSRRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo operationalCredentialsopCSRRequestCSRNonceCommandParameterInfo = new CommandParameterInfo("CSRNonce", byte[].class);
        operationalCredentialsopCSRRequestCommandParams.put("CSRNonce",operationalCredentialsopCSRRequestCSRNonceCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo operationalCredentialsopCSRRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7222,7 +7222,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> operationalCredentialsremoveFabricCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo operationalCredentialsremoveFabricfabricIndexCommandParameterInfo = new CommandParameterInfo("fabricIndex", int.class);
        operationalCredentialsremoveFabricCommandParams.put("fabricIndex",operationalCredentialsremoveFabricfabricIndexCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo operationalCredentialsremoveFabricInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7240,7 +7240,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> operationalCredentialsremoveTrustedRootCertificateCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo operationalCredentialsremoveTrustedRootCertificatetrustedRootIdentifierCommandParameterInfo = new CommandParameterInfo("trustedRootIdentifier", byte[].class);
        operationalCredentialsremoveTrustedRootCertificateCommandParams.put("trustedRootIdentifier",operationalCredentialsremoveTrustedRootCertificatetrustedRootIdentifierCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo operationalCredentialsremoveTrustedRootCertificateInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7258,7 +7258,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> operationalCredentialsupdateFabricLabelCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo operationalCredentialsupdateFabricLabellabelCommandParameterInfo = new CommandParameterInfo("label", String.class);
        operationalCredentialsupdateFabricLabelCommandParams.put("label",operationalCredentialsupdateFabricLabellabelCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo operationalCredentialsupdateFabricLabelInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7276,10 +7276,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> operationalCredentialsupdateNOCCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo operationalCredentialsupdateNOCNOCValueCommandParameterInfo = new CommandParameterInfo("NOCValue", byte[].class);
        operationalCredentialsupdateNOCCommandParams.put("NOCValue",operationalCredentialsupdateNOCNOCValueCommandParameterInfo);
-      
+
        CommandParameterInfo operationalCredentialsupdateNOCICACValueCommandParameterInfo = new CommandParameterInfo("ICACValue", byte[].class);
        operationalCredentialsupdateNOCCommandParams.put("ICACValue",operationalCredentialsupdateNOCICACValueCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo operationalCredentialsupdateNOCInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7312,25 +7312,25 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> scenesaddSceneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo scenesaddScenegroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        scenesaddSceneCommandParams.put("groupId",scenesaddScenegroupIdCommandParameterInfo);
-      
+
        CommandParameterInfo scenesaddScenesceneIdCommandParameterInfo = new CommandParameterInfo("sceneId", int.class);
        scenesaddSceneCommandParams.put("sceneId",scenesaddScenesceneIdCommandParameterInfo);
-      
+
        CommandParameterInfo scenesaddScenetransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        scenesaddSceneCommandParams.put("transitionTime",scenesaddScenetransitionTimeCommandParameterInfo);
-      
+
        CommandParameterInfo scenesaddScenesceneNameCommandParameterInfo = new CommandParameterInfo("sceneName", String.class);
        scenesaddSceneCommandParams.put("sceneName",scenesaddScenesceneNameCommandParameterInfo);
-      
+
        CommandParameterInfo scenesaddSceneclusterIdCommandParameterInfo = new CommandParameterInfo("clusterId", long.class);
        scenesaddSceneCommandParams.put("clusterId",scenesaddSceneclusterIdCommandParameterInfo);
-      
+
        CommandParameterInfo scenesaddScenelengthCommandParameterInfo = new CommandParameterInfo("length", int.class);
        scenesaddSceneCommandParams.put("length",scenesaddScenelengthCommandParameterInfo);
-      
+
        CommandParameterInfo scenesaddScenevalueCommandParameterInfo = new CommandParameterInfo("value", int.class);
        scenesaddSceneCommandParams.put("value",scenesaddScenevalueCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo scenesaddSceneInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7366,7 +7366,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> scenesgetSceneMembershipCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo scenesgetSceneMembershipgroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        scenesgetSceneMembershipCommandParams.put("groupId",scenesgetSceneMembershipgroupIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo scenesgetSceneMembershipInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7384,13 +7384,13 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> scenesrecallSceneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo scenesrecallScenegroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        scenesrecallSceneCommandParams.put("groupId",scenesrecallScenegroupIdCommandParameterInfo);
-      
+
        CommandParameterInfo scenesrecallScenesceneIdCommandParameterInfo = new CommandParameterInfo("sceneId", int.class);
        scenesrecallSceneCommandParams.put("sceneId",scenesrecallScenesceneIdCommandParameterInfo);
-      
+
        CommandParameterInfo scenesrecallScenetransitionTimeCommandParameterInfo = new CommandParameterInfo("transitionTime", int.class);
        scenesrecallSceneCommandParams.put("transitionTime",scenesrecallScenetransitionTimeCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo scenesrecallSceneInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7414,7 +7414,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> scenesremoveAllScenesCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo scenesremoveAllScenesgroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        scenesremoveAllScenesCommandParams.put("groupId",scenesremoveAllScenesgroupIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo scenesremoveAllScenesInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7432,10 +7432,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> scenesremoveSceneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo scenesremoveScenegroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        scenesremoveSceneCommandParams.put("groupId",scenesremoveScenegroupIdCommandParameterInfo);
-      
+
        CommandParameterInfo scenesremoveScenesceneIdCommandParameterInfo = new CommandParameterInfo("sceneId", int.class);
        scenesremoveSceneCommandParams.put("sceneId",scenesremoveScenesceneIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo scenesremoveSceneInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7456,10 +7456,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> scenesstoreSceneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo scenesstoreScenegroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        scenesstoreSceneCommandParams.put("groupId",scenesstoreScenegroupIdCommandParameterInfo);
-      
+
        CommandParameterInfo scenesstoreScenesceneIdCommandParameterInfo = new CommandParameterInfo("sceneId", int.class);
        scenesstoreSceneCommandParams.put("sceneId",scenesstoreScenesceneIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo scenesstoreSceneInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7480,10 +7480,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> scenesviewSceneCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo scenesviewScenegroupIdCommandParameterInfo = new CommandParameterInfo("groupId", int.class);
        scenesviewSceneCommandParams.put("groupId",scenesviewScenegroupIdCommandParameterInfo);
-      
+
        CommandParameterInfo scenesviewScenesceneIdCommandParameterInfo = new CommandParameterInfo("sceneId", int.class);
        scenesviewSceneCommandParams.put("sceneId",scenesviewScenesceneIdCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo scenesviewSceneInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7522,10 +7522,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> targetNavigatornavigateTargetRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo targetNavigatornavigateTargetRequesttargetCommandParameterInfo = new CommandParameterInfo("target", int.class);
        targetNavigatornavigateTargetRequestCommandParams.put("target",targetNavigatornavigateTargetRequesttargetCommandParameterInfo);
-      
+
        CommandParameterInfo targetNavigatornavigateTargetRequestdataCommandParameterInfo = new CommandParameterInfo("data", String.class);
        targetNavigatornavigateTargetRequestCommandParams.put("data",targetNavigatornavigateTargetRequestdataCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo targetNavigatornavigateTargetRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7550,28 +7550,28 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustersimpleStructEchoRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustersimpleStructEchoRequestaCommandParameterInfo = new CommandParameterInfo("a", int.class);
        testClustersimpleStructEchoRequestCommandParams.put("a",testClustersimpleStructEchoRequestaCommandParameterInfo);
-      
+
        CommandParameterInfo testClustersimpleStructEchoRequestbCommandParameterInfo = new CommandParameterInfo("b", boolean.class);
        testClustersimpleStructEchoRequestCommandParams.put("b",testClustersimpleStructEchoRequestbCommandParameterInfo);
-      
+
        CommandParameterInfo testClustersimpleStructEchoRequestcCommandParameterInfo = new CommandParameterInfo("c", int.class);
        testClustersimpleStructEchoRequestCommandParams.put("c",testClustersimpleStructEchoRequestcCommandParameterInfo);
-      
+
        CommandParameterInfo testClustersimpleStructEchoRequestdCommandParameterInfo = new CommandParameterInfo("d", byte[].class);
        testClustersimpleStructEchoRequestCommandParams.put("d",testClustersimpleStructEchoRequestdCommandParameterInfo);
-      
+
        CommandParameterInfo testClustersimpleStructEchoRequesteCommandParameterInfo = new CommandParameterInfo("e", String.class);
        testClustersimpleStructEchoRequestCommandParams.put("e",testClustersimpleStructEchoRequesteCommandParameterInfo);
-      
+
        CommandParameterInfo testClustersimpleStructEchoRequestfCommandParameterInfo = new CommandParameterInfo("f", int.class);
        testClustersimpleStructEchoRequestCommandParams.put("f",testClustersimpleStructEchoRequestfCommandParameterInfo);
-      
+
        CommandParameterInfo testClustersimpleStructEchoRequestgCommandParameterInfo = new CommandParameterInfo("g", float.class);
        testClustersimpleStructEchoRequestCommandParams.put("g",testClustersimpleStructEchoRequestgCommandParameterInfo);
-      
+
        CommandParameterInfo testClustersimpleStructEchoRequesthCommandParameterInfo = new CommandParameterInfo("h", double.class);
        testClustersimpleStructEchoRequestCommandParams.put("h",testClustersimpleStructEchoRequesthCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo testClustersimpleStructEchoRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7622,10 +7622,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustertestAddArgumentsCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustertestAddArgumentsarg1CommandParameterInfo = new CommandParameterInfo("arg1", int.class);
        testClustertestAddArgumentsCommandParams.put("arg1",testClustertestAddArgumentsarg1CommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestAddArgumentsarg2CommandParameterInfo = new CommandParameterInfo("arg2", int.class);
        testClustertestAddArgumentsCommandParams.put("arg2",testClustertestAddArgumentsarg2CommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo testClustertestAddArgumentsInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7646,10 +7646,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustertestEnumsRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustertestEnumsRequestarg1CommandParameterInfo = new CommandParameterInfo("arg1", int.class);
        testClustertestEnumsRequestCommandParams.put("arg1",testClustertestEnumsRequestarg1CommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestEnumsRequestarg2CommandParameterInfo = new CommandParameterInfo("arg2", int.class);
        testClustertestEnumsRequestCommandParams.put("arg2",testClustertestEnumsRequestarg2CommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo testClustertestEnumsRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7670,7 +7670,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustertestListInt8UArgumentRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustertestListInt8UArgumentRequestarg1CommandParameterInfo = new CommandParameterInfo("arg1", int.class);
        testClustertestListInt8UArgumentRequestCommandParams.put("arg1",testClustertestListInt8UArgumentRequestarg1CommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo testClustertestListInt8UArgumentRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7688,7 +7688,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustertestListInt8UReverseRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustertestListInt8UReverseRequestarg1CommandParameterInfo = new CommandParameterInfo("arg1", int.class);
        testClustertestListInt8UReverseRequestCommandParams.put("arg1",testClustertestListInt8UReverseRequestarg1CommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo testClustertestListInt8UReverseRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7706,19 +7706,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustertestListNestedStructListArgumentRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustertestListNestedStructListArgumentRequestaCommandParameterInfo = new CommandParameterInfo("a", int.class);
        testClustertestListNestedStructListArgumentRequestCommandParams.put("a",testClustertestListNestedStructListArgumentRequestaCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestListNestedStructListArgumentRequestbCommandParameterInfo = new CommandParameterInfo("b", boolean.class);
        testClustertestListNestedStructListArgumentRequestCommandParams.put("b",testClustertestListNestedStructListArgumentRequestbCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestListNestedStructListArgumentRequesteCommandParameterInfo = new CommandParameterInfo("e", long.class);
        testClustertestListNestedStructListArgumentRequestCommandParams.put("e",testClustertestListNestedStructListArgumentRequesteCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestListNestedStructListArgumentRequestfCommandParameterInfo = new CommandParameterInfo("f", byte[].class);
        testClustertestListNestedStructListArgumentRequestCommandParams.put("f",testClustertestListNestedStructListArgumentRequestfCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestListNestedStructListArgumentRequestgCommandParameterInfo = new CommandParameterInfo("g", int.class);
        testClustertestListNestedStructListArgumentRequestCommandParams.put("g",testClustertestListNestedStructListArgumentRequestgCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo testClustertestListNestedStructListArgumentRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7748,28 +7748,28 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustertestListStructArgumentRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustertestListStructArgumentRequestaCommandParameterInfo = new CommandParameterInfo("a", int.class);
        testClustertestListStructArgumentRequestCommandParams.put("a",testClustertestListStructArgumentRequestaCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestListStructArgumentRequestbCommandParameterInfo = new CommandParameterInfo("b", boolean.class);
        testClustertestListStructArgumentRequestCommandParams.put("b",testClustertestListStructArgumentRequestbCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestListStructArgumentRequestcCommandParameterInfo = new CommandParameterInfo("c", int.class);
        testClustertestListStructArgumentRequestCommandParams.put("c",testClustertestListStructArgumentRequestcCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestListStructArgumentRequestdCommandParameterInfo = new CommandParameterInfo("d", byte[].class);
        testClustertestListStructArgumentRequestCommandParams.put("d",testClustertestListStructArgumentRequestdCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestListStructArgumentRequesteCommandParameterInfo = new CommandParameterInfo("e", String.class);
        testClustertestListStructArgumentRequestCommandParams.put("e",testClustertestListStructArgumentRequesteCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestListStructArgumentRequestfCommandParameterInfo = new CommandParameterInfo("f", int.class);
        testClustertestListStructArgumentRequestCommandParams.put("f",testClustertestListStructArgumentRequestfCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestListStructArgumentRequestgCommandParameterInfo = new CommandParameterInfo("g", float.class);
        testClustertestListStructArgumentRequestCommandParams.put("g",testClustertestListStructArgumentRequestgCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestListStructArgumentRequesthCommandParameterInfo = new CommandParameterInfo("h", double.class);
        testClustertestListStructArgumentRequestCommandParams.put("h",testClustertestListStructArgumentRequesthCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo testClustertestListStructArgumentRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7808,10 +7808,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustertestNestedStructArgumentRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustertestNestedStructArgumentRequestaCommandParameterInfo = new CommandParameterInfo("a", int.class);
        testClustertestNestedStructArgumentRequestCommandParams.put("a",testClustertestNestedStructArgumentRequestaCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestNestedStructArgumentRequestbCommandParameterInfo = new CommandParameterInfo("b", boolean.class);
        testClustertestNestedStructArgumentRequestCommandParams.put("b",testClustertestNestedStructArgumentRequestbCommandParameterInfo);
-      
+
      // Populate commands
        InteractionInfo testClustertestNestedStructArgumentRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7832,19 +7832,19 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustertestNestedStructListArgumentRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustertestNestedStructListArgumentRequestaCommandParameterInfo = new CommandParameterInfo("a", int.class);
        testClustertestNestedStructListArgumentRequestCommandParams.put("a",testClustertestNestedStructListArgumentRequestaCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestNestedStructListArgumentRequestbCommandParameterInfo = new CommandParameterInfo("b", boolean.class);
        testClustertestNestedStructListArgumentRequestCommandParams.put("b",testClustertestNestedStructListArgumentRequestbCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestNestedStructListArgumentRequesteCommandParameterInfo = new CommandParameterInfo("e", long.class);
        testClustertestNestedStructListArgumentRequestCommandParams.put("e",testClustertestNestedStructListArgumentRequesteCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestNestedStructListArgumentRequestfCommandParameterInfo = new CommandParameterInfo("f", byte[].class);
        testClustertestNestedStructListArgumentRequestCommandParams.put("f",testClustertestNestedStructListArgumentRequestfCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestNestedStructListArgumentRequestgCommandParameterInfo = new CommandParameterInfo("g", int.class);
        testClustertestNestedStructListArgumentRequestCommandParams.put("g",testClustertestNestedStructListArgumentRequestgCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo testClustertestNestedStructListArgumentRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7886,7 +7886,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustertestNullableOptionalRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustertestNullableOptionalRequestarg1CommandParameterInfo = new CommandParameterInfo("arg1", int.class);
        testClustertestNullableOptionalRequestCommandParams.put("arg1",testClustertestNullableOptionalRequestarg1CommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo testClustertestNullableOptionalRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7904,7 +7904,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustertestSimpleOptionalArgumentRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustertestSimpleOptionalArgumentRequestarg1CommandParameterInfo = new CommandParameterInfo("arg1", boolean.class);
        testClustertestSimpleOptionalArgumentRequestCommandParams.put("arg1",testClustertestSimpleOptionalArgumentRequestarg1CommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo testClustertestSimpleOptionalArgumentRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -7934,28 +7934,28 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> testClustertestStructArgumentRequestCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo testClustertestStructArgumentRequestaCommandParameterInfo = new CommandParameterInfo("a", int.class);
        testClustertestStructArgumentRequestCommandParams.put("a",testClustertestStructArgumentRequestaCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestStructArgumentRequestbCommandParameterInfo = new CommandParameterInfo("b", boolean.class);
        testClustertestStructArgumentRequestCommandParams.put("b",testClustertestStructArgumentRequestbCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestStructArgumentRequestcCommandParameterInfo = new CommandParameterInfo("c", int.class);
        testClustertestStructArgumentRequestCommandParams.put("c",testClustertestStructArgumentRequestcCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestStructArgumentRequestdCommandParameterInfo = new CommandParameterInfo("d", byte[].class);
        testClustertestStructArgumentRequestCommandParams.put("d",testClustertestStructArgumentRequestdCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestStructArgumentRequesteCommandParameterInfo = new CommandParameterInfo("e", String.class);
        testClustertestStructArgumentRequestCommandParams.put("e",testClustertestStructArgumentRequesteCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestStructArgumentRequestfCommandParameterInfo = new CommandParameterInfo("f", int.class);
        testClustertestStructArgumentRequestCommandParams.put("f",testClustertestStructArgumentRequestfCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestStructArgumentRequestgCommandParameterInfo = new CommandParameterInfo("g", float.class);
        testClustertestStructArgumentRequestCommandParams.put("g",testClustertestStructArgumentRequestgCommandParameterInfo);
-      
+
        CommandParameterInfo testClustertestStructArgumentRequesthCommandParameterInfo = new CommandParameterInfo("h", double.class);
        testClustertestStructArgumentRequestCommandParams.put("h",testClustertestStructArgumentRequesthCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo testClustertestStructArgumentRequestInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -8044,10 +8044,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> thermostatgetWeeklyScheduleCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo thermostatgetWeeklyScheduledaysToReturnCommandParameterInfo = new CommandParameterInfo("daysToReturn", int.class);
        thermostatgetWeeklyScheduleCommandParams.put("daysToReturn",thermostatgetWeeklyScheduledaysToReturnCommandParameterInfo);
-      
+
        CommandParameterInfo thermostatgetWeeklySchedulemodeToReturnCommandParameterInfo = new CommandParameterInfo("modeToReturn", int.class);
        thermostatgetWeeklyScheduleCommandParams.put("modeToReturn",thermostatgetWeeklySchedulemodeToReturnCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo thermostatgetWeeklyScheduleInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -8068,16 +8068,16 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> thermostatsetWeeklyScheduleCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo thermostatsetWeeklySchedulenumberOfTransitionsForSequenceCommandParameterInfo = new CommandParameterInfo("numberOfTransitionsForSequence", int.class);
        thermostatsetWeeklyScheduleCommandParams.put("numberOfTransitionsForSequence",thermostatsetWeeklySchedulenumberOfTransitionsForSequenceCommandParameterInfo);
-      
+
        CommandParameterInfo thermostatsetWeeklyScheduledayOfWeekForSequenceCommandParameterInfo = new CommandParameterInfo("dayOfWeekForSequence", int.class);
        thermostatsetWeeklyScheduleCommandParams.put("dayOfWeekForSequence",thermostatsetWeeklyScheduledayOfWeekForSequenceCommandParameterInfo);
-      
+
        CommandParameterInfo thermostatsetWeeklySchedulemodeForSequenceCommandParameterInfo = new CommandParameterInfo("modeForSequence", int.class);
        thermostatsetWeeklyScheduleCommandParams.put("modeForSequence",thermostatsetWeeklySchedulemodeForSequenceCommandParameterInfo);
-      
+
        CommandParameterInfo thermostatsetWeeklySchedulepayloadCommandParameterInfo = new CommandParameterInfo("payload", int.class);
        thermostatsetWeeklyScheduleCommandParams.put("payload",thermostatsetWeeklySchedulepayloadCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo thermostatsetWeeklyScheduleInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -8104,10 +8104,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> thermostatsetpointRaiseLowerCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo thermostatsetpointRaiseLowermodeCommandParameterInfo = new CommandParameterInfo("mode", int.class);
        thermostatsetpointRaiseLowerCommandParams.put("mode",thermostatsetpointRaiseLowermodeCommandParameterInfo);
-      
+
        CommandParameterInfo thermostatsetpointRaiseLoweramountCommandParameterInfo = new CommandParameterInfo("amount", int.class);
        thermostatsetpointRaiseLowerCommandParams.put("amount",thermostatsetpointRaiseLoweramountCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo thermostatsetpointRaiseLowerInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -8176,10 +8176,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> windowCoveringgoToLiftPercentageCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo windowCoveringgoToLiftPercentageliftPercentageValueCommandParameterInfo = new CommandParameterInfo("liftPercentageValue", int.class);
        windowCoveringgoToLiftPercentageCommandParams.put("liftPercentageValue",windowCoveringgoToLiftPercentageliftPercentageValueCommandParameterInfo);
-      
+
        CommandParameterInfo windowCoveringgoToLiftPercentageliftPercent100thsValueCommandParameterInfo = new CommandParameterInfo("liftPercent100thsValue", int.class);
        windowCoveringgoToLiftPercentageCommandParams.put("liftPercent100thsValue",windowCoveringgoToLiftPercentageliftPercent100thsValueCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo windowCoveringgoToLiftPercentageInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -8200,7 +8200,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> windowCoveringgoToLiftValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo windowCoveringgoToLiftValueliftValueCommandParameterInfo = new CommandParameterInfo("liftValue", int.class);
        windowCoveringgoToLiftValueCommandParams.put("liftValue",windowCoveringgoToLiftValueliftValueCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo windowCoveringgoToLiftValueInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -8218,10 +8218,10 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> windowCoveringgoToTiltPercentageCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo windowCoveringgoToTiltPercentagetiltPercentageValueCommandParameterInfo = new CommandParameterInfo("tiltPercentageValue", int.class);
        windowCoveringgoToTiltPercentageCommandParams.put("tiltPercentageValue",windowCoveringgoToTiltPercentagetiltPercentageValueCommandParameterInfo);
-      
+
        CommandParameterInfo windowCoveringgoToTiltPercentagetiltPercent100thsValueCommandParameterInfo = new CommandParameterInfo("tiltPercent100thsValue", int.class);
        windowCoveringgoToTiltPercentageCommandParams.put("tiltPercent100thsValue",windowCoveringgoToTiltPercentagetiltPercent100thsValueCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo windowCoveringgoToTiltPercentageInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -8242,7 +8242,7 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
      Map<String, CommandParameterInfo> windowCoveringgoToTiltValueCommandParams = new LinkedHashMap<String, CommandParameterInfo>();
        CommandParameterInfo windowCoveringgoToTiltValuetiltValueCommandParameterInfo = new CommandParameterInfo("tiltValue", int.class);
        windowCoveringgoToTiltValueCommandParams.put("tiltValue",windowCoveringgoToTiltValuetiltValueCommandParameterInfo);
-     
+
      // Populate commands
        InteractionInfo windowCoveringgoToTiltValueInteractionInfo = new InteractionInfo(
          (cluster, callback, commandArguments) -> {
@@ -8286,4 +8286,3 @@ CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "
   }
 
 }
-
