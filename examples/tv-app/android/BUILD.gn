@@ -102,6 +102,7 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/MediaInputManagerStub.java",
     "java/src/com/tcl/chip/tvapp/MediaPlaybackManager.java",
     "java/src/com/tcl/chip/tvapp/MediaPlaybackManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/MediaPlaybackPosition.java",
     "java/src/com/tcl/chip/tvapp/TvApp.java",
     "java/src/com/tcl/chip/tvapp/TvAppCallback.java",
     "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",

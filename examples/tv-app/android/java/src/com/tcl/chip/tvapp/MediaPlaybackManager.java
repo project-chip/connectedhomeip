@@ -29,23 +29,17 @@ public interface MediaPlaybackManager {
   /** The duration, in milliseconds or 0 if the duration is not applicable */
   int ATTRIBUTE_PLAYBACK_DURATION = 0x0002;
 
-  /** The position of playback (Position field) at the time (UpdateAt field) in milliseconds. */
-  int ATTRIBUTE_PLAYBACK_POSITION_UPDATED_AT = 0x0003;
-
-  /** The position of playback (Position field) at the time (UpdateAt field) in milliseconds. */
-  int ATTRIBUTE_PLAYBACK_POSITION = 0x0004;
-
   /**
    * The speed at which the current media is being played. 10000 means 1X, 5000 means 0.5X and 20000
    * means 2X
    */
-  int ATTRIBUTE_PLAYBACK_SPEED = 0x0005;
+  int ATTRIBUTE_PLAYBACK_SPEED = 0x0003;
 
   /** The earliest valid position to which a client MAY seek back, in milliseconds */
-  int ATTRIBUTE_PLAYBACK_SEEK_RANGE_END = 0x0006;
+  int ATTRIBUTE_PLAYBACK_SEEK_RANGE_END = 0x0004;
 
   /** The furthest forward valid position to which a client MAY seek forward, in milliseconds */
-  int ATTRIBUTE_PLAYBACK_SEEK_RANGE_START = 0x0007;
+  int ATTRIBUTE_PLAYBACK_SEEK_RANGE_START = 0x0005;
 
   int PLAYBACK_STATE_PLAYING = 0;
   int PLAYBACK_STATE_PAUSED = 1;
@@ -122,4 +116,9 @@ public interface MediaPlaybackManager {
    * @return the response status defined in RESPONSE_STATUS_XXX
    */
   int request(int cmd, long parameter);
+
+  /**
+   * Get the position of playback (Position field) at the time (UpdateAt field) specified
+   */
+  MediaPlaybackPosition getPosition();
 }

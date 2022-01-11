@@ -19,7 +19,19 @@
 #pragma once
 
 #include <app/clusters/media-playback-server/media-playback-server.h>
+#include <cstdint>
 #include <jni.h>
+
+enum MediaPlaybackRequestAttribute : uint8_t
+{
+    MEDIA_PLAYBACK_ATTRIBUTE_PLAYBACK_STATE = 0,
+    MEDIA_PLAYBACK_ATTRIBUTE_START_TIME = 1,
+    MEDIA_PLAYBACK_ATTRIBUTE_DURATION = 2,
+    MEDIA_PLAYBACK_ATTRIBUTE_SPEED = 3,
+    MEDIA_PLAYBACK_ATTRIBUTE_SEEK_RANGE_END = 4,
+    MEDIA_PLAYBACK_ATTRIBUTE_SEEK_RANGE_START = 5,
+    MEDIA_PLAYBACK_ATTRIBUTE_COUNT,
+};
 
 enum MediaPlaybackRequest : uint8_t
 {
@@ -64,11 +76,14 @@ public:
     HandleSeekRequest(const uint64_t & positionMilliseconds) override;
     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleNext() override;
     chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type HandleStartOverRequest() override;
-    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
-    HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
 
 private:
     jobject mMediaPlaybackManagerObject = nullptr;
     jmethodID mRequestMethod            = nullptr;
     jmethodID mGetAttributeMethod       = nullptr;
+    jmethodID mGetPositionMethod        = nullptr;
+
+    uint64_t HandleMediaRequestGetAttribute(MediaPlaybackRequestAttribute attribute);
+    chip::app::Clusters::MediaPlayback::Commands::PlaybackResponse::Type
+    HandleMediaRequest(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
 };

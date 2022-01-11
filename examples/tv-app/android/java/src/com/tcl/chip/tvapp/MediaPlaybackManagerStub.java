@@ -47,14 +47,6 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
         Log.d(TAG, "getAttributes Duration at " + endpoint);
         return 5 * 60 * 1000;
 
-      case ATTRIBUTE_PLAYBACK_POSITION_UPDATED_AT:
-        Log.d(TAG, "getAttributes SampledPosition UpdatedAt at " + endpoint);
-        return new Date().getTime() * 1000;
-
-      case ATTRIBUTE_PLAYBACK_POSITION:
-        Log.d(TAG, "getAttributes SampledPosition Position at " + endpoint);
-        return 3 * 60 * 1000;
-
       case ATTRIBUTE_PLAYBACK_SPEED:
         Log.d(TAG, "getAttributes SampledPosition PlaybackSpeed at " + endpoint);
         return 10000;
@@ -120,5 +112,10 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
     }
 
     return RESPONSE_STATUS_NOT_ALLOWED;
+  }
+
+  @Override
+  public MediaPlaybackPosition getPosition() {
+    return new MediaPlaybackPosition(3 * 60 * 1000);
   }
 }
