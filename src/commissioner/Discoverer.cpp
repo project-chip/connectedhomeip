@@ -21,10 +21,8 @@ namespace chip {
 namespace Commissioner {
 namespace CommissionableNodeDiscoverer {
 
-Discoverer::Discoverer(Controller::DeviceControllerSystemState & systemState, Platform::SharedPtr<SetupPayload> payload,
-                       Delegate * delegate) :
-    Joinable(&mDelegate),
-    mDelegate(delegate), mPayload(payload)
+Discoverer::Discoverer(Controller::DeviceControllerSystemState & systemState, Delegate * delegate) :
+    Joinable(&mDelegate), mDelegate(delegate)
 #if CONFIG_NETWORK_LAYER_BLE
     ,
     mBleDiscoverer(systemState, &mDelegate)
@@ -57,21 +55,21 @@ void Discoverer::SetDelegate(Delegate * delegate)
     mDelegate = delegate;
 }
 
-CHIP_ERROR Discoverer::Discover()
+CHIP_ERROR Discoverer::Discover(SetupPayload & payload)
 {
     CHIP_ERROR err = CHIP_ERROR_NOT_IMPLEMENTED;
 #if CONFIG_NETWORK_LAYER_BLE
-    bool searchAllOver = this->mPayload.get()->rendezvousInformation == RendezvousInformationFlag::kNone;
-    if (searchAllOver || this->mPayload.get()->rendezvousInformation == RendezvousInformationFlag::kBLE)
+    bool searchAllOver = payload.rendezvousInformation == RendezvousInformationFlag::kNone;
+    if (searchAllOver || payload.rendezvousInformation == RendezvousInformationFlag::kBLE)
     {
-        SuccessOrExit(err = mBleDiscoverer.StartBleDiscovery(*mPayload.get(), GetShutdownToken()));
+        SuccessOrExit(err = mBleDiscoverer.StartBleDiscovery(payload, GetShutdownToken()));
     }
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     // We always want to search on-network because any node that has
     // already been commissioned will use on-network regardless of
     // onboarding payload contents.
-    SuccessOrExit(err = mDnssdDiscoverer.StartDnssdDiscovery(*mPayload.get(), GetShutdownToken()));
+    SuccessOrExit(err = mDnssdDiscoverer.StartDnssdDiscovery(payload, GetShutdownToken()));
 #endif
 exit:
     return err;
