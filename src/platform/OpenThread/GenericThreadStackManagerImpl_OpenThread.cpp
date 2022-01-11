@@ -47,6 +47,7 @@
 
 #include <app/AttributeAccessInterface.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/FixedBufferAllocator.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -2073,6 +2074,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 
     // Extract from the <hostname>.<domain-name>. the <hostname> part.
     size_t substringSize = strchr(serviceInfo.mHostNameBuffer, '.') - serviceInfo.mHostNameBuffer;
+    if (substringSize >= ArraySize(mdnsService.mHostName))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     strncpy(mdnsService.mHostName, serviceInfo.mHostNameBuffer, substringSize);
     // Append string terminating character.
     mdnsService.mHostName[substringSize] = '\0';
@@ -2082,6 +2087,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
 
     // Extract from the <type>.<protocol>.<domain-name>. the <type> part.
     substringSize = strchr(serviceType, '.') - serviceType;
+    if (substringSize >= ArraySize(mdnsService.mType))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     strncpy(mdnsService.mType, serviceType, substringSize);
     // Append string terminating character.
     mdnsService.mType[substringSize] = '\0';
@@ -2093,6 +2102,10 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::FromOtDnsRespons
         return CHIP_ERROR_INVALID_ARGUMENT;
 
     substringSize = strchr(protocolSubstringStart, '.') - protocolSubstringStart;
+    if (substringSize >= ArraySize(protocol))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     strncpy(protocol, protocolSubstringStart, substringSize);
     // Append string terminating character.
     protocol[substringSize] = '\0';
@@ -2211,7 +2224,9 @@ void GenericThreadStackManagerImpl_OpenThread<ImplClass>::OnDnsBrowseResult(otEr
             // Invoke callback for every service one by one instead of for the whole list due to large memory size needed to
             // allocate on
             // stack.
-            strncpy(dnsResult->mMdnsService.mName, serviceName, sizeof(serviceName));
+            static_assert(ArraySize(dnsResult->mMdnsService.mName) >= ArraySize(serviceName),
+                          "The target buffer must be big enough");
+            Platform::CopyString(dnsResult->mMdnsService.mName, serviceName);
             DeviceLayer::PlatformMgr().ScheduleWork(DispatchBrowse, reinterpret_cast<intptr_t>(dnsResult));
             wasAnythingBrowsed = true;
         }
