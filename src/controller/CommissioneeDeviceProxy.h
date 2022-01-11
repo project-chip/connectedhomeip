@@ -198,7 +198,7 @@ public:
 
     /**
      * @brief
-     * Should be called when the pairing completes.
+     * Called to indicate this proxy has been paired successfully.
      *
      * This causes the secure session parameters to be loaded and stores the session details in the session manager.
      */

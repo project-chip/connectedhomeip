@@ -134,9 +134,17 @@ CHIP_ERROR CommissioneeDeviceProxy::UpdateDeviceData(const Transport::PeerAddres
 
 CHIP_ERROR CommissioneeDeviceProxy::SetConnected()
 {
-    mState = ConnectionState::SecureConnected;
-    bool didLoad;
-    return LoadSecureSessionParametersIfNeeded(didLoad);
+    if (mState != ConnectionState::Connecting)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    bool _didLoad;
+    CHIP_ERROR err = LoadSecureSessionParametersIfNeeded(_didLoad);
+    if (err == CHIP_NO_ERROR)
+    {
+        mState = ConnectionState::SecureConnected;
+    }
+    return err;
 }
 
 void CommissioneeDeviceProxy::Reset()
