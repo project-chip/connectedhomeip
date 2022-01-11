@@ -196,6 +196,11 @@ void CommandHandler::DecrementHoldOff()
         err = SendCommandResponse();
     }
 
+    if (mpExchangeCtx && mpExchangeCtx->IsGroupExchangeContext())
+    {
+        mpExchangeCtx->Close();
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
