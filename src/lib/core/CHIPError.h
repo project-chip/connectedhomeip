@@ -91,7 +91,7 @@ public:
         kLwIP       = 0x3, ///< Encapsulated LwIP errors.
         kOpenThread = 0x4, ///< Encapsulated OpenThread errors.
         kPlatform   = 0x5, ///< Platform-defined encapsulation.
-        kLastRange  = kPlatform
+        kLastRange  = kPlatform,
     };
 
     /**
@@ -99,12 +99,14 @@ public:
      */
     enum class SdkPart : uint8_t
     {
-        kCore        = 0, ///< SDK core errors.
-        kInet        = 1, ///< Inet layer errors; see <inet/InetError.h>.
-        kDevice      = 2, ///< Device layer errors; see <platform/CHIPDeviceError.h>.
-        kASN1        = 3, ///< ASN1 errors; see <asn1/ASN1Error.h>.
-        kBLE         = 4, ///< BLE layer errors; see <ble/BleError.h>.
-        kApplication = 7, ///< Application-defined errors; see CHIP_APPLICATION_ERROR
+        kCore            = 0, ///< SDK core errors.
+        kInet            = 1, ///< Inet layer errors; see <inet/InetError.h>.
+        kDevice          = 2, ///< Device layer errors; see <platform/CHIPDeviceError.h>.
+        kASN1            = 3, ///< ASN1 errors; see <asn1/ASN1Error.h>.
+        kBLE             = 4, ///< BLE layer errors; see <ble/BleError.h>.
+        kIMGlobalStatus  = 5, ///< Interaction Model global status code.
+        kIMClusterStatus = 6, ///< Interaction Model cluster-specific status code.
+        kApplication     = 7, ///< Application-defined errors; see CHIP_APPLICATION_ERROR
     };
 
     ChipError() = default;
@@ -261,6 +263,23 @@ public:
         return (mError & (MakeMask(kRangeStart, kRangeLength) | MakeMask(kSdkPartStart, kSdkPartLength))) ==
             (MakeField(kRangeStart, static_cast<StorageType>(Range::kSDK)) |
              MakeField(kSdkPartStart, static_cast<StorageType>(part)));
+    }
+
+    /**
+     * Get the SDK code for an SDK error.
+     */
+    constexpr uint8_t GetSdkCode() const { return static_cast<uint8_t>(GetField(kSdkCodeStart, kSdkCodeLength, mError)); }
+
+    /**
+     * Test whether @a error is an SDK error representing an Interaction Model
+     * status.  If it is, it can be converted to/from an interaction model
+     * StatusIB struct.
+     */
+    constexpr bool IsIMStatus() const
+    {
+        // Open question: should CHIP_NO_ERROR be treated as an IM status for
+        // purposes of this test?
+        return IsPart(SdkPart::kIMGlobalStatus) || IsPart(SdkPart::kIMClusterStatus);
     }
 
 #if CHIP_CONFIG_ERROR_SOURCE
