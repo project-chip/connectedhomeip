@@ -19,7 +19,7 @@ package com.tcl.chip.tvapp;
 
 public class ChannelInfo {
 
-  public static final int kNoError = -1; //todo: what will be the value of no error?
+  public static final int kNoError = -1; // todo: what will be the value of no error?
   public static final int kMultipleMatches = 0;
   public static final int kNoMatches = 1;
 
@@ -30,7 +30,8 @@ public class ChannelInfo {
   private String callSign;
   private String affiliateCallSign;
 
-  public ChannelInfo(int majorNumber, int minorNumber, String name, String callSign, String affiliateCallSign) {
+  public ChannelInfo(
+      int majorNumber, int minorNumber, String name, String callSign, String affiliateCallSign) {
     this.errorType = kNoError;
     this.majorNumber = majorNumber;
     this.minorNumber = minorNumber;

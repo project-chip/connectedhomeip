@@ -34,7 +34,8 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
     Log.d(TAG, "launchContent:" + data + " autoplay=" + autoplay + " at " + endpoint);
 
     if ("err".equals(data)) {
-      return new ContentLaunchResponse(ContentLaunchResponse.STATUS_URL_NOT_AVAILABLE, "Error data in Java");
+      return new ContentLaunchResponse(
+          ContentLaunchResponse.STATUS_URL_NOT_AVAILABLE, "Error data in Java");
     }
     return new ContentLaunchResponse(ContentLaunchResponse.STATUS_SUCCESS, "Example data in Java");
   }
@@ -45,7 +46,8 @@ public class ContentLaunchManagerStub implements ContentLaunchManager {
     Log.d(TAG, "launchUrl:" + url + " display=" + display + " at " + endpoint);
 
     if ("err".equals(display)) {
-      return new ContentLaunchResponse(ContentLaunchResponse.STATUS_URL_NOT_AVAILABLE, "Error data in Java");
+      return new ContentLaunchResponse(
+          ContentLaunchResponse.STATUS_URL_NOT_AVAILABLE, "Error data in Java");
     }
     return new ContentLaunchResponse(ContentLaunchResponse.STATUS_SUCCESS, "Example data in Java");
   }

@@ -117,8 +117,6 @@ public interface MediaPlaybackManager {
    */
   int request(int cmd, long parameter);
 
-  /**
-   * Get the position of playback (Position field) at the time (UpdateAt field) specified
-   */
+  /** Get the position of playback (Position field) at the time (UpdateAt field) specified */
   MediaPlaybackPosition getPosition();
 }
