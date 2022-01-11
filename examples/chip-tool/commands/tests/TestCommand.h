@@ -18,10 +18,9 @@
 
 #pragma once
 
-#include "ConstraintsChecker.h"
-#include "ValueChecker.h"
-
 #include "../common/CHIPCommand.h"
+#include <app/tests/suites/include/ConstraintsChecker.h>
+#include <app/tests/suites/include/ValueChecker.h>
 #include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
 #include <app/tests/suites/pics/PICSBooleanReader.h>
 #include <lib/support/UnitTestUtils.h>

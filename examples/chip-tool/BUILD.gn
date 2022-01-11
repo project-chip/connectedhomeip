@@ -37,6 +37,8 @@ config("config") {
 
 static_library("chip-tool-utils") {
   sources = [
+    "${chip_root}/src/app/tests/suites/include/ConstraintsChecker.h",
+    "${chip_root}/src/app/tests/suites/include/ValueChecker.h",
     "commands/clusters/ModelCommand.cpp",
     "commands/common/CHIPCommand.cpp",
     "commands/common/CHIPCommand.h",
