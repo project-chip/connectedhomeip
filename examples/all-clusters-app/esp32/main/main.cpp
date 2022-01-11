@@ -52,8 +52,6 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/clusters/on-off-server/on-off-server.h>
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/Dnssd.h>
 #include <app/server/OnboardingCodesUtil.h>
@@ -66,8 +64,6 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/ESP32/OTAImageProcessorImpl.h>
-#include <platform/GenericOTARequestorDriver.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 
@@ -123,13 +119,6 @@ namespace {
 std::vector<Button> buttons          = { Button(), Button(), Button() };
 std::vector<gpio_num_t> button_gpios = { BUTTON_1_GPIO_NUM, BUTTON_2_GPIO_NUM, BUTTON_3_GPIO_NUM };
 
-#endif
-
-#if CONFIG_ENABLE_OTA_REQUESTOR
-OTARequestor gRequestorCore;
-GenericOTARequestorDriver gRequestorUser;
-BDXDownloader gDownloader;
-OTAImageProcessorImpl gImageProcessor;
 #endif
 
 // Pretend these are devices with endpoints with clusters with attributes
@@ -527,19 +516,6 @@ static void InitServer(intptr_t context)
     SetupPretendDevices();
 }
 
-static void InitOTARequestor(void)
-{
-#if CONFIG_ENABLE_OTA_REQUESTOR
-    SetRequestorInstance(&gRequestorCore);
-    gRequestorCore.SetServerInstance(&Server::GetInstance());
-    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-    gRequestorCore.SetBDXDownloader(&gDownloader);
-#endif
-}
-
 extern "C" void app_main()
 {
     ESP_LOGI(TAG, "All Clusters Demo!");
@@ -597,8 +573,6 @@ extern "C" void app_main()
 
     // Print QR Code URL
     PrintOnboardingCodes(chip::RendezvousInformationFlags(CONFIG_RENDEZVOUS_MODE));
-
-    InitOTARequestor();
 
 #if CONFIG_HAVE_DISPLAY
     std::string qrCodeText;
