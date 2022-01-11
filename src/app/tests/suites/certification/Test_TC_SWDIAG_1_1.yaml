@@ -24,10 +24,10 @@ tests:
       command: "WaitForCommissionee"
 
     #Issue #11185 Disabled as ThreadMetrics attribute missing
+    #disabled due to issue  #13441
     - label:
           "Reads a list of ThreadMetrics struct non-global attribute from DUT."
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ThreadMetrics"
       PICS: A_THREADMETRICS
