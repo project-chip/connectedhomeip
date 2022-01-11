@@ -113,12 +113,10 @@ public class ChipClusters {
   }
 
   public static class AccessControlCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 31L;
+
     public AccessControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("31");
     }
 
     @Override
@@ -231,12 +229,10 @@ public class ChipClusters {
   }
 
   public static class AccountLoginCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1294L;
+
     public AccountLoginCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1294");
     }
 
     @Override
@@ -322,12 +318,10 @@ public class ChipClusters {
   }
 
   public static class AdministratorCommissioningCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 60L;
+
     public AdministratorCommissioningCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("60");
     }
 
     @Override
@@ -476,12 +470,10 @@ public class ChipClusters {
   }
 
   public static class ApplicationBasicCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1293L;
+
     public ApplicationBasicCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1293");
     }
 
     @Override
@@ -633,12 +625,10 @@ public class ChipClusters {
   }
 
   public static class ApplicationLauncherCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1292L;
+
     public ApplicationLauncherCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1292");
     }
 
     @Override
@@ -766,12 +756,10 @@ public class ChipClusters {
   }
 
   public static class AudioOutputCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1291L;
+
     public AudioOutputCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1291");
     }
 
     @Override
@@ -900,12 +888,10 @@ public class ChipClusters {
   }
 
   public static class BarrierControlCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 259L;
+
     public BarrierControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("259");
     }
 
     @Override
@@ -1031,12 +1017,10 @@ public class ChipClusters {
   }
 
   public static class BasicCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 40L;
+
     public BasicCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("40");
     }
 
     @Override
@@ -1450,12 +1434,10 @@ public class ChipClusters {
   }
 
   public static class BinaryInputBasicCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 15L;
+
     public BinaryInputBasicCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("15");
     }
 
     @Override
@@ -1568,12 +1550,10 @@ public class ChipClusters {
   }
 
   public static class BindingCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 30L;
+
     public BindingCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("30");
     }
 
     @Override
@@ -1668,12 +1648,10 @@ public class ChipClusters {
   }
 
   public static class BooleanStateCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 69L;
+
     public BooleanStateCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("69");
     }
 
     @Override
@@ -1726,12 +1704,10 @@ public class ChipClusters {
   }
 
   public static class BridgedActionsCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 37L;
+
     public BridgedActionsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("37");
     }
 
     @Override
@@ -2160,12 +2136,10 @@ public class ChipClusters {
   }
 
   public static class BridgedDeviceBasicCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 57L;
+
     public BridgedDeviceBasicCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("57");
     }
 
     @Override
@@ -2203,12 +2177,10 @@ public class ChipClusters {
   }
 
   public static class ChannelCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1284L;
+
     public ChannelCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1284");
     }
 
     @Override
@@ -2367,12 +2339,10 @@ public class ChipClusters {
   }
 
   public static class ColorControlCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 768L;
+
     public ColorControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("768");
     }
 
     @Override
@@ -4221,12 +4191,10 @@ public class ChipClusters {
   }
 
   public static class ContentLauncherCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1290L;
+
     public ContentLauncherCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1290");
     }
 
     @Override
@@ -4361,12 +4329,10 @@ public class ChipClusters {
   }
 
   public static class DescriptorCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 29L;
+
     public DescriptorCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("29");
     }
 
     @Override
@@ -4488,12 +4454,10 @@ public class ChipClusters {
   }
 
   public static class DiagnosticLogsCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 50L;
+
     public DiagnosticLogsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("50");
     }
 
     @Override
@@ -4554,12 +4518,10 @@ public class ChipClusters {
   }
 
   public static class DoorLockCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 257L;
+
     public DoorLockCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("257");
     }
 
     @Override
@@ -5169,12 +5131,10 @@ public class ChipClusters {
   }
 
   public static class ElectricalMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 2820L;
+
     public ElectricalMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("2820");
     }
 
     @Override
@@ -5377,12 +5337,10 @@ public class ChipClusters {
   }
 
   public static class EthernetNetworkDiagnosticsCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 55L;
+
     public EthernetNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("55");
     }
 
     @Override
@@ -5575,12 +5533,10 @@ public class ChipClusters {
   }
 
   public static class FixedLabelCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 64L;
+
     public FixedLabelCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("64");
     }
 
     @Override
@@ -5657,12 +5613,10 @@ public class ChipClusters {
   }
 
   public static class FlowMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1028L;
+
     public FlowMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1028");
     }
 
     @Override
@@ -5760,12 +5714,10 @@ public class ChipClusters {
   }
 
   public static class GeneralCommissioningCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 48L;
+
     public GeneralCommissioningCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("48");
     }
 
     @Override
@@ -5980,12 +5932,10 @@ public class ChipClusters {
   }
 
   public static class GeneralDiagnosticsCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 51L;
+
     public GeneralDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("51");
     }
 
     @Override
@@ -6196,12 +6146,10 @@ public class ChipClusters {
   }
 
   public static class GroupKeyManagementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 63L;
+
     public GroupKeyManagementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("63");
     }
 
     @Override
@@ -6469,12 +6417,10 @@ public class ChipClusters {
   }
 
   public static class GroupsCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 4L;
+
     public GroupsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("4");
     }
 
     @Override
@@ -6651,12 +6597,10 @@ public class ChipClusters {
   }
 
   public static class IdentifyCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 3L;
+
     public IdentifyCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("3");
     }
 
     @Override
@@ -6794,12 +6738,10 @@ public class ChipClusters {
   }
 
   public static class IlluminanceMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1024L;
+
     public IlluminanceMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1024");
     }
 
     @Override
@@ -6956,12 +6898,10 @@ public class ChipClusters {
   }
 
   public static class KeypadInputCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1289L;
+
     public KeypadInputCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1289");
     }
 
     @Override
@@ -7020,12 +6960,10 @@ public class ChipClusters {
   }
 
   public static class LevelControlCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 8L;
+
     public LevelControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("8");
     }
 
     @Override
@@ -7634,12 +7572,10 @@ public class ChipClusters {
   }
 
   public static class LocalizationConfigurationCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 43L;
+
     public LocalizationConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("43");
     }
 
     @Override
@@ -7684,12 +7620,10 @@ public class ChipClusters {
   }
 
   public static class LowPowerCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1288L;
+
     public LowPowerCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1288");
     }
 
     @Override
@@ -7740,12 +7674,10 @@ public class ChipClusters {
   }
 
   public static class MediaInputCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1287L;
+
     public MediaInputCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1287");
     }
 
     @Override
@@ -7907,12 +7839,10 @@ public class ChipClusters {
   }
 
   public static class MediaPlaybackCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1286L;
+
     public MediaPlaybackCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1286");
     }
 
     @Override
@@ -8192,12 +8122,10 @@ public class ChipClusters {
   }
 
   public static class ModeSelectCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 80L;
+
     public ModeSelectCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("80");
     }
 
     @Override
@@ -8372,12 +8300,10 @@ public class ChipClusters {
   }
 
   public static class NetworkCommissioningCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 49L;
+
     public NetworkCommissioningCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("49");
     }
 
     @Override
@@ -8670,12 +8596,10 @@ public class ChipClusters {
   }
 
   public static class OtaSoftwareUpdateProviderCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 41L;
+
     public OtaSoftwareUpdateProviderCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("41");
     }
 
     @Override
@@ -8836,12 +8760,10 @@ public class ChipClusters {
   }
 
   public static class OtaSoftwareUpdateRequestorCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 42L;
+
     public OtaSoftwareUpdateRequestorCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("42");
     }
 
     @Override
@@ -9028,12 +8950,10 @@ public class ChipClusters {
   }
 
   public static class OccupancySensingCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1030L;
+
     public OccupancySensingCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1030");
     }
 
     @Override
@@ -9117,12 +9037,10 @@ public class ChipClusters {
   }
 
   public static class OnOffCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 6L;
+
     public OnOffCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("6");
     }
 
     @Override
@@ -9391,12 +9309,10 @@ public class ChipClusters {
   }
 
   public static class OnOffSwitchConfigurationCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 7L;
+
     public OnOffSwitchConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("7");
     }
 
     @Override
@@ -9479,12 +9395,10 @@ public class ChipClusters {
   }
 
   public static class OperationalCredentialsCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 62L;
+
     public OperationalCredentialsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("62");
     }
 
     @Override
@@ -9864,12 +9778,10 @@ public class ChipClusters {
   }
 
   public static class PowerSourceCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 47L;
+
     public PowerSourceCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("47");
     }
 
     @Override
@@ -10058,12 +9970,10 @@ public class ChipClusters {
   }
 
   public static class PowerSourceConfigurationCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 46L;
+
     public PowerSourceConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("46");
     }
 
     @Override
@@ -10108,12 +10018,10 @@ public class ChipClusters {
   }
 
   public static class PressureMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1027L;
+
     public PressureMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1027");
     }
 
     @Override
@@ -10196,12 +10104,10 @@ public class ChipClusters {
   }
 
   public static class PumpConfigurationAndControlCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 512L;
+
     public PumpConfigurationAndControlCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("512");
     }
 
     @Override
@@ -10697,12 +10603,10 @@ public class ChipClusters {
   }
 
   public static class RelativeHumidityMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1029L;
+
     public RelativeHumidityMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1029");
     }
 
     @Override
@@ -10800,12 +10704,10 @@ public class ChipClusters {
   }
 
   public static class ScenesCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 5L;
+
     public ScenesCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("5");
     }
 
     @Override
@@ -11128,12 +11030,10 @@ public class ChipClusters {
   }
 
   public static class SoftwareDiagnosticsCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 52L;
+
     public SoftwareDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("52");
     }
 
     @Override
@@ -11295,12 +11195,10 @@ public class ChipClusters {
   }
 
   public static class SwitchCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 59L;
+
     public SwitchCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("59");
     }
 
     @Override
@@ -11398,12 +11296,10 @@ public class ChipClusters {
   }
 
   public static class TargetNavigatorCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1285L;
+
     public TargetNavigatorCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1285");
     }
 
     @Override
@@ -11521,12 +11417,10 @@ public class ChipClusters {
   }
 
   public static class TemperatureMeasurementCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1026L;
+
     public TemperatureMeasurementCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1026");
     }
 
     @Override
@@ -11624,12 +11518,10 @@ public class ChipClusters {
   }
 
   public static class TestClusterCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1295L;
+
     public TestClusterCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1295");
     }
 
     @Override
@@ -14719,12 +14611,10 @@ public class ChipClusters {
   }
 
   public static class ThermostatCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 513L;
+
     public ThermostatCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("513");
     }
 
     @Override
@@ -15303,12 +15193,10 @@ public class ChipClusters {
   }
 
   public static class ThermostatUserInterfaceConfigurationCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 516L;
+
     public ThermostatUserInterfaceConfigurationCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("516");
     }
 
     @Override
@@ -15440,12 +15328,10 @@ public class ChipClusters {
   }
 
   public static class ThreadNetworkDiagnosticsCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 53L;
+
     public ThreadNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("53");
     }
 
     @Override
@@ -16774,12 +16660,10 @@ public class ChipClusters {
   }
 
   public static class UserLabelCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 65L;
+
     public UserLabelCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("65");
     }
 
     @Override
@@ -16833,12 +16717,10 @@ public class ChipClusters {
   }
 
   public static class WakeOnLanCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 1283L;
+
     public WakeOnLanCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("1283");
     }
 
     @Override
@@ -16894,12 +16776,10 @@ public class ChipClusters {
   }
 
   public static class WiFiNetworkDiagnosticsCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 54L;
+
     public WiFiNetworkDiagnosticsCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("54");
     }
 
     @Override
@@ -17154,12 +17034,10 @@ public class ChipClusters {
   }
 
   public static class WindowCoveringCluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = 258L;
+
     public WindowCoveringCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("258");
     }
 
     @Override

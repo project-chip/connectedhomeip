@@ -83,12 +83,10 @@ public class ChipClusters {
 
   {{#chip_client_clusters}}
   public static class {{asUpperCamelCase name}}Cluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = {{code}}L;
+
     public {{asUpperCamelCase name}}Cluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("{{code}}");
     }
 
     @Override
