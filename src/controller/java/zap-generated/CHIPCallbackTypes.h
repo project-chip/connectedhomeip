@@ -584,6 +584,11 @@ typedef void (*CHIPLevelControlClusterAttributeListAttributeCallbackType)(
 typedef void (*CHIPLevelControlClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
+typedef void (*CHIPLocalizationConfigurationClusterActiveLocaleAttributeCallbackType)(
+    void *, chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo::DecodableArgType);
+typedef void (*CHIPLocalizationConfigurationClusterSupportedLocalesAttributeCallbackType)(
+    void *, const chip::app::Clusters::LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo::DecodableType &);
+
 typedef void (*CHIPLowPowerClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::LowPower::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPLowPowerClusterClusterRevisionAttributeCallbackType)(

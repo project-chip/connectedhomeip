@@ -125,6 +125,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         emberAfLevelControlClusterInitCallback(endpoint);
         break;
+    case ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID:
+        emberAfLocalizationConfigurationClusterInitCallback(endpoint);
+        break;
     case ZCL_LOW_POWER_CLUSTER_ID:
         emberAfLowPowerClusterInitCallback(endpoint);
         break;
@@ -374,6 +377,11 @@ void __attribute__((weak)) emberAfKeypadInputClusterInitCallback(EndpointId endp
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfLevelControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfLocalizationConfigurationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

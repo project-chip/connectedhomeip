@@ -2708,6 +2708,35 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<LocalizationConfigurationSupportedLocalesListAttributeCallback>
+{
+public:
+    CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LocalizationConfigurationSupportedLocalesListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value);
+};
+
+class CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge
+    : public CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge
+{
+public:
+    CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPLowPowerAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<LowPowerAttributeListListAttributeCallback>
 {
 public:

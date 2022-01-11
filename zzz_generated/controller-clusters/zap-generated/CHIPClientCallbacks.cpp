@@ -1235,6 +1235,28 @@ void LevelControlClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvDat
     cb->mCall(cb->mContext, list);
 }
 
+void LocalizationConfigurationClusterSupportedLocalesListAttributeFilter(TLV::TLVReader * tlvData,
+                                                                         Callback::Cancelable * onSuccessCallback,
+                                                                         Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::CharSpan> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<LocalizationConfigurationSupportedLocalesListAttributeCallback> * cb =
+        Callback::Callback<LocalizationConfigurationSupportedLocalesListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
 void LowPowerClusterAttributeListListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback)
 {
