@@ -24,9 +24,8 @@ using namespace chip::app::Clusters::ContentLauncher;
 using namespace chip::AppPlatform;
 
 void ContentLauncherManager::HandleLaunchContent(
-                                                                           const std::list<Parameter> & parameterList,
-                                                                           bool autoplay, const chip::CharSpan & data,
-                        chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
+    const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
+    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent");
     string dataString(data.data(), data.size());
@@ -49,10 +48,10 @@ void ContentLauncherManager::HandleLaunchContent(
     responser.Success(response);
 }
 
-void ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
-                                                                       const chip::CharSpan & displayString,
-                                                                       const std::list<BrandingInformation> & brandingInformation,
-                        chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
+void ContentLauncherManager::HandleLaunchUrl(
+    const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+    const std::list<BrandingInformation> & brandingInformation,
+    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 

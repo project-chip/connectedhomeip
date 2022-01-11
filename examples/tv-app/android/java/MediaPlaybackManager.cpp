@@ -164,7 +164,8 @@ void MediaPlaybackManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mGetPositionMethod = env->GetMethodID(mMediaPlaybackManagerClass, "getPosition", "()[Lcom/tcl/chip/tvapp/MediaPlaybackPosition;");
+    mGetPositionMethod =
+        env->GetMethodID(mMediaPlaybackManagerClass, "getPosition", "()[Lcom/tcl/chip/tvapp/MediaPlaybackPosition;");
     if (mGetPositionMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MediaPlaybackManager 'getPosition' method");
@@ -174,7 +175,7 @@ void MediaPlaybackManager::InitializeWithObjects(jobject managerObject)
 
 uint64_t MediaPlaybackManager::HandleMediaRequestGetAttribute(MediaPlaybackRequestAttribute attribute)
 {
-    uint64_t ret = std::numeric_limits<uint64_t>::max();
+    uint64_t ret          = std::numeric_limits<uint64_t>::max();
     jlong jAttributeValue = -1;
     CHIP_ERROR err        = CHIP_NO_ERROR;
     JNIEnv * env          = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -275,11 +276,11 @@ Structs::PlaybackPosition::Type MediaPlaybackManager::HandleGetSampledPosition()
     }
 
     {
-        jclass inputClass = env->GetObjectClass(positionObj);
-        jfieldID positionId      = env->GetFieldID(inputClass, "position", "J");
-        jfieldID updatedAtId      = env->GetFieldID(inputClass, "updatedAt", "J");
-        response.position = static_cast<uint64_t>(env->GetIntField(positionObj, positionId));
-        response.updatedAt = static_cast<uint64_t>(env->GetIntField(positionObj, updatedAtId));
+        jclass inputClass    = env->GetObjectClass(positionObj);
+        jfieldID positionId  = env->GetFieldID(inputClass, "position", "J");
+        jfieldID updatedAtId = env->GetFieldID(inputClass, "updatedAt", "J");
+        response.position    = static_cast<uint64_t>(env->GetIntField(positionObj, positionId));
+        response.updatedAt   = static_cast<uint64_t>(env->GetIntField(positionObj, updatedAtId));
     }
 
 exit:

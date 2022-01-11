@@ -190,9 +190,9 @@ exit:
     {
         ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchContentRequestCallback error: %s", err.AsString());
     }
-    
+
     // If isDelegateNull, no one will call responser, so IsResponsed will be false
-    if (!responser.IsResponsed()) 
+    if (!responser.IsResponsed())
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
@@ -226,9 +226,9 @@ exit:
     {
         ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchURLCallback error: %s", err.AsString());
     }
-    
+
     // If isDelegateNull, no one will call responser, so IsResponsed will be false
-    if (!responser.IsResponsed()) 
+    if (!responser.IsResponsed())
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }

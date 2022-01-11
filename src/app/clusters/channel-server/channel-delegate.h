@@ -35,13 +35,14 @@ namespace Channel {
 class Delegate
 {
 public:
-    virtual CHIP_ERROR HandleGetChannelList(app::AttributeValueEncoder & aEncoder)     = 0;
-    virtual CHIP_ERROR HandleGetLineup(app::AttributeValueEncoder & aEncoder)     = 0;
-    virtual CHIP_ERROR HandleGetCurrentChannel(app::AttributeValueEncoder & aEncoder)     = 0;
+    virtual CHIP_ERROR HandleGetChannelList(app::AttributeValueEncoder & aEncoder)    = 0;
+    virtual CHIP_ERROR HandleGetLineup(app::AttributeValueEncoder & aEncoder)         = 0;
+    virtual CHIP_ERROR HandleGetCurrentChannel(app::AttributeValueEncoder & aEncoder) = 0;
 
-    virtual void HandleChangeChannel(const chip::CharSpan & match, CommandResponseHelper<Commands::ChangeChannelResponse::Type> & responser)      = 0;
-    virtual bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber) = 0;
-    virtual bool HandleSkipChannel(const uint16_t & count)                                               = 0;
+    virtual void HandleChangeChannel(const chip::CharSpan & match,
+                                     CommandResponseHelper<Commands::ChangeChannelResponse::Type> & responser) = 0;
+    virtual bool HandleChangeChannelByNumber(const uint16_t & majorNumber, const uint16_t & minorNumber)       = 0;
+    virtual bool HandleSkipChannel(const uint16_t & count)                                                     = 0;
 
     virtual ~Delegate() = default;
 };

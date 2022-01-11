@@ -65,7 +65,9 @@ CHIP_ERROR ChannelManager::HandleGetCurrentChannel(chip::app::AttributeValueEnco
     return aEncoder.Encode(currentChannel);
 }
 
-void ChannelManager::HandleChangeChannel(const chip::CharSpan & match, chip::app::CommandResponseHelper<chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type> & responser)
+void ChannelManager::HandleChangeChannel(
+    const chip::CharSpan & match,
+    chip::app::CommandResponseHelper<chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type> & responser)
 {
     Commands::ChangeChannelResponse::Type response;
     response.channelMatch.majorNumber       = 1;

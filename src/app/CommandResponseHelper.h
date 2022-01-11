@@ -22,7 +22,6 @@
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
 
-
 namespace chip {
 namespace app {
 
@@ -30,13 +29,15 @@ template <typename CommandData>
 class CommandResponseHelper
 {
 public:
-    CommandResponseHelper(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath)
-        :mCommand(command),mCommandPath(commandPath),responsed(false) {}
+    CommandResponseHelper(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath) :
+        mCommand(command), mCommandPath(commandPath), responsed(false)
+    {}
 
     CHIP_ERROR Success(const CommandData & response)
     {
         CHIP_ERROR err = mCommand->AddResponseData(mCommandPath, response);
-        if(err == CHIP_NO_ERROR) {
+        if (err == CHIP_NO_ERROR)
+        {
             responsed = true;
         }
         return err;
@@ -48,7 +49,7 @@ public:
         responsed = true;
     }
 
-    bool IsResponsed() {return responsed;}
+    bool IsResponsed() { return responsed; }
 
 private:
     app::CommandHandler * mCommand;
