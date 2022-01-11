@@ -3992,6 +3992,8 @@ exit:
     return err;
 }
 
+// LocalizationConfiguration Cluster Commands
+
 // LowPower Cluster Commands
 CHIP_ERROR LowPowerCluster::Sleep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {

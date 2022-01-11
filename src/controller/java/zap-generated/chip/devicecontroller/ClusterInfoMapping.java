@@ -2100,6 +2100,32 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedLocalizationConfigurationClusterSupportedLocalesAttributeCallback
+      implements ChipClusters.LocalizationConfigurationCluster.SupportedLocalesAttributeCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(List<Object> valueList) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo commandResponseInfo =
+          new CommandResponseInfo("valueList", "List<String>");
+
+      responseValues.put(commandResponseInfo, valueList);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception ex) {
+      callback.onFailure(ex);
+    }
+  }
+
   public static class DelegatedLowPowerClusterAttributeListAttributeCallback
       implements ChipClusters.LowPowerCluster.AttributeListAttributeCallback,
           DelegatedClusterCallback {
@@ -4308,6 +4334,11 @@ public class ClusterInfoMapping {
             (ptr, endpointId) -> new ChipClusters.LevelControlCluster(ptr, endpointId),
             new HashMap<>());
     clusterMap.put("levelControl", levelControlClusterInfo);
+    ClusterInfo localizationConfigurationClusterInfo =
+        new ClusterInfo(
+            (ptr, endpointId) -> new ChipClusters.LocalizationConfigurationCluster(ptr, endpointId),
+            new HashMap<>());
+    clusterMap.put("localizationConfiguration", localizationConfigurationClusterInfo);
     ClusterInfo lowPowerClusterInfo =
         new ClusterInfo(
             (ptr, endpointId) -> new ChipClusters.LowPowerCluster(ptr, endpointId),
@@ -4495,6 +4526,9 @@ public class ClusterInfoMapping {
     destination.get("illuminanceMeasurement").combineCommands(source.get("illuminanceMeasurement"));
     destination.get("keypadInput").combineCommands(source.get("keypadInput"));
     destination.get("levelControl").combineCommands(source.get("levelControl"));
+    destination
+        .get("localizationConfiguration")
+        .combineCommands(source.get("localizationConfiguration"));
     destination.get("lowPower").combineCommands(source.get("lowPower"));
     destination.get("mediaInput").combineCommands(source.get("mediaInput"));
     destination.get("mediaPlayback").combineCommands(source.get("mediaPlayback"));
@@ -7209,6 +7243,9 @@ public class ClusterInfoMapping {
     levelControlClusterInteractionInfoMap.put(
         "stopWithOnOff", levelControlstopWithOnOffInteractionInfo);
     commandMap.put("levelControl", levelControlClusterInteractionInfoMap);
+    Map<String, InteractionInfo> localizationConfigurationClusterInteractionInfoMap =
+        new LinkedHashMap<>();
+    commandMap.put("localizationConfiguration", localizationConfigurationClusterInteractionInfoMap);
     Map<String, InteractionInfo> lowPowerClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> lowPowersleepCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

@@ -42,6 +42,7 @@
     MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
     MatterKeypadInputPluginServerInitCallback();                                                                                   \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
+    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterLowPowerPluginServerInitCallback();                                                                                      \
     MatterMediaInputPluginServerInitCallback();                                                                                    \
     MatterMediaPlaybackPluginServerInitCallback();                                                                                 \

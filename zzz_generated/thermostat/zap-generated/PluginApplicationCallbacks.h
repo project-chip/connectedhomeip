@@ -35,6 +35,7 @@
     MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterIdentifyPluginClientInitCallback();                                                                                      \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
+    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOtaSoftwareUpdateProviderPluginServerInitCallback();                                                                     \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
