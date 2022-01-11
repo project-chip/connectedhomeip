@@ -235,7 +235,7 @@ ContentApp * AppPlatform::GetLoadContentAppByVendorId(uint16_t vendorId)
     return NULL;
 }
 
-ContentApp * AppPlatform::GetLoadContentAppByAppId(Application application)
+ContentApp * AppPlatform::GetLoadContentAppByAppId(ApplicationLauncherApplication application)
 {
     ChipLogProgress(DeviceLayer, "GetLoadContentAppByAppId()");
     if (mContentAppFactory != NULL)

@@ -27,7 +27,7 @@ public:
     uint16_t HandleGetVendorId() override;
     chip::CharSpan HandleGetApplicationName() override;
     uint16_t HandleGetProductId() override;
-    chip::app::Clusters::ApplicationBasic::Structs::Application::Type HandleGetApplication() override;
+    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type HandleGetApplication() override;
     chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum HandleGetStatus() override;
     chip::CharSpan HandleGetApplicationVersion() override;
     std::list<uint16_t> HandleGetAllowedVendorList() override;

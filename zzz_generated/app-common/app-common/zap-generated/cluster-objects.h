@@ -32718,7 +32718,7 @@ enum class ChannelFeature : uint32_t
 };
 
 namespace Structs {
-namespace Application {
+namespace ApplicationLauncherApplication {
 enum class Fields
 {
     kCatalogVendorId = 1,
@@ -32737,7 +32737,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace Application
+} // namespace ApplicationLauncherApplication
 namespace ApplicationEP {
 enum class Fields
 {
@@ -32748,7 +32748,7 @@ enum class Fields
 struct Type
 {
 public:
-    Structs::Application::Type application;
+    Structs::ApplicationLauncherApplication::Type application;
     chip::CharSpan endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32801,7 +32801,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
-    Structs::Application::Type application;
+    Structs::ApplicationLauncherApplication::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32817,7 +32817,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
-    Structs::Application::DecodableType application;
+    Structs::ApplicationLauncherApplication::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchAppRequest
@@ -32834,7 +32834,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::Type application;
+    Structs::ApplicationLauncherApplication::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32849,7 +32849,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::DecodableType application;
+    Structs::ApplicationLauncherApplication::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopAppRequest
@@ -32866,7 +32866,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::Type application;
+    Structs::ApplicationLauncherApplication::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32881,7 +32881,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::DecodableType application;
+    Structs::ApplicationLauncherApplication::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace HideAppRequest
@@ -33013,7 +33013,7 @@ enum class ApplicationStatusEnum : uint8_t
 };
 
 namespace Structs {
-namespace Application {
+namespace ApplicationBasicApplication {
 enum class Fields
 {
     kCatalogVendorId = 1,
@@ -33032,7 +33032,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace Application
+} // namespace ApplicationBasicApplication
 } // namespace Structs
 
 namespace Attributes {
@@ -33088,9 +33088,9 @@ struct TypeInfo
 namespace ApplicationApp {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ApplicationBasic::Structs::Application::Type;
-    using DecodableType    = chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType &;
+    using Type             = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type;
+    using DecodableType    = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationApp::Id; }
