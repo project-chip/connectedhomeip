@@ -71,7 +71,6 @@ tests:
               maxValue: 10000
 
     - label: "Reads the optional attribute: Tolerance"
-      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "tolerance"
@@ -79,7 +78,6 @@ tests:
           value: 0
 
     - label: "Reads constraints of attribute: Tolerance"
-      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "tolerance"

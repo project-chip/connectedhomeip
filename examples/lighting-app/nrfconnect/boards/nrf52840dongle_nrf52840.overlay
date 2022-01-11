@@ -1,5 +1,4 @@
-/**
- *
+/*
  *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +14,15 @@
  *    limitations under the License.
  */
 
-#import <Foundation/Foundation.h>
+/ {
+	chosen {
+		zephyr,shell-uart = &cdc_acm_uart0;
+	};
+};
 
-#include <lib/core/CHIPError.h>
-
-NS_ASSUME_NONNULL_BEGIN
-
-@interface CHIPError : NSObject
-+ (nullable NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
-+ (nullable NSError *)errorForZCLErrorCode:(uint8_t)errorCode;
-+ (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error;
-+ (uint8_t)errorToZCLErrorCode:(NSError * _Nullable)error;
-@end
-
-NS_ASSUME_NONNULL_END
+&zephyr_udc0 {
+	cdc_acm_uart0: cdc_acm_uart0 {
+		compatible = "zephyr,cdc-acm-uart";
+		label = "CDC_ACM_0";
+	};
+};

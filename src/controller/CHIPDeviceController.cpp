@@ -272,6 +272,7 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
 {
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
+    VerifyOrReturn(session->GetSessionType() == Transport::Session::SessionType::kSecure);
     UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
 }
 
