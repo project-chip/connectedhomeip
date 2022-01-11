@@ -21,15 +21,14 @@
 #include "../common/CHIPCommand.h"
 #include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
+#include <app/tests/suites/include/PICSChecker.h>
 #include <app/tests/suites/include/ValueChecker.h>
-#include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
-#include <app/tests/suites/pics/PICSBooleanReader.h>
 #include <lib/support/UnitTestUtils.h>
 #include <zap-generated/tests/CHIPClustersTest.h>
 
 constexpr uint16_t kTimeoutInSeconds = 30;
 
-class TestCommand : public CHIPCommand, public ValueChecker, public ConstraintsChecker, public LogCommands
+class TestCommand : public CHIPCommand, public ValueChecker, public ConstraintsChecker, public PICSChecker, public LogCommands
 {
 public:
     TestCommand(const char * commandName) :
@@ -71,8 +70,6 @@ protected:
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
-    bool ShouldSkip(const char * expression);
-
     void Wait()
     {
         if (mDelayInMs.HasValue())
@@ -84,5 +81,4 @@ protected:
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<chip::EndpointId> mEndpointId;
     chip::Optional<uint16_t> mTimeout;
-    chip::Optional<std::map<std::string, bool>> PICS;
 };

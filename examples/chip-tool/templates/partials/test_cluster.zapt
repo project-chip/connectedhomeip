@@ -41,7 +41,14 @@ class {{filename}}: public TestCommand
         {{#chip_tests_items}}
         case {{index}}:
           ChipLogProgress(chipTool, " ***** Test Step {{index}} : {{label}}\n");
-          err = {{#if PICS}}ShouldSkip("{{PICS}}") ? CHIP_NO_ERROR : {{/if}}Test{{asUpperCamelCase label}}_{{index}}();
+          {{#if PICS}}
+          if (ShouldSkip("{{PICS}}"))
+          {
+              NextTest();
+              return;
+          }
+          {{/if}}
+          err = Test{{asUpperCamelCase label}}_{{index}}();
           break;
         {{/chip_tests_items}}
       }
