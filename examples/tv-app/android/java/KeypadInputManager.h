@@ -24,19 +24,13 @@
 class KeypadInputManager : public chip::app::Clusters::KeypadInput::Delegate
 {
 public:
+    static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
+
     chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::Type
     HandleSendKey(const chip::app::Clusters::KeypadInput::CecKeyCode & keyCode) override;
 
 private:
-    friend KeypadInputManager & KeypadInputMgr();
-
-    static KeypadInputManager sInstance;
     jobject mKeypadInputManagerObject = nullptr;
     jmethodID mSendKeyMethod          = nullptr;
 };
-
-inline KeypadInputManager & KeypadInputMgr()
-{
-    return KeypadInputManager::sInstance;
-}
