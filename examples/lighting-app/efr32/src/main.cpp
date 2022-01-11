@@ -70,6 +70,10 @@
 #include "Rpc.h"
 #endif
 
+#ifdef ENABLE_CHIP_SHELL
+#include "matter_shell.h"
+#endif
+
 #define BLE_DEV_NAME "SiLabs-Light"
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -195,6 +199,10 @@ int main(void)
         EFR32_LOG("GetAppTask().Init() failed");
         appError(ret);
     }
+
+#ifdef ENABLE_CHIP_SHELL
+    chip::startShellTask();
+#endif
 
     EFR32_LOG("Starting FreeRTOS scheduler");
     sl_system_kernel_start();
