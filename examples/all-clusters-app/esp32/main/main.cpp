@@ -51,6 +51,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/clusters/door-lock-server/door-lock-server.h>
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/clusters/on-off-server/on-off-server.h>
 #include <app/clusters/ota-requestor/BDXDownloader.h>
 #include <app/clusters/ota-requestor/OTARequestor.h>
@@ -66,6 +67,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/ErrorStr.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
 #include <platform/GenericOTARequestorDriver.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
@@ -142,6 +144,16 @@ typedef std::vector<Endpoint> Endpoints;
 typedef std::tuple<std::string, Endpoints> Device;
 typedef std::vector<Device> Devices;
 Devices devices;
+
+namespace {
+app::Clusters::NetworkCommissioning::Instance
+    sWiFiNetworkCommissioningInstance(0 /* Endpoint Id */, &(NetworkCommissioning::ESPWiFiDriver::GetInstance()));
+} // namespace
+
+void NetWorkCommissioningInstInit()
+{
+    sWiFiNetworkCommissioningInstance.Init();
+}
 
 void AddAttribute(std::string name, std::string value)
 {
@@ -523,7 +535,7 @@ static void InitServer(intptr_t context)
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
-
+    NetWorkCommissioningInstInit();
     SetupPretendDevices();
 }
 
