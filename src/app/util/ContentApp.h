@@ -91,7 +91,7 @@ class DLL_EXPORT ApplicationLauncher : public ContentAppCluster
 public:
     virtual ~ApplicationLauncher() = default;
 
-    virtual app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type LaunchApp(Application application,
+    virtual app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type LaunchApp(ApplicationLauncherApplication application,
                                                                                            std::string data) = 0;
 
     EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength) override;

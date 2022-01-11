@@ -29,9 +29,9 @@ public:
 
     chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
     HandleLaunchApp(const chip::CharSpan & data,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) override;
+                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
     chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
-    HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) override;
+    HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
     chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
-    HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) override;
+    HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
 };

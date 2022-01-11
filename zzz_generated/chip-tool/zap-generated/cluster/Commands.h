@@ -130,11 +130,11 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::Application::DecodableType & value);
+                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType & value);
+                    const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -2069,7 +2069,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::Application::DecodableType & value)
+                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -2116,7 +2116,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType & value)
+                    const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {

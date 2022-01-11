@@ -29226,7 +29226,7 @@ class ApplicationLauncher(Cluster):
 
     class Structs:
         @dataclass
-        class Application(ClusterObject):
+        class ApplicationLauncherApplication(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -29244,11 +29244,11 @@ class ApplicationLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="application", Tag=1, Type=ApplicationLauncher.Structs.Application),
+                            ClusterObjectFieldDescriptor(Label="application", Tag=1, Type=ApplicationLauncher.Structs.ApplicationLauncherApplication),
                             ClusterObjectFieldDescriptor(Label="endpoint", Tag=2, Type=str),
                     ])
 
-            application: 'ApplicationLauncher.Structs.Application' = field(default_factory=lambda: ApplicationLauncher.Structs.Application())
+            application: 'ApplicationLauncher.Structs.ApplicationLauncherApplication' = field(default_factory=lambda: ApplicationLauncher.Structs.ApplicationLauncherApplication())
             endpoint: 'str' = ""
 
 
@@ -29265,11 +29265,11 @@ class ApplicationLauncher(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="data", Tag=0, Type=str),
-                            ClusterObjectFieldDescriptor(Label="application", Tag=1, Type=ApplicationLauncher.Structs.Application),
+                            ClusterObjectFieldDescriptor(Label="application", Tag=1, Type=ApplicationLauncher.Structs.ApplicationLauncherApplication),
                     ])
 
             data: 'str' = ""
-            application: 'ApplicationLauncher.Structs.Application' = field(default_factory=lambda: ApplicationLauncher.Structs.Application())
+            application: 'ApplicationLauncher.Structs.ApplicationLauncherApplication' = field(default_factory=lambda: ApplicationLauncher.Structs.ApplicationLauncherApplication())
 
         @dataclass
         class StopAppRequest(ClusterCommand):
@@ -29281,10 +29281,10 @@ class ApplicationLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="application", Tag=0, Type=ApplicationLauncher.Structs.Application),
+                            ClusterObjectFieldDescriptor(Label="application", Tag=0, Type=ApplicationLauncher.Structs.ApplicationLauncherApplication),
                     ])
 
-            application: 'ApplicationLauncher.Structs.Application' = field(default_factory=lambda: ApplicationLauncher.Structs.Application())
+            application: 'ApplicationLauncher.Structs.ApplicationLauncherApplication' = field(default_factory=lambda: ApplicationLauncher.Structs.ApplicationLauncherApplication())
 
         @dataclass
         class HideAppRequest(ClusterCommand):
@@ -29296,10 +29296,10 @@ class ApplicationLauncher(Cluster):
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
                     Fields = [
-                            ClusterObjectFieldDescriptor(Label="application", Tag=0, Type=ApplicationLauncher.Structs.Application),
+                            ClusterObjectFieldDescriptor(Label="application", Tag=0, Type=ApplicationLauncher.Structs.ApplicationLauncherApplication),
                     ])
 
-            application: 'ApplicationLauncher.Structs.Application' = field(default_factory=lambda: ApplicationLauncher.Structs.Application())
+            application: 'ApplicationLauncher.Structs.ApplicationLauncherApplication' = field(default_factory=lambda: ApplicationLauncher.Structs.ApplicationLauncherApplication())
 
         @dataclass
         class LauncherResponse(ClusterCommand):
@@ -29414,7 +29414,7 @@ class ApplicationBasic(Cluster):
                 ClusterObjectFieldDescriptor(Label="vendorId", Tag=0x00000001, Type=uint),
                 ClusterObjectFieldDescriptor(Label="applicationName", Tag=0x00000002, Type=str),
                 ClusterObjectFieldDescriptor(Label="productId", Tag=0x00000003, Type=uint),
-                ClusterObjectFieldDescriptor(Label="applicationApp", Tag=0x00000004, Type=ApplicationBasic.Structs.Application),
+                ClusterObjectFieldDescriptor(Label="applicationApp", Tag=0x00000004, Type=ApplicationBasic.Structs.ApplicationBasicApplication),
                 ClusterObjectFieldDescriptor(Label="applicationStatus", Tag=0x00000005, Type=ApplicationBasic.Enums.ApplicationStatusEnum),
                 ClusterObjectFieldDescriptor(Label="applicationVersion", Tag=0x00000006, Type=str),
                 ClusterObjectFieldDescriptor(Label="allowedVendorList", Tag=0x00000007, Type=typing.List[uint]),
@@ -29427,7 +29427,7 @@ class ApplicationBasic(Cluster):
     vendorId: 'uint' = None
     applicationName: 'str' = None
     productId: 'uint' = None
-    applicationApp: 'ApplicationBasic.Structs.Application' = None
+    applicationApp: 'ApplicationBasic.Structs.ApplicationBasicApplication' = None
     applicationStatus: 'ApplicationBasic.Enums.ApplicationStatusEnum' = None
     applicationVersion: 'str' = None
     allowedVendorList: 'typing.List[uint]' = None
@@ -29445,7 +29445,7 @@ class ApplicationBasic(Cluster):
 
     class Structs:
         @dataclass
-        class Application(ClusterObject):
+        class ApplicationBasicApplication(ClusterObject):
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
                 return ClusterObjectDescriptor(
@@ -29537,9 +29537,9 @@ class ApplicationBasic(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=ApplicationBasic.Structs.Application)
+                return ClusterObjectFieldDescriptor(Type=ApplicationBasic.Structs.ApplicationBasicApplication)
 
-            value: 'ApplicationBasic.Structs.Application' = field(default_factory=lambda: ApplicationBasic.Structs.Application())
+            value: 'ApplicationBasic.Structs.ApplicationBasicApplication' = field(default_factory=lambda: ApplicationBasic.Structs.ApplicationBasicApplication())
 
         @dataclass
         class ApplicationStatus(ClusterAttributeDescriptor):
