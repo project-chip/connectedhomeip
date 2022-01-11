@@ -32,6 +32,10 @@ public class KeypadInputManagerStub implements KeypadInputManager {
   @Override
   public int sendKey(int keyCode) {
     Log.d(TAG, "sendKey:" + keyCode + " at " + endpoint);
+
+    if (keyCode == KeypadInputManager.KEY_CODE_F4_YELLOW) {
+      return KEY_STATUS_UNSUPPORTED_KEY;
+    }
     return KEY_STATUS_SUCCESS;
   }
 }

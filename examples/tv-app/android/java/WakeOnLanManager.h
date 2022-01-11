@@ -27,7 +27,7 @@ public:
     static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
 
-    chip::CharSpan HandleGetMacAddress() override;
+    CHIP_ERROR HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder) override;
 
 private:
     jobject mWakeOnLanManagerObject = nullptr;

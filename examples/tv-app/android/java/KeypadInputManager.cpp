@@ -59,7 +59,7 @@ Commands::SendKeyResponse::Type KeypadInputManager::HandleSendKey(const CecKeyCo
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kSuccess;
+        response.status = chip::app::Clusters::KeypadInput::StatusEnum::kInvalidKeyInCurrentState;
     }
     else
     {

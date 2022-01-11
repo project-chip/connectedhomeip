@@ -49,9 +49,9 @@ void WakeOnLanManager::NewManager(jint endpoint, jobject manager)
     chip::app::Clusters::WakeOnLan::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
-chip::CharSpan WakeOnLanManager::HandleGetMacAddress()
+CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder)
 {
-
+    jobject javaMac;
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
     chip::CharSpan macValue;
@@ -61,19 +61,17 @@ chip::CharSpan WakeOnLanManager::HandleGetMacAddress()
     VerifyOrExit(mGetMacMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
+    env->ExceptionClear();
+    javaMac = env->CallObjectMethod(mWakeOnLanManagerObject, mGetMacMethod);
+    if (env->ExceptionCheck())
     {
+        ChipLogError(DeviceLayer, "Java exception in WakeOnLanManager::getMac");
+        env->ExceptionDescribe();
         env->ExceptionClear();
-        jobject javaMac = env->CallObjectMethod(mWakeOnLanManagerObject, mGetMacMethod);
-        if (env->ExceptionCheck())
-        {
-            ChipLogError(DeviceLayer, "Java exception in WakeOnLanManager::getMac");
-            env->ExceptionDescribe();
-            env->ExceptionClear();
-            return macValue;
-        }
-
-        macValue = chip::JniUtfString(env, static_cast<jstring>(javaMac)).charSpan();
+        goto exit;
     }
+
+    macValue = chip::JniUtfString(env, static_cast<jstring>(javaMac)).charSpan();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -81,7 +79,7 @@ exit:
         ChipLogError(Zcl, "WakeOnLanManager::HandleGetMacAddress status error: %s", err.AsString());
     }
 
-    return macValue;
+    return aEncoder.Encode(macValue);
 }
 
 void WakeOnLanManager::InitializeWithObjects(jobject managerObject)

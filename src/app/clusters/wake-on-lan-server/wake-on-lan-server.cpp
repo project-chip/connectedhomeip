@@ -126,8 +126,7 @@ CHIP_ERROR WakeOnLanAttrAccess::Read(const app::ConcreteReadAttributePath & aPat
 
 CHIP_ERROR WakeOnLanAttrAccess::ReadMacAddressAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    chip::CharSpan macAddress = delegate->HandleGetMacAddress();
-    return aEncoder.Encode(macAddress);
+    return delegate->HandleGetMacAddress(aEncoder);
 }
 
 } // anonymous namespace
