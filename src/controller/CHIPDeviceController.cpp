@@ -856,7 +856,8 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
     // TODO(cecille): Can we get rid of mDeviceBeingCommissioned and use the remote id instead? Would require storing the
     // commissioning stage in the device.
     CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
-    if (device->GetDeviceId() != remoteDeviceId || (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
+    if (device == nullptr || device->GetDeviceId() != remoteDeviceId ||
+        (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
     {
         ChipLogError(Controller, "Invalid device for commissioning" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
         return CHIP_ERROR_INCORRECT_STATE;
