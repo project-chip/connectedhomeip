@@ -24,8 +24,7 @@
 #include <app/ConcreteCommandPath.h>
 
 #include <app/tests/suites/commands/log/LogCommands.h>
-#include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
-#include <app/tests/suites/pics/PICSBooleanReader.h>
+#include <app/tests/suites/include/PICSChecker.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -35,7 +34,7 @@ constexpr const char kIdentityAlpha[] = "";
 constexpr const char kIdentityBeta[]  = "";
 constexpr const char kIdentityGamma[] = "";
 
-class TestCommand : public LogCommands
+class TestCommand : public PICSChecker, public LogCommands
 {
 public:
     TestCommand(const char * commandName) : mCommandPath(0, 0, 0), mAttributePath(0, 0, 0) {}
@@ -117,26 +116,6 @@ public:
         mCommandPath   = chip::app::ConcreteCommandPath(0, 0, 0);
         mAttributePath = chip::app::ConcreteAttributePath(0, 0, 0);
     }
-
-    bool ShouldSkip(const char * expression)
-    {
-        // If there is no PICS configuration file, considers that nothing should be skipped.
-        if (!PICS.HasValue())
-        {
-            return false;
-        }
-
-        std::map<std::string, bool> pics(PICS.Value());
-        bool shouldSkip = !PICSBooleanExpressionParser::Eval(expression, pics);
-        if (shouldSkip)
-        {
-            ChipLogProgress(chipTool, " **** Skipping: %s == false\n", expression);
-            NextTest();
-        }
-        return shouldSkip;
-    }
-
-    chip::Optional<std::map<std::string, bool>> PICS;
 
     std::atomic_bool isRunning{ true };
 

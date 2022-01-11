@@ -80,21 +80,3 @@ void TestCommand::ThrowSuccessResponse()
 {
     Exit("Expecting failure response but got a success response");
 }
-
-bool TestCommand::ShouldSkip(const char * expression)
-{
-    // If there is no PICS configuration file, considers that nothing should be skipped.
-    if (!PICS.HasValue())
-    {
-        return false;
-    }
-
-    std::map<std::string, bool> pics(PICS.Value());
-    bool shouldSkip = !PICSBooleanExpressionParser::Eval(expression, pics);
-    if (shouldSkip)
-    {
-        ChipLogProgress(chipTool, " **** Skipping: %s == false\n", expression);
-        ContinueOnChipMainThread();
-    }
-    return shouldSkip;
-}
