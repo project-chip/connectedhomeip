@@ -65,20 +65,6 @@ CHIP_ERROR TestCommand::Wait(chip::System::Clock::Timeout duration)
     return chip::DeviceLayer::SystemLayer().StartTimer(duration, OnWaitForMsFn, this);
 }
 
-CHIP_ERROR TestCommand::Log(const char * message)
-{
-    ChipLogDetail(chipTool, "%s", message);
-    ReturnErrorOnFailure(ContinueOnChipMainThread());
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR TestCommand::UserPrompt(const char * message)
-{
-    ChipLogDetail(chipTool, "USER_PROMPT: %s", message);
-    ReturnErrorOnFailure(ContinueOnChipMainThread());
-    return CHIP_NO_ERROR;
-}
-
 void TestCommand::Exit(std::string message)
 {
     ChipLogError(chipTool, " ***** Test Failure: %s\n", message.c_str());
