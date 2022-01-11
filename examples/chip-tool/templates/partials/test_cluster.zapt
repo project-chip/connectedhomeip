@@ -336,6 +336,9 @@ class {{filename}}: public TestCommand
               {{~#if expectedConstraints.format}}VerifyOrReturn(CheckConstraintFormat("{{>item}}", "", "{{expectedConstraints.format}}"));{{/if}}
               {{~#if expectedConstraints.startsWith}}VerifyOrReturn(CheckConstraintStartsWith("{{>item}}", {{>item}}, "{{expectedConstraints.startsWith}}"));{{/if}}
               {{~#if expectedConstraints.endsWith}}VerifyOrReturn(CheckConstraintEndsWith("{{>item}}", {{>item}}, "{{expectedConstraints.endsWith}}"));{{/if}}
+              {{~#if expectedConstraints.isUpperCase}}VerifyOrReturn(CheckConstraintIsUpperCase("{{>item}}", {{>item}}, {{expectedConstraints.isUpperCase}}));{{/if}}
+              {{~#if expectedConstraints.isLowerCase}}VerifyOrReturn(CheckConstraintIsLowerCase("{{>item}}", {{>item}}, {{expectedConstraints.isLowerCase}}));{{/if}}
+              {{~#if expectedConstraints.isHexString}}VerifyOrReturn(CheckConstraintIsHexString("{{>item}}", {{>item}}, {{expectedConstraints.isHexString}}));{{/if}}
               {{~#if expectedConstraints.minLength}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.minLength}}));{{/if}}
               {{~#if expectedConstraints.maxLength}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
               {{~#if expectedConstraints.minValue}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}

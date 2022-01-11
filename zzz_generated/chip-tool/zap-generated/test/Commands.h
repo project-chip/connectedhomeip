@@ -55871,8 +55871,51 @@ public:
             err = TestReadAttributeCharStringValueEndsWithConstraints_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Write attribute CHAR_STRING Value Back to Default Value\n");
-            err = TestWriteAttributeCharStringValueBackToDefaultValue_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Write attribute CHAR_STRING Value\n");
+            err = TestWriteAttributeCharStringValue_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 12 : Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints\n");
+            err = TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Write attribute CHAR_STRING Value\n");
+            err = TestWriteAttributeCharStringValue_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 14 : Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints\n");
+            err = TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Write attribute CHAR_STRING Value\n");
+            err = TestWriteAttributeCharStringValue_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 16 : Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints\n");
+            err = TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Write attribute CHAR_STRING Value\n");
+            err = TestWriteAttributeCharStringValue_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Read attribute CHAR_STRING Value isHexString Constraints\n");
+            err = TestReadAttributeCharStringValueIsHexStringConstraints_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Write attribute CHAR_STRING Value\n");
+            err = TestWriteAttributeCharStringValue_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Read attribute CHAR_STRING Value isHexString Constraints\n");
+            err = TestReadAttributeCharStringValueIsHexStringConstraints_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Write attribute CHAR_STRING Value Back to Default Value\n");
+            err = TestWriteAttributeCharStringValueBackToDefaultValue_21();
             break;
         }
 
@@ -55885,7 +55928,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 12;
+    const uint16_t mTestCount = 22;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -55987,6 +56030,91 @@ private:
     }
 
     static void OnSuccessCallback_11(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_11(); }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_12(status);
+    }
+
+    static void OnSuccessCallback_12(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_12(charString);
+    }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_13(); }
+
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_14(status);
+    }
+
+    static void OnSuccessCallback_14(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_14(charString);
+    }
+
+    static void OnFailureCallback_15(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_15(status);
+    }
+
+    static void OnSuccessCallback_15(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_15(); }
+
+    static void OnFailureCallback_16(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_16(status);
+    }
+
+    static void OnSuccessCallback_16(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_16(charString);
+    }
+
+    static void OnFailureCallback_17(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_17(status);
+    }
+
+    static void OnSuccessCallback_17(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_17(); }
+
+    static void OnFailureCallback_18(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_18(status);
+    }
+
+    static void OnSuccessCallback_18(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_18(charString);
+    }
+
+    static void OnFailureCallback_19(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_19(status);
+    }
+
+    static void OnSuccessCallback_19(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_19(); }
+
+    static void OnFailureCallback_20(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_20(status);
+    }
+
+    static void OnSuccessCallback_20(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_20(charString);
+    }
+
+    static void OnFailureCallback_21(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_21(status);
+    }
+
+    static void OnSuccessCallback_21(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_21(); }
 
     //
     // Tests methods
@@ -56186,14 +56314,14 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeCharStringValueBackToDefaultValue_11()
+    CHIP_ERROR TestWriteAttributeCharStringValue_11()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan charStringArgument;
-        charStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
+        charStringArgument = chip::Span<const char>("lowercasegarbage: not in length on purpose", 9);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
             charStringArgument, this, OnSuccessCallback_11, OnFailureCallback_11));
@@ -56203,6 +56331,194 @@ private:
     void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_12, OnFailureCallback_12));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintIsUpperCase("charString", charString, false));
+        VerifyOrReturn(CheckConstraintIsLowerCase("charString", charString, true));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringValue_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("UPPERCASEgarbage: not in length on purpose", 9);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintIsUpperCase("charString", charString, true));
+        VerifyOrReturn(CheckConstraintIsLowerCase("charString", charString, false));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringValue_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("lowUPPERgarbage: not in length on purpose", 8);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_16, OnFailureCallback_16));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_16(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintIsUpperCase("charString", charString, false));
+        VerifyOrReturn(CheckConstraintIsLowerCase("charString", charString, false));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringValue_17()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("ABCDEF012Vgarbage: not in length on purpose", 10);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_17, OnFailureCallback_17));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_17() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringValueIsHexStringConstraints_18()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_18, OnFailureCallback_18));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_18(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintIsHexString("charString", charString, false));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringValue_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("ABCDEF0123garbage: not in length on purpose", 10);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_19, OnFailureCallback_19));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_19() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringValueIsHexStringConstraints_20()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_20, OnFailureCallback_20));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_20(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintIsHexString("charString", charString, true));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringValueBackToDefaultValue_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_21, OnFailureCallback_21));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_21() { NextTest(); }
 };
 
 class TestDelayCommands : public TestCommand
