@@ -142,7 +142,7 @@ jobs:
            - name: Build example Standalone Door Lock App
               timeout-minutes: 5
               run: |
-		  scripts/examples/ota_test.sh
+                  scripts/examples/ota_test.sh
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
