@@ -11886,12 +11886,20 @@ public:
             err = TestCheckColorLoopDirectionValue_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Reset Enhanced Move To Hue command\n");
+            err = ShouldSkip("CR_ENHANCEDMOVETOHUE") ? CHIP_NO_ERROR : TestResetEnhancedMoveToHueCommand_15();
             break;
         case 16:
-            ChipLogProgress(chipTool, " ***** Test Step 16 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_16();
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Reset Color Loop Set Command\n");
+            err = TestResetColorLoopSetCommand_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_18();
             break;
         }
 
@@ -11904,7 +11912,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 17;
+    const uint16_t mTestCount = 19;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -11999,14 +12007,14 @@ private:
         (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_14(colorLoopDirection);
     }
 
-    static void OnFailureCallback_16(void * context, EmberAfStatus status)
+    static void OnFailureCallback_18(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_16(status);
+        (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_18(status);
     }
 
-    static void OnSuccessCallback_16(void * context, bool onOff)
+    static void OnSuccessCallback_18(void * context, bool onOff)
     {
-        (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_16(onOff);
+        (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_18(onOff);
     }
 
     //
@@ -12343,12 +12351,17 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_15()
+    CHIP_ERROR TestResetEnhancedMoveToHueCommand_15()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
 
         RequestType request;
+        request.enhancedHue     = 0U;
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
+        request.transitionTime  = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_15();
@@ -12366,20 +12379,73 @@ private:
 
     void OnSuccessResponse_15() { NextTest(); }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_16()
+    CHIP_ERROR TestResetColorLoopSetCommand_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+
+        RequestType request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(0);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 0U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_16();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_16(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_16() { NextTest(); }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_17()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_8_1 *>(context))->OnSuccessResponse_17();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_17(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_17() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_18()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_16, OnFailureCallback_16));
+            this, OnSuccessCallback_18, OnFailureCallback_18));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_16(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_18(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_16(bool onOff)
+    void OnSuccessResponse_18(bool onOff)
     {
         VerifyOrReturn(CheckValue("onOff", onOff, 0));
 
@@ -12870,12 +12936,20 @@ public:
             err = TestReadEnhancedCurrentHueAttributeFromDut_51();
             break;
         case 52:
-            ChipLogProgress(chipTool, " ***** Test Step 52 : Turn Off light for color control tests\n");
-            err = TestTurnOffLightForColorControlTests_52();
+            ChipLogProgress(chipTool, " ***** Test Step 52 : Reset Enhanced Move To Hue command\n");
+            err = ShouldSkip("CR_ENHANCEDMOVETOHUE") ? CHIP_NO_ERROR : TestResetEnhancedMoveToHueCommand_52();
             break;
         case 53:
-            ChipLogProgress(chipTool, " ***** Test Step 53 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_53();
+            ChipLogProgress(chipTool, " ***** Test Step 53 : Reset Color Loop Set Command\n");
+            err = TestResetColorLoopSetCommand_53();
+            break;
+        case 54:
+            ChipLogProgress(chipTool, " ***** Test Step 54 : Turn Off light for color control tests\n");
+            err = TestTurnOffLightForColorControlTests_54();
+            break;
+        case 55:
+            ChipLogProgress(chipTool, " ***** Test Step 55 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_55();
             break;
         }
 
@@ -12888,7 +12962,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 54;
+    const uint16_t mTestCount = 56;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -13232,14 +13306,14 @@ private:
         (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_51(enhancedCurrentHue);
     }
 
-    static void OnFailureCallback_53(void * context, EmberAfStatus status)
+    static void OnFailureCallback_55(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_53(status);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_55(status);
     }
 
-    static void OnSuccessCallback_53(void * context, bool onOff)
+    static void OnSuccessCallback_55(void * context, bool onOff)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_53(onOff);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_55(onOff);
     }
 
     //
@@ -14427,12 +14501,17 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestTurnOffLightForColorControlTests_52()
+    CHIP_ERROR TestResetEnhancedMoveToHueCommand_52()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
 
         RequestType request;
+        request.enhancedHue     = 0U;
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
+        request.transitionTime  = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_52();
@@ -14450,20 +14529,73 @@ private:
 
     void OnSuccessResponse_52() { NextTest(); }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_53()
+    CHIP_ERROR TestResetColorLoopSetCommand_53()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+
+        RequestType request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(0);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 0U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_53();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_53(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_53(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_53() { NextTest(); }
+
+    CHIP_ERROR TestTurnOffLightForColorControlTests_54()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_54();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_54(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_54(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_54() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_55()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_53, OnFailureCallback_53));
+            this, OnSuccessCallback_55, OnFailureCallback_55));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_53(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_55(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_53(bool onOff)
+    void OnSuccessResponse_55(bool onOff)
     {
         VerifyOrReturn(CheckValue("onOff", onOff, 0));
 
@@ -14653,12 +14785,20 @@ public:
             err = TestReadEnhancedCurrentHueAttributeFromDut_17();
             break;
         case 18:
-            ChipLogProgress(chipTool, " ***** Test Step 18 : Turn off light for color control tests\n");
-            err = TestTurnOffLightForColorControlTests_18();
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Reset Enhanced Move To Hue command\n");
+            err = ShouldSkip("CR_ENHANCEDMOVETOHUE") ? CHIP_NO_ERROR : TestResetEnhancedMoveToHueCommand_18();
             break;
         case 19:
-            ChipLogProgress(chipTool, " ***** Test Step 19 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_19();
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Reset Color Loop Set Command\n");
+            err = TestResetColorLoopSetCommand_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Turn off light for color control tests\n");
+            err = TestTurnOffLightForColorControlTests_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_21();
             break;
         }
 
@@ -14671,7 +14811,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 20;
+    const uint16_t mTestCount = 22;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -14799,14 +14939,14 @@ private:
         (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_17(enhancedCurrentHue);
     }
 
-    static void OnFailureCallback_19(void * context, EmberAfStatus status)
+    static void OnFailureCallback_21(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_19(status);
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_21(status);
     }
 
-    static void OnSuccessCallback_19(void * context, bool onOff)
+    static void OnSuccessCallback_21(void * context, bool onOff)
     {
-        (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_19(onOff);
+        (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_21(onOff);
     }
 
     //
@@ -15205,12 +15345,17 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestTurnOffLightForColorControlTests_18()
+    CHIP_ERROR TestResetEnhancedMoveToHueCommand_18()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
 
         RequestType request;
+        request.enhancedHue     = 0U;
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
+        request.transitionTime  = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_18();
@@ -15228,20 +15373,73 @@ private:
 
     void OnSuccessResponse_18() { NextTest(); }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_19()
+    CHIP_ERROR TestResetColorLoopSetCommand_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+
+        RequestType request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(0);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 0U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_19();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_19(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_19() { NextTest(); }
+
+    CHIP_ERROR TestTurnOffLightForColorControlTests_20()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnSuccessResponse_20();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_20(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_20() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_21()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_19, OnFailureCallback_19));
+            this, OnSuccessCallback_21, OnFailureCallback_21));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_19(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_21(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_19(bool onOff)
+    void OnSuccessResponse_21(bool onOff)
     {
         VerifyOrReturn(CheckValue("onOff", onOff, 0));
 
@@ -15431,12 +15629,20 @@ public:
             err = TestReadEnhancedCurrentHueAttributeFromDut_17();
             break;
         case 18:
-            ChipLogProgress(chipTool, " ***** Test Step 18 : Turn off light for color control tests\n");
-            err = TestTurnOffLightForColorControlTests_18();
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Reset Enhanced Move To Hue command\n");
+            err = ShouldSkip("CR_ENHANCEDMOVETOHUE") ? CHIP_NO_ERROR : TestResetEnhancedMoveToHueCommand_18();
             break;
         case 19:
-            ChipLogProgress(chipTool, " ***** Test Step 19 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_19();
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Reset Color Loop Set Command\n");
+            err = TestResetColorLoopSetCommand_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Turn off light for color control tests\n");
+            err = TestTurnOffLightForColorControlTests_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_21();
             break;
         }
 
@@ -15449,7 +15655,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 20;
+    const uint16_t mTestCount = 22;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -15577,14 +15783,14 @@ private:
         (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_17(enhancedCurrentHue);
     }
 
-    static void OnFailureCallback_19(void * context, EmberAfStatus status)
+    static void OnFailureCallback_21(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_19(status);
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_21(status);
     }
 
-    static void OnSuccessCallback_19(void * context, bool onOff)
+    static void OnSuccessCallback_21(void * context, bool onOff)
     {
-        (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_19(onOff);
+        (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_21(onOff);
     }
 
     //
@@ -15983,12 +16189,17 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestTurnOffLightForColorControlTests_18()
+    CHIP_ERROR TestResetEnhancedMoveToHueCommand_18()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
 
         RequestType request;
+        request.enhancedHue     = 0U;
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
+        request.transitionTime  = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_18();
@@ -16006,20 +16217,73 @@ private:
 
     void OnSuccessResponse_18() { NextTest(); }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_19()
+    CHIP_ERROR TestResetColorLoopSetCommand_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+
+        RequestType request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(0);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 0U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_19();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_19(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_19() { NextTest(); }
+
+    CHIP_ERROR TestTurnOffLightForColorControlTests_20()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnSuccessResponse_20();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_20(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_20() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_21()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_19, OnFailureCallback_19));
+            this, OnSuccessCallback_21, OnFailureCallback_21));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_19(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_21(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_19(bool onOff)
+    void OnSuccessResponse_21(bool onOff)
     {
         VerifyOrReturn(CheckValue("onOff", onOff, 0));
 
