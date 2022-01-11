@@ -196,6 +196,14 @@ public:
 
     void SetActive(bool active) { mActive = active; }
 
+    /**
+     * @brief
+     * Should be called when the pairing completes.
+     *
+     * This causes the secure session parameters to be loaded and stores the session details in the session manager.
+     */
+    CHIP_ERROR SetConnected();
+
     bool IsSecureConnected() const override { return IsActive() && mState == ConnectionState::SecureConnected; }
 
     bool IsSessionSetupInProgress() const { return IsActive() && mState == ConnectionState::Connecting; }
