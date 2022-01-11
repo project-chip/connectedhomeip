@@ -100,10 +100,12 @@ StaticTask_t appTaskStruct;
  * Identify Callbacks
  *********************************************************/
 
-inline void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
+namespace {
+void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
     sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 }
+} // namespace
 
 void OnTriggerIdentifyEffect(Identify * identify)
 {
@@ -152,8 +154,8 @@ Identify gIdentify = {
 
 void OnTriggerOffWithEffect(OnOffEffect * effect)
 {
-    uint8_t effectId      = effect->mEffectIdentifier;
-    uint8_t effectVariant = effect->mEffectVariant;
+    chip::app::Clusters::OnOff::OnOffEffectIdentifier effectId = effect->mEffectIdentifier;
+    uint8_t effectVariant                                      = effect->mEffectVariant;
 
     // Uses print outs until we can support the effects
     if (effectId == EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF)
