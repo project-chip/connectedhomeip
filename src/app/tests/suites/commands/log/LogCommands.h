@@ -23,8 +23,8 @@
 class LogCommands
 {
 public:
-    LogCommands() {};
-    virtual ~LogCommands() {};
+    LogCommands(){};
+    virtual ~LogCommands(){};
 
     virtual CHIP_ERROR ContinueOnChipMainThread() = 0;
 
