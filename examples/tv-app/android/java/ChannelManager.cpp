@@ -70,7 +70,7 @@ CHIP_ERROR ChannelManager::HandleGetChannelList(chip::app::AttributeValueEncoder
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
-        jint length                  = env->GetArrayLength(channelInfoList);
+        jint length = env->GetArrayLength(channelInfoList);
 
         for (jint i = 0; i < length; i++)
         {
@@ -238,7 +238,9 @@ exit:
     return err;
 }
 
-void ChannelManager::HandleChangeChannel(const chip::CharSpan & match, chip::app::CommandResponseHelper<chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type> & responser)
+void ChannelManager::HandleChangeChannel(
+    const chip::CharSpan & match,
+    chip::app::CommandResponseHelper<chip::app::Clusters::Channel::Commands::ChangeChannelResponse::Type> & responser)
 {
     std::string name(match.data(), match.size());
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -268,7 +270,7 @@ void ChannelManager::HandleChangeChannel(const chip::CharSpan & match, chip::app
 
         jfieldID getErrorTypeField = env->GetFieldID(channelClass, "errorType", "I");
         jint jerrorType            = env->GetIntField(channelObject, getErrorTypeField);
-        response.errorType = static_cast<app::Clusters::Channel::ErrorTypeEnum>(jerrorType);
+        response.errorType         = static_cast<app::Clusters::Channel::ErrorTypeEnum>(jerrorType);
 
         jfieldID getCallSignField = env->GetFieldID(channelClass, "callSign", "Ljava/lang/String;");
         jstring jcallSign         = static_cast<jstring>(env->GetObjectField(channelObject, getCallSignField));

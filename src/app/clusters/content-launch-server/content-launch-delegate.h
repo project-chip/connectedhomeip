@@ -21,9 +21,9 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
-#include <app/util/af.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandResponseHelper.h>
+#include <app/util/af.h>
 #include <list>
 
 namespace chip {
@@ -37,13 +37,12 @@ namespace ContentLauncher {
 class Delegate
 {
 public:
-    virtual void HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay,
-                                                               const chip::CharSpan & data,
-                                                            CommandResponseHelper<Commands::LaunchResponse::Type> & responser) = 0;
+    virtual void HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
+                                     CommandResponseHelper<Commands::LaunchResponse::Type> & responser) = 0;
 
     virtual void HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                           const std::list<BrandingInformation> & brandingInformation,
-                                                           CommandResponseHelper<Commands::LaunchResponse::Type> & responser) = 0;
+                                 const std::list<BrandingInformation> & brandingInformation,
+                                 CommandResponseHelper<Commands::LaunchResponse::Type> & responser) = 0;
 
     virtual CHIP_ERROR HandleGetAcceptHeaderList(app::AttributeValueEncoder & aEncoder) = 0;
 

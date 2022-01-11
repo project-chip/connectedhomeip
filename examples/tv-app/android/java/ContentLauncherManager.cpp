@@ -43,9 +43,9 @@ void ContentLauncherManager::NewManager(jint endpoint, jobject manager)
     chip::app::Clusters::ContentLauncher::SetDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
-void ContentLauncherManager::HandleLaunchContent(const std::list<Parameter> & parameterList,
-                                                                           bool autoplay, const chip::CharSpan & data,
-                                                                           chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
+void ContentLauncherManager::HandleLaunchContent(
+    const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
+    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
 {
     Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -62,8 +62,8 @@ void ContentLauncherManager::HandleLaunchContent(const std::list<Parameter> & pa
         // Todo: make parameterList java
         jobjectArray parameterArray = nullptr;
 
-        jobject resp =
-            env->CallObjectMethod(mContentLauncherManagerObject, mLaunchContentMethod, parameterArray, static_cast<jboolean>(autoplay), jData.jniValue());
+        jobject resp = env->CallObjectMethod(mContentLauncherManagerObject, mLaunchContentMethod, parameterArray,
+                                             static_cast<jboolean>(autoplay), jData.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentLauncherManager::LaunchContent");
@@ -97,10 +97,10 @@ exit:
     }
 }
 
-void ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
-                                                                       const chip::CharSpan & displayString,
-                                                                       const std::list<BrandingInformation> & brandingInformation,
-                                                                           chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
+void ContentLauncherManager::HandleLaunchUrl(
+    const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+    const std::list<BrandingInformation> & brandingInformation,
+    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
 {
     Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -178,7 +178,7 @@ CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(chip::app::Attribut
         jint size = env->GetArrayLength(acceptedHeadersArray);
         for (int i = 0; i < size; i++)
         {
-            jstring jAcceptedHeader     = (jstring) env->GetObjectArrayElement(acceptedHeadersArray, i);
+            jstring jAcceptedHeader = (jstring) env->GetObjectArrayElement(acceptedHeadersArray, i);
             JniUtfString acceptedHeader(env, jAcceptedHeader);
             ReturnErrorOnFailure(encoder.Encode(acceptedHeader.charSpan()));
         }
