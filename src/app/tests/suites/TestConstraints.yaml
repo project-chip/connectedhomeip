@@ -100,7 +100,8 @@ tests:
       arguments:
           value: "lowercase"
 
-    - label: "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
       command: "readAttribute"
       attribute: "char_string"
       response:
@@ -114,7 +115,8 @@ tests:
       arguments:
           value: "UPPERCASE"
 
-    - label: "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
       command: "readAttribute"
       attribute: "char_string"
       response:
@@ -128,7 +130,8 @@ tests:
       arguments:
           value: "lowUPPER"
 
-    - label: "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
+    - label:
+          "Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints"
       command: "readAttribute"
       attribute: "char_string"
       response:
