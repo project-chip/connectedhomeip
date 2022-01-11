@@ -115,11 +115,13 @@ var endpointClusterWithInit = [
   'On/Off',
   'Pump Configuration and Control',
   'Scenes',
+  'Time Format Localization',
   'Thermostat',
 ];
 var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock', 'Pump Configuration and Control' ];
-var endpointClusterWithPreAttribute     = [ 'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration' ];
-var endpointClusterWithMessageSent      = [ 'IAS Zone' ];
+var endpointClusterWithPreAttribute =
+    [ 'IAS Zone', 'Door Lock', 'Thermostat User Interface Configuration', 'Time Format Localization' ];
+var endpointClusterWithMessageSent = [ 'IAS Zone' ];
 
 /**
  * Populate the GENERATED_FUNCTIONS field

@@ -42,6 +42,7 @@ tests:
                   0x0028, # Basic Information
                   0x002A, # OTA Software Update Requestor
                   0x002B, # Localization Configuration
+                  0x002C, # Time Format Localization
                   0x002E, # Power Source Configuration
                   0x0030, # General Commissioning
                   0x0031, # Network Commissioning
