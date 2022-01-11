@@ -175,7 +175,7 @@ bool emberAfChannelClusterChangeChannelRequestCallback(app::CommandHandler * com
     auto & match = commandData.match;
 
     app::CommandResponseHelper<Commands::ChangeChannelResponse::Type> responser(command, commandPath);
-    
+
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
@@ -187,9 +187,9 @@ exit:
     {
         ChipLogError(Zcl, "emberAfChannelClusterChangeChannelRequestCallback error: %s", err.AsString());
     }
-    
+
     // If isDelegateNull, no one will call responser, so IsResponsed will be false
-    if (!responser.IsResponsed()) 
+    if (!responser.IsResponsed())
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }

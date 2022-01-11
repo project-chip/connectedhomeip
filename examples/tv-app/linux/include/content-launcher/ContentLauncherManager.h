@@ -24,7 +24,7 @@ class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Dele
 {
 public:
     ContentLauncherManager(chip::EndpointId endpointId):mEndpointId(endpointId) {}
-    
+
     void HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay,
                         const chip::CharSpan & data,
                         chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser) override;
