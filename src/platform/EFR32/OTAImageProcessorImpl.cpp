@@ -54,17 +54,20 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
     uint32_t err = SL_BOOTLOADER_OK;
 
+    ChipLogError(SoftwareUpdate, "LISS Apply() is called ");
     // Assuming that bootloader_verifyImage() call is not too expensive and
-    // doesn't need to be offladed to a different task
+    // doesn't need to be offloaded to a different task
     err = bootloader_verifyImage(mSlotId, NULL);
     if (err != SL_BOOTLOADER_OK)
         {
+            ChipLogError(SoftwareUpdate, "bootloader_verifyImage error %ld", err);
             return CHIP_ERROR_INTERNAL;
         }
 
     err = bootloader_setImageToBootload(mSlotId);
     if (err != SL_BOOTLOADER_OK)
         {
+            ChipLogError(SoftwareUpdate, "setImageToBootload error %ld", err);
             return CHIP_ERROR_INTERNAL;
         }
 
@@ -123,7 +126,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     bootloader_init();
     mSlotId = 0; // Single slot unless we support multiple images
     mWriteOffset = 0;
-    err = bootloader_eraseStorageSlot(mSlotId);
+    //  err = bootloader_eraseStorageSlot(mSlotId);
 
     imageProcessor->mDownloader->OnPreparedForDownload(err == SL_BOOTLOADER_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
 }
@@ -170,11 +173,13 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     // TODO: Process block header if any
 
-    err = bootloader_writeStorage(mSlotId, imageProcessor->mBlock.size(),
-        reinterpret_cast<uint8_t *>(imageProcessor->mBlock.data()), mWriteOffset);
+    err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset,
+        reinterpret_cast<uint8_t *>(imageProcessor->mBlock.data()), imageProcessor->mBlock.size());
 
     if (err)
-        {
+        {  
+            ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage err %ld", err);
+
             imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
             return;
         }
