@@ -23,6 +23,7 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 
+#include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
 #include <app/tests/suites/pics/PICSBooleanReader.h>
 
@@ -34,7 +35,7 @@ constexpr const char kIdentityAlpha[] = "";
 constexpr const char kIdentityBeta[]  = "";
 constexpr const char kIdentityGamma[] = "";
 
-class TestCommand
+class TestCommand : public LogCommands
 {
 public:
     TestCommand(const char * commandName) : mCommandPath(0, 0, 0), mAttributePath(0, 0, 0) {}
@@ -60,16 +61,8 @@ public:
         return 0;
     }
 
-    CHIP_ERROR Log(const char * message)
+    CHIP_ERROR ContinueOnChipMainThread() override
     {
-        ChipLogProgress(chipTool, "%s", message);
-        NextTest();
-        return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR UserPrompt(const char * message)
-    {
-        ChipLogProgress(chipTool, "USER_PROMPT: %s", message);
         NextTest();
         return CHIP_NO_ERROR;
     }
