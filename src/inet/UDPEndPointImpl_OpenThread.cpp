@@ -118,15 +118,12 @@ CHIP_ERROR UDPEndPointImplOT::IPv6Bind(otUdpSocket & socket, const IPAddress & a
 CHIP_ERROR UDPEndPointImplOT::BindImpl(IPAddressType addressType, const IPAddress & addr, uint16_t port, InterfaceId interface)
 {
 
-    if (addressType == IPAddressType::kIPv6)
-    {
-        ReturnErrorOnFailure(IPv6Bind(mSocket, addr, port, interface));
-    }
-    else
+    if (addressType != IPAddressType::kIPv6)
     {
         return INET_ERROR_WRONG_ADDRESS_TYPE;
     }
 
+    ReturnErrorOnFailure(IPv6Bind(mSocket, addr, port, interface));
     mBoundPort   = port;
     mBoundIntfId = interface;
 
@@ -178,7 +175,7 @@ CHIP_ERROR UDPEndPointImplOT::SetMulticastLoopback(IPVersion aIPVersion, bool aL
     (void) aIPVersion;
     (void) aLoopback;
     // TODO
-    return CHIP_NO_ERROR;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR UDPEndPointImplOT::BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId)

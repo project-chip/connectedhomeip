@@ -75,6 +75,9 @@ public:
         return *this;
     }
 
+    /**
+     * Networking Stack Native parameter (optional)
+     */
     void * GetNativeParams() const { return mNativeParams; }
     UdpListenParameters & SetNativeParams(void * params)
     {

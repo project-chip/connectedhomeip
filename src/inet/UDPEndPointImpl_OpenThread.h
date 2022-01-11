@@ -43,7 +43,7 @@ public:
     uint16_t GetBoundPort() const override;
     void Free() override;
     void HandleDataReceived(System::PacketBufferHandle && msg);
-    inline void SetNativeParams(otInstance * params) { mOTInstance = static_cast<otInstance *>(params); }
+    inline void SetNativeParams(void * params) { mOTInstance = static_cast<otInstance *>(params); }
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
     CHIP_ERROR BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId) override;
 

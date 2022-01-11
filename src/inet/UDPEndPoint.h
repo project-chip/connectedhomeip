@@ -247,6 +247,11 @@ public:
      */
     virtual void Free() = 0;
 
+    /**
+     * Set Network Native Parameters (optional)
+     *
+     * Some networking stack requires additionnal parameters
+     */
     virtual inline void SetNativeParams(void * params) { (void) params; }
 
 protected:
