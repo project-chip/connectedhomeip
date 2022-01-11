@@ -41,6 +41,16 @@ bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
  gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/minimal-mdns '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-minmdns-ipv6only'
 
+# Generating linux-arm64-shell
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/standalone '"'"'--args=target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-shell'
+
+# Generating linux-arm64-shell-ipv6only
+bash -c '
+PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
+ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/standalone '"'"'--args=chip_inet_config_enable_ipv4=false target_cpu="arm64" is_clang=true chip_crypto="mbedtls" sysroot="SYSROOT_AARCH64"'"'"' {out}/linux-arm64-shell-ipv6only'
+
 # Generating linux-arm64-thermostat
 bash -c '
 PKG_CONFIG_PATH="SYSROOT_AARCH64/lib/aarch64-linux-gnu/pkgconfig" \
@@ -81,6 +91,12 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 # Generating linux-x64-rpc-console
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/common/pigweed/rpc_console {out}/linux-x64-rpc-console
 
+# Generating linux-x64-shell
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/standalone {out}/linux-x64-shell
+
+# Generating linux-x64-shell-ipv6only
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/standalone --args=chip_inet_config_enable_ipv4=false {out}/linux-x64-shell-ipv6only
+
 # Generating linux-x64-tests
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root} --args=chip_build_tests=true {out}/linux-x64-tests
 
@@ -120,6 +136,12 @@ ninja -C {out}/linux-arm64-minmdns
 # Building linux-arm64-minmdns-ipv6only
 ninja -C {out}/linux-arm64-minmdns-ipv6only
 
+# Building linux-arm64-shell
+ninja -C {out}/linux-arm64-shell
+
+# Building linux-arm64-shell-ipv6only
+ninja -C {out}/linux-arm64-shell-ipv6only
+
 # Building linux-arm64-thermostat
 ninja -C {out}/linux-arm64-thermostat
 
@@ -155,6 +177,12 @@ ninja -C {out}/linux-x64-minmdns-ipv6only
 
 # Building linux-x64-rpc-console
 ninja -C {out}/linux-x64-rpc-console
+
+# Building linux-x64-shell
+ninja -C {out}/linux-x64-shell
+
+# Building linux-x64-shell-ipv6only
+ninja -C {out}/linux-x64-shell-ipv6only
 
 # Building linux-x64-tests
 ninja -C {out}/linux-x64-tests check

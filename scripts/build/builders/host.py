@@ -29,6 +29,7 @@ class HostApp(Enum):
     TV_APP = auto()
     LOCK = auto()
     TESTS = auto()
+    SHELL = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -47,6 +48,8 @@ class HostApp(Enum):
             return 'door-lock-app/linux'
         elif self == HostApp.TESTS:
             return '../'
+        elif self == HostApp.SHELL:
+            return 'shell/standalone'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -77,6 +80,9 @@ class HostApp(Enum):
             yield 'chip-door-lock-app.map'
         elif self == HostApp.TESTS:
             pass
+        elif self == HostApp.SHELL:
+            yield 'chip-shell'
+            yield 'chip-shell.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
