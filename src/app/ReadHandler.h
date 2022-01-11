@@ -217,6 +217,10 @@ private:
     uint16_t mMinIntervalFloorSeconds   = 0;
     uint16_t mMaxIntervalCeilingSeconds = 0;
     SessionHolder mSessionHandle;
+    // only for subscription, mHoldReport is set to true by current class when trying to refresh subscription sync timer, which
+    // would block report delivery within min interval, and it is set to false by current class after min interval which means it is
+    // allowed to send report with data. There is one exception situation, where if EventManagement/Report Engine needs to send
+    // urgent event, mHoldReport is also set as false, and the urgent event would be generated
     bool mHoldReport         = false;
     bool mDirty              = false;
     bool mActiveSubscription = false;
@@ -226,8 +230,11 @@ private:
     NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
     bool mIsFabricFiltered                                   = false;
-    bool mHoldSync                                           = false;
-    uint32_t mLastWrittenEventsBytes                         = 0;
+    // only for subscription, mHoldSync is set to true when trying to refresh subscription timer, which mean empty sync report
+    // cannot be sent during max interval. mHoldSync is set to false after max interval is passed, it means empty sync report is
+    // allowed to be generated.
+    bool mHoldSync                   = false;
+    uint32_t mLastWrittenEventsBytes = 0;
     SubjectDescriptor mSubjectDescriptor;
     // The detailed encoding state for a single attribute, used by list chunking feature.
     AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;
