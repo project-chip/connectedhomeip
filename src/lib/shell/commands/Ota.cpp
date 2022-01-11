@@ -26,6 +26,16 @@
 using namespace chip::DeviceLayer;
 
 namespace chip {
+
+TODO: Remove weak functions when ESP32 all-clusters-app includes code from src/app/clusters/ota-requestor
+// The code requires OTA Provider client cluster which interferes with OTA Provider server cluster,
+// already enabled in the all-clusters-app.
+__attribute__((weak)) void SetRequestorInstance(OTARequestorInterface * instance) {}
+__attribute__((weak)) OTARequestorInterface * GetRequestorInstance()
+{
+    return nullptr;
+}
+
 namespace Shell {
 namespace {
 
