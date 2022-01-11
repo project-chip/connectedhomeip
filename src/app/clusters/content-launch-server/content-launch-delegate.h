@@ -22,6 +22,8 @@
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/util/af.h>
+#include <app/AttributeAccessInterface.h>
+#include <app/CommandResponseHelper.h>
 #include <list>
 
 namespace chip {
@@ -35,14 +37,15 @@ namespace ContentLauncher {
 class Delegate
 {
 public:
-    virtual Commands::LaunchResponse::Type HandleLaunchContent(chip::EndpointId endpointId,
-                                                               const std::list<Parameter> & parameterList, bool autoplay,
-                                                               const chip::CharSpan & data) = 0;
+    virtual void HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay,
+                                                               const chip::CharSpan & data,
+                                                            CommandResponseHelper<Commands::LaunchResponse::Type> & responser) = 0;
 
-    virtual Commands::LaunchResponse::Type HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                                           const std::list<BrandingInformation> & brandingInformation) = 0;
+    virtual void HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                                           const std::list<BrandingInformation> & brandingInformation,
+                                                           CommandResponseHelper<Commands::LaunchResponse::Type> & responser) = 0;
 
-    virtual std::list<std::string> HandleGetAcceptHeaderList() = 0;
+    virtual CHIP_ERROR HandleGetAcceptHeaderList(app::AttributeValueEncoder & aEncoder) = 0;
 
     virtual uint32_t HandleGetSupportedStreamingProtocols() = 0;
 

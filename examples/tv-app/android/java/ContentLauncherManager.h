@@ -32,13 +32,13 @@ public:
     static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
 
-    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
-    HandleLaunchContent(chip::EndpointId endpointId, const std::list<Parameter> & parameterList, bool autoplay,
-                        const chip::CharSpan & data) override;
-    chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type
-    HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                    const std::list<BrandingInformation> & brandingInformation) override;
-    std::list<std::string> HandleGetAcceptHeaderList() override;
+    void HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay,
+                        const chip::CharSpan & data,
+                        chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser) override;
+    void HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                    const std::list<BrandingInformation> & brandingInformation,
+                        chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser) override;
+    CHIP_ERROR HandleGetAcceptHeaderList(chip::app::AttributeValueEncoder & aEncoder) override;
     uint32_t HandleGetSupportedStreamingProtocols() override;
 
 private:
