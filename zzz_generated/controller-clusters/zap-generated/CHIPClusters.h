@@ -456,6 +456,13 @@ public:
     CHIP_ERROR StopWithOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 };
 
+class DLL_EXPORT LocalizationConfigurationCluster : public ClusterBase
+{
+public:
+    LocalizationConfigurationCluster() : ClusterBase(app::Clusters::LocalizationConfiguration::Id) {}
+    ~LocalizationConfigurationCluster() {}
+};
+
 class DLL_EXPORT LowPowerCluster : public ClusterBase
 {
 public:

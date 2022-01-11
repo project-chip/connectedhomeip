@@ -3464,6 +3464,7 @@ static void OnThermostatGetWeeklyScheduleResponseSuccess(
 | IlluminanceMeasurement                                              | 0x0400 |
 | KeypadInput                                                         | 0x0509 |
 | LevelControl                                                        | 0x0008 |
+| LocalizationConfiguration                                           | 0x002B |
 | LowPower                                                            | 0x0508 |
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
@@ -22508,6 +22509,102 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*----------------------------------------------------------------------------*\
+| Cluster LocalizationConfiguration                                   | 0x002B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ActiveLocale                                                      | 0x0001 |
+| * SupportedLocales                                                  | 0x0002 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute ActiveLocale
+ */
+class ReadLocalizationConfigurationActiveLocale : public ModelCommand
+{
+public:
+    ReadLocalizationConfigurationActiveLocale() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-locale");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationConfigurationActiveLocale() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationConfiguration.ActiveLocale response", value);
+    }
+};
+
+class WriteLocalizationConfigurationActiveLocale : public ModelCommand
+{
+public:
+    WriteLocalizationConfigurationActiveLocale() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "active-locale");
+        AddArgument("attr-value", &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteLocalizationConfigurationActiveLocale() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::CharSpan mValue;
+};
+
+/*
+ * Attribute SupportedLocales
+ */
+class ReadLocalizationConfigurationSupportedLocales : public ModelCommand
+{
+public:
+    ReadLocalizationConfigurationSupportedLocales() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-locales");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationConfigurationSupportedLocales() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationConfiguration.SupportedLocales response", value);
+    }
 };
 
 /*----------------------------------------------------------------------------*\
@@ -51870,6 +51967,18 @@ void registerClusterLevelControl(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterLocalizationConfiguration(Commands & commands)
+{
+    const char * clusterName = "LocalizationConfiguration";
+
+    commands_list clusterCommands = {
+        make_unique<ReadLocalizationConfigurationActiveLocale>(),     //
+        make_unique<WriteLocalizationConfigurationActiveLocale>(),    //
+        make_unique<ReadLocalizationConfigurationSupportedLocales>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterLowPower(Commands & commands)
 {
     const char * clusterName = "LowPower";
@@ -52993,6 +53102,7 @@ void registerClusters(Commands & commands)
     registerClusterIlluminanceMeasurement(commands);
     registerClusterKeypadInput(commands);
     registerClusterLevelControl(commands);
+    registerClusterLocalizationConfiguration(commands);
     registerClusterLowPower(commands);
     registerClusterMediaInput(commands);
     registerClusterMediaPlayback(commands);

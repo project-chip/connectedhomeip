@@ -526,6 +526,16 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Localization Configuration
+ *
+ */
+@interface CHIPTestLocalizationConfiguration : CHIPLocalizationConfiguration
+
+- (void)writeAttributeSupportedLocalesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
  * Cluster Low Power
  *
  */

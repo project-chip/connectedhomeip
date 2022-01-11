@@ -6213,6 +6213,48 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
   }
 
+  public static class LocalizationConfigurationCluster extends BaseChipCluster {
+    public LocalizationConfigurationCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    public static long clusterId() {
+      return Long.parseUnsignedLong("43");
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public interface SupportedLocalesAttributeCallback {
+      void onSuccess(List<Object> valueList);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
+    public void readActiveLocaleAttribute(CharStringAttributeCallback callback) {
+      readActiveLocaleAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeActiveLocaleAttribute(DefaultClusterCallback callback, String value) {
+      writeActiveLocaleAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void readSupportedLocalesAttribute(SupportedLocalesAttributeCallback callback) {
+      readSupportedLocalesAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readActiveLocaleAttribute(
+        long chipClusterPtr, CharStringAttributeCallback callback);
+
+    private native void writeActiveLocaleAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, String value);
+
+    private native void readSupportedLocalesAttribute(
+        long chipClusterPtr, SupportedLocalesAttributeCallback callback);
+  }
+
   public static class LowPowerCluster extends BaseChipCluster {
     public LowPowerCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
