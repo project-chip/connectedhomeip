@@ -29,7 +29,7 @@
 #include <type_traits>
 #include <zap-generated/tests/CHIPClustersTest.h>
 
-constexpr uint16_t kTimeoutInSeconds = 30;
+constexpr uint16_t kTimeoutInSeconds = 90;
 
 class TestCommand : public CHIPCommand
 {
