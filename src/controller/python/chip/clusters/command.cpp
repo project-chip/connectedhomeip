@@ -32,7 +32,8 @@ using namespace chip::app;
 using PyObject = void *;
 
 extern "C" {
-chip::ChipError::StorageType pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, chip::EndpointId endpointId,
+chip::ChipError::StorageType pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device,
+                                                              uint16_t timedRequestTimeoutMs, chip::EndpointId endpointId,
                                                               chip::ClusterId clusterId, chip::CommandId commandId,
                                                               const uint8_t * payload, size_t length);
 }
@@ -121,37 +122,33 @@ void pychip_CommandSender_InitCallbacks(OnCommandSenderResponseCallback onComman
     gOnCommandSenderDoneCallback     = onCommandSenderDoneCallback;
 }
 
-chip::ChipError::StorageType pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device, chip::EndpointId endpointId,
+chip::ChipError::StorageType pychip_CommandSender_SendCommand(void * appContext, DeviceProxy * device,
+                                                              uint16_t timedRequestTimeoutMs, chip::EndpointId endpointId,
                                                               chip::ClusterId clusterId, chip::CommandId commandId,
                                                               const uint8_t * payload, size_t length)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     std::unique_ptr<CommandSenderCallback> callback = std::make_unique<CommandSenderCallback>(appContext);
-    std::unique_ptr<CommandSender> sender           = std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager());
+    std::unique_ptr<CommandSender> sender           = std::make_unique<CommandSender>(callback.get(), device->GetExchangeManager(),
+                                                                            /* is timed request */ timedRequestTimeoutMs != 0);
 
     app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, clusterId, commandId,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams, false));
 
     {
         auto writer = sender->GetCommandDataIBTLVWriter();
         TLV::TLVReader reader;
-        TLV::TLVType type;
         VerifyOrExit(writer != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         reader.Init(payload, length);
         reader.Next();
-        reader.EnterContainer(type);
-        while (reader.Next() == CHIP_NO_ERROR)
-        {
-            TLV::TLVReader tReader;
-            tReader.Init(reader);
-            writer->CopyElement(tReader);
-        }
+        SuccessOrExit(writer->CopyContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), reader));
     }
 
-    SuccessOrExit(err = sender->FinishCommand());
+    SuccessOrExit(err = sender->FinishCommand(timedRequestTimeoutMs != 0 ? Optional<uint16_t>(timedRequestTimeoutMs)
+                                                                         : Optional<uint16_t>::Missing()));
     SuccessOrExit(err = device->SendCommands(sender.get()));
 
     sender.release();

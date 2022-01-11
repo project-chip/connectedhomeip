@@ -29672,6 +29672,10 @@ class AccountLogin(Cluster):
                             ClusterObjectFieldDescriptor(Label="tempAccountIdentifier", Tag=0, Type=str),
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
             tempAccountIdentifier: 'str' = ""
 
         @dataclass
@@ -29686,6 +29690,10 @@ class AccountLogin(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="setupPIN", Tag=0, Type=str),
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
             setupPIN: 'str' = ""
 
@@ -29717,6 +29725,10 @@ class AccountLogin(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                     ])
+
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
 
 
 
@@ -30623,6 +30635,10 @@ class TestCluster(Cluster):
                     Fields = [
                     ])
 
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
 
         @dataclass
         class TestSimpleOptionalArgumentRequest(ClusterCommand):
@@ -31357,6 +31373,10 @@ class TestCluster(Cluster):
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
                 return 0x00000030
+
+            @ChipUtility.classproperty
+            def must_use_timed_write(cls) -> bool:
+                return True
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
