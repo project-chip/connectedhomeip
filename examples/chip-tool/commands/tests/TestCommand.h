@@ -19,6 +19,7 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
+#include <app/tests/suites/commands/log/LogCommands.h>
 #include <app/tests/suites/include/ConstraintsChecker.h>
 #include <app/tests/suites/include/ValueChecker.h>
 #include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
@@ -28,7 +29,7 @@
 
 constexpr uint16_t kTimeoutInSeconds = 30;
 
-class TestCommand : public CHIPCommand, public ValueChecker, public ConstraintsChecker
+class TestCommand : public CHIPCommand, public ValueChecker, public ConstraintsChecker, public LogCommands
 {
 public:
     TestCommand(const char * commandName) :
@@ -52,8 +53,6 @@ public:
     CHIP_ERROR Wait(chip::System::Clock::Timeout ms);
     CHIP_ERROR WaitForMs(uint16_t ms) { return Wait(chip::System::Clock::Milliseconds32(ms)); }
     CHIP_ERROR WaitForCommissionee();
-    CHIP_ERROR Log(const char * message);
-    CHIP_ERROR UserPrompt(const char * message);
 
 protected:
     std::map<std::string, ChipDevice *> mDevices;
@@ -63,7 +62,7 @@ protected:
     static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
     static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
 
-    CHIP_ERROR ContinueOnChipMainThread() { return WaitForMs(0); };
+    CHIP_ERROR ContinueOnChipMainThread() override { return WaitForMs(0); };
 
     void Exit(std::string message) override;
     void ThrowFailureResponse();
