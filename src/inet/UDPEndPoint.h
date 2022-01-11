@@ -37,6 +37,8 @@
 #include <inet/InetLayer.h>
 #include <system/SystemPacketBuffer.h>
 
+struct otInstance;
+
 namespace chip {
 namespace Inet {
 
@@ -244,6 +246,13 @@ public:
      *  On LwIP systems, this method must not be called with the LwIP stack lock already acquired.
      */
     virtual void Free() = 0;
+
+    /**
+     * Set Network Native Parameters (optional)
+     *
+     * Some networking stack requires additionnal parameters
+     */
+    virtual inline void SetNativeParams(void * params) { (void) params; }
 
 protected:
     UDPEndPoint(EndPointManager<UDPEndPoint> & endPointManager) :
