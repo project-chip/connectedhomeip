@@ -58582,9 +58582,9 @@ private:
     void OnSuccessResponse_3(const chip::app::DataModel::DecodableList<chip::ClusterId> & clientList)
     {
         {
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(clientList)>("clientList", iter, 0));
-        VerifyOrReturn(CheckValue("clientList[0]", iter.GetValue(), 41UL));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(clientList)>("clientList", iter, 1));
+            VerifyOrReturn(CheckNextListItemDecodes<decltype(clientList)>("clientList", iter, 0));
+            VerifyOrReturn(CheckValue("clientList[0]", iter.GetValue(), 41UL));
+            VerifyOrReturn(CheckNoMoreListItems<decltype(clientList)>("clientList", iter, 1));
             VerifyOrReturn(CheckNoMoreListItems<decltype(clientList)>("clientList", iter_0, 1));
         }
 
