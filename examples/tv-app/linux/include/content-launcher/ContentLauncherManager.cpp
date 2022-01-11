@@ -27,7 +27,7 @@ void ContentLauncherManager::HandleLaunchContent(
     const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
     chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
 {
-    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent");
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());
 
     Commands::LaunchResponse::Type response;
