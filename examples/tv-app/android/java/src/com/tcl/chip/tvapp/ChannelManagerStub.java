@@ -20,46 +20,73 @@ package com.tcl.chip.tvapp;
 import android.util.Log;
 
 public class ChannelManagerStub implements ChannelManager {
-  private static final String TAG = "ChannelManagerStub";
+  private static final String TAG = ChannelManagerStub.class.getSimpleName();
+
+  private int endpoint;
+
+  public ChannelManagerStub(int endpoint) {
+    this.endpoint = endpoint;
+  }
 
   @Override
   public ChannelInfo[] getChannelList() {
-    ChannelInfo ChannelInfo1 = new ChannelInfo(1, 1, "HDMI1", "callSign1", "affiliateCallSign1");
-    ChannelInfo ChannelInfo2 = new ChannelInfo(2, 2, "HDMI2", "callSign2", "affiliateCallSign2");
-    Log.d(TAG, "getChannelList");
+    ChannelInfo ChannelInfo1 = new ChannelInfo(1, 11, "HDMI1", "callSign1", "affiliateCallSign1");
+    ChannelInfo ChannelInfo2 = new ChannelInfo(2, 22, "HDMI2", "callSign2", "affiliateCallSign2");
+    Log.d(TAG, "getChannelList at " + endpoint);
     return new ChannelInfo[] {ChannelInfo1, ChannelInfo2};
   }
 
   @Override
   public ChannelLineupInfo getLineup() {
     ChannelLineupInfo lineupInfo = new ChannelLineupInfo("operator", "lineup", "postalCode");
-    Log.d(TAG, "getChannelLineup: " + lineupInfo);
+    Log.d(TAG, "getChannelLineup: " + lineupInfo + " at " + endpoint);
     return lineupInfo;
   }
 
   @Override
   public ChannelInfo getCurrentChannel() {
-    Log.d(TAG, "getCurrentChannel: ");
+    Log.d(TAG, "getCurrentChannel: at " + endpoint);
     return new ChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
   }
 
   @Override
   public ChannelInfo changeChannel(String match) {
-    Log.d(TAG, "changeChannel: " + match);
-    return new ChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
+    Log.d(TAG, "changeChannel: " + match + " at " + endpoint);
+    if ("no".equals(match)) {
+      return new ChannelInfo(ChannelInfo.kNoMatches);
+    } else if ("multiple".equals(match)) {
+      return new ChannelInfo(ChannelInfo.kMultipleMatches);
+    } else {
+      return new ChannelInfo(1, 1, "HDMI", "callSign", "affiliateCallSign");
+    }
   }
 
   @Override
   public boolean changeChannelByNumber(int majorNumber, int minorNumber) {
     Log.d(
         TAG,
-        "changeChannelByNumber: majorNumber = " + majorNumber + " minorNumber = " + minorNumber);
+        "changeChannelByNumber: majorNumber = "
+            + majorNumber
+            + " minorNumber = "
+            + minorNumber
+            + " at "
+            + endpoint);
+
+    // for failed test
+    if (majorNumber == 1 && minorNumber == 1) {
+      return false;
+    }
     return true;
   }
 
   @Override
   public boolean skipChannel(int count) {
-    Log.d(TAG, "skipChannel: count = " + count);
+    Log.d(TAG, "skipChannel: count = " + count + " at " + endpoint);
+
+    // for failed test
+    if (count == 100) {
+      return false;
+    }
     return true;
   }
 }

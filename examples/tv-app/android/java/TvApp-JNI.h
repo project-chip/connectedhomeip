@@ -16,12 +16,25 @@
  *    limitations under the License.
  */
 
-#include "WakeOnLanManager.h"
+#pragma once
 
-using namespace chip;
-using namespace chip::app::Clusters::WakeOnLan;
+#include <jni.h>
 
-CHIP_ERROR WakeOnLanManager::HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder)
+class TvAppJNI
 {
-    return aEncoder.Encode(chip::CharSpan("00:00:00:00:00", strlen("00:00:00:00:00")));
+public:
+    void InitializeWithObjects(jobject app);
+    void PostClusterInit(int clusterId, int endpoint);
+
+private:
+    friend TvAppJNI & TvAppJNIMgr();
+
+    static TvAppJNI sInstance;
+    jobject mTvAppObject             = nullptr;
+    jmethodID mPostClusterInitMethod = nullptr;
+};
+
+inline class TvAppJNI & TvAppJNIMgr()
+{
+    return TvAppJNI::sInstance;
 }

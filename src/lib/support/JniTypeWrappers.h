@@ -37,7 +37,13 @@ public:
         mChars      = env->GetStringUTFChars(string, 0);
         mDataLength = env->GetStringUTFLength(string);
     }
-    ~JniUtfString() { mEnv->ReleaseStringUTFChars(mString, mChars); }
+    ~JniUtfString()
+    {
+        if (mString != nullptr)
+        {
+            mEnv->ReleaseStringUTFChars(mString, mChars);
+        }
+    }
 
     const char * c_str() const { return mChars; }
 

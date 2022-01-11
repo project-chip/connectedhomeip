@@ -23,5 +23,5 @@
 class WakeOnLanManager : public chip::app::Clusters::WakeOnLan::Delegate
 {
 public:
-    chip::CharSpan HandleGetMacAddress() override;
+    CHIP_ERROR HandleGetMacAddress(chip::app::AttributeValueEncoder & aEncoder) override;
 };
