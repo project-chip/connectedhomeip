@@ -328,7 +328,7 @@ void ExchangeContext::OnSessionReleased()
         NotifyResponseTimeout();
     }
 
-    DoClose(true);
+    DoClose(true /* clearRetransTable */);
 }
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
