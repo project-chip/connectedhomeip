@@ -55,7 +55,6 @@ tests:
       response:
           value: 1
 
-    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label: "Read the global attribute: AttributeList"
       command: "readAttribute"
       attribute: "AttributeList"
@@ -63,6 +62,7 @@ tests:
           constraints:
               type: list
 
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label: "Read the global attribute: EventList"
       disabled: true
       command: "readAttribute"

@@ -86,6 +86,7 @@ tests:
       response:
           value: 0
 
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
     - label: "Read the mandatory global attribute: EventList"
       disabled: true
       command: "readAttribute"

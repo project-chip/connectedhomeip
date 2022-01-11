@@ -237,6 +237,41 @@ tests:
       response:
           value: ColorLoopStoredEnhancedHueValue
 
+    - label: "Reset Enhanced Move To Hue command"
+      command: "EnhancedMoveToHue"
+      PICS: CR_ENHANCEDMOVETOHUE
+      arguments:
+          values:
+              - name: "enhancedHue"
+                value: 0
+              - name: "direction"
+                value: 0
+              - name: "transitionTime"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Reset Color Loop Set Command"
+      command: "ColorLoopSet"
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 0
+              - name: "action"
+                value: 0
+              - name: "direction"
+                value: 0
+              - name: "time"
+                value: 0
+              - name: "startHue"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
     - label: "Turn off light for color control tests"
       cluster: "On/Off"
       command: "off"
