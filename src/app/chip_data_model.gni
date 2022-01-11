@@ -148,6 +148,14 @@ template("chip_data_model") {
           "${_app_root}/util/ContentApp.cpp",
           "${_app_root}/util/ContentAppPlatform.cpp",
         ]
+      } else if (cluster == "ota-requestor") {
+        sources += [
+          # TODO - align name of folder ?
+          "${_app_root}/clusters/${cluster}/${cluster}-server.cpp",
+          "${_app_root}/clusters/${cluster}/BDXDownloader.cpp",
+          "${_app_root}/clusters/${cluster}/BDXDownloader.h",
+          "${_app_root}/clusters/${cluster}/OTARequestor.cpp",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }
