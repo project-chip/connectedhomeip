@@ -7658,7 +7658,12 @@ public class ChipClusters {
     }
 
     public void writeActiveLocaleAttribute(DefaultClusterCallback callback, String value) {
-      writeActiveLocaleAttribute(chipClusterPtr, callback, value);
+      writeActiveLocaleAttribute(chipClusterPtr, callback, value, null);
+    }
+
+    public void writeActiveLocaleAttribute(
+        DefaultClusterCallback callback, String value, int timedWriteTimeoutMs) {
+      writeActiveLocaleAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
     public void readSupportedLocalesAttribute(SupportedLocalesAttributeCallback callback) {
@@ -7669,7 +7674,10 @@ public class ChipClusters {
         long chipClusterPtr, CharStringAttributeCallback callback);
 
     private native void writeActiveLocaleAttribute(
-        long chipClusterPtr, DefaultClusterCallback callback, String value);
+        long chipClusterPtr,
+        DefaultClusterCallback callback,
+        String value,
+        @Nullable Integer timedWriteTimeoutMs);
 
     private native void readSupportedLocalesAttribute(
         long chipClusterPtr, SupportedLocalesAttributeCallback callback);
