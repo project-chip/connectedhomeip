@@ -317,17 +317,18 @@ bool ExchangeContext::MatchExchange(const SessionHandle & session, const PacketH
 
 void ExchangeContext::OnSessionReleased()
 {
-    if (!IsResponseExpected())
+    ExchangeHandle ref(*this);
+
+    if (IsResponseExpected())
     {
-        // Nothing to do in this case
-        return;
+        // If we're waiting on a response, we now know it's never going to show up
+        // and we should notify our delegate accordingly.
+        CancelResponseTimer();
+        SetResponseExpected(false);
+        NotifyResponseTimeout();
     }
 
-    // If we're waiting on a response, we now know it's never going to show up
-    // and we should notify our delegate accordingly.
-    CancelResponseTimer();
-    SetResponseExpected(false);
-    NotifyResponseTimeout();
+    DoClose(true);
 }
 
 CHIP_ERROR ExchangeContext::StartResponseTimer()
