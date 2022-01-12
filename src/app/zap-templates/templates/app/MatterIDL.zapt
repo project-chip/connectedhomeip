@@ -1,0 +1,10 @@
+// This IDL was generated automatically by ZAP.
+// It is for view/code review purposes only.
+
+{{#zcl_enums}}
+enum {{name}} : {{asUnderlyingZclType type}} {
+  {{#zcl_enum_items}}
+  {{label}} = {{value}};
+  {{/zcl_enum_items}}
+}
+{{/zcl_enums}}

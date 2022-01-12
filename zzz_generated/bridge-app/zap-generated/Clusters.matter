@@ -1,0 +1,1403 @@
+// This IDL was generated automatically by ZAP.
+// It is for view/code review purposes only.
+
+enum ActionErrorEnum : uint8_t {
+  unknown = 0;
+  interrupted = 1;
+}
+enum ActionStateEnum : uint8_t {
+  Inactive = 0;
+  Active = 1;
+  Paused = 2;
+  Disabled = 3;
+}
+enum ActionTypeEnum : uint8_t {
+  other = 0;
+  scene = 1;
+  sequence = 2;
+  automation = 3;
+  exception = 4;
+  notification = 5;
+  alarm = 6;
+}
+enum AlertCountType : uint8_t {
+  Unstructured = 0;
+}
+enum AlertStructureCategory : uint16_t {
+  Warning = 256;
+  Danger = 512;
+  Failure = 768;
+}
+enum AlertStructurePresenceRecovery : uint16_t {
+  Recovery = 0;
+  Presence = 4096;
+}
+enum AmiRegistrationState : uint8_t {
+  Unregistered = 0;
+  JoiningNetwork = 1;
+  JoinedNetwork = 2;
+  SubmittedRegistrationRequest = 3;
+  RegistrationRejected = 4;
+  Registered = 5;
+  RegisterationNotPossible = 6;
+}
+enum AnonymousDataState : uint8_t {
+  NoSourceFound = 0;
+  SourceFound = 1;
+}
+enum ApplianceStatus : uint8_t {
+  Off = 1;
+  StandBy = 2;
+  Programmed = 3;
+  ProgrammedWaitingToStart = 4;
+  Running = 5;
+  Pause = 6;
+  EndProgrammed = 7;
+  Failure = 8;
+  ProgrammeInterrupted = 9;
+  Idle = 10;
+  RinseHold = 11;
+  Service = 12;
+  Superfreezing = 13;
+  Supercooling = 14;
+  Superheating = 15;
+}
+enum ApplicationStatusEnum : uint8_t {
+  Stopped = 0;
+  ActiveVisibleFocus = 1;
+  ActiveHidden = 2;
+  ActiveVisibleNotFocus = 3;
+}
+enum AssociationFailureCause : uint8_t {
+  Unknown = 0;
+  AssociationFailed = 1;
+  AuthenticationFailed = 2;
+  SsidNotFound = 3;
+}
+enum AttributeWritePermission : uint8_t {
+  DenyWrite = 0;
+  AllowWriteNormal = 1;
+  AllowWriteOfReadOnly = 2;
+  UnsupportedAttribute = 134;
+  InvalidValue = 135;
+  ReadOnly = 136;
+  InvalidDataType = 141;
+}
+enum AuthMode : uint8_t {
+  PASE = 1;
+  CASE = 2;
+  Group = 3;
+}
+enum BarrierControlBarrierPosition : uint8_t {
+  Closed = 0;
+  Open = 100;
+  Unknown = 255;
+}
+enum BarrierControlMovingState : uint8_t {
+  Stopped = 0;
+  Closing = 1;
+  Opening = 2;
+}
+enum BatChargeFaultType : uint8_t {
+  Unspecfied = 0;
+  AmbientTooHot = 1;
+  AmbientTooCold = 2;
+  BatteryTooHot = 3;
+  BatteryTooCold = 4;
+  BatteryAbsent = 5;
+  BatteryOverVoltage = 6;
+  BatteryUnderVoltage = 7;
+  ChargerOverVoltage = 8;
+  ChargerUnderVoltage = 9;
+  SafetyTimeout = 10;
+}
+enum BatChargeLevel : uint8_t {
+  Ok = 0;
+  Warning = 1;
+  Critical = 2;
+}
+enum BatChargeState : uint8_t {
+  Unknown = 0;
+  IsCharging = 1;
+  IsAtFullCharge = 2;
+  IsNotCharging = 3;
+}
+enum BatFaultType : uint8_t {
+  Unspecfied = 0;
+  OverTemp = 1;
+  UnderTemp = 2;
+}
+enum BatReplaceability : uint8_t {
+  Unspecified = 0;
+  NotReplaceable = 1;
+  UserReplaceable = 2;
+  FactoryReplaceable = 3;
+}
+enum BatterySize : uint8_t {
+  NoBattery = 0;
+  BuiltIn = 1;
+  Other = 2;
+  AA = 3;
+  AAA = 4;
+  C = 5;
+  D = 6;
+  Unknown = 255;
+}
+enum BootReasonType : uint8_t {
+  Unspecified = 0;
+  PowerOnReboot = 1;
+  BrownOutReset = 2;
+  SoftwareWatchdogReset = 3;
+  HardwareWatchdogReset = 4;
+  SoftwareUpdateCompleted = 5;
+  SoftwareReset = 6;
+}
+enum CalendarType : uint8_t {
+  Buddhist = 0;
+  Chinese = 1;
+  Coptic = 2;
+  Ethiopian = 3;
+  Gregorian = 4;
+  Hebrew = 5;
+  Indian = 6;
+  Islamic = 7;
+  Japanese = 8;
+  Korean = 9;
+  Persian = 10;
+  Taiwanese = 11;
+}
+enum CecKeyCode : uint8_t {
+  Select = 0;
+  Up = 1;
+  Down = 2;
+  Left = 3;
+  Right = 4;
+  RightUp = 5;
+  RightDown = 6;
+  LeftUp = 7;
+  LeftDown = 8;
+  RootMenu = 9;
+  SetupMenu = 10;
+  ContentsMenu = 11;
+  FavoriteMenu = 12;
+  Exit = 13;
+  MediaTopMenu = 16;
+  MediaContextSensitiveMenu = 17;
+  NumberEntryMode = 29;
+  Number11 = 30;
+  Number12 = 31;
+  Number0OrNumber10 = 32;
+  Numbers1 = 33;
+  Numbers2 = 34;
+  Numbers3 = 35;
+  Numbers4 = 36;
+  Numbers5 = 37;
+  Numbers6 = 38;
+  Numbers7 = 39;
+  Numbers8 = 40;
+  Numbers9 = 41;
+  Dot = 42;
+  Enter = 43;
+  Clear = 44;
+  NextFavorite = 47;
+  ChannelUp = 48;
+  ChannelDown = 49;
+  PreviousChannel = 50;
+  SoundSelect = 51;
+  InputSelect = 52;
+  DisplayInformation = 53;
+  Help = 54;
+  PageUp = 55;
+  PageDown = 56;
+  Power = 64;
+  VolumeUp = 65;
+  VolumeDown = 66;
+  Mute = 67;
+  Play = 68;
+  Stop = 69;
+  Pause = 70;
+  Record = 71;
+  Rewind = 72;
+  FastForward = 73;
+  Eject = 74;
+  Forward = 75;
+  Backward = 76;
+  StopRecord = 77;
+  PauseRecord = 78;
+  Reserved = 79;
+  Angle = 80;
+  SubPicture = 81;
+  VideoOnDemand = 82;
+  ElectronicProgramGuide = 83;
+  TimerProgramming = 84;
+  InitialConfiguration = 85;
+  SelectBroadcastType = 86;
+  SelectSoundPresentation = 87;
+  PlayFunction = 96;
+  PausePlayFunction = 97;
+  RecordFunction = 98;
+  PauseRecordFunction = 99;
+  StopFunction = 100;
+  MuteFunction = 101;
+  RestoreVolumeFunction = 102;
+  TuneFunction = 103;
+  SelectMediaFunction = 104;
+  SelectAvInputFunction = 105;
+  SelectAudioInputFunction = 106;
+  PowerToggleFunction = 107;
+  PowerOffFunction = 108;
+  PowerOnFunction = 109;
+  F1Blue = 113;
+  F2Red = 114;
+  F3Green = 115;
+  F4Yellow = 116;
+  F5 = 117;
+  Data = 118;
+}
+enum CecedSpecificationVersion : uint8_t {
+  CompliantWithV10NotCertified = 16;
+  CompliantWithV10Certified = 26;
+}
+enum ColorControlOptions : uint8_t {
+  ExecuteIfOff = 1;
+}
+enum ColorLoopAction : uint8_t {
+  Deactivate = 0;
+  ActivateFromColorLoopStartEnhancedHue = 1;
+  ActivateFromEnhancedCurrentHue = 2;
+}
+enum ColorLoopDirection : uint8_t {
+  DecrementHue = 0;
+  IncrementHue = 1;
+}
+enum ColorMode : uint8_t {
+  CurrentHueAndCurrentSaturation = 0;
+  CurrentXAndCurrentY = 1;
+  ColorTemperature = 2;
+}
+enum CommandIdentification : uint8_t {
+  Start = 1;
+  Stop = 2;
+  Pause = 3;
+  StartSuperfreezing = 4;
+  StopSuperfreezing = 5;
+  StartSupercooling = 6;
+  StopSupercooling = 7;
+  DisableGas = 8;
+  EnableGas = 9;
+  EnableEnergyControl = 10;
+  DisableEnergyControl = 11;
+}
+enum CommissioningWindowStatus : uint8_t {
+  WindowNotOpen = 0;
+  EnhancedWindowOpen = 1;
+  BasicWindowOpen = 2;
+}
+enum DataQualityId : uint16_t {
+  AllDataCertified = 0;
+  OnlyInstantaneousPowerNotCertified = 1;
+  OnlyCumulatedConsumptionNotCertified = 2;
+  NotCertifiedData = 3;
+}
+enum DehumidifcationLockout : uint8_t {
+  notAllowed = 0;
+  allowed = 1;
+}
+enum DeviceStatus2Structure : uint8_t {
+  IrisSymptomCode = 32;
+}
+enum DlAlarmCode : uint8_t {
+  LockJammed = 0;
+  LockFactoryReset = 1;
+  LockRadioPowerCycled = 3;
+  WrongCodeEntryLimit = 4;
+  FrontEsceutcheonRemoved = 5;
+  DoorForcedOpen = 6;
+  DoorAjar = 7;
+  ForcedUser = 8;
+}
+enum DlCredentialRule : uint8_t {
+  Single = 0;
+  Double = 1;
+  Tri = 2;
+}
+enum DlCredentialType : uint8_t {
+  ProgrammingPIN = 0;
+  PIN = 1;
+  RFID = 2;
+  Fingerprint = 3;
+  FingerVein = 4;
+  Face = 5;
+}
+enum DlDataOperationType : uint8_t {
+  Add = 0;
+  Clear = 1;
+  Modify = 2;
+}
+enum DlDoorLockStatus : uint8_t {
+  Duplicate = 2;
+  Occupied = 3;
+}
+enum DlDoorState : uint8_t {
+  DoorOpen = 0;
+  DoorClosed = 1;
+  DoorJammed = 2;
+  DoorForcedOpen = 3;
+  DoorUnspecifiedError = 4;
+  DoorAjar = 5;
+}
+enum DlLockDataType : uint8_t {
+  Unspecified = 0;
+  ProgrammingCode = 1;
+  UserIndex = 2;
+  WeekDaySchedule = 3;
+  YearDaySchedule = 4;
+  HolidaySchedule = 5;
+  PIN = 6;
+  RFID = 7;
+  Fingerprint = 8;
+}
+enum DlLockOperationType : uint8_t {
+  Lock = 0;
+  Unlock = 1;
+  NonAccessUserEvent = 2;
+  ForcedUserEvent = 3;
+}
+enum DlLockState : uint8_t {
+  NotFullyLocked = 0;
+  Locked = 1;
+  Unlocked = 2;
+}
+enum DlLockType : uint8_t {
+  DeadBolt = 0;
+  Magnetic = 1;
+  Other = 2;
+  Mortise = 3;
+  Rim = 4;
+  LatchBolt = 5;
+  CylindricalLock = 6;
+  TubularLock = 7;
+  InterconnectedLock = 8;
+  Dead Latch = 9;
+  Door Furniture = 10;
+}
+enum DlOperatingMode : uint8_t {
+  Normal = 0;
+  Vacation = 1;
+  Privacy = 2;
+  NoRemoteLockUnlock = 3;
+  Passage = 4;
+}
+enum DlOperationError : uint8_t {
+  Unspecified = 0;
+  InvalidCredential = 1;
+  DisabledUserDenied = 2;
+  Restricted = 3;
+  InsufficientBattery = 4;
+}
+enum DlOperationSource : uint8_t {
+  Unspecified = 0;
+  Manual = 1;
+  ProprietaryRemote = 2;
+  Keypad = 3;
+  Auto = 4;
+  Button = 5;
+  Schedule = 6;
+  Remote = 7;
+  RFID = 8;
+  Biometric = 9;
+}
+enum DlStatus : uint8_t {
+  Success = 0;
+  Failure = 1;
+  Duplicate = 2;
+  Occupied = 3;
+  InvalidField = 133;
+  NotFound = 139;
+}
+enum DlUserStatus : uint8_t {
+  Available = 0;
+  OccupiedEnabled = 1;
+  OccupiedDisabled = 3;
+}
+enum DlUserType : uint8_t {
+  UnrestrictedUser = 0;
+  YearDayScheduleUser = 1;
+  WeekDayScheduleUser = 2;
+  ProgrammingUser = 3;
+  NonAccessUser = 4;
+  ForcedUser = 5;
+  DisposableUser = 6;
+  ExpiringUser = 7;
+  ScheduleRestrictedUser = 8;
+  RemoteOnlyUser = 9;
+}
+enum DoorLockEventSource : uint8_t {
+  Keypad = 0;
+  Rf = 1;
+  Manual = 2;
+  Rfid = 3;
+  Indeterminate = 255;
+}
+enum DoorLockEventType : uint8_t {
+  Operation = 0;
+  Programming = 1;
+  Alarm = 2;
+}
+enum DoorLockOperatingMode : uint8_t {
+  NormalMode = 0;
+  VacationMode = 1;
+  PrivacyMode = 2;
+  NoRfLockOrUnlock = 3;
+  LocalProgrammingMode = 4;
+  PassageMode = 5;
+}
+enum DoorLockOperationEventCode : uint8_t {
+  UnknownOrMfgSpecific = 0;
+  Lock = 1;
+  Unlock = 2;
+  LockInvalidPinOrId = 3;
+  LockInvalidSchedule = 4;
+  UnlockInvalidPinOrId = 5;
+  UnlockInvalidSchedule = 6;
+  OneTouchLock = 7;
+  KeyLock = 8;
+  KeyUnlock = 9;
+  AutoLock = 10;
+  ScheduleLock = 11;
+  ScheduleUnlock = 12;
+  ManualLock = 13;
+  ManualUnlock = 14;
+}
+enum DoorLockProgrammingEventCode : uint8_t {
+  UnknownOrMfgSpecific = 0;
+  MasterCodeChanged = 1;
+  PinAdded = 2;
+  PinDeleted = 3;
+  PinChanged = 4;
+  IdAdded = 5;
+  IdDeleted = 6;
+}
+enum DoorLockSecurityLevel : uint8_t {
+  NetworkSecurity = 0;
+  ApsSecurity = 1;
+}
+enum DoorLockSetPinOrIdStatus : uint8_t {
+  Success = 0;
+  GeneralFailure = 1;
+  MemoryFull = 2;
+  DuplicateCodeError = 3;
+}
+enum DoorLockSoundVolume : uint8_t {
+  Silent = 0;
+  Low = 1;
+  High = 2;
+}
+enum DoorLockState : uint8_t {
+  NotFullyLocked = 0;
+  Locked = 1;
+  Unlocked = 2;
+}
+enum DoorLockType : uint8_t {
+  DeadBolt = 0;
+  Magnetic = 1;
+  Mortise = 2;
+  Rim = 3;
+  LatchBolt = 4;
+  Cylindrical = 5;
+  Tubular = 6;
+  Interconnected = 7;
+  DeadLatch = 8;
+  Other = 9;
+}
+enum DoorLockUserStatus : uint8_t {
+  Available = 0;
+  OccupiedEnabled = 1;
+  OccupiedDisabled = 3;
+  NotSupported = 255;
+}
+enum DoorLockUserType : uint8_t {
+  Unrestricted = 0;
+  YearDayScheduleUser = 1;
+  WeekDayScheduleUser = 2;
+  MasterUser = 3;
+  NonAccessUser = 4;
+  NotSupported = 255;
+}
+enum DoorState : uint8_t {
+  Open = 0;
+  Closed = 1;
+  ErrorJammed = 2;
+  ErrorForcedOpen = 3;
+  ErrorUnspecified = 4;
+}
+enum EndpointListTypeEnum : uint8_t {
+  other = 0;
+  room = 1;
+  zone = 2;
+}
+enum EnhancedColorMode : uint8_t {
+  CurrentHueAndCurrentSaturation = 0;
+  CurrentXAndCurrentY = 1;
+  ColorTemperature = 2;
+  EnhancedCurrentHueAndCurrentSaturation = 3;
+}
+enum ErrorTypeEnum : uint8_t {
+  MultipleMatches = 0;
+  NoMatches = 1;
+}
+enum EventId : uint8_t {
+  MeterCoverRemoved = 0;
+  MeterCoverClosed = 1;
+  StrongMagneticField = 2;
+  NoStrongMagneticField = 3;
+  BatteryFailure = 4;
+  LowBattery = 5;
+  ProgramMemoryError = 6;
+  RamError = 7;
+  NvMemoryError = 8;
+  MeasurementSystemError = 9;
+  WatchdogError = 10;
+  SupplyDisconnectFailure = 11;
+  SupplyConnectFailure = 12;
+  MeasurmentSoftwareChanged = 13;
+  DstEnabled = 14;
+  DstDisabled = 15;
+  ClockAdjBackward = 16;
+  ClockAdjForward = 17;
+  ClockInvalid = 18;
+  CommsErrorHan = 19;
+  CommsOkHan = 20;
+  FraudAttempt = 21;
+  PowerLoss = 22;
+  IncorrectProtocol = 23;
+  UnusualHanTraffic = 24;
+  UnexpectedClockChange = 25;
+  CommsUsingUnauthenticatedComponent = 26;
+  ErrorRegClear = 27;
+  AlarmRegClear = 28;
+  UnexpectedHwReset = 29;
+  UnexpectedProgramExecution = 30;
+  EventLogCleared = 31;
+  ManualDisconnect = 32;
+  ManualConnect = 33;
+  RemoteDisconnection = 34;
+  LocalDisconnection = 35;
+  LimitThresholdExceeded = 36;
+  LimitThresholdOk = 37;
+  LimitThresholdChanged = 38;
+  MaximumDemandExceeded = 39;
+  ProfileCleared = 40;
+  FirmwareReadyForActivation = 41;
+  FirmwareActivated = 42;
+  PatchFailure = 43;
+  TouTariffActivation = 44;
+  8x8Tariffactivated = 45;
+  SingleTariffRateActivated = 46;
+  AsynchronousBillingOccurred = 47;
+  SynchronousBillingOccurred = 48;
+  IncorrectPolarity = 128;
+  CurrentNoVoltage = 129;
+  UnderVoltage = 130;
+  OverVoltage = 131;
+  NormalVoltage = 132;
+  PfBelowThreshold = 133;
+  PfAboveThreshold = 134;
+  TerminalCoverRemoved = 135;
+  TerminalCoverClosed = 136;
+  ReverseFlow = 160;
+  TiltTamper = 161;
+  BatteryCoverRemoved = 162;
+  BatteryCoverClosed = 163;
+  ExcessFlow = 164;
+  CreditOk = 192;
+  LowCredit = 193;
+  EmergencyCreditInUse = 192;
+  EmergencyCreditExhausted = 193;
+  ZeroCreditEcNotSelected = 194;
+  SupplyOn = 195;
+  SupplyOffAarmed = 196;
+  SupplyOff = 197;
+  DiscountApplied = 198;
+  ManufacturerSpecificA = 224;
+  ManufacturerSpecificB = 225;
+  ManufacturerSpecificC = 226;
+  ManufacturerSpecificD = 227;
+  ManufacturerSpecificE = 228;
+  ManufacturerSpecificF = 229;
+  ManufacturerSpecificG = 230;
+  ManufacturerSpecificH = 231;
+  ManufacturerSpecificI = 232;
+}
+enum EventIdentification : uint8_t {
+  EndOfCycle = 1;
+  TemperatureReached = 4;
+  EndOfCooking = 5;
+  SwitchingOff = 6;
+  WrongData = 7;
+}
+enum FanMode : uint8_t {
+  off = 0;
+  low = 1;
+  medium = 2;
+  high = 3;
+  on = 4;
+  auto = 5;
+  smart = 6;
+}
+enum FanModeSequence : uint8_t {
+  LowMedHigh = 0;
+  lowHigh = 1;
+  LowMedHighAuto = 2;
+  lowHighAuto = 3;
+  onAuto = 4;
+}
+enum GeneralCommissioningError : uint8_t {
+  Ok = 0;
+  ValueOutsideRange = 1;
+  InvalidAuthentication = 2;
+  NotCommissioning = 3;
+}
+enum GenericDeviceClass : uint8_t {
+  Lighting = 0;
+}
+enum GenericDeviceType : uint8_t {
+  Incandescent = 0;
+  SpotlightHalogen = 1;
+  HalogenBulb = 2;
+  CFL = 3;
+  LinearFlourescent = 4;
+  LedBulb = 5;
+  SpotlightLed = 6;
+  LedStrip = 7;
+  LedTube = 8;
+  GenericIndoorFixture = 9;
+  GenericOutdoorFixture = 10;
+  PendantFixture = 11;
+  FloorStandingFixture = 12;
+  GenericController = 224;
+  WallSwitch = 225;
+  PortableRemoteController = 226;
+  MotionOrLightSensor = 227;
+  GenericActuator = 240;
+  PluginUnit = 241;
+  RetrofitActuator = 242;
+  Unspecified = 255;
+}
+enum GroupKeySecurityPolicy : uint8_t {
+  Standard = 0;
+  LowLatency = 1;
+}
+enum HardwareFaultType : uint8_t {
+  Unspecified = 0;
+  Radio = 1;
+  Sensor = 2;
+  ResettableOverTemp = 3;
+  NonResettableOverTemp = 4;
+  PowerSource = 5;
+  VisualDisplayFault = 6;
+  AudioOutputFault = 7;
+  UserInterfaceFault = 8;
+  NonVolatileMemoryError = 9;
+  TamperDetected = 10;
+}
+enum HourFormat : uint8_t {
+  12hr = 0;
+  24hr = 1;
+}
+enum HueDirection : uint8_t {
+  ShortestDistance = 0;
+  LongestDistance = 1;
+  Up = 2;
+  Down = 3;
+}
+enum HueMoveMode : uint8_t {
+  stop = 0;
+  Up = 1;
+  Down = 3;
+}
+enum HueStepMode : uint8_t {
+  Up = 1;
+  Down = 3;
+}
+enum IasAceAlarmStatus : uint8_t {
+  noAlarm = 0;
+  burglar = 1;
+  fire = 2;
+  emergency = 3;
+  policePanic = 4;
+  firePanic = 5;
+  emergencyPanic = 6;
+}
+enum IasAceArmMode : uint8_t {
+  disarm = 0;
+  armDayHomeZonesOnly = 1;
+  armNightSleepZonesOnly = 2;
+  armAllZones = 3;
+}
+enum IasAceArmNotification : uint8_t {
+  allZonesDisarmed = 0;
+  onlyDayHomeZonesArmed = 1;
+  onlyNightSleepZonesArmed = 2;
+  allZonesArmed = 3;
+  invalidArmDisarmCode = 4;
+  notReadyToArm = 5;
+  alreadyDisarmed = 6;
+}
+enum IasAceAudibleNotification : uint8_t {
+  mute = 0;
+  defaultSound = 1;
+}
+enum IasAceBypassResult : uint8_t {
+  zoneBypassed = 0;
+  zoneNotBypassed = 1;
+  notAllowed = 2;
+  invalidZoneId = 3;
+  unknownZoneId = 4;
+  invalidArmDisarmCode = 5;
+}
+enum IasAcePanelStatus : uint8_t {
+  panelDisarmed = 0;
+  armedStay = 1;
+  armedNight = 2;
+  armedAway = 3;
+  exitDelay = 4;
+  entryDelay = 5;
+  notReadyToArm = 6;
+  inAlarm = 7;
+  armingStay = 8;
+  armingNight = 9;
+  armingAway = 10;
+}
+enum IasEnrollResponseCode : uint8_t {
+  success = 0;
+  notSupported = 1;
+  noEnrollPermit = 2;
+  tooManyZones = 3;
+}
+enum IasZoneState : uint8_t {
+  notEnrolled = 0;
+  enrolled = 1;
+}
+enum IasZoneType : uint16_t {
+  standardCie = 0;
+  motionSensor = 13;
+  contactSwitch = 21;
+  fireSensor = 40;
+  waterSensor = 42;
+  gasSensor = 43;
+  personalEmergencyDevice = 44;
+  vibrationMovementSensor = 45;
+  remoteControl = 271;
+  keyFob = 277;
+  keypad = 541;
+  standardWarningDevice = 549;
+  glassBreakSensor = 550;
+  carbonMonoxideSensor = 551;
+  securityRepeater = 553;
+  invalidZoneType = 65535;
+}
+enum IdentifyEffectIdentifier : uint8_t {
+  Blink = 0;
+  Breathe = 1;
+  Okay = 2;
+  ChannelChange = 11;
+  FinishEffect = 254;
+  StopEffect = 255;
+}
+enum IdentifyEffectVariant : uint8_t {
+  Default = 0;
+}
+enum IdentifyIdentifyType : uint8_t {
+  None = 0;
+  VisibleLight = 1;
+  VisibleLED = 2;
+  AudibleBeep = 3;
+  Display = 4;
+  Actuator = 5;
+}
+enum InputTypeEnum : uint8_t {
+  Internal = 0;
+  Aux = 1;
+  Coax = 2;
+  Composite = 3;
+  Hdmi = 4;
+  Input = 5;
+  Line = 6;
+  Optical = 7;
+  Video = 8;
+  Scart = 9;
+  Usb = 10;
+  Other = 11;
+}
+enum InterfaceType : uint8_t {
+  Unspecified = 0;
+  WiFi = 1;
+  Ethernet = 2;
+  Cellular = 3;
+  Thread = 4;
+}
+enum KeypadLockout : uint8_t {
+  noLockout = 0;
+  levelOneLockout = 1;
+  levelTwoLockout = 2;
+  levelThreeLockout = 3;
+  levelFourLockout = 4;
+  levelfiveLockout = 5;
+}
+enum LevelControlOptions : uint8_t {
+  ExecuteIfOff = 1;
+  CoupleColorTempToLevel = 2;
+}
+enum LevelStatus : uint8_t {
+  OnTarget = 0;
+  BelowTarget = 1;
+  AboveTarget = 2;
+}
+enum LightSensorType : uint8_t {
+  Photodiode = 0;
+  CMOS = 1;
+}
+enum LineupInfoTypeEnum : uint8_t {
+  Mso = 0;
+}
+enum LogsIntent : uint8_t {
+  EndUserSupport = 0;
+  NetworkDiag = 1;
+  CrashLogs = 2;
+}
+enum LogsStatus : uint8_t {
+  Success = 0;
+  Exhausted = 1;
+  NoLogs = 2;
+  Busy = 3;
+  Denied = 4;
+}
+enum LogsTransferProtocol : uint8_t {
+  ResponsePayload = 0;
+  BDX = 1;
+}
+enum MessagingControlConfirmation : uint8_t {
+  notRequired = 0;
+  required = 128;
+}
+enum MessagingControlEnhancedConfirmation : uint8_t {
+  notRequired = 0;
+  required = 32;
+}
+enum MessagingControlImportance : uint8_t {
+  low = 0;
+  medium = 4;
+  high = 8;
+  critical = 12;
+}
+enum MessagingControlTransmission : uint8_t {
+  normal = 0;
+  normalAndAnonymous = 1;
+  anonymous = 2;
+  reserved = 3;
+}
+enum MeterTypeId : uint16_t {
+  UtilityPrimaryMeter = 0;
+  UtilityProductionMeter = 1;
+  UtilitySecondaryMeter = 2;
+  PrivatePrimaryMeter = 256;
+  PrivateProductionMeter = 257;
+  PrivateSecondaryMeters = 258;
+  GenericMeter = 272;
+}
+enum MetricTypeEnum : uint8_t {
+  PIXELS = 0;
+  PERCENTAGE = 1;
+}
+enum MoveMode : uint8_t {
+  Up = 0;
+  Down = 1;
+}
+enum NetworkCommissioningStatus : uint8_t {
+  Success = 0;
+  OutOfRange = 1;
+  BoundsExceeded = 2;
+  NetworkIDNotFound = 3;
+  DuplicateNetworkID = 4;
+  NetworkNotFound = 5;
+  RegulatoryError = 6;
+  AuthFailure = 7;
+  UnsupportedSecurity = 8;
+  OtherConnectionFailure = 9;
+  IPV6Failed = 10;
+  IPBindFailed = 11;
+  UnknownError = 12;
+}
+enum NetworkFault : uint8_t {
+  Unspecified = 0;
+  LinkDown = 1;
+  HardwareFailure = 2;
+  NetworkJammed = 3;
+}
+enum NetworkFaultType : uint8_t {
+  Unspecified = 0;
+  HardwareFailure = 1;
+  NetworkJammed = 2;
+  ConnectionFailed = 3;
+}
+enum NodeOperationalCertStatus : uint8_t {
+  SUCCESS = 0;
+  InvalidPublicKey = 1;
+  InvalidNodeOpId = 2;
+  InvalidNOC = 3;
+  MissingCsr = 4;
+  TableFull = 5;
+  InsufficientPrivilege = 8;
+  FabricConflict = 9;
+  LabelConflict = 10;
+  InvalidFabricIndex = 11;
+}
+enum OTAAnnouncementReason : uint8_t {
+  SimpleAnnouncement = 0;
+  UpdateAvailable = 1;
+  UrgentUpdateAvailable = 2;
+}
+enum OTAApplyUpdateAction : uint8_t {
+  Proceed = 0;
+  AwaitNextAction = 1;
+  Discontinue = 2;
+}
+enum OTAChangeReasonEnum : uint8_t {
+  Unknown = 0;
+  Success = 1;
+  Failure = 2;
+  TimeOut = 3;
+  DelayByProvider = 4;
+}
+enum OTADownloadProtocol : uint8_t {
+  BDXSynchronous = 0;
+  BDXAsynchronous = 1;
+  HTTPS = 2;
+  VendorSpecific = 3;
+}
+enum OTAQueryStatus : uint8_t {
+  UpdateAvailable = 0;
+  Busy = 1;
+  NotAvailable = 2;
+  DownloadProtocolNotSupported = 3;
+}
+enum OTAUpdateStateEnum : uint8_t {
+  Unknown = 0;
+  Idle = 1;
+  Querying = 2;
+  DelayedOnQuery = 3;
+  Downloading = 4;
+  Applying = 5;
+  DelayedOnApply = 6;
+  RollingBack = 7;
+  DelayedOnUserConsent = 8;
+}
+enum OccupancySensorType : uint8_t {
+  PIR = 0;
+  Ultrasonic = 1;
+  pirAndUltrasonic = 2;
+  physicalContact = 3;
+}
+enum OnOffDelayedAllOffEffectVariant : uint8_t {
+  FadeToOffIn_0p8Seconds = 0;
+  NoFade = 1;
+  50PercentDimDownIn_0p8SecondsThenFadeToOffIn_12Seconds = 2;
+}
+enum OnOffDyingLightEffectVariant : uint8_t {
+  20PercenterDimUpIn_0p5SecondsThenFadeToOffIn_1Second = 0;
+}
+enum OnOffEffectIdentifier : uint8_t {
+  DelayedAllOff = 0;
+  DyingLight = 1;
+}
+enum OperatingMode : uint8_t {
+  normal = 0;
+  configure = 1;
+}
+enum OutputTypeEnum : uint8_t {
+  Hdmi = 0;
+  Bt = 1;
+  Optical = 2;
+  Headphone = 3;
+  Internal = 4;
+  Other = 5;
+}
+enum PHYRateType : uint8_t {
+  10M = 0;
+  100M = 1;
+  1000M = 2;
+  2.5G = 3;
+  5G = 4;
+  10G = 5;
+  40G = 6;
+  100G = 7;
+  200G = 8;
+  400G = 9;
+}
+enum ParameterEnum : uint8_t {
+  actor = 0;
+  channel = 1;
+  character = 2;
+  director = 3;
+  event = 4;
+  franchise = 5;
+  genre = 6;
+  league = 7;
+  popularity = 8;
+  provider = 9;
+  sport = 10;
+  sportsTeam = 11;
+  type = 12;
+}
+enum PhysicalEnvironment : uint8_t {
+  Unspecified = 0;
+  FirstProfileSpecifiedValue = 1;
+  LastProfileSpecifiedValue = 127;
+  Unknown = 255;
+}
+enum PlaybackStateEnum : uint8_t {
+  Playing = 0;
+  Paused = 1;
+  NotPlaying = 2;
+  Buffering = 3;
+}
+enum PowerProfileState : uint8_t {
+  PowerProfileWaitingToStart = 1;
+  PowerProfileStarted = 2;
+  EnergyPhaseRunning = 3;
+  EnergyPhaseEnded = 4;
+  EnergyPhaseWaitingToStart = 5;
+  EnergyPhaseStarted = 6;
+  PowerProfileEnded = 7;
+  ProfileReadyForScheduling = 8;
+  PowerProfileScheduled = 9;
+}
+enum PowerSource : uint8_t {
+  Unknown = 0;
+  SinglePhaseMains = 1;
+  ThreePhaseMains = 2;
+  Battery = 3;
+  DcSource = 4;
+  EmergencyMainsConstantPower = 5;
+  EmergencyMainsTransferSwitch = 6;
+  BatteryBackup = 128;
+}
+enum PowerSourceStatus : uint8_t {
+  Unspecfied = 0;
+  Active = 1;
+  Standby = 2;
+  Unavailable = 3;
+}
+enum Privilege : uint8_t {
+  View = 1;
+  ProxyView = 2;
+  Operate = 3;
+  Manage = 4;
+  Administer = 5;
+}
+enum ProductCode : uint8_t {
+  ManufacturerDefined = 0;
+  IternationalArticleNumber = 1;
+  GlobalTradeItemNumber = 2;
+  UniversalProductCode = 3;
+  StockKeepingUnit = 4;
+}
+enum ProductTypeId : uint16_t {
+  WhiteGoods = 0;
+  Dishwasher = 22017;
+  TumbleDryer = 22018;
+  WasherDryer = 22019;
+  WashingMachine = 22020;
+  Hobs = 24067;
+  InductionHobs = 24073;
+  Oven = 24065;
+  ElectricalOven = 24070;
+  RefrigeratorFreezer = 26113;
+}
+enum PumpControlMode : uint8_t {
+  ConstantSpeed = 0;
+  ConstantPressure = 1;
+  ProportionalPressure = 2;
+  ConstantFlow = 3;
+  ConstantTemperature = 5;
+  Automatic = 7;
+}
+enum PumpOperationMode : uint8_t {
+  Normal = 0;
+  Minimum = 1;
+  Maximum = 2;
+  Local = 3;
+}
+enum RadioFaultType : uint8_t {
+  Unspecified = 0;
+  WiFiFault = 1;
+  CellularFault = 2;
+  ThreadFault = 3;
+  NFCFault = 4;
+  BLEFault = 5;
+  EthernetFault = 6;
+}
+enum RegulatoryLocationType : uint8_t {
+  Indoor = 0;
+  Outdoor = 1;
+  IndoorOutdoor = 2;
+}
+enum RelativeHumidityDisplay : uint8_t {
+  notDisplayed = 0;
+  displayed = 1;
+}
+enum RelativeHumidityMode : uint8_t {
+  measureLocally = 0;
+  updatedOverTheNetwork = 1;
+}
+enum RemoteEnableFlags : uint8_t {
+  Disabled = 0;
+  TemporarilyLockedDisabled = 7;
+  EnabledRemoteControl = 15;
+  EnabledRemoteAndEnergyControl = 1;
+}
+enum RoutingRole : uint8_t {
+  Unspecified = 0;
+  Unassigned = 1;
+  SleepyEndDevice = 2;
+  EndDevice = 3;
+  REED = 4;
+  Router = 5;
+  Leader = 6;
+}
+enum SaturationMoveMode : uint8_t {
+  stop = 0;
+  Up = 1;
+  Down = 3;
+}
+enum SaturationStepMode : uint8_t {
+  Up = 1;
+  Down = 3;
+}
+enum SecurityType : uint8_t {
+  Unspecified = 0;
+  None = 1;
+  WEP = 2;
+  WPA = 3;
+  WPA2 = 4;
+  WPA3 = 5;
+}
+enum SetpointAdjustMode : uint8_t {
+  heatSetpoint = 0;
+  coolSetpoint = 1;
+  heatAndCoolSetpoints = 2;
+}
+enum SimpleEnum : uint8_t {
+  Unspecified = 0;
+  ValueA = 1;
+  ValueB = 2;
+  ValueC = 3;
+}
+enum SquawkLevel : uint8_t {
+  lowLevel = 0;
+  mediumLevel = 1;
+  highLevel = 2;
+  veryHighLevel = 2;
+}
+enum SquawkMode : uint8_t {
+  systemIsArmed = 0;
+  systemIsDisarmed = 1;
+}
+enum SquawkStobe : uint8_t {
+  noStrobe = 0;
+  useStrobe = 1;
+}
+enum StartOfWeek : uint8_t {
+  Sunday = 0;
+  Monday = 1;
+  Tuesday = 2;
+  Wednesday = 3;
+  Thursday = 4;
+  Friday = 5;
+  Saturday = 6;
+}
+enum StartUpOnOffValue : uint8_t {
+  SetToOff = 0;
+  SetToOn = 1;
+  SetToToggle = 2;
+  SetToPrevious = 255;
+}
+enum StatusCode : uint8_t {
+  Busy = 1;
+  PAKEParameterError = 2;
+  WindowNotOpen = 3;
+}
+enum StatusEnum : uint8_t {
+  Success = 0;
+  UnsupportedKey = 1;
+  InvalidKeyInCurrentState = 2;
+}
+enum StatusEnum : uint8_t {
+  Success = 0;
+  AppNotAvailable = 1;
+  SystemBusy = 2;
+}
+enum StatusEnum : uint8_t {
+  Success = 0;
+  AppNotAvailable = 1;
+  SystemBusy = 2;
+}
+enum StatusEnum : uint8_t {
+  success = 0;
+  urlNotAvailable = 1;
+  authFailed = 2;
+}
+enum StatusEnum : uint8_t {
+  Success = 0;
+  InvalidStateForCommand = 1;
+  NotAllowed = 2;
+  NotActive = 3;
+  SpeedOutOfRange = 4;
+  SeekOutOfRange = 5;
+}
+enum StepMode : uint8_t {
+  Up = 0;
+  Down = 1;
+}
+enum SwitchActions : uint8_t {
+  On = 0;
+  Off = 1;
+  Toggle = 2;
+}
+enum SwitchType : uint8_t {
+  Toggle = 0;
+  Momentary = 1;
+  MultiFunction = 2;
+}
+enum TempUnit : uint8_t {
+  Fahrenheit = 0;
+  Celsius = 1;
+  Kelvin = 2;
+}
+enum TemperatureDisplayMode : uint8_t {
+  celsius = 0;
+  fahrenheit = 1;
+}
+enum TemperatureSetpointHold : uint8_t {
+  SetpointHoldOff = 0;
+  SetpointHoldOn = 1;
+}
+enum ThermostatControlSequence : uint8_t {
+  coolingOnly = 0;
+  coolingWithReheat = 1;
+  heatingOnly = 2;
+  heatingWithReheat = 3;
+  coolingAndHeating = 4;
+  coolingAndHeatingWithReheat = 5;
+}
+enum ThermostatRunningMode : uint8_t {
+  Off = 0;
+  Cool = 3;
+  Heat = 4;
+}
+enum ThermostatSystemMode : uint8_t {
+  off = 0;
+  auto = 1;
+  cool = 3;
+  heat = 4;
+  emergencyHeating = 5;
+  precooling = 6;
+  fanOnly = 7;
+}
+enum ThreadConnectionStatus : uint8_t {
+  Connected = 0;
+  NotConnected = 1;
+}
+enum TimeEncoding : uint8_t {
+  Relative = 0;
+  Absolute = 64;
+}
+enum WarningEvent : uint8_t {
+  Warning1OverallPowerAboveAvailablePowerLevel = 0;
+  Warning2OverallPowerAbovePowerThresholdLevel = 1;
+  Warning3OverallPowerBackBelowTheAvailablePowerLevel = 2;
+  Warning4OverallPowerBackBelowThePowerThresholdLevel = 3;
+  Warning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 4;
+}
+enum WarningMode : uint8_t {
+  stop = 0;
+  burglar = 1;
+  fire = 2;
+  emergency = 3;
+  policePanic = 4;
+  firePanic = 5;
+  emergencyPanic = 6;
+}
+enum WarningStobe : uint8_t {
+  noStrobe = 0;
+  useStrobe = 1;
+}
+enum WcEndProductType : uint8_t {
+  RollerShade = 0;
+  RomanShade = 1;
+  BalloonShade = 2;
+  WovenWood = 3;
+  PleatedShade = 4;
+  CellularShade = 5;
+  LayeredShade = 6;
+  LayeredShade2D = 7;
+  SheerShade = 8;
+  TiltOnlyInteriorBlind = 9;
+  InteriorBlind = 10;
+  VerticalBlindStripCurtain = 11;
+  InteriorVenetianBlind = 12;
+  ExteriorVenetianBlind = 13;
+  LateralLeftCurtain = 14;
+  LateralRightCurtain = 15;
+  CentralCurtain = 16;
+  RollerShutter = 17;
+  ExteriorVerticalScreen = 18;
+  AwningTerracePatio = 19;
+  AwningVerticalScreen = 20;
+  TiltOnlyPergola = 21;
+  SwingingShutter = 22;
+  SlidingShutter = 23;
+  Unknown = 255;
+}
+enum WcType : uint8_t {
+  Rollershade = 0;
+  Rollershade2Motor = 1;
+  RollershadeExterior = 2;
+  RollershadeExterior2Motor = 3;
+  Drapery = 4;
+  Awning = 5;
+  Shutter = 6;
+  TiltBlindTiltOnly = 7;
+  TiltBlindLiftAndTilt = 8;
+  ProjectorScreen = 9;
+  Unknown = 255;
+}
+enum WiFiBand : uint8_t {
+  2G4 = 0;
+  3G65 = 1;
+  5G = 2;
+  6G = 3;
+  60G = 4;
+}
+enum WiFiConnectionStatus : uint8_t {
+  Connected = 0;
+  NotConnected = 1;
+}
+enum WiFiVersionType : uint8_t {
+  802.11a = 0;
+  802.11b = 1;
+  802.11g = 2;
+  802.11n = 3;
+  802.11ac = 4;
+  802.11ax = 5;
+}
+enum WiredCurrentType : uint8_t {
+  AC = 0;
+  DC = 1;
+}
+enum WiredFaultType : uint8_t {
+  Unspecfied = 0;
+  OverVoltage = 1;
+  UnderVoltage = 2;
+}
