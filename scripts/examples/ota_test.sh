@@ -35,11 +35,14 @@ echo  "Sending announce-ota-provider "
 ./$CHIP_ROOT/out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0  > $CHIP_ROOT/tmp/chip-tool-3.txt 
 
 echo  "Sleeping for 20 seconds "
-sleep 10
+sleep 20
 
 echo "Exiting, logs are in $CHIP_ROOT/tmp/"
 
-if grep "OTA image downloaded to test.txt" $CHIP_ROOT/tmp/requestor-log.txt; then echo Test passed; else echo Test failed; fi
+kill $provider_pid
+kill $requestor_pid
 
-# kill $provider_pid
-# kill $requestor_pid
+if grep "OTA image downloaded to test.txt" $CHIP_ROOT/tmp/requestor-log.txt;
+then echo Test passed && exit 0;
+else echo Test failed && exit 1;
+fi
