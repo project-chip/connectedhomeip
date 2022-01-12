@@ -133,13 +133,25 @@ struct AccessControlEntryCodec
         {
             to.cluster.SetNonNull(from.cluster);
         }
+        else
+        {
+            to.cluster.SetNull();
+        }
         if (from.flags & AccessControl::Entry::Target::kEndpoint)
         {
             to.endpoint.SetNonNull(from.endpoint);
         }
+        else
+        {
+            to.endpoint.SetNull();
+        }
         if (from.flags & AccessControl::Entry::Target::kDeviceType)
         {
             to.deviceType.SetNonNull(from.deviceType);
+        }
+        else
+        {
+            to.deviceType.SetNull();
         }
         return CHIP_NO_ERROR;
     }
