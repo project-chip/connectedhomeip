@@ -70,7 +70,7 @@ Identify gIdentify1 = {
 // #define STATUS_LED_GPIO_NUM NC
 // #endif
  #define STATUS_LED_GPIO_NUM PA_2
- 
+
 static DeviceCallbacks EchoCallbacks;
 
 void GetGatewayIP(char * ip_buf, size_t ip_len)

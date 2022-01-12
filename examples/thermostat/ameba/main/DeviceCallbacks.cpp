@@ -156,7 +156,7 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * comm
     return true;
 }
 
-extern "C" { 
+extern "C" {
     void __attribute__((weak)) SendtoThermostat(AttributeId attributeId, uint8_t *value)
     {
 
@@ -172,4 +172,3 @@ void DeviceCallbacks::OnThermostatPostAttributeChangeCallback(EndpointId endpoin
 exit:
     return;
 }
-

@@ -64,4 +64,3 @@ void LEDWidget::Toggle()
     mState = ~mState;
     gpio_write(&gpio_led, mState);
 }
-
