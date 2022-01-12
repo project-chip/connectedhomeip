@@ -39,6 +39,10 @@
         {
             "name": "log_struct_value",
             "path": "partials/log_struct_value.zapt"
+        },
+        {
+            "name": "log_event_value",
+            "path": "partials/log_event_value.zapt"
         }
     ],
     "templates": [
