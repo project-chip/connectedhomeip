@@ -3792,9 +3792,9 @@ struct TypeInfo
 namespace StartUpCurrentLevel {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpCurrentLevel::Id; }
@@ -3859,7 +3859,7 @@ struct TypeInfo
         Attributes::OnTransitionTime::TypeInfo::DecodableType onTransitionTime;
         Attributes::OffTransitionTime::TypeInfo::DecodableType offTransitionTime;
         Attributes::DefaultMoveRate::TypeInfo::DecodableType defaultMoveRate;
-        Attributes::StartUpCurrentLevel::TypeInfo::DecodableType startUpCurrentLevel = static_cast<uint8_t>(0);
+        Attributes::StartUpCurrentLevel::TypeInfo::DecodableType startUpCurrentLevel;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);

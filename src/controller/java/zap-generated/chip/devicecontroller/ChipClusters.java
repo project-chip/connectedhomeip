@@ -7213,6 +7213,14 @@ public class ChipClusters {
       default void onSubscriptionEstablished() {}
     }
 
+    public interface StartUpCurrentLevelAttributeCallback {
+      void onSuccess(@Nullable Integer value);
+
+      void onError(Exception ex);
+
+      default void onSubscriptionEstablished() {}
+    }
+
     public interface AttributeListAttributeCallback {
       void onSuccess(List<Object> valueList);
 
@@ -7395,21 +7403,22 @@ public class ChipClusters {
       subscribeDefaultMoveRateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
-    public void readStartUpCurrentLevelAttribute(IntegerAttributeCallback callback) {
+    public void readStartUpCurrentLevelAttribute(StartUpCurrentLevelAttributeCallback callback) {
       readStartUpCurrentLevelAttribute(chipClusterPtr, callback);
     }
 
-    public void writeStartUpCurrentLevelAttribute(DefaultClusterCallback callback, Integer value) {
+    public void writeStartUpCurrentLevelAttribute(
+        DefaultClusterCallback callback, @Nullable Integer value) {
       writeStartUpCurrentLevelAttribute(chipClusterPtr, callback, value, null);
     }
 
     public void writeStartUpCurrentLevelAttribute(
-        DefaultClusterCallback callback, Integer value, int timedWriteTimeoutMs) {
+        DefaultClusterCallback callback, @Nullable Integer value, int timedWriteTimeoutMs) {
       writeStartUpCurrentLevelAttribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
 
     public void subscribeStartUpCurrentLevelAttribute(
-        IntegerAttributeCallback callback, int minInterval, int maxInterval) {
+        StartUpCurrentLevelAttributeCallback callback, int minInterval, int maxInterval) {
       subscribeStartUpCurrentLevelAttribute(chipClusterPtr, callback, minInterval, maxInterval);
     }
 
@@ -7554,16 +7563,19 @@ public class ChipClusters {
         int maxInterval);
 
     private native void readStartUpCurrentLevelAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
+        long chipClusterPtr, StartUpCurrentLevelAttributeCallback callback);
 
     private native void writeStartUpCurrentLevelAttribute(
         long chipClusterPtr,
         DefaultClusterCallback callback,
-        Integer value,
+        @Nullable Integer value,
         @Nullable Integer timedWriteTimeoutMs);
 
     private native void subscribeStartUpCurrentLevelAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback, int minInterval, int maxInterval);
+        long chipClusterPtr,
+        StartUpCurrentLevelAttributeCallback callback,
+        int minInterval,
+        int maxInterval);
 
     private native void readAttributeListAttribute(
         long chipClusterPtr, AttributeListAttributeCallback callback);

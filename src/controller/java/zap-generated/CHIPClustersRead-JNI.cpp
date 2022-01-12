@@ -8596,8 +8596,10 @@ JNI_METHOD(void, LevelControlCluster, readStartUpCurrentLevelAttribute)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo;
-    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
-        chip::Platform::New<CHIPInt8uAttributeCallback>(callback, false), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    std::unique_ptr<CHIPLevelControlStartUpCurrentLevelAttributeCallback,
+                    void (*)(CHIPLevelControlStartUpCurrentLevelAttributeCallback *)>
+        onSuccess(chip::Platform::New<CHIPLevelControlStartUpCurrentLevelAttributeCallback>(callback, false),
+                  chip::Platform::Delete<CHIPLevelControlStartUpCurrentLevelAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));

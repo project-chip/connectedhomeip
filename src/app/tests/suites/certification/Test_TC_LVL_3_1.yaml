@@ -39,7 +39,7 @@ tests:
       command: "readAttribute"
       attribute: "max level"
       response:
-          value: 255
+          value: 254
 
     - label: "sends a Move to level command"
       command: "MoveToLevel"

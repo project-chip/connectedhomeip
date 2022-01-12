@@ -1319,8 +1319,9 @@
               ZAP_EMPTY_DEFAULT() }, /* off transition time */                                                                     \
             { 0x0014, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                             \
               ZAP_EMPTY_DEFAULT() }, /* default move rate */                                                                       \
-            { 0x4000, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                             \
-              ZAP_EMPTY_DEFAULT() },                                             /* start up current level */                      \
+            { 0x4000, ZAP_TYPE(INT8U), 1,                                                                                          \
+              ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                          \
+              ZAP_SIMPLE_DEFAULT(255) },                                         /* start up current level */                      \
             { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(2401) }, /* FeatureMap */                                  \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(5) },           /* ClusterRevision */                             \
                                                                                                                                    \

@@ -3301,7 +3301,8 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
                   .readStartUpCurrentLevelAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.LevelControlCluster.StartUpCurrentLevelAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlStartUpCurrentLevelCommandParams);
