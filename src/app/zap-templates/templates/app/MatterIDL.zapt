@@ -1,15 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-{{#zcl_enums}}
-enum {{asUpperCamelCase name}} : {{type}} {
-  {{#zcl_enum_items}}
-  k{{asUpperCamelCase label}} = {{value}};
-  {{/zcl_enum_items}}
-}
-
-{{/zcl_enums}}
-
 {{#zcl_structs}}
 {{#if struct_is_fabric_scoped}}
 [fabric_scoped_by=k{{asUpperCamelCase struct_fabric_idx_field}}]
@@ -24,6 +15,14 @@ struct {{name}} {
 
 {{#chip_clusters}}
 {{side}} cluster {{asUpperCamelCase name}} = {{code}} {
+  {{#zcl_enums}}
+  enum {{asUpperCamelCase name}} : {{type}} {
+    {{#zcl_enum_items}}
+    k{{asUpperCamelCase label}} = {{value}};
+    {{/zcl_enum_items}}
+  }
+
+  {{/zcl_enums}}
   {{#zcl_events}}
   event {{asUpperCamelCase name}}({{priority}}) = {{code}} {
     {{#zcl_event_fields}}
@@ -33,10 +32,12 @@ struct {{name}} {
 
   {{/zcl_events}}
   {{#chip_cluster_attributes}}
-  attribute({{#if isWritableAttribute}}readonly{{else}}writable{{/if}}{{#if isReportableAttribute}}, reportable{{/if}}) {{asLowerCamelCase name}} = {{code}};
+  attribute({{#if isWritableAttribute}}readonly{{else}}writable{{/if}}{{#if isReportableAttribute}}, reportable{{/if}}) {{type}} {{asLowerCamelCase name}} = {{code}};
   {{/chip_cluster_attributes}}
-
   {{#zcl_commands}}
+  {{#first}}
+
+  {{/first}}
   command {{asUpperCamelCase name}}() = {{code}};
   {{/zcl_commands}}
 }
