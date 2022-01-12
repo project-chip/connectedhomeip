@@ -3961,6 +3961,15 @@ class ChipClusters:
                         "arg2": "int",
                     },
                 },
+            0x00000014: {
+                    "commandId": 0x00000014,
+                    "commandName": "TestEmitTestEventRequest",
+                    "args": {
+                        "arg1": "int",
+                        "arg2": "int",
+                        "arg3": "bool",
+                    },
+                },
             0x0000000E: {
                     "commandId": 0x0000000E,
                     "commandName": "TestEnumsRequest",
