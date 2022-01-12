@@ -40,10 +40,10 @@ static_library("Ameba") {
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
     "LwIPCoreLock.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
+    "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
-    "ServiceProvisioning.cpp",
-    "ServiceProvisioning.h",
     "SoftwareUpdateManagerImpl.h",
     "SystemTimeSupport.cpp",
   ]
