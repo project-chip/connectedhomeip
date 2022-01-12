@@ -158,7 +158,12 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
     }
 
     // We have a value; decode it.
-    return Decode(reader, x.SetNonNull());
+    ReturnErrorOnFailure(Decode(reader, x.SetNonNull()));
+    if (!x.HasValidValue())
+    {
+        return CHIP_ERROR_IM_CONSTRAINT_ERROR;
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DataModel

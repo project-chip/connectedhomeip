@@ -220,8 +220,15 @@ private:
 
     void CloseExchange();
 
-    // TODO: Remove this and replace with system method to retrieve current time
-    CHIP_ERROR SetEffectiveTime(void);
+    /**
+     * Clear our reference to our exchange context pointer so that it can close
+     * itself at some later time.
+     */
+    void DiscardExchange();
+
+    CHIP_ERROR GetHardcodedTime();
+
+    CHIP_ERROR SetEffectiveTime();
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                        System::PacketBufferHandle & msg);

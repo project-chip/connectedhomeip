@@ -9345,6 +9345,56 @@ using namespace chip::app::Clusters;
 
 @end
 
+@implementation CHIPLocalizationConfiguration
+
+- (chip::Controller::ClusterBase *)getCluster
+{
+    return &_cppCluster;
+}
+
+- (void)readAttributeActiveLocaleWithCompletionHandler:(void (^)(
+                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPCharStringAttributeCallbackBridge(self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+        using TypeInfo = LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo;
+        auto successFn = Callback<CharStringAttributeCallback>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+    });
+}
+
+- (void)writeAttributeActiveLocaleWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(id _Nullable ignored, NSError * _Nullable error) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = [self asCharSpan:value];
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)readAttributeSupportedLocalesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler
+{
+    new CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo;
+            auto successFn = Callback<LocalizationConfigurationSupportedLocalesListAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+@end
+
 @implementation CHIPLowPower
 
 - (chip::Controller::ClusterBase *)getCluster
@@ -14446,6 +14496,24 @@ using namespace chip::app::Clusters;
     new CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             auto successFn = Callback<CHIPTestClusterClusterTestAddArgumentsResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)testEmitTestEventRequestWithParams:(CHIPTestClusterClusterTestEmitTestEventRequestParams *)params
+                         completionHandler:(void (^)(CHIPTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    TestCluster::Commands::TestEmitTestEventRequest::Type request;
+    request.arg1 = params.arg1.unsignedCharValue;
+    request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
+    request.arg3 = params.arg3.boolValue;
+
+    new CHIPTestClusterClusterTestEmitTestEventResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPTestClusterClusterTestEmitTestEventResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -22033,8 +22101,6 @@ using namespace chip::app::Clusters;
                         }
                         auto element_0 = (CHIPUserLabelClusterLabelStruct *) value[i_0];
                         listHolder_0->mList[i_0].label = [self asCharSpan:element_0.label];
-                        listHolder_0->mList[i_0].label = [self asCharSpan:element_0.label];
-                        listHolder_0->mList[i_0].value = [self asCharSpan:element_0.value];
                         listHolder_0->mList[i_0].value = [self asCharSpan:element_0.value];
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);

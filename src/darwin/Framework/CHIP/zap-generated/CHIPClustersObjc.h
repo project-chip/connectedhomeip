@@ -2202,6 +2202,21 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Localization Configuration
+ *
+ */
+@interface CHIPLocalizationConfiguration : CHIPCluster
+
+- (void)readAttributeActiveLocaleWithCompletionHandler:(void (^)(
+                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeActiveLocaleWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeSupportedLocalesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
  * Cluster Low Power
  *
  */
@@ -3506,6 +3521,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testAddArgumentsWithParams:(CHIPTestClusterClusterTestAddArgumentsParams *)params
                  completionHandler:(void (^)(CHIPTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler;
+- (void)testEmitTestEventRequestWithParams:(CHIPTestClusterClusterTestEmitTestEventRequestParams *)params
+                         completionHandler:(void (^)(CHIPTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completionHandler;
 - (void)testEnumsRequestWithParams:(CHIPTestClusterClusterTestEnumsRequestParams *)params
                  completionHandler:(void (^)(CHIPTestClusterClusterTestEnumsResponseParams * _Nullable data,
                                        NSError * _Nullable error))completionHandler;

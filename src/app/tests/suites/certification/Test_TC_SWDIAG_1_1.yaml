@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 48.1.1. [TC-DIAGSW-1.1] Attributes with server as DUT
+name: 45.1.1. [TC-SWDIAG-1.1] Attributes with server as DUT
 
 config:
     cluster: "Software Diagnostics"
@@ -24,10 +24,10 @@ tests:
       command: "WaitForCommissionee"
 
     #Issue #11185 Disabled as ThreadMetrics attribute missing
+    #disabled due to issue  #13441
     - label:
           "Reads a list of ThreadMetrics struct non-global attribute from DUT."
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "ThreadMetrics"
       PICS: A_THREADMETRICS
@@ -36,28 +36,28 @@ tests:
               value: 0
 
     - label: "Reads CurrentHeapFree non-global attribute value from DUT"
+      optional: true
       command: "readAttribute"
       attribute: "CurrentHeapFree"
-      optional: true
       response:
           constraints:
               type: uint64
 
     - label: "Reads CurrentHeapUsed non-global attribute value from DUT"
+      optional: true
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
       PICS: A_CURRENTHEAPUSED
-      optional: true
       response:
           constraints:
               type: uint64
 
     - label:
           "Reads CurrentHeapHighWaterMark non-global attribute value from DUT"
+      optional: true
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
       PICS: A_CURRENTHEAPHIGHWATERMARK
-      optional: true
       response:
           constraints:
               type: uint64

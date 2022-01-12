@@ -126,7 +126,7 @@ public:
     }
     void OnError(const chip::app::CommandSender * apCommandSender, const chip::app::StatusIB & aStatus, CHIP_ERROR aError) override
     {
-        ChipLogError(Controller, "OnError happens with %" PRIx16 " %" CHIP_ERROR_FORMAT, to_underlying(aStatus.mStatus),
+        ChipLogError(Controller, "OnError happens with %" PRIx8 " %" CHIP_ERROR_FORMAT, to_underlying(aStatus.mStatus),
                      aError.Format());
         onErrorCalledTimes++;
     }

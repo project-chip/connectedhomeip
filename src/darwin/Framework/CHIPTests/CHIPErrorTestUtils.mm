@@ -54,8 +54,6 @@ NS_ASSUME_NONNULL_BEGIN
         return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
     case CHIPErrorCodeUnsupportedCluster:
         return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
-    case CHIPSuccess:
-        return EMBER_ZCL_STATUS_SUCCESS;
     default:
         return EMBER_ZCL_STATUS_FAILURE;
     }

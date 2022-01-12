@@ -53,6 +53,7 @@
     MatterIlluminanceMeasurementPluginClientInitCallback();                                                                        \
     MatterKeypadInputPluginClientInitCallback();                                                                                   \
     MatterLevelControlPluginClientInitCallback();                                                                                  \
+    MatterLocalizationConfigurationPluginClientInitCallback();                                                                     \
     MatterLowPowerPluginClientInitCallback();                                                                                      \
     MatterMediaInputPluginClientInitCallback();                                                                                    \
     MatterMediaPlaybackPluginClientInitCallback();                                                                                 \

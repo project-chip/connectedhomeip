@@ -37,6 +37,32 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace detail {
+// Structs shared across multiple clusters.
+namespace Structs {
+namespace LabelStruct {
+enum class Fields
+{
+    kLabel = 1,
+    kValue = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan label;
+    chip::CharSpan value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace LabelStruct
+} // namespace Structs
+} // namespace detail
+
 namespace PowerConfiguration {
 
 namespace Attributes {
@@ -15459,26 +15485,7 @@ struct TypeInfo
 namespace FixedLabel {
 
 namespace Structs {
-namespace LabelStruct {
-enum class Fields
-{
-    kLabel = 1,
-    kValue = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan label;
-    chip::CharSpan value;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-
-using DecodableType = Type;
-
-} // namespace LabelStruct
+namespace LabelStruct = Clusters::detail::Structs::LabelStruct;
 } // namespace Structs
 
 namespace Attributes {
@@ -15552,26 +15559,7 @@ struct TypeInfo
 namespace UserLabel {
 
 namespace Structs {
-namespace LabelStruct {
-enum class Fields
-{
-    kLabel = 1,
-    kValue = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan label;
-    chip::CharSpan value;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-
-using DecodableType = Type;
-
-} // namespace LabelStruct
+namespace LabelStruct = Clusters::detail::Structs::LabelStruct;
 } // namespace Structs
 
 namespace Attributes {

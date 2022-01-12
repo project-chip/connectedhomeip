@@ -40,6 +40,9 @@
 namespace {
 
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::detail::Structs::LabelStruct::DecodableType & value);
+
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::DecodableType & value);
@@ -94,10 +97,6 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -268,6 +267,30 @@ CHIP_ERROR LogValue(const char * label, size_t indent, const chip::Optional<T> &
 // be logging.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::detail::Structs::LabelStruct::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Label'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Value", indent + 1, value.value);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Value'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::DecodableType & value)
 {
@@ -1546,52 +1569,6 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'EpochStartTime2'",
                             IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Label'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Value", indent + 1, value.value);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Value'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Label", indent + 1, value.label);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Label'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Value", indent + 1, value.value);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Value'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -3320,6 +3297,20 @@ static void OnTestClusterTestAddArgumentsResponseSuccess(
     command->SetCommandExitStatus(err);
 };
 
+static void OnTestClusterTestEmitTestEventResponseSuccess(
+    void * context, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received TestEmitTestEventResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("value", 1, data.value);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
 static void
 OnTestClusterTestEnumsResponseSuccess(void * context,
                                       const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & data)
@@ -3487,6 +3478,7 @@ static void OnThermostatGetWeeklyScheduleResponseSuccess(
 | IlluminanceMeasurement                                              | 0x0400 |
 | KeypadInput                                                         | 0x0509 |
 | LevelControl                                                        | 0x0008 |
+| LocalizationConfiguration                                           | 0x002B |
 | LowPower                                                            | 0x0508 |
 | MediaInput                                                          | 0x0507 |
 | MediaPlayback                                                       | 0x0506 |
@@ -22534,6 +22526,102 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster LocalizationConfiguration                                   | 0x002B |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ActiveLocale                                                      | 0x0001 |
+| * SupportedLocales                                                  | 0x0002 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Attribute ActiveLocale
+ */
+class ReadLocalizationConfigurationActiveLocale : public ModelCommand
+{
+public:
+    ReadLocalizationConfigurationActiveLocale() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "active-locale");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationConfigurationActiveLocale() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationConfiguration.ActiveLocale response", value);
+    }
+};
+
+class WriteLocalizationConfigurationActiveLocale : public ModelCommand
+{
+public:
+    WriteLocalizationConfigurationActiveLocale() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "active-locale");
+        AddArgument("attr-value", &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteLocalizationConfigurationActiveLocale() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::CharSpan mValue;
+};
+
+/*
+ * Attribute SupportedLocales
+ */
+class ReadLocalizationConfigurationSupportedLocales : public ModelCommand
+{
+public:
+    ReadLocalizationConfigurationSupportedLocales() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "supported-locales");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadLocalizationConfigurationSupportedLocales() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
+    {
+        OnGeneralAttributeResponse(context, "LocalizationConfiguration.SupportedLocales response", value);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster LowPower                                                    | 0x0508 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
@@ -33396,6 +33484,7 @@ private:
 | * SimpleStructEchoRequest                                           |   0x11 |
 | * Test                                                              |   0x00 |
 | * TestAddArguments                                                  |   0x04 |
+| * TestEmitTestEventRequest                                          |   0x14 |
 | * TestEnumsRequest                                                  |   0x0E |
 | * TestListInt8UArgumentRequest                                      |   0x0A |
 | * TestListInt8UReverseRequest                                       |   0x0D |
@@ -33561,6 +33650,32 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type mRequest;
+};
+
+/*
+ * Command TestEmitTestEventRequest
+ */
+class TestClusterTestEmitTestEventRequest : public ModelCommand
+{
+public:
+    TestClusterTestEmitTestEventRequest() : ModelCommand("test-emit-test-event-request")
+    {
+        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
+        AddArgument("Arg2", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.arg2)> *>(&mRequest.arg2));
+        AddArgument("Arg3", 0, 1, &mRequest.arg3);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterTestEmitTestEventResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type mRequest;
 };
 
 /*
@@ -51893,6 +52008,18 @@ void registerClusterLevelControl(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
+void registerClusterLocalizationConfiguration(Commands & commands)
+{
+    const char * clusterName = "LocalizationConfiguration";
+
+    commands_list clusterCommands = {
+        make_unique<ReadLocalizationConfigurationActiveLocale>(),     //
+        make_unique<WriteLocalizationConfigurationActiveLocale>(),    //
+        make_unique<ReadLocalizationConfigurationSupportedLocales>(), //
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
 void registerClusterLowPower(Commands & commands)
 {
     const char * clusterName = "LowPower";
@@ -52403,6 +52530,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<TestClusterSimpleStructEchoRequest>(),                 //
         make_unique<TestClusterTest>(),                                    //
         make_unique<TestClusterTestAddArguments>(),                        //
+        make_unique<TestClusterTestEmitTestEventRequest>(),                //
         make_unique<TestClusterTestEnumsRequest>(),                        //
         make_unique<TestClusterTestListInt8UArgumentRequest>(),            //
         make_unique<TestClusterTestListInt8UReverseRequest>(),             //
@@ -53016,6 +53144,7 @@ void registerClusters(Commands & commands)
     registerClusterIlluminanceMeasurement(commands);
     registerClusterKeypadInput(commands);
     registerClusterLevelControl(commands);
+    registerClusterLocalizationConfiguration(commands);
     registerClusterLowPower(commands);
     registerClusterMediaInput(commands);
     registerClusterMediaPlayback(commands);

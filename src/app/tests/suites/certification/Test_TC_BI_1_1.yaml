@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 12.1.1. [TC-BI-1.1] Global attributes with server as DUT
+name: 18.1.1. [TC-BI-1.1] Global attributes with server as DUT
 
 config:
     cluster: "Binary Input (Basic)"
@@ -53,6 +53,7 @@ tests:
           value: 1
 
     #issue #11053 disabled steps below Global attributes missing from YAML framework
+    #disabled due to issue #13442
     - label: "Read the global attribute: AttributeList"
       disabled: true
       command: "readAttribute"

@@ -25,6 +25,7 @@
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
+    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \

@@ -272,6 +272,7 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
 {
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
+    VerifyOrReturn(session->GetSessionType() == Transport::Session::SessionType::kSecure);
     UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
 }
 
@@ -752,7 +753,6 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
 CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params)
 {
-
     CHIP_ERROR err                     = CHIP_NO_ERROR;
     CommissioneeDeviceProxy * device   = nullptr;
     Transport::PeerAddress peerAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
@@ -845,16 +845,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        // Delete the current rendezvous session only if a device is not currently being paired.
-        if (mDeviceBeingCommissioned == nullptr)
-        {
-            FreeRendezvousSession();
-        }
-
-        if (device != nullptr)
-        {
-            ReleaseCommissioneeDevice(device);
-        }
+        RendezvousCleanup(err);
     }
 
     return err;
@@ -865,7 +856,8 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
     // TODO(cecille): Can we get rid of mDeviceBeingCommissioned and use the remote id instead? Would require storing the
     // commissioning stage in the device.
     CommissioneeDeviceProxy * device = mDeviceBeingCommissioned;
-    if (device->GetDeviceId() != remoteDeviceId || (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
+    if (device == nullptr || device->GetDeviceId() != remoteDeviceId ||
+        (!device->IsSecureConnected() && !device->IsSessionSetupInProgress()))
     {
         ChipLogError(Controller, "Invalid device for commissioning" ChipLogFormatX64, ChipLogValueX64(remoteDeviceId));
         return CHIP_ERROR_INCORRECT_STATE;
@@ -974,12 +966,6 @@ void DeviceCommissioner::OnSessionEstablishmentError(CHIP_ERROR err)
     }
 
     RendezvousCleanup(err);
-
-    if (mDeviceBeingCommissioned != nullptr)
-    {
-        ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
-        mDeviceBeingCommissioned = nullptr;
-    }
 }
 
 void DeviceCommissioner::OnSessionEstablished()
@@ -991,9 +977,7 @@ void DeviceCommissioner::OnSessionEstablished()
     // TODO: the session should know which peer we are trying to connect to when started
     pairing->SetPeerNodeId(mDeviceBeingCommissioned->GetDeviceId());
 
-    CHIP_ERROR err = mSystemState->SessionMgr()->NewPairing(
-        mDeviceBeingCommissioned->GetSecureSessionHolder(), Optional<Transport::PeerAddress>::Value(pairing->GetPeerAddress()),
-        pairing->GetPeerNodeId(), pairing, CryptoContext::SessionRole::kInitiator, mFabricIndex);
+    CHIP_ERROR err = mDeviceBeingCommissioned->SetConnected();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Failed in setting up secure channel: err %s", ErrorStr(err));

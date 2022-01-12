@@ -28,7 +28,7 @@ from dataclasses import dataclass
 # The type should match CommandStatus in interaction_model/Delegate.h
 # CommandStatus should not contain padding
 IMCommandStatus = Struct(
-    "Status" / Int16ul,
+    "Status" / Int8ul,
     "ClusterStatus" / Int8ul,
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
@@ -36,10 +36,11 @@ IMCommandStatus = Struct(
     "CommandIndex" / Int8ul,
 )
 
+# The type should match WriteStatus in interaction_model/Delegate.h
 IMWriteStatus = Struct(
     "NodeId" / Int64ul,
     "AppIdentifier" / Int64ul,
-    "Status" / Int16ul,
+    "Status" / Int8ul,
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "AttributeId" / Int32ul,

@@ -2,7 +2,16 @@
 class {{filename}}: public TestCommand
 {
   public:
-    {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0) {}
+    {{filename}}(): TestCommand("{{filename}}"), mTestIndex(0)
+    {
+        {{#chip_tests_config}}
+          {{#if (isString type)}}
+          AddArgument("{{name}}", &m{{asUpperCamelCase name}});
+          {{else}}
+          AddArgument("{{name}}", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &m{{asUpperCamelCase name}});
+          {{/if}}
+        {{/chip_tests_config}}
+    }
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -32,7 +41,14 @@ class {{filename}}: public TestCommand
         {{#chip_tests_items}}
         case {{index}}:
           ChipLogProgress(chipTool, " ***** Test Step {{index}} : {{label}}\n");
-          err = {{#if PICS}}ShouldSkip("{{PICS}}") ? CHIP_NO_ERROR : {{/if}}Test{{asUpperCamelCase label}}_{{index}}();
+          {{#if PICS}}
+          if (ShouldSkip("{{PICS}}"))
+          {
+              NextTest();
+              return;
+          }
+          {{/if}}
+          err = Test{{asUpperCamelCase label}}_{{index}}();
           break;
         {{/chip_tests_items}}
       }
@@ -45,12 +61,16 @@ class {{filename}}: public TestCommand
     }
 
   {{#if timeout}}
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.HasValue() : mTimeout.Value() : {{timeout}}); }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.HasValue() ? mTimeout.Value() : {{timeout}}); }
   {{/if}}
 
   private:
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = {{totalTests}};
+
+    {{#chip_tests_config}}
+    chip::Optional<{{chipType}}> m{{asUpperCamelCase name}};
+    {{/chip_tests_config}}
 
     {{#chip_tests_items}}
     {{#chip_tests_item_response_parameters}}
@@ -156,7 +176,7 @@ class {{filename}}: public TestCommand
     {{else if isWait}}
     CHIP_ERROR {{>testCommand}}()
     {
-      const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : {{endpoint}};
+      const chip::EndpointId endpoint = {{#if (chip_tests_config_has "endpoint")}}mEndpoint.HasValue() ? mEndpoint.Value() : {{/if}}{{endpoint}};
       ChipLogError(chipTool, "[Endpoint: 0x%08x Cluster: {{cluster}} {{#if isAttribute}}Attribute: {{attribute}}{{else}}Command: {{wait}}{{/if}}] {{label}}", endpoint);
       {{#*inline "waitForTypeName"}}{{#if isAttribute}}Attribute{{else}}Command{{/if}}{{/inline}}
       {{#*inline "waitForTypeId"}}chip::app::Clusters::{{asUpperCamelCase cluster}}::{{#if isAttribute}}Attributes::{{attribute}}{{else}}Commands::{{wait}}{{/if}}::Id{{/inline}}
@@ -172,7 +192,7 @@ class {{filename}}: public TestCommand
         {{#if isGroupCommand}}
         const chip::GroupId groupId = {{groupId}};
         {{else}}
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : {{endpoint}};
+        const chip::EndpointId endpoint = {{#if (chip_tests_config_has "endpoint")}}mEndpoint.HasValue() ? mEndpoint.Value() : {{/if}}{{endpoint}};
         {{/if}}
 
         {{~#*inline "maybeTimedInteractionTimeout"}}
@@ -312,18 +332,23 @@ class {{filename}}: public TestCommand
                 {{~#*inline "item"}}{{asLowerCamelCase name}}{{/inline}}
                 VerifyOrReturn(CheckValuePresent("{{> item}}", {{> item}}));
               {{/if}}
-              {{#if expectedConstraints.type}}VerifyOrReturn(CheckConstraintType("{{>item}}", "", "{{expectedConstraints.type}}"));{{/if}}
-              {{~#if expectedConstraints.format}}VerifyOrReturn(CheckConstraintFormat("{{>item}}", "", "{{expectedConstraints.format}}"));{{/if}}
-              {{~#if expectedConstraints.startsWith}}VerifyOrReturn(CheckConstraintStartsWith("{{>item}}", {{>item}}, "{{expectedConstraints.startsWith}}"));{{/if}}
-              {{~#if expectedConstraints.endsWith}}VerifyOrReturn(CheckConstraintEndsWith("{{>item}}", {{>item}}, "{{expectedConstraints.endsWith}}"));{{/if}}
-              {{~#if expectedConstraints.minLength}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.minLength}}));{{/if}}
-              {{~#if expectedConstraints.maxLength}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
-              {{~#if expectedConstraints.minValue}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}
-              {{~#if expectedConstraints.maxValue}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
-              {{~#if expectedConstraints.notValue}}
-                VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.notValue type}}));
-              {{else if (isLiteralNull expectedConstraints.notValue)}}
+              {{#if (hasProperty expectedConstraints "type")}}VerifyOrReturn(CheckConstraintType("{{>item}}", "", "{{expectedConstraints.type}}"));{{/if}}
+              {{~#if (hasProperty expectedConstraints "format")}}VerifyOrReturn(CheckConstraintFormat("{{>item}}", "", "{{expectedConstraints.format}}"));{{/if}}
+              {{~#if (hasProperty expectedConstraints "startsWith")}}VerifyOrReturn(CheckConstraintStartsWith("{{>item}}", {{>item}}, "{{expectedConstraints.startsWith}}"));{{/if}}
+              {{~#if (hasProperty expectedConstraints "endsWith")}}VerifyOrReturn(CheckConstraintEndsWith("{{>item}}", {{>item}}, "{{expectedConstraints.endsWith}}"));{{/if}}
+              {{~#if (hasProperty expectedConstraints "isUpperCase")}}VerifyOrReturn(CheckConstraintIsUpperCase("{{>item}}", {{>item}}, {{expectedConstraints.isUpperCase}}));{{/if}}
+              {{~#if (hasProperty expectedConstraints "isLowerCase")}}VerifyOrReturn(CheckConstraintIsLowerCase("{{>item}}", {{>item}}, {{expectedConstraints.isLowerCase}}));{{/if}}
+              {{~#if (hasProperty expectedConstraints "isHexString")}}VerifyOrReturn(CheckConstraintIsHexString("{{>item}}", {{>item}}, {{expectedConstraints.isHexString}}));{{/if}}
+              {{~#if (hasProperty expectedConstraints "minLength")}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.minLength}}));{{/if}}
+              {{~#if (hasProperty expectedConstraints "maxLength")}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
+              {{~#if (hasProperty expectedConstraints "minValue")}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.minValue type}}));{{/if}}
+              {{~#if (hasProperty expectedConstraints "maxValue")}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.maxValue type}}));{{/if}}
+              {{~#if (hasProperty expectedConstraints "notValue")}}
+                {{#if (isLiteralNull expectedConstraints.notValue)}}
                 VerifyOrReturn(CheckValueNonNull("{{>item}}", {{>item}}));
+                {{else}}
+                VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.notValue type}}));
+                {{/if}}
               {{/if}}
             {{/if}}
 
