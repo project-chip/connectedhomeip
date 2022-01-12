@@ -21,6 +21,7 @@
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <protocols/interaction_model/Constants.h>
 
 namespace chip {
 namespace app {
@@ -30,31 +31,55 @@ class CommandResponseHelper
 {
 public:
     CommandResponseHelper(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath) :
-        mCommand(command), mCommandPath(commandPath), responsed(false)
+        mCommandHandler(command), mCommandPath(commandPath), mSentResponse(false)
     {}
 
-    CHIP_ERROR Success(const CommandData & response)
+    CHIP_ERROR Success(const CommandData & aResponse)
     {
-        CHIP_ERROR err = mCommand->AddResponseData(mCommandPath, response);
+        CHIP_ERROR err = mCommandHandler->AddResponseData(mCommandPath, aResponse);
         if (err == CHIP_NO_ERROR)
         {
-            responsed = true;
+            mSentResponse = true;
         }
         return err;
     };
 
-    void Response(EmberAfStatus status)
+    CHIP_ERROR Success(ClusterStatus aClusterStatus)
     {
-        emberAfSendImmediateDefaultResponse(status);
-        responsed = true;
+        CHIP_ERROR err = mCommandHandler->AddClusterSpecificSuccess(mCommandPath, aClusterStatus);
+        if (err == CHIP_NO_ERROR)
+        {
+            mSentResponse = true;
+        }
+        return err;
     }
 
-    bool IsResponsed() { return responsed; }
+    CHIP_ERROR Failure(Protocols::InteractionModel::Status aStatus)
+    {
+        CHIP_ERROR err = mCommandHandler->AddStatus(mCommandPath, aStatus);
+        if (err == CHIP_NO_ERROR)
+        {
+            mSentResponse = true;
+        }
+        return err;
+    }
+
+    CHIP_ERROR Failure(ClusterStatus aClusterStatus)
+    {
+        CHIP_ERROR err = mCommandHandler->AddClusterSpecificFailure(mCommandPath, aClusterStatus);
+        if (err == CHIP_NO_ERROR)
+        {
+            mSentResponse = true;
+        }
+        return err;
+    }
+
+    bool HasSentResponse() const { return mSentResponse; }
 
 private:
-    app::CommandHandler * mCommand;
+    app::CommandHandler * mCommandHandler;
     app::ConcreteCommandPath mCommandPath;
-    bool responsed;
+    bool mSentResponse;
 };
 
 } // namespace app
