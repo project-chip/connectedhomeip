@@ -29,6 +29,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/ESP32/DiagnosticDataProviderImpl.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <platform/ESP32/SystemTimeSupport.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
 
@@ -123,6 +124,7 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // to finish the initialization process.
     ReturnErrorOnFailure(Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack());
 
+    ReturnErrorOnFailure(System::Clock::InitClock_RealTime());
 exit:
     return chip::DeviceLayer::Internal::ESP32Utils::MapError(err);
 }
