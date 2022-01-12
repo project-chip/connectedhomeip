@@ -216,10 +216,10 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Commands:                                                                           |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    bool readCommand        = false;
-    bool writeCommand       = false;
-    bool reportCommand      = false;
-    bool readEventCommand   = false;
+    bool readCommand      = false;
+    bool writeCommand     = false;
+    bool reportCommand    = false;
+    bool readEventCommand = false;
     for (auto & command : commands)
     {
         bool shouldPrint = true;
