@@ -157,7 +157,7 @@ static CHIP_ERROR AppPlatformHandler(int argc, char ** argv)
         char * eptr;
 
         uint16_t vid     = (uint16_t) strtol(argv[1], &eptr, 10);
-        uint32_t pincode = (uint32_t) strtol(argv[2], &eptr, 10);
+        char * pincode   = argv[2];
         ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetLoadContentAppByVendorId(vid);
         if (app == nullptr)
         {

@@ -31,6 +31,4 @@ public:
     chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum HandleGetStatus() override;
     chip::CharSpan HandleGetApplicationVersion() override;
     std::list<uint16_t> HandleGetAllowedVendorList() override;
-
-    inline const char * GetApplicationName() override { return "exampleName1"; }
 };

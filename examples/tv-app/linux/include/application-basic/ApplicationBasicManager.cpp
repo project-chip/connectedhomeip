@@ -57,7 +57,7 @@ chip::app::Clusters::ApplicationBasic::Structs::Application::Type ApplicationBas
 {
     chip::app::Clusters::ApplicationBasic::Structs::Application::Type application;
     application.catalogVendorId = 123;
-    application.applicationId   = chip::CharSpan("applicationId", strlen("applicationId"));
+    application.applicationId   = chip::CharSpan(mApplicationName, strlen(mApplicationName));
     return application;
 }
 

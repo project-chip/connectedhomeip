@@ -23,9 +23,9 @@
 using namespace std;
 using namespace chip::app::Clusters::AccountLogin;
 
-AccountLoginManager::AccountLoginManager(uint32_t setupPIN)
+AccountLoginManager::AccountLoginManager(const char * setupPIN)
 {
-    mSetupPIN = setupPIN;
+    strncpy(mSetupPIN, setupPIN, sizeof(mSetupPIN));
 }
 
 bool AccountLoginManager::HandleLogin(const chip::CharSpan & tempAccountIdentifier, const chip::CharSpan & setupPin)
@@ -35,8 +35,16 @@ bool AccountLoginManager::HandleLogin(const chip::CharSpan & tempAccountIdentifi
     ChipLogProgress(Zcl, "temporary account id: %s", tempAccountIdentifierString.c_str());
     ChipLogProgress(Zcl, "setup pin %s", setupPinString.c_str());
 
-    // TODO: Insert your code here to handle login request
-    return true;
+    if (strcmp(mSetupPIN, setupPinString.c_str()) == 0)
+    {
+        ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin success");
+        return true;
+    }
+    else
+    {
+        ChipLogProgress(Zcl, "AccountLoginManager::HandleLogin failed expected pin %s", mSetupPIN);
+        return false;
+    }
 }
 
 bool AccountLoginManager::HandleLogout()
@@ -50,17 +58,8 @@ Commands::GetSetupPINResponse::Type AccountLoginManager::HandleGetSetupPin(const
     string tempAccountIdentifierString(tempAccountIdentifier.data(), tempAccountIdentifier.size());
 
     Commands::GetSetupPINResponse::Type response;
-    if (mSetupPIN == 0)
-    {
-        // tempPin123 is needed for unit tests to succeed
-        ChipLogProgress(Zcl, "temporary account id: %s returning dummy pin", tempAccountIdentifierString.c_str());
-        response.setupPIN = chip::CharSpan("tempPin123", strlen("tempPin123"));
-        return response;
-    }
+    ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), mSetupPIN);
 
-    std::string pin = std::to_string(mSetupPIN);
-    ChipLogProgress(Zcl, "temporary account id: %s returning pin: %s", tempAccountIdentifierString.c_str(), pin.c_str());
-
-    response.setupPIN = chip::CharSpan(pin.c_str(), pin.length());
+    response.setupPIN = chip::CharSpan(mSetupPIN, strlen(mSetupPIN));
     return response;
 }

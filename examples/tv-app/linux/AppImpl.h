@@ -56,7 +56,7 @@ class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                   const char * szApplicationVersion, uint32_t setupPIN) :
+                   const char * szApplicationVersion, const char * setupPIN) :
         mApplicationBasicDelegate(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion),
         mAccountLoginDelegate(setupPIN),
         mContentLauncherDelegate({ "image/*", "video/*" },
@@ -109,11 +109,11 @@ public:
     ContentApp * LoadContentAppByAppId(Application application);
 
 protected:
-    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1", 34567890),
-                                                      ContentAppImpl("Vendor2", 2222, "App2", 22, "Version2", 34567890),
-                                                      ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", 20202021),
+    ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1", "34567890"),
+                                                      ContentAppImpl("Vendor2", 2222, "App2", 22, "Version2", "34567890"),
+                                                      ContentAppImpl("Vendor3", 9050, "App3", 22, "Version3", "20202021"),
                                                       ContentAppImpl("TestSuiteVendor", 1111, "applicationId", 22, "v2",
-                                                                     20202021) };
+                                                                     "20202021") };
 };
 
 } // namespace AppPlatform

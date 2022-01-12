@@ -46,17 +46,18 @@ namespace AppPlatform {
 EmberAfStatus ContentApp::HandleReadAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer,
                                               uint16_t maxReadLength)
 {
-    ChipLogProgress(DeviceLayer, "Read Attribute for device %s cluster " ChipLogFormatMEI " attribute=" ChipLogFormatMEI,
-                    GetApplicationBasicDelegate()->GetApplicationName(), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
+    ChipLogProgress(DeviceLayer,
+                    "Read Attribute for endpoint " ChipLogFormatMEI " cluster " ChipLogFormatMEI " attribute " ChipLogFormatMEI,
+                    ChipLogValueMEI(mEndpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
 
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
 EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer)
 {
-    ChipLogProgress(DeviceLayer, "Read Attribute for device %s cluster %d attribute=%d)",
-                    GetApplicationBasicDelegate()->GetApplicationName(), static_cast<uint16_t>(clusterId),
-                    static_cast<uint16_t>(attributeId));
+    ChipLogProgress(DeviceLayer,
+                    "Read Attribute for endpoint " ChipLogFormatMEI " cluster " ChipLogFormatMEI " attribute " ChipLogFormatMEI,
+                    ChipLogValueMEI(mEndpointId), ChipLogValueMEI(clusterId), ChipLogValueMEI(attributeId));
 
     return EMBER_ZCL_STATUS_FAILURE;
 }

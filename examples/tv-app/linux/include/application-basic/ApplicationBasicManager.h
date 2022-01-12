@@ -42,8 +42,6 @@ public:
         mApplicationStatus = applicationStatus;
     };
 
-    inline const char * GetApplicationName() override { return mApplicationName; }
-
 protected:
     static const int kVendorNameSize         = 32;
     static const int kApplicationNameSize    = 32;

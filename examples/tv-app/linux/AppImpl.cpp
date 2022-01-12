@@ -174,8 +174,11 @@ ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(Application applicatio
 
     for (auto & app : mContentApps)
     {
-        ChipLogProgress(DeviceLayer, " Looking next=%s ", app.GetApplicationBasicDelegate()->GetApplicationName());
-        if (strcmp(app.GetApplicationBasicDelegate()->GetApplicationName(), appId.c_str()) == 0)
+        CharSpan nextAppIdCharSpan = app.GetApplicationBasicDelegate()->HandleGetApplication().applicationId;
+        std::string nextAppId(nextAppIdCharSpan.data(), nextAppIdCharSpan.size());
+
+        ChipLogProgress(DeviceLayer, " Looking next=%s ", nextAppId.c_str());
+        if (strcmp(nextAppId.c_str(), appId.c_str()) == 0)
         {
             AppPlatform::GetInstance().AddContentApp(&app, &contentAppEndpoint, DEVICE_TYPE_CONTENT_APP);
             return &app;

@@ -34,7 +34,7 @@ class Delegate
 {
 public:
     // helper method to allow the platform to facilitate providing the pin
-    virtual void SetSetupPIN(uint32_t setupPIN) = 0;
+    virtual void SetSetupPIN(char * setupPIN) = 0;
 
     virtual bool HandleLogin(const chip::CharSpan & tempAccountIdentifierString, const chip::CharSpan & setupPinString) = 0;
     virtual bool HandleLogout()                                                                                         = 0;

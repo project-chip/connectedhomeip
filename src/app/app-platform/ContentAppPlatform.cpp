@@ -85,7 +85,10 @@ namespace AppPlatform {
 
 int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint16_t deviceType)
 {
-    ChipLogProgress(DeviceLayer, "Adding device %s ", app->GetApplicationBasicDelegate()->GetApplicationName());
+    CharSpan appNameCharSpan = app->GetApplicationBasicDelegate()->HandleGetApplicationName();
+    std::string appName(appNameCharSpan.data(), appNameCharSpan.size());
+
+    ChipLogProgress(DeviceLayer, "Adding device %s ", appName.c_str());
     uint8_t index = 0;
     // check if already loaded
     while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
@@ -110,8 +113,8 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
                 ret = emberAfSetDynamicEndpoint(index, mCurrentEndpointId, ep, deviceType, DEVICE_VERSION_DEFAULT);
                 if (ret == EMBER_ZCL_STATUS_SUCCESS)
                 {
-                    ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)",
-                                    app->GetApplicationBasicDelegate()->GetApplicationName(), mCurrentEndpointId, index);
+                    ChipLogProgress(DeviceLayer, "Added device %s to dynamic endpoint %d (index=%d)", appName.c_str(),
+                                    mCurrentEndpointId, index);
                     app->SetEndpointId(mCurrentEndpointId);
                     return index;
                 }
@@ -195,8 +198,7 @@ void AppPlatform::UnloadContentAppByVendorId(uint16_t vendorId)
         {
             EndpointId ep       = emberAfClearDynamicEndpoint(index);
             mContentApps[index] = NULL;
-            ChipLogProgress(DeviceLayer, "Removed device %s from dynamic endpoint %d (index=%d)",
-                            app->GetApplicationBasicDelegate()->GetApplicationName(), ep, index);
+            ChipLogProgress(DeviceLayer, "Removed vendor %d from dynamic endpoint %d (index=%d)", vendorId, ep, index);
             // Silence complaints about unused ep when progress logging
             // disabled.
             UNUSED_VAR(ep);
