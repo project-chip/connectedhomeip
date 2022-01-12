@@ -1,5 +1,4 @@
 import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
 
 static_library("secure_channel") {
   output_name = "libSecureChannel"
@@ -30,6 +29,6 @@ static_library("secure_channel") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/system",
-    "${dir_pigweed}/pw_trace",
+    "${chip_root}/src/trace"
   ]
 }
