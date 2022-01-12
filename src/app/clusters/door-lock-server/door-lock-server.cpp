@@ -297,7 +297,10 @@ void DoorLockServer::GetUserCommandHandler(chip::app::CommandHandler * commandOb
                 user.lastModifiedBy);
 
             SuccessOrExit(err = writer->PutString(TLV::ContextTag(to_underlying(ResponseFields::kUserName)), user.userName));
-            SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserUniqueId)), user.userUniqueId));
+            if (0xFFFFFFFFU != user.userUniqueId)
+            {
+                SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserUniqueId)), user.userUniqueId));
+            }
             SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserStatus)), user.userStatus));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kUserType)), user.userType));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(to_underlying(ResponseFields::kCredentialRule)), user.credentialRule));
@@ -425,19 +428,19 @@ void DoorLockServer::SetCredentialCommandHandler(
         return;
     }
 
+    // appclusters, 5.2.4.41: response should contain next available credential slot
+    uint16_t nextAvailableCredentialSlot = 0;
+    findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, credentialIndex + 1, nextAvailableCredentialSlot);
+
     uint16_t maxNumberOfCredentials = 0;
     if (!credentialIndexValid(commandPath.mEndpointId, credentialType, credentialIndex, maxNumberOfCredentials))
     {
         emberAfDoorLockClusterPrintln(
             "[SetCredential] Credential index is out of range [endpointId=%d,credentialType=%hhu,credentialIndex=%d]",
             commandPath.mEndpointId, credentialType, credentialIndex);
-        sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, 0);
+        sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
         return;
     }
-
-    // appclusters, 5.2.4.41: response should contain next available credential slot
-    uint16_t nextAvailableCredentialSlot = 0;
-    findUnoccupiedCredentialSlot(commandPath.mEndpointId, credentialType, credentialIndex + 1, nextAvailableCredentialSlot);
 
     // TODO: move to a separate function
     // appclusters, 5.2.4.40.3: If the credential data length is out of bounds we should return INVALID_COMMAND
@@ -963,9 +966,6 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, DlCr
 
         for (uint16_t j = 0; j < user.credentials.size(); ++j)
         {
-            emberAfDoorLockClusterPrintln("j=%d, index=%d,type=%d (looking for index=%d, type=%d)", j,
-                                          user.credentials.data()[j].CredentialIndex, user.credentials.data()[j].CredentialType,
-                                          credentialIndex, to_underlying(credentialType));
             if (user.credentials.data()[j].CredentialIndex == credentialIndex &&
                 user.credentials.data()[j].CredentialType == to_underlying(credentialType))
             {
@@ -1398,6 +1398,14 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
         return EMBER_ZCL_STATUS_INVALID_COMMAND;
     }
 
+    if (!credentialIndexValid(endpointId, credentialType, credentialIndex))
+    {
+        emberAfDoorLockClusterPrintln("[clearCredential] Cannot clear credential - index out of bounds "
+                                      "[endpointId=%d,credentialType=%hhu,credentialIndex=%d,modifier=%d]",
+                                      endpointId, credentialType, credentialIndex, modifier);
+        return EMBER_ZCL_STATUS_INVALID_COMMAND;
+    }
+
     // 1. Clear the credential
     EmberAfPluginDoorLockCredentialInfo credential;
     if (!emberAfPluginDoorLockGetCredential(endpointId, credentialIndex, credentialType, credential))
@@ -1414,6 +1422,15 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
         emberAfDoorLockClusterPrintln("[clearCredential] Ignored attempt to clear unoccupied credential slot "
                                       "[endpointId=%d,credentialType=%hhu,credentialIndex=%d,modifier=%d]",
                                       endpointId, credentialType, credentialIndex, modifier);
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+
+    if (credentialType != credential.credentialType)
+    {
+        emberAfDoorLockClusterPrintln(
+            "[clearCredential] Ignored attempt to clear credential of different type "
+            "[endpointId=%d,credentialType=%hhu,credentialIndex=%d,modifier=%d,actualCredentialType=%hhu]",
+            endpointId, credentialType, credentialIndex, modifier, credential.credentialType);
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
@@ -1454,12 +1471,13 @@ EmberAfStatus DoorLockServer::clearCredential(chip::EndpointId endpointId, chip:
         emberAfDoorLockClusterPrintln("[clearCredential] Clearing related user - no credentials left "
                                       "[endpointId=%d,credentialType=%hhu,credentialIndex=%d,modifier=%d,userIndex=%d]",
                                       endpointId, credentialType, credentialIndex, modifier, relatedUserIndex);
-        if (!clearUser(endpointId, relatedUserIndex))
+        auto clearStatus = clearUser(endpointId, relatedUserIndex);
+        if (EMBER_ZCL_STATUS_SUCCESS != clearStatus)
         {
             ChipLogError(Zcl,
                          "[clearCredential] Unable to clear related credential user - internal error "
-                         "[endpointId=%d,credentialType=%hhu,credentialIndex=%d,modifier=%d,userIndex=%d]",
-                         endpointId, credentialType, credentialIndex, modifier, relatedUserIndex);
+                         "[endpointId=%d,credentialType=%hhu,credentialIndex=%d,modifier=%d,userIndex=%d,status=%d]",
+                         endpointId, credentialType, credentialIndex, modifier, relatedUserIndex, clearStatus);
 
             return EMBER_ZCL_STATUS_FAILURE;
         }
@@ -1570,7 +1588,7 @@ EmberAfStatus DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip
         emberAfDoorLockClusterPrintln("[clearCredentials] All face credentials were cleared [endpointId=%d]", endpointId);
     }
 
-    return EMBER_ZCL_STATUS_FAILURE;
+    return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 EmberAfStatus DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier,
@@ -1592,7 +1610,7 @@ EmberAfStatus DoorLockServer::clearCredentials(chip::EndpointId endpointId, chip
         if (EMBER_ZCL_STATUS_SUCCESS != status)
         {
             ChipLogError(Zcl,
-                         "[clearCredentials] Unable to clear the credential - internal error"
+                         "[clearCredentials] Unable to clear the credential - internal error "
                          "[endpointId=%d,credentialType=%hhu,credentialIndex=%d,status=%d]",
                          endpointId, credentialType, i, status);
             return status;
