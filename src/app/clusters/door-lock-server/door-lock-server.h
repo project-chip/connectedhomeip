@@ -91,6 +91,10 @@ public:
 
     inline bool SupportsPFID(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kRFIDCredentials); }
 
+    inline bool SupportsFingers(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kFingerCredentials); }
+
+    inline bool SupportsFace(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kFaceCredentials); }
+
     inline bool SupportsUSR(chip::EndpointId endpointId)
     {
         // appclusters, 5.2.2: USR feature has conformance [PIN | RID | FGP | FACE]
@@ -141,6 +145,11 @@ private:
                                  const DlCredential & credential);
     DlStatus modifyCredentialForUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
                                      const DlCredential & credential);
+
+    EmberAfStatus clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, DlCredentialType credentialType,
+                                  uint16_t credentialIndex);
+    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier);
+    EmberAfStatus clearCredentials(chip::EndpointId endpointId, chip::FabricIndex modifier, DlCredentialType credentialType);
 
     CHIP_ERROR sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DlStatus status, uint16_t userIndex,
                                          uint16_t nextCredentialIndex);
