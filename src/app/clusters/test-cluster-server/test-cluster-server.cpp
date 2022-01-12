@@ -412,7 +412,6 @@ CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder
 CHIP_ERROR TestAttrAccess::ReadListFabricScopedAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        // Just encode our one struct for now.
         auto fabricTable = Server::GetInstance().GetFabricTable();
 
         chip::app::Clusters::TestCluster::Structs::TestFabricScoped::Type val;
@@ -424,7 +423,7 @@ CHIP_ERROR TestAttrAccess::ReadListFabricScopedAttribute(AttributeValueEncoder &
         }
 
         // Always append a fake fabric index so we can test fabric filter even when there is only one fabric provisioned.
-        val.fabricIndex = 0xFF;
+        val.fabricIndex = kUndefinedFabricIndex;
         ReturnErrorOnFailure(encoder.Encode(val));
         return CHIP_NO_ERROR;
     });
