@@ -2030,9 +2030,9 @@ server cluster AdministratorCommissioning = 60 {
   attribute(writable) adminVendorId = 2;
   attribute(writable, reportable) clusterRevision = 65533;
 
-  command OpenCommissioningWindow = 0;
-  command OpenBasicCommissioningWindow = 1;
-  command RevokeCommissioning = 2;
+  command OpenCommissioningWindow() = 0;
+  command OpenBasicCommissioningWindow() = 1;
+  command RevokeCommissioning() = 2;
 }
 
 server cluster Basic = 40 {
@@ -2063,7 +2063,7 @@ server cluster Basic = 40 {
   attribute(writable, reportable) softwareVersionString = 10;
   attribute(writable, reportable) clusterRevision = 65533;
 
-  command MfgSpecificPing = 0;
+  command MfgSpecificPing() = 0;
 }
 
 server cluster Descriptor = 29 {
@@ -2077,8 +2077,8 @@ server cluster Descriptor = 29 {
 
 server cluster DiagnosticLogs = 50 {
 
-  command RetrieveLogsRequest = 0;
-  command RetrieveLogsResponse = 1;
+  command RetrieveLogsRequest() = 0;
+  command RetrieveLogsResponse() = 1;
 }
 
 server cluster EthernetNetworkDiagnostics = 55 {
@@ -2094,7 +2094,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
   attribute(writable) featureMap = 65532;
   attribute(writable, reportable) clusterRevision = 65533;
 
-  command ResetCounts = 0;
+  command ResetCounts() = 0;
 }
 
 server cluster FixedLabel = 64 {
@@ -2111,12 +2111,12 @@ server cluster GeneralCommissioning = 48 {
   attribute(writable) featureMap = 65532;
   attribute(writable, reportable) clusterRevision = 65533;
 
-  command ArmFailSafe = 0;
-  command ArmFailSafeResponse = 1;
-  command SetRegulatoryConfig = 2;
-  command SetRegulatoryConfigResponse = 3;
-  command CommissioningComplete = 4;
-  command CommissioningCompleteResponse = 5;
+  command ArmFailSafe() = 0;
+  command ArmFailSafeResponse() = 1;
+  command SetRegulatoryConfig() = 2;
+  command SetRegulatoryConfigResponse() = 3;
+  command CommissioningComplete() = 4;
+  command CommissioningCompleteResponse() = 5;
 }
 
 server cluster GeneralDiagnostics = 51 {
@@ -2168,14 +2168,14 @@ server cluster LevelControl = 8 {
   attribute(readonly, reportable) startUpCurrentLevel = 16384;
   attribute(writable, reportable) clusterRevision = 65533;
 
-  command MoveToLevel = 0;
-  command Move = 1;
-  command Step = 2;
-  command Stop = 3;
-  command MoveToLevelWithOnOff = 4;
-  command MoveWithOnOff = 5;
-  command StepWithOnOff = 6;
-  command StopWithOnOff = 7;
+  command MoveToLevel() = 0;
+  command Move() = 1;
+  command Step() = 2;
+  command Stop() = 3;
+  command MoveToLevelWithOnOff() = 4;
+  command MoveWithOnOff() = 5;
+  command StepWithOnOff() = 6;
+  command StopWithOnOff() = 7;
 }
 
 server cluster LocalizationConfiguration = 43 {
@@ -2196,27 +2196,27 @@ server cluster NetworkCommissioning = 49 {
   attribute(writable) featureMap = 65532;
   attribute(writable, reportable) clusterRevision = 65533;
 
-  command ScanNetworks = 0;
-  command ScanNetworksResponse = 1;
-  command AddOrUpdateWiFiNetwork = 2;
-  command AddOrUpdateThreadNetwork = 3;
-  command RemoveNetwork = 4;
-  command NetworkConfigResponse = 5;
-  command ConnectNetwork = 6;
-  command ConnectNetworkResponse = 7;
-  command ReorderNetwork = 8;
+  command ScanNetworks() = 0;
+  command ScanNetworksResponse() = 1;
+  command AddOrUpdateWiFiNetwork() = 2;
+  command AddOrUpdateThreadNetwork() = 3;
+  command RemoveNetwork() = 4;
+  command NetworkConfigResponse() = 5;
+  command ConnectNetwork() = 6;
+  command ConnectNetworkResponse() = 7;
+  command ReorderNetwork() = 8;
 }
 
 server cluster OnOff = 6 {
   attribute(writable, reportable) onOff = 0;
   attribute(writable, reportable) clusterRevision = 65533;
 
-  command Off = 0;
-  command On = 1;
-  command Toggle = 2;
-  command OffWithEffect = 64;
-  command OnWithRecallGlobalScene = 65;
-  command OnWithTimedOff = 66;
+  command Off() = 0;
+  command On() = 1;
+  command Toggle() = 2;
+  command OffWithEffect() = 64;
+  command OnWithRecallGlobalScene() = 65;
+  command OnWithTimedOff() = 66;
 }
 
 server cluster OperationalCredentials = 62 {
@@ -2227,19 +2227,19 @@ server cluster OperationalCredentials = 62 {
   attribute(writable, reportable) currentFabricIndex = 5;
   attribute(writable, reportable) clusterRevision = 65533;
 
-  command AttestationRequest = 0;
-  command AttestationResponse = 1;
-  command CertificateChainRequest = 2;
-  command CertificateChainResponse = 3;
-  command OpCSRRequest = 4;
-  command OpCSRResponse = 5;
-  command AddNOC = 6;
-  command UpdateNOC = 7;
-  command NOCResponse = 8;
-  command UpdateFabricLabel = 9;
-  command RemoveFabric = 10;
-  command AddTrustedRootCertificate = 11;
-  command RemoveTrustedRootCertificate = 12;
+  command AttestationRequest() = 0;
+  command AttestationResponse() = 1;
+  command CertificateChainRequest() = 2;
+  command CertificateChainResponse() = 3;
+  command OpCSRRequest() = 4;
+  command OpCSRResponse() = 5;
+  command AddNOC() = 6;
+  command UpdateNOC() = 7;
+  command NOCResponse() = 8;
+  command UpdateFabricLabel() = 9;
+  command RemoveFabric() = 10;
+  command AddTrustedRootCertificate() = 11;
+  command RemoveTrustedRootCertificate() = 12;
 }
 
 server cluster SoftwareDiagnostics = 52 {
@@ -2254,7 +2254,7 @@ server cluster SoftwareDiagnostics = 52 {
   attribute(writable) featureMap = 65532;
   attribute(writable, reportable) clusterRevision = 65533;
 
-  command ResetWatermarks = 0;
+  command ResetWatermarks() = 0;
 }
 
 server cluster Switch = 59 {
@@ -2367,7 +2367,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
   attribute(writable) featureMap = 65532;
   attribute(writable, reportable) clusterRevision = 65533;
 
-  command ResetCounts = 0;
+  command ResetCounts() = 0;
 }
 
 server cluster UserLabel = 65 {
@@ -2406,7 +2406,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
   attribute(writable) featureMap = 65532;
   attribute(writable, reportable) clusterRevision = 65533;
 
-  command ResetCounts = 0;
+  command ResetCounts() = 0;
 }
 
 

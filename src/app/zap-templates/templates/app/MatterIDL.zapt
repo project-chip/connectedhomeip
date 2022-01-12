@@ -37,7 +37,7 @@ struct {{name}} {
   {{/chip_cluster_attributes}}
 
   {{#zcl_commands}}
-  command {{asUpperCamelCase name}} = {{code}};
+  command {{asUpperCamelCase name}}() = {{code}};
   {{/zcl_commands}}
 }
 
