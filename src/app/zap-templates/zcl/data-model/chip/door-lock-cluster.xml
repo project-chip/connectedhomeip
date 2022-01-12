@@ -595,7 +595,7 @@ limitations under the License.
         <command source="client" code="38" name="ClearCredential" optional="true">
             <description>Clear one, one type, or all credentials except ProgrammingPIN credential.</description>
             <access op="invoke" role="administer" />
-            <arg name="credential" type="DlCredential" />
+            <arg name="credential" type="DlCredential" isNullable="true" />
         </command>
 
 
