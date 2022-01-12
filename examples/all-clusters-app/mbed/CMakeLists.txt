@@ -43,7 +43,6 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${CHIP_ROOT}/src/app
                            ${CHIP_ROOT}/third_party/nlio/repo/include
                            ${GEN_DIR}/all-clusters-app
-                           ${GEN_DIR}/ota-provider-app
                            ${GEN_DIR}/app-common
 )
 
@@ -118,7 +117,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/network-commissioning-old/network-commissioning-ember.cpp
                ${APP_CLUSTERS}/network-commissioning-old/network-commissioning-old.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
-               ${APP_CLUSTERS}/ota-provider/ota-provider.cpp
                ${APP_CLUSTERS}/scenes/scenes.cpp
                ${APP_CLUSTERS}/switch-server/switch-server.cpp
                ${APP_CLUSTERS}/target-navigator-server/target-navigator-server.cpp
