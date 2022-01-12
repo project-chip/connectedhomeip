@@ -27,11 +27,11 @@ public:
     chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type HandleGetCurrentApp() override;
     std::list<uint16_t> HandleGetCatalogList() override;
 
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
-    HandleLaunchApp(const chip::CharSpan & data,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
-    HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
-    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type
-    HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
+    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleLaunchApp(
+        const chip::CharSpan & data,
+        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
+    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleStopApp(
+        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
+    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleHideApp(
+        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
 };
