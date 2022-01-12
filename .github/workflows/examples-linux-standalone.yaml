@@ -128,7 +128,7 @@ jobs:
                     out/ota_requestor_debug/chip-ota-requestor-app \
                     /tmp/bloat_reports/
             - name: Build and run OTA example
-              timeout-minutes: 5
+              timeout-minutes: 20
               run: |
                   scripts/examples/ota_test.sh
             - name: Build example Standalone Door Lock App
