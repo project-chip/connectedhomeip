@@ -37,17 +37,7 @@ CHIP_ERROR WriteClient::Init()
     VerifyOrReturnError(mpExchangeMgr != nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-    VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-    mMessageWriter.Init(std::move(packet));
-
-    ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
-    mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue());
-    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
-    mWriteRequestBuilder.CreateWriteRequests();
-    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
-
+    ReturnErrorOnFailure(CreateNewChunk());
     MoveToState(State::Initialized);
 
     return CHIP_NO_ERROR;
@@ -144,13 +134,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePathParams)
+CHIP_ERROR WriteClient::PrepareAttribute(const ConcreteDataAttributePath & attributePathParams)
 {
     if (mState == State::Uninitialized)
     {
         ReturnErrorOnFailure(Init());
     }
-    VerifyOrReturnError(attributePathParams.IsValidAttributePath(), CHIP_ERROR_INVALID_PATH_LIST);
     AttributeDataIBs::Builder & writeRequests  = mWriteRequestBuilder.GetWriteRequests();
     AttributeDataIB::Builder & attributeDataIB = writeRequests.CreateAttributeDataIBBuilder();
     ReturnErrorOnFailure(writeRequests.GetError());
@@ -176,15 +165,56 @@ TLV::TLVWriter * WriteClient::GetAttributeDataIBTLVWriter()
     return mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder().GetWriter();
 }
 
-CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
+CHIP_ERROR WriteClient::FinalizeCurrentChunk(bool aHasMoreChunks)
 {
+    System::PacketBufferHandle packet;
     VerifyOrReturnError(mState == State::AddAttribute, CHIP_ERROR_INCORRECT_STATE);
     AttributeDataIBs::Builder & attributeDataIBsBuilder = mWriteRequestBuilder.GetWriteRequests().EndOfAttributeDataIBs();
     ReturnErrorOnFailure(attributeDataIBsBuilder.GetError());
 
-    mWriteRequestBuilder.IsFabricFiltered(false).EndOfWriteRequestMessage();
+    TLV::TLVWriter * writer = mWriteRequestBuilder.GetWriter();
+    ReturnErrorCodeIf(writer == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(writer->UnreserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfRequestMessage));
+
+    mWriteRequestBuilder.MoreChunkedMessages(aHasMoreChunks).EndOfWriteRequestMessage();
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
-    ReturnErrorOnFailure(mMessageWriter.Finalize(&aPacket));
+    ReturnErrorOnFailure(mMessageWriter.Finalize(&packet));
+    mChunks.AddToEnd(std::move(packet));
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WriteClient::CreateNewChunk()
+{
+    System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
+    VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
+
+    mMessageWriter.Init(std::move(packet));
+
+    ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
+    mWriteRequestBuilder.TimedRequest(mTimedWriteTimeoutMs.HasValue());
+    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
+    mWriteRequestBuilder.CreateWriteRequests();
+    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
+
+    TLV::TLVWriter * writer = mWriteRequestBuilder.GetWriter();
+    VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(writer->ReserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfRequestMessage));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR WriteClient::FinalizeMessage()
+{
+    return FinalizeCurrentChunk(false);
+}
+
+CHIP_ERROR WriteClient::PrepareNewChunk()
+{
+    if (mState == State::AddAttribute)
+    {
+        ReturnErrorOnFailure(FinalizeCurrentChunk(true));
+        return CreateNewChunk();
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -235,7 +265,7 @@ CHIP_ERROR WriteClient::SendWriteRequest(const SessionHandle & session, System::
 
     VerifyOrExit(mState == State::AddAttribute, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = FinalizeMessage(mPendingWriteData);
+    err = FinalizeMessage();
     SuccessOrExit(err);
 
     // Create a new exchange context.
@@ -288,9 +318,10 @@ CHIP_ERROR WriteClient::SendWriteRequest()
     using namespace Protocols::InteractionModel;
     using namespace Messaging;
 
+    System::PacketBufferHandle data = mChunks.PopHead();
+
     // kExpectResponse is ignored by ExchangeContext in case of groupcast
-    ReturnErrorOnFailure(
-        mpExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(mPendingWriteData), SendMessageFlags::kExpectResponse));
+    ReturnErrorOnFailure(mpExchangeCtx->SendMessage(MsgType::WriteRequest, std::move(data), SendMessageFlags::kExpectResponse));
     MoveToState(State::AwaitingResponse);
     return CHIP_NO_ERROR;
 }
@@ -298,7 +329,9 @@ CHIP_ERROR WriteClient::SendWriteRequest()
 CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                           System::PacketBufferHandle && aPayload)
 {
-    if (mState == State::AwaitingResponse)
+    if (mState == State::AwaitingResponse &&
+        // We had sent the last chunk of data, and received all responses
+        mChunks.IsNull())
     {
         MoveToState(State::ResponseReceived);
     }
@@ -328,6 +361,8 @@ CHIP_ERROR WriteClient::OnMessageReceived(Messaging::ExchangeContext * apExchang
     {
         err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
         SuccessOrExit(err);
+        // We have received the status response to a chunk, continue to the next chunk.
+        SendWriteRequest();
     }
     else
     {

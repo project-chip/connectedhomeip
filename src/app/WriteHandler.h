@@ -94,6 +94,11 @@ public:
      */
     bool IsTimedWrite() const { return mIsTimedRequest; }
 
+    bool IsMatchedExchangeContext(Messaging::ExchangeContext * apExchangeContext) const
+    {
+        return !IsFree() && mpExchangeCtx == apExchangeContext;
+    }
+
 private:
     enum class State
     {
@@ -117,9 +122,9 @@ private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;
-    State mState           = State::Uninitialized;
-    bool mIsTimedRequest   = false;
-    bool mIsFabricFiltered = false;
+    State mState         = State::Uninitialized;
+    bool mIsTimedRequest = false;
+    bool mHasMoreChunks  = false;
 };
 } // namespace app
 } // namespace chip

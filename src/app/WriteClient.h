@@ -122,7 +122,7 @@ public:
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put
      */
     template <class T>
-    CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath, const T & value)
+    CHIP_ERROR EncodeSingleAttributeDataIB(const chip::app::ConcreteDataAttributePath & attributePath, const T & value)
     {
         chip::TLV::TLVWriter * writer = nullptr;
 
@@ -134,6 +134,74 @@ public:
 
         return CHIP_NO_ERROR;
     }
+
+    /**
+     *  Encode an attribute value that can be directly encoded using TLVWriter::Put
+     */
+    template <class T>
+    CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath, const T & value)
+    {
+        ReturnErrorOnFailure(PrepareNewChunk());
+        return EncodeSingleAttributeDataIB(
+            ConcreteDataAttributePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId), value);
+    }
+
+    /**
+     *  Encode an attribute value that can be directly encoded using TLVWriter::Put
+     *
+     *  Note: When encoding lists with this function, you may receive more than one write state for each list entry. You can refer
+     * to ChunkedWriteCallback.h for a high level API which will merge status code for chunked write requests.
+     */
+    template <class T>
+    CHIP_ERROR EncodeAttributeWritePayload(const chip::app::AttributePathParams & attributePath, const DataModel::List<T> & value)
+    {
+        TLV::TLVWriter backupWriter;
+        ConcreteDataAttributePath path =
+            ConcreteDataAttributePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId);
+
+        ReturnErrorOnFailure(PrepareNewChunk());
+
+        // Encode a list with only one element before all other data. Since we are using a clean chunk for this payload, this call
+        // must success. Note: This is a hack for ACL cluster, since the first element must gurantee itself admin priviledge, we do
+        // not encode a real empty list, instead, we encode a list with first element.
+        ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, DataModel::List<T>(value.data(), value.size() > 0 ? 1 : 0)));
+
+        path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
+        for (ListIndex i = 1; i < value.size(); i++)
+        {
+            mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
+
+            // First attempt to write this attribute.
+            CHIP_ERROR err = EncodeSingleAttributeDataIB(path, value.data()[i]);
+            if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+            {
+                // If it failed with no memory, then we create a new chunk for it.
+                mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
+                ReturnErrorOnFailure(PrepareNewChunk());
+                ReturnErrorOnFailure(EncodeSingleAttributeDataIB(path, value.data()[i]));
+            }
+            else
+            {
+                ReturnErrorOnFailure(err);
+            }
+        }
+
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     *  Encode an attribute value which is already encoded into a TLV. The TLVReader is expected to be initialized and the read head
+     * is expected to point to the element to be encoded.
+     *
+     *  Note: When encoding lists with this function, you may receive more than one write state for each list entry. You can refer
+     * to ChunkedWriteCallback.h for a high level API which will merge status code for chunked write requests.
+     */
+    CHIP_ERROR PutPreencodedAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
+                                                  const TLV::TLVReader & data);
+
+    CHIP_ERROR PrepareNewChunk();
+    CHIP_ERROR FinalizeCurrentChunk(bool aHasMoreChunks);
+    CHIP_ERROR CreateNewChunk();
 
     /**
      *  Once SendWriteRequest returns successfully, the WriteClient will
@@ -152,7 +220,7 @@ public:
      */
     void Shutdown();
 
-    CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
+    CHIP_ERROR PrepareAttribute(const ConcreteDataAttributePath & attributePathParams);
     CHIP_ERROR FinishAttribute();
     TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 
@@ -187,7 +255,7 @@ private:
     /**
      * Finalize Write Request Message TLV Builder and retrieve final data from tlv builder for later sending
      */
-    CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & aPacket);
+    CHIP_ERROR FinalizeMessage();
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
@@ -245,6 +313,13 @@ private:
     // If mTimedWriteTimeoutMs has a value, we are expected to do a timed
     // write.
     Optional<uint16_t> mTimedWriteTimeoutMs;
+
+    // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
+    static constexpr uint32_t kReservedSizeForMoreChunksFlag      = 1 + 1;
+    static constexpr uint32_t kReservedSizeForEndOfRequestMessage = 1;
+
+    // A list of buffers, one buffer for each chunk.
+    System::PacketBufferHandle mChunks;
 };
 
 } // namespace app

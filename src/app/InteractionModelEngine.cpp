@@ -286,6 +286,14 @@ Protocols::InteractionModel::Status InteractionModelEngine::OnWriteRequest(Messa
 
     for (auto & writeHandler : mWriteHandlers)
     {
+        if (writeHandler.IsMatchedExchangeContext(apExchangeContext))
+        {
+            return writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload), aIsTimedWrite);
+        }
+    }
+
+    for (auto & writeHandler : mWriteHandlers)
+    {
         if (writeHandler.IsFree())
         {
             VerifyOrReturnError(writeHandler.Init(mpDelegate) == CHIP_NO_ERROR, Status::Busy);

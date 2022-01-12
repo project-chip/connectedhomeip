@@ -122,8 +122,7 @@ CHIP_ERROR WriteRequestMessage::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kIsFabricFiltered)) | (1 << to_underlying(Tag::kTimedRequest)) |
-            (1 << to_underlying(Tag::kWriteRequests));
+        const int RequiredFields = ((1 << to_underlying(Tag::kTimedRequest)) | (1 << to_underlying(Tag::kWriteRequests)));
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {

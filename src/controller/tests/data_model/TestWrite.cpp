@@ -66,36 +66,55 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteDataAttributePath & aPath,
                                   TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
 {
-    if (aClusterInfo.mClusterId == TestCluster::Id &&
-        aClusterInfo.mAttributeId == TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
+    static chip::ListIndex listStructOctetStringElementCount = 0;
+    if (aPath.mClusterId == TestCluster::Id &&
+        aPath.mAttributeId == TestCluster::Attributes::ListStructOctetString::TypeInfo::GetAttributeId())
     {
         if (responseDirective == kSendAttributeSuccess)
         {
-            TestCluster::Attributes::ListStructOctetString::TypeInfo::DecodableType value;
-
-            ReturnErrorOnFailure(DataModel::Decode(aReader, value));
-
-            auto iter = value.begin();
-            uint8_t i = 0;
-            while (iter.Next())
+            if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
             {
-                auto & item = iter.GetValue();
 
-                VerifyOrReturnError(item.fabricIndex == i, CHIP_ERROR_INVALID_ARGUMENT);
-                i++;
+                TestCluster::Attributes::ListStructOctetString::TypeInfo::DecodableType value;
+
+                ReturnErrorOnFailure(DataModel::Decode(aReader, value));
+
+                auto iter                         = value.begin();
+                listStructOctetStringElementCount = 0;
+                while (iter.Next())
+                {
+                    auto & item = iter.GetValue();
+
+                    VerifyOrReturnError(item.fabricIndex == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                    listStructOctetStringElementCount++;
+                }
+
+                // VerifyOrReturnError(i == 4, CHIP_ERROR_INVALID_ARGUMENT);
+
+                AttributePathParams attributePathParams(aPath.mClusterId, aPath.mEndpointId, aPath.mAttributeId);
+                aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
             }
+            else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+            {
+                chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType item;
+                ReturnErrorOnFailure(DataModel::Decode(aReader, item));
+                VerifyOrReturnError(item.fabricIndex == listStructOctetStringElementCount, CHIP_ERROR_INVALID_ARGUMENT);
+                listStructOctetStringElementCount++;
 
-            VerifyOrReturnError(i == 4, CHIP_ERROR_INVALID_ARGUMENT);
-
-            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
-            aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+                AttributePathParams attributePathParams(aPath.mClusterId, aPath.mEndpointId, aPath.mAttributeId);
+                aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+            }
+            else
+            {
+                return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+            }
         }
         else
         {
-            AttributePathParams attributePathParams(aClusterInfo.mClusterId, aClusterInfo.mEndpointId, aClusterInfo.mAttributeId);
+            AttributePathParams attributePathParams(aPath.mClusterId, aPath.mEndpointId, aPath.mAttributeId);
             aWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Failure);
         }
 

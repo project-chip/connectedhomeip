@@ -139,6 +139,17 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetListIndex(DataModel::Nullable<ListIndex> * const apListIndex) const;
+
+    /**
+     *  @brief Get the ListIndex, and fill the corresponding field in the ConcreteDataAttributePath field.
+     *
+     *  @param [in] apListIndex    A pointer to apListIndex
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types or null
+     *                                     type.
+     */
+    CHIP_ERROR GetListIndex(ConcreteDataAttributePath & aAttributePath) const;
 };
 
 class Builder : public ListBuilder
@@ -209,6 +220,7 @@ public:
     AttributePathIB::Builder & EndOfAttributePathIB();
 
     CHIP_ERROR Encode(const AttributePathParams & aAttributePathParams);
+    CHIP_ERROR Encode(const ConcreteDataAttributePath & aAttributePathParams);
 };
 } // namespace AttributePathIB
 } // namespace app

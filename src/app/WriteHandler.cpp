@@ -19,6 +19,7 @@
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/EventPathIB.h>
+#include <app/StatusResponse.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
 #include <app/util/MatterCallbacks.h>
@@ -64,7 +65,8 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
     Status status = ProcessWriteRequest(std::move(aPayload), aIsTimedWrite);
 
     // Do not send response on Group Write
-    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext())
+    // Also, hold the response until finished processing the last chunk.
+    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext() && !mHasMoreChunks)
     {
         CHIP_ERROR err = SendWriteResponse();
         if (err != CHIP_NO_ERROR)
@@ -73,7 +75,18 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
         }
     }
 
-    Shutdown();
+    if (mHasMoreChunks && status == Status::Success)
+    {
+        CHIP_ERROR err = StatusResponse::Send(status, mpExchangeCtx, status == Status::Success);
+        if (err != CHIP_NO_ERROR)
+        {
+            status = Status::Failure;
+        }
+    }
+    else
+    {
+        Shutdown();
+    }
     return status;
 }
 
@@ -120,7 +133,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         chip::TLV::TLVReader dataReader;
         AttributeDataIB::Parser element;
         AttributePathIB::Parser attributePath;
-        ClusterInfo clusterInfo;
+        ConcreteDataAttributePath dataAttributePath;
         TLV::TLVReader reader = aAttributeDataIBsReader;
         err                   = element.Init(reader);
         SuccessOrExit(err);
@@ -131,51 +144,38 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         // We are using the feature that the parser won't touch the value if the field does not exist, since all fields in the
         // cluster info will be invalid / wildcard, it is safe ignore CHIP_END_OF_TLV directly.
 
-        err = attributePath.GetNode(&(clusterInfo.mNodeId));
-        if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
         if (mpExchangeCtx->IsGroupExchangeContext())
         {
             // TODO retrieve Endpoint ID with GroupDataProvider using GroupId and FabricId
             // Issue 11075
 
             // Using endpoint 0 for test purposes
-            clusterInfo.mEndpointId = 0;
+            dataAttributePath.mEndpointId = 0;
         }
         else
         {
-            err = attributePath.GetEndpoint(&(clusterInfo.mEndpointId));
+            err = attributePath.GetEndpoint(&(dataAttributePath.mEndpointId));
             SuccessOrExit(err);
         }
 
-        err = attributePath.GetCluster(&(clusterInfo.mClusterId));
+        err = attributePath.GetCluster(&(dataAttributePath.mClusterId));
         SuccessOrExit(err);
 
-        err = attributePath.GetAttribute(&(clusterInfo.mAttributeId));
+        err = attributePath.GetAttribute(&(dataAttributePath.mAttributeId));
         SuccessOrExit(err);
 
-        err = attributePath.GetListIndex(&(clusterInfo.mListIndex));
-        if (CHIP_END_OF_TLV == err)
-        {
-            err = CHIP_NO_ERROR;
-        }
-
-        // We do not support Wildcard writes for now, reject all wildcard write requests.
-        VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasAttributeWildcard(),
-                     err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+        err = attributePath.GetListIndex(dataAttributePath);
+        SuccessOrExit(err);
 
         err = element.GetData(&dataReader);
         SuccessOrExit(err);
 
-        {
-            const ConcreteAttributePath concretePath =
-                ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
-            MatterPreAttributeWriteCallback(concretePath);
-            err = WriteSingleClusterData(subjectDescriptor, clusterInfo, dataReader, this);
-            MatterPostAttributeWriteCallback(concretePath);
-        }
+        // TODO: We should check if there is another write transaction writing the same attribute, we should reject such request
+        // since it will cause unexpected behavior.
+
+        MatterPreAttributeWriteCallback(dataAttributePath);
+        err = WriteSingleClusterData(subjectDescriptor, dataAttributePath, dataReader, this);
+        MatterPostAttributeWriteCallback(dataAttributePath);
         SuccessOrExit(err);
     }
 
@@ -228,7 +228,11 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     err = writeRequestParser.GetTimedRequest(&mIsTimedRequest);
     SuccessOrExit(err);
 
-    err = writeRequestParser.GetIsFabricFiltered(&mIsFabricFiltered);
+    err = writeRequestParser.GetMoreChunkedMessages(&mHasMoreChunks);
+    if (err == CHIP_ERROR_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
     SuccessOrExit(err);
 
     err = writeRequestParser.GetWriteRequests(&AttributeDataIBsParser);
@@ -250,6 +254,10 @@ Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload,
     }
 
 exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DataManagement, "Failed to process write request: %" CHIP_ERROR_FORMAT, err.Format());
+    }
     return status;
 }
 

@@ -288,7 +288,7 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
             TLV::TLVReader reader;
 
             SuccessOrExit(err = client->PrepareAttribute(
-                              chip::app::AttributePathParams(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId)));
+                              chip::app::ConcreteDataAttributePath(pathObj.endpointId, pathObj.clusterId, pathObj.attributeId)));
             VerifyOrExit((writer = client->GetAttributeDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
             reader.Init(tlvBuffer, static_cast<uint32_t>(length));

@@ -296,7 +296,8 @@ CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescr
 /**
  * TODO: Document.
  */
-CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
-                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor,
+                                  const ConcreteDataAttributePath & aAttributePath, TLV::TLVReader & aReader,
+                                  WriteHandler * apWriteHandler);
 } // namespace app
 } // namespace chip
