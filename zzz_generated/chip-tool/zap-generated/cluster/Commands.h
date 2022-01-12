@@ -3297,6 +3297,20 @@ static void OnTestClusterTestAddArgumentsResponseSuccess(
     command->SetCommandExitStatus(err);
 };
 
+static void OnTestClusterTestEmitTestEventResponseSuccess(
+    void * context, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received TestEmitTestEventResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("value", 1, data.value);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
 static void
 OnTestClusterTestEnumsResponseSuccess(void * context,
                                       const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & data)
@@ -33470,6 +33484,7 @@ private:
 | * SimpleStructEchoRequest                                           |   0x11 |
 | * Test                                                              |   0x00 |
 | * TestAddArguments                                                  |   0x04 |
+| * TestEmitTestEventRequest                                          |   0x14 |
 | * TestEnumsRequest                                                  |   0x0E |
 | * TestListInt8UArgumentRequest                                      |   0x0A |
 | * TestListInt8UReverseRequest                                       |   0x0D |
@@ -33635,6 +33650,32 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type mRequest;
+};
+
+/*
+ * Command TestEmitTestEventRequest
+ */
+class TestClusterTestEmitTestEventRequest : public ModelCommand
+{
+public:
+    TestClusterTestEmitTestEventRequest() : ModelCommand("test-emit-test-event-request")
+    {
+        AddArgument("Arg1", 0, UINT8_MAX, &mRequest.arg1);
+        AddArgument("Arg2", 0, UINT8_MAX, reinterpret_cast<std::underlying_type_t<decltype(mRequest.arg2)> *>(&mRequest.arg2));
+        AddArgument("Arg3", 0, 1, &mRequest.arg3);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000014) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterTestEmitTestEventResponseSuccess, OnDefaultFailure,
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type mRequest;
 };
 
 /*
@@ -52489,6 +52530,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<TestClusterSimpleStructEchoRequest>(),                 //
         make_unique<TestClusterTest>(),                                    //
         make_unique<TestClusterTestAddArguments>(),                        //
+        make_unique<TestClusterTestEmitTestEventRequest>(),                //
         make_unique<TestClusterTestEnumsRequest>(),                        //
         make_unique<TestClusterTestListInt8UArgumentRequest>(),            //
         make_unique<TestClusterTestListInt8UReverseRequest>(),             //

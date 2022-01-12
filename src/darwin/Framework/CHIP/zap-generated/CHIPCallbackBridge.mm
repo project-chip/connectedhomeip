@@ -5941,6 +5941,16 @@ void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
+void CHIPTestClusterClusterTestEmitTestEventResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & data)
+{
+    auto * response = [CHIPTestClusterClusterTestEmitTestEventResponseParams new];
+    {
+        response.value = [NSNumber numberWithUnsignedLongLong:data.value];
+    }
+    DispatchSuccess(context, response);
+};
+
 void CHIPTestClusterClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & data)
 {

@@ -11576,6 +11576,20 @@ public class ChipClusters {
       testAddArguments(chipClusterPtr, callback, arg1, arg2, timedInvokeTimeoutMs);
     }
 
+    public void testEmitTestEventRequest(
+        TestEmitTestEventResponseCallback callback, Integer arg1, Integer arg2, Boolean arg3) {
+      testEmitTestEventRequest(chipClusterPtr, callback, arg1, arg2, arg3, null);
+    }
+
+    public void testEmitTestEventRequest(
+        TestEmitTestEventResponseCallback callback,
+        Integer arg1,
+        Integer arg2,
+        Boolean arg3,
+        int timedInvokeTimeoutMs) {
+      testEmitTestEventRequest(chipClusterPtr, callback, arg1, arg2, arg3, timedInvokeTimeoutMs);
+    }
+
     public void testEnumsRequest(TestEnumsResponseCallback callback, Integer arg1, Integer arg2) {
       testEnumsRequest(chipClusterPtr, callback, arg1, arg2, null);
     }
@@ -11779,6 +11793,14 @@ public class ChipClusters {
         Integer arg2,
         @Nullable Integer timedInvokeTimeoutMs);
 
+    private native void testEmitTestEventRequest(
+        long chipClusterPtr,
+        TestEmitTestEventResponseCallback Callback,
+        Integer arg1,
+        Integer arg2,
+        Boolean arg3,
+        @Nullable Integer timedInvokeTimeoutMs);
+
     private native void testEnumsRequest(
         long chipClusterPtr,
         TestEnumsResponseCallback Callback,
@@ -11899,6 +11921,12 @@ public class ChipClusters {
 
     public interface TestAddArgumentsResponseCallback {
       void onSuccess(Integer returnValue);
+
+      void onError(Exception error);
+    }
+
+    public interface TestEmitTestEventResponseCallback {
+      void onSuccess(Long value);
 
       void onError(Exception error);
     }
