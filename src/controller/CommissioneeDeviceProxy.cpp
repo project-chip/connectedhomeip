@@ -138,11 +138,12 @@ CHIP_ERROR CommissioneeDeviceProxy::SetConnected()
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
+    mState = ConnectionState::SecureConnected;
     bool _didLoad;
     CHIP_ERROR err = LoadSecureSessionParametersIfNeeded(_didLoad);
-    if (err == CHIP_NO_ERROR)
+    if (err != CHIP_NO_ERROR)
     {
-        mState = ConnectionState::SecureConnected;
+        mState = ConnectionState::NotConnected;
     }
     return err;
 }
