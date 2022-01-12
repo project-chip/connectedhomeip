@@ -22,27 +22,23 @@ struct {{name}} {
 
 {{/zcl_structs}}
 
-/// TODO: ZCL Events should be associated with  clusters
-/// rather than being global defines
-{{#zcl_events}}
-event {{asUpperCamelCase name}}({{priority}}) = {{code}} {
-  {{#zcl_event_fields}}
-  k{{asUpperCamelCase name}} = {{fieldIdentifier}},
-  {{/zcl_event_fields}}
-}
-
-{{/zcl_events}}
-
 {{#chip_clusters}}
 {{side}} cluster {{asUpperCamelCase name}} = {{code}} {
+  {{#zcl_events}}
+  event {{asUpperCamelCase name}}({{priority}}) = {{code}} {
+    {{#zcl_event_fields}}
+    k{{asUpperCamelCase name}} = {{fieldIdentifier}},
+    {{/zcl_event_fields}}
+  }
 
-  // TODO: events for cluster
-
+  {{/zcl_events}}
   {{#chip_cluster_attributes}}
-  {{#if isWritableAttribute}}rw{{else}}ro{{/if}}{{#if isReportableAttribute}} reportable{{/if}} attribute {{asLowerCamelCase name}} = {{code}};
+  attribute({{#if isWritableAttribute}}readonly{{else}}writable{{/if}}{{#if isReportableAttribute}}, reportable{{/if}}) {{asLowerCamelCase name}} = {{code}};
   {{/chip_cluster_attributes}}
 
-  // TODO: commands for cluster
+  {{#zcl_commands}}
+  command {{asUpperCamelCase name}} = {{code}};
+  {{/zcl_commands}}
 }
 
 {{/chip_clusters}}

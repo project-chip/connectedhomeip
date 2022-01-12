@@ -2024,545 +2024,389 @@ struct WriteStructuredAttributeStatusRecord {
 }
 
 
-/// TODO: ZCL Events should be associated with  clusters
-/// rather than being global defines
-event StateChanged(info) = 0 {
-  kActionID = 0,
-  kInvokeID = 1,
-  kNewState = 2,
-}
-
-event ActionFailed(info) = 1 {
-  kActionID = 0,
-  kInvokeID = 1,
-  kNewState = 2,
-  kError = 3,
-}
-
-event StartUp(critical) = 0 {
-  kSoftwareVersion = 0,
-}
-
-event ShutDown(critical) = 1 {
-}
-
-event Leave(info) = 2 {
-}
-
-event ReachableChanged(info) = 3 {
-  kReachableNewValue = 0,
-}
-
-event StateTransition(info) = 0 {
-  kPreviousState = 0,
-  kNewState = 1,
-  kReason = 2,
-  kTargetSoftwareVersion = 3,
-}
-
-event VersionApplied(critical) = 1 {
-  kSoftwareVersion = 0,
-  kProductID = 1,
-}
-
-event DownloadError(info) = 2 {
-  kSoftwareVersion = 0,
-  kBytesDownloaded = 1,
-  kProgressPercent = 2,
-  kPlatformCode = 3,
-}
-
-event HardwareFaultChange(critical) = 0 {
-  kCurrent = 0,
-  kPrevious = 1,
-}
-
-event RadioFaultChange(critical) = 1 {
-  kCurrent = 0,
-  kPrevious = 1,
-}
-
-event NetworkFaultChange(critical) = 2 {
-  kCurrent = 0,
-  kPrevious = 1,
-}
-
-event BootReason(critical) = 3 {
-  kBootReason = 0,
-}
-
-event SoftwareFault(info) = 0 {
-  kSoftwareFault = 0,
-}
-
-event ConnectionStatus(info) = 0 {
-  kConnectionStatus = 0,
-}
-
-event Disconnection(info) = 0 {
-  kReasonCode = 0,
-}
-
-event AssociationFailure(info) = 1 {
-  kAssociationFailure = 0,
-  kStatus = 1,
-}
-
-event ConnectionStatus(info) = 2 {
-  kConnectionStatus = 0,
-}
-
-event SwitchLatched(info) = 0 {
-  kNewPosition = 0,
-}
-
-event InitialPress(info) = 1 {
-  kNewPosition = 0,
-}
-
-event LongPress(info) = 2 {
-  kNewPosition = 0,
-}
-
-event ShortRelease(info) = 3 {
-  kPreviousPosition = 0,
-}
-
-event LongRelease(info) = 4 {
-  kPreviousPosition = 0,
-}
-
-event MultiPressOngoing(info) = 5 {
-  kNewPosition = 0,
-  kCurrentNumberOfPressesCounted = 1,
-}
-
-event MultiPressComplete(info) = 6 {
-  kNewPosition = 0,
-  kTotalNumberOfPressesCounted = 1,
-}
-
-event StateChange(info) = 0 {
-  kStateValue = 0,
-}
-
-event DoorLockAlarm(critical) = 0 {
-  kAlarmCode = 0,
-}
-
-event DoorStateChange(critical) = 1 {
-  kDoorState = 0,
-}
-
-event LockOperation(critical) = 2 {
-  kLockOperationType = 0,
-  kOperationSource = 1,
-  kUserIndex = 2,
-  kFabricIndex = 3,
-  kSourceNode = 4,
-  kCredentials = 5,
-}
-
-event LockOperationError(critical) = 3 {
-  kLockOperationType = 0,
-  kOperationSource = 1,
-  kOperationError = 2,
-  kUserIndex = 3,
-  kFabricIndex = 4,
-  kSourceNode = 5,
-  kCredentials = 6,
-}
-
-event LockUserChange(info) = 4 {
-  kLockDataType = 0,
-  kDataOperationType = 1,
-  kOperationSource = 2,
-  kUserIndex = 3,
-  kFabricIndex = 4,
-  kSourceNode = 5,
-  kDataIndex = 6,
-}
-
-event SupplyVoltageLow(info) = 0 {
-}
-
-event SupplyVoltageHigh(info) = 1 {
-}
-
-event PowerMissingPhase(info) = 2 {
-}
-
-event SystemPressureLow(info) = 3 {
-}
-
-event SystemPressureHigh(info) = 4 {
-}
-
-event DryRunning(critical) = 5 {
-}
-
-event MotorTemperatureHigh(info) = 6 {
-}
-
-event PumpMotorFatalFailure(critical) = 7 {
-}
-
-event ElectronicTemperatureHigh(info) = 8 {
-}
-
-event PumpBlocked(critical) = 9 {
-}
-
-event SensorFailure(info) = 10 {
-}
-
-event ElectronicNonFatalFailure(info) = 11 {
-}
-
-event ElectronicFatalFailure(critical) = 12 {
-}
-
-event GeneralFault(info) = 13 {
-}
-
-event Leakage(info) = 14 {
-}
-
-event AirDetection(info) = 15 {
-}
-
-event TurbineOperation(info) = 16 {
-}
-
-event TestEvent(info) = 1 {
-  kArg1 = 1,
-  kArg2 = 2,
-  kArg3 = 3,
-  kArg4 = 4,
-  kArg5 = 5,
-  kArg6 = 6,
-}
-
-
 server cluster AdministratorCommissioning = 60 {
+  attribute(writable) windowStatus = 0;
+  attribute(writable) adminFabricIndex = 1;
+  attribute(writable) adminVendorId = 2;
+  attribute(writable, reportable) clusterRevision = 65533;
 
-  // TODO: events for cluster
-
-  ro attribute windowStatus = 0;
-  ro attribute adminFabricIndex = 1;
-  ro attribute adminVendorId = 2;
-  ro reportable attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
+  command OpenCommissioningWindow = 0;
+  command OpenBasicCommissioningWindow = 1;
+  command RevokeCommissioning = 2;
 }
 
 server cluster Basic = 40 {
+  event StartUp(critical) = 0 {
+    kSoftwareVersion = 0,
+  }
 
-  // TODO: events for cluster
+  event ShutDown(critical) = 1 {
+  }
 
-  ro reportable attribute interactionModelVersion = 0;
-  ro reportable attribute vendorName = 1;
-  ro reportable attribute vendorID = 2;
-  ro reportable attribute productName = 3;
-  ro reportable attribute productID = 4;
-  rw reportable attribute nodeLabel = 5;
-  rw reportable attribute location = 6;
-  ro reportable attribute hardwareVersion = 7;
-  ro reportable attribute hardwareVersionString = 8;
-  ro reportable attribute softwareVersion = 9;
-  ro reportable attribute softwareVersionString = 10;
-  ro reportable attribute clusterRevision = 65533;
+  event Leave(info) = 2 {
+  }
 
-  // TODO: commands for cluster
+  event ReachableChanged(info) = 3 {
+    kReachableNewValue = 0,
+  }
+
+  attribute(writable, reportable) interactionModelVersion = 0;
+  attribute(writable, reportable) vendorName = 1;
+  attribute(writable, reportable) vendorID = 2;
+  attribute(writable, reportable) productName = 3;
+  attribute(writable, reportable) productID = 4;
+  attribute(readonly, reportable) nodeLabel = 5;
+  attribute(readonly, reportable) location = 6;
+  attribute(writable, reportable) hardwareVersion = 7;
+  attribute(writable, reportable) hardwareVersionString = 8;
+  attribute(writable, reportable) softwareVersion = 9;
+  attribute(writable, reportable) softwareVersionString = 10;
+  attribute(writable, reportable) clusterRevision = 65533;
+
+  command MfgSpecificPing = 0;
 }
 
 server cluster Descriptor = 29 {
+  attribute(writable, reportable) deviceList = 0;
+  attribute(writable, reportable) serverList = 1;
+  attribute(writable, reportable) clientList = 2;
+  attribute(writable, reportable) partsList = 3;
+  attribute(writable, reportable) clusterRevision = 65533;
 
-  // TODO: events for cluster
-
-  ro reportable attribute deviceList = 0;
-  ro reportable attribute serverList = 1;
-  ro reportable attribute clientList = 2;
-  ro reportable attribute partsList = 3;
-  ro reportable attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
 }
 
 server cluster DiagnosticLogs = 50 {
 
-  // TODO: events for cluster
-
-
-  // TODO: commands for cluster
+  command RetrieveLogsRequest = 0;
+  command RetrieveLogsResponse = 1;
 }
 
 server cluster EthernetNetworkDiagnostics = 55 {
+  attribute(writable, reportable) PHYRate = 0;
+  attribute(writable, reportable) fullDuplex = 1;
+  attribute(writable, reportable) packetRxCount = 2;
+  attribute(writable, reportable) packetTxCount = 3;
+  attribute(writable, reportable) txErrCount = 4;
+  attribute(writable, reportable) collisionCount = 5;
+  attribute(writable, reportable) overrunCount = 6;
+  attribute(writable, reportable) carrierDetect = 7;
+  attribute(writable, reportable) timeSinceReset = 8;
+  attribute(writable) featureMap = 65532;
+  attribute(writable, reportable) clusterRevision = 65533;
 
-  // TODO: events for cluster
-
-  ro reportable attribute PHYRate = 0;
-  ro reportable attribute fullDuplex = 1;
-  ro reportable attribute packetRxCount = 2;
-  ro reportable attribute packetTxCount = 3;
-  ro reportable attribute txErrCount = 4;
-  ro reportable attribute collisionCount = 5;
-  ro reportable attribute overrunCount = 6;
-  ro reportable attribute carrierDetect = 7;
-  ro reportable attribute timeSinceReset = 8;
-  ro attribute featureMap = 65532;
-  ro reportable attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
+  command ResetCounts = 0;
 }
 
 server cluster FixedLabel = 64 {
+  attribute(writable) labelList = 0;
+  attribute(writable) clusterRevision = 65533;
 
-  // TODO: events for cluster
-
-  ro attribute labelList = 0;
-  ro attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
 }
 
 server cluster GeneralCommissioning = 48 {
+  attribute(readonly, reportable) breadcrumb = 0;
+  attribute(writable, reportable) basicCommissioningInfoList = 1;
+  attribute(writable) regulatoryConfig = 2;
+  attribute(writable) locationCapability = 3;
+  attribute(writable) featureMap = 65532;
+  attribute(writable, reportable) clusterRevision = 65533;
 
-  // TODO: events for cluster
-
-  rw reportable attribute breadcrumb = 0;
-  ro reportable attribute basicCommissioningInfoList = 1;
-  ro attribute regulatoryConfig = 2;
-  ro attribute locationCapability = 3;
-  ro attribute featureMap = 65532;
-  ro reportable attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
+  command ArmFailSafe = 0;
+  command ArmFailSafeResponse = 1;
+  command SetRegulatoryConfig = 2;
+  command SetRegulatoryConfigResponse = 3;
+  command CommissioningComplete = 4;
+  command CommissioningCompleteResponse = 5;
 }
 
 server cluster GeneralDiagnostics = 51 {
+  event HardwareFaultChange(critical) = 0 {
+    kCurrent = 0,
+    kPrevious = 1,
+  }
 
-  // TODO: events for cluster
+  event RadioFaultChange(critical) = 1 {
+    kCurrent = 0,
+    kPrevious = 1,
+  }
 
-  ro reportable attribute networkInterfaces = 0;
-  ro reportable attribute rebootCount = 1;
-  ro reportable attribute upTime = 2;
-  ro reportable attribute totalOperationalHours = 3;
-  ro reportable attribute bootReasons = 4;
-  ro reportable attribute activeHardwareFaults = 5;
-  ro reportable attribute activeRadioFaults = 6;
-  ro reportable attribute activeNetworkFaults = 7;
-  ro reportable attribute clusterRevision = 65533;
+  event NetworkFaultChange(critical) = 2 {
+    kCurrent = 0,
+    kPrevious = 1,
+  }
 
-  // TODO: commands for cluster
+  event BootReason(critical) = 3 {
+    kBootReason = 0,
+  }
+
+  attribute(writable, reportable) networkInterfaces = 0;
+  attribute(writable, reportable) rebootCount = 1;
+  attribute(writable, reportable) upTime = 2;
+  attribute(writable, reportable) totalOperationalHours = 3;
+  attribute(writable, reportable) bootReasons = 4;
+  attribute(writable, reportable) activeHardwareFaults = 5;
+  attribute(writable, reportable) activeRadioFaults = 6;
+  attribute(writable, reportable) activeNetworkFaults = 7;
+  attribute(writable, reportable) clusterRevision = 65533;
+
 }
 
 server cluster LevelControl = 8 {
+  attribute(writable, reportable) currentLevel = 0;
+  attribute(writable, reportable) remainingTime = 1;
+  attribute(writable, reportable) minLevel = 2;
+  attribute(writable, reportable) maxLevel = 3;
+  attribute(writable, reportable) currentFrequency = 4;
+  attribute(writable, reportable) minFrequency = 5;
+  attribute(writable, reportable) maxFrequency = 6;
+  attribute(readonly, reportable) options = 15;
+  attribute(readonly, reportable) onOffTransitionTime = 16;
+  attribute(readonly, reportable) onLevel = 17;
+  attribute(readonly, reportable) onTransitionTime = 18;
+  attribute(readonly, reportable) offTransitionTime = 19;
+  attribute(readonly, reportable) defaultMoveRate = 20;
+  attribute(readonly, reportable) startUpCurrentLevel = 16384;
+  attribute(writable, reportable) clusterRevision = 65533;
 
-  // TODO: events for cluster
-
-  ro reportable attribute currentLevel = 0;
-  ro reportable attribute remainingTime = 1;
-  ro reportable attribute minLevel = 2;
-  ro reportable attribute maxLevel = 3;
-  ro reportable attribute currentFrequency = 4;
-  ro reportable attribute minFrequency = 5;
-  ro reportable attribute maxFrequency = 6;
-  rw reportable attribute options = 15;
-  rw reportable attribute onOffTransitionTime = 16;
-  rw reportable attribute onLevel = 17;
-  rw reportable attribute onTransitionTime = 18;
-  rw reportable attribute offTransitionTime = 19;
-  rw reportable attribute defaultMoveRate = 20;
-  rw reportable attribute startUpCurrentLevel = 16384;
-  ro reportable attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
+  command MoveToLevel = 0;
+  command Move = 1;
+  command Step = 2;
+  command Stop = 3;
+  command MoveToLevelWithOnOff = 4;
+  command MoveWithOnOff = 5;
+  command StepWithOnOff = 6;
+  command StopWithOnOff = 7;
 }
 
 server cluster LocalizationConfiguration = 43 {
+  attribute(readonly) activeLocale = 1;
+  attribute(writable) supportedLocales = 2;
 
-  // TODO: events for cluster
-
-  rw attribute activeLocale = 1;
-  ro attribute supportedLocales = 2;
-
-  // TODO: commands for cluster
 }
 
 server cluster NetworkCommissioning = 49 {
+  attribute(writable) maxNetworks = 0;
+  attribute(writable) networks = 1;
+  attribute(writable) scanMaxTimeSeconds = 2;
+  attribute(writable) connectMaxTimeSeconds = 3;
+  attribute(readonly) interfaceEnabled = 4;
+  attribute(writable) lastNetworkingStatus = 5;
+  attribute(writable) lastNetworkID = 6;
+  attribute(writable) lastConnectErrorValue = 7;
+  attribute(writable) featureMap = 65532;
+  attribute(writable, reportable) clusterRevision = 65533;
 
-  // TODO: events for cluster
-
-  ro attribute maxNetworks = 0;
-  ro attribute networks = 1;
-  ro attribute scanMaxTimeSeconds = 2;
-  ro attribute connectMaxTimeSeconds = 3;
-  rw attribute interfaceEnabled = 4;
-  ro attribute lastNetworkingStatus = 5;
-  ro attribute lastNetworkID = 6;
-  ro attribute lastConnectErrorValue = 7;
-  ro attribute featureMap = 65532;
-  ro reportable attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
+  command ScanNetworks = 0;
+  command ScanNetworksResponse = 1;
+  command AddOrUpdateWiFiNetwork = 2;
+  command AddOrUpdateThreadNetwork = 3;
+  command RemoveNetwork = 4;
+  command NetworkConfigResponse = 5;
+  command ConnectNetwork = 6;
+  command ConnectNetworkResponse = 7;
+  command ReorderNetwork = 8;
 }
 
 server cluster OnOff = 6 {
+  attribute(writable, reportable) onOff = 0;
+  attribute(writable, reportable) clusterRevision = 65533;
 
-  // TODO: events for cluster
-
-  ro reportable attribute onOff = 0;
-  ro reportable attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
+  command Off = 0;
+  command On = 1;
+  command Toggle = 2;
+  command OffWithEffect = 64;
+  command OnWithRecallGlobalScene = 65;
+  command OnWithTimedOff = 66;
 }
 
 server cluster OperationalCredentials = 62 {
+  attribute(writable, reportable) fabricsList = 1;
+  attribute(writable, reportable) supportedFabrics = 2;
+  attribute(writable, reportable) commissionedFabrics = 3;
+  attribute(writable, reportable) trustedRootCertificates = 4;
+  attribute(writable, reportable) currentFabricIndex = 5;
+  attribute(writable, reportable) clusterRevision = 65533;
 
-  // TODO: events for cluster
-
-  ro reportable attribute fabricsList = 1;
-  ro reportable attribute supportedFabrics = 2;
-  ro reportable attribute commissionedFabrics = 3;
-  ro reportable attribute trustedRootCertificates = 4;
-  ro reportable attribute currentFabricIndex = 5;
-  ro reportable attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
+  command AttestationRequest = 0;
+  command AttestationResponse = 1;
+  command CertificateChainRequest = 2;
+  command CertificateChainResponse = 3;
+  command OpCSRRequest = 4;
+  command OpCSRResponse = 5;
+  command AddNOC = 6;
+  command UpdateNOC = 7;
+  command NOCResponse = 8;
+  command UpdateFabricLabel = 9;
+  command RemoveFabric = 10;
+  command AddTrustedRootCertificate = 11;
+  command RemoveTrustedRootCertificate = 12;
 }
 
 server cluster SoftwareDiagnostics = 52 {
+  event SoftwareFault(info) = 0 {
+    kSoftwareFault = 0,
+  }
 
-  // TODO: events for cluster
+  attribute(writable, reportable) threadMetrics = 0;
+  attribute(writable, reportable) currentHeapFree = 1;
+  attribute(writable, reportable) currentHeapUsed = 2;
+  attribute(writable, reportable) currentHeapHighWatermark = 3;
+  attribute(writable) featureMap = 65532;
+  attribute(writable, reportable) clusterRevision = 65533;
 
-  ro reportable attribute threadMetrics = 0;
-  ro reportable attribute currentHeapFree = 1;
-  ro reportable attribute currentHeapUsed = 2;
-  ro reportable attribute currentHeapHighWatermark = 3;
-  ro attribute featureMap = 65532;
-  ro reportable attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
+  command ResetWatermarks = 0;
 }
 
 server cluster Switch = 59 {
+  event SwitchLatched(info) = 0 {
+    kNewPosition = 0,
+  }
 
-  // TODO: events for cluster
+  event InitialPress(info) = 1 {
+    kNewPosition = 0,
+  }
 
-  ro reportable attribute numberOfPositions = 0;
-  ro reportable attribute currentPosition = 1;
-  ro reportable attribute multiPressMax = 2;
-  ro reportable attribute featureMap = 65532;
-  ro reportable attribute clusterRevision = 65533;
+  event LongPress(info) = 2 {
+    kNewPosition = 0,
+  }
 
-  // TODO: commands for cluster
+  event ShortRelease(info) = 3 {
+    kPreviousPosition = 0,
+  }
+
+  event LongRelease(info) = 4 {
+    kPreviousPosition = 0,
+  }
+
+  event MultiPressOngoing(info) = 5 {
+    kNewPosition = 0,
+    kCurrentNumberOfPressesCounted = 1,
+  }
+
+  event MultiPressComplete(info) = 6 {
+    kNewPosition = 0,
+    kTotalNumberOfPressesCounted = 1,
+  }
+
+  attribute(writable, reportable) numberOfPositions = 0;
+  attribute(writable, reportable) currentPosition = 1;
+  attribute(writable, reportable) multiPressMax = 2;
+  attribute(writable, reportable) featureMap = 65532;
+  attribute(writable, reportable) clusterRevision = 65533;
+
 }
 
 server cluster ThreadNetworkDiagnostics = 53 {
+  event ConnectionStatus(info) = 0 {
+    kConnectionStatus = 0,
+  }
 
-  // TODO: events for cluster
+  attribute(writable, reportable) channel = 0;
+  attribute(writable, reportable) routingRole = 1;
+  attribute(writable, reportable) networkName = 2;
+  attribute(writable, reportable) panId = 3;
+  attribute(writable, reportable) extendedPanId = 4;
+  attribute(writable, reportable) meshLocalPrefix = 5;
+  attribute(writable, reportable) overrunCount = 6;
+  attribute(writable, reportable) neighborTableList = 7;
+  attribute(writable, reportable) routeTableList = 8;
+  attribute(writable, reportable) partitionId = 9;
+  attribute(writable, reportable) weighting = 10;
+  attribute(writable, reportable) dataVersion = 11;
+  attribute(writable, reportable) stableDataVersion = 12;
+  attribute(writable, reportable) leaderRouterId = 13;
+  attribute(writable, reportable) detachedRoleCount = 14;
+  attribute(writable, reportable) childRoleCount = 15;
+  attribute(writable, reportable) routerRoleCount = 16;
+  attribute(writable, reportable) leaderRoleCount = 17;
+  attribute(writable, reportable) attachAttemptCount = 18;
+  attribute(writable, reportable) partitionIdChangeCount = 19;
+  attribute(writable, reportable) betterPartitionAttachAttemptCount = 20;
+  attribute(writable, reportable) parentChangeCount = 21;
+  attribute(writable, reportable) txTotalCount = 22;
+  attribute(writable, reportable) txUnicastCount = 23;
+  attribute(writable, reportable) txBroadcastCount = 24;
+  attribute(writable, reportable) txAckRequestedCount = 25;
+  attribute(writable, reportable) txAckedCount = 26;
+  attribute(writable, reportable) txNoAckRequestedCount = 27;
+  attribute(writable, reportable) txDataCount = 28;
+  attribute(writable, reportable) txDataPollCount = 29;
+  attribute(writable, reportable) txBeaconCount = 30;
+  attribute(writable, reportable) txBeaconRequestCount = 31;
+  attribute(writable, reportable) txOtherCount = 32;
+  attribute(writable, reportable) txRetryCount = 33;
+  attribute(writable, reportable) txDirectMaxRetryExpiryCount = 34;
+  attribute(writable, reportable) txIndirectMaxRetryExpiryCount = 35;
+  attribute(writable, reportable) txErrCcaCount = 36;
+  attribute(writable, reportable) txErrAbortCount = 37;
+  attribute(writable, reportable) txErrBusyChannelCount = 38;
+  attribute(writable, reportable) rxTotalCount = 39;
+  attribute(writable, reportable) rxUnicastCount = 40;
+  attribute(writable, reportable) rxBroadcastCount = 41;
+  attribute(writable, reportable) rxDataCount = 42;
+  attribute(writable, reportable) rxDataPollCount = 43;
+  attribute(writable, reportable) rxBeaconCount = 44;
+  attribute(writable, reportable) rxBeaconRequestCount = 45;
+  attribute(writable, reportable) rxOtherCount = 46;
+  attribute(writable, reportable) rxAddressFilteredCount = 47;
+  attribute(writable, reportable) rxDestAddrFilteredCount = 48;
+  attribute(writable, reportable) rxDuplicatedCount = 49;
+  attribute(writable, reportable) rxErrNoFrameCount = 50;
+  attribute(writable, reportable) rxErrUnknownNeighborCount = 51;
+  attribute(writable, reportable) rxErrInvalidSrcAddrCount = 52;
+  attribute(writable, reportable) rxErrSecCount = 53;
+  attribute(writable, reportable) rxErrFcsCount = 54;
+  attribute(writable, reportable) rxErrOtherCount = 55;
+  attribute(writable, reportable) activeTimestamp = 56;
+  attribute(writable, reportable) pendingTimestamp = 57;
+  attribute(writable, reportable) delay = 58;
+  attribute(writable, reportable) securityPolicy = 59;
+  attribute(writable, reportable) channelMask = 60;
+  attribute(writable, reportable) operationalDatasetComponents = 61;
+  attribute(writable, reportable) activeNetworkFaultsList = 62;
+  attribute(writable) featureMap = 65532;
+  attribute(writable, reportable) clusterRevision = 65533;
 
-  ro reportable attribute channel = 0;
-  ro reportable attribute routingRole = 1;
-  ro reportable attribute networkName = 2;
-  ro reportable attribute panId = 3;
-  ro reportable attribute extendedPanId = 4;
-  ro reportable attribute meshLocalPrefix = 5;
-  ro reportable attribute overrunCount = 6;
-  ro reportable attribute neighborTableList = 7;
-  ro reportable attribute routeTableList = 8;
-  ro reportable attribute partitionId = 9;
-  ro reportable attribute weighting = 10;
-  ro reportable attribute dataVersion = 11;
-  ro reportable attribute stableDataVersion = 12;
-  ro reportable attribute leaderRouterId = 13;
-  ro reportable attribute detachedRoleCount = 14;
-  ro reportable attribute childRoleCount = 15;
-  ro reportable attribute routerRoleCount = 16;
-  ro reportable attribute leaderRoleCount = 17;
-  ro reportable attribute attachAttemptCount = 18;
-  ro reportable attribute partitionIdChangeCount = 19;
-  ro reportable attribute betterPartitionAttachAttemptCount = 20;
-  ro reportable attribute parentChangeCount = 21;
-  ro reportable attribute txTotalCount = 22;
-  ro reportable attribute txUnicastCount = 23;
-  ro reportable attribute txBroadcastCount = 24;
-  ro reportable attribute txAckRequestedCount = 25;
-  ro reportable attribute txAckedCount = 26;
-  ro reportable attribute txNoAckRequestedCount = 27;
-  ro reportable attribute txDataCount = 28;
-  ro reportable attribute txDataPollCount = 29;
-  ro reportable attribute txBeaconCount = 30;
-  ro reportable attribute txBeaconRequestCount = 31;
-  ro reportable attribute txOtherCount = 32;
-  ro reportable attribute txRetryCount = 33;
-  ro reportable attribute txDirectMaxRetryExpiryCount = 34;
-  ro reportable attribute txIndirectMaxRetryExpiryCount = 35;
-  ro reportable attribute txErrCcaCount = 36;
-  ro reportable attribute txErrAbortCount = 37;
-  ro reportable attribute txErrBusyChannelCount = 38;
-  ro reportable attribute rxTotalCount = 39;
-  ro reportable attribute rxUnicastCount = 40;
-  ro reportable attribute rxBroadcastCount = 41;
-  ro reportable attribute rxDataCount = 42;
-  ro reportable attribute rxDataPollCount = 43;
-  ro reportable attribute rxBeaconCount = 44;
-  ro reportable attribute rxBeaconRequestCount = 45;
-  ro reportable attribute rxOtherCount = 46;
-  ro reportable attribute rxAddressFilteredCount = 47;
-  ro reportable attribute rxDestAddrFilteredCount = 48;
-  ro reportable attribute rxDuplicatedCount = 49;
-  ro reportable attribute rxErrNoFrameCount = 50;
-  ro reportable attribute rxErrUnknownNeighborCount = 51;
-  ro reportable attribute rxErrInvalidSrcAddrCount = 52;
-  ro reportable attribute rxErrSecCount = 53;
-  ro reportable attribute rxErrFcsCount = 54;
-  ro reportable attribute rxErrOtherCount = 55;
-  ro reportable attribute activeTimestamp = 56;
-  ro reportable attribute pendingTimestamp = 57;
-  ro reportable attribute delay = 58;
-  ro reportable attribute securityPolicy = 59;
-  ro reportable attribute channelMask = 60;
-  ro reportable attribute operationalDatasetComponents = 61;
-  ro reportable attribute activeNetworkFaultsList = 62;
-  ro attribute featureMap = 65532;
-  ro reportable attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
+  command ResetCounts = 0;
 }
 
 server cluster UserLabel = 65 {
+  attribute(readonly) labelList = 0;
+  attribute(writable) clusterRevision = 65533;
 
-  // TODO: events for cluster
-
-  rw attribute labelList = 0;
-  ro attribute clusterRevision = 65533;
-
-  // TODO: commands for cluster
 }
 
 server cluster WiFiNetworkDiagnostics = 54 {
+  event Disconnection(info) = 0 {
+    kReasonCode = 0,
+  }
 
-  // TODO: events for cluster
+  event AssociationFailure(info) = 1 {
+    kAssociationFailure = 0,
+    kStatus = 1,
+  }
 
-  ro reportable attribute bssid = 0;
-  ro reportable attribute securityType = 1;
-  ro reportable attribute wiFiVersion = 2;
-  ro reportable attribute channelNumber = 3;
-  ro reportable attribute rssi = 4;
-  ro reportable attribute beaconLostCount = 5;
-  ro reportable attribute beaconRxCount = 6;
-  ro reportable attribute packetMulticastRxCount = 7;
-  ro reportable attribute packetMulticastTxCount = 8;
-  ro reportable attribute packetUnicastRxCount = 9;
-  ro reportable attribute packetUnicastTxCount = 10;
-  ro reportable attribute currentMaxRate = 11;
-  ro reportable attribute overrunCount = 12;
-  ro attribute featureMap = 65532;
-  ro reportable attribute clusterRevision = 65533;
+  event ConnectionStatus(info) = 2 {
+    kConnectionStatus = 0,
+  }
 
-  // TODO: commands for cluster
+  attribute(writable, reportable) bssid = 0;
+  attribute(writable, reportable) securityType = 1;
+  attribute(writable, reportable) wiFiVersion = 2;
+  attribute(writable, reportable) channelNumber = 3;
+  attribute(writable, reportable) rssi = 4;
+  attribute(writable, reportable) beaconLostCount = 5;
+  attribute(writable, reportable) beaconRxCount = 6;
+  attribute(writable, reportable) packetMulticastRxCount = 7;
+  attribute(writable, reportable) packetMulticastTxCount = 8;
+  attribute(writable, reportable) packetUnicastRxCount = 9;
+  attribute(writable, reportable) packetUnicastTxCount = 10;
+  attribute(writable, reportable) currentMaxRate = 11;
+  attribute(writable, reportable) overrunCount = 12;
+  attribute(writable) featureMap = 65532;
+  attribute(writable, reportable) clusterRevision = 65533;
+
+  command ResetCounts = 0;
 }
 
 
