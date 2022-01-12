@@ -27,6 +27,48 @@
 #include "app/util/af.h"
 #include "lib/core/CHIPError.h"
 
+#if defined(ENABLE_CHIP_SHELL)
+#include "lib/shell/Engine.h"
+
+using chip::Shell::Engine;
+using chip::Shell::shell_command_t;
+using chip::Shell::streamer_get;
+using chip::Shell::streamer_printf;
+#endif // defined(ENABLE_CHIP_SHELL)
+
+static bool sSwitchOnOffState = false;
+
+#if defined(ENABLE_CHIP_SHELL)
+static void ToggleSwitchOnOff(bool newState)
+{
+    sSwitchOnOffState = newState;
+    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, ZCL_ON_OFF_CLUSTER_ID);
+}
+
+static CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)
+{
+    if (argc == 1 && strcmp(argv[0], "on") == 0)
+    {
+        ToggleSwitchOnOff(true);
+        return CHIP_NO_ERROR;
+    }
+    if (argc == 1 && strcmp(argv[0], "off") == 0)
+    {
+        ToggleSwitchOnOff(false);
+        return CHIP_NO_ERROR;
+    }
+    streamer_printf(streamer_get(), "Usage: switch [on|off]");
+    return CHIP_NO_ERROR;
+}
+
+static void RegisterSwitchCommands()
+{
+    static const shell_command_t sSwitchCommand = { SwitchCommandHandler, "switch", "Switch commands. Usage: switch [on|off]" };
+    Engine::Root().RegisterCommands(&sSwitchCommand, 1);
+    return;
+}
+#endif // defined(ENABLE_CHIP_SHELL)
+
 static void BoundDeviceChangedHandler(chip::EndpointId localEndpoint, chip::EndpointId remoteEndpoint, chip::ClusterId clusterId,
                                       chip::OperationalDeviceProxy * peer_device)
 {
@@ -37,9 +79,7 @@ static void BoundDeviceChangedHandler(chip::EndpointId localEndpoint, chip::Endp
     // TODO: investigate code generation issue for binding
     if (localEndpoint == 1 && clusterId == ZCL_ON_OFF_CLUSTER_ID)
     {
-        bool onOffValue = false;
-        Clusters::OnOff::Attributes::OnOff::Get(localEndpoint, &onOffValue);
-        CommandId command           = onOffValue ? Clusters::OnOff::Commands::On::Id : Clusters::OnOff::Commands::Off::Id;
+        CommandId command           = sSwitchOnOffState ? Clusters::OnOff::Commands::On::Id : Clusters::OnOff::Commands::Off::Id;
         CommandPathParams cmdParams = { remoteEndpoint, /* group id */ 0, clusterId, command,
                                         (chip::app::CommandPathFlags::kEndpointIdValid) };
         CommandSender sender(nullptr, peer_device->GetExchangeManager());
@@ -53,5 +93,8 @@ CHIP_ERROR InitBindingHandlers()
 {
     chip::BindingManager::GetInstance().SetAppServer(&chip::Server::GetInstance());
     chip::BindingManager::GetInstance().RegisterBoundDeviceChangedHandler(BoundDeviceChangedHandler);
+#if defined(ENABLE_CHIP_SHELL)
+    RegisterSwitchCommands();
+#endif
     return CHIP_NO_ERROR;
 }

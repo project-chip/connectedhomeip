@@ -91,6 +91,7 @@ private:
         ClusterId cluster;
     };
 
+    // A pending command to be sent to a bound peer waiting for the CASE session to be established.
     class PendingClusterEntry
     {
     public:
@@ -127,6 +128,7 @@ private:
         System::Clock::Timestamp mLastUpdateTime;
     };
 
+    // The pool for all the pending comands.
     class PendingClusterMap
     {
     public:
@@ -154,8 +156,10 @@ private:
     static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
     void HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR error);
 
+    // Called when CASE session is established to a peer device. Will send all the pending commands to the peer.
     void SyncPendingClustersToPeer(OperationalDeviceProxy * device, PendingClusterEntry * pendingClusters);
 
+    // Called when CASE session is not established to a bound peer. Will enqueue the command and initialize connection.
     CHIP_ERROR EnqueueClusterAndConnect(FabricIndex fabric, NodeId node, EndpointId endpoint, ClusterId cluster);
 
     PendingClusterMap mPendingClusterMap;

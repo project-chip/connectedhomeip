@@ -188,21 +188,3 @@ bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const
 }
 
 void MatterBindingPluginServerInitCallback() {}
-
-void MatterBindingClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath)
-{
-    EmberBindingTableEntry entry;
-    for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
-    {
-        if (emberGetBinding(i, &entry) == EMBER_SUCCESS && entry.type != EMBER_UNUSED_BINDING &&
-            entry.local == attributePath.mEndpointId && entry.clusterId == attributePath.mClusterId)
-        {
-            CHIP_ERROR error = BindingManager::GetInstance().NotifyBoundClusterChanged(entry.local, entry.clusterId);
-            if (error != CHIP_NO_ERROR)
-            {
-                ChipLogError(Zcl, "Failed to notify bound cluster %" PRIu32 " on endpoint %u: %s", entry.clusterId, entry.local,
-                             error.AsString());
-            }
-        }
-    }
-}
