@@ -42,7 +42,7 @@ void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDevicePro
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
     command->mDevices[command->GetIdentity()] = device;
 
-    command->NextTest();
+    command->ContinueOnChipMainThread();
 }
 
 void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
@@ -51,7 +51,8 @@ void TestCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHI
                     peerId.GetNodeId(), error.Format());
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Test command context is null"));
-    command->SetCommandExitStatus(error);
+
+    command->ContinueOnChipMainThread();
 }
 
 void TestCommand::OnWaitForMsFn(chip::System::Layer * systemLayer, void * context)
