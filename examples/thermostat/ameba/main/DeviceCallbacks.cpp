@@ -90,7 +90,6 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
         OnThermostatPostAttributeChangeCallback(endpointId, attributeId, value);
         break;
 
-
     default:
         break;
     }
@@ -126,7 +125,6 @@ void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
     }
 }
 
-
 void IdentifyTimerHandler(Layer * systemLayer, void * appState, CHIP_ERROR error)
 {
     if (identifyTimerCount)
@@ -157,10 +155,7 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * comm
 }
 
 extern "C" {
-    void __attribute__((weak)) SendtoThermostat(AttributeId attributeId, uint8_t *value)
-    {
-
-    }
+void __attribute__((weak)) SendtoThermostat(AttributeId attributeId, uint8_t * value) {}
 }
 
 void DeviceCallbacks::OnThermostatPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)

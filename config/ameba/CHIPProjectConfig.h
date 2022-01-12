@@ -51,7 +51,6 @@
 // // Use a default pairing code if one hasn't been provisioned in flash.
 // #define CHIP_DEVICE_CONFIG_USE_TEST_PAIRING_CODE "CHIPUS"
 
-
 /**
  * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
  *

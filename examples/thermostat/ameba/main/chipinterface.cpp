@@ -69,7 +69,7 @@ Identify gIdentify1 = {
 // #else
 // #define STATUS_LED_GPIO_NUM NC
 // #endif
- #define STATUS_LED_GPIO_NUM PA_2
+#define STATUS_LED_GPIO_NUM PA_2
 
 static DeviceCallbacks EchoCallbacks;
 
