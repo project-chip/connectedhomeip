@@ -264,6 +264,34 @@ public:
             onFailureCb, minIntervalFloorSeconds, maxIntervalCeilingSeconds, onSubscriptionEstablishedCb);
     }
 
+    /**
+     * Read an event and get a type-safe callback with the event data.
+     */
+    template <typename DecodableType>
+    CHIP_ERROR ReadEvent(void * context, ReadResponseSuccessCallback<DecodableType> successCb,
+                         ReadResponseFailureCallback failureCb)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onSuccessCb = [context, successCb](const app::EventHeader & eventHeader, const DecodableType & aData) {
+            if (successCb != nullptr)
+            {
+                successCb(context, aData);
+            }
+        };
+
+        auto onFailureCb = [context, failureCb](const app::EventHeader * eventHeader, Protocols::InteractionModel::Status status,
+                                                CHIP_ERROR error) {
+            if (failureCb != nullptr)
+            {
+                failureCb(context, app::ToEmberAfStatus(status));
+            }
+        };
+
+        return Controller::ReadEvent<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
+                                                    onSuccessCb, onFailureCb);
+    }
+
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}
 

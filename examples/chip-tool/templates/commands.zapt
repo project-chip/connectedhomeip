@@ -36,6 +36,14 @@ CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodableClust
 {{/zcl_structs}}
 {{/zcl_clusters}}
 
+{{#zcl_clusters}}
+{{#zcl_events}}
+{{#unless has_more_than_one_cluster}}
+CHIP_ERROR LogValue(const char * label, size_t indent, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType value);
+{{/unless}}
+{{/zcl_events}}
+{{/zcl_clusters}}
+
 #if CHIP_PROGRESS_LOGGING
 std::string IndentStr(size_t indent)
 {
@@ -168,6 +176,18 @@ CHIP_ERROR LogValue(const char * label, size_t indent, const chip::Optional<T> &
 {{/zcl_clusters}}
 #pragma GCC diagnostic pop
 
+// We output helpers for all events here, including ones we might not actually
+// be logging.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+{{#zcl_clusters}}
+{{#zcl_events}}
+{{#unless has_more_than_one_cluster}}
+{{> log_event_value ns=parent.name}}
+{{/unless}}
+{{/zcl_events}}
+{{/zcl_clusters}}
+#pragma GCC diagnostic pop
 } // anonymous namespace
 
 static void OnDefaultSuccessResponseWithoutExit(void * context)
@@ -197,7 +217,7 @@ static void OnDefaultSuccess(void * context, const chip::app::DataModel::NullObj
 };
 
 template <typename T>
-static void OnGeneralAttributeResponse(void * context, const char * label, T value)
+static void OnGeneralAttributeEventResponse(void * context, const char * label, T value)
 {
     CHIP_ERROR err = LogValue(label, 0, value);
 
@@ -278,6 +298,41 @@ private:
 
 {{/chip_cluster_commands}}
 
+{{#chip_server_cluster_events}}
+/*
+ * Event {{asUpperCamelCase name}}
+ */
+class Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
+{
+public:
+    Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("read-event")
+    {
+        AddArgument("event-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
+        ModelCommand::AddArguments();
+    }
+
+    ~Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
+    {
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) ReadEvent on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadEvent<chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType>(this,
+          OnEventResponse,
+          OnDefaultFailure);
+    }
+
+    static void OnEventResponse(void * context, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType value)
+    {
+        OnGeneralAttributeEventResponse(context, "{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response", value);
+    }
+};
+{{/chip_server_cluster_events}}
+
 {{#chip_server_cluster_attributes}}
 {{! TODO: Various types (floats, structs) not supported here. }}
 {{#unless (isStrEqual chipCallback.name "Unsupported")}}
@@ -299,7 +354,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x00) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) ReadAttribute on endpoint %" PRIu8, endpointId);
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -310,7 +365,7 @@ public:
 
     static void OnAttributeResponse(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} value)
     {
-        OnGeneralAttributeResponse(context, "{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response", value);
+        OnGeneralAttributeEventResponse(context, "{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response", value);
     }
 };
 
@@ -342,7 +397,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x01) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) WriteAttribute on endpoint %" PRIu8, endpointId);
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -374,7 +429,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) command (0x06) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) ReportAttribute on endpoint %" PRIu8, endpointId);
 
         chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
         cluster.Associate(device, endpointId);
@@ -434,6 +489,9 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{/if}}
         {{/unless}}
         {{/chip_server_cluster_attributes}}
+        {{#chip_server_cluster_events}}
+        make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        {{/chip_server_cluster_events}}
     };
 
     commands.Register(clusterName, clusterCommands);
