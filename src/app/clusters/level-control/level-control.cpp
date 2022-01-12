@@ -1017,53 +1017,53 @@ void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
 #ifndef IGNORE_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL
-        // StartUp behavior relies StartUpCurrentLevel attributes being tokenized.
+        // StartUp behavior relies StartUpCurrentLevel attributes being Non Volatile.
         if (areStartUpLevelControlServerAttributesNonVolatile(endpoint))
         {
-            // Read the StartUpOnOff attribute and set the OnOff attribute as per
-            // following from zcl 7 14-0127-20i-zcl-ch-3-general.doc.
-            // 3.10.2.2.14	StartUpCurrentLevel Attribute
+            // 1.5.14. StartUpCurrentLevel Attribute
             // The StartUpCurrentLevel attribute SHALL define the desired startup level
             // for a device when it is supplied with power and this level SHALL be
             // reflected in the CurrentLevel attribute. The values of the StartUpCurrentLevel
             // attribute are listed below:
-            // Table 3 58. Values of the StartUpCurrentLevel Attribute
+            // Table 4. Values of the StartUpCurrentLevel attribute
             // Value      Action on power up
             // 0x00       Set the CurrentLevel attribute to the minimum value permitted on the device.
             // 0x01-0xfe  Set the CurrentLevel attribute to this value.
-            // 0xff       Set the CurrentLevel attribute to its previous value.
+            // NULL       Set the CurrentLevel attribute to its previous value.
+            // 0xFF       Work Around ZAP Can't set default value to NULL
+            // https://github.com/project-chip/zap/issues/354
 
-            // Initialize startUpCurrentLevel to assume previous value for currentLevel.
-            uint8_t startUpCurrentLevel = STARTUP_CURRENT_LEVEL_USE_PREVIOUS_LEVEL;
-            status                      = Attributes::StartUpCurrentLevel::Get(endpoint, &startUpCurrentLevel);
+            app::DataModel::Nullable<uint8_t> startUpCurrentLevel;
+            status = Attributes::StartUpCurrentLevel::Get(endpoint, startUpCurrentLevel);
             if (status == EMBER_ZCL_STATUS_SUCCESS)
             {
-                switch (startUpCurrentLevel)
+                if (!startUpCurrentLevel.IsNull())
                 {
-                case STARTUP_CURRENT_LEVEL_USE_DEVICE_MINIMUM:
-                    currentLevel = minLevel;
-                    break;
-                case STARTUP_CURRENT_LEVEL_USE_PREVIOUS_LEVEL:
-                    // Just fetched it.
-                    break;
-                default:
-                    // Otherwise set to specified value 0x01-0xFE.
-                    // But, need to enforce currentLevel's min/max, right?
-                    // Spec doesn't mention this.
-                    if (startUpCurrentLevel < minLevel)
+                    if (startUpCurrentLevel.Value() == STARTUP_CURRENT_LEVEL_USE_DEVICE_MINIMUM)
                     {
                         currentLevel = minLevel;
                     }
-                    else if (startUpCurrentLevel > maxLevel)
-                    {
-                        currentLevel = maxLevel;
-                    }
                     else
                     {
-                        currentLevel = startUpCurrentLevel;
+                        // Otherwise set to specified value 0x01-0xFE.
+                        // But, need to enforce currentLevel's min/max, right?
+                        // Spec doesn't mention this.
+                        if (startUpCurrentLevel.Value() < minLevel)
+                        {
+                            currentLevel = minLevel;
+                        }
+                        else if (startUpCurrentLevel.Value() > maxLevel)
+                        {
+                            currentLevel = maxLevel;
+                        }
+                        else
+                        {
+                            currentLevel = startUpCurrentLevel.Value();
+                        }
                     }
-                    break;
                 }
+                // Otherwise Set the CurrentLevel attribute to its previous value which was already fetch above
+
                 Attributes::CurrentLevel::Set(endpoint, currentLevel);
             }
         }
