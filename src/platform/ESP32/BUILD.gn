@@ -20,7 +20,6 @@ assert(chip_device_platform == "esp32")
 
 static_library("ESP32") {
   sources = [
-    "../FreeRTOS/SystemTimeSupport.cpp",
     "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
@@ -45,6 +44,7 @@ static_library("ESP32") {
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
+    "SystemTimeSupport.h",
     "bluedroid/BLEManagerImpl.cpp",
     "nimble/BLEManagerImpl.cpp",
   ]
