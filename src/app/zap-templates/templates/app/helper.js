@@ -685,6 +685,11 @@ function incrementDepth(depth)
   return depth + 1;
 }
 
+function hasProperty(obj, prop)
+{
+  return prop in obj;
+}
+
 //
 // Module exports
 //
@@ -695,6 +700,7 @@ exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
 exports.asTypedLiteral                      = asTypedLiteral;
 exports.asLowerCamelCase                    = asLowerCamelCase;
 exports.asUpperCamelCase                    = asUpperCamelCase;
+exports.hasProperty                         = hasProperty;
 exports.hasSpecificAttributes               = hasSpecificAttributes;
 exports.asMEI                               = asMEI;
 exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;
