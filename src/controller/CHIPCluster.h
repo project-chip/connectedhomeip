@@ -295,6 +295,41 @@ public:
                                                     onSuccessCb, onFailureCb);
     }
 
+    template <typename DecodableType>
+    CHIP_ERROR SubscribeEvent(void * context, ReadResponseSuccessCallback<DecodableType> reportCb,
+                              ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
+                              uint16_t maxIntervalCeilingSeconds,
+                              SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr)
+    {
+        VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+        auto onReportCb = [context, reportCb](const app::EventHeader & eventHeader, const DecodableType & aData) {
+            if (reportCb != nullptr)
+            {
+                reportCb(context, aData);
+            }
+        };
+
+        auto onFailureCb = [context, failureCb](const app::EventHeader * eventHeader, Protocols::InteractionModel::Status status,
+                                                CHIP_ERROR aError) {
+            if (failureCb != nullptr)
+            {
+                failureCb(context, app::ToEmberAfStatus(status));
+            }
+        };
+
+        auto onSubscriptionEstablishedCb = [context, subscriptionEstablishedCb]() {
+            if (subscriptionEstablishedCb != nullptr)
+            {
+                subscriptionEstablishedCb(context);
+            }
+        };
+
+        return Controller::SubscribeEvent<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(),
+                                                         mEndpoint, onReportCb, onFailureCb, minIntervalFloorSeconds,
+                                                         maxIntervalCeilingSeconds, onSubscriptionEstablishedCb);
+    }
+
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}
 
