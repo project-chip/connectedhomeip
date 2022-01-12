@@ -400,11 +400,13 @@ class ChipDeviceController(object):
             raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
         return returnDevice
 
-    async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None):
+    async def SendCommand(self, nodeid: int, endpoint: int, payload: ClusterObjects.ClusterCommand, responseType=None, timedRequestTimeoutMs: int = None):
         '''
         Send a cluster-object encapsulated command to a node and get returned a future that can be awaited upon to receive the response.
         If a valid responseType is passed in, that will be used to deserialize the object. If not, the type will be automatically deduced
         from the metadata received over the wire.
+
+        timedWriteTimeoutMs: Timeout for a timed invoke request. Omit or set to 'None' to indicate a non-timed request.
         '''
 
         eventLoop = asyncio.get_running_loop()
@@ -417,17 +419,18 @@ class ChipDeviceController(object):
                     EndpointId=endpoint,
                     ClusterId=payload.cluster_id,
                     CommandId=payload.command_id,
-                ), payload)
+                ), payload, timedRequestTimeoutMs=timedRequestTimeoutMs)
         )
         if res != 0:
             future.set_exception(self._ChipStack.ErrorToException(res))
         return await future
 
-    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]]):
+    async def WriteAttribute(self, nodeid: int, attributes: typing.List[typing.Tuple[int, ClusterObjects.ClusterAttributeDescriptor]], timedRequestTimeoutMs: int = None):
         '''
         Write a list of attributes on a target node.
 
         nodeId: Target's Node ID
+        timedWriteTimeoutMs: Timeout for a timed write request. Omit or set to 'None' to indicate a non-timed request.
         attributes: A list of tuples of type (endpoint, cluster-object):
 
         E.g
@@ -445,7 +448,7 @@ class ChipDeviceController(object):
 
         res = self._ChipStack.Call(
             lambda: ClusterAttribute.WriteAttributes(
-                future, eventLoop, device, attrs)
+                future, eventLoop, device, attrs, timedRequestTimeoutMs=timedRequestTimeoutMs)
         )
         if res != 0:
             raise self._ChipStack.ErrorToException(res)

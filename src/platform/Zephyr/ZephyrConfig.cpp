@@ -72,6 +72,8 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation = CONFIG_KEY
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode        = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_ActiveLocale       = CONFIG_KEY(NAMESPACE_CONFIG "active-locale");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_Breadcrumb         = CONFIG_KEY(NAMESPACE_CONFIG "breadcrumb");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_HourFormat         = CONFIG_KEY(NAMESPACE_CONFIG "hour-format");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_CalendarType       = CONFIG_KEY(NAMESPACE_CONFIG "calendar-type");
 
 // Keys stored in the counters namespace
 const ZephyrConfig::Key ZephyrConfig::kCounterKey_RebootCount           = CONFIG_KEY(NAMESPACE_COUNTERS "reboot-count");
@@ -86,7 +88,8 @@ constexpr const char * sAllResettableConfigKeys[] = {
     ZephyrConfig::kConfigKey_FabricSecret,       ZephyrConfig::kConfigKey_GroupKeyIndex,
     ZephyrConfig::kConfigKey_LastUsedEpochKeyId, ZephyrConfig::kConfigKey_FailSafeArmed,
     ZephyrConfig::kConfigKey_RegulatoryLocation, ZephyrConfig::kConfigKey_CountryCode,
-    ZephyrConfig::kConfigKey_ActiveLocale,       ZephyrConfig::kConfigKey_Breadcrumb
+    ZephyrConfig::kConfigKey_ActiveLocale,       ZephyrConfig::kConfigKey_Breadcrumb,
+    ZephyrConfig::kConfigKey_HourFormat,         ZephyrConfig::kConfigKey_CalendarType,
 };
 
 // Data structure to be passed as a parameter of Zephyr's settings_load_subtree_direct() function

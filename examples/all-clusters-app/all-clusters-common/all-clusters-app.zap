@@ -1408,7 +1408,7 @@
           "mfgCode": null,
           "define": "OTA_PROVIDER_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "QueryImageResponse",

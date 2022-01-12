@@ -133,6 +133,9 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mSecuredServicePort)
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+                               .SetNativeParams(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance())
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
 
 #if INET_CONFIG_ENABLE_IPV4
                                ,
@@ -151,10 +154,10 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     SuccessOrExit(err);
 
-    // Enable Group Listening
-    // TODO : Fix this once GroupDataProvider is implemented #Issue 11075
-    // for (iterate through all GroupDataProvider multicast Address)
-    // {
+// Enable Group Listening
+// TODO : Fix this once GroupDataProvider is implemented #Issue 11075
+// for (iterate through all GroupDataProvider multicast Address)
+// {
 #ifdef CHIP_ENABLE_GROUP_MESSAGING_TESTS
     err = mTransports.MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(1, 1234), true);
     SuccessOrExit(err);

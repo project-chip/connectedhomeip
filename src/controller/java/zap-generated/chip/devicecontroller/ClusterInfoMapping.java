@@ -4597,7 +4597,8 @@ public class ClusterInfoMapping {
               ((ChipClusters.AccountLoginCluster) cluster)
                   .getSetupPINRequest(
                       (ChipClusters.AccountLoginCluster.GetSetupPINResponseCallback) callback,
-                      (String) commandArguments.get("tempAccountIdentifier"));
+                      (String) commandArguments.get("tempAccountIdentifier"),
+                      10000);
             },
             () -> new DelegatedGetSetupPINResponseCallback(),
             accountLogingetSetupPINRequestCommandParams);
@@ -4636,7 +4637,7 @@ public class ClusterInfoMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.AccountLoginCluster) cluster)
-                  .logoutRequest((DefaultClusterCallback) callback);
+                  .logoutRequest((DefaultClusterCallback) callback, 10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             accountLoginlogoutRequestCommandParams);
@@ -8976,7 +8977,7 @@ public class ClusterInfoMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .timedInvokeRequest((DefaultClusterCallback) callback);
+                  .timedInvokeRequest((DefaultClusterCallback) callback, 10000);
             },
             () -> new DelegatedDefaultClusterCallback(),
             testClustertimedInvokeRequestCommandParams);

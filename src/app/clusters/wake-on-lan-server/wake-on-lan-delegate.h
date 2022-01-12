@@ -19,6 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
 
 namespace chip {
 namespace app {
@@ -31,7 +32,7 @@ namespace WakeOnLan {
 class Delegate
 {
 public:
-    virtual chip::CharSpan HandleGetMacAddress() = 0;
+    virtual CHIP_ERROR HandleGetMacAddress(app::AttributeValueEncoder & aEncoder) = 0;
 
     virtual ~Delegate() = default;
 };

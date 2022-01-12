@@ -1559,7 +1559,9 @@ public class ClusterWriteMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
                   .writeTimedWriteBooleanAttribute(
-                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+                      (DefaultClusterCallback) callback,
+                      (Boolean) commandArguments.get("value"),
+                      10000);
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterTimedWriteBooleanCommandParams);

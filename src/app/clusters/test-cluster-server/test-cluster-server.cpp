@@ -610,6 +610,11 @@ bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
     {
         auto iter = commandData.arg1.begin();
         Commands::TestListInt8UReverseResponse::Type responseData;
+        if (count == 0)
+        {
+            SuccessOrExit(commandObj->AddResponseData(commandPath, responseData));
+            return true;
+        }
         size_t cur = count;
         Platform::ScopedMemoryBuffer<uint8_t> responseBuf;
         VerifyOrExit(responseBuf.Calloc(count), );
