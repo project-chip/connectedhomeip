@@ -27,6 +27,8 @@
 #include <app/ReadClient.h>
 #include <app/util/error-mapping.h>
 
+typedef void (^SubscriptionEstablishedHandler)(void);
+
 using namespace chip;
 using namespace chip::app;
 using namespace chip::Protocols::InteractionModel;
@@ -138,7 +140,7 @@ private:
                 minInterval:(uint16_t)minInterval
                 maxInterval:(uint16_t)maxInterval
               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
+    subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler
 {
     DeviceProxy * device = [self internalDevice];
     if (!device) {
