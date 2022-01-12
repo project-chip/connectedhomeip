@@ -90,6 +90,105 @@ protected:
         return true;
     }
 
+    bool CheckConstraintIsUpperCase(const char * itemName, const chip::CharSpan current, bool expectUpperCase)
+    {
+        std::string value(current.data(), current.size());
+        return CheckConstraintIsUpperCase(itemName, value.c_str(), expectUpperCase);
+    }
+
+    bool CheckConstraintIsUpperCase(const char * itemName, const char * current, bool expectUpperCase)
+    {
+        bool isUpperCase = true;
+        for (size_t i = 0; i < strlen(current); i++)
+        {
+            if (!isupper(current[i]))
+            {
+                isUpperCase = false;
+                break;
+            }
+        }
+
+        if (expectUpperCase && !isUpperCase)
+        {
+            Exit(std::string(itemName) + " (\"" + std::string(current) + "\") is not an upppercase string");
+            return false;
+        }
+
+        if (!expectUpperCase && isUpperCase)
+        {
+            Exit(std::string(itemName) + " (\"" + std::string(current) + "\") is an upppercase string");
+            return false;
+        }
+
+        return true;
+    }
+
+    bool CheckConstraintIsLowerCase(const char * itemName, const chip::CharSpan current, bool expectLowerCase)
+    {
+        std::string value(current.data(), current.size());
+        return CheckConstraintIsLowerCase(itemName, value.c_str(), expectLowerCase);
+    }
+
+    bool CheckConstraintIsLowerCase(const char * itemName, const char * current, bool expectLowerCase)
+    {
+        bool isLowerCase = true;
+        for (size_t i = 0; i < strlen(current); i++)
+        {
+            if (isupper(current[i]))
+            {
+                isLowerCase = false;
+                break;
+            }
+        }
+
+        if (expectLowerCase && !isLowerCase)
+        {
+            Exit(std::string(itemName) + " (\"" + std::string(current) + "\") is not a lowercase string");
+            return false;
+        }
+
+        if (!expectLowerCase && isLowerCase)
+        {
+            Exit(std::string(itemName) + " (\"" + std::string(current) + "\") is a lowercase string");
+            return false;
+        }
+
+        return true;
+    }
+
+    bool CheckConstraintIsHexString(const char * itemName, const chip::CharSpan current, bool expectHexString)
+    {
+        std::string value(current.data(), current.size());
+        return CheckConstraintIsHexString(itemName, value.c_str(), expectHexString);
+    }
+
+    bool CheckConstraintIsHexString(const char * itemName, const char * current, bool expectHexString)
+    {
+        bool isHexString = true;
+        for (size_t i = 0; i < strlen(current); i++)
+        {
+            if (!isxdigit(current[i]))
+            {
+                isHexString = false;
+                break;
+            }
+        }
+
+        if (expectHexString && !isHexString)
+        {
+            Exit(std::string(itemName) + " (\"" + std::string(current) + "\") is not a hexadecimal string");
+            return false;
+        }
+
+        if (!expectHexString && isHexString)
+        {
+            Exit(std::string(itemName) + " (\"" + std::string(current) + "\") is a hexadecimal string");
+            return false;
+        }
+
+        return true;
+    }
+
     template <typename T>
     bool CheckConstraintMinValue(const char * itemName, T current, T expected)
     {
