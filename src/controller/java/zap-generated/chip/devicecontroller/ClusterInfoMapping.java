@@ -3485,6 +3485,30 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedTestEmitTestEventResponseCallback
+      implements ChipClusters.TestClusterCluster.TestEmitTestEventResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(Long value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo valueResponseValue = new CommandResponseInfo("value", "long");
+      responseValues.put(valueResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedTestEnumsResponseCallback
       implements ChipClusters.TestClusterCluster.TestEnumsResponseCallback,
           DelegatedClusterCallback {
@@ -8579,6 +8603,38 @@ public class ClusterInfoMapping {
             testClustertestAddArgumentsCommandParams);
     testClusterClusterInteractionInfoMap.put(
         "testAddArguments", testClustertestAddArgumentsInteractionInfo);
+    Map<String, CommandParameterInfo> testClustertestEmitTestEventRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo testClustertestEmitTestEventRequestarg1CommandParameterInfo =
+        new CommandParameterInfo("arg1", int.class);
+    testClustertestEmitTestEventRequestCommandParams.put(
+        "arg1", testClustertestEmitTestEventRequestarg1CommandParameterInfo);
+
+    CommandParameterInfo testClustertestEmitTestEventRequestarg2CommandParameterInfo =
+        new CommandParameterInfo("arg2", int.class);
+    testClustertestEmitTestEventRequestCommandParams.put(
+        "arg2", testClustertestEmitTestEventRequestarg2CommandParameterInfo);
+
+    CommandParameterInfo testClustertestEmitTestEventRequestarg3CommandParameterInfo =
+        new CommandParameterInfo("arg3", boolean.class);
+    testClustertestEmitTestEventRequestCommandParams.put(
+        "arg3", testClustertestEmitTestEventRequestarg3CommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo testClustertestEmitTestEventRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .testEmitTestEventRequest(
+                      (ChipClusters.TestClusterCluster.TestEmitTestEventResponseCallback) callback,
+                      (Integer) commandArguments.get("arg1"),
+                      (Integer) commandArguments.get("arg2"),
+                      (Boolean) commandArguments.get("arg3"));
+            },
+            () -> new DelegatedTestEmitTestEventResponseCallback(),
+            testClustertestEmitTestEventRequestCommandParams);
+    testClusterClusterInteractionInfoMap.put(
+        "testEmitTestEventRequest", testClustertestEmitTestEventRequestInteractionInfo);
     Map<String, CommandParameterInfo> testClustertestEnumsRequestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClustertestEnumsRequestarg1CommandParameterInfo =

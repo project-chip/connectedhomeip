@@ -2915,6 +2915,20 @@ bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(EndpointId endpoi
     return true;
 }
 
+bool emberAfTestClusterClusterTestEmitTestEventResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                                uint64_t value)
+{
+    ChipLogProgress(Zcl, "TestEmitTestEventResponse:");
+    ChipLogProgress(Zcl, "  value: %" PRIu64 "", value);
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterTestEmitTestEventResponseCallback");
+
+    Callback::Callback<TestClusterClusterTestEmitTestEventResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterTestEmitTestEventResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, value);
+    return true;
+}
+
 bool emberAfTestClusterClusterTestEnumsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, chip::VendorId arg1,
                                                         uint8_t arg2)
 {
