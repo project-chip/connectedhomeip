@@ -27,22 +27,24 @@ ContentLauncherManager::ContentLauncherManager(std::list<std::string> acceptHead
     mSupportedStreamingProtocols = supportedStreamingProtocols;
 }
 
-Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(const std::list<Parameter> & parameterList,
-                                                                           bool autoplay, const chip::CharSpan & data)
+void ContentLauncherManager::HandleLaunchContent(
+    const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
+    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
 {
-    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent");
+    ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchContent for endpoint %d", mEndpointId);
     string dataString(data.data(), data.size());
 
-    // TODO: Insert code here
     Commands::LaunchResponse::Type response;
+    // TODO: Insert code here
     response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
-    return response;
+    responser.Success(response);
 }
 
-Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
-                                                                       const chip::CharSpan & displayString,
-                                                                       const std::list<BrandingInformation> & brandingInformation)
+void ContentLauncherManager::HandleLaunchUrl(
+    const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+    const std::list<BrandingInformation> & brandingInformation,
+    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleLaunchUrl");
 
@@ -53,13 +55,20 @@ Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchUrl(const chi
     Commands::LaunchResponse::Type response;
     response.data   = chip::CharSpan("exampleData", strlen("exampleData"));
     response.status = chip::app::Clusters::ContentLauncher::StatusEnum::kSuccess;
-    return response;
+    responser.Success(response);
 }
 
-std::list<std::string> ContentLauncherManager::HandleGetAcceptHeaderList()
+CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(chip::app::AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "ContentLauncherManager::HandleGetAcceptHeaderList");
-    return mAcceptHeaderList;
+    return aEncoder.EncodeList([this](const auto & encoder) -> CHIP_ERROR {
+        for (std::string & entry : mAcceptHeaderList)
+        {
+            chip::CharSpan data = chip::CharSpan(entry.c_str(), entry.length());
+            ReturnErrorOnFailure(encoder.Encode(data));
+        }
+        return CHIP_NO_ERROR;
+    });
 }
 
 uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()

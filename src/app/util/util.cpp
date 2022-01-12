@@ -311,7 +311,6 @@ void MatterAlarmsPluginServerInitCallback() {}
 void MatterTimePluginServerInitCallback() {}
 void MatterAclPluginServerInitCallback() {}
 void MatterPollControlPluginServerInitCallback() {}
-void MatterLocalizationConfigurationPluginServerInitCallback() {}
 void MatterLocalizationUnitPluginServerInitCallback() {}
 void MatterLocalizationTimeFormatPluginServerInitCallback() {}
 void MatterTimeSynchronizationPluginServerInitCallback() {}
@@ -448,7 +447,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
     }
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
     else if ((cmd->type == EMBER_INCOMING_MULTICAST || cmd->type == EMBER_INCOMING_MULTICAST_LOOPBACK) &&
-             !emberAfGroupsClusterEndpointInGroupCallback(cmd->source->GetSessionHandle().GetFabricIndex(),
+             !emberAfGroupsClusterEndpointInGroupCallback(cmd->source->GetSessionHandle()->AsSecureSession()->GetFabricIndex(),
                                                           cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
     {
         emberAfDebugPrint("Drop cluster " ChipLogFormatMEI " command " ChipLogFormatMEI, ChipLogValueMEI(cmd->apsFrame->clusterId),

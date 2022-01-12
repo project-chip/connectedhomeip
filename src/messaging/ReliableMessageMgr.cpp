@@ -35,6 +35,8 @@
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 
+using namespace chip::System::Clock::Literals;
+
 namespace chip {
 namespace Messaging {
 
@@ -141,7 +143,8 @@ void ReliableMessageMgr::ExecuteActions()
                       " Send Cnt %d",
                       messageCounter, ChipLogValueExchange(&entry->ec.Get()), entry->sendCount);
         // TODO: Choose active/idle timeout corresponding to the activity of exchanges of the session.
-        entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + entry->ec->GetMRPConfig().mActiveRetransTimeout;
+        entry->nextRetransTime =
+            System::SystemClock().GetMonotonicTimestamp() + entry->ec->GetSessionHandle()->GetMRPConfig().mActiveRetransTimeout;
         SendFromRetransTable(entry);
         // For test not using async IO loop, the entry may have been removed after send, do not use entry below
 
@@ -185,7 +188,8 @@ CHIP_ERROR ReliableMessageMgr::AddToRetransTable(ReliableMessageContext * rc, Re
 void ReliableMessageMgr::StartRetransmision(RetransTableEntry * entry)
 {
     // TODO: Choose active/idle timeout corresponding to the activity of exchanges of the session.
-    entry->nextRetransTime = System::SystemClock().GetMonotonicTimestamp() + entry->ec->GetMRPConfig().mIdleRetransTimeout;
+    entry->nextRetransTime =
+        System::SystemClock().GetMonotonicTimestamp() + entry->ec->GetSessionHandle()->GetMRPConfig().mIdleRetransTimeout;
     StartTimer();
 }
 
@@ -306,7 +310,10 @@ void ReliableMessageMgr::StartTimer()
 #endif
 
         StopTimer();
-        VerifyOrDie(mSystemLayer->StartTimer(nextWakeTime, Timeout, this) == CHIP_NO_ERROR);
+
+        const System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+        const auto nextWakeDelay           = (nextWakeTime > now) ? nextWakeTime - now : 0_ms;
+        VerifyOrDie(mSystemLayer->StartTimer(nextWakeDelay, Timeout, this) == CHIP_NO_ERROR);
     }
     else
     {

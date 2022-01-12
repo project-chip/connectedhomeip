@@ -35,7 +35,8 @@ class Delegate
 {
 public:
     virtual chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type HandleGetCurrentApp() = 0;
-    virtual std::list<uint16_t> HandleGetCatalogList()                                                   = 0;
+    // TODO: refactor this method signature to address memory issue (see PR 13398)
+    virtual std::list<uint16_t> HandleGetCatalogList() = 0;
 
     virtual Commands::LauncherResponse::Type
     HandleLaunchApp(const chip::CharSpan & data,

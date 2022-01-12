@@ -695,6 +695,28 @@ public class ClusterWriteMapping {
         "writeStartUpCurrentLevelAttribute",
         writeLevelControlStartUpCurrentLevelAttributeInteractionInfo);
     writeAttributeMap.put("levelControl", writeLevelControlInteractionInfo);
+    Map<String, InteractionInfo> writeLocalizationConfigurationInteractionInfo =
+        new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeLocalizationConfigurationActiveLocaleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo localizationConfigurationactiveLocaleCommandParameterInfo =
+        new CommandParameterInfo("value", String.class);
+    writeLocalizationConfigurationActiveLocaleCommandParams.put(
+        "value", localizationConfigurationactiveLocaleCommandParameterInfo);
+    InteractionInfo writeLocalizationConfigurationActiveLocaleAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.LocalizationConfigurationCluster) cluster)
+                  .writeActiveLocaleAttribute(
+                      (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeLocalizationConfigurationActiveLocaleCommandParams);
+    writeLocalizationConfigurationInteractionInfo.put(
+        "writeActiveLocaleAttribute",
+        writeLocalizationConfigurationActiveLocaleAttributeInteractionInfo);
+    writeAttributeMap.put(
+        "localizationConfiguration", writeLocalizationConfigurationInteractionInfo);
     Map<String, InteractionInfo> writeLowPowerInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("lowPower", writeLowPowerInteractionInfo);
     Map<String, InteractionInfo> writeMediaInputInteractionInfo = new LinkedHashMap<>();
@@ -1537,7 +1559,9 @@ public class ClusterWriteMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
                   .writeTimedWriteBooleanAttribute(
-                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+                      (DefaultClusterCallback) callback,
+                      (Boolean) commandArguments.get("value"),
+                      10000);
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
             writeTestClusterTimedWriteBooleanCommandParams);

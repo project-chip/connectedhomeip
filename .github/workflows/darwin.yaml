@@ -26,7 +26,7 @@ concurrency:
 jobs:
     darwin:
         name: Build Darwin
-        timeout-minutes: 60
+        timeout-minutes: 75
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest

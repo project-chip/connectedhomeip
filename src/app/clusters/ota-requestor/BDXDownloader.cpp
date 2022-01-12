@@ -49,6 +49,9 @@ void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader,
 
 CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData)
 {
+    mState = State::kIdle;
+    mBdxTransfer.Reset();
+
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
 
     // Must call StartTransfer() here to store the the pointer data contained in bdxInitData in the TransferSession object.

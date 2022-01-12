@@ -84,7 +84,7 @@ class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegat
 {
 public:
     ~CommissioneeDeviceProxy();
-    CommissioneeDeviceProxy() {}
+    CommissioneeDeviceProxy() : mSecureSession(*this) {}
     CommissioneeDeviceProxy(const CommissioneeDeviceProxy &) = delete;
 
     /**
@@ -164,7 +164,7 @@ public:
      *
      * @param session A handle to the secure session
      */
-    void OnSessionReleased(const SessionHandle & session) override;
+    void OnSessionReleased() override;
 
     /**
      *  In case there exists an open session to the device, mark it as expired.
@@ -195,6 +195,14 @@ public:
     bool IsActive() const override { return mActive; }
 
     void SetActive(bool active) { mActive = active; }
+
+    /**
+     * @brief
+     * Called to indicate this proxy has been paired successfully.
+     *
+     * This causes the secure session parameters to be loaded and stores the session details in the session manager.
+     */
+    CHIP_ERROR SetConnected();
 
     bool IsSecureConnected() const override { return IsActive() && mState == ConnectionState::SecureConnected; }
 
@@ -298,7 +306,7 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    SessionHolder mSecureSession;
+    SessionHolderWithDelegate mSecureSession;
 
     Controller::DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 

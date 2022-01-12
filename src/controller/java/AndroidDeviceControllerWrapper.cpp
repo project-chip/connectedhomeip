@@ -282,6 +282,76 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
     return wrapper.release();
 }
 
+CHIP_ERROR AndroidDeviceControllerWrapper::ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params,
+                                                                   jobject networkCredentials)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Retrieve WiFi or Thread credentials from the NetworkCredentials Java object, and set them in the commissioning params.
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jmethodID getWiFiCredentials;
+    err = chip::JniReferences::GetInstance().FindMethod(env, networkCredentials, "getWiFiCredentials",
+                                                        "()Lchip/devicecontroller/NetworkCredentials$WiFiCredentials;",
+                                                        &getWiFiCredentials);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    jobject wifiCredentialsJava = env->CallObjectMethod(networkCredentials, getWiFiCredentials);
+
+    jmethodID getThreadCredentials;
+    err = chip::JniReferences::GetInstance().FindMethod(env, networkCredentials, "getThreadCredentials",
+                                                        "()Lchip/devicecontroller/NetworkCredentials$ThreadCredentials;",
+                                                        &getThreadCredentials);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+    jobject threadCredentialsJava = env->CallObjectMethod(networkCredentials, getThreadCredentials);
+
+    if (wifiCredentialsJava != nullptr)
+    {
+        jmethodID getSsid;
+        jmethodID getPassword;
+        err = chip::JniReferences::GetInstance().FindMethod(env, wifiCredentialsJava, "getSsid", "()Ljava/lang/String;", &getSsid);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        err = chip::JniReferences::GetInstance().FindMethod(env, wifiCredentialsJava, "getPassword", "()Ljava/lang/String;",
+                                                            &getPassword);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        ssidStr = static_cast<jstring>(env->NewGlobalRef(env->CallObjectMethod(wifiCredentialsJava, getSsid)));
+        VerifyOrReturnError(ssidStr != nullptr && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+        passwordStr = static_cast<jstring>(env->NewGlobalRef(env->CallObjectMethod(wifiCredentialsJava, getPassword)));
+        VerifyOrReturnError(ssidStr != nullptr && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+        ssid                 = env->GetStringUTFChars(ssidStr, 0);
+        password             = env->GetStringUTFChars(passwordStr, 0);
+        jsize ssidLength     = env->GetStringUTFLength(ssidStr);
+        jsize passwordLength = env->GetStringUTFLength(passwordStr);
+
+        params.SetWiFiCredentials(
+            WiFiCredentials(chip::ByteSpan(reinterpret_cast<const uint8_t *>(ssid), static_cast<size_t>(ssidLength)),
+                            chip::ByteSpan(reinterpret_cast<const uint8_t *>(password), static_cast<size_t>(passwordLength))));
+    }
+    else if (threadCredentialsJava != nullptr)
+    {
+        jmethodID getOperationalDataset;
+        err = chip::JniReferences::GetInstance().FindMethod(env, threadCredentialsJava, "getOperationalDataset", "()[B",
+                                                            &getOperationalDataset);
+        VerifyOrReturnError(err == CHIP_NO_ERROR, err);
+        operationalDatasetBytes =
+            static_cast<jbyteArray>(env->NewGlobalRef(env->CallObjectMethod(threadCredentialsJava, getOperationalDataset)));
+        VerifyOrReturnError(operationalDatasetBytes != nullptr && !env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+        operationalDataset = env->GetByteArrayElements(operationalDatasetBytes, nullptr);
+        jsize length       = env->GetArrayLength(operationalDatasetBytes);
+
+        params.SetThreadOperationalDataset(
+            chip::ByteSpan(reinterpret_cast<const uint8_t *>(operationalDataset), static_cast<size_t>(length)));
+    }
+    else
+    {
+        ChipLogError(Controller, "Both WiFi and Thread credentials were null in NetworkCredentials");
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    return err;
+}
+
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -309,6 +379,22 @@ void AndroidDeviceControllerWrapper::OnCommissioningComplete(NodeId deviceId, CH
                                                              &onCommissioningCompleteMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Controller, "Error finding Java method: %" CHIP_ERROR_FORMAT, err.Format()));
     env->CallVoidMethod(mJavaObjectRef, onCommissioningCompleteMethod, static_cast<jlong>(deviceId), error.AsInteger());
+
+    if (ssidStr != nullptr)
+    {
+        env->ReleaseStringUTFChars(ssidStr, ssid);
+        env->DeleteGlobalRef(ssidStr);
+    }
+    if (passwordStr != nullptr)
+    {
+        env->ReleaseStringUTFChars(passwordStr, password);
+        env->DeleteGlobalRef(passwordStr);
+    }
+    if (operationalDatasetBytes != nullptr)
+    {
+        env->ReleaseByteArrayElements(operationalDatasetBytes, operationalDataset, 0);
+        env->DeleteGlobalRef(operationalDatasetBytes);
+    }
 }
 
 CHIP_ERROR AndroidDeviceControllerWrapper::InitializeOperationalCredentialsIssuer()

@@ -37,6 +37,32 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace detail {
+// Structs shared across multiple clusters.
+namespace Structs {
+namespace LabelStruct {
+enum class Fields
+{
+    kLabel = 1,
+    kValue = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan label;
+    chip::CharSpan value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace LabelStruct
+} // namespace Structs
+} // namespace detail
+
 namespace PowerConfiguration {
 
 namespace Attributes {
@@ -7740,9 +7766,9 @@ struct TypeInfo
 namespace VendorID {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::VendorId;
+    using DecodableType    = chip::VendorId;
+    using DecodableArgType = chip::VendorId;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
@@ -8137,9 +8163,6 @@ public:
 } // namespace Events
 } // namespace Basic
 namespace OtaSoftwareUpdateProvider {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAApplyUpdateAction
 enum class OTAApplyUpdateAction : uint8_t
 {
@@ -8147,12 +8170,6 @@ enum class OTAApplyUpdateAction : uint8_t
     kAwaitNextAction = 0x01,
     kDiscontinue     = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTAApplyUpdateAction            = EmberAfOTAApplyUpdateAction;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTADownloadProtocol
 enum class OTADownloadProtocol : uint8_t
 {
@@ -8161,9 +8178,6 @@ enum class OTADownloadProtocol : uint8_t
     kHttps           = 0x02,
     kVendorSpecific  = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTADownloadProtocol             = EmberAfOTADownloadProtocol;
-#endif
 // Enum for OTAQueryStatus
 enum class OTAQueryStatus : uint8_t
 {
@@ -8472,24 +8486,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace OtaSoftwareUpdateProvider
 namespace OtaSoftwareUpdateRequestor {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for ChangeReasonEnum
-enum class ChangeReasonEnum : uint8_t
-{
-    kUnknown         = 0x00,
-    kSuccess         = 0x01,
-    kFailure         = 0x02,
-    kTimeOut         = 0x03,
-    kDelayByProvider = 0x04,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ChangeReasonEnum                = EmberAfChangeReasonEnum;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAAnnouncementReason
 enum class OTAAnnouncementReason : uint8_t
 {
@@ -8497,14 +8493,17 @@ enum class OTAAnnouncementReason : uint8_t
     kUpdateAvailable       = 0x01,
     kUrgentUpdateAvailable = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTAAnnouncementReason           = EmberAfOTAAnnouncementReason;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for UpdateStateEnum
-enum class UpdateStateEnum : uint8_t
+// Enum for OTAChangeReasonEnum
+enum class OTAChangeReasonEnum : uint8_t
+{
+    kUnknown         = 0x00,
+    kSuccess         = 0x01,
+    kFailure         = 0x02,
+    kTimeOut         = 0x03,
+    kDelayByProvider = 0x04,
+};
+// Enum for OTAUpdateStateEnum
+enum class OTAUpdateStateEnum : uint8_t
 {
     kUnknown              = 0x00,
     kIdle                 = 0x01,
@@ -8516,9 +8515,6 @@ enum class UpdateStateEnum : uint8_t
     kRollingBack          = 0x07,
     kDelayedOnUserConsent = 0x08,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using UpdateStateEnum                 = EmberAfUpdateStateEnum;
-#endif
 
 namespace Structs {
 namespace ProviderLocation {
@@ -8634,9 +8630,9 @@ struct TypeInfo
 namespace UpdateState {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
-    using DecodableType    = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
-    using DecodableArgType = chip::app::Clusters::OtaSoftwareUpdateRequestor::UpdateStateEnum;
+    using Type             = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using DecodableType    = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using DecodableArgType = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UpdateState::Id; }
@@ -8730,9 +8726,9 @@ public:
     static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    DataModel::Nullable<UpdateStateEnum> previousState;
-    UpdateStateEnum newState;
-    ChangeReasonEnum reason;
+    DataModel::Nullable<OTAUpdateStateEnum> previousState;
+    OTAUpdateStateEnum newState;
+    OTAChangeReasonEnum reason;
     DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -8745,9 +8741,9 @@ public:
     static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    DataModel::Nullable<UpdateStateEnum> previousState;
-    UpdateStateEnum newState;
-    ChangeReasonEnum reason;
+    DataModel::Nullable<OTAUpdateStateEnum> previousState;
+    OTAUpdateStateEnum newState;
+    OTAChangeReasonEnum reason;
     DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -8837,6 +8833,30 @@ namespace LocalizationConfiguration {
 
 namespace Attributes {
 
+namespace ActiveLocale {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveLocale::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActiveLocale
+namespace SupportedLocales {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedLocales::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedLocales
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8882,6 +8902,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ActiveLocale::TypeInfo::DecodableType activeLocale;
+        Attributes::SupportedLocales::TypeInfo::DecodableType supportedLocales;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
@@ -8890,9 +8912,67 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace LocalizationConfiguration
 namespace LocalizationTimeFormat {
+// Enum for CalendarType
+enum class CalendarType : uint8_t
+{
+    kBuddhist  = 0x00,
+    kChinese   = 0x01,
+    kCoptic    = 0x02,
+    kEthiopian = 0x03,
+    kGregorian = 0x04,
+    kHebrew    = 0x05,
+    kIndian    = 0x06,
+    kIslamic   = 0x07,
+    kJapanese  = 0x08,
+    kKorean    = 0x09,
+    kPersian   = 0x0A,
+    kTaiwanese = 0x0B,
+};
+// Enum for HourFormat
+enum class HourFormat : uint8_t
+{
+    k12hr = 0x00,
+    k24hr = 0x01,
+};
 
 namespace Attributes {
 
+namespace HourFormat {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HourFormat::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HourFormat
+namespace CalendarType {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CalendarType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CalendarType
+namespace SupportedCalendarTypes {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::LocalizationTimeFormat::CalendarType>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::LocalizationTimeFormat::CalendarType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::LocalizationTimeFormat::CalendarType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedCalendarTypes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedCalendarTypes
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8938,6 +9018,9 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::HourFormat::TypeInfo::DecodableType hourFormat;
+        Attributes::CalendarType::TypeInfo::DecodableType calendarType;
+        Attributes::SupportedCalendarTypes::TypeInfo::DecodableType supportedCalendarTypes;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
@@ -8946,9 +9029,28 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace LocalizationTimeFormat
 namespace LocalizationUnit {
+// Enum for TempUnit
+enum class TempUnit : uint8_t
+{
+    kFahrenheit = 0x00,
+    kCelsius    = 0x01,
+    kKelvin     = 0x02,
+};
 
 namespace Attributes {
 
+namespace TemperatureUnit {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TemperatureUnit
 namespace AttributeList {
 struct TypeInfo
 {
@@ -8994,6 +9096,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::TemperatureUnit::TypeInfo::DecodableType temperatureUnit;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
@@ -9547,9 +9650,6 @@ enum class GeneralCommissioningError : uint8_t
     kInvalidAuthentication = 0x02,
     kNotCommissioning      = 0x03,
 };
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RegulatoryLocationType
 enum class RegulatoryLocationType : uint8_t
 {
@@ -9557,9 +9657,6 @@ enum class RegulatoryLocationType : uint8_t
     kOutdoor       = 0x01,
     kIndoorOutdoor = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RegulatoryLocationType          = EmberAfRegulatoryLocationType;
-#endif
 
 namespace Structs {
 namespace BasicCommissioningInfoType {
@@ -15388,26 +15485,7 @@ struct TypeInfo
 namespace FixedLabel {
 
 namespace Structs {
-namespace LabelStruct {
-enum class Fields
-{
-    kLabel = 1,
-    kValue = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan label;
-    chip::CharSpan value;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-
-using DecodableType = Type;
-
-} // namespace LabelStruct
+namespace LabelStruct = Clusters::detail::Structs::LabelStruct;
 } // namespace Structs
 
 namespace Attributes {
@@ -15481,26 +15559,7 @@ struct TypeInfo
 namespace UserLabel {
 
 namespace Structs {
-namespace LabelStruct {
-enum class Fields
-{
-    kLabel = 1,
-    kValue = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan label;
-    chip::CharSpan value;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-
-using DecodableType = Type;
-
-} // namespace LabelStruct
+namespace LabelStruct = Clusters::detail::Structs::LabelStruct;
 } // namespace Structs
 
 namespace Attributes {

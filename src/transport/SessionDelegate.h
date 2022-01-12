@@ -31,7 +31,7 @@ public:
      *
      * @param session   The handle to the secure session
      */
-    virtual void OnSessionReleased(const SessionHandle & session) = 0;
+    virtual void OnSessionReleased() = 0;
 };
 
 class DLL_EXPORT SessionRecoveryDelegate

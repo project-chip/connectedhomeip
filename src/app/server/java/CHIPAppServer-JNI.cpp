@@ -22,6 +22,7 @@
  *
  */
 #include "AndroidAppServerWrapper.h"
+#include "ChipThreadWork.h"
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
@@ -127,6 +128,12 @@ exit:
     {
         return JNI_FALSE;
     }
+    return JNI_TRUE;
+}
+
+JNI_METHOD(jboolean, stopApp)(JNIEnv * env, jobject self)
+{
+    chip::ThreadWork::ChipMainThreadScheduleAndWait([] { ChipAndroidAppShutdown(); });
     return JNI_TRUE;
 }
 

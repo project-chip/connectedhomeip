@@ -100,33 +100,22 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR InvokeGroupCommand(DeviceProxy * aDevice, GroupId groupId, const RequestType & aRequestData)
+    CHIP_ERROR InvokeGroupCommand(Messaging::ExchangeManager * exchangeManager, GroupId groupId, const RequestType & aRequestData)
     {
         app::CommandPathParams commandPath = { 0 /* endpoint */, groupId, RequestType::GetClusterId(), RequestType::GetCommandId(),
                                                (app::CommandPathFlags::kGroupIdValid) };
 
-        auto commandSender = Platform::MakeUnique<app::CommandSender>(this, aDevice->GetExchangeManager());
+        auto commandSender = Platform::MakeUnique<app::CommandSender>(this, exchangeManager);
         VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
         ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, aRequestData));
 
-        if (aDevice->GetSecureSession().HasValue())
+        Optional<SessionHandle> session = exchangeManager->GetSessionManager()->CreateGroupSession(groupId);
+        if (!session.HasValue())
         {
-            SessionHandle session = aDevice->GetSecureSession().Value();
-            session.SetGroupId(groupId);
-
-            if (!session.IsGroupSession())
-            {
-                return CHIP_ERROR_INCORRECT_STATE;
-            }
-
-            ReturnErrorOnFailure(commandSender->SendCommandRequest(session));
+            return CHIP_ERROR_NO_MEMORY;
         }
-        else
-        {
-            // something fishy is going on
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
+        ReturnErrorOnFailure(commandSender->SendCommandRequest(session));
 
         commandSender.release();
         return CHIP_NO_ERROR;

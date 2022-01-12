@@ -122,6 +122,19 @@ void CASESession::CloseExchange()
     }
 }
 
+void CASESession::DiscardExchange()
+{
+    if (mExchangeCtxt != nullptr)
+    {
+        // Make sure the exchange doesn't try to notify us when it closes,
+        // since we might be dead by then.
+        mExchangeCtxt->SetDelegate(nullptr);
+        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // exchange will handle that.
+        mExchangeCtxt = nullptr;
+    }
+}
+
 CHIP_ERROR CASESession::ToCachable(CASESessionCachable & cachableSession)
 {
     const NodeId peerNodeId = GetPeerNodeId();
@@ -231,7 +244,7 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
     mFabricInfo     = fabric;
     mLocalMRPConfig = mrpConfig;
 
-    mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetAckTimeout());
+    mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     SetPeerAddress(peerAddress);
     SetPeerNodeId(peerNodeId);
 
@@ -252,11 +265,12 @@ void CASESession::OnResponseTimeout(ExchangeContext * ec)
     VerifyOrReturn(mExchangeCtxt == ec, ChipLogError(SecureChannel, "CASESession::OnResponseTimeout exchange doesn't match"));
     ChipLogError(SecureChannel, "CASESession timed out while waiting for a response from the peer. Current state was %" PRIu8,
                  mState);
-    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
-    // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+    // Discard the exchange so that Clear() doesn't try closing it.  The
     // exchange will handle that.
-    mExchangeCtxt = nullptr;
+    DiscardExchange();
     Clear();
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role)
@@ -683,10 +697,12 @@ CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 
     mCASESessionEstablished = true;
 
-    // Forget our exchange, as no additional messages are expected from the peer
-    mExchangeCtxt = nullptr;
+    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    DiscardExchange();
 
     // Call delegate to indicate session establishment is successful
+    // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablished();
 
 exit:
@@ -1117,10 +1133,12 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
 
     mCASESessionEstablished = true;
 
-    // Forget our exchange, as no additional messages are expected from the peer
-    mExchangeCtxt = nullptr;
+    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    DiscardExchange();
 
     // Call delegate to indicate session establishment is successful
+    // Do this last in case the delegate frees us.
     mDelegate->OnSessionEstablished();
 
 exit:
@@ -1280,15 +1298,14 @@ CHIP_ERROR CASESession::RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk)
     return CHIP_NO_ERROR;
 }
 
-// TODO: Remove this and replace with system method to retrieve current time
-CHIP_ERROR CASESession::SetEffectiveTime(void)
+CHIP_ERROR CASESession::GetHardcodedTime()
 {
     using namespace ASN1;
     ASN1UniversalTime effectiveTime;
 
-    effectiveTime.Year   = 2021;
-    effectiveTime.Month  = 2;
-    effectiveTime.Day    = 12;
+    effectiveTime.Year   = 2022;
+    effectiveTime.Month  = 1;
+    effectiveTime.Day    = 1;
     effectiveTime.Hour   = 10;
     effectiveTime.Minute = 10;
     effectiveTime.Second = 10;
@@ -1296,21 +1313,43 @@ CHIP_ERROR CASESession::SetEffectiveTime(void)
     return ASN1ToChipEpochTime(effectiveTime, mValidContext.mEffectiveTime);
 }
 
+CHIP_ERROR CASESession::SetEffectiveTime()
+{
+    System::Clock::Milliseconds64 currentTimeMS;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentTimeMS);
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        ChipLogError(
+            SecureChannel,
+            "The device does not support GetClock_RealTimeMS() API. This will eventually result in CASE session setup failures.");
+        // TODO: Remove use of hardcoded time during CASE setup
+        return GetHardcodedTime();
+    }
+    ReturnErrorOnFailure(err);
+
+    System::Clock::Seconds32 currentTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentTimeMS);
+    VerifyOrReturnError(UnixEpochToChipEpochTime(currentTime.count(), mValidContext.mEffectiveTime), CHIP_ERROR_INVALID_TIME);
+
+    return CHIP_NO_ERROR;
+}
+
 void CASESession::OnSuccessStatusReport()
 {
     ChipLogProgress(SecureChannel, "Success status report received. Session was established");
     mCASESessionEstablished = true;
 
-    // Forget our exchange, as no additional messages are expected from the peer
-    mExchangeCtxt = nullptr;
-
-    // Call delegate to indicate pairing completion
-    mDelegate->OnSessionEstablished();
+    // Discard the exchange so that Clear() doesn't try closing it.  The
+    // exchange will handle that.
+    DiscardExchange();
 
     mState = kInitialized;
 
     // TODO: Set timestamp on the new session, to allow selecting a least-recently-used session for eviction
     // on running out of session contexts.
+
+    // Call delegate to indicate pairing completion.
+    // Do this last in case the delegate frees us.
+    mDelegate->OnSessionEstablished();
 }
 
 CHIP_ERROR CASESession::OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode)
@@ -1438,7 +1477,7 @@ CHIP_ERROR CASESession::ValidateReceivedMessage(ExchangeContext * ec, const Payl
     else
     {
         mExchangeCtxt = ec;
-        mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetAckTimeout());
+        mExchangeCtxt->SetResponseTimeout(kSigma_Response_Timeout + mExchangeCtxt->GetSessionHandle()->GetAckTimeout());
     }
 
     VerifyOrReturnError(!msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1522,10 +1561,11 @@ exit:
     // Call delegate to indicate session establishment failure.
     if (err != CHIP_NO_ERROR)
     {
-        // Null out mExchangeCtxt so that Clear() doesn't try closing it.  The
+        // Discard the exchange so that Clear() doesn't try closing it.  The
         // exchange will handle that.
-        mExchangeCtxt = nullptr;
+        DiscardExchange();
         Clear();
+        // Do this last in case the delegate frees us.
         mDelegate->OnSessionEstablishmentError(err);
     }
     return err;

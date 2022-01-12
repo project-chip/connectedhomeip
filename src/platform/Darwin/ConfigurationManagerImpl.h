@@ -44,6 +44,8 @@ private:
 
     CHIP_ERROR Init(void) override;
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf) override;
+    CHIP_ERROR GetActiveLocale(char * buf, size_t bufSize, size_t & codeLen) override;
+    CHIP_ERROR StoreActiveLocale(const char * code, size_t codeLen) override;
     bool CanFactoryReset(void) override;
     void InitiateFactoryReset(void) override;
     CHIP_ERROR ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key key, uint32_t & value) override;

@@ -16,7 +16,8 @@
  */
 
 #include "MediaInputManager.h"
-
+#include "TvApp-JNI.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/JniReferences.h>
@@ -24,12 +25,6 @@
 
 using namespace chip;
 using namespace chip::app::Clusters::MediaInput;
-
-MediaInputManager MediaInputManager::sInstance;
-
-namespace {
-static MediaInputManager mediaInputManager;
-} // namespace
 
 /** @brief Media Input Cluster Init
  *
@@ -42,13 +37,20 @@ static MediaInputManager mediaInputManager;
  */
 void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Android App: MediaInput::SetDefaultDelegate");
-    chip::app::Clusters::MediaInput::SetDefaultDelegate(endpoint, &mediaInputManager);
+    ChipLogProgress(Zcl, "TV Android App: MediaInput::PostClusterInit");
+    TvAppJNIMgr().PostClusterInit(chip::app::Clusters::MediaInput::Id, endpoint);
 }
 
-std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> MediaInputManager::HandleGetInputList()
+void MediaInputManager::NewManager(jint endpoint, jobject manager)
 {
-    std::list<Structs::InputInfo::Type> list;
+    ChipLogProgress(Zcl, "TV Android App: MediaInput::SetDefaultDelegate");
+    MediaInputManager * mgr = new MediaInputManager();
+    mgr->InitializeWithObjects(manager);
+    chip::app::Clusters::MediaInput::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
+}
+
+CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -57,14 +59,14 @@ std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> MediaInputM
     VerifyOrExit(mGetInputListMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    {
+    return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jobjectArray inputArray = (jobjectArray) env->CallObjectMethod(mMediaInputManagerObject, mGetInputListMethod);
         if (env->ExceptionCheck())
         {
             ChipLogError(AppServer, "Java exception in MediaInputManager::HandleGetInputList");
             env->ExceptionDescribe();
             env->ExceptionClear();
-            return list;
+            return CHIP_ERROR_INCORRECT_STATE;
         }
 
         jint size = env->GetArrayLength(inputArray);
@@ -86,32 +88,34 @@ std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> MediaInputM
             jfieldID nameId = env->GetFieldID(inputClass, "name", "Ljava/lang/String;");
             jstring jname   = static_cast<jstring>(env->GetObjectField(inputObj, nameId));
 
+            JniUtfString name(env, jname);
             if (jname != NULL)
             {
-                JniUtfString name(env, jname);
                 mediaInput.name = name.charSpan();
             }
 
             jfieldID descriptionId = env->GetFieldID(inputClass, "description", "Ljava/lang/String;");
             jstring jdescription   = static_cast<jstring>(env->GetObjectField(inputObj, descriptionId));
 
+            JniUtfString description(env, jdescription);
             if (jdescription != NULL)
             {
-                JniUtfString description(env, jdescription);
                 mediaInput.description = description.charSpan();
             }
 
-            list.push_back(mediaInput);
+            ReturnErrorOnFailure(encoder.Encode(mediaInput));
         }
-    }
+
+        return CHIP_NO_ERROR;
+    });
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "MediaInputManager::HandleGetInputList status error: %s", err.AsString());
+        ChipLogError(Zcl, "MediaInputManager::GetInputList status error: %s", err.AsString());
     }
 
-    return list;
+    return err;
 }
 
 uint8_t MediaInputManager::HandleGetCurrentInput()
@@ -256,7 +260,7 @@ void MediaInputManager::InitializeWithObjects(jobject managerObject)
     jclass MediaInputManagerClass = env->GetObjectClass(managerObject);
     VerifyOrReturn(MediaInputManagerClass != nullptr, ChipLogError(Zcl, "Failed to get MediaInputManager Java class"));
 
-    mGetInputListMethod = env->GetMethodID(MediaInputManagerClass, "getInputList", "()[Lcom/tcl/chip/tvapp/InputInfo;");
+    mGetInputListMethod = env->GetMethodID(MediaInputManagerClass, "getInputList", "()[Lcom/tcl/chip/tvapp/MediaInputInfo;");
     if (mGetInputListMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access MediaInputManager 'getInputList' method");

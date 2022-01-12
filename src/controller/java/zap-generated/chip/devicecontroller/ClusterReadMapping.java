@@ -536,7 +536,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicCluster) cluster)
-                  .readVendorIDAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readVendorIDAttribute(
+                      (ChipClusters.BasicCluster.VendorIDAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readBasicVendorIDCommandParams);
@@ -3334,6 +3335,40 @@ public class ClusterReadMapping {
     readLevelControlInteractionInfo.put(
         "readClusterRevisionAttribute", readLevelControlClusterRevisionAttributeInteractionInfo);
     readAttributeMap.put("levelControl", readLevelControlInteractionInfo);
+    Map<String, InteractionInfo> readLocalizationConfigurationInteractionInfo =
+        new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readLocalizationConfigurationActiveLocaleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readLocalizationConfigurationActiveLocaleAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.LocalizationConfigurationCluster) cluster)
+                  .readActiveLocaleAttribute((ChipClusters.CharStringAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+            readLocalizationConfigurationActiveLocaleCommandParams);
+    readLocalizationConfigurationInteractionInfo.put(
+        "readActiveLocaleAttribute",
+        readLocalizationConfigurationActiveLocaleAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readLocalizationConfigurationSupportedLocalesCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readLocalizationConfigurationSupportedLocalesAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.LocalizationConfigurationCluster) cluster)
+                  .readSupportedLocalesAttribute(
+                      (ChipClusters.LocalizationConfigurationCluster
+                              .SupportedLocalesAttributeCallback)
+                          callback);
+            },
+            () ->
+                new ClusterInfoMapping
+                    .DelegatedLocalizationConfigurationClusterSupportedLocalesAttributeCallback(),
+            readLocalizationConfigurationSupportedLocalesCommandParams);
+    readLocalizationConfigurationInteractionInfo.put(
+        "readSupportedLocalesAttribute",
+        readLocalizationConfigurationSupportedLocalesAttributeInteractionInfo);
+    readAttributeMap.put("localizationConfiguration", readLocalizationConfigurationInteractionInfo);
     Map<String, InteractionInfo> readLowPowerInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readLowPowerAttributeListCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();

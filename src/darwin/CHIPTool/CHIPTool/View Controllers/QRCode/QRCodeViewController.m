@@ -474,14 +474,14 @@
 }
 
 // MARK: CHIPDevicePairingDelegate
-- (void)onPairingComplete:(NSError *)error
+- (void)onPairingComplete:(NSError * _Nullable)error
 {
-    if (error.code != CHIPSuccess) {
+    if (error != nil) {
         NSLog(@"Got pairing error back %@", error);
     } else {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self->_deviceList refreshDeviceList];
-            [self retrieveAndSendWifiCredentials];
+            [self retrieveAndSendWiFiCredentials];
         });
     }
 }
@@ -574,10 +574,10 @@
     [self handleRendezVous:payload rawPayload:rawPayload];
 }
 
-- (void)retrieveAndSendWifiCredentials
+- (void)retrieveAndSendWiFiCredentials
 {
     UIAlertController * alertController =
-        [UIAlertController alertControllerWithTitle:@"Wifi Configuration"
+        [UIAlertController alertControllerWithTitle:@"WiFi Configuration"
                                             message:@"Input network SSID and password that your phone is connected to."
                                      preferredStyle:UIAlertControllerStyleAlert];
     [alertController addTextFieldWithConfigurationHandler:^(UITextField * textField) {
@@ -721,9 +721,9 @@
     [controller updateDevice:deviceId fabricId:0];
 }
 
-- (void)onAddressUpdated:(NSError *)error
+- (void)onAddressUpdated:(NSError * _Nullable)error
 {
-    if (error.code != CHIPSuccess) {
+    if (error != nil) {
         NSLog(@"Error retrieving device informations over Mdns: %@", error);
         return;
     }

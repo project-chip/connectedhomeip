@@ -20,6 +20,7 @@
 
 #include <app/CommandHandler.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
+#include <ota-provider-common/BdxOtaSender.h>
 
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.
@@ -30,6 +31,7 @@ public:
     OTAProviderExample();
 
     void SetOTAFilePath(const char * path);
+    BdxOtaSender * GetBdxOtaSender() { return &mBdxOtaSender; }
 
     // Inherited from OTAProviderDelegate
     EmberAfStatus HandleQueryImage(
@@ -52,6 +54,7 @@ public:
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
 
 private:
+    BdxOtaSender mBdxOtaSender;
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
     queryImageBehaviorType mQueryImageBehavior;

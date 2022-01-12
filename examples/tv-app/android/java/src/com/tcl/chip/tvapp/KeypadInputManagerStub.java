@@ -23,10 +23,19 @@ import android.util.Log;
 public class KeypadInputManagerStub implements KeypadInputManager {
 
   private final String TAG = KeypadInputManagerStub.class.getSimpleName();
+  private int endpoint;
+
+  public KeypadInputManagerStub(int endpoint) {
+    this.endpoint = endpoint;
+  }
 
   @Override
   public int sendKey(int keyCode) {
-    Log.d(TAG, "sendKey:" + keyCode);
+    Log.d(TAG, "sendKey:" + keyCode + " at " + endpoint);
+
+    if (keyCode == KeypadInputManager.KEY_CODE_F4_YELLOW) {
+      return KEY_STATUS_UNSUPPORTED_KEY;
+    }
     return KEY_STATUS_SUCCESS;
   }
 }

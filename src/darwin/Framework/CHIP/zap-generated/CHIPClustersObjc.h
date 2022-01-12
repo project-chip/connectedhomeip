@@ -2202,6 +2202,21 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /**
+ * Cluster Localization Configuration
+ *
+ */
+@interface CHIPLocalizationConfiguration : CHIPCluster
+
+- (void)readAttributeActiveLocaleWithCompletionHandler:(void (^)(
+                                                           NSString * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeActiveLocaleWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+- (void)readAttributeSupportedLocalesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+@end
+
+/**
  * Cluster Low Power
  *
  */
@@ -3812,6 +3827,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeListNullablesAndOptionalsStructWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                               NSError * _Nullable error))completionHandler;
+- (void)writeAttributeListNullablesAndOptionalsStructWithValue:(NSArray * _Nonnull)value
+                                             completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeListNullablesAndOptionalsStructWithMinInterval:(uint16_t)minInterval
                                                              maxInterval:(uint16_t)maxInterval
                                                  subscriptionEstablished:

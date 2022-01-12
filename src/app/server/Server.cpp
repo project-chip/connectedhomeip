@@ -92,7 +92,8 @@ Server::Server() :
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
-    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage)
+    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage),
+    mAttributePersister(mServerStorage)
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
@@ -106,6 +107,11 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     mCommissioningWindowManager.SetAppDelegate(delegate);
     mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
+
+    // Set up attribute persistence before we try to bring up the data model
+    // handler.
+    SetAttributePersistenceProvider(&mAttributePersister);
+
     InitDataModelHandler(&mExchangeMgr);
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -127,6 +133,9 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mSecuredServicePort)
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+                               .SetNativeParams(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance())
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
 
 #if INET_CONFIG_ENABLE_IPV4
                                ,
@@ -145,10 +154,10 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     SuccessOrExit(err);
 
-    // Enable Group Listening
-    // TODO : Fix this once GroupDataProvider is implemented #Issue 11075
-    // for (iterate through all GroupDataProvider multicast Address)
-    // {
+// Enable Group Listening
+// TODO : Fix this once GroupDataProvider is implemented #Issue 11075
+// for (iterate through all GroupDataProvider multicast Address)
+// {
 #ifdef CHIP_ENABLE_GROUP_MESSAGING_TESTS
     err = mTransports.MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(1, 1234), true);
     SuccessOrExit(err);

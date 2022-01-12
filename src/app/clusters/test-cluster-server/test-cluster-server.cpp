@@ -96,6 +96,12 @@ Structs::SimpleStruct::Type gStructAttributeValue = { 0,          false,      Si
                                                       0,          0 };
 NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
 
+// We don't actually support any interesting bits in the struct for now, except
+// for a non-null nullableList member.
+SimpleEnum gSimpleEnums[kAttributeListLength];
+size_t gSimpleEnumCount = 0;
+Structs::NullablesAndOptionalsStruct::Type gNullablesAndOptionalsStruct;
+
 CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
@@ -334,17 +340,59 @@ CHIP_ERROR TestAttrAccess::WriteListStructOctetStringAttribute(AttributeValueDec
 CHIP_ERROR TestAttrAccess::ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder)
 {
     return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        // Just encode a single default-initialized
-        // entry for now.
-        Structs::NullablesAndOptionalsStruct::Type entry;
-        ReturnErrorOnFailure(encoder.Encode(entry));
+        // Just encode our one struct for now.
+        ReturnErrorOnFailure(encoder.Encode(gNullablesAndOptionalsStruct));
         return CHIP_NO_ERROR;
     });
 }
 
 CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(AttributeValueDecoder & aDecoder)
 {
-    // TODO Add yaml test case for NullablesAndOptionalsStruct list
+    DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType> list;
+    ReturnErrorOnFailure(aDecoder.Decode(list));
+
+    size_t count;
+    ReturnErrorOnFailure(list.ComputeSize(&count));
+    // This should really send proper errors on invalid input!
+    VerifyOrReturnError(count == 1, CHIP_ERROR_INVALID_ARGUMENT);
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+        auto & value = iter.GetValue();
+        // We only support some values so far.
+        VerifyOrReturnError(value.nullableString.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(value.nullableStruct.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        VerifyOrReturnError(!value.optionalString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.nullableOptionalString.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.optionalStruct.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.nullableOptionalStruct.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.optionalList.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(!value.nullableOptionalList.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        // Start our value off as null, just in case we fail to decode things.
+        gNullablesAndOptionalsStruct.nullableList.SetNull();
+        if (!value.nullableList.IsNull())
+        {
+            ReturnErrorOnFailure(value.nullableList.Value().ComputeSize(&count));
+            VerifyOrReturnError(count <= ArraySize(gSimpleEnums), CHIP_ERROR_INVALID_ARGUMENT);
+            auto iter2       = value.nullableList.Value().begin();
+            gSimpleEnumCount = 0;
+            while (iter2.Next())
+            {
+                gSimpleEnums[gSimpleEnumCount] = iter2.GetValue();
+                ++gSimpleEnumCount;
+            }
+            ReturnErrorOnFailure(iter2.GetStatus());
+            gNullablesAndOptionalsStruct.nullableList.SetNonNull(Span<SimpleEnum>(gSimpleEnums, gSimpleEnumCount));
+        }
+        gNullablesAndOptionalsStruct.nullableInt         = value.nullableInt;
+        gNullablesAndOptionalsStruct.optionalInt         = value.optionalInt;
+        gNullablesAndOptionalsStruct.nullableOptionalInt = value.nullableOptionalInt;
+    }
+
+    ReturnErrorOnFailure(iter.GetStatus());
     return CHIP_NO_ERROR;
 }
 
@@ -562,6 +610,11 @@ bool emberAfTestClusterClusterTestListInt8UReverseRequestCallback(
     {
         auto iter = commandData.arg1.begin();
         Commands::TestListInt8UReverseResponse::Type responseData;
+        if (count == 0)
+        {
+            SuccessOrExit(commandObj->AddResponseData(commandPath, responseData));
+            return true;
+        }
         size_t cur = count;
         Platform::ScopedMemoryBuffer<uint8_t> responseBuf;
         VerifyOrExit(responseBuf.Calloc(count), );

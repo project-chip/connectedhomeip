@@ -145,6 +145,12 @@ static void TestDACProvidersExample_Signature(nlTestSuite * inSuite, void * inCo
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
+static void OnAttestationInformationVerificationCallback(void * context, AttestationVerificationResult result)
+{
+    AttestationVerificationResult * pResult = reinterpret_cast<AttestationVerificationResult *>(context);
+    *pResult                                = result;
+}
+
 static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -184,9 +190,10 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
     DeviceAttestationVerifier * default_verifier = GetDeviceAttestationVerifier();
     NL_TEST_ASSERT(inSuite, default_verifier != nullptr);
 
-    AttestationVerificationResult attestation_result =
-        default_verifier->VerifyAttestationInformation(ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan());
-    NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kNotImplemented);
+    AttestationVerificationResult attestationResult = AttestationVerificationResult::kSuccess;
+    ByteSpan emptyByteSpan;
+    attestationResult = default_verifier->ValidateCertificationDeclarationSignature(ByteSpan(), emptyByteSpan);
+    NL_TEST_ASSERT(inSuite, attestationResult == AttestationVerificationResult::kNotImplemented);
 
     DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
     NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
@@ -213,10 +220,14 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
     err = default_provider->GetProductAttestationIntermediateCert(pai_span);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    attestation_result = default_verifier->VerifyAttestationInformation(
+    attestationResult = AttestationVerificationResult::kNotImplemented;
+    Callback::Callback<OnAttestationInformationVerification> attestationInformationVerificationCallback(
+        OnAttestationInformationVerificationCallback, &attestationResult);
+
+    default_verifier->VerifyAttestationInformation(
         ByteSpan(attestationElementsTestVector), ByteSpan(attestationChallengeTestVector), ByteSpan(attestationSignatureTestVector),
-        pai_span, dac_span, ByteSpan(attestationNonceTestVector));
-    NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
+        pai_span, dac_span, ByteSpan(attestationNonceTestVector), &attestationInformationVerificationCallback);
+    NL_TEST_ASSERT(inSuite, attestationResult == AttestationVerificationResult::kSuccess);
 }
 
 static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inSuite, void * inContext)

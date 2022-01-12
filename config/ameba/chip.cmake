@@ -42,6 +42,8 @@ list(
     -Wno-unused-parameter
     -Wno-format
     -Wno-stringop-truncation
+    -Wno-format-nonliteral
+    -Wno-format-security
     -std=c++17
 )
 

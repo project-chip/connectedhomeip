@@ -86,6 +86,7 @@ tests:
       response:
           value: 0
 
+    #disabled due to issue #13442
     - label: "Read the optional attribute: Tolerance"
       disabled: true
       command: "readAttribute"

@@ -24,6 +24,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/internal/BLEManager.h>
 
 #include "esp_event.h"
@@ -338,7 +339,7 @@ static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
     return frequency;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
+CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWiFiStatsCounters(void)
 {
     esp_err_t err;
     wifi_config_t wifiConfig;
@@ -366,7 +367,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
                   "Our bits are going to start overlapping");
     bssid = static_cast<uint16_t>((wifiConfig.sta.bssid[4] << 8) | wifiConfig.sta.bssid[5]);
     ChipLogProgress(DeviceLayer,
-                    "Wifi-Telemetry\n"
+                    "WiFi-Telemetry\n"
                     "BSSID: %x\n"
                     "freq: %d\n",
                     bssid, freq);
@@ -441,6 +442,10 @@ void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
         {
             switch (event->Platform.ESPSystemEvent.Id)
             {
+            case WIFI_EVENT_SCAN_DONE:
+                ChipLogProgress(DeviceLayer, "WIFI_EVENT_SCAN_DONE");
+                NetworkCommissioning::ESPWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
+                break;
             case WIFI_EVENT_STA_START:
                 ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_START");
                 DriveStationState();
@@ -644,7 +649,7 @@ void ConnectivityManagerImpl::OnStationConnected()
     {
         ChipLogError(DeviceLayer, "esp_netif_create_ip6_linklocal() failed for WIFI_STA_DEF interface: %s", esp_err_to_name(err));
     }
-
+    NetworkCommissioning::ESPWiFiDriver::GetInstance().OnConnectWiFiNetwork();
     // TODO Invoke WARM to perform actions that occur when the WiFi station interface comes up.
 
     // Alert other components of the new state.

@@ -257,7 +257,7 @@ void TestWriteInteraction::TestWriteClientGroup(nlTestSuite * apSuite, void * ap
     AddAttributeDataIB(apSuite, apContext, writeClientHandle);
 
     SessionHandle groupSession = ctx.GetSessionBobToFriends();
-    NL_TEST_ASSERT(apSuite, groupSession.IsGroupSession());
+    NL_TEST_ASSERT(apSuite, groupSession->IsGroupSession());
 
     err = writeClientHandle.SendWriteRequest(groupSession);
 

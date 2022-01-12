@@ -173,8 +173,7 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SessionReleaseDelegate,
-                                    public SessionRecoveryDelegate,
+class DLL_EXPORT DeviceController : public SessionRecoveryDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
                                     public AbstractDnssdDiscoveryController,
 #endif
@@ -397,9 +396,6 @@ protected:
 
     ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 
-    //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(const SessionHandle & session) override;
-
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
@@ -417,7 +413,7 @@ private:
     Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
 
     static void OnPIDReadResponse(void * context, uint16_t value);
-    static void OnVIDReadResponse(void * context, uint16_t value);
+    static void OnVIDReadResponse(void * context, VendorId value);
     static void OnVIDPIDReadFailureResponse(void * context, EmberAfStatus status);
 
     CHIP_ERROR OpenCommissioningWindowInternal();
@@ -707,9 +703,6 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(const SessionHandle & session) override;
-
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
     /* This function sends a Device Attestation Certificate chain request to the device.
@@ -773,6 +766,8 @@ private:
     static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
 
+    static void OnDeviceAttestationInformationVerification(void * context, Credentials::AttestationVerificationResult result);
+
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                            const ByteSpan & rcac);
 
@@ -826,6 +821,8 @@ private:
 
     Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    Callback::Callback<Credentials::OnAttestationInformationVerification> mDeviceAttestationInformationVerificationCallback;
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;
