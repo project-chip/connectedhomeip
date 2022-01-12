@@ -156,7 +156,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                                 DlCredentialType credentialType, const chip::ByteSpan & credentialData)
 {
     ChipLogProgress(Zcl,
-                    "Door Lock App: LockManager::GetCredential "
+                    "Door Lock App: LockManager::SetCredential "
                     "[endpoint=%d,credentialIndex=%hu,credentialStatus=%hhu,credentialType=%hhu,credentialDataSize=%zu]",
                     endpointId, credentialIndex, credentialStatus, credentialType, credentialData.size());
 
@@ -183,7 +183,7 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     std::memcpy(credentialInStorage.credentialData, credentialData.data(), credentialData.size());
     credentialInStorage.credentialDataSize = credentialData.size();
 
-    ChipLogProgress(Zcl, "Successfully set the user [endpointId=%d,index=%d,adjustedIndex=%d,credentialType=%hhu]", endpointId, credentialIndex,
+    ChipLogProgress(Zcl, "Successfully set the credential [endpointId=%d,index=%d,adjustedIndex=%d,credentialType=%hhu]", endpointId, credentialIndex,
                     adjustedCredentialIndex, credentialType);
 
     return true;
