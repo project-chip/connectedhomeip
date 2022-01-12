@@ -113,6 +113,8 @@ Status AmebaWiFiDriver::RemoveNetwork(ByteSpan networkId)
 
 Status AmebaWiFiDriver::ReorderNetwork(ByteSpan networkId, uint8_t index)
 {
+    // Only one network is supported now
+    VerifyOrReturnError(index == 0, Status::kOutOfRange);
     VerifyOrReturnError(NetworkMatch(mStagingNetwork, networkId), Status::kNetworkIDNotFound);
     return Status::kSuccess;
 }
