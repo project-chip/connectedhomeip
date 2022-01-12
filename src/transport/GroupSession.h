@@ -120,7 +120,7 @@ public:
     }
 
     /**
-     * @brief Deletes an entry from the
+     * @brief Deletes an entry from the object pool
      *
      * @param entry
      */
