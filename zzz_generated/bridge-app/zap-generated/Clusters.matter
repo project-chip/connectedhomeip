@@ -1679,6 +1679,7 @@ struct Target {
   devtype_id kDeviceType = 2;
 }
 
+[fabric_scoped_by=kFabricIndex]
 struct AccessControlEntry {
   fabric_idx kFabricIndex = 0;
   Privilege kPrivilege = 1;
@@ -1735,6 +1736,7 @@ struct EndpointListStruct {
   ENDPOINT_NO kEndpoints = 4;
 }
 
+[fabric_scoped_by=kFabricIndex]
 struct ExtensionEntry {
   fabric_idx kFabricIndex = 0;
   OCTET_STRING kData = 1;
@@ -1756,6 +1758,7 @@ struct GroupInfo {
   CHAR_STRING kGroupName = 3;
 }
 
+[fabric_scoped_by=kFabricIndex]
 struct GroupKey {
   fabric_idx kFabricIndex = 0;
   INT16U kGroupId = 1;
@@ -1877,6 +1880,7 @@ struct PowerProfileRecord {
   ENUM8 kPowerProfileState = 4;
 }
 
+[fabric_scoped_by=kFabricIndex]
 struct ProviderLocation {
   fabric_idx kFabricIndex = 0;
   node_id kProviderNodeID = 1;

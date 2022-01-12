@@ -11,11 +11,11 @@ enum {{asUpperCamelCase name}} : {{type}} {
 {{/zcl_enums}}
 
 {{#zcl_structs}}
+{{#if struct_is_fabric_scoped}}
+[fabric_scoped_by=k{{asUpperCamelCase struct_fabric_idx_field}}]
+{{/if}}
 struct {{name}} {
   {{#zcl_struct_items}}
-  {{#if struct_is_fabric_scoped}}
-  [fabric_scoped {{struct_fabric_idx_field}}]
-  {{/if}}
   {{type}} k{{asUpperCamelCase label}} = {{fieldIdentifier}};
   {{/zcl_struct_items}}
 }
