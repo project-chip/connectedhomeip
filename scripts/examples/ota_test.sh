@@ -12,9 +12,9 @@ CHIP_ROOT="../.."
 pkill chip-ota-provider-app
 pkill chip-ota-requestor-app 
 
-scripts/examples/gn_build_example.sh examples/chip-tool out/
-scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
-scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false
+$CHIP_ROOT/scripts/examples/gn_build_example.sh $CHIP_ROOT/examples/chip-tool out/
+$CHIP_ROOT/scripts/examples/gn_build_example.sh $CHIP_ROOT/examples/ota-provider-app/linux $CHIP_ROOT/out/debug chip_config_network_layer_ble=false
+$CHIP_ROOT/scripts/examples/gn_build_example.sh $CHIP_ROOT/examples/ota-requestor-app/linux $CHIP_ROOT/out/debug chip_config_network_layer_ble=false
 
 ./$CHIP_ROOT/out/debug/chip-ota-provider-app -f $CHIP_ROOT/tmp/ota.txt > $CHIP_ROOT/tmp/provider-log.txt  &
 provider_pid=$!
