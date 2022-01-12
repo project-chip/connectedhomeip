@@ -1293,17 +1293,6 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
 
 } // namespace OtaSoftwareUpdateProvider
 
-namespace OtaSoftwareUpdateProvider {
-
-void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
-{
-    apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::UnsupportedCommand);
-    ChipLogError(Zcl, "Unknown command " ChipLogFormatMEI " for cluster " ChipLogFormatMEI,
-                 ChipLogValueMEI(aCommandPath.mCommandId), ChipLogValueMEI(aCommandPath.mClusterId));
-}
-
-} // namespace OtaSoftwareUpdateProvider
-
 namespace OtaSoftwareUpdateRequestor {
 
 void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandPath & aCommandPath, TLV::TLVReader & aDataTlv)
@@ -2079,9 +2068,6 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, TLV:
         break;
     case Clusters::NetworkCommissioning::Id:
         Clusters::NetworkCommissioning::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
-        break;
-    case Clusters::OtaSoftwareUpdateProvider::Id:
-        Clusters::OtaSoftwareUpdateProvider::DispatchServerCommand(apCommandObj, aCommandPath, aReader);
         break;
     case Clusters::OtaSoftwareUpdateRequestor::Id:
         Clusters::OtaSoftwareUpdateRequestor::DispatchServerCommand(apCommandObj, aCommandPath, aReader);

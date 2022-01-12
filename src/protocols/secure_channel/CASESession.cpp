@@ -1310,20 +1310,39 @@ CHIP_ERROR CASESession::RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk)
     return CHIP_NO_ERROR;
 }
 
-// TODO: Remove this and replace with system method to retrieve current time
-CHIP_ERROR CASESession::SetEffectiveTime(void)
+CHIP_ERROR CASESession::GetHardcodedTime()
 {
     using namespace ASN1;
     ASN1UniversalTime effectiveTime;
 
-    effectiveTime.Year   = 2021;
-    effectiveTime.Month  = 2;
-    effectiveTime.Day    = 12;
+    effectiveTime.Year   = 2022;
+    effectiveTime.Month  = 1;
+    effectiveTime.Day    = 1;
     effectiveTime.Hour   = 10;
     effectiveTime.Minute = 10;
     effectiveTime.Second = 10;
 
     return ASN1ToChipEpochTime(effectiveTime, mValidContext.mEffectiveTime);
+}
+
+CHIP_ERROR CASESession::SetEffectiveTime()
+{
+    System::Clock::Milliseconds64 currentTimeMS;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentTimeMS);
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        ChipLogError(
+            SecureChannel,
+            "The device does not support GetClock_RealTimeMS() API. This will eventually result in CASE session setup failures.");
+        // TODO: Remove use of hardcoded time during CASE setup
+        return GetHardcodedTime();
+    }
+    ReturnErrorOnFailure(err);
+
+    System::Clock::Seconds32 currentTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentTimeMS);
+    VerifyOrReturnError(UnixEpochToChipEpochTime(currentTime.count(), mValidContext.mEffectiveTime), CHIP_ERROR_INVALID_TIME);
+
+    return CHIP_NO_ERROR;
 }
 
 void CASESession::OnSuccessStatusReport()

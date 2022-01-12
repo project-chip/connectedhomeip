@@ -21,6 +21,8 @@ from dataclasses import dataclass
 from typing import Type
 from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32, c_uint16, c_uint8, py_object
 
+from construct.core import ValidationError
+
 from .ClusterObjects import ClusterCommand
 import chip.exceptions
 import chip.interaction_model
@@ -137,7 +139,7 @@ def _OnCommandSenderDoneCallback(closure):
     ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
-def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand) -> int:
+def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPath: CommandPath, payload: ClusterCommand, timedRequestTimeoutMs: int = None) -> int:
     ''' Send a cluster-object encapsulated command to a device and does the following:
             - On receipt of a successful data response, returns the cluster-object equivalent through the provided future.
             - None (on a successful response containing no data)
@@ -147,6 +149,9 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
     '''
     if (responseType is not None) and (not issubclass(responseType, ClusterCommand)):
         raise ValueError("responseType must be a ClusterCommand or None")
+    if payload.must_use_timed_invoke and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
+        raise ValueError(
+            f"Command {payload.__class__} must use timed invoke, please specify a valid timedRequestTimeoutMs value")
 
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncCommandTransaction(future, eventLoop, responseType)
@@ -154,7 +159,7 @@ def SendCommand(future: Future, eventLoop, responseType: Type, device, commandPa
     payloadTLV = payload.ToTLV()
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     return handle.pychip_CommandSender_SendCommand(ctypes.py_object(
-        transaction), device, commandPath.EndpointId, commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV))
+        transaction), device, c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), commandPath.EndpointId, commandPath.ClusterId, commandPath.CommandId, payloadTLV, len(payloadTLV))
 
 
 _deviceController = None
@@ -180,7 +185,7 @@ def Init(devCtrl):
         setter = chip.native.NativeLibraryHandleMethodArguments(handle)
 
         setter.Set('pychip_CommandSender_SendCommand',
-                   c_uint32, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t])
+                   c_uint32, [py_object, c_void_p, c_uint16, c_uint32, c_uint32, c_char_p, c_size_t, c_uint16])
         setter.Set('pychip_CommandSender_InitCallbacks', None, [
                    _OnCommandSenderResponseCallbackFunct, _OnCommandSenderErrorCallbackFunct, _OnCommandSenderDoneCallbackFunct])
 

@@ -2504,6 +2504,25 @@ class ChipClusters:
                 },
             },
     }
+    _LOCALIZATION_CONFIGURATION_CLUSTER_INFO = {
+            "clusterName": "LocalizationConfiguration",
+            "clusterId": 0x0000002B,
+            "commands": {
+            },
+            "attributes": {
+                0x00000001: {
+                    "attributeName": "ActiveLocale",
+                    "attributeId": 0x00000001,
+                    "type": "str",
+                    "writable": True,
+                },
+                0x00000002: {
+                    "attributeName": "SupportedLocales",
+                    "attributeId": 0x00000002,
+                    "type": "str",
+                },
+            },
+    }
     _LOW_POWER_CLUSTER_INFO = {
             "clusterName": "LowPower",
             "clusterId": 0x00000508,
@@ -3940,6 +3959,15 @@ class ChipClusters:
                     "args": {
                         "arg1": "int",
                         "arg2": "int",
+                    },
+                },
+            0x00000014: {
+                    "commandId": 0x00000014,
+                    "commandName": "TestEmitTestEventRequest",
+                    "args": {
+                        "arg1": "int",
+                        "arg2": "int",
+                        "arg3": "bool",
                     },
                 },
             0x0000000E: {
@@ -5612,6 +5640,7 @@ class ChipClusters:
     0x00000400: _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,
     0x00000509: _KEYPAD_INPUT_CLUSTER_INFO,
     0x00000008: _LEVEL_CONTROL_CLUSTER_INFO,
+    0x0000002B: _LOCALIZATION_CONFIGURATION_CLUSTER_INFO,
     0x00000508: _LOW_POWER_CLUSTER_INFO,
     0x00000507: _MEDIA_INPUT_CLUSTER_INFO,
     0x00000506: _MEDIA_PLAYBACK_CLUSTER_INFO,
@@ -5675,6 +5704,7 @@ class ChipClusters:
         "IlluminanceMeasurement": _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,
         "KeypadInput": _KEYPAD_INPUT_CLUSTER_INFO,
         "LevelControl": _LEVEL_CONTROL_CLUSTER_INFO,
+        "LocalizationConfiguration": _LOCALIZATION_CONFIGURATION_CLUSTER_INFO,
         "LowPower": _LOW_POWER_CLUSTER_INFO,
         "MediaInput": _MEDIA_INPUT_CLUSTER_INFO,
         "MediaPlayback": _MEDIA_PLAYBACK_CLUSTER_INFO,

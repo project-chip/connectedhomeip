@@ -763,12 +763,14 @@ def _OnWriteDoneCallback(closure):
     ctypes.pythonapi.Py_DecRef(ctypes.py_object(closure))
 
 
-def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest]) -> int:
+def WriteAttributes(future: Future, eventLoop, device, attributes: List[AttributeWriteRequest], timedRequestTimeoutMs: int = None) -> int:
     handle = chip.native.GetLibraryHandle()
-    transaction = AsyncWriteTransaction(future, eventLoop)
 
     writeargs = []
     for attr in attributes:
+        if attr.Attribute.must_use_timed_write and timedRequestTimeoutMs is None or timedRequestTimeoutMs == 0:
+            raise ValueError(
+                f"Attribute {attr.__class__} must use timed write, please specify a valid timedRequestTimeoutMs value.")
         path = chip.interaction_model.AttributePathIBstruct.parse(
             b'\x00' * chip.interaction_model.AttributePathIBstruct.sizeof())
         path.EndpointId = attr.EndpointId
@@ -780,9 +782,10 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
         writeargs.append(ctypes.c_char_p(bytes(tlv)))
         writeargs.append(ctypes.c_int(len(tlv)))
 
+    transaction = AsyncWriteTransaction(future, eventLoop)
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
     res = handle.pychip_WriteClient_WriteAttributes(
-        ctypes.py_object(transaction), device, ctypes.c_size_t(len(attributes)), *writeargs)
+        ctypes.py_object(transaction), device, ctypes.c_uint16(0 if timedRequestTimeoutMs is None else timedRequestTimeoutMs), ctypes.c_size_t(len(attributes)), *writeargs)
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res

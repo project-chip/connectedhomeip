@@ -29,6 +29,7 @@ public class ClusterWriteMapping {
               (DefaultClusterCallback) callback,
               ({{asJavaBoxedType type}})
               commandArguments.get("value")
+              {{#if mustUseTimedWrite}}, 10000{{/if}}
             );
           },
           () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),

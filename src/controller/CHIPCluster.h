@@ -115,6 +115,7 @@ public:
                               WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
                               const Optional<uint16_t> & aTimedWriteTimeoutMs, WriteResponseDoneCallback doneCb = nullptr)
     {
+        CHIP_ERROR err = CHIP_NO_ERROR;
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         auto onSuccessCb = [context, successCb](const app::ConcreteAttributePath & commandPath) {
@@ -141,15 +142,17 @@ public:
 
         if (mGroupSession)
         {
-            return chip::Controller::WriteAttribute<AttrType>(mGroupSession.Get(), mEndpoint, clusterId, attributeId, requestData,
-                                                              onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
+            err = chip::Controller::WriteAttribute<AttrType>(mGroupSession.Get(), mEndpoint, clusterId, attributeId, requestData,
+                                                             onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
+            mDevice->GetExchangeManager()->GetSessionManager()->RemoveGroupSession(mGroupSession->AsGroupSession());
         }
         else
         {
-            return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId,
-                                                              attributeId, requestData, onSuccessCb, onFailureCb,
-                                                              aTimedWriteTimeoutMs, onDoneCb);
+            err = chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId, attributeId,
+                                                             requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
         }
+
+        return err;
     }
 
     template <typename AttributeInfo>

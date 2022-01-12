@@ -2336,6 +2336,36 @@ private:
     bool keepAlive;
 };
 
+class CHIPLocalizationConfigurationSupportedLocalesAttributeCallback
+    : public chip::Callback::Callback<CHIPLocalizationConfigurationClusterSupportedLocalesAttributeCallbackType>
+{
+public:
+    CHIPLocalizationConfigurationSupportedLocalesAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPLocalizationConfigurationSupportedLocalesAttributeCallback();
+
+    static void maybeDestroy(CHIPLocalizationConfigurationSupportedLocalesAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPLocalizationConfigurationSupportedLocalesAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & list);
+    static void OnSubscriptionEstablished(void * context)
+    {
+        CHIP_ERROR err = chip::JniReferences::GetInstance().CallSubscriptionEstablished(
+            reinterpret_cast<CHIPLocalizationConfigurationSupportedLocalesAttributeCallback *>(context)->javaCallbackRef);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error calling onSubscriptionEstablished: %s", ErrorStr(err)));
+    };
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPLowPowerAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPLowPowerClusterAttributeListAttributeCallbackType>
 {

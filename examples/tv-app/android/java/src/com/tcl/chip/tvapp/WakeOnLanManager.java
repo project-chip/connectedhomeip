@@ -24,5 +24,5 @@ public interface WakeOnLanManager {
    *
    * @return Mac address in AA:BB:CC:DD:EE
    */
-  String getMac(int endpoint);
+  String getMac();
 }

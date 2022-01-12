@@ -109,6 +109,8 @@ typedef void (*CHIPTestClusterClusterSimpleStructResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestAddArgumentsResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterTestEmitTestEventResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestEnumsResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestListInt8UReverseResponseCallbackType)(
@@ -2708,6 +2710,35 @@ private:
     SubscriptionEstablishedHandler mEstablishedHandler;
 };
 
+class CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<LocalizationConfigurationSupportedLocalesListAttributeCallback>
+{
+public:
+    CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<LocalizationConfigurationSupportedLocalesListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value);
+};
+
+class CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge
+    : public CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge
+{
+public:
+    CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
 class CHIPLowPowerAttributeListListAttributeCallbackBridge : public CHIPCallbackBridge<LowPowerAttributeListListAttributeCallback>
 {
 public:
@@ -4582,6 +4613,19 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & data);
+};
+
+class CHIPTestClusterClusterTestEmitTestEventResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPTestClusterClusterTestEmitTestEventResponseCallbackType>
+{
+public:
+    CHIPTestClusterClusterTestEmitTestEventResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPTestClusterClusterTestEmitTestEventResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & data);
 };
 
 class CHIPTestClusterClusterTestEnumsResponseCallbackBridge

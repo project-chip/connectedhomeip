@@ -241,6 +241,13 @@ public:
     ~LevelControlClusterTest() {}
 };
 
+class DLL_EXPORT LocalizationConfigurationClusterTest : public LocalizationConfigurationCluster
+{
+public:
+    LocalizationConfigurationClusterTest() : LocalizationConfigurationCluster() {}
+    ~LocalizationConfigurationClusterTest() {}
+};
+
 class DLL_EXPORT LowPowerClusterTest : public LowPowerCluster
 {
 public:

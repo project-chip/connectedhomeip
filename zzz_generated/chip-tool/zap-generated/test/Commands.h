@@ -743,6 +743,7 @@ private:
     void OnSuccessResponse_9(uint8_t statusFlags)
     {
         VerifyOrReturn(CheckConstraintType("statusFlags", "", "map8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("statusFlags", statusFlags, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("statusFlags", statusFlags, 15));
         NextTest();
     }
@@ -830,35 +831,75 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads PresentValue attribute from DUT\n");
-            err = ShouldSkip("A_PRESENTVALUE") ? CHIP_NO_ERROR : TestReadsPresentValueAttributeFromDut_1();
+            if (ShouldSkip("A_PRESENTVALUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsPresentValueAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads OutOfService attribute from DUT\n");
-            err = ShouldSkip("A_OUTOFSERVICE") ? CHIP_NO_ERROR : TestReadsOutOfServiceAttributeFromDut_2();
+            if (ShouldSkip("A_OUTOFSERVICE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOutOfServiceAttributeFromDut_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Reads StatusFlags attribute from DUT\n");
-            err = ShouldSkip("A_STATUSFLAGS") ? CHIP_NO_ERROR : TestReadsStatusFlagsAttributeFromDut_3();
+            if (ShouldSkip("A_STATUSFLAGS"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsStatusFlagsAttributeFromDut_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Reads PresentValue attribute from DUT\n");
-            err = ShouldSkip("A_PRESENTVALUE") ? CHIP_NO_ERROR : TestReadsPresentValueAttributeFromDut_4();
+            if (ShouldSkip("A_PRESENTVALUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsPresentValueAttributeFromDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Reads OutOfService attribute from DUT\n");
-            err = ShouldSkip("A_OUTOFSERVICE") ? CHIP_NO_ERROR : TestReadsOutOfServiceAttributeFromDut_5();
+            if (ShouldSkip("A_OUTOFSERVICE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOutOfServiceAttributeFromDut_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Reads StatusFlags attribute from DUT\n");
-            err = ShouldSkip("A_STATUSFLAGS") ? CHIP_NO_ERROR : TestReadsStatusFlagsAttributeFromDut_6();
+            if (ShouldSkip("A_STATUSFLAGS"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsStatusFlagsAttributeFromDut_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Reads StatusFlags attribute from DUT\n");
-            err = ShouldSkip("A_STATUSFLAGS") ? CHIP_NO_ERROR : TestReadsStatusFlagsAttributeFromDut_7();
+            if (ShouldSkip("A_STATUSFLAGS"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsStatusFlagsAttributeFromDut_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Reads StatusFlags attribute from DUT\n");
-            err = ShouldSkip("A_STATUSFLAGS") ? CHIP_NO_ERROR : TestReadsStatusFlagsAttributeFromDut_8();
+            if (ShouldSkip("A_STATUSFLAGS"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsStatusFlagsAttributeFromDut_8();
             break;
         }
 
@@ -3781,6 +3822,7 @@ private:
     void OnSuccessResponse_2(uint8_t currentHue)
     {
         VerifyOrReturn(CheckConstraintType("currentHue", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentHue", currentHue, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentHue", currentHue, 254));
         NextTest();
     }
@@ -3863,6 +3905,7 @@ private:
     void OnSuccessResponse_6(uint8_t currentSaturation)
     {
         VerifyOrReturn(CheckConstraintType("currentSaturation", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("currentSaturation", currentSaturation, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("currentSaturation", currentSaturation, 254));
         NextTest();
     }
@@ -3945,6 +3988,7 @@ private:
     void OnSuccessResponse_10(uint16_t currentX)
     {
         VerifyOrReturn(CheckConstraintType("currentX", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentX", currentX, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentX", currentX, 65279U));
         NextTest();
     }
@@ -4027,6 +4071,7 @@ private:
     void OnSuccessResponse_14(uint16_t currentY)
     {
         VerifyOrReturn(CheckConstraintType("currentY", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentY", currentY, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentY", currentY, 65279U));
         NextTest();
     }
@@ -4089,6 +4134,7 @@ private:
     void OnSuccessResponse_17(uint16_t colorTemperature)
     {
         VerifyOrReturn(CheckConstraintType("colorTemperature", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTemperature", colorTemperature, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTemperature", colorTemperature, 65279U));
         NextTest();
     }
@@ -4109,6 +4155,7 @@ private:
     void OnSuccessResponse_18(uint8_t colorMode)
     {
         VerifyOrReturn(CheckConstraintType("colorMode", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("colorMode", colorMode, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("colorMode", colorMode, 2));
         NextTest();
     }
@@ -4739,6 +4786,7 @@ private:
     void OnSuccessResponse_49(uint16_t colorCapabilities)
     {
         VerifyOrReturn(CheckConstraintType("colorCapabilities", "", "map16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorCapabilities", colorCapabilities, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorCapabilities", colorCapabilities, 65279U));
         NextTest();
     }
@@ -4821,6 +4869,7 @@ private:
     void OnSuccessResponse_53(uint16_t colorTempPhysicalMin)
     {
         VerifyOrReturn(CheckConstraintType("colorTempPhysicalMin", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTempPhysicalMin", colorTempPhysicalMin, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMin", colorTempPhysicalMin, 65279U));
         NextTest();
     }
@@ -4903,6 +4952,7 @@ private:
     void OnSuccessResponse_57(uint16_t colorTempPhysicalMax)
     {
         VerifyOrReturn(CheckConstraintType("colorTempPhysicalMax", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorTempPhysicalMax", colorTempPhysicalMax, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorTempPhysicalMax", colorTempPhysicalMax, 65279U));
         NextTest();
     }
@@ -5039,6 +5089,7 @@ private:
     void OnSuccessResponse_63(uint16_t startUpColorTemperatureMireds)
     {
         VerifyOrReturn(CheckConstraintType("startUpColorTemperatureMireds", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("startUpColorTemperatureMireds", startUpColorTemperatureMireds, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("startUpColorTemperatureMireds", startUpColorTemperatureMireds, 65279U));
         NextTest();
     }
@@ -5131,6 +5182,7 @@ private:
     void OnSuccessResponse_67(uint16_t remainingTime)
     {
         VerifyOrReturn(CheckConstraintType("remainingTime", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("remainingTime", remainingTime, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("remainingTime", remainingTime, 254U));
         NextTest();
     }
@@ -5199,6 +5251,7 @@ private:
     void OnSuccessResponse_70(uint8_t driftCompensation)
     {
         VerifyOrReturn(CheckConstraintType("driftCompensation", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("driftCompensation", driftCompensation, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("driftCompensation", driftCompensation, 4));
         NextTest();
     }
@@ -5332,6 +5385,7 @@ private:
     void OnSuccessResponse_76(uint8_t numberOfPrimaries)
     {
         VerifyOrReturn(CheckConstraintType("numberOfPrimaries", "", "uint8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("numberOfPrimaries", numberOfPrimaries, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("numberOfPrimaries", numberOfPrimaries, 6));
         NextTest();
     }
@@ -5394,6 +5448,7 @@ private:
     void OnSuccessResponse_79(uint16_t primary1X)
     {
         VerifyOrReturn(CheckConstraintType("primary1X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary1X", primary1X, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1X", primary1X, 65279U));
         NextTest();
     }
@@ -5456,6 +5511,7 @@ private:
     void OnSuccessResponse_82(uint16_t primary1Y)
     {
         VerifyOrReturn(CheckConstraintType("primary1Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary1Y", primary1Y, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary1Y", primary1Y, 65279U));
         NextTest();
     }
@@ -5537,6 +5593,7 @@ private:
     void OnSuccessResponse_86(uint16_t primary2X)
     {
         VerifyOrReturn(CheckConstraintType("primary2X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary2X", primary2X, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2X", primary2X, 65279U));
         NextTest();
     }
@@ -5599,6 +5656,7 @@ private:
     void OnSuccessResponse_89(uint16_t primary2Y)
     {
         VerifyOrReturn(CheckConstraintType("primary2Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary2Y", primary2Y, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary2Y", primary2Y, 65279U));
         NextTest();
     }
@@ -5680,6 +5738,7 @@ private:
     void OnSuccessResponse_93(uint16_t primary3X)
     {
         VerifyOrReturn(CheckConstraintType("primary3X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary3X", primary3X, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3X", primary3X, 65279U));
         NextTest();
     }
@@ -5742,6 +5801,7 @@ private:
     void OnSuccessResponse_96(uint16_t primary3Y)
     {
         VerifyOrReturn(CheckConstraintType("primary3Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary3Y", primary3Y, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary3Y", primary3Y, 65279U));
         NextTest();
     }
@@ -5823,6 +5883,7 @@ private:
     void OnSuccessResponse_100(uint16_t primary4X)
     {
         VerifyOrReturn(CheckConstraintType("primary4X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary4X", primary4X, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4X", primary4X, 65279U));
         NextTest();
     }
@@ -5885,6 +5946,7 @@ private:
     void OnSuccessResponse_103(uint16_t primary4Y)
     {
         VerifyOrReturn(CheckConstraintType("primary4Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary4Y", primary4Y, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary4Y", primary4Y, 65279U));
         NextTest();
     }
@@ -5966,6 +6028,7 @@ private:
     void OnSuccessResponse_107(uint16_t primary5X)
     {
         VerifyOrReturn(CheckConstraintType("primary5X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary5X", primary5X, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5X", primary5X, 65279U));
         NextTest();
     }
@@ -6028,6 +6091,7 @@ private:
     void OnSuccessResponse_110(uint16_t primary5Y)
     {
         VerifyOrReturn(CheckConstraintType("primary5Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary5Y", primary5Y, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary5Y", primary5Y, 65279U));
         NextTest();
     }
@@ -6109,6 +6173,7 @@ private:
     void OnSuccessResponse_114(uint16_t primary6X)
     {
         VerifyOrReturn(CheckConstraintType("primary6X", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary6X", primary6X, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6X", primary6X, 65279U));
         NextTest();
     }
@@ -6171,6 +6236,7 @@ private:
     void OnSuccessResponse_117(uint16_t primary6Y)
     {
         VerifyOrReturn(CheckConstraintType("primary6Y", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("primary6Y", primary6Y, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("primary6Y", primary6Y, 65279U));
         NextTest();
     }
@@ -6255,6 +6321,7 @@ private:
     void OnSuccessResponse_121(uint16_t whitePointX)
     {
         VerifyOrReturn(CheckConstraintType("whitePointX", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("whitePointX", whitePointX, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("whitePointX", whitePointX, 65279U));
         NextTest();
     }
@@ -6322,6 +6389,7 @@ private:
     void OnSuccessResponse_124(uint16_t whitePointY)
     {
         VerifyOrReturn(CheckConstraintType("whitePointY", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("whitePointY", whitePointY, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("whitePointY", whitePointY, 65279U));
         NextTest();
     }
@@ -6389,6 +6457,7 @@ private:
     void OnSuccessResponse_127(uint16_t colorPointRX)
     {
         VerifyOrReturn(CheckConstraintType("colorPointRX", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointRX", colorPointRX, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointRX", colorPointRX, 65279U));
         NextTest();
     }
@@ -6456,6 +6525,7 @@ private:
     void OnSuccessResponse_130(uint16_t colorPointRY)
     {
         VerifyOrReturn(CheckConstraintType("colorPointRY", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointRY", colorPointRY, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointRY", colorPointRY, 65279U));
         NextTest();
     }
@@ -6589,6 +6659,7 @@ private:
     void OnSuccessResponse_136(uint16_t colorPointGX)
     {
         VerifyOrReturn(CheckConstraintType("colorPointGX", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointGX", colorPointGX, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointGX", colorPointGX, 65279U));
         NextTest();
     }
@@ -6656,6 +6727,7 @@ private:
     void OnSuccessResponse_139(uint16_t colorPointGY)
     {
         VerifyOrReturn(CheckConstraintType("colorPointGY", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointGY", colorPointGY, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointGY", colorPointGY, 65279U));
         NextTest();
     }
@@ -6789,6 +6861,7 @@ private:
     void OnSuccessResponse_145(uint16_t colorPointBX)
     {
         VerifyOrReturn(CheckConstraintType("colorPointBX", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointBX", colorPointBX, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointBX", colorPointBX, 65279U));
         NextTest();
     }
@@ -6856,6 +6929,7 @@ private:
     void OnSuccessResponse_148(uint16_t colorPointBY)
     {
         VerifyOrReturn(CheckConstraintType("colorPointBY", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("colorPointBY", colorPointBY, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("colorPointBY", colorPointBY, 65279U));
         NextTest();
     }
@@ -12032,80 +12106,174 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_3();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_4();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_5();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Read ColorLoopDirection attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_6();
+            if (ShouldSkip("A_COLORLOOPDIRECTION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopDirectionAttributeFromDut_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_7();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Read ColorLoopTime attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPTIME") ? CHIP_NO_ERROR : TestReadColorLoopTimeAttributeFromDut_8();
+            if (ShouldSkip("A_COLORLOOPTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopTimeAttributeFromDut_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_9();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : Read ColorLoopStartEnhancedHue attribute from DUT\n");
-            err =
-                ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE") ? CHIP_NO_ERROR : TestReadColorLoopStartEnhancedHueAttributeFromDut_10();
+            if (ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopStartEnhancedHueAttributeFromDut_10();
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_11();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_11();
             break;
         case 12:
             ChipLogProgress(chipTool, " ***** Test Step 12 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_12();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_13();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_13();
             break;
         case 14:
             ChipLogProgress(chipTool, " ***** Test Step 14 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_14();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_14();
             break;
         case 15:
             ChipLogProgress(chipTool, " ***** Test Step 15 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_15();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_15();
             break;
         case 16:
             ChipLogProgress(chipTool, " ***** Test Step 16 : Read ColorLoopDirection attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_16();
+            if (ShouldSkip("A_COLORLOOPDIRECTION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopDirectionAttributeFromDut_16();
             break;
         case 17:
             ChipLogProgress(chipTool, " ***** Test Step 17 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_17();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_17();
             break;
         case 18:
             ChipLogProgress(chipTool, " ***** Test Step 18 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_18();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_18();
             break;
         case 19:
             ChipLogProgress(chipTool, " ***** Test Step 19 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_19();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_19();
             break;
         case 20:
             ChipLogProgress(chipTool, " ***** Test Step 20 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_20();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_20();
             break;
         case 21:
             ChipLogProgress(chipTool, " ***** Test Step 21 : Enhanced Move To Hue command 10\n");
-            err = ShouldSkip("CR_ENHANCEDMOVETOHUE") ? CHIP_NO_ERROR : TestEnhancedMoveToHueCommand10_21();
+            if (ShouldSkip("CR_ENHANCEDMOVETOHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestEnhancedMoveToHueCommand10_21();
             break;
         case 22:
             ChipLogProgress(chipTool, " ***** Test Step 22 : Wait 2000ms\n");
@@ -12113,55 +12281,120 @@ public:
             break;
         case 23:
             ChipLogProgress(chipTool, " ***** Test Step 23 : Read EnhancedCurrentHue attribute from DUT\n");
-            err = ShouldSkip("A_ENHANCEDCURRENTHUE") ? CHIP_NO_ERROR : TestReadEnhancedCurrentHueAttributeFromDut_23();
+            if (ShouldSkip("A_ENHANCEDCURRENTHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadEnhancedCurrentHueAttributeFromDut_23();
             break;
         case 24:
             ChipLogProgress(chipTool, " ***** Test Step 24 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_24();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_24();
             break;
         case 25:
             ChipLogProgress(chipTool, " ***** Test Step 25 : Read ColorLoopDirection attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_25();
+            if (ShouldSkip("A_COLORLOOPDIRECTION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopDirectionAttributeFromDut_25();
             break;
         case 26:
             ChipLogProgress(chipTool, " ***** Test Step 26 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_26();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_26();
             break;
         case 27:
             ChipLogProgress(chipTool, " ***** Test Step 27 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_27();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_27();
             break;
         case 28:
             ChipLogProgress(chipTool, " ***** Test Step 28 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_28();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_28();
             break;
         case 29:
             ChipLogProgress(chipTool, " ***** Test Step 29 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_29();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_29();
             break;
         case 30:
             ChipLogProgress(chipTool, " ***** Test Step 30 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_30();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_30();
             break;
         case 31:
             ChipLogProgress(chipTool, " ***** Test Step 31 : Read ColorLoopDirection attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_31();
+            if (ShouldSkip("A_COLORLOOPDIRECTION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopDirectionAttributeFromDut_31();
             break;
         case 32:
             ChipLogProgress(chipTool, " ***** Test Step 32 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_32();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_32();
             break;
         case 33:
             ChipLogProgress(chipTool, " ***** Test Step 33 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_33();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_33();
             break;
         case 34:
             ChipLogProgress(chipTool, " ***** Test Step 34 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_34();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_34();
             break;
         case 35:
             ChipLogProgress(chipTool, " ***** Test Step 35 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_35();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_35();
             break;
         case 36:
             ChipLogProgress(chipTool, " ***** Test Step 36 : Turn Off light for color control tests\n");
@@ -13283,47 +13516,102 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_3();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_4();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Read ColorLoopDirection attribute from DUT.\n");
-            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_5();
+            if (ShouldSkip("A_COLORLOOPDIRECTION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopDirectionAttributeFromDut_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Read ColorLoopTime attribute from DUT.\n");
-            err = ShouldSkip("A_COLORLOOPTIME") ? CHIP_NO_ERROR : TestReadColorLoopTimeAttributeFromDut_6();
+            if (ShouldSkip("A_COLORLOOPTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopTimeAttributeFromDut_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Read ColorLoopStartEnhancedHue attribute from DUT.\n");
-            err = ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE") ? CHIP_NO_ERROR : TestReadColorLoopStartEnhancedHueAttributeFromDut_7();
+            if (ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopStartEnhancedHueAttributeFromDut_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Color Loop Set Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandSetAllAttributes_8();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestColorLoopSetCommandSetAllAttributes_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : Read ColorLoopActive attribute from DUT.\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_9();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : Color Loop Set Command - Start Color Loop\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandStartColorLoop_10();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestColorLoopSetCommandStartColorLoop_10();
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : Read ColorLoopDirection attribute from DUT.\n");
-            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_11();
+            if (ShouldSkip("A_COLORLOOPDIRECTION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopDirectionAttributeFromDut_11();
             break;
         case 12:
             ChipLogProgress(chipTool, " ***** Test Step 12 : Color Loop Set Command - Start Color Loop\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandStartColorLoop_12();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestColorLoopSetCommandStartColorLoop_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_13();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_13();
             break;
         case 14:
             ChipLogProgress(chipTool, " ***** Test Step 14 : Turn off light for color control tests\n");
@@ -13811,47 +14099,102 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_3();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_4();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Read ColorLoopDirection attribute from DUT.\n");
-            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_5();
+            if (ShouldSkip("A_COLORLOOPDIRECTION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopDirectionAttributeFromDut_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Read ColorLoopTime attribute from DUT.\n");
-            err = ShouldSkip("A_COLORLOOPTIME") ? CHIP_NO_ERROR : TestReadColorLoopTimeAttributeFromDut_6();
+            if (ShouldSkip("A_COLORLOOPTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopTimeAttributeFromDut_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Read ColorLoopStartEnhancedHue attribute from DUT.\n");
-            err = ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE") ? CHIP_NO_ERROR : TestReadColorLoopStartEnhancedHueAttributeFromDut_7();
+            if (ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopStartEnhancedHueAttributeFromDut_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Color Loop Set Command - Set all Attributes\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandSetAllAttributes_8();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestColorLoopSetCommandSetAllAttributes_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : Read ColorLoopActive attribute from DUT.\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_9();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : Color Loop Set Command - Start Color Loop\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandStartColorLoop_10();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestColorLoopSetCommandStartColorLoop_10();
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : Read ColorLoopTime attribute from DUT.\n");
-            err = ShouldSkip("A_COLORLOOPTIME") ? CHIP_NO_ERROR : TestReadColorLoopTimeAttributeFromDut_11();
+            if (ShouldSkip("A_COLORLOOPTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopTimeAttributeFromDut_11();
             break;
         case 12:
             ChipLogProgress(chipTool, " ***** Test Step 12 : Color Loop Set Command - Start Color Loop\n");
-            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandStartColorLoop_12();
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestColorLoopSetCommandStartColorLoop_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : Read ColorLoopActive attribute from DUT\n");
-            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_13();
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_13();
             break;
         case 14:
             ChipLogProgress(chipTool, " ***** Test Step 14 : Turn off light for color control tests\n");
@@ -14765,11 +15108,21 @@ public:
             break;
         case 12:
             ChipLogProgress(chipTool, " ***** Test Step 12 : Query ManufacturingDate\n");
-            err = ShouldSkip("MANF_DATE") ? CHIP_NO_ERROR : TestQueryManufacturingDate_12();
+            if (ShouldSkip("MANF_DATE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestQueryManufacturingDate_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : Query PartNumber\n");
-            err = ShouldSkip("PART_NUM") ? CHIP_NO_ERROR : TestQueryPartNumber_13();
+            if (ShouldSkip("PART_NUM"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestQueryPartNumber_13();
             break;
         case 14:
             ChipLogProgress(chipTool, " ***** Test Step 14 : Query ProductURL\n");
@@ -16486,6 +16839,7 @@ private:
     void OnSuccessResponse_11(uint16_t tolerance)
     {
         VerifyOrReturn(CheckConstraintType("tolerance", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("tolerance", tolerance, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("tolerance", tolerance, 2048U));
         NextTest();
     }
@@ -19784,6 +20138,7 @@ private:
     void OnSuccessResponse_1(uint8_t occupancy)
     {
         VerifyOrReturn(CheckConstraintType("occupancy", "", "map8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("occupancy", occupancy, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("occupancy", occupancy, 1));
         NextTest();
     }
@@ -19847,6 +20202,7 @@ private:
     void OnSuccessResponse_4(uint8_t occupancySensorType)
     {
         VerifyOrReturn(CheckConstraintType("occupancySensorType", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("occupancySensorType", occupancySensorType, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("occupancySensorType", occupancySensorType, 3));
         NextTest();
     }
@@ -20002,11 +20358,21 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads Occupancy attribute from DUT\n");
-            err = ShouldSkip("A_OCCUPANCY") ? CHIP_NO_ERROR : TestReadsOccupancyAttributeFromDut_1();
+            if (ShouldSkip("A_OCCUPANCY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOccupancyAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads Occupancy attribute from DUT\n");
-            err = ShouldSkip("A_OCCUPANCY") ? CHIP_NO_ERROR : TestReadsOccupancyAttributeFromDut_2();
+            if (ShouldSkip("A_OCCUPANCY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOccupancyAttributeFromDut_2();
             break;
         }
 
@@ -21527,7 +21893,12 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Send On Command\n");
-            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_1();
+            if (ShouldSkip("CR_ON"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendOnCommand_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 1000ms\n");
@@ -21535,15 +21906,30 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_3();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Reads GlobalSceneControl attribute from DUT\n");
-            err = ShouldSkip("A_GLOBALSCENECONTROL") ? CHIP_NO_ERROR : TestReadsGlobalSceneControlAttributeFromDut_4();
+            if (ShouldSkip("A_GLOBALSCENECONTROL"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsGlobalSceneControlAttributeFromDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Send On Command\n");
-            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_5();
+            if (ShouldSkip("CR_ON"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendOnCommand_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 1000ms\n");
@@ -21551,15 +21937,30 @@ public:
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_7();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Reads GlobalSceneControl attribute from DUT\n");
-            err = ShouldSkip("A_GLOBALSCENECONTROL") ? CHIP_NO_ERROR : TestReadsGlobalSceneControlAttributeFromDut_8();
+            if (ShouldSkip("A_GLOBALSCENECONTROL"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsGlobalSceneControlAttributeFromDut_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : Send On Command\n");
-            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_9();
+            if (ShouldSkip("CR_ON"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendOnCommand_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : Wait 1000ms\n");
@@ -21567,147 +21968,327 @@ public:
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_11();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_11();
             break;
         case 12:
             ChipLogProgress(chipTool, " ***** Test Step 12 : Reads GlobalSceneControl attribute from DUT\n");
-            err = ShouldSkip("A_GLOBALSCENECONTROL") ? CHIP_NO_ERROR : TestReadsGlobalSceneControlAttributeFromDut_12();
+            if (ShouldSkip("A_GLOBALSCENECONTROL"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsGlobalSceneControlAttributeFromDut_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : Reads OnTime attribute from DUT\n");
-            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_13();
+            if (ShouldSkip("A_ONTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnTimeAttributeFromDut_13();
             break;
         case 14:
             ChipLogProgress(chipTool, " ***** Test Step 14 : Reads OffWaitTime attribute from DUT\n");
-            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_14();
+            if (ShouldSkip("A_OFFWAITTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOffWaitTimeAttributeFromDut_14();
             break;
         case 15:
             ChipLogProgress(chipTool, " ***** Test Step 15 : Send On Command\n");
-            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_15();
+            if (ShouldSkip("CR_ON"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendOnCommand_15();
             break;
         case 16:
             ChipLogProgress(chipTool, " ***** Test Step 16 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_16();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_16();
             break;
         case 17:
             ChipLogProgress(chipTool, " ***** Test Step 17 : Reads OnTime attribute from DUT\n");
-            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_17();
+            if (ShouldSkip("A_ONTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnTimeAttributeFromDut_17();
             break;
         case 18:
             ChipLogProgress(chipTool, " ***** Test Step 18 : Reads OffWaitTime attribute from DUT\n");
-            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_18();
+            if (ShouldSkip("A_OFFWAITTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOffWaitTimeAttributeFromDut_18();
             break;
         case 19:
             ChipLogProgress(chipTool, " ***** Test Step 19 : Send Off Command\n");
-            err = ShouldSkip("CR_OFF") ? CHIP_NO_ERROR : TestSendOffCommand_19();
+            if (ShouldSkip("CR_OFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendOffCommand_19();
             break;
         case 20:
             ChipLogProgress(chipTool, " ***** Test Step 20 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_20();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_20();
             break;
         case 21:
             ChipLogProgress(chipTool, " ***** Test Step 21 : Reads OnTime attribute from DUT\n");
-            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_21();
+            if (ShouldSkip("A_ONTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnTimeAttributeFromDut_21();
             break;
         case 22:
             ChipLogProgress(chipTool, " ***** Test Step 22 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_22();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_22();
             break;
         case 23:
             ChipLogProgress(chipTool, " ***** Test Step 23 : Reads OnTime attribute from DUT\n");
-            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_23();
+            if (ShouldSkip("A_ONTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnTimeAttributeFromDut_23();
             break;
         case 24:
             ChipLogProgress(chipTool, " ***** Test Step 24 : Reads OffWaitTime attribute from DUT\n");
-            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_24();
+            if (ShouldSkip("A_OFFWAITTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOffWaitTimeAttributeFromDut_24();
             break;
         case 25:
             ChipLogProgress(chipTool, " ***** Test Step 25 : Send On Command\n");
-            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_25();
+            if (ShouldSkip("CR_ON"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendOnCommand_25();
             break;
         case 26:
             ChipLogProgress(chipTool, " ***** Test Step 26 : Reads OnTime attribute from DUT\n");
-            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_26();
+            if (ShouldSkip("A_ONTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnTimeAttributeFromDut_26();
             break;
         case 27:
             ChipLogProgress(chipTool, " ***** Test Step 27 : Reads OffWaitTime attribute from DUT\n");
-            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_27();
+            if (ShouldSkip("A_OFFWAITTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOffWaitTimeAttributeFromDut_27();
             break;
         case 28:
             ChipLogProgress(chipTool, " ***** Test Step 28 : Send Off Command\n");
-            err = ShouldSkip("CR_OFF") ? CHIP_NO_ERROR : TestSendOffCommand_28();
+            if (ShouldSkip("CR_OFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendOffCommand_28();
             break;
         case 29:
             ChipLogProgress(chipTool, " ***** Test Step 29 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_29();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_29();
             break;
         case 30:
             ChipLogProgress(chipTool, " ***** Test Step 30 : Reads OnTime attribute from DUT\n");
-            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_30();
+            if (ShouldSkip("A_ONTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnTimeAttributeFromDut_30();
             break;
         case 31:
             ChipLogProgress(chipTool, " ***** Test Step 31 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_31();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_31();
             break;
         case 32:
             ChipLogProgress(chipTool, " ***** Test Step 32 : Reads OnTime attribute from DUT\n");
-            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_32();
+            if (ShouldSkip("A_ONTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnTimeAttributeFromDut_32();
             break;
         case 33:
             ChipLogProgress(chipTool, " ***** Test Step 33 : Send On Command\n");
-            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_33();
+            if (ShouldSkip("CR_ON"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendOnCommand_33();
             break;
         case 34:
             ChipLogProgress(chipTool, " ***** Test Step 34 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_34();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_34();
             break;
         case 35:
             ChipLogProgress(chipTool, " ***** Test Step 35 : Reads OnTime attribute from DUT\n");
-            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_35();
+            if (ShouldSkip("A_ONTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnTimeAttributeFromDut_35();
             break;
         case 36:
             ChipLogProgress(chipTool, " ***** Test Step 36 : Reads OffWaitTime attribute from DUT\n");
-            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_36();
+            if (ShouldSkip("A_OFFWAITTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOffWaitTimeAttributeFromDut_36();
             break;
         case 37:
             ChipLogProgress(chipTool, " ***** Test Step 37 : Send Off Command\n");
-            err = ShouldSkip("CR_OFF") ? CHIP_NO_ERROR : TestSendOffCommand_37();
+            if (ShouldSkip("CR_OFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendOffCommand_37();
             break;
         case 38:
             ChipLogProgress(chipTool, " ***** Test Step 38 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_38();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_38();
             break;
         case 39:
             ChipLogProgress(chipTool, " ***** Test Step 39 : Reads OnTime attribute from DUT\n");
-            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_39();
+            if (ShouldSkip("A_ONTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnTimeAttributeFromDut_39();
             break;
         case 40:
             ChipLogProgress(chipTool, " ***** Test Step 40 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_40();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_40();
             break;
         case 41:
             ChipLogProgress(chipTool, " ***** Test Step 41 : Reads OnTime attribute from DUT\n");
-            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_41();
+            if (ShouldSkip("A_ONTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnTimeAttributeFromDut_41();
             break;
         case 42:
             ChipLogProgress(chipTool, " ***** Test Step 42 : Reads OffWaitTime attribute from DUT\n");
-            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_42();
+            if (ShouldSkip("A_OFFWAITTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOffWaitTimeAttributeFromDut_42();
             break;
         case 43:
             ChipLogProgress(chipTool, " ***** Test Step 43 : Reads OnOff attribute from DUT\n");
-            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_43();
+            if (ShouldSkip("A_ONOFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnOffAttributeFromDut_43();
             break;
         case 44:
             ChipLogProgress(chipTool, " ***** Test Step 44 : Reads OnTime attribute from DUT\n");
-            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_44();
+            if (ShouldSkip("A_ONTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOnTimeAttributeFromDut_44();
             break;
         case 45:
             ChipLogProgress(chipTool, " ***** Test Step 45 : Reads OffWaitTime attribute from DUT\n");
-            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_45();
+            if (ShouldSkip("A_OFFWAITTIME"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOffWaitTimeAttributeFromDut_45();
             break;
         case 46:
             ChipLogProgress(chipTool, " ***** Test Step 46 : Send Off Command\n");
-            err = ShouldSkip("CR_OFF") ? CHIP_NO_ERROR : TestSendOffCommand_46();
+            if (ShouldSkip("CR_OFF"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendOffCommand_46();
             break;
         }
 
@@ -25530,15 +26111,30 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Write 1 to the OperationMode attribute to DUT: OperationMode\n");
-            err = ShouldSkip("A_OPERATIONMODE") ? CHIP_NO_ERROR : TestWrite1ToTheOperationModeAttributeToDutOperationMode_1();
+            if (ShouldSkip("A_OPERATIONMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWrite1ToTheOperationModeAttributeToDutOperationMode_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Write 2 to the OperationMode attribute to DUT: OperationMode\n");
-            err = ShouldSkip("A_OPERATIONMODE") ? CHIP_NO_ERROR : TestWrite2ToTheOperationModeAttributeToDutOperationMode_2();
+            if (ShouldSkip("A_OPERATIONMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWrite2ToTheOperationModeAttributeToDutOperationMode_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Write 3 to the OperationMode attribute to DUT: OperationMode\n");
-            err = ShouldSkip("A_OPERATIONMODE") ? CHIP_NO_ERROR : TestWrite3ToTheOperationModeAttributeToDutOperationMode_3();
+            if (ShouldSkip("A_OPERATIONMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWrite3ToTheOperationModeAttributeToDutOperationMode_3();
             break;
         }
 
@@ -25685,39 +26281,84 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Write 0 to the OperationMode attribute to DUT\n");
-            err = ShouldSkip("A_OPERATIONMODE") ? CHIP_NO_ERROR : TestWrite0ToTheOperationModeAttributeToDut_1();
+            if (ShouldSkip("A_OPERATIONMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWrite0ToTheOperationModeAttributeToDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the attribute: EffectiveOperationMode\n");
-            err = ShouldSkip("A_EFFECTIVEOPERATIONMODE") ? CHIP_NO_ERROR : TestReadsTheAttributeEffectiveOperationMode_2();
+            if (ShouldSkip("A_EFFECTIVEOPERATIONMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsTheAttributeEffectiveOperationMode_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Write 0 to the ControlMode attribute to DUT\n");
-            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite0ToTheControlModeAttributeToDut_3();
+            if (ShouldSkip("A_CONTROLMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWrite0ToTheControlModeAttributeToDut_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Reads the attribute: EffectiveControlMode\n");
-            err = ShouldSkip("A_EFFECTIVECONTROLMODE") ? CHIP_NO_ERROR : TestReadsTheAttributeEffectiveControlMode_4();
+            if (ShouldSkip("A_EFFECTIVECONTROLMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsTheAttributeEffectiveControlMode_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Write 1 to the ControlMode attribute to DUT\n");
-            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite1ToTheControlModeAttributeToDut_5();
+            if (ShouldSkip("A_CONTROLMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWrite1ToTheControlModeAttributeToDut_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Write 2 to the ControlMode attribute to DUT\n");
-            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite2ToTheControlModeAttributeToDut_6();
+            if (ShouldSkip("A_CONTROLMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWrite2ToTheControlModeAttributeToDut_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Write 3 to the ControlMode attribute to DUT\n");
-            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite3ToTheControlModeAttributeToDut_7();
+            if (ShouldSkip("A_CONTROLMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWrite3ToTheControlModeAttributeToDut_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Write 5 to the ControlMode attribute to DUT\n");
-            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite5ToTheControlModeAttributeToDut_8();
+            if (ShouldSkip("A_CONTROLMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWrite5ToTheControlModeAttributeToDut_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : Write 7 to the ControlMode attribute to DUT\n");
-            err = ShouldSkip("A_CONTROLMODE") ? CHIP_NO_ERROR : TestWrite7ToTheControlModeAttributeToDut_9();
+            if (ShouldSkip("A_CONTROLMODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWrite7ToTheControlModeAttributeToDut_9();
             break;
         }
 
@@ -26281,6 +26922,7 @@ private:
     void OnSuccessResponse_2(uint16_t minMeasuredValue)
     {
         VerifyOrReturn(CheckConstraintType("minMeasuredValue", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("minMeasuredValue", minMeasuredValue, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("minMeasuredValue", minMeasuredValue, 9999U));
         NextTest();
     }
@@ -26329,6 +26971,7 @@ private:
     void OnSuccessResponse_4(uint16_t tolerance)
     {
         VerifyOrReturn(CheckConstraintType("tolerance", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("tolerance", tolerance, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("tolerance", tolerance, 2048U));
         NextTest();
     }
@@ -26374,11 +27017,21 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads MeasuredValue attribute from DUT\n");
-            err = ShouldSkip("A_RELATIVEHUMIDITY") ? CHIP_NO_ERROR : TestReadsMeasuredValueAttributeFromDut_1();
+            if (ShouldSkip("A_RELATIVEHUMIDITY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsMeasuredValueAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Read the mandatory attribute: MeasuredValue\n");
-            err = ShouldSkip("A_RELATIVEHUMIDITY") ? CHIP_NO_ERROR : TestReadTheMandatoryAttributeMeasuredValue_2();
+            if (ShouldSkip("A_RELATIVEHUMIDITY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadTheMandatoryAttributeMeasuredValue_2();
             break;
         }
 
@@ -26802,6 +27455,7 @@ private:
     void OnSuccessResponse_2(uint16_t tolerance)
     {
         VerifyOrReturn(CheckConstraintType("tolerance", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("tolerance", tolerance, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("tolerance", tolerance, 2048U));
         NextTest();
     }
@@ -26847,11 +27501,21 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads MeasuredValue attribute from DUT\n");
-            err = ShouldSkip("A_TEMPERATURE") ? CHIP_NO_ERROR : TestReadsMeasuredValueAttributeFromDut_1();
+            if (ShouldSkip("A_TEMPERATURE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsMeasuredValueAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Read the mandatory attribute: MeasuredValue\n");
-            err = ShouldSkip("A_TEMPERATURE") ? CHIP_NO_ERROR : TestReadTheMandatoryAttributeMeasuredValue_2();
+            if (ShouldSkip("A_TEMPERATURE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadTheMandatoryAttributeMeasuredValue_2();
             break;
         }
 
@@ -28870,6 +29534,7 @@ private:
     void OnSuccessResponse_43(uint8_t controlSequenceOfOperation)
     {
         VerifyOrReturn(CheckConstraintType("controlSequenceOfOperation", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 5));
         NextTest();
     }
@@ -28950,6 +29615,7 @@ private:
     void OnSuccessResponse_47(uint8_t systemMode)
     {
         VerifyOrReturn(CheckConstraintType("systemMode", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("systemMode", systemMode, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("systemMode", systemMode, 9));
         NextTest();
     }
@@ -29034,6 +29700,7 @@ private:
     void OnSuccessResponse_51(int8_t minSetpointDeadBand)
     {
         VerifyOrReturn(CheckConstraintType("minSetpointDeadBand", "", "int8"));
+        VerifyOrReturn(CheckConstraintMinValue<int8_t>("minSetpointDeadBand", minSetpointDeadBand, 0));
         VerifyOrReturn(CheckConstraintMaxValue<int8_t>("minSetpointDeadBand", minSetpointDeadBand, 25));
         NextTest();
     }
@@ -29101,6 +29768,7 @@ private:
     void OnSuccessResponse_54(uint8_t startOfWeek)
     {
         VerifyOrReturn(CheckConstraintType("startOfWeek", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("startOfWeek", startOfWeek, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("startOfWeek", startOfWeek, 6));
         NextTest();
     }
@@ -29284,344 +29952,509 @@ public:
             ChipLogProgress(chipTool,
                             " ***** Test Step 1 : Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT")
-                ? CHIP_NO_ERROR
-                : TestReadsOccupiedCoolingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_1();
+            if (ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOccupiedCoolingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_1();
             break;
         case 2:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 2 : Writes a value back that is different but valid for OccupiedCoolingSetpoint attribute\n");
-            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT")
-                ? CHIP_NO_ERROR
-                : TestWritesAValueBackThatIsDifferentButValidForOccupiedCoolingSetpointAttribute_2();
+            if (ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueBackThatIsDifferentButValidForOccupiedCoolingSetpointAttribute_2();
             break;
         case 3:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 3 : Reads it back again to confirm the successful write of OccupiedCoolingSetpoint attribute\n");
-            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT")
-                ? CHIP_NO_ERROR
-                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedCoolingSetpointAttribute_3();
+            if (ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedCoolingSetpointAttribute_3();
             break;
         case 4:
             ChipLogProgress(chipTool,
                             " ***** Test Step 4 : Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint attribute\n");
-            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfMinCoolSetpointLimitToOccupiedCoolingSetpointAttribute_4();
+            if (ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfMinCoolSetpointLimitToOccupiedCoolingSetpointAttribute_4();
             break;
         case 5:
             ChipLogProgress(chipTool,
                             " ***** Test Step 5 : Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute\n");
-            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfMaxCoolSetpointLimitToOccupiedCoolingSetpointAttribute_5();
+            if (ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfMaxCoolSetpointLimitToOccupiedCoolingSetpointAttribute_5();
             break;
         case 6:
             ChipLogProgress(chipTool,
                             " ***** Test Step 6 : Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT")
-                ? CHIP_NO_ERROR
-                : TestReadsOccupiedHeatingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_6();
+            if (ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsOccupiedHeatingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_6();
             break;
         case 7:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 7 : Writes a value back that is different but valid for OccupiedHeatingSetpoint attribute\n");
-            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT")
-                ? CHIP_NO_ERROR
-                : TestWritesAValueBackThatIsDifferentButValidForOccupiedHeatingSetpointAttribute_7();
+            if (ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueBackThatIsDifferentButValidForOccupiedHeatingSetpointAttribute_7();
             break;
         case 8:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 8 : Reads it back again to confirm the successful write of OccupiedHeatingSetpoint attribute\n");
-            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT")
-                ? CHIP_NO_ERROR
-                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedHeatingSetpointAttribute_8();
+            if (ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedHeatingSetpointAttribute_8();
             break;
         case 9:
             ChipLogProgress(chipTool,
                             " ***** Test Step 9 : Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint attribute\n");
-            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfMinHeatSetpointLimitToOccupiedHeatingSetpointAttribute_9();
+            if (ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfMinHeatSetpointLimitToOccupiedHeatingSetpointAttribute_9();
             break;
         case 10:
             ChipLogProgress(
                 chipTool, " ***** Test Step 10 : Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint attribute\n");
-            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfMaxHeatSetpointLimitToOccupiedHeatingSetpointAttribute_10();
+            if (ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfMaxHeatSetpointLimitToOccupiedHeatingSetpointAttribute_10();
             break;
         case 11:
             ChipLogProgress(chipTool,
                             " ***** Test Step 11 : Reads MinHeatSetpointLimit attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestReadsMinHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_11();
+            if (ShouldSkip("A_MINHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsMinHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_11();
             break;
         case 12:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 12 : Writes a value back that is different but valid for MinHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesAValueBackThatIsDifferentButValidForMinHeatSetpointLimitAttribute_12();
+            if (ShouldSkip("A_MINHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueBackThatIsDifferentButValidForMinHeatSetpointLimitAttribute_12();
             break;
         case 13:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 13 : Reads it back again to confirm the successful write of MinHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinHeatSetpointLimitAttribute_13();
+            if (ShouldSkip("A_MINHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinHeatSetpointLimitAttribute_13();
             break;
         case 14:
             ChipLogProgress(
                 chipTool, " ***** Test Step 14 : Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfAbsMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_14();
+            if (ShouldSkip("A_MINHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfAbsMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_14();
             break;
         case 15:
             ChipLogProgress(
                 chipTool, " ***** Test Step 15 : Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_15();
+            if (ShouldSkip("A_MINHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_15();
             break;
         case 16:
             ChipLogProgress(chipTool,
                             " ***** Test Step 16 : Reads MaxHeatSetpointLimit attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = ShouldSkip("A_MAXHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestReadsMaxHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_16();
+            if (ShouldSkip("A_MAXHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsMaxHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_16();
             break;
         case 17:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 17 : Writes a value back that is different but valid for MaxHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MAXHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesAValueBackThatIsDifferentButValidForMaxHeatSetpointLimitAttribute_17();
+            if (ShouldSkip("A_MAXHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueBackThatIsDifferentButValidForMaxHeatSetpointLimitAttribute_17();
             break;
         case 18:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 18 : Reads it back again to confirm the successful write of MaxHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MAXHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxHeatSetpointLimitAttribute_18();
+            if (ShouldSkip("A_MAXHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxHeatSetpointLimitAttribute_18();
             break;
         case 19:
             ChipLogProgress(
                 chipTool, " ***** Test Step 19 : Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MAXHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfAbsMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_19();
+            if (ShouldSkip("A_MAXHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfAbsMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_19();
             break;
         case 20:
             ChipLogProgress(
                 chipTool, " ***** Test Step 20 : Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MAXHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_20();
+            if (ShouldSkip("A_MAXHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_20();
             break;
         case 21:
             ChipLogProgress(chipTool,
                             " ***** Test Step 21 : Reads MinCoolSetpointLimit attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestReadsMinCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_21();
+            if (ShouldSkip("A_MINCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsMinCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_21();
             break;
         case 22:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 22 : Writes a value back that is different but valid for MinCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesAValueBackThatIsDifferentButValidForMinCoolSetpointLimitAttribute_22();
+            if (ShouldSkip("A_MINCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueBackThatIsDifferentButValidForMinCoolSetpointLimitAttribute_22();
             break;
         case 23:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 23 : Reads it back again to confirm the successful write of MinCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinCoolSetpointLimitAttribute_23();
+            if (ShouldSkip("A_MINCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinCoolSetpointLimitAttribute_23();
             break;
         case 24:
             ChipLogProgress(
                 chipTool, " ***** Test Step 24 : Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfAbsMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_24();
+            if (ShouldSkip("A_MINCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfAbsMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_24();
             break;
         case 25:
             ChipLogProgress(chipTool,
                             " ***** Test Step 25 : Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_25();
+            if (ShouldSkip("A_MINCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_25();
             break;
         case 26:
             ChipLogProgress(chipTool,
                             " ***** Test Step 26 : Reads MaxCoolSetpointLimit attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestReadsMaxCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_26();
+            if (ShouldSkip("A_MAXCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsMaxCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_26();
             break;
         case 27:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 27 : Writes a value back that is different but valid for MaxCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesAValueBackThatIsDifferentButValidForMaxCoolSetpointLimitAttribute_27();
+            if (ShouldSkip("A_MAXCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueBackThatIsDifferentButValidForMaxCoolSetpointLimitAttribute_27();
             break;
         case 28:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 28 : Reads it back again to confirm the successful write of MaxCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxCoolSetpointLimitAttribute_28();
+            if (ShouldSkip("A_MAXCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxCoolSetpointLimitAttribute_28();
             break;
         case 29:
             ChipLogProgress(
                 chipTool, " ***** Test Step 29 : Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfAbsMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_29();
+            if (ShouldSkip("A_MAXCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfAbsMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_29();
             break;
         case 30:
             ChipLogProgress(chipTool,
                             " ***** Test Step 30 : Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_30();
+            if (ShouldSkip("A_MAXCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_30();
             break;
         case 31:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 31 : Writes (sets back) the limit of MinHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_31();
+            if (ShouldSkip("A_MINHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_31();
             break;
         case 32:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 32 : Writes (sets back) the limit of MaxHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_32();
+            if (ShouldSkip("A_MINHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_32();
             break;
         case 33:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 33 : Writes (sets back) the limit of MinHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_33();
+            if (ShouldSkip("A_MINHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_33();
             break;
         case 34:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 34 : Writes (sets back) the limit of MaxHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_34();
+            if (ShouldSkip("A_MINHEATSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_34();
             break;
         case 35:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 35 : Writes (sets back) the limit of MinCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_35();
+            if (ShouldSkip("A_MINCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_35();
             break;
         case 36:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 36 : Writes (sets back) the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_36();
+            if (ShouldSkip("A_MINCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_36();
             break;
         case 37:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 37 : Writes (sets back) the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_37();
+            if (ShouldSkip("A_MAXCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_37();
             break;
         case 38:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 38 : Writes (sets back) the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
-            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
-                ? CHIP_NO_ERROR
-                : TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_38();
+            if (ShouldSkip("A_MAXCOOLSETPOINTLIMIT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_38();
             break;
         case 39:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 39 : Reads ControlSequenceOfOperation from Server DUT and verifies that the value is valid\n");
-            err = ShouldSkip("A_CONTROLSEQUENCEOFOPERATION")
-                ? CHIP_NO_ERROR
-                : TestReadsControlSequenceOfOperationFromServerDutAndVerifiesThatTheValueIsValid_39();
+            if (ShouldSkip("A_CONTROLSEQUENCEOFOPERATION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsControlSequenceOfOperationFromServerDutAndVerifiesThatTheValueIsValid_39();
             break;
         case 40:
             ChipLogProgress(
                 chipTool, " ***** Test Step 40 : Write Attribute command for ControlSequenceOfOperation with a new valid value\n");
-            err = ShouldSkip("A_CONTROLSEQUENCEOFOPERATION")
-                ? CHIP_NO_ERROR
-                : TestWriteAttributeCommandForControlSequenceOfOperationWithANewValidValue_40();
+            if (ShouldSkip("A_CONTROLSEQUENCEOFOPERATION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWriteAttributeCommandForControlSequenceOfOperationWithANewValidValue_40();
             break;
         case 41:
             ChipLogProgress(chipTool, " ***** Test Step 41 : Read it back again to confirm the successful write\n");
-            err = ShouldSkip("A_CONTROLSEQUENCEOFOPERATION") ? CHIP_NO_ERROR : TestReadItBackAgainToConfirmTheSuccessfulWrite_41();
+            if (ShouldSkip("A_CONTROLSEQUENCEOFOPERATION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadItBackAgainToConfirmTheSuccessfulWrite_41();
             break;
         case 42:
             ChipLogProgress(chipTool, " ***** Test Step 42 : Sets OccupiedHeatingSetpoint to default value\n");
-            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedHeatingSetpointToDefaultValue_42();
+            if (ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSetsOccupiedHeatingSetpointToDefaultValue_42();
             break;
         case 43:
             ChipLogProgress(chipTool, " ***** Test Step 43 : Sets OccupiedHeatingSetpoint to default value\n");
-            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedHeatingSetpointToDefaultValue_43();
+            if (ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSetsOccupiedHeatingSetpointToDefaultValue_43();
             break;
         case 44:
             ChipLogProgress(chipTool, " ***** Test Step 44 : Sets OccupiedCoolingSetpoint to default value\n");
-            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedCoolingSetpointToDefaultValue_44();
+            if (ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSetsOccupiedCoolingSetpointToDefaultValue_44();
             break;
         case 45:
             ChipLogProgress(chipTool, " ***** Test Step 45 : Sets OccupiedCoolingSetpoint to default value\n");
-            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedCoolingSetpointToDefaultValue_45();
+            if (ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSetsOccupiedCoolingSetpointToDefaultValue_45();
             break;
         case 46:
             ChipLogProgress(chipTool, " ***** Test Step 46 : Sets OccupiedCoolingSetpoint to default value\n");
-            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedCoolingSetpointToDefaultValue_46();
+            if (ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSetsOccupiedCoolingSetpointToDefaultValue_46();
             break;
         case 47:
             ChipLogProgress(chipTool, " ***** Test Step 47 : Sets OccupiedHeatingSetpoint to default value\n");
-            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedHeatingSetpointToDefaultValue_47();
+            if (ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSetsOccupiedHeatingSetpointToDefaultValue_47();
             break;
         case 48:
             ChipLogProgress(chipTool, " ***** Test Step 48 : Sets OccupiedCoolingSetpoint to default value\n");
-            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedCoolingSetpointToDefaultValue_48();
+            if (ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSetsOccupiedCoolingSetpointToDefaultValue_48();
             break;
         case 49:
             ChipLogProgress(chipTool, " ***** Test Step 49 : Sets OccupiedHeatingSetpoint to default value\n");
-            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedHeatingSetpointToDefaultValue_49();
+            if (ShouldSkip("A_OCCUPIEDHEATINGSETPOINT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSetsOccupiedHeatingSetpointToDefaultValue_49();
             break;
         }
 
@@ -31702,51 +32535,95 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Writes a value of 0 to TemperatureDisplayMode attribute of DUT\n");
-            err = ShouldSkip("A_TEMPERATURE_DISPLAY_MODE") ? CHIP_NO_ERROR
-                                                           : TestWritesAValueOf0ToTemperatureDisplayModeAttributeOfDut_1();
+            if (ShouldSkip("A_TEMPERATURE_DISPLAY_MODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOf0ToTemperatureDisplayModeAttributeOfDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Writes a value of 1 to TemperatureDisplayMode attribute of DUT\n");
-            err = ShouldSkip("A_TEMPERATURE_DISPLAY_MODE") ? CHIP_NO_ERROR
-                                                           : TestWritesAValueOf1ToTemperatureDisplayModeAttributeOfDut_2();
+            if (ShouldSkip("A_TEMPERATURE_DISPLAY_MODE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOf1ToTemperatureDisplayModeAttributeOfDut_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Writes a value of 0 to KeypadLockout attribute of DUT\n");
-            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf0ToKeypadLockoutAttributeOfDut_3();
+            if (ShouldSkip("A_KEYPAD_LOCKOUT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOf0ToKeypadLockoutAttributeOfDut_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Writes a value of 1 to KeypadLockout attribute of DUT\n");
-            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf1ToKeypadLockoutAttributeOfDut_4();
+            if (ShouldSkip("A_KEYPAD_LOCKOUT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOf1ToKeypadLockoutAttributeOfDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Writes a value of 2 to KeypadLockout attribute of DUT\n");
-            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf2ToKeypadLockoutAttributeOfDut_5();
+            if (ShouldSkip("A_KEYPAD_LOCKOUT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOf2ToKeypadLockoutAttributeOfDut_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Writes a value of 3 to KeypadLockout attribute of DUT\n");
-            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf3ToKeypadLockoutAttributeOfDut_6();
+            if (ShouldSkip("A_KEYPAD_LOCKOUT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOf3ToKeypadLockoutAttributeOfDut_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Writes a value of 4 to KeypadLockout attribute of DUT\n");
-            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf4ToKeypadLockoutAttributeOfDut_7();
+            if (ShouldSkip("A_KEYPAD_LOCKOUT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOf4ToKeypadLockoutAttributeOfDut_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Writes a value of 5 to KeypadLockout attribute of DUT\n");
-            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf5ToKeypadLockoutAttributeOfDut_8();
+            if (ShouldSkip("A_KEYPAD_LOCKOUT"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOf5ToKeypadLockoutAttributeOfDut_8();
             break;
         case 9:
             ChipLogProgress(chipTool,
                             " ***** Test Step 9 : Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT\n");
-            err = ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY")
-                ? CHIP_NO_ERROR
-                : TestWritesAValueOf0ToScheduleProgrammingVisibilityAttributeOfDut_9();
+            if (ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOf0ToScheduleProgrammingVisibilityAttributeOfDut_9();
             break;
         case 10:
             ChipLogProgress(chipTool,
                             " ***** Test Step 10 : Writes a value of 1 to ScheduleProgrammingVisibility attribute of DUT\n");
-            err = ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY")
-                ? CHIP_NO_ERROR
-                : TestWritesAValueOf1ToScheduleProgrammingVisibilityAttributeOfDut_10();
+            if (ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestWritesAValueOf1ToScheduleProgrammingVisibilityAttributeOfDut_10();
             break;
         }
 
@@ -32467,6 +33344,7 @@ private:
     void OnSuccessResponse_4(uint32_t featureMap)
     {
         VerifyOrReturn(CheckConstraintType("featureMap", "", "uint32"));
+        VerifyOrReturn(CheckConstraintMinValue<uint32_t>("featureMap", featureMap, 0UL));
         VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("featureMap", featureMap, 32768UL));
         NextTest();
     }
@@ -33342,6 +34220,7 @@ private:
     void OnSuccessResponse_1(uint8_t type)
     {
         VerifyOrReturn(CheckConstraintType("type", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("type", type, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("type", type, 9));
         NextTest();
     }
@@ -33405,6 +34284,7 @@ private:
     void OnSuccessResponse_4(uint8_t configStatus)
     {
         VerifyOrReturn(CheckConstraintType("configStatus", "", "map8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("configStatus", configStatus, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("configStatus", configStatus, 63));
         NextTest();
     }
@@ -33468,6 +34348,7 @@ private:
     void OnSuccessResponse_7(uint8_t operationalStatus)
     {
         VerifyOrReturn(CheckConstraintType("operationalStatus", "", "map8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("operationalStatus", operationalStatus, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("operationalStatus", operationalStatus, 63));
         NextTest();
     }
@@ -33531,6 +34412,7 @@ private:
     void OnSuccessResponse_10(uint8_t endProductType)
     {
         VerifyOrReturn(CheckConstraintType("endProductType", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("endProductType", endProductType, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("endProductType", endProductType, 23));
         NextTest();
     }
@@ -33594,6 +34476,7 @@ private:
     void OnSuccessResponse_13(uint8_t mode)
     {
         VerifyOrReturn(CheckConstraintType("mode", "", "map8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("mode", mode, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("mode", mode, 15));
         NextTest();
     }
@@ -33653,6 +34536,8 @@ private:
     void OnSuccessResponse_16(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionLiftPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("targetPositionLiftPercent100ths", "", "Percent100ths"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("targetPositionLiftPercent100ths", targetPositionLiftPercent100ths, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionLiftPercent100ths",
                                                                     targetPositionLiftPercent100ths, 10000U));
         NextTest();
@@ -33721,6 +34606,8 @@ private:
     void OnSuccessResponse_19(const chip::app::DataModel::Nullable<chip::Percent100ths> & targetPositionTiltPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("targetPositionTiltPercent100ths", "", "Percent100ths"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("targetPositionTiltPercent100ths", targetPositionTiltPercent100ths, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("targetPositionTiltPercent100ths",
                                                                     targetPositionTiltPercent100ths, 10000U));
         NextTest();
@@ -33789,6 +34676,8 @@ private:
     void OnSuccessResponse_22(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionLiftPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercent100ths", "", "Percent100ths"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionLiftPercent100ths", currentPositionLiftPercent100ths, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionLiftPercent100ths",
                                                                     currentPositionLiftPercent100ths, 10000U));
         NextTest();
@@ -33857,6 +34746,8 @@ private:
     void OnSuccessResponse_25(const chip::app::DataModel::Nullable<chip::Percent100ths> & currentPositionTiltPercent100ths)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercent100ths", "", "Percent100ths"));
+        VerifyOrReturn(
+            CheckConstraintMinValue<chip::Percent100ths>("currentPositionTiltPercent100ths", currentPositionTiltPercent100ths, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<chip::Percent100ths>("currentPositionTiltPercent100ths",
                                                                     currentPositionTiltPercent100ths, 10000U));
         NextTest();
@@ -33925,6 +34816,7 @@ private:
     void OnSuccessResponse_28(uint16_t installedOpenLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 65535U));
         NextTest();
     }
@@ -33969,6 +34861,7 @@ private:
     void OnSuccessResponse_30(uint16_t installedOpenLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitLift", installedOpenLimitLift, 65535U));
         NextTest();
     }
@@ -33990,6 +34883,7 @@ private:
     void OnSuccessResponse_31(uint16_t installedClosedLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 65535U));
         NextTest();
     }
@@ -34034,6 +34928,7 @@ private:
     void OnSuccessResponse_33(uint16_t installedClosedLimitLift)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitLift", installedClosedLimitLift, 65535U));
         NextTest();
     }
@@ -34055,6 +34950,7 @@ private:
     void OnSuccessResponse_34(uint16_t installedOpenLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 65535U));
         NextTest();
     }
@@ -34099,6 +34995,7 @@ private:
     void OnSuccessResponse_36(uint16_t installedOpenLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedOpenLimitTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedOpenLimitTilt", installedOpenLimitTilt, 65535U));
         NextTest();
     }
@@ -34120,6 +35017,7 @@ private:
     void OnSuccessResponse_37(uint16_t installedClosedLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 65535U));
         NextTest();
     }
@@ -34164,6 +35062,7 @@ private:
     void OnSuccessResponse_39(uint16_t installedClosedLimitTilt)
     {
         VerifyOrReturn(CheckConstraintType("installedClosedLimitTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("installedClosedLimitTilt", installedClosedLimitTilt, 65535U));
         NextTest();
     }
@@ -34184,6 +35083,7 @@ private:
     void OnSuccessResponse_40(uint16_t safetyStatus)
     {
         VerifyOrReturn(CheckConstraintType("safetyStatus", "", "map16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("safetyStatus", safetyStatus, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("safetyStatus", safetyStatus, 2047U));
         NextTest();
     }
@@ -34247,6 +35147,7 @@ private:
     void OnSuccessResponse_43(const chip::app::DataModel::Nullable<uint16_t> & currentPositionLift)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentPositionLift", currentPositionLift, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535U));
         NextTest();
     }
@@ -34290,6 +35191,7 @@ private:
     void OnSuccessResponse_45(const chip::app::DataModel::Nullable<uint16_t> & currentPositionLift)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLift", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentPositionLift", currentPositionLift, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionLift", currentPositionLift, 65535U));
         NextTest();
     }
@@ -34310,6 +35212,7 @@ private:
     void OnSuccessResponse_46(const chip::app::DataModel::Nullable<uint16_t> & currentPositionTilt)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentPositionTilt", currentPositionTilt, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535U));
         NextTest();
     }
@@ -34353,6 +35256,7 @@ private:
     void OnSuccessResponse_48(const chip::app::DataModel::Nullable<uint16_t> & currentPositionTilt)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTilt", "", "uint16"));
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("currentPositionTilt", currentPositionTilt, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("currentPositionTilt", currentPositionTilt, 65535U));
         NextTest();
     }
@@ -34374,6 +35278,7 @@ private:
     void OnSuccessResponse_49(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionLiftPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionLiftPercentage", "", "Percent"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 0));
         VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionLiftPercentage", currentPositionLiftPercentage, 100));
         NextTest();
     }
@@ -34441,6 +35346,7 @@ private:
     void OnSuccessResponse_52(const chip::app::DataModel::Nullable<chip::Percent> & currentPositionTiltPercentage)
     {
         VerifyOrReturn(CheckConstraintType("currentPositionTiltPercentage", "", "Percent"));
+        VerifyOrReturn(CheckConstraintMinValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 0));
         VerifyOrReturn(CheckConstraintMaxValue<chip::Percent>("currentPositionTiltPercentage", currentPositionTiltPercentage, 100));
         NextTest();
     }
@@ -34597,11 +35503,21 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads Type attribute from DUT\n");
-            err = ShouldSkip("A_TYPE") ? CHIP_NO_ERROR : TestReadsTypeAttributeFromDut_1();
+            if (ShouldSkip("A_TYPE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsTypeAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads Type attribute constraints\n");
-            err = ShouldSkip("A_TYPE") ? CHIP_NO_ERROR : TestReadsTypeAttributeConstraints_2();
+            if (ShouldSkip("A_TYPE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsTypeAttributeConstraints_2();
             break;
         }
 
@@ -34685,6 +35601,7 @@ private:
     void OnSuccessResponse_2(uint8_t type)
     {
         VerifyOrReturn(CheckConstraintType("type", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("type", type, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("type", type, 9));
         NextTest();
     }
@@ -34730,11 +35647,21 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads EndProductType attribute from DUT\n");
-            err = ShouldSkip("A_ENDPRODUCTTYPE") ? CHIP_NO_ERROR : TestReadsEndProductTypeAttributeFromDut_1();
+            if (ShouldSkip("A_ENDPRODUCTTYPE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsEndProductTypeAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads EndProductType attribute constraints from DUT\n");
-            err = ShouldSkip("A_ENDPRODUCTTYPE") ? CHIP_NO_ERROR : TestReadsEndProductTypeAttributeConstraintsFromDut_2();
+            if (ShouldSkip("A_ENDPRODUCTTYPE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsEndProductTypeAttributeConstraintsFromDut_2();
             break;
         }
 
@@ -34818,6 +35745,7 @@ private:
     void OnSuccessResponse_2(uint8_t endProductType)
     {
         VerifyOrReturn(CheckConstraintType("endProductType", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("endProductType", endProductType, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("endProductType", endProductType, 23));
         NextTest();
     }
@@ -48875,6 +49803,7 @@ private:
 
     void OnSuccessResponse_214(const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
     {
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("nullableInt8u", nullableInt8u, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("nullableInt8u", nullableInt8u, 254));
         NextTest();
     }
@@ -48933,6 +49862,7 @@ private:
 
     void OnSuccessResponse_217(const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
     {
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("nullableInt8u", nullableInt8u, 0));
         VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("nullableInt8u", nullableInt8u, 254));
         NextTest();
     }
@@ -49134,6 +50064,7 @@ private:
 
     void OnSuccessResponse_227(const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
     {
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("nullableInt16u", nullableInt16u, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("nullableInt16u", nullableInt16u, 65534U));
         NextTest();
     }
@@ -49192,6 +50123,7 @@ private:
 
     void OnSuccessResponse_230(const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
     {
+        VerifyOrReturn(CheckConstraintMinValue<uint16_t>("nullableInt16u", nullableInt16u, 0U));
         VerifyOrReturn(CheckConstraintMaxValue<uint16_t>("nullableInt16u", nullableInt16u, 65534U));
         NextTest();
     }
@@ -49393,6 +50325,7 @@ private:
 
     void OnSuccessResponse_240(const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
     {
+        VerifyOrReturn(CheckConstraintMinValue<uint32_t>("nullableInt32u", nullableInt32u, 0UL));
         VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("nullableInt32u", nullableInt32u, 4294967294UL));
         NextTest();
     }
@@ -49451,6 +50384,7 @@ private:
 
     void OnSuccessResponse_243(const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
     {
+        VerifyOrReturn(CheckConstraintMinValue<uint32_t>("nullableInt32u", nullableInt32u, 0UL));
         VerifyOrReturn(CheckConstraintMaxValue<uint32_t>("nullableInt32u", nullableInt32u, 4294967294UL));
         NextTest();
     }
@@ -49652,6 +50586,7 @@ private:
 
     void OnSuccessResponse_253(const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
     {
+        VerifyOrReturn(CheckConstraintMinValue<uint64_t>("nullableInt64u", nullableInt64u, 0ULL));
         VerifyOrReturn(CheckConstraintMaxValue<uint64_t>("nullableInt64u", nullableInt64u, 18446744073709551614ULL));
         NextTest();
     }
@@ -49710,6 +50645,7 @@ private:
 
     void OnSuccessResponse_256(const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
     {
+        VerifyOrReturn(CheckConstraintMinValue<uint64_t>("nullableInt64u", nullableInt64u, 0ULL));
         VerifyOrReturn(CheckConstraintMaxValue<uint64_t>("nullableInt64u", nullableInt64u, 18446744073709551614ULL));
         NextTest();
     }
@@ -55018,8 +55954,51 @@ public:
             err = TestReadAttributeCharStringValueEndsWithConstraints_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Write attribute CHAR_STRING Value Back to Default Value\n");
-            err = TestWriteAttributeCharStringValueBackToDefaultValue_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Write attribute CHAR_STRING Value\n");
+            err = TestWriteAttributeCharStringValue_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 12 : Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints\n");
+            err = TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Write attribute CHAR_STRING Value\n");
+            err = TestWriteAttributeCharStringValue_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 14 : Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints\n");
+            err = TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Write attribute CHAR_STRING Value\n");
+            err = TestWriteAttributeCharStringValue_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 16 : Read attribute CHAR_STRING Value isLowerCase/isUpperCase Constraints\n");
+            err = TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Write attribute CHAR_STRING Value\n");
+            err = TestWriteAttributeCharStringValue_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : Read attribute CHAR_STRING Value isHexString Constraints\n");
+            err = TestReadAttributeCharStringValueIsHexStringConstraints_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Write attribute CHAR_STRING Value\n");
+            err = TestWriteAttributeCharStringValue_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Read attribute CHAR_STRING Value isHexString Constraints\n");
+            err = TestReadAttributeCharStringValueIsHexStringConstraints_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Write attribute CHAR_STRING Value Back to Default Value\n");
+            err = TestWriteAttributeCharStringValueBackToDefaultValue_21();
             break;
         }
 
@@ -55032,7 +56011,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 12;
+    const uint16_t mTestCount = 22;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -55134,6 +56113,91 @@ private:
     }
 
     static void OnSuccessCallback_11(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_11(); }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_12(status);
+    }
+
+    static void OnSuccessCallback_12(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_12(charString);
+    }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_13(); }
+
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_14(status);
+    }
+
+    static void OnSuccessCallback_14(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_14(charString);
+    }
+
+    static void OnFailureCallback_15(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_15(status);
+    }
+
+    static void OnSuccessCallback_15(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_15(); }
+
+    static void OnFailureCallback_16(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_16(status);
+    }
+
+    static void OnSuccessCallback_16(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_16(charString);
+    }
+
+    static void OnFailureCallback_17(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_17(status);
+    }
+
+    static void OnSuccessCallback_17(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_17(); }
+
+    static void OnFailureCallback_18(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_18(status);
+    }
+
+    static void OnSuccessCallback_18(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_18(charString);
+    }
+
+    static void OnFailureCallback_19(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_19(status);
+    }
+
+    static void OnSuccessCallback_19(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_19(); }
+
+    static void OnFailureCallback_20(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_20(status);
+    }
+
+    static void OnSuccessCallback_20(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_20(charString);
+    }
+
+    static void OnFailureCallback_21(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_21(status);
+    }
+
+    static void OnSuccessCallback_21(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_21(); }
 
     //
     // Tests methods
@@ -55333,14 +56397,14 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeCharStringValueBackToDefaultValue_11()
+    CHIP_ERROR TestWriteAttributeCharStringValue_11()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan charStringArgument;
-        charStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
+        charStringArgument = chip::Span<const char>("lowercasegarbage: not in length on purpose", 9);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
             charStringArgument, this, OnSuccessCallback_11, OnFailureCallback_11));
@@ -55350,6 +56414,194 @@ private:
     void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_12, OnFailureCallback_12));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintIsUpperCase("charString", charString, false));
+        VerifyOrReturn(CheckConstraintIsLowerCase("charString", charString, true));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringValue_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("UPPERCASEgarbage: not in length on purpose", 9);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintIsUpperCase("charString", charString, true));
+        VerifyOrReturn(CheckConstraintIsLowerCase("charString", charString, false));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringValue_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("lowUPPERgarbage: not in length on purpose", 8);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringValueIsLowerCaseIsUpperCaseConstraints_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_16, OnFailureCallback_16));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_16(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintIsUpperCase("charString", charString, false));
+        VerifyOrReturn(CheckConstraintIsLowerCase("charString", charString, false));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringValue_17()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("ABCDEF012Vgarbage: not in length on purpose", 10);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_17, OnFailureCallback_17));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_17() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringValueIsHexStringConstraints_18()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_18, OnFailureCallback_18));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_18(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintIsHexString("charString", charString, false));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringValue_19()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("ABCDEF0123garbage: not in length on purpose", 10);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_19, OnFailureCallback_19));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_19() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringValueIsHexStringConstraints_20()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_20, OnFailureCallback_20));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_20(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintIsHexString("charString", charString, true));
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringValueBackToDefaultValue_21()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_21, OnFailureCallback_21));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_21() { NextTest(); }
 };
 
 class TestDelayCommands : public TestCommand
@@ -58917,9 +60169,9 @@ private:
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 5));
             VerifyOrReturn(CheckValue("serverList[5]", iter_0.GetValue(), 40UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 6));
-            VerifyOrReturn(CheckValue("serverList[6]", iter_0.GetValue(), 41UL));
+            VerifyOrReturn(CheckValue("serverList[6]", iter_0.GetValue(), 42UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 7));
-            VerifyOrReturn(CheckValue("serverList[7]", iter_0.GetValue(), 42UL));
+            VerifyOrReturn(CheckValue("serverList[7]", iter_0.GetValue(), 43UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 8));
             VerifyOrReturn(CheckValue("serverList[8]", iter_0.GetValue(), 46UL));
             VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter_0, 9));
@@ -60723,8 +61975,16 @@ public:
             err = TestGroupWriteAttribute_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Restore initial location value\n");
-            err = TestRestoreInitialLocationValue_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read back Attribute\n");
+            err = TestReadBackAttribute_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Restore initial location value\n");
+            err = TestRestoreInitialLocationValue_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Read back Attribute\n");
+            err = TestReadBackAttribute_4();
             break;
         }
 
@@ -60737,7 +61997,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 5;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -60751,14 +62011,34 @@ private:
 
     static void OnSuccessCallback_1(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_1(); }
 
-    static void OnDoneCallback_2(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_2(); }
-
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
         (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_2(status);
     }
 
-    static void OnSuccessCallback_2(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_2(); }
+    static void OnSuccessCallback_2(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_2(location);
+    }
+
+    static void OnDoneCallback_3(void * context) { (static_cast<TestGroupMessaging *>(context))->OnDoneResponse_3(); }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, chip::CharSpan location)
+    {
+        (static_cast<TestGroupMessaging *>(context))->OnSuccessResponse_4(location);
+    }
 
     //
     // Tests methods
@@ -60790,7 +62070,27 @@ private:
 
     void OnDoneResponse_1() { NextTest(); }
 
-    CHIP_ERROR TestRestoreInitialLocationValue_2()
+    CHIP_ERROR TestReadBackAttribute_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(chip::CharSpan location)
+    {
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("us", 2)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestRestoreInitialLocationValue_3()
     {
         const chip::GroupId groupId = 1234;
         chip::Controller::BasicClusterTest cluster;
@@ -60800,15 +62100,35 @@ private:
         locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2, OnDoneCallback_2));
+            locationArgument, this, OnSuccessCallback_3, OnFailureCallback_3, OnDoneCallback_3));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_2() { NextTest(); }
+    void OnSuccessResponse_3() { NextTest(); }
 
-    void OnDoneResponse_2() { NextTest(); }
+    void OnDoneResponse_3() { NextTest(); }
+
+    CHIP_ERROR TestReadBackAttribute_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 0;
+        chip::Controller::BasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(chip::CharSpan location)
+    {
+        VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
+
+        NextTest();
+    }
 };
 
 class Test_TC_SWDIAG_1_1 : public TestCommand
@@ -60855,12 +62175,21 @@ public:
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapUsed non-global attribute value from DUT\n");
-            err = ShouldSkip("A_CURRENTHEAPUSED") ? CHIP_NO_ERROR : TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_2();
+            if (ShouldSkip("A_CURRENTHEAPUSED"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Reads CurrentHeapHighWaterMark non-global attribute value from DUT\n");
-            err = ShouldSkip("A_CURRENTHEAPHIGHWATERMARK") ? CHIP_NO_ERROR
-                                                           : TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_3();
+            if (ShouldSkip("A_CURRENTHEAPHIGHWATERMARK"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_3();
             break;
         }
 
@@ -61081,12 +62410,21 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads CurrentHeapUsed attribute value from DUT\n");
-            err = ShouldSkip("A_CURRENTHEAPUSED") ? CHIP_NO_ERROR : TestReadsCurrentHeapUsedAttributeValueFromDut_1();
+            if (ShouldSkip("A_CURRENTHEAPUSED"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsCurrentHeapUsedAttributeValueFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapHighWaterMark attribute value from DUT\n");
-            err = ShouldSkip("A_CURRENTHEAPHIGHWATERMARK") ? CHIP_NO_ERROR
-                                                           : TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_2();
+            if (ShouldSkip("A_CURRENTHEAPHIGHWATERMARK"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadsCurrentHeapHighWaterMarkAttributeValueFromDut_2();
             break;
         }
 

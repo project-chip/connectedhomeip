@@ -19,46 +19,43 @@
 package com.tcl.chip.tvapp;
 
 import android.util.Log;
-import java.util.Date;
 
 /** Stub implement of MediaPlaybackManager, TV manufacture should have there own implements */
 public class MediaPlaybackManagerStub implements MediaPlaybackManager {
 
   private final String TAG = MediaPlaybackManagerStub.class.getSimpleName();
 
+  private int endpoint;
+
+  public MediaPlaybackManagerStub(int endpoint) {
+    this.endpoint = endpoint;
+  }
+
   @Override
   public long getAttributes(int attributesId) {
     switch (attributesId) {
       case ATTRIBUTE_PLAYBACK_STATE:
-        Log.d(TAG, "getAttributes CurrentState");
+        Log.d(TAG, "getAttributes CurrentState at " + endpoint);
         return PLAYBACK_STATE_PLAYING;
 
       case ATTRIBUTE_PLAYBACK_START_TIME:
-        Log.d(TAG, "getAttributes StartTime");
+        Log.d(TAG, "getAttributes StartTime at " + endpoint);
         return 100;
 
       case ATTRIBUTE_PLAYBACK_DURATION:
-        Log.d(TAG, "getAttributes Duration");
+        Log.d(TAG, "getAttributes Duration at " + endpoint);
         return 5 * 60 * 1000;
 
-      case ATTRIBUTE_PLAYBACK_POSITION_UPDATED_AT:
-        Log.d(TAG, "getAttributes SampledPosition UpdatedAt");
-        return new Date().getTime() * 1000;
-
-      case ATTRIBUTE_PLAYBACK_POSITION:
-        Log.d(TAG, "getAttributes SampledPosition Position");
-        return 3 * 60 * 1000;
-
       case ATTRIBUTE_PLAYBACK_SPEED:
-        Log.d(TAG, "getAttributes SampledPosition PlaybackSpeed");
+        Log.d(TAG, "getAttributes SampledPosition PlaybackSpeed at " + endpoint);
         return 10000;
 
       case ATTRIBUTE_PLAYBACK_SEEK_RANGE_END:
-        Log.d(TAG, "getAttributes SampledPosition SeekRangeEnd");
+        Log.d(TAG, "getAttributes SampledPosition SeekRangeEnd at " + endpoint);
         return 5 * 60 * 1000;
 
       case ATTRIBUTE_PLAYBACK_SEEK_RANGE_START:
-        Log.d(TAG, "getAttributes SampledPosition SeekRangeStart");
+        Log.d(TAG, "getAttributes SampledPosition SeekRangeStart at " + endpoint);
         return 200;
     }
 
@@ -69,50 +66,55 @@ public class MediaPlaybackManagerStub implements MediaPlaybackManager {
   public int request(int cmd, long parameter) {
     switch (cmd) {
       case REQUEST_PLAY:
-        Log.d(TAG, "request Play");
+        Log.d(TAG, "request Play at " + endpoint);
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_PAUSE:
-        Log.d(TAG, "request pause");
+        Log.d(TAG, "request pause at " + endpoint);
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_STOP:
-        Log.d(TAG, "request stop");
+        Log.d(TAG, "request stop at " + endpoint);
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_START_OVER:
-        Log.d(TAG, "request start over");
+        Log.d(TAG, "request start over at " + endpoint);
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_PREVIOUS:
-        Log.d(TAG, "request previous");
+        Log.d(TAG, "request previous at " + endpoint);
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_NEXT:
-        Log.d(TAG, "request next");
+        Log.d(TAG, "request next at " + endpoint);
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_REWIND:
-        Log.d(TAG, "request rewind");
+        Log.d(TAG, "request rewind at " + endpoint);
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_FAST_FORWARD:
-        Log.d(TAG, "request fast forward");
+        Log.d(TAG, "request fast forward at " + endpoint);
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_SKIP_FORWARD:
-        Log.d(TAG, "request skip forward " + parameter + " milliseconds");
+        Log.d(TAG, "request skip forward " + parameter + " milliseconds at " + endpoint);
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_SKIP_BACKWARD:
-        Log.d(TAG, "request skip backward " + parameter + " milliseconds");
+        Log.d(TAG, "request skip backward " + parameter + " milliseconds at " + endpoint);
         return RESPONSE_STATUS_SUCCESS;
 
       case REQUEST_SEEK:
-        Log.d(TAG, "request seek to " + parameter + " milliseconds");
+        Log.d(TAG, "request seek to " + parameter + " milliseconds at " + endpoint);
         return RESPONSE_STATUS_SUCCESS;
     }
 
     return RESPONSE_STATUS_NOT_ALLOWED;
+  }
+
+  @Override
+  public MediaPlaybackPosition getPosition() {
+    return new MediaPlaybackPosition(3 * 60 * 1000);
   }
 }

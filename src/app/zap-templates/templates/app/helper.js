@@ -352,6 +352,16 @@ function asMEI(prefix, suffix)
   return cHelper.asHex((prefix << 16) + suffix, 8);
 }
 
+// Not to be exported.
+function nsValueToNamespace(ns)
+{
+  if (ns == "detail") {
+    return ns;
+  }
+
+  return asUpperCamelCase(ns);
+}
+
 /*
  * @brief
  *
@@ -372,7 +382,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
   let passByReference = false;
   async function fn(pkgId)
   {
-    const ns          = options.hash.ns ? ('chip::app::Clusters::' + asUpperCamelCase(options.hash.ns) + '::') : '';
+    const ns          = options.hash.ns ? ('chip::app::Clusters::' + nsValueToNamespace(options.hash.ns) + '::') : '';
     const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
     if (await typeChecker('isEnum')) {
@@ -675,6 +685,11 @@ function incrementDepth(depth)
   return depth + 1;
 }
 
+function hasProperty(obj, prop)
+{
+  return prop in obj;
+}
+
 //
 // Module exports
 //
@@ -685,6 +700,7 @@ exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
 exports.asTypedLiteral                      = asTypedLiteral;
 exports.asLowerCamelCase                    = asLowerCamelCase;
 exports.asUpperCamelCase                    = asUpperCamelCase;
+exports.hasProperty                         = hasProperty;
 exports.hasSpecificAttributes               = hasSpecificAttributes;
 exports.asMEI                               = asMEI;
 exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectType;

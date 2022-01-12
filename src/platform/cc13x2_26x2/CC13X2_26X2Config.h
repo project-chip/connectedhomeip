@@ -67,6 +67,8 @@ public:
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_ActiveLocale;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_HourFormat;
+    static const Key kConfigKey_CalendarType;
     static const Key kConfigKey_KVS_key;   // special key for KVS system, key storage
     static const Key kConfigKey_KVS_value; // special key for KVS system, value storage
 

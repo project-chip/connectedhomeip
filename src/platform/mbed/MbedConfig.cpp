@@ -82,6 +82,8 @@ const MbedConfig::Key MbedConfig::kConfigKey_RegulatoryLocation = { CONFIG_KEY("
 const MbedConfig::Key MbedConfig::kConfigKey_CountryCode        = { CONFIG_KEY("country-code") };
 const MbedConfig::Key MbedConfig::kConfigKey_ActiveLocale       = { CONFIG_KEY("active-locale") };
 const MbedConfig::Key MbedConfig::kConfigKey_Breadcrumb         = { CONFIG_KEY("breadcrumb") };
+const MbedConfig::Key MbedConfig::kConfigKey_HourFormat         = { CONFIG_KEY("hour-format") };
+const MbedConfig::Key MbedConfig::kConfigKey_CalendarType       = { CONFIG_KEY("calendar-type") };
 
 CHIP_ERROR MbedConfig::ReadConfigValue(Key key, bool & val)
 {

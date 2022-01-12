@@ -49,6 +49,7 @@
     MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterKeypadInputPluginClientInitCallback();                                                                                   \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
+    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterMediaInputPluginClientInitCallback();                                                                                    \
     MatterMediaPlaybackPluginClientInitCallback();                                                                                 \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \

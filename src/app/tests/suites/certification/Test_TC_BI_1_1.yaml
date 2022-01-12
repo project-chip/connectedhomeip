@@ -53,6 +53,7 @@ tests:
           value: 1
 
     #issue #11053 disabled steps below Global attributes missing from YAML framework
+    #disabled due to issue #13442
     - label: "Read the global attribute: AttributeList"
       disabled: true
       command: "readAttribute"
@@ -95,7 +96,6 @@ tests:
 
     - label: "Read the optional global attribute : FeatureMap"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "FeatureMap"
       response:

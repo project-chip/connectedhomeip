@@ -20,22 +20,25 @@
 using namespace chip;
 using namespace chip::app::Clusters::MediaInput;
 
-std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> MediaInputManager::HandleGetInputList()
+CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
 {
-    std::list<Structs::InputInfo::Type> list;
     // TODO: Insert code here
-    int maximumVectorSize = 2;
 
-    for (int i = 0; i < maximumVectorSize; ++i)
-    {
-        chip::app::Clusters::MediaInput::Structs::InputInfo::Type inputInfo;
-        inputInfo.description = chip::CharSpan("exampleDescription", strlen("exampleDescription"));
-        inputInfo.name        = chip::CharSpan("exampleName", strlen("exampleName"));
-        inputInfo.inputType   = chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi;
-        inputInfo.index       = static_cast<uint8_t>(1 + i);
-        list.push_back(inputInfo);
-    }
-    return list;
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        int maximumVectorSize = 2;
+        for (int i = 0; i < maximumVectorSize; ++i)
+        {
+            chip::app::Clusters::MediaInput::Structs::InputInfo::Type inputInfo;
+            inputInfo.description = chip::CharSpan("exampleDescription", strlen("exampleDescription"));
+            inputInfo.name        = chip::CharSpan("exampleName", strlen("exampleName"));
+            inputInfo.inputType   = chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi;
+            inputInfo.index       = static_cast<uint8_t>(1 + i);
+
+            ReturnErrorOnFailure(encoder.Encode(inputInfo));
+        }
+
+        return CHIP_NO_ERROR;
+    });
 }
 
 uint8_t MediaInputManager::HandleGetCurrentInput()

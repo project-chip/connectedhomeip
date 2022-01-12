@@ -49,6 +49,7 @@ static_library("app") {
     "CASESessionManager.cpp",
     "CASESessionManager.h",
     "CommandHandler.cpp",
+    "CommandResponseHelper.h",
     "CommandSender.cpp",
     "DefaultAttributePersistenceProvider.cpp",
     "DeviceProxy.cpp",
