@@ -28,11 +28,16 @@ message DeviceState {
   repeated FabricInfo fabric_info = 2;
 }
 
+message PairingState {
+  bool pairing_enabled = 1;
+}
+
 service Device {
   rpc FactoryReset(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
   rpc Reboot(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
   rpc TriggerOta(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
   rpc GetDeviceInfo(pw.protobuf.Empty) returns (DeviceInfo){}
   rpc GetDeviceState(pw.protobuf.Empty) returns (DeviceState){}
-  rpc SetPairingInfo(PairingInfo) returns (pw.protobuf.Empty){}
+  rpc SetPairingState(PairingState) returns (pw.protobuf.Empty){}
+  rpc GetPairingState(pw.protobuf.Empty) returns (PairingState){}
 }
