@@ -38,11 +38,12 @@
 #define TRACE_EVENT_FUNCTION(...) PW_TRACE_FUNCTION(__VA_ARGS__)
 #define TRACE_EVENT_FUNCTION_FLAG(...) PW_TRACE_FUNCTION_FLAG(__VA_ARGS__)
 
-#else  // defined(PW_TRACE_BACKEND_SET) && PW_TRACE_BACKEND_SET
+#else // defined(PW_TRACE_BACKEND_SET) && PW_TRACE_BACKEND_SET
 
-#define _TRACE_EVENT_DISABLE(...) \
-  do {                          \
-  } while (0)
+#define _TRACE_EVENT_DISABLE(...)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (0)
 
 #define TRACE_EVENT_INSTANT(...) _TRACE_EVENT_DISABLE(__VA_ARGS__)
 #define TRACE_EVENT_INSTANT_FLAG(...) _TRACE_EVENT_DISABLE(__VA_ARGS__)
@@ -61,4 +62,4 @@
 #define TRACE_EVENT_FUNCTION(...) _TRACE_EVENT_DISABLE(__VA_ARGS__)
 #define TRACE_EVENT_FUNCTION_FLAG(...) _TRACE_EVENT_DISABLE(__VA_ARGS__)
 
-#endif  // defined(PW_TRACE_BACKEND_SET) && PW_TRACE_BACKEND_SET
+#endif // defined(PW_TRACE_BACKEND_SET) && PW_TRACE_BACKEND_SET
