@@ -32,6 +32,7 @@
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
 #endif
 
+#include <platform/Ameba/NetworkCommissioningDriver.h>
 #include <platform/internal/BLEManager.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
@@ -68,6 +69,9 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
     mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
     mFlags.SetRaw(0);
+
+    // Set callback functions from chip_porting
+    chip_connmgr_set_callback_func((chip_connmgr_callback)(conn_callback_dispatcher), this);
 
     // Ensure that station mode is enabled.
     wifi_on(RTW_MODE_STA);
@@ -136,13 +140,18 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     if (event->Type == DeviceEventType::kRtkWiFiStationConnectedEvent)
     {
-        ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_CONNECTED");
+        ChipLogProgress(DeviceLayer, "WiFiStationConnected");
         if (mWiFiStationState == kWiFiStationState_Connecting)
         {
             ChangeWiFiStationState(kWiFiStationState_Connecting_Succeeded);
         }
         DriveStationState();
         DHCPProcess();
+    }
+    if (event->Type == DeviceEventType::kRtkWiFiScanCompletedEvent)
+    {
+        ChipLogProgress(DeviceLayer, "WiFiScanCompleted");
+        NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnScanWiFiNetworkDone();        
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 }
@@ -557,6 +566,7 @@ void ConnectivityManagerImpl::DriveStationState()
 
 void ConnectivityManagerImpl::OnStationConnected()
 {
+    NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnConnectWiFiNetwork();
     // Alert other components of the new state.
     ChipDeviceEvent event;
     event.Type                          = DeviceEventType::kWiFiConnectivityChange;
@@ -776,6 +786,14 @@ void ConnectivityManagerImpl::RtkWiFiStationConnectedHandler(char * buf, int buf
     PlatformMgr().PostEventOrDie(&event);
 }
 
+void ConnectivityManagerImpl::RtkWiFiScanCompletedHandler(void)
+{
+    ChipDeviceEvent event;
+    memset(&event, 0, sizeof(event));
+    event.Type = DeviceEventType::kRtkWiFiScanCompletedEvent;
+    PlatformMgr().PostEventOrDie(&event);
+}
+
 void ConnectivityManagerImpl::DHCPProcessThread(void * param)
 {
     LwIP_DHCP(0, DHCP_START);
@@ -797,6 +815,14 @@ void ConnectivityManagerImpl::DHCPProcess(void)
 {
     xTaskCreate(DHCPProcessThread, "DHCPProcess", 4096 / sizeof(StackType_t), this, 1, NULL);
 }
+
+int ConnectivityManagerImpl::conn_callback_dispatcher(void *object)
+{
+    ConnectivityManagerImpl * connmgr = static_cast<ConnectivityManagerImpl *>(object);
+    connmgr->RtkWiFiScanCompletedHandler();
+    return 0;
+}
+
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
