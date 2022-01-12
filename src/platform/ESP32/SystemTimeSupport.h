@@ -20,10 +20,9 @@
 namespace chip {
 namespace System {
 namespace Clock {
-    
+
 CHIP_ERROR InitClock_RealTime();
 
 } // namespace Clock
 } // namespace System
 } // namespace chip
-
