@@ -84,6 +84,12 @@ function getCommands(methodName)
                                  : ensureClusters(this).getServerCommands(clusterName);
 }
 
+function getAttributes(methodName)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
+  return ensureClusters(this).getAttributesByClusterName(clusterName);
+}
+
 function getResponses(methodName)
 {
   const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
@@ -215,6 +221,20 @@ function chip_cluster_commands(options)
   return asBlocks.call(this, commands, options);
 }
 
+/**
+ * Creates block iterator over the cluster attributes for a given cluster/side.
+ *
+ * This function is meant to be used inside a {{#chip_*_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_cluster_attributes(options)
+{
+  const attributes = getAttributes.call(this, 'chip_cluster_attributes');
+
+  return asBlocks.call(this, attributes, options);
+}
 /**
  * Creates block iterator over the cluster responses for a given cluster/side.
  *
@@ -407,6 +427,7 @@ exports.chip_has_server_clusters                             = chip_has_server_c
 exports.chip_cluster_commands                                = chip_cluster_commands;
 exports.chip_cluster_command_arguments                       = chip_cluster_command_arguments;
 exports.chip_cluster_command_arguments_with_structs_expanded = chip_cluster_command_arguments_with_structs_expanded;
+exports.chip_cluster_attributes                              = chip_cluster_attributes;
 exports.chip_server_global_responses                         = chip_server_global_responses;
 exports.chip_cluster_responses                               = chip_cluster_responses;
 exports.chip_cluster_response_arguments                      = chip_cluster_response_arguments

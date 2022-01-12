@@ -2,9 +2,49 @@
 // It is for view/code review purposes only.
 
 {{#zcl_enums}}
-enum {{name}} : {{asUnderlyingZclType type}} {
+enum {{asUpperCamelCase name}} : {{type}} {
   {{#zcl_enum_items}}
-  {{label}} = {{value}};
+  k{{asUpperCamelCase label}} = {{value}};
   {{/zcl_enum_items}}
 }
+
 {{/zcl_enums}}
+
+{{#zcl_structs}}
+struct {{name}} {
+  {{#zcl_struct_items}}
+  {{#if struct_is_fabric_scoped}}
+  [fabric_scoped {{struct_fabric_idx_field}}]
+  {{/if}}
+  {{type}} k{{asUpperCamelCase label}} = {{fieldIdentifier}};
+  {{/zcl_struct_items}}
+}
+
+{{/zcl_structs}}
+
+/// TODO: ZCL Events should be associated with  clusters
+/// rather than being global defines
+{{#zcl_events}}
+event {{asUpperCamelCase name}}({{priority}}) = {{code}} {
+  {{#zcl_event_fields}}
+  k{{asUpperCamelCase name}} = {{fieldIdentifier}},
+  {{/zcl_event_fields}}
+}
+
+{{/zcl_events}}
+
+{{#chip_clusters}}
+{{side}} cluster {{asUpperCamelCase name}} = {{code}} {
+
+  // TODO: events for cluster
+
+  {{#chip_cluster_attributes}}
+  {{#if isWritableAttribute}}rw{{else}}ro{{/if}}{{#if isReportableAttribute}} reportable{{/if}} attribute {{asLowerCamelCase name}} = {{code}};
+  {{/chip_cluster_attributes}}
+
+  // TODO: commands for cluster
+}
+
+{{/chip_clusters}}
+
+// TODO: endpoints

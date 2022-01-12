@@ -1,1403 +1,2565 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-enum ActionErrorEnum : uint8_t {
-  unknown = 0;
-  interrupted = 1;
-}
-enum ActionStateEnum : uint8_t {
-  Inactive = 0;
-  Active = 1;
-  Paused = 2;
-  Disabled = 3;
-}
-enum ActionTypeEnum : uint8_t {
-  other = 0;
-  scene = 1;
-  sequence = 2;
-  automation = 3;
-  exception = 4;
-  notification = 5;
-  alarm = 6;
-}
-enum AlertCountType : uint8_t {
-  Unstructured = 0;
-}
-enum AlertStructureCategory : uint16_t {
-  Warning = 256;
-  Danger = 512;
-  Failure = 768;
-}
-enum AlertStructurePresenceRecovery : uint16_t {
-  Recovery = 0;
-  Presence = 4096;
-}
-enum AmiRegistrationState : uint8_t {
-  Unregistered = 0;
-  JoiningNetwork = 1;
-  JoinedNetwork = 2;
-  SubmittedRegistrationRequest = 3;
-  RegistrationRejected = 4;
-  Registered = 5;
-  RegisterationNotPossible = 6;
-}
-enum AnonymousDataState : uint8_t {
-  NoSourceFound = 0;
-  SourceFound = 1;
-}
-enum ApplianceStatus : uint8_t {
-  Off = 1;
-  StandBy = 2;
-  Programmed = 3;
-  ProgrammedWaitingToStart = 4;
-  Running = 5;
-  Pause = 6;
-  EndProgrammed = 7;
-  Failure = 8;
-  ProgrammeInterrupted = 9;
-  Idle = 10;
-  RinseHold = 11;
-  Service = 12;
-  Superfreezing = 13;
-  Supercooling = 14;
-  Superheating = 15;
-}
-enum ApplicationStatusEnum : uint8_t {
-  Stopped = 0;
-  ActiveVisibleFocus = 1;
-  ActiveHidden = 2;
-  ActiveVisibleNotFocus = 3;
-}
-enum AssociationFailureCause : uint8_t {
-  Unknown = 0;
-  AssociationFailed = 1;
-  AuthenticationFailed = 2;
-  SsidNotFound = 3;
-}
-enum AttributeWritePermission : uint8_t {
-  DenyWrite = 0;
-  AllowWriteNormal = 1;
-  AllowWriteOfReadOnly = 2;
-  UnsupportedAttribute = 134;
-  InvalidValue = 135;
-  ReadOnly = 136;
-  InvalidDataType = 141;
-}
-enum AuthMode : uint8_t {
-  PASE = 1;
-  CASE = 2;
-  Group = 3;
-}
-enum BarrierControlBarrierPosition : uint8_t {
-  Closed = 0;
-  Open = 100;
-  Unknown = 255;
-}
-enum BarrierControlMovingState : uint8_t {
-  Stopped = 0;
-  Closing = 1;
-  Opening = 2;
-}
-enum BatChargeFaultType : uint8_t {
-  Unspecfied = 0;
-  AmbientTooHot = 1;
-  AmbientTooCold = 2;
-  BatteryTooHot = 3;
-  BatteryTooCold = 4;
-  BatteryAbsent = 5;
-  BatteryOverVoltage = 6;
-  BatteryUnderVoltage = 7;
-  ChargerOverVoltage = 8;
-  ChargerUnderVoltage = 9;
-  SafetyTimeout = 10;
-}
-enum BatChargeLevel : uint8_t {
-  Ok = 0;
-  Warning = 1;
-  Critical = 2;
-}
-enum BatChargeState : uint8_t {
-  Unknown = 0;
-  IsCharging = 1;
-  IsAtFullCharge = 2;
-  IsNotCharging = 3;
-}
-enum BatFaultType : uint8_t {
-  Unspecfied = 0;
-  OverTemp = 1;
-  UnderTemp = 2;
-}
-enum BatReplaceability : uint8_t {
-  Unspecified = 0;
-  NotReplaceable = 1;
-  UserReplaceable = 2;
-  FactoryReplaceable = 3;
-}
-enum BatterySize : uint8_t {
-  NoBattery = 0;
-  BuiltIn = 1;
-  Other = 2;
-  AA = 3;
-  AAA = 4;
-  C = 5;
-  D = 6;
-  Unknown = 255;
-}
-enum BootReasonType : uint8_t {
-  Unspecified = 0;
-  PowerOnReboot = 1;
-  BrownOutReset = 2;
-  SoftwareWatchdogReset = 3;
-  HardwareWatchdogReset = 4;
-  SoftwareUpdateCompleted = 5;
-  SoftwareReset = 6;
-}
-enum CalendarType : uint8_t {
-  Buddhist = 0;
-  Chinese = 1;
-  Coptic = 2;
-  Ethiopian = 3;
-  Gregorian = 4;
-  Hebrew = 5;
-  Indian = 6;
-  Islamic = 7;
-  Japanese = 8;
-  Korean = 9;
-  Persian = 10;
-  Taiwanese = 11;
-}
-enum CecKeyCode : uint8_t {
-  Select = 0;
-  Up = 1;
-  Down = 2;
-  Left = 3;
-  Right = 4;
-  RightUp = 5;
-  RightDown = 6;
-  LeftUp = 7;
-  LeftDown = 8;
-  RootMenu = 9;
-  SetupMenu = 10;
-  ContentsMenu = 11;
-  FavoriteMenu = 12;
-  Exit = 13;
-  MediaTopMenu = 16;
-  MediaContextSensitiveMenu = 17;
-  NumberEntryMode = 29;
-  Number11 = 30;
-  Number12 = 31;
-  Number0OrNumber10 = 32;
-  Numbers1 = 33;
-  Numbers2 = 34;
-  Numbers3 = 35;
-  Numbers4 = 36;
-  Numbers5 = 37;
-  Numbers6 = 38;
-  Numbers7 = 39;
-  Numbers8 = 40;
-  Numbers9 = 41;
-  Dot = 42;
-  Enter = 43;
-  Clear = 44;
-  NextFavorite = 47;
-  ChannelUp = 48;
-  ChannelDown = 49;
-  PreviousChannel = 50;
-  SoundSelect = 51;
-  InputSelect = 52;
-  DisplayInformation = 53;
-  Help = 54;
-  PageUp = 55;
-  PageDown = 56;
-  Power = 64;
-  VolumeUp = 65;
-  VolumeDown = 66;
-  Mute = 67;
-  Play = 68;
-  Stop = 69;
-  Pause = 70;
-  Record = 71;
-  Rewind = 72;
-  FastForward = 73;
-  Eject = 74;
-  Forward = 75;
-  Backward = 76;
-  StopRecord = 77;
-  PauseRecord = 78;
-  Reserved = 79;
-  Angle = 80;
-  SubPicture = 81;
-  VideoOnDemand = 82;
-  ElectronicProgramGuide = 83;
-  TimerProgramming = 84;
-  InitialConfiguration = 85;
-  SelectBroadcastType = 86;
-  SelectSoundPresentation = 87;
-  PlayFunction = 96;
-  PausePlayFunction = 97;
-  RecordFunction = 98;
-  PauseRecordFunction = 99;
-  StopFunction = 100;
-  MuteFunction = 101;
-  RestoreVolumeFunction = 102;
-  TuneFunction = 103;
-  SelectMediaFunction = 104;
-  SelectAvInputFunction = 105;
-  SelectAudioInputFunction = 106;
-  PowerToggleFunction = 107;
-  PowerOffFunction = 108;
-  PowerOnFunction = 109;
-  F1Blue = 113;
-  F2Red = 114;
-  F3Green = 115;
-  F4Yellow = 116;
-  F5 = 117;
-  Data = 118;
-}
-enum CecedSpecificationVersion : uint8_t {
-  CompliantWithV10NotCertified = 16;
-  CompliantWithV10Certified = 26;
-}
-enum ColorControlOptions : uint8_t {
-  ExecuteIfOff = 1;
-}
-enum ColorLoopAction : uint8_t {
-  Deactivate = 0;
-  ActivateFromColorLoopStartEnhancedHue = 1;
-  ActivateFromEnhancedCurrentHue = 2;
-}
-enum ColorLoopDirection : uint8_t {
-  DecrementHue = 0;
-  IncrementHue = 1;
-}
-enum ColorMode : uint8_t {
-  CurrentHueAndCurrentSaturation = 0;
-  CurrentXAndCurrentY = 1;
-  ColorTemperature = 2;
-}
-enum CommandIdentification : uint8_t {
-  Start = 1;
-  Stop = 2;
-  Pause = 3;
-  StartSuperfreezing = 4;
-  StopSuperfreezing = 5;
-  StartSupercooling = 6;
-  StopSupercooling = 7;
-  DisableGas = 8;
-  EnableGas = 9;
-  EnableEnergyControl = 10;
-  DisableEnergyControl = 11;
-}
-enum CommissioningWindowStatus : uint8_t {
-  WindowNotOpen = 0;
-  EnhancedWindowOpen = 1;
-  BasicWindowOpen = 2;
-}
-enum DataQualityId : uint16_t {
-  AllDataCertified = 0;
-  OnlyInstantaneousPowerNotCertified = 1;
-  OnlyCumulatedConsumptionNotCertified = 2;
-  NotCertifiedData = 3;
-}
-enum DehumidifcationLockout : uint8_t {
-  notAllowed = 0;
-  allowed = 1;
-}
-enum DeviceStatus2Structure : uint8_t {
-  IrisSymptomCode = 32;
-}
-enum DlAlarmCode : uint8_t {
-  LockJammed = 0;
-  LockFactoryReset = 1;
-  LockRadioPowerCycled = 3;
-  WrongCodeEntryLimit = 4;
-  FrontEsceutcheonRemoved = 5;
-  DoorForcedOpen = 6;
-  DoorAjar = 7;
-  ForcedUser = 8;
-}
-enum DlCredentialRule : uint8_t {
-  Single = 0;
-  Double = 1;
-  Tri = 2;
-}
-enum DlCredentialType : uint8_t {
-  ProgrammingPIN = 0;
-  PIN = 1;
-  RFID = 2;
-  Fingerprint = 3;
-  FingerVein = 4;
-  Face = 5;
-}
-enum DlDataOperationType : uint8_t {
-  Add = 0;
-  Clear = 1;
-  Modify = 2;
-}
-enum DlDoorLockStatus : uint8_t {
-  Duplicate = 2;
-  Occupied = 3;
-}
-enum DlDoorState : uint8_t {
-  DoorOpen = 0;
-  DoorClosed = 1;
-  DoorJammed = 2;
-  DoorForcedOpen = 3;
-  DoorUnspecifiedError = 4;
-  DoorAjar = 5;
-}
-enum DlLockDataType : uint8_t {
-  Unspecified = 0;
-  ProgrammingCode = 1;
-  UserIndex = 2;
-  WeekDaySchedule = 3;
-  YearDaySchedule = 4;
-  HolidaySchedule = 5;
-  PIN = 6;
-  RFID = 7;
-  Fingerprint = 8;
-}
-enum DlLockOperationType : uint8_t {
-  Lock = 0;
-  Unlock = 1;
-  NonAccessUserEvent = 2;
-  ForcedUserEvent = 3;
-}
-enum DlLockState : uint8_t {
-  NotFullyLocked = 0;
-  Locked = 1;
-  Unlocked = 2;
-}
-enum DlLockType : uint8_t {
-  DeadBolt = 0;
-  Magnetic = 1;
-  Other = 2;
-  Mortise = 3;
-  Rim = 4;
-  LatchBolt = 5;
-  CylindricalLock = 6;
-  TubularLock = 7;
-  InterconnectedLock = 8;
-  Dead Latch = 9;
-  Door Furniture = 10;
-}
-enum DlOperatingMode : uint8_t {
-  Normal = 0;
-  Vacation = 1;
-  Privacy = 2;
-  NoRemoteLockUnlock = 3;
-  Passage = 4;
-}
-enum DlOperationError : uint8_t {
-  Unspecified = 0;
-  InvalidCredential = 1;
-  DisabledUserDenied = 2;
-  Restricted = 3;
-  InsufficientBattery = 4;
-}
-enum DlOperationSource : uint8_t {
-  Unspecified = 0;
-  Manual = 1;
-  ProprietaryRemote = 2;
-  Keypad = 3;
-  Auto = 4;
-  Button = 5;
-  Schedule = 6;
-  Remote = 7;
-  RFID = 8;
-  Biometric = 9;
-}
-enum DlStatus : uint8_t {
-  Success = 0;
-  Failure = 1;
-  Duplicate = 2;
-  Occupied = 3;
-  InvalidField = 133;
-  NotFound = 139;
-}
-enum DlUserStatus : uint8_t {
-  Available = 0;
-  OccupiedEnabled = 1;
-  OccupiedDisabled = 3;
-}
-enum DlUserType : uint8_t {
-  UnrestrictedUser = 0;
-  YearDayScheduleUser = 1;
-  WeekDayScheduleUser = 2;
-  ProgrammingUser = 3;
-  NonAccessUser = 4;
-  ForcedUser = 5;
-  DisposableUser = 6;
-  ExpiringUser = 7;
-  ScheduleRestrictedUser = 8;
-  RemoteOnlyUser = 9;
-}
-enum DoorLockEventSource : uint8_t {
-  Keypad = 0;
-  Rf = 1;
-  Manual = 2;
-  Rfid = 3;
-  Indeterminate = 255;
-}
-enum DoorLockEventType : uint8_t {
-  Operation = 0;
-  Programming = 1;
-  Alarm = 2;
-}
-enum DoorLockOperatingMode : uint8_t {
-  NormalMode = 0;
-  VacationMode = 1;
-  PrivacyMode = 2;
-  NoRfLockOrUnlock = 3;
-  LocalProgrammingMode = 4;
-  PassageMode = 5;
-}
-enum DoorLockOperationEventCode : uint8_t {
-  UnknownOrMfgSpecific = 0;
-  Lock = 1;
-  Unlock = 2;
-  LockInvalidPinOrId = 3;
-  LockInvalidSchedule = 4;
-  UnlockInvalidPinOrId = 5;
-  UnlockInvalidSchedule = 6;
-  OneTouchLock = 7;
-  KeyLock = 8;
-  KeyUnlock = 9;
-  AutoLock = 10;
-  ScheduleLock = 11;
-  ScheduleUnlock = 12;
-  ManualLock = 13;
-  ManualUnlock = 14;
-}
-enum DoorLockProgrammingEventCode : uint8_t {
-  UnknownOrMfgSpecific = 0;
-  MasterCodeChanged = 1;
-  PinAdded = 2;
-  PinDeleted = 3;
-  PinChanged = 4;
-  IdAdded = 5;
-  IdDeleted = 6;
-}
-enum DoorLockSecurityLevel : uint8_t {
-  NetworkSecurity = 0;
-  ApsSecurity = 1;
-}
-enum DoorLockSetPinOrIdStatus : uint8_t {
-  Success = 0;
-  GeneralFailure = 1;
-  MemoryFull = 2;
-  DuplicateCodeError = 3;
-}
-enum DoorLockSoundVolume : uint8_t {
-  Silent = 0;
-  Low = 1;
-  High = 2;
-}
-enum DoorLockState : uint8_t {
-  NotFullyLocked = 0;
-  Locked = 1;
-  Unlocked = 2;
-}
-enum DoorLockType : uint8_t {
-  DeadBolt = 0;
-  Magnetic = 1;
-  Mortise = 2;
-  Rim = 3;
-  LatchBolt = 4;
-  Cylindrical = 5;
-  Tubular = 6;
-  Interconnected = 7;
-  DeadLatch = 8;
-  Other = 9;
-}
-enum DoorLockUserStatus : uint8_t {
-  Available = 0;
-  OccupiedEnabled = 1;
-  OccupiedDisabled = 3;
-  NotSupported = 255;
-}
-enum DoorLockUserType : uint8_t {
-  Unrestricted = 0;
-  YearDayScheduleUser = 1;
-  WeekDayScheduleUser = 2;
-  MasterUser = 3;
-  NonAccessUser = 4;
-  NotSupported = 255;
-}
-enum DoorState : uint8_t {
-  Open = 0;
-  Closed = 1;
-  ErrorJammed = 2;
-  ErrorForcedOpen = 3;
-  ErrorUnspecified = 4;
-}
-enum EndpointListTypeEnum : uint8_t {
-  other = 0;
-  room = 1;
-  zone = 2;
-}
-enum EnhancedColorMode : uint8_t {
-  CurrentHueAndCurrentSaturation = 0;
-  CurrentXAndCurrentY = 1;
-  ColorTemperature = 2;
-  EnhancedCurrentHueAndCurrentSaturation = 3;
-}
-enum ErrorTypeEnum : uint8_t {
-  MultipleMatches = 0;
-  NoMatches = 1;
-}
-enum EventId : uint8_t {
-  MeterCoverRemoved = 0;
-  MeterCoverClosed = 1;
-  StrongMagneticField = 2;
-  NoStrongMagneticField = 3;
-  BatteryFailure = 4;
-  LowBattery = 5;
-  ProgramMemoryError = 6;
-  RamError = 7;
-  NvMemoryError = 8;
-  MeasurementSystemError = 9;
-  WatchdogError = 10;
-  SupplyDisconnectFailure = 11;
-  SupplyConnectFailure = 12;
-  MeasurmentSoftwareChanged = 13;
-  DstEnabled = 14;
-  DstDisabled = 15;
-  ClockAdjBackward = 16;
-  ClockAdjForward = 17;
-  ClockInvalid = 18;
-  CommsErrorHan = 19;
-  CommsOkHan = 20;
-  FraudAttempt = 21;
-  PowerLoss = 22;
-  IncorrectProtocol = 23;
-  UnusualHanTraffic = 24;
-  UnexpectedClockChange = 25;
-  CommsUsingUnauthenticatedComponent = 26;
-  ErrorRegClear = 27;
-  AlarmRegClear = 28;
-  UnexpectedHwReset = 29;
-  UnexpectedProgramExecution = 30;
-  EventLogCleared = 31;
-  ManualDisconnect = 32;
-  ManualConnect = 33;
-  RemoteDisconnection = 34;
-  LocalDisconnection = 35;
-  LimitThresholdExceeded = 36;
-  LimitThresholdOk = 37;
-  LimitThresholdChanged = 38;
-  MaximumDemandExceeded = 39;
-  ProfileCleared = 40;
-  FirmwareReadyForActivation = 41;
-  FirmwareActivated = 42;
-  PatchFailure = 43;
-  TouTariffActivation = 44;
-  8x8Tariffactivated = 45;
-  SingleTariffRateActivated = 46;
-  AsynchronousBillingOccurred = 47;
-  SynchronousBillingOccurred = 48;
-  IncorrectPolarity = 128;
-  CurrentNoVoltage = 129;
-  UnderVoltage = 130;
-  OverVoltage = 131;
-  NormalVoltage = 132;
-  PfBelowThreshold = 133;
-  PfAboveThreshold = 134;
-  TerminalCoverRemoved = 135;
-  TerminalCoverClosed = 136;
-  ReverseFlow = 160;
-  TiltTamper = 161;
-  BatteryCoverRemoved = 162;
-  BatteryCoverClosed = 163;
-  ExcessFlow = 164;
-  CreditOk = 192;
-  LowCredit = 193;
-  EmergencyCreditInUse = 192;
-  EmergencyCreditExhausted = 193;
-  ZeroCreditEcNotSelected = 194;
-  SupplyOn = 195;
-  SupplyOffAarmed = 196;
-  SupplyOff = 197;
-  DiscountApplied = 198;
-  ManufacturerSpecificA = 224;
-  ManufacturerSpecificB = 225;
-  ManufacturerSpecificC = 226;
-  ManufacturerSpecificD = 227;
-  ManufacturerSpecificE = 228;
-  ManufacturerSpecificF = 229;
-  ManufacturerSpecificG = 230;
-  ManufacturerSpecificH = 231;
-  ManufacturerSpecificI = 232;
-}
-enum EventIdentification : uint8_t {
-  EndOfCycle = 1;
-  TemperatureReached = 4;
-  EndOfCooking = 5;
-  SwitchingOff = 6;
-  WrongData = 7;
-}
-enum FanMode : uint8_t {
-  off = 0;
-  low = 1;
-  medium = 2;
-  high = 3;
-  on = 4;
-  auto = 5;
-  smart = 6;
-}
-enum FanModeSequence : uint8_t {
-  LowMedHigh = 0;
-  lowHigh = 1;
-  LowMedHighAuto = 2;
-  lowHighAuto = 3;
-  onAuto = 4;
-}
-enum GeneralCommissioningError : uint8_t {
-  Ok = 0;
-  ValueOutsideRange = 1;
-  InvalidAuthentication = 2;
-  NotCommissioning = 3;
-}
-enum GenericDeviceClass : uint8_t {
-  Lighting = 0;
-}
-enum GenericDeviceType : uint8_t {
-  Incandescent = 0;
-  SpotlightHalogen = 1;
-  HalogenBulb = 2;
-  CFL = 3;
-  LinearFlourescent = 4;
-  LedBulb = 5;
-  SpotlightLed = 6;
-  LedStrip = 7;
-  LedTube = 8;
-  GenericIndoorFixture = 9;
-  GenericOutdoorFixture = 10;
-  PendantFixture = 11;
-  FloorStandingFixture = 12;
-  GenericController = 224;
-  WallSwitch = 225;
-  PortableRemoteController = 226;
-  MotionOrLightSensor = 227;
-  GenericActuator = 240;
-  PluginUnit = 241;
-  RetrofitActuator = 242;
-  Unspecified = 255;
-}
-enum GroupKeySecurityPolicy : uint8_t {
-  Standard = 0;
-  LowLatency = 1;
-}
-enum HardwareFaultType : uint8_t {
-  Unspecified = 0;
-  Radio = 1;
-  Sensor = 2;
-  ResettableOverTemp = 3;
-  NonResettableOverTemp = 4;
-  PowerSource = 5;
-  VisualDisplayFault = 6;
-  AudioOutputFault = 7;
-  UserInterfaceFault = 8;
-  NonVolatileMemoryError = 9;
-  TamperDetected = 10;
-}
-enum HourFormat : uint8_t {
-  12hr = 0;
-  24hr = 1;
-}
-enum HueDirection : uint8_t {
-  ShortestDistance = 0;
-  LongestDistance = 1;
-  Up = 2;
-  Down = 3;
-}
-enum HueMoveMode : uint8_t {
-  stop = 0;
-  Up = 1;
-  Down = 3;
-}
-enum HueStepMode : uint8_t {
-  Up = 1;
-  Down = 3;
-}
-enum IasAceAlarmStatus : uint8_t {
-  noAlarm = 0;
-  burglar = 1;
-  fire = 2;
-  emergency = 3;
-  policePanic = 4;
-  firePanic = 5;
-  emergencyPanic = 6;
-}
-enum IasAceArmMode : uint8_t {
-  disarm = 0;
-  armDayHomeZonesOnly = 1;
-  armNightSleepZonesOnly = 2;
-  armAllZones = 3;
-}
-enum IasAceArmNotification : uint8_t {
-  allZonesDisarmed = 0;
-  onlyDayHomeZonesArmed = 1;
-  onlyNightSleepZonesArmed = 2;
-  allZonesArmed = 3;
-  invalidArmDisarmCode = 4;
-  notReadyToArm = 5;
-  alreadyDisarmed = 6;
-}
-enum IasAceAudibleNotification : uint8_t {
-  mute = 0;
-  defaultSound = 1;
-}
-enum IasAceBypassResult : uint8_t {
-  zoneBypassed = 0;
-  zoneNotBypassed = 1;
-  notAllowed = 2;
-  invalidZoneId = 3;
-  unknownZoneId = 4;
-  invalidArmDisarmCode = 5;
-}
-enum IasAcePanelStatus : uint8_t {
-  panelDisarmed = 0;
-  armedStay = 1;
-  armedNight = 2;
-  armedAway = 3;
-  exitDelay = 4;
-  entryDelay = 5;
-  notReadyToArm = 6;
-  inAlarm = 7;
-  armingStay = 8;
-  armingNight = 9;
-  armingAway = 10;
-}
-enum IasEnrollResponseCode : uint8_t {
-  success = 0;
-  notSupported = 1;
-  noEnrollPermit = 2;
-  tooManyZones = 3;
-}
-enum IasZoneState : uint8_t {
-  notEnrolled = 0;
-  enrolled = 1;
-}
-enum IasZoneType : uint16_t {
-  standardCie = 0;
-  motionSensor = 13;
-  contactSwitch = 21;
-  fireSensor = 40;
-  waterSensor = 42;
-  gasSensor = 43;
-  personalEmergencyDevice = 44;
-  vibrationMovementSensor = 45;
-  remoteControl = 271;
-  keyFob = 277;
-  keypad = 541;
-  standardWarningDevice = 549;
-  glassBreakSensor = 550;
-  carbonMonoxideSensor = 551;
-  securityRepeater = 553;
-  invalidZoneType = 65535;
-}
-enum IdentifyEffectIdentifier : uint8_t {
-  Blink = 0;
-  Breathe = 1;
-  Okay = 2;
-  ChannelChange = 11;
-  FinishEffect = 254;
-  StopEffect = 255;
-}
-enum IdentifyEffectVariant : uint8_t {
-  Default = 0;
-}
-enum IdentifyIdentifyType : uint8_t {
-  None = 0;
-  VisibleLight = 1;
-  VisibleLED = 2;
-  AudibleBeep = 3;
-  Display = 4;
-  Actuator = 5;
-}
-enum InputTypeEnum : uint8_t {
-  Internal = 0;
-  Aux = 1;
-  Coax = 2;
-  Composite = 3;
-  Hdmi = 4;
-  Input = 5;
-  Line = 6;
-  Optical = 7;
-  Video = 8;
-  Scart = 9;
-  Usb = 10;
-  Other = 11;
-}
-enum InterfaceType : uint8_t {
-  Unspecified = 0;
-  WiFi = 1;
-  Ethernet = 2;
-  Cellular = 3;
-  Thread = 4;
-}
-enum KeypadLockout : uint8_t {
-  noLockout = 0;
-  levelOneLockout = 1;
-  levelTwoLockout = 2;
-  levelThreeLockout = 3;
-  levelFourLockout = 4;
-  levelfiveLockout = 5;
-}
-enum LevelControlOptions : uint8_t {
-  ExecuteIfOff = 1;
-  CoupleColorTempToLevel = 2;
-}
-enum LevelStatus : uint8_t {
-  OnTarget = 0;
-  BelowTarget = 1;
-  AboveTarget = 2;
-}
-enum LightSensorType : uint8_t {
-  Photodiode = 0;
-  CMOS = 1;
-}
-enum LineupInfoTypeEnum : uint8_t {
-  Mso = 0;
-}
-enum LogsIntent : uint8_t {
-  EndUserSupport = 0;
-  NetworkDiag = 1;
-  CrashLogs = 2;
-}
-enum LogsStatus : uint8_t {
-  Success = 0;
-  Exhausted = 1;
-  NoLogs = 2;
-  Busy = 3;
-  Denied = 4;
-}
-enum LogsTransferProtocol : uint8_t {
-  ResponsePayload = 0;
-  BDX = 1;
-}
-enum MessagingControlConfirmation : uint8_t {
-  notRequired = 0;
-  required = 128;
-}
-enum MessagingControlEnhancedConfirmation : uint8_t {
-  notRequired = 0;
-  required = 32;
-}
-enum MessagingControlImportance : uint8_t {
-  low = 0;
-  medium = 4;
-  high = 8;
-  critical = 12;
-}
-enum MessagingControlTransmission : uint8_t {
-  normal = 0;
-  normalAndAnonymous = 1;
-  anonymous = 2;
-  reserved = 3;
-}
-enum MeterTypeId : uint16_t {
-  UtilityPrimaryMeter = 0;
-  UtilityProductionMeter = 1;
-  UtilitySecondaryMeter = 2;
-  PrivatePrimaryMeter = 256;
-  PrivateProductionMeter = 257;
-  PrivateSecondaryMeters = 258;
-  GenericMeter = 272;
-}
-enum MetricTypeEnum : uint8_t {
-  PIXELS = 0;
-  PERCENTAGE = 1;
-}
-enum MoveMode : uint8_t {
-  Up = 0;
-  Down = 1;
-}
-enum NetworkCommissioningStatus : uint8_t {
-  Success = 0;
-  OutOfRange = 1;
-  BoundsExceeded = 2;
-  NetworkIDNotFound = 3;
-  DuplicateNetworkID = 4;
-  NetworkNotFound = 5;
-  RegulatoryError = 6;
-  AuthFailure = 7;
-  UnsupportedSecurity = 8;
-  OtherConnectionFailure = 9;
-  IPV6Failed = 10;
-  IPBindFailed = 11;
-  UnknownError = 12;
-}
-enum NetworkFault : uint8_t {
-  Unspecified = 0;
-  LinkDown = 1;
-  HardwareFailure = 2;
-  NetworkJammed = 3;
-}
-enum NetworkFaultType : uint8_t {
-  Unspecified = 0;
-  HardwareFailure = 1;
-  NetworkJammed = 2;
-  ConnectionFailed = 3;
-}
-enum NodeOperationalCertStatus : uint8_t {
-  SUCCESS = 0;
-  InvalidPublicKey = 1;
-  InvalidNodeOpId = 2;
-  InvalidNOC = 3;
-  MissingCsr = 4;
-  TableFull = 5;
-  InsufficientPrivilege = 8;
-  FabricConflict = 9;
-  LabelConflict = 10;
-  InvalidFabricIndex = 11;
-}
-enum OTAAnnouncementReason : uint8_t {
-  SimpleAnnouncement = 0;
-  UpdateAvailable = 1;
-  UrgentUpdateAvailable = 2;
-}
-enum OTAApplyUpdateAction : uint8_t {
-  Proceed = 0;
-  AwaitNextAction = 1;
-  Discontinue = 2;
-}
-enum OTAChangeReasonEnum : uint8_t {
-  Unknown = 0;
-  Success = 1;
-  Failure = 2;
-  TimeOut = 3;
-  DelayByProvider = 4;
-}
-enum OTADownloadProtocol : uint8_t {
-  BDXSynchronous = 0;
-  BDXAsynchronous = 1;
-  HTTPS = 2;
-  VendorSpecific = 3;
-}
-enum OTAQueryStatus : uint8_t {
-  UpdateAvailable = 0;
-  Busy = 1;
-  NotAvailable = 2;
-  DownloadProtocolNotSupported = 3;
-}
-enum OTAUpdateStateEnum : uint8_t {
-  Unknown = 0;
-  Idle = 1;
-  Querying = 2;
-  DelayedOnQuery = 3;
-  Downloading = 4;
-  Applying = 5;
-  DelayedOnApply = 6;
-  RollingBack = 7;
-  DelayedOnUserConsent = 8;
-}
-enum OccupancySensorType : uint8_t {
-  PIR = 0;
-  Ultrasonic = 1;
-  pirAndUltrasonic = 2;
-  physicalContact = 3;
-}
-enum OnOffDelayedAllOffEffectVariant : uint8_t {
-  FadeToOffIn_0p8Seconds = 0;
-  NoFade = 1;
-  50PercentDimDownIn_0p8SecondsThenFadeToOffIn_12Seconds = 2;
-}
-enum OnOffDyingLightEffectVariant : uint8_t {
-  20PercenterDimUpIn_0p5SecondsThenFadeToOffIn_1Second = 0;
-}
-enum OnOffEffectIdentifier : uint8_t {
-  DelayedAllOff = 0;
-  DyingLight = 1;
-}
-enum OperatingMode : uint8_t {
-  normal = 0;
-  configure = 1;
-}
-enum OutputTypeEnum : uint8_t {
-  Hdmi = 0;
-  Bt = 1;
-  Optical = 2;
-  Headphone = 3;
-  Internal = 4;
-  Other = 5;
-}
-enum PHYRateType : uint8_t {
-  10M = 0;
-  100M = 1;
-  1000M = 2;
-  2.5G = 3;
-  5G = 4;
-  10G = 5;
-  40G = 6;
-  100G = 7;
-  200G = 8;
-  400G = 9;
-}
-enum ParameterEnum : uint8_t {
-  actor = 0;
-  channel = 1;
-  character = 2;
-  director = 3;
-  event = 4;
-  franchise = 5;
-  genre = 6;
-  league = 7;
-  popularity = 8;
-  provider = 9;
-  sport = 10;
-  sportsTeam = 11;
-  type = 12;
-}
-enum PhysicalEnvironment : uint8_t {
-  Unspecified = 0;
-  FirstProfileSpecifiedValue = 1;
-  LastProfileSpecifiedValue = 127;
-  Unknown = 255;
-}
-enum PlaybackStateEnum : uint8_t {
-  Playing = 0;
-  Paused = 1;
-  NotPlaying = 2;
-  Buffering = 3;
-}
-enum PowerProfileState : uint8_t {
-  PowerProfileWaitingToStart = 1;
-  PowerProfileStarted = 2;
-  EnergyPhaseRunning = 3;
-  EnergyPhaseEnded = 4;
-  EnergyPhaseWaitingToStart = 5;
-  EnergyPhaseStarted = 6;
-  PowerProfileEnded = 7;
-  ProfileReadyForScheduling = 8;
-  PowerProfileScheduled = 9;
-}
-enum PowerSource : uint8_t {
-  Unknown = 0;
-  SinglePhaseMains = 1;
-  ThreePhaseMains = 2;
-  Battery = 3;
-  DcSource = 4;
-  EmergencyMainsConstantPower = 5;
-  EmergencyMainsTransferSwitch = 6;
-  BatteryBackup = 128;
-}
-enum PowerSourceStatus : uint8_t {
-  Unspecfied = 0;
-  Active = 1;
-  Standby = 2;
-  Unavailable = 3;
-}
-enum Privilege : uint8_t {
-  View = 1;
-  ProxyView = 2;
-  Operate = 3;
-  Manage = 4;
-  Administer = 5;
-}
-enum ProductCode : uint8_t {
-  ManufacturerDefined = 0;
-  IternationalArticleNumber = 1;
-  GlobalTradeItemNumber = 2;
-  UniversalProductCode = 3;
-  StockKeepingUnit = 4;
-}
-enum ProductTypeId : uint16_t {
-  WhiteGoods = 0;
-  Dishwasher = 22017;
-  TumbleDryer = 22018;
-  WasherDryer = 22019;
-  WashingMachine = 22020;
-  Hobs = 24067;
-  InductionHobs = 24073;
-  Oven = 24065;
-  ElectricalOven = 24070;
-  RefrigeratorFreezer = 26113;
-}
-enum PumpControlMode : uint8_t {
-  ConstantSpeed = 0;
-  ConstantPressure = 1;
-  ProportionalPressure = 2;
-  ConstantFlow = 3;
-  ConstantTemperature = 5;
-  Automatic = 7;
-}
-enum PumpOperationMode : uint8_t {
-  Normal = 0;
-  Minimum = 1;
-  Maximum = 2;
-  Local = 3;
-}
-enum RadioFaultType : uint8_t {
-  Unspecified = 0;
-  WiFiFault = 1;
-  CellularFault = 2;
-  ThreadFault = 3;
-  NFCFault = 4;
-  BLEFault = 5;
-  EthernetFault = 6;
-}
-enum RegulatoryLocationType : uint8_t {
-  Indoor = 0;
-  Outdoor = 1;
-  IndoorOutdoor = 2;
-}
-enum RelativeHumidityDisplay : uint8_t {
-  notDisplayed = 0;
-  displayed = 1;
-}
-enum RelativeHumidityMode : uint8_t {
-  measureLocally = 0;
-  updatedOverTheNetwork = 1;
-}
-enum RemoteEnableFlags : uint8_t {
-  Disabled = 0;
-  TemporarilyLockedDisabled = 7;
-  EnabledRemoteControl = 15;
-  EnabledRemoteAndEnergyControl = 1;
-}
-enum RoutingRole : uint8_t {
-  Unspecified = 0;
-  Unassigned = 1;
-  SleepyEndDevice = 2;
-  EndDevice = 3;
-  REED = 4;
-  Router = 5;
-  Leader = 6;
-}
-enum SaturationMoveMode : uint8_t {
-  stop = 0;
-  Up = 1;
-  Down = 3;
-}
-enum SaturationStepMode : uint8_t {
-  Up = 1;
-  Down = 3;
-}
-enum SecurityType : uint8_t {
-  Unspecified = 0;
-  None = 1;
-  WEP = 2;
-  WPA = 3;
-  WPA2 = 4;
-  WPA3 = 5;
-}
-enum SetpointAdjustMode : uint8_t {
-  heatSetpoint = 0;
-  coolSetpoint = 1;
-  heatAndCoolSetpoints = 2;
-}
-enum SimpleEnum : uint8_t {
-  Unspecified = 0;
-  ValueA = 1;
-  ValueB = 2;
-  ValueC = 3;
-}
-enum SquawkLevel : uint8_t {
-  lowLevel = 0;
-  mediumLevel = 1;
-  highLevel = 2;
-  veryHighLevel = 2;
-}
-enum SquawkMode : uint8_t {
-  systemIsArmed = 0;
-  systemIsDisarmed = 1;
-}
-enum SquawkStobe : uint8_t {
-  noStrobe = 0;
-  useStrobe = 1;
-}
-enum StartOfWeek : uint8_t {
-  Sunday = 0;
-  Monday = 1;
-  Tuesday = 2;
-  Wednesday = 3;
-  Thursday = 4;
-  Friday = 5;
-  Saturday = 6;
-}
-enum StartUpOnOffValue : uint8_t {
-  SetToOff = 0;
-  SetToOn = 1;
-  SetToToggle = 2;
-  SetToPrevious = 255;
-}
-enum StatusCode : uint8_t {
-  Busy = 1;
-  PAKEParameterError = 2;
-  WindowNotOpen = 3;
-}
-enum StatusEnum : uint8_t {
-  Success = 0;
-  UnsupportedKey = 1;
-  InvalidKeyInCurrentState = 2;
-}
-enum StatusEnum : uint8_t {
-  Success = 0;
-  AppNotAvailable = 1;
-  SystemBusy = 2;
-}
-enum StatusEnum : uint8_t {
-  Success = 0;
-  AppNotAvailable = 1;
-  SystemBusy = 2;
-}
-enum StatusEnum : uint8_t {
-  success = 0;
-  urlNotAvailable = 1;
-  authFailed = 2;
-}
-enum StatusEnum : uint8_t {
-  Success = 0;
-  InvalidStateForCommand = 1;
-  NotAllowed = 2;
-  NotActive = 3;
-  SpeedOutOfRange = 4;
-  SeekOutOfRange = 5;
-}
-enum StepMode : uint8_t {
-  Up = 0;
-  Down = 1;
-}
-enum SwitchActions : uint8_t {
-  On = 0;
-  Off = 1;
-  Toggle = 2;
-}
-enum SwitchType : uint8_t {
-  Toggle = 0;
-  Momentary = 1;
-  MultiFunction = 2;
-}
-enum TempUnit : uint8_t {
-  Fahrenheit = 0;
-  Celsius = 1;
-  Kelvin = 2;
-}
-enum TemperatureDisplayMode : uint8_t {
-  celsius = 0;
-  fahrenheit = 1;
-}
-enum TemperatureSetpointHold : uint8_t {
-  SetpointHoldOff = 0;
-  SetpointHoldOn = 1;
-}
-enum ThermostatControlSequence : uint8_t {
-  coolingOnly = 0;
-  coolingWithReheat = 1;
-  heatingOnly = 2;
-  heatingWithReheat = 3;
-  coolingAndHeating = 4;
-  coolingAndHeatingWithReheat = 5;
-}
-enum ThermostatRunningMode : uint8_t {
-  Off = 0;
-  Cool = 3;
-  Heat = 4;
-}
-enum ThermostatSystemMode : uint8_t {
-  off = 0;
-  auto = 1;
-  cool = 3;
-  heat = 4;
-  emergencyHeating = 5;
-  precooling = 6;
-  fanOnly = 7;
-}
-enum ThreadConnectionStatus : uint8_t {
-  Connected = 0;
-  NotConnected = 1;
-}
-enum TimeEncoding : uint8_t {
-  Relative = 0;
-  Absolute = 64;
-}
-enum WarningEvent : uint8_t {
-  Warning1OverallPowerAboveAvailablePowerLevel = 0;
-  Warning2OverallPowerAbovePowerThresholdLevel = 1;
-  Warning3OverallPowerBackBelowTheAvailablePowerLevel = 2;
-  Warning4OverallPowerBackBelowThePowerThresholdLevel = 3;
-  Warning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 4;
-}
-enum WarningMode : uint8_t {
-  stop = 0;
-  burglar = 1;
-  fire = 2;
-  emergency = 3;
-  policePanic = 4;
-  firePanic = 5;
-  emergencyPanic = 6;
-}
-enum WarningStobe : uint8_t {
-  noStrobe = 0;
-  useStrobe = 1;
-}
-enum WcEndProductType : uint8_t {
-  RollerShade = 0;
-  RomanShade = 1;
-  BalloonShade = 2;
-  WovenWood = 3;
-  PleatedShade = 4;
-  CellularShade = 5;
-  LayeredShade = 6;
-  LayeredShade2D = 7;
-  SheerShade = 8;
-  TiltOnlyInteriorBlind = 9;
-  InteriorBlind = 10;
-  VerticalBlindStripCurtain = 11;
-  InteriorVenetianBlind = 12;
-  ExteriorVenetianBlind = 13;
-  LateralLeftCurtain = 14;
-  LateralRightCurtain = 15;
-  CentralCurtain = 16;
-  RollerShutter = 17;
-  ExteriorVerticalScreen = 18;
-  AwningTerracePatio = 19;
-  AwningVerticalScreen = 20;
-  TiltOnlyPergola = 21;
-  SwingingShutter = 22;
-  SlidingShutter = 23;
-  Unknown = 255;
-}
-enum WcType : uint8_t {
-  Rollershade = 0;
-  Rollershade2Motor = 1;
-  RollershadeExterior = 2;
-  RollershadeExterior2Motor = 3;
-  Drapery = 4;
-  Awning = 5;
-  Shutter = 6;
-  TiltBlindTiltOnly = 7;
-  TiltBlindLiftAndTilt = 8;
-  ProjectorScreen = 9;
-  Unknown = 255;
-}
-enum WiFiBand : uint8_t {
-  2G4 = 0;
-  3G65 = 1;
-  5G = 2;
-  6G = 3;
-  60G = 4;
-}
-enum WiFiConnectionStatus : uint8_t {
-  Connected = 0;
-  NotConnected = 1;
-}
-enum WiFiVersionType : uint8_t {
-  802.11a = 0;
-  802.11b = 1;
-  802.11g = 2;
-  802.11n = 3;
-  802.11ac = 4;
-  802.11ax = 5;
-}
-enum WiredCurrentType : uint8_t {
-  AC = 0;
-  DC = 1;
-}
-enum WiredFaultType : uint8_t {
-  Unspecfied = 0;
-  OverVoltage = 1;
-  UnderVoltage = 2;
-}
+enum ActionErrorEnum : ENUM8 {
+  kUnknown = 0;
+  kInterrupted = 1;
+}
+
+enum ActionStateEnum : ENUM8 {
+  kInactive = 0;
+  kActive = 1;
+  kPaused = 2;
+  kDisabled = 3;
+}
+
+enum ActionTypeEnum : ENUM8 {
+  kOther = 0;
+  kScene = 1;
+  kSequence = 2;
+  kAutomation = 3;
+  kException = 4;
+  kNotification = 5;
+  kAlarm = 6;
+}
+
+enum AlertCountType : ENUM8 {
+  kUnstructured = 0;
+}
+
+enum AlertStructureCategory : ENUM16 {
+  kWarning = 256;
+  kDanger = 512;
+  kFailure = 768;
+}
+
+enum AlertStructurePresenceRecovery : ENUM16 {
+  kRecovery = 0;
+  kPresence = 4096;
+}
+
+enum AmiRegistrationState : ENUM8 {
+  kUnregistered = 0;
+  kJoiningNetwork = 1;
+  kJoinedNetwork = 2;
+  kSubmittedRegistrationRequest = 3;
+  kRegistrationRejected = 4;
+  kRegistered = 5;
+  kRegisterationNotPossible = 6;
+}
+
+enum AnonymousDataState : ENUM8 {
+  kNoSourceFound = 0;
+  kSourceFound = 1;
+}
+
+enum ApplianceStatus : ENUM8 {
+  kOff = 1;
+  kStandBy = 2;
+  kProgrammed = 3;
+  kProgrammedWaitingToStart = 4;
+  kRunning = 5;
+  kPause = 6;
+  kEndProgrammed = 7;
+  kFailure = 8;
+  kProgrammeInterrupted = 9;
+  kIdle = 10;
+  kRinseHold = 11;
+  kService = 12;
+  kSuperfreezing = 13;
+  kSupercooling = 14;
+  kSuperheating = 15;
+}
+
+enum ApplicationStatusEnum : ENUM8 {
+  kStopped = 0;
+  kActiveVisibleFocus = 1;
+  kActiveHidden = 2;
+  kActiveVisibleNotFocus = 3;
+}
+
+enum AssociationFailureCause : ENUM8 {
+  kUnknown = 0;
+  kAssociationFailed = 1;
+  kAuthenticationFailed = 2;
+  kSsidNotFound = 3;
+}
+
+enum AttributeWritePermission : ENUM8 {
+  kDenyWrite = 0;
+  kAllowWriteNormal = 1;
+  kAllowWriteOfReadOnly = 2;
+  kUnsupportedAttribute = 134;
+  kInvalidValue = 135;
+  kReadOnly = 136;
+  kInvalidDataType = 141;
+}
+
+enum AuthMode : ENUM8 {
+  kPase = 1;
+  kCase = 2;
+  kGroup = 3;
+}
+
+enum BarrierControlBarrierPosition : INT8U {
+  kClosed = 0;
+  kOpen = 100;
+  kUnknown = 255;
+}
+
+enum BarrierControlMovingState : ENUM8 {
+  kStopped = 0;
+  kClosing = 1;
+  kOpening = 2;
+}
+
+enum BatChargeFaultType : ENUM8 {
+  kUnspecfied = 0;
+  kAmbientTooHot = 1;
+  kAmbientTooCold = 2;
+  kBatteryTooHot = 3;
+  kBatteryTooCold = 4;
+  kBatteryAbsent = 5;
+  kBatteryOverVoltage = 6;
+  kBatteryUnderVoltage = 7;
+  kChargerOverVoltage = 8;
+  kChargerUnderVoltage = 9;
+  kSafetyTimeout = 10;
+}
+
+enum BatChargeLevel : ENUM8 {
+  kOk = 0;
+  kWarning = 1;
+  kCritical = 2;
+}
+
+enum BatChargeState : ENUM8 {
+  kUnknown = 0;
+  kIsCharging = 1;
+  kIsAtFullCharge = 2;
+  kIsNotCharging = 3;
+}
+
+enum BatFaultType : ENUM8 {
+  kUnspecfied = 0;
+  kOverTemp = 1;
+  kUnderTemp = 2;
+}
+
+enum BatReplaceability : ENUM8 {
+  kUnspecified = 0;
+  kNotReplaceable = 1;
+  kUserReplaceable = 2;
+  kFactoryReplaceable = 3;
+}
+
+enum BatterySize : ENUM8 {
+  kNoBattery = 0;
+  kBuiltIn = 1;
+  kOther = 2;
+  kAa = 3;
+  kAaa = 4;
+  kC = 5;
+  kD = 6;
+  kUnknown = 255;
+}
+
+enum BootReasonType : ENUM8 {
+  kUnspecified = 0;
+  kPowerOnReboot = 1;
+  kBrownOutReset = 2;
+  kSoftwareWatchdogReset = 3;
+  kHardwareWatchdogReset = 4;
+  kSoftwareUpdateCompleted = 5;
+  kSoftwareReset = 6;
+}
+
+enum CalendarType : ENUM8 {
+  kBuddhist = 0;
+  kChinese = 1;
+  kCoptic = 2;
+  kEthiopian = 3;
+  kGregorian = 4;
+  kHebrew = 5;
+  kIndian = 6;
+  kIslamic = 7;
+  kJapanese = 8;
+  kKorean = 9;
+  kPersian = 10;
+  kTaiwanese = 11;
+}
+
+enum CecKeyCode : ENUM8 {
+  kSelect = 0;
+  kUp = 1;
+  kDown = 2;
+  kLeft = 3;
+  kRight = 4;
+  kRightUp = 5;
+  kRightDown = 6;
+  kLeftUp = 7;
+  kLeftDown = 8;
+  kRootMenu = 9;
+  kSetupMenu = 10;
+  kContentsMenu = 11;
+  kFavoriteMenu = 12;
+  kExit = 13;
+  kMediaTopMenu = 16;
+  kMediaContextSensitiveMenu = 17;
+  kNumberEntryMode = 29;
+  kNumber11 = 30;
+  kNumber12 = 31;
+  kNumber0OrNumber10 = 32;
+  kNumbers1 = 33;
+  kNumbers2 = 34;
+  kNumbers3 = 35;
+  kNumbers4 = 36;
+  kNumbers5 = 37;
+  kNumbers6 = 38;
+  kNumbers7 = 39;
+  kNumbers8 = 40;
+  kNumbers9 = 41;
+  kDot = 42;
+  kEnter = 43;
+  kClear = 44;
+  kNextFavorite = 47;
+  kChannelUp = 48;
+  kChannelDown = 49;
+  kPreviousChannel = 50;
+  kSoundSelect = 51;
+  kInputSelect = 52;
+  kDisplayInformation = 53;
+  kHelp = 54;
+  kPageUp = 55;
+  kPageDown = 56;
+  kPower = 64;
+  kVolumeUp = 65;
+  kVolumeDown = 66;
+  kMute = 67;
+  kPlay = 68;
+  kStop = 69;
+  kPause = 70;
+  kRecord = 71;
+  kRewind = 72;
+  kFastForward = 73;
+  kEject = 74;
+  kForward = 75;
+  kBackward = 76;
+  kStopRecord = 77;
+  kPauseRecord = 78;
+  kReserved = 79;
+  kAngle = 80;
+  kSubPicture = 81;
+  kVideoOnDemand = 82;
+  kElectronicProgramGuide = 83;
+  kTimerProgramming = 84;
+  kInitialConfiguration = 85;
+  kSelectBroadcastType = 86;
+  kSelectSoundPresentation = 87;
+  kPlayFunction = 96;
+  kPausePlayFunction = 97;
+  kRecordFunction = 98;
+  kPauseRecordFunction = 99;
+  kStopFunction = 100;
+  kMuteFunction = 101;
+  kRestoreVolumeFunction = 102;
+  kTuneFunction = 103;
+  kSelectMediaFunction = 104;
+  kSelectAvInputFunction = 105;
+  kSelectAudioInputFunction = 106;
+  kPowerToggleFunction = 107;
+  kPowerOffFunction = 108;
+  kPowerOnFunction = 109;
+  kF1Blue = 113;
+  kF2Red = 114;
+  kF3Green = 115;
+  kF4Yellow = 116;
+  kF5 = 117;
+  kData = 118;
+}
+
+enum CecedSpecificationVersion : ENUM8 {
+  kCompliantWithV10NotCertified = 16;
+  kCompliantWithV10Certified = 26;
+}
+
+enum ColorControlOptions : BITMAP8 {
+  kExecuteIfOff = 1;
+}
+
+enum ColorLoopAction : ENUM8 {
+  kDeactivate = 0;
+  kActivateFromColorLoopStartEnhancedHue = 1;
+  kActivateFromEnhancedCurrentHue = 2;
+}
+
+enum ColorLoopDirection : ENUM8 {
+  kDecrementHue = 0;
+  kIncrementHue = 1;
+}
+
+enum ColorMode : ENUM8 {
+  kCurrentHueAndCurrentSaturation = 0;
+  kCurrentXAndCurrentY = 1;
+  kColorTemperature = 2;
+}
+
+enum CommandIdentification : ENUM8 {
+  kStart = 1;
+  kStop = 2;
+  kPause = 3;
+  kStartSuperfreezing = 4;
+  kStopSuperfreezing = 5;
+  kStartSupercooling = 6;
+  kStopSupercooling = 7;
+  kDisableGas = 8;
+  kEnableGas = 9;
+  kEnableEnergyControl = 10;
+  kDisableEnergyControl = 11;
+}
+
+enum CommissioningWindowStatus : ENUM8 {
+  kWindowNotOpen = 0;
+  kEnhancedWindowOpen = 1;
+  kBasicWindowOpen = 2;
+}
+
+enum DataQualityId : ENUM16 {
+  kAllDataCertified = 0;
+  kOnlyInstantaneousPowerNotCertified = 1;
+  kOnlyCumulatedConsumptionNotCertified = 2;
+  kNotCertifiedData = 3;
+}
+
+enum DehumidifcationLockout : ENUM8 {
+  kNotAllowed = 0;
+  kAllowed = 1;
+}
+
+enum DeviceStatus2Structure : ENUM8 {
+  kIrisSymptomCode = 32;
+}
+
+enum DlAlarmCode : ENUM8 {
+  kLockJammed = 0;
+  kLockFactoryReset = 1;
+  kLockRadioPowerCycled = 3;
+  kWrongCodeEntryLimit = 4;
+  kFrontEsceutcheonRemoved = 5;
+  kDoorForcedOpen = 6;
+  kDoorAjar = 7;
+  kForcedUser = 8;
+}
+
+enum DlCredentialRule : ENUM8 {
+  kSingle = 0;
+  kDouble = 1;
+  kTri = 2;
+}
+
+enum DlCredentialType : ENUM8 {
+  kProgrammingPIN = 0;
+  kPin = 1;
+  kRfid = 2;
+  kFingerprint = 3;
+  kFingerVein = 4;
+  kFace = 5;
+}
+
+enum DlDataOperationType : ENUM8 {
+  kAdd = 0;
+  kClear = 1;
+  kModify = 2;
+}
+
+enum DlDoorLockStatus : ENUM8 {
+  kDuplicate = 2;
+  kOccupied = 3;
+}
+
+enum DlDoorState : ENUM8 {
+  kDoorOpen = 0;
+  kDoorClosed = 1;
+  kDoorJammed = 2;
+  kDoorForcedOpen = 3;
+  kDoorUnspecifiedError = 4;
+  kDoorAjar = 5;
+}
+
+enum DlLockDataType : ENUM8 {
+  kUnspecified = 0;
+  kProgrammingCode = 1;
+  kUserIndex = 2;
+  kWeekDaySchedule = 3;
+  kYearDaySchedule = 4;
+  kHolidaySchedule = 5;
+  kPin = 6;
+  kRfid = 7;
+  kFingerprint = 8;
+}
+
+enum DlLockOperationType : ENUM8 {
+  kLock = 0;
+  kUnlock = 1;
+  kNonAccessUserEvent = 2;
+  kForcedUserEvent = 3;
+}
+
+enum DlLockState : ENUM8 {
+  kNotFullyLocked = 0;
+  kLocked = 1;
+  kUnlocked = 2;
+}
+
+enum DlLockType : ENUM8 {
+  kDeadBolt = 0;
+  kMagnetic = 1;
+  kOther = 2;
+  kMortise = 3;
+  kRim = 4;
+  kLatchBolt = 5;
+  kCylindricalLock = 6;
+  kTubularLock = 7;
+  kInterconnectedLock = 8;
+  kDeadLatch = 9;
+  kDoorFurniture = 10;
+}
+
+enum DlOperatingMode : ENUM8 {
+  kNormal = 0;
+  kVacation = 1;
+  kPrivacy = 2;
+  kNoRemoteLockUnlock = 3;
+  kPassage = 4;
+}
+
+enum DlOperationError : ENUM8 {
+  kUnspecified = 0;
+  kInvalidCredential = 1;
+  kDisabledUserDenied = 2;
+  kRestricted = 3;
+  kInsufficientBattery = 4;
+}
+
+enum DlOperationSource : ENUM8 {
+  kUnspecified = 0;
+  kManual = 1;
+  kProprietaryRemote = 2;
+  kKeypad = 3;
+  kAuto = 4;
+  kButton = 5;
+  kSchedule = 6;
+  kRemote = 7;
+  kRfid = 8;
+  kBiometric = 9;
+}
+
+enum DlStatus : ENUM8 {
+  kSuccess = 0;
+  kFailure = 1;
+  kDuplicate = 2;
+  kOccupied = 3;
+  kInvalidField = 133;
+  kNotFound = 139;
+}
+
+enum DlUserStatus : ENUM8 {
+  kAvailable = 0;
+  kOccupiedEnabled = 1;
+  kOccupiedDisabled = 3;
+}
+
+enum DlUserType : ENUM8 {
+  kUnrestrictedUser = 0;
+  kYearDayScheduleUser = 1;
+  kWeekDayScheduleUser = 2;
+  kProgrammingUser = 3;
+  kNonAccessUser = 4;
+  kForcedUser = 5;
+  kDisposableUser = 6;
+  kExpiringUser = 7;
+  kScheduleRestrictedUser = 8;
+  kRemoteOnlyUser = 9;
+}
+
+enum DoorLockEventSource : ENUM8 {
+  kKeypad = 0;
+  kRf = 1;
+  kManual = 2;
+  kRfid = 3;
+  kIndeterminate = 255;
+}
+
+enum DoorLockEventType : ENUM8 {
+  kOperation = 0;
+  kProgramming = 1;
+  kAlarm = 2;
+}
+
+enum DoorLockOperatingMode : ENUM8 {
+  kNormalMode = 0;
+  kVacationMode = 1;
+  kPrivacyMode = 2;
+  kNoRfLockOrUnlock = 3;
+  kLocalProgrammingMode = 4;
+  kPassageMode = 5;
+}
+
+enum DoorLockOperationEventCode : ENUM8 {
+  kUnknownOrMfgSpecific = 0;
+  kLock = 1;
+  kUnlock = 2;
+  kLockInvalidPinOrId = 3;
+  kLockInvalidSchedule = 4;
+  kUnlockInvalidPinOrId = 5;
+  kUnlockInvalidSchedule = 6;
+  kOneTouchLock = 7;
+  kKeyLock = 8;
+  kKeyUnlock = 9;
+  kAutoLock = 10;
+  kScheduleLock = 11;
+  kScheduleUnlock = 12;
+  kManualLock = 13;
+  kManualUnlock = 14;
+}
+
+enum DoorLockProgrammingEventCode : ENUM8 {
+  kUnknownOrMfgSpecific = 0;
+  kMasterCodeChanged = 1;
+  kPinAdded = 2;
+  kPinDeleted = 3;
+  kPinChanged = 4;
+  kIdAdded = 5;
+  kIdDeleted = 6;
+}
+
+enum DoorLockSecurityLevel : ENUM8 {
+  kNetworkSecurity = 0;
+  kApsSecurity = 1;
+}
+
+enum DoorLockSetPinOrIdStatus : ENUM8 {
+  kSuccess = 0;
+  kGeneralFailure = 1;
+  kMemoryFull = 2;
+  kDuplicateCodeError = 3;
+}
+
+enum DoorLockSoundVolume : ENUM8 {
+  kSilent = 0;
+  kLow = 1;
+  kHigh = 2;
+}
+
+enum DoorLockState : ENUM8 {
+  kNotFullyLocked = 0;
+  kLocked = 1;
+  kUnlocked = 2;
+}
+
+enum DoorLockType : ENUM8 {
+  kDeadBolt = 0;
+  kMagnetic = 1;
+  kMortise = 2;
+  kRim = 3;
+  kLatchBolt = 4;
+  kCylindrical = 5;
+  kTubular = 6;
+  kInterconnected = 7;
+  kDeadLatch = 8;
+  kOther = 9;
+}
+
+enum DoorLockUserStatus : ENUM8 {
+  kAvailable = 0;
+  kOccupiedEnabled = 1;
+  kOccupiedDisabled = 3;
+  kNotSupported = 255;
+}
+
+enum DoorLockUserType : ENUM8 {
+  kUnrestricted = 0;
+  kYearDayScheduleUser = 1;
+  kWeekDayScheduleUser = 2;
+  kMasterUser = 3;
+  kNonAccessUser = 4;
+  kNotSupported = 255;
+}
+
+enum DoorState : ENUM8 {
+  kOpen = 0;
+  kClosed = 1;
+  kErrorJammed = 2;
+  kErrorForcedOpen = 3;
+  kErrorUnspecified = 4;
+}
+
+enum EndpointListTypeEnum : ENUM8 {
+  kOther = 0;
+  kRoom = 1;
+  kZone = 2;
+}
+
+enum EnhancedColorMode : ENUM8 {
+  kCurrentHueAndCurrentSaturation = 0;
+  kCurrentXAndCurrentY = 1;
+  kColorTemperature = 2;
+  kEnhancedCurrentHueAndCurrentSaturation = 3;
+}
+
+enum ErrorTypeEnum : ENUM8 {
+  kMultipleMatches = 0;
+  kNoMatches = 1;
+}
+
+enum EventId : ENUM8 {
+  kMeterCoverRemoved = 0;
+  kMeterCoverClosed = 1;
+  kStrongMagneticField = 2;
+  kNoStrongMagneticField = 3;
+  kBatteryFailure = 4;
+  kLowBattery = 5;
+  kProgramMemoryError = 6;
+  kRamError = 7;
+  kNvMemoryError = 8;
+  kMeasurementSystemError = 9;
+  kWatchdogError = 10;
+  kSupplyDisconnectFailure = 11;
+  kSupplyConnectFailure = 12;
+  kMeasurmentSoftwareChanged = 13;
+  kDstEnabled = 14;
+  kDstDisabled = 15;
+  kClockAdjBackward = 16;
+  kClockAdjForward = 17;
+  kClockInvalid = 18;
+  kCommsErrorHan = 19;
+  kCommsOkHan = 20;
+  kFraudAttempt = 21;
+  kPowerLoss = 22;
+  kIncorrectProtocol = 23;
+  kUnusualHanTraffic = 24;
+  kUnexpectedClockChange = 25;
+  kCommsUsingUnauthenticatedComponent = 26;
+  kErrorRegClear = 27;
+  kAlarmRegClear = 28;
+  kUnexpectedHwReset = 29;
+  kUnexpectedProgramExecution = 30;
+  kEventLogCleared = 31;
+  kManualDisconnect = 32;
+  kManualConnect = 33;
+  kRemoteDisconnection = 34;
+  kLocalDisconnection = 35;
+  kLimitThresholdExceeded = 36;
+  kLimitThresholdOk = 37;
+  kLimitThresholdChanged = 38;
+  kMaximumDemandExceeded = 39;
+  kProfileCleared = 40;
+  kFirmwareReadyForActivation = 41;
+  kFirmwareActivated = 42;
+  kPatchFailure = 43;
+  kTouTariffActivation = 44;
+  k8x8Tariffactivated = 45;
+  kSingleTariffRateActivated = 46;
+  kAsynchronousBillingOccurred = 47;
+  kSynchronousBillingOccurred = 48;
+  kIncorrectPolarity = 128;
+  kCurrentNoVoltage = 129;
+  kUnderVoltage = 130;
+  kOverVoltage = 131;
+  kNormalVoltage = 132;
+  kPfBelowThreshold = 133;
+  kPfAboveThreshold = 134;
+  kTerminalCoverRemoved = 135;
+  kTerminalCoverClosed = 136;
+  kReverseFlow = 160;
+  kTiltTamper = 161;
+  kBatteryCoverRemoved = 162;
+  kBatteryCoverClosed = 163;
+  kExcessFlow = 164;
+  kCreditOk = 192;
+  kLowCredit = 193;
+  kEmergencyCreditInUse = 192;
+  kEmergencyCreditExhausted = 193;
+  kZeroCreditEcNotSelected = 194;
+  kSupplyOn = 195;
+  kSupplyOffAarmed = 196;
+  kSupplyOff = 197;
+  kDiscountApplied = 198;
+  kManufacturerSpecificA = 224;
+  kManufacturerSpecificB = 225;
+  kManufacturerSpecificC = 226;
+  kManufacturerSpecificD = 227;
+  kManufacturerSpecificE = 228;
+  kManufacturerSpecificF = 229;
+  kManufacturerSpecificG = 230;
+  kManufacturerSpecificH = 231;
+  kManufacturerSpecificI = 232;
+}
+
+enum EventIdentification : ENUM8 {
+  kEndOfCycle = 1;
+  kTemperatureReached = 4;
+  kEndOfCooking = 5;
+  kSwitchingOff = 6;
+  kWrongData = 7;
+}
+
+enum FanMode : ENUM8 {
+  kOff = 0;
+  kLow = 1;
+  kMedium = 2;
+  kHigh = 3;
+  kOn = 4;
+  kAuto = 5;
+  kSmart = 6;
+}
+
+enum FanModeSequence : ENUM8 {
+  kLowMedHigh = 0;
+  kLowHigh = 1;
+  kLowMedHighAuto = 2;
+  kLowHighAuto = 3;
+  kOnAuto = 4;
+}
+
+enum GeneralCommissioningError : ENUM8 {
+  kOk = 0;
+  kValueOutsideRange = 1;
+  kInvalidAuthentication = 2;
+  kNotCommissioning = 3;
+}
+
+enum GenericDeviceClass : ENUM8 {
+  kLighting = 0;
+}
+
+enum GenericDeviceType : ENUM8 {
+  kIncandescent = 0;
+  kSpotlightHalogen = 1;
+  kHalogenBulb = 2;
+  kCfl = 3;
+  kLinearFlourescent = 4;
+  kLedBulb = 5;
+  kSpotlightLed = 6;
+  kLedStrip = 7;
+  kLedTube = 8;
+  kGenericIndoorFixture = 9;
+  kGenericOutdoorFixture = 10;
+  kPendantFixture = 11;
+  kFloorStandingFixture = 12;
+  kGenericController = 224;
+  kWallSwitch = 225;
+  kPortableRemoteController = 226;
+  kMotionOrLightSensor = 227;
+  kGenericActuator = 240;
+  kPluginUnit = 241;
+  kRetrofitActuator = 242;
+  kUnspecified = 255;
+}
+
+enum GroupKeySecurityPolicy : ENUM8 {
+  kStandard = 0;
+  kLowLatency = 1;
+}
+
+enum HardwareFaultType : ENUM8 {
+  kUnspecified = 0;
+  kRadio = 1;
+  kSensor = 2;
+  kResettableOverTemp = 3;
+  kNonResettableOverTemp = 4;
+  kPowerSource = 5;
+  kVisualDisplayFault = 6;
+  kAudioOutputFault = 7;
+  kUserInterfaceFault = 8;
+  kNonVolatileMemoryError = 9;
+  kTamperDetected = 10;
+}
+
+enum HourFormat : ENUM8 {
+  k12hr = 0;
+  k24hr = 1;
+}
+
+enum HueDirection : ENUM8 {
+  kShortestDistance = 0;
+  kLongestDistance = 1;
+  kUp = 2;
+  kDown = 3;
+}
+
+enum HueMoveMode : ENUM8 {
+  kStop = 0;
+  kUp = 1;
+  kDown = 3;
+}
+
+enum HueStepMode : ENUM8 {
+  kUp = 1;
+  kDown = 3;
+}
+
+enum IasAceAlarmStatus : ENUM8 {
+  kNoAlarm = 0;
+  kBurglar = 1;
+  kFire = 2;
+  kEmergency = 3;
+  kPolicePanic = 4;
+  kFirePanic = 5;
+  kEmergencyPanic = 6;
+}
+
+enum IasAceArmMode : ENUM8 {
+  kDisarm = 0;
+  kArmDayHomeZonesOnly = 1;
+  kArmNightSleepZonesOnly = 2;
+  kArmAllZones = 3;
+}
+
+enum IasAceArmNotification : ENUM8 {
+  kAllZonesDisarmed = 0;
+  kOnlyDayHomeZonesArmed = 1;
+  kOnlyNightSleepZonesArmed = 2;
+  kAllZonesArmed = 3;
+  kInvalidArmDisarmCode = 4;
+  kNotReadyToArm = 5;
+  kAlreadyDisarmed = 6;
+}
+
+enum IasAceAudibleNotification : ENUM8 {
+  kMute = 0;
+  kDefaultSound = 1;
+}
+
+enum IasAceBypassResult : ENUM8 {
+  kZoneBypassed = 0;
+  kZoneNotBypassed = 1;
+  kNotAllowed = 2;
+  kInvalidZoneId = 3;
+  kUnknownZoneId = 4;
+  kInvalidArmDisarmCode = 5;
+}
+
+enum IasAcePanelStatus : ENUM8 {
+  kPanelDisarmed = 0;
+  kArmedStay = 1;
+  kArmedNight = 2;
+  kArmedAway = 3;
+  kExitDelay = 4;
+  kEntryDelay = 5;
+  kNotReadyToArm = 6;
+  kInAlarm = 7;
+  kArmingStay = 8;
+  kArmingNight = 9;
+  kArmingAway = 10;
+}
+
+enum IasEnrollResponseCode : ENUM8 {
+  kSuccess = 0;
+  kNotSupported = 1;
+  kNoEnrollPermit = 2;
+  kTooManyZones = 3;
+}
+
+enum IasZoneState : ENUM8 {
+  kNotEnrolled = 0;
+  kEnrolled = 1;
+}
+
+enum IasZoneType : ENUM16 {
+  kStandardCie = 0;
+  kMotionSensor = 13;
+  kContactSwitch = 21;
+  kFireSensor = 40;
+  kWaterSensor = 42;
+  kGasSensor = 43;
+  kPersonalEmergencyDevice = 44;
+  kVibrationMovementSensor = 45;
+  kRemoteControl = 271;
+  kKeyFob = 277;
+  kKeypad = 541;
+  kStandardWarningDevice = 549;
+  kGlassBreakSensor = 550;
+  kCarbonMonoxideSensor = 551;
+  kSecurityRepeater = 553;
+  kInvalidZoneType = 65535;
+}
+
+enum IdentifyEffectIdentifier : ENUM8 {
+  kBlink = 0;
+  kBreathe = 1;
+  kOkay = 2;
+  kChannelChange = 11;
+  kFinishEffect = 254;
+  kStopEffect = 255;
+}
+
+enum IdentifyEffectVariant : ENUM8 {
+  kDefault = 0;
+}
+
+enum IdentifyIdentifyType : ENUM8 {
+  kNone = 0;
+  kVisibleLight = 1;
+  kVisibleLED = 2;
+  kAudibleBeep = 3;
+  kDisplay = 4;
+  kActuator = 5;
+}
+
+enum InputTypeEnum : ENUM8 {
+  kInternal = 0;
+  kAux = 1;
+  kCoax = 2;
+  kComposite = 3;
+  kHdmi = 4;
+  kInput = 5;
+  kLine = 6;
+  kOptical = 7;
+  kVideo = 8;
+  kScart = 9;
+  kUsb = 10;
+  kOther = 11;
+}
+
+enum InterfaceType : ENUM8 {
+  kUnspecified = 0;
+  kWiFi = 1;
+  kEthernet = 2;
+  kCellular = 3;
+  kThread = 4;
+}
+
+enum KeypadLockout : ENUM8 {
+  kNoLockout = 0;
+  kLevelOneLockout = 1;
+  kLevelTwoLockout = 2;
+  kLevelThreeLockout = 3;
+  kLevelFourLockout = 4;
+  kLevelfiveLockout = 5;
+}
+
+enum LevelControlOptions : BITMAP8 {
+  kExecuteIfOff = 1;
+  kCoupleColorTempToLevel = 2;
+}
+
+enum LevelStatus : ENUM8 {
+  kOnTarget = 0;
+  kBelowTarget = 1;
+  kAboveTarget = 2;
+}
+
+enum LightSensorType : ENUM8 {
+  kPhotodiode = 0;
+  kCmos = 1;
+}
+
+enum LineupInfoTypeEnum : ENUM8 {
+  kMso = 0;
+}
+
+enum LogsIntent : ENUM8 {
+  kEndUserSupport = 0;
+  kNetworkDiag = 1;
+  kCrashLogs = 2;
+}
+
+enum LogsStatus : ENUM8 {
+  kSuccess = 0;
+  kExhausted = 1;
+  kNoLogs = 2;
+  kBusy = 3;
+  kDenied = 4;
+}
+
+enum LogsTransferProtocol : ENUM8 {
+  kResponsePayload = 0;
+  kBdx = 1;
+}
+
+enum MessagingControlConfirmation : ENUM8 {
+  kNotRequired = 0;
+  kRequired = 128;
+}
+
+enum MessagingControlEnhancedConfirmation : ENUM8 {
+  kNotRequired = 0;
+  kRequired = 32;
+}
+
+enum MessagingControlImportance : ENUM8 {
+  kLow = 0;
+  kMedium = 4;
+  kHigh = 8;
+  kCritical = 12;
+}
+
+enum MessagingControlTransmission : ENUM8 {
+  kNormal = 0;
+  kNormalAndAnonymous = 1;
+  kAnonymous = 2;
+  kReserved = 3;
+}
+
+enum MeterTypeId : ENUM16 {
+  kUtilityPrimaryMeter = 0;
+  kUtilityProductionMeter = 1;
+  kUtilitySecondaryMeter = 2;
+  kPrivatePrimaryMeter = 256;
+  kPrivateProductionMeter = 257;
+  kPrivateSecondaryMeters = 258;
+  kGenericMeter = 272;
+}
+
+enum MetricTypeEnum : ENUM8 {
+  kPixels = 0;
+  kPercentage = 1;
+}
+
+enum MoveMode : ENUM8 {
+  kUp = 0;
+  kDown = 1;
+}
+
+enum NetworkCommissioningStatus : ENUM8 {
+  kSuccess = 0;
+  kOutOfRange = 1;
+  kBoundsExceeded = 2;
+  kNetworkIDNotFound = 3;
+  kDuplicateNetworkID = 4;
+  kNetworkNotFound = 5;
+  kRegulatoryError = 6;
+  kAuthFailure = 7;
+  kUnsupportedSecurity = 8;
+  kOtherConnectionFailure = 9;
+  kIPV6Failed = 10;
+  kIPBindFailed = 11;
+  kUnknownError = 12;
+}
+
+enum NetworkFault : ENUM8 {
+  kUnspecified = 0;
+  kLinkDown = 1;
+  kHardwareFailure = 2;
+  kNetworkJammed = 3;
+}
+
+enum NetworkFaultType : ENUM8 {
+  kUnspecified = 0;
+  kHardwareFailure = 1;
+  kNetworkJammed = 2;
+  kConnectionFailed = 3;
+}
+
+enum NodeOperationalCertStatus : ENUM8 {
+  kSuccess = 0;
+  kInvalidPublicKey = 1;
+  kInvalidNodeOpId = 2;
+  kInvalidNOC = 3;
+  kMissingCsr = 4;
+  kTableFull = 5;
+  kInsufficientPrivilege = 8;
+  kFabricConflict = 9;
+  kLabelConflict = 10;
+  kInvalidFabricIndex = 11;
+}
+
+enum OTAAnnouncementReason : ENUM8 {
+  kSimpleAnnouncement = 0;
+  kUpdateAvailable = 1;
+  kUrgentUpdateAvailable = 2;
+}
+
+enum OTAApplyUpdateAction : ENUM8 {
+  kProceed = 0;
+  kAwaitNextAction = 1;
+  kDiscontinue = 2;
+}
+
+enum OTAChangeReasonEnum : ENUM8 {
+  kUnknown = 0;
+  kSuccess = 1;
+  kFailure = 2;
+  kTimeOut = 3;
+  kDelayByProvider = 4;
+}
+
+enum OTADownloadProtocol : ENUM8 {
+  kBDXSynchronous = 0;
+  kBDXAsynchronous = 1;
+  kHttps = 2;
+  kVendorSpecific = 3;
+}
+
+enum OTAQueryStatus : ENUM8 {
+  kUpdateAvailable = 0;
+  kBusy = 1;
+  kNotAvailable = 2;
+  kDownloadProtocolNotSupported = 3;
+}
+
+enum OTAUpdateStateEnum : ENUM8 {
+  kUnknown = 0;
+  kIdle = 1;
+  kQuerying = 2;
+  kDelayedOnQuery = 3;
+  kDownloading = 4;
+  kApplying = 5;
+  kDelayedOnApply = 6;
+  kRollingBack = 7;
+  kDelayedOnUserConsent = 8;
+}
+
+enum OccupancySensorType : ENUM8 {
+  kPir = 0;
+  kUltrasonic = 1;
+  kPirAndUltrasonic = 2;
+  kPhysicalContact = 3;
+}
+
+enum OnOffDelayedAllOffEffectVariant : enum8 {
+  kFadeToOffIn0p8Seconds = 0;
+  kNoFade = 1;
+  k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+}
+
+enum OnOffDyingLightEffectVariant : enum8 {
+  k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+}
+
+enum OnOffEffectIdentifier : enum8 {
+  kDelayedAllOff = 0;
+  kDyingLight = 1;
+}
+
+enum OperatingMode : ENUM8 {
+  kNormal = 0;
+  kConfigure = 1;
+}
+
+enum OutputTypeEnum : ENUM8 {
+  kHdmi = 0;
+  kBt = 1;
+  kOptical = 2;
+  kHeadphone = 3;
+  kInternal = 4;
+  kOther = 5;
+}
+
+enum PHYRateType : ENUM8 {
+  k10m = 0;
+  k100m = 1;
+  k1000m = 2;
+  k25g = 3;
+  k5g = 4;
+  k10g = 5;
+  k40g = 6;
+  k100g = 7;
+  k200g = 8;
+  k400g = 9;
+}
+
+enum ParameterEnum : ENUM8 {
+  kActor = 0;
+  kChannel = 1;
+  kCharacter = 2;
+  kDirector = 3;
+  kEvent = 4;
+  kFranchise = 5;
+  kGenre = 6;
+  kLeague = 7;
+  kPopularity = 8;
+  kProvider = 9;
+  kSport = 10;
+  kSportsTeam = 11;
+  kType = 12;
+}
+
+enum PhysicalEnvironment : ENUM8 {
+  kUnspecified = 0;
+  kFirstProfileSpecifiedValue = 1;
+  kLastProfileSpecifiedValue = 127;
+  kUnknown = 255;
+}
+
+enum PlaybackStateEnum : ENUM8 {
+  kPlaying = 0;
+  kPaused = 1;
+  kNotPlaying = 2;
+  kBuffering = 3;
+}
+
+enum PowerProfileState : ENUM8 {
+  kPowerProfileWaitingToStart = 1;
+  kPowerProfileStarted = 2;
+  kEnergyPhaseRunning = 3;
+  kEnergyPhaseEnded = 4;
+  kEnergyPhaseWaitingToStart = 5;
+  kEnergyPhaseStarted = 6;
+  kPowerProfileEnded = 7;
+  kProfileReadyForScheduling = 8;
+  kPowerProfileScheduled = 9;
+}
+
+enum PowerSource : ENUM8 {
+  kUnknown = 0;
+  kSinglePhaseMains = 1;
+  kThreePhaseMains = 2;
+  kBattery = 3;
+  kDcSource = 4;
+  kEmergencyMainsConstantPower = 5;
+  kEmergencyMainsTransferSwitch = 6;
+  kBatteryBackup = 128;
+}
+
+enum PowerSourceStatus : ENUM8 {
+  kUnspecfied = 0;
+  kActive = 1;
+  kStandby = 2;
+  kUnavailable = 3;
+}
+
+enum Privilege : ENUM8 {
+  kView = 1;
+  kProxyView = 2;
+  kOperate = 3;
+  kManage = 4;
+  kAdminister = 5;
+}
+
+enum ProductCode : ENUM8 {
+  kManufacturerDefined = 0;
+  kIternationalArticleNumber = 1;
+  kGlobalTradeItemNumber = 2;
+  kUniversalProductCode = 3;
+  kStockKeepingUnit = 4;
+}
+
+enum ProductTypeId : ENUM16 {
+  kWhiteGoods = 0;
+  kDishwasher = 22017;
+  kTumbleDryer = 22018;
+  kWasherDryer = 22019;
+  kWashingMachine = 22020;
+  kHobs = 24067;
+  kInductionHobs = 24073;
+  kOven = 24065;
+  kElectricalOven = 24070;
+  kRefrigeratorFreezer = 26113;
+}
+
+enum PumpControlMode : ENUM8 {
+  kConstantSpeed = 0;
+  kConstantPressure = 1;
+  kProportionalPressure = 2;
+  kConstantFlow = 3;
+  kConstantTemperature = 5;
+  kAutomatic = 7;
+}
+
+enum PumpOperationMode : ENUM8 {
+  kNormal = 0;
+  kMinimum = 1;
+  kMaximum = 2;
+  kLocal = 3;
+}
+
+enum RadioFaultType : ENUM8 {
+  kUnspecified = 0;
+  kWiFiFault = 1;
+  kCellularFault = 2;
+  kThreadFault = 3;
+  kNFCFault = 4;
+  kBLEFault = 5;
+  kEthernetFault = 6;
+}
+
+enum RegulatoryLocationType : ENUM8 {
+  kIndoor = 0;
+  kOutdoor = 1;
+  kIndoorOutdoor = 2;
+}
+
+enum RelativeHumidityDisplay : ENUM8 {
+  kNotDisplayed = 0;
+  kDisplayed = 1;
+}
+
+enum RelativeHumidityMode : ENUM8 {
+  kMeasureLocally = 0;
+  kUpdatedOverTheNetwork = 1;
+}
+
+enum RemoteEnableFlags : ENUM8 {
+  kDisabled = 0;
+  kTemporarilyLockedDisabled = 7;
+  kEnabledRemoteControl = 15;
+  kEnabledRemoteAndEnergyControl = 1;
+}
+
+enum RoutingRole : ENUM8 {
+  kUnspecified = 0;
+  kUnassigned = 1;
+  kSleepyEndDevice = 2;
+  kEndDevice = 3;
+  kReed = 4;
+  kRouter = 5;
+  kLeader = 6;
+}
+
+enum SaturationMoveMode : ENUM8 {
+  kStop = 0;
+  kUp = 1;
+  kDown = 3;
+}
+
+enum SaturationStepMode : ENUM8 {
+  kUp = 1;
+  kDown = 3;
+}
+
+enum SecurityType : ENUM8 {
+  kUnspecified = 0;
+  kNone = 1;
+  kWep = 2;
+  kWpa = 3;
+  kWpa2 = 4;
+  kWpa3 = 5;
+}
+
+enum SetpointAdjustMode : ENUM8 {
+  kHeatSetpoint = 0;
+  kCoolSetpoint = 1;
+  kHeatAndCoolSetpoints = 2;
+}
+
+enum SimpleEnum : ENUM8 {
+  kUnspecified = 0;
+  kValueA = 1;
+  kValueB = 2;
+  kValueC = 3;
+}
+
+enum SquawkLevel : ENUM8 {
+  kLowLevel = 0;
+  kMediumLevel = 1;
+  kHighLevel = 2;
+  kVeryHighLevel = 2;
+}
+
+enum SquawkMode : ENUM8 {
+  kSystemIsArmed = 0;
+  kSystemIsDisarmed = 1;
+}
+
+enum SquawkStobe : ENUM8 {
+  kNoStrobe = 0;
+  kUseStrobe = 1;
+}
+
+enum StartOfWeek : ENUM8 {
+  kSunday = 0;
+  kMonday = 1;
+  kTuesday = 2;
+  kWednesday = 3;
+  kThursday = 4;
+  kFriday = 5;
+  kSaturday = 6;
+}
+
+enum StartUpOnOffValue : ENUM8 {
+  kSetToOff = 0;
+  kSetToOn = 1;
+  kSetToToggle = 2;
+  kSetToPrevious = 255;
+}
+
+enum StatusCode : ENUM8 {
+  kBusy = 1;
+  kPAKEParameterError = 2;
+  kWindowNotOpen = 3;
+}
+
+enum StatusEnum : ENUM8 {
+  kSuccess = 0;
+  kUnsupportedKey = 1;
+  kInvalidKeyInCurrentState = 2;
+}
+
+enum StatusEnum : ENUM8 {
+  kSuccess = 0;
+  kAppNotAvailable = 1;
+  kSystemBusy = 2;
+}
+
+enum StatusEnum : ENUM8 {
+  kSuccess = 0;
+  kAppNotAvailable = 1;
+  kSystemBusy = 2;
+}
+
+enum StatusEnum : ENUM8 {
+  kSuccess = 0;
+  kUrlNotAvailable = 1;
+  kAuthFailed = 2;
+}
+
+enum StatusEnum : ENUM8 {
+  kSuccess = 0;
+  kInvalidStateForCommand = 1;
+  kNotAllowed = 2;
+  kNotActive = 3;
+  kSpeedOutOfRange = 4;
+  kSeekOutOfRange = 5;
+}
+
+enum StepMode : ENUM8 {
+  kUp = 0;
+  kDown = 1;
+}
+
+enum SwitchActions : ENUM8 {
+  kOn = 0;
+  kOff = 1;
+  kToggle = 2;
+}
+
+enum SwitchType : ENUM8 {
+  kToggle = 0;
+  kMomentary = 1;
+  kMultiFunction = 2;
+}
+
+enum TempUnit : ENUM8 {
+  kFahrenheit = 0;
+  kCelsius = 1;
+  kKelvin = 2;
+}
+
+enum TemperatureDisplayMode : ENUM8 {
+  kCelsius = 0;
+  kFahrenheit = 1;
+}
+
+enum TemperatureSetpointHold : ENUM8 {
+  kSetpointHoldOff = 0;
+  kSetpointHoldOn = 1;
+}
+
+enum ThermostatControlSequence : ENUM8 {
+  kCoolingOnly = 0;
+  kCoolingWithReheat = 1;
+  kHeatingOnly = 2;
+  kHeatingWithReheat = 3;
+  kCoolingAndHeating = 4;
+  kCoolingAndHeatingWithReheat = 5;
+}
+
+enum ThermostatRunningMode : ENUM8 {
+  kOff = 0;
+  kCool = 3;
+  kHeat = 4;
+}
+
+enum ThermostatSystemMode : ENUM8 {
+  kOff = 0;
+  kAuto = 1;
+  kCool = 3;
+  kHeat = 4;
+  kEmergencyHeating = 5;
+  kPrecooling = 6;
+  kFanOnly = 7;
+}
+
+enum ThreadConnectionStatus : ENUM8 {
+  kConnected = 0;
+  kNotConnected = 1;
+}
+
+enum TimeEncoding : ENUM8 {
+  kRelative = 0;
+  kAbsolute = 64;
+}
+
+enum WarningEvent : ENUM8 {
+  kWarning1OverallPowerAboveAvailablePowerLevel = 0;
+  kWarning2OverallPowerAbovePowerThresholdLevel = 1;
+  kWarning3OverallPowerBackBelowTheAvailablePowerLevel = 2;
+  kWarning4OverallPowerBackBelowThePowerThresholdLevel = 3;
+  kWarning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 4;
+}
+
+enum WarningMode : ENUM8 {
+  kStop = 0;
+  kBurglar = 1;
+  kFire = 2;
+  kEmergency = 3;
+  kPolicePanic = 4;
+  kFirePanic = 5;
+  kEmergencyPanic = 6;
+}
+
+enum WarningStobe : ENUM8 {
+  kNoStrobe = 0;
+  kUseStrobe = 1;
+}
+
+enum WcEndProductType : ENUM8 {
+  kRollerShade = 0;
+  kRomanShade = 1;
+  kBalloonShade = 2;
+  kWovenWood = 3;
+  kPleatedShade = 4;
+  kCellularShade = 5;
+  kLayeredShade = 6;
+  kLayeredShade2D = 7;
+  kSheerShade = 8;
+  kTiltOnlyInteriorBlind = 9;
+  kInteriorBlind = 10;
+  kVerticalBlindStripCurtain = 11;
+  kInteriorVenetianBlind = 12;
+  kExteriorVenetianBlind = 13;
+  kLateralLeftCurtain = 14;
+  kLateralRightCurtain = 15;
+  kCentralCurtain = 16;
+  kRollerShutter = 17;
+  kExteriorVerticalScreen = 18;
+  kAwningTerracePatio = 19;
+  kAwningVerticalScreen = 20;
+  kTiltOnlyPergola = 21;
+  kSwingingShutter = 22;
+  kSlidingShutter = 23;
+  kUnknown = 255;
+}
+
+enum WcType : ENUM8 {
+  kRollershade = 0;
+  kRollershade2Motor = 1;
+  kRollershadeExterior = 2;
+  kRollershadeExterior2Motor = 3;
+  kDrapery = 4;
+  kAwning = 5;
+  kShutter = 6;
+  kTiltBlindTiltOnly = 7;
+  kTiltBlindLiftAndTilt = 8;
+  kProjectorScreen = 9;
+  kUnknown = 255;
+}
+
+enum WiFiBand : ENUM8 {
+  k2g4 = 0;
+  k3g65 = 1;
+  k5g = 2;
+  k6g = 3;
+  k60g = 4;
+}
+
+enum WiFiConnectionStatus : ENUM8 {
+  kConnected = 0;
+  kNotConnected = 1;
+}
+
+enum WiFiVersionType : ENUM8 {
+  k80211a = 0;
+  k80211b = 1;
+  k80211g = 2;
+  k80211n = 3;
+  k80211ac = 4;
+  k80211ax = 5;
+}
+
+enum WiredCurrentType : ENUM8 {
+  kAc = 0;
+  kDc = 1;
+}
+
+enum WiredFaultType : ENUM8 {
+  kUnspecfied = 0;
+  kOverVoltage = 1;
+  kUnderVoltage = 2;
+}
+
+
+struct Dimension {
+  double kWidth = 1;
+  double kHeight = 2;
+  MetricTypeEnum kMetric = 3;
+}
+
+struct AdditionalInfo {
+  CHAR_STRING kName = 1;
+  CHAR_STRING kValue = 2;
+}
+
+struct SimpleStruct {
+  INT8U kA = 1;
+  BOOLEAN kB = 2;
+  SimpleEnum kC = 3;
+  OCTET_STRING kD = 4;
+  CHAR_STRING kE = 5;
+  SimpleBitmap kF = 6;
+  single kG = 7;
+  double kH = 8;
+}
+
+struct NullablesAndOptionalsStruct {
+  INT16U kNullableInt = 1;
+  INT16U kOptionalInt = 2;
+  INT16U kNullableOptionalInt = 3;
+  CHAR_STRING kNullableString = 4;
+  CHAR_STRING kOptionalString = 5;
+  CHAR_STRING kNullableOptionalString = 6;
+  SimpleStruct kNullableStruct = 7;
+  SimpleStruct kOptionalStruct = 8;
+  SimpleStruct kNullableOptionalStruct = 9;
+  SimpleEnum kNullableList = 10;
+  SimpleEnum kOptionalList = 11;
+  SimpleEnum kNullableOptionalList = 12;
+}
+
+struct NestedStruct {
+  INT8U kA = 1;
+  BOOLEAN kB = 2;
+  SimpleStruct kC = 3;
+}
+
+struct NestedStructList {
+  INT8U kA = 1;
+  BOOLEAN kB = 2;
+  SimpleStruct kC = 3;
+  SimpleStruct kD = 4;
+  INT32U kE = 5;
+  OCTET_STRING kF = 6;
+  INT8U kG = 7;
+}
+
+struct DoubleNestedStructList {
+  NestedStructList kA = 1;
+}
+
+struct Parameter {
+  ParameterEnum kType = 1;
+  CHAR_STRING kValue = 2;
+  AdditionalInfo kExternalIDList = 3;
+}
+
+struct ContentSearch {
+  Parameter kParameterList = 1;
+}
+
+struct StyleInformation {
+  CHAR_STRING kImageUrl = 1;
+  CHAR_STRING kColor = 2;
+  Dimension kSize = 3;
+}
+
+struct BrandingInformation {
+  CHAR_STRING kProviderName = 1;
+  StyleInformation kBackground = 2;
+  StyleInformation kLogo = 3;
+  StyleInformation kProgressBar = 4;
+  StyleInformation kSplash = 5;
+  StyleInformation kWaterMark = 6;
+}
+
+struct Application {
+  INT16U kCatalogVendorId = 1;
+  CHAR_STRING kApplicationId = 2;
+}
+
+struct ApplicationEP {
+  Application kApplication = 1;
+  CHAR_STRING kEndpoint = 2;
+}
+
+struct Target {
+  cluster_id kCluster = 0;
+  endpoint_no kEndpoint = 1;
+  devtype_id kDeviceType = 2;
+}
+
+struct AccessControlEntry {
+  fabric_idx kFabricIndex = 0;
+  Privilege kPrivilege = 1;
+  AuthMode kAuthMode = 2;
+  INT64U kSubjects = 3;
+  Target kTargets = 4;
+}
+
+struct ActionStruct {
+  INT16U kActionID = 1;
+  CHAR_STRING kName = 2;
+  ActionTypeEnum kType = 3;
+  INT16U kEndpointListID = 4;
+  INT16U kSupportedCommands = 5;
+  ActionStateEnum kStatus = 6;
+}
+
+struct BasicCommissioningInfoType {
+  INT32U kFailSafeExpiryLengthMs = 1;
+}
+
+struct BatChargeFaultChangeType {
+  BatChargeFaultType kCurrent = 1;
+  BatChargeFaultType kPrevious = 2;
+}
+
+struct BatFaultChangeType {
+  BatFaultType kCurrent = 1;
+  BatFaultType kPrevious = 2;
+}
+
+struct ChannelInfo {
+  INT16U kMajorNumber = 1;
+  INT16U kMinorNumber = 2;
+  CHAR_STRING kName = 3;
+  CHAR_STRING kCallSign = 4;
+  CHAR_STRING kAffiliateCallSign = 5;
+}
+
+struct DeviceType {
+  DEVTYPE_ID kType = 1;
+  INT16U kRevision = 2;
+}
+
+struct DlCredential {
+  DlCredentialType kCredentialType = 1;
+  INT16U kCredentialIndex = 2;
+}
+
+struct EndpointListStruct {
+  INT16U kEndpointListID = 1;
+  CHAR_STRING kName = 2;
+  EndpointListTypeEnum kType = 3;
+  ENDPOINT_NO kEndpoints = 4;
+}
+
+struct ExtensionEntry {
+  fabric_idx kFabricIndex = 0;
+  OCTET_STRING kData = 1;
+}
+
+struct FabricDescriptor {
+  INT8U kFabricIndex = 1;
+  OCTET_STRING kRootPublicKey = 2;
+  INT16U kVendorId = 3;
+  FABRIC_ID kFabricId = 4;
+  NODE_ID kNodeId = 5;
+  CHAR_STRING kLabel = 6;
+}
+
+struct GroupInfo {
+  INT16U kFabricIndex = 0;
+  INT16U kGroupId = 1;
+  INT16U kEndpoints = 2;
+  CHAR_STRING kGroupName = 3;
+}
+
+struct GroupKey {
+  fabric_idx kFabricIndex = 0;
+  INT16U kGroupId = 1;
+  INT16U kGroupKeySetID = 2;
+}
+
+struct GroupKeySet {
+  INT16U kGroupKeySetID = 0;
+  GroupKeySecurityPolicy kSecurityPolicy = 1;
+  OCTET_STRING kEpochKey0 = 2;
+  INT64U kEpochStartTime0 = 3;
+  OCTET_STRING kEpochKey1 = 4;
+  INT64U kEpochStartTime1 = 5;
+  OCTET_STRING kEpochKey2 = 6;
+  INT64U kEpochStartTime2 = 7;
+}
+
+struct IasAceZoneStatusResult {
+  INT8U kZoneId = 1;
+  IasZoneStatus kZoneStatus = 2;
+}
+
+struct InputInfo {
+  INT8U kIndex = 1;
+  InputTypeEnum kInputType = 2;
+  CHAR_STRING kName = 3;
+  CHAR_STRING kDescription = 4;
+}
+
+struct LabelStruct {
+  CHAR_STRING kLabel = 1;
+  CHAR_STRING kValue = 2;
+}
+
+struct LineupInfo {
+  CHAR_STRING kOperatorName = 1;
+  CHAR_STRING kLineupName = 2;
+  CHAR_STRING kPostalCode = 3;
+  LineupInfoTypeEnum kLineupInfoType = 4;
+}
+
+struct ModeOptionStruct {
+  CHAR_STRING kLabel = 1;
+  INT8U kMode = 2;
+  INT32U kSemanticTag = 3;
+}
+
+struct NOCStruct {
+  INT8U kFabricIndex = 1;
+  OCTET_STRING kNoc = 2;
+}
+
+struct NeighborTable {
+  INT64U kExtAddress = 1;
+  INT32U kAge = 2;
+  INT16U kRloc16 = 3;
+  INT32U kLinkFrameCounter = 4;
+  INT32U kMleFrameCounter = 5;
+  INT8U kLqi = 6;
+  INT8S kAverageRssi = 7;
+  INT8S kLastRssi = 8;
+  INT8U kFrameErrorRate = 9;
+  INT8U kMessageErrorRate = 10;
+  BOOLEAN kRxOnWhenIdle = 11;
+  BOOLEAN kFullThreadDevice = 12;
+  BOOLEAN kFullNetworkData = 13;
+  BOOLEAN kIsChild = 14;
+}
+
+struct NetworkInfo {
+  OCTET_STRING kNetworkID = 1;
+  BOOLEAN kConnected = 2;
+}
+
+struct NetworkInterfaceType {
+  CHAR_STRING kName = 1;
+  BOOLEAN kFabricConnected = 2;
+  BOOLEAN kOffPremiseServicesReachableIPv4 = 3;
+  BOOLEAN kOffPremiseServicesReachableIPv6 = 4;
+  OCTET_STRING kHardwareAddress = 5;
+  InterfaceType kType = 6;
+}
+
+struct Notification {
+  INT16U kContentId = 1;
+  ENUM8 kStatusFeedback = 2;
+}
+
+struct OperationalDatasetComponents {
+  BOOLEAN kActiveTimestampPresent = 1;
+  BOOLEAN kPendingTimestampPresent = 2;
+  BOOLEAN kMasterKeyPresent = 3;
+  BOOLEAN kNetworkNamePresent = 4;
+  BOOLEAN kExtendedPanIdPresent = 5;
+  BOOLEAN kMeshLocalPrefixPresent = 6;
+  BOOLEAN kDelayPresent = 7;
+  BOOLEAN kPanIdPresent = 8;
+  BOOLEAN kChannelPresent = 9;
+  BOOLEAN kPskcPresent = 10;
+  BOOLEAN kSecurityPolicyPresent = 11;
+  BOOLEAN kChannelMaskPresent = 12;
+}
+
+struct OutputInfo {
+  INT8U kIndex = 1;
+  OutputTypeEnum kOutputType = 2;
+  CHAR_STRING kName = 3;
+}
+
+struct PlaybackPosition {
+  INT64U kUpdatedAt = 1;
+  INT64U kPosition = 2;
+}
+
+struct PowerProfileRecord {
+  INT8U kPowerProfileId = 1;
+  INT8U kEnergyPhaseId = 2;
+  BOOLEAN kPowerProfileRemoteControl = 3;
+  ENUM8 kPowerProfileState = 4;
+}
+
+struct ProviderLocation {
+  fabric_idx kFabricIndex = 0;
+  node_id kProviderNodeID = 1;
+  endpoint_no kEndpoint = 2;
+}
+
+struct ReadAttributeStatusRecord {
+  ATTRIB_ID kAttributeId = 1;
+  Status kStatus = 2;
+  INT8U kAttributeType = 3;
+  NO_DATA kAttributeLocation = 4;
+}
+
+struct ReadStructuredAttributeRecord {
+  ATTRIB_ID kAttributeId = 1;
+  INT8U kIndicator = 2;
+  INT16U kIndicies = 3;
+}
+
+struct RouteTable {
+  INT64U kExtAddress = 1;
+  INT16U kRloc16 = 2;
+  INT8U kRouterId = 3;
+  INT8U kNextHop = 4;
+  INT8U kPathCost = 5;
+  INT8U kLQIIn = 6;
+  INT8U kLQIOut = 7;
+  INT8U kAge = 8;
+  BOOLEAN kAllocated = 9;
+  BOOLEAN kLinkEstablished = 10;
+}
+
+struct SceneExtensionAttributeInfo {
+  INT8U kAttributeType = 1;
+  NO_DATA kAttributeLocation = 2;
+}
+
+struct SceneExtensionFieldSet {
+  CLUSTER_ID kClusterId = 1;
+  INT8U kLength = 2;
+  INT8U kValue = 3;
+}
+
+struct ScheduledPhase {
+  INT8U kEnergyPhaseId = 1;
+  INT16U kScheduledTime = 2;
+}
+
+struct SecurityPolicy {
+  INT16U kRotationTime = 1;
+  BITMAP16 kFlags = 2;
+}
+
+struct SemanticTag {
+  ENUM16 kMfgCode = 1;
+  ENUM16 kValue = 2;
+}
+
+struct SoftwareFault {
+  INT64U kId = 1;
+  CHAR_STRING kName = 2;
+  OCTET_STRING kFaultRecording = 3;
+}
+
+struct TargetInfo {
+  INT8U kIdentifier = 1;
+  CHAR_STRING kName = 2;
+}
+
+struct TestListStructOctet {
+  INT64U kFabricIndex = 1;
+  OCTET_STRING kOperationalCert = 2;
+}
+
+struct ThreadInterfaceScanResult {
+  INT64U kPanId = 1;
+  INT64U kExtendedPanId = 2;
+  CHAR_STRING kNetworkName = 3;
+  INT16U kChannel = 4;
+  INT8U kVersion = 5;
+  INT64U kExtendedAddress = 6;
+  INT8S kRssi = 7;
+  INT8U kLqi = 8;
+}
+
+struct ThreadMetrics {
+  INT64U kId = 1;
+  CHAR_STRING kName = 2;
+  INT32U kStackFreeCurrent = 3;
+  INT32U kStackFreeMinimum = 4;
+  INT32U kStackSize = 5;
+}
+
+struct TransferredPhase {
+  INT8U kEnergyPhaseId = 1;
+  INT8U kMacroPhaseId = 2;
+  INT16U kExpectedDuration = 3;
+  INT16U kPeakPower = 4;
+  INT16U kEnergy = 5;
+  INT16U kMaxActivationDelay = 6;
+}
+
+struct WiFiInterfaceScanResult {
+  BITMAP8 kSecurity = 1;
+  OCTET_STRING kSsid = 2;
+  OCTET_STRING kBssid = 3;
+  INT16U kChannel = 4;
+  WiFiBand kWiFiBand = 5;
+  INT8S kRssi = 6;
+}
+
+struct WiredFaultChangeType {
+  WiredFaultType kCurrent = 1;
+  WiredFaultType kPrevious = 2;
+}
+
+struct WriteAttributeRecord {
+  ATTRIB_ID kAttributeId = 1;
+  INT8U kAttributeType = 2;
+  NO_DATA kAttributeLocation = 3;
+}
+
+struct WriteAttributeStatusRecord {
+  Status kStatus = 1;
+  ATTRIB_ID kAttributeId = 2;
+}
+
+struct WriteStructuredAttributeRecord {
+  ATTRIB_ID kAttributeId = 1;
+  INT8U kIndicator = 2;
+  INT16U kIndicies = 3;
+  INT8U kAttributeType = 4;
+  NO_DATA kAttributeLocation = 5;
+}
+
+struct WriteStructuredAttributeStatusRecord {
+  Status kStatus = 1;
+  ATTRIB_ID kAttributeId = 2;
+  INT8U kIndicator = 3;
+  INT16U kIndicies = 4;
+}
+
+
+/// TODO: ZCL Events should be associated with  clusters
+/// rather than being global defines
+event StateChanged(info) = 0 {
+  kActionID = 0,
+  kInvokeID = 1,
+  kNewState = 2,
+}
+
+event ActionFailed(info) = 1 {
+  kActionID = 0,
+  kInvokeID = 1,
+  kNewState = 2,
+  kError = 3,
+}
+
+event StartUp(critical) = 0 {
+  kSoftwareVersion = 0,
+}
+
+event ShutDown(critical) = 1 {
+}
+
+event Leave(info) = 2 {
+}
+
+event ReachableChanged(info) = 3 {
+  kReachableNewValue = 0,
+}
+
+event StateTransition(info) = 0 {
+  kPreviousState = 0,
+  kNewState = 1,
+  kReason = 2,
+  kTargetSoftwareVersion = 3,
+}
+
+event VersionApplied(critical) = 1 {
+  kSoftwareVersion = 0,
+  kProductID = 1,
+}
+
+event DownloadError(info) = 2 {
+  kSoftwareVersion = 0,
+  kBytesDownloaded = 1,
+  kProgressPercent = 2,
+  kPlatformCode = 3,
+}
+
+event HardwareFaultChange(critical) = 0 {
+  kCurrent = 0,
+  kPrevious = 1,
+}
+
+event RadioFaultChange(critical) = 1 {
+  kCurrent = 0,
+  kPrevious = 1,
+}
+
+event NetworkFaultChange(critical) = 2 {
+  kCurrent = 0,
+  kPrevious = 1,
+}
+
+event BootReason(critical) = 3 {
+  kBootReason = 0,
+}
+
+event SoftwareFault(info) = 0 {
+  kSoftwareFault = 0,
+}
+
+event ConnectionStatus(info) = 0 {
+  kConnectionStatus = 0,
+}
+
+event Disconnection(info) = 0 {
+  kReasonCode = 0,
+}
+
+event AssociationFailure(info) = 1 {
+  kAssociationFailure = 0,
+  kStatus = 1,
+}
+
+event ConnectionStatus(info) = 2 {
+  kConnectionStatus = 0,
+}
+
+event SwitchLatched(info) = 0 {
+  kNewPosition = 0,
+}
+
+event InitialPress(info) = 1 {
+  kNewPosition = 0,
+}
+
+event LongPress(info) = 2 {
+  kNewPosition = 0,
+}
+
+event ShortRelease(info) = 3 {
+  kPreviousPosition = 0,
+}
+
+event LongRelease(info) = 4 {
+  kPreviousPosition = 0,
+}
+
+event MultiPressOngoing(info) = 5 {
+  kNewPosition = 0,
+  kCurrentNumberOfPressesCounted = 1,
+}
+
+event MultiPressComplete(info) = 6 {
+  kNewPosition = 0,
+  kTotalNumberOfPressesCounted = 1,
+}
+
+event StateChange(info) = 0 {
+  kStateValue = 0,
+}
+
+event DoorLockAlarm(critical) = 0 {
+  kAlarmCode = 0,
+}
+
+event DoorStateChange(critical) = 1 {
+  kDoorState = 0,
+}
+
+event LockOperation(critical) = 2 {
+  kLockOperationType = 0,
+  kOperationSource = 1,
+  kUserIndex = 2,
+  kFabricIndex = 3,
+  kSourceNode = 4,
+  kCredentials = 5,
+}
+
+event LockOperationError(critical) = 3 {
+  kLockOperationType = 0,
+  kOperationSource = 1,
+  kOperationError = 2,
+  kUserIndex = 3,
+  kFabricIndex = 4,
+  kSourceNode = 5,
+  kCredentials = 6,
+}
+
+event LockUserChange(info) = 4 {
+  kLockDataType = 0,
+  kDataOperationType = 1,
+  kOperationSource = 2,
+  kUserIndex = 3,
+  kFabricIndex = 4,
+  kSourceNode = 5,
+  kDataIndex = 6,
+}
+
+event SupplyVoltageLow(info) = 0 {
+}
+
+event SupplyVoltageHigh(info) = 1 {
+}
+
+event PowerMissingPhase(info) = 2 {
+}
+
+event SystemPressureLow(info) = 3 {
+}
+
+event SystemPressureHigh(info) = 4 {
+}
+
+event DryRunning(critical) = 5 {
+}
+
+event MotorTemperatureHigh(info) = 6 {
+}
+
+event PumpMotorFatalFailure(critical) = 7 {
+}
+
+event ElectronicTemperatureHigh(info) = 8 {
+}
+
+event PumpBlocked(critical) = 9 {
+}
+
+event SensorFailure(info) = 10 {
+}
+
+event ElectronicNonFatalFailure(info) = 11 {
+}
+
+event ElectronicFatalFailure(critical) = 12 {
+}
+
+event GeneralFault(info) = 13 {
+}
+
+event Leakage(info) = 14 {
+}
+
+event AirDetection(info) = 15 {
+}
+
+event TurbineOperation(info) = 16 {
+}
+
+event TestEvent(info) = 1 {
+  kArg1 = 1,
+  kArg2 = 2,
+  kArg3 = 3,
+  kArg4 = 4,
+  kArg5 = 5,
+  kArg6 = 6,
+}
+
+
+server cluster AdministratorCommissioning = 60 {
+
+  // TODO: events for cluster
+
+  ro attribute windowStatus = 0;
+  ro attribute adminFabricIndex = 1;
+  ro attribute adminVendorId = 2;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster Basic = 40 {
+
+  // TODO: events for cluster
+
+  ro reportable attribute interactionModelVersion = 0;
+  ro reportable attribute vendorName = 1;
+  ro reportable attribute vendorID = 2;
+  ro reportable attribute productName = 3;
+  ro reportable attribute productID = 4;
+  rw reportable attribute nodeLabel = 5;
+  rw reportable attribute location = 6;
+  ro reportable attribute hardwareVersion = 7;
+  ro reportable attribute hardwareVersionString = 8;
+  ro reportable attribute softwareVersion = 9;
+  ro reportable attribute softwareVersionString = 10;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster Descriptor = 29 {
+
+  // TODO: events for cluster
+
+  ro reportable attribute deviceList = 0;
+  ro reportable attribute serverList = 1;
+  ro reportable attribute clientList = 2;
+  ro reportable attribute partsList = 3;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster DiagnosticLogs = 50 {
+
+  // TODO: events for cluster
+
+
+  // TODO: commands for cluster
+}
+
+server cluster EthernetNetworkDiagnostics = 55 {
+
+  // TODO: events for cluster
+
+  ro reportable attribute PHYRate = 0;
+  ro reportable attribute fullDuplex = 1;
+  ro reportable attribute packetRxCount = 2;
+  ro reportable attribute packetTxCount = 3;
+  ro reportable attribute txErrCount = 4;
+  ro reportable attribute collisionCount = 5;
+  ro reportable attribute overrunCount = 6;
+  ro reportable attribute carrierDetect = 7;
+  ro reportable attribute timeSinceReset = 8;
+  ro attribute featureMap = 65532;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster FixedLabel = 64 {
+
+  // TODO: events for cluster
+
+  ro attribute labelList = 0;
+  ro attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster GeneralCommissioning = 48 {
+
+  // TODO: events for cluster
+
+  rw reportable attribute breadcrumb = 0;
+  ro reportable attribute basicCommissioningInfoList = 1;
+  ro attribute regulatoryConfig = 2;
+  ro attribute locationCapability = 3;
+  ro attribute featureMap = 65532;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster GeneralDiagnostics = 51 {
+
+  // TODO: events for cluster
+
+  ro reportable attribute networkInterfaces = 0;
+  ro reportable attribute rebootCount = 1;
+  ro reportable attribute upTime = 2;
+  ro reportable attribute totalOperationalHours = 3;
+  ro reportable attribute bootReasons = 4;
+  ro reportable attribute activeHardwareFaults = 5;
+  ro reportable attribute activeRadioFaults = 6;
+  ro reportable attribute activeNetworkFaults = 7;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster LevelControl = 8 {
+
+  // TODO: events for cluster
+
+  ro reportable attribute currentLevel = 0;
+  ro reportable attribute remainingTime = 1;
+  ro reportable attribute minLevel = 2;
+  ro reportable attribute maxLevel = 3;
+  ro reportable attribute currentFrequency = 4;
+  ro reportable attribute minFrequency = 5;
+  ro reportable attribute maxFrequency = 6;
+  rw reportable attribute options = 15;
+  rw reportable attribute onOffTransitionTime = 16;
+  rw reportable attribute onLevel = 17;
+  rw reportable attribute onTransitionTime = 18;
+  rw reportable attribute offTransitionTime = 19;
+  rw reportable attribute defaultMoveRate = 20;
+  rw reportable attribute startUpCurrentLevel = 16384;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster LocalizationConfiguration = 43 {
+
+  // TODO: events for cluster
+
+  rw attribute activeLocale = 1;
+  ro attribute supportedLocales = 2;
+
+  // TODO: commands for cluster
+}
+
+server cluster NetworkCommissioning = 49 {
+
+  // TODO: events for cluster
+
+  ro attribute maxNetworks = 0;
+  ro attribute networks = 1;
+  ro attribute scanMaxTimeSeconds = 2;
+  ro attribute connectMaxTimeSeconds = 3;
+  rw attribute interfaceEnabled = 4;
+  ro attribute lastNetworkingStatus = 5;
+  ro attribute lastNetworkID = 6;
+  ro attribute lastConnectErrorValue = 7;
+  ro attribute featureMap = 65532;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster OnOff = 6 {
+
+  // TODO: events for cluster
+
+  ro reportable attribute onOff = 0;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster OperationalCredentials = 62 {
+
+  // TODO: events for cluster
+
+  ro reportable attribute fabricsList = 1;
+  ro reportable attribute supportedFabrics = 2;
+  ro reportable attribute commissionedFabrics = 3;
+  ro reportable attribute trustedRootCertificates = 4;
+  ro reportable attribute currentFabricIndex = 5;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster SoftwareDiagnostics = 52 {
+
+  // TODO: events for cluster
+
+  ro reportable attribute threadMetrics = 0;
+  ro reportable attribute currentHeapFree = 1;
+  ro reportable attribute currentHeapUsed = 2;
+  ro reportable attribute currentHeapHighWatermark = 3;
+  ro attribute featureMap = 65532;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster Switch = 59 {
+
+  // TODO: events for cluster
+
+  ro reportable attribute numberOfPositions = 0;
+  ro reportable attribute currentPosition = 1;
+  ro reportable attribute multiPressMax = 2;
+  ro reportable attribute featureMap = 65532;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster ThreadNetworkDiagnostics = 53 {
+
+  // TODO: events for cluster
+
+  ro reportable attribute channel = 0;
+  ro reportable attribute routingRole = 1;
+  ro reportable attribute networkName = 2;
+  ro reportable attribute panId = 3;
+  ro reportable attribute extendedPanId = 4;
+  ro reportable attribute meshLocalPrefix = 5;
+  ro reportable attribute overrunCount = 6;
+  ro reportable attribute neighborTableList = 7;
+  ro reportable attribute routeTableList = 8;
+  ro reportable attribute partitionId = 9;
+  ro reportable attribute weighting = 10;
+  ro reportable attribute dataVersion = 11;
+  ro reportable attribute stableDataVersion = 12;
+  ro reportable attribute leaderRouterId = 13;
+  ro reportable attribute detachedRoleCount = 14;
+  ro reportable attribute childRoleCount = 15;
+  ro reportable attribute routerRoleCount = 16;
+  ro reportable attribute leaderRoleCount = 17;
+  ro reportable attribute attachAttemptCount = 18;
+  ro reportable attribute partitionIdChangeCount = 19;
+  ro reportable attribute betterPartitionAttachAttemptCount = 20;
+  ro reportable attribute parentChangeCount = 21;
+  ro reportable attribute txTotalCount = 22;
+  ro reportable attribute txUnicastCount = 23;
+  ro reportable attribute txBroadcastCount = 24;
+  ro reportable attribute txAckRequestedCount = 25;
+  ro reportable attribute txAckedCount = 26;
+  ro reportable attribute txNoAckRequestedCount = 27;
+  ro reportable attribute txDataCount = 28;
+  ro reportable attribute txDataPollCount = 29;
+  ro reportable attribute txBeaconCount = 30;
+  ro reportable attribute txBeaconRequestCount = 31;
+  ro reportable attribute txOtherCount = 32;
+  ro reportable attribute txRetryCount = 33;
+  ro reportable attribute txDirectMaxRetryExpiryCount = 34;
+  ro reportable attribute txIndirectMaxRetryExpiryCount = 35;
+  ro reportable attribute txErrCcaCount = 36;
+  ro reportable attribute txErrAbortCount = 37;
+  ro reportable attribute txErrBusyChannelCount = 38;
+  ro reportable attribute rxTotalCount = 39;
+  ro reportable attribute rxUnicastCount = 40;
+  ro reportable attribute rxBroadcastCount = 41;
+  ro reportable attribute rxDataCount = 42;
+  ro reportable attribute rxDataPollCount = 43;
+  ro reportable attribute rxBeaconCount = 44;
+  ro reportable attribute rxBeaconRequestCount = 45;
+  ro reportable attribute rxOtherCount = 46;
+  ro reportable attribute rxAddressFilteredCount = 47;
+  ro reportable attribute rxDestAddrFilteredCount = 48;
+  ro reportable attribute rxDuplicatedCount = 49;
+  ro reportable attribute rxErrNoFrameCount = 50;
+  ro reportable attribute rxErrUnknownNeighborCount = 51;
+  ro reportable attribute rxErrInvalidSrcAddrCount = 52;
+  ro reportable attribute rxErrSecCount = 53;
+  ro reportable attribute rxErrFcsCount = 54;
+  ro reportable attribute rxErrOtherCount = 55;
+  ro reportable attribute activeTimestamp = 56;
+  ro reportable attribute pendingTimestamp = 57;
+  ro reportable attribute delay = 58;
+  ro reportable attribute securityPolicy = 59;
+  ro reportable attribute channelMask = 60;
+  ro reportable attribute operationalDatasetComponents = 61;
+  ro reportable attribute activeNetworkFaultsList = 62;
+  ro attribute featureMap = 65532;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster UserLabel = 65 {
+
+  // TODO: events for cluster
+
+  rw attribute labelList = 0;
+  ro attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+server cluster WiFiNetworkDiagnostics = 54 {
+
+  // TODO: events for cluster
+
+  ro reportable attribute bssid = 0;
+  ro reportable attribute securityType = 1;
+  ro reportable attribute wiFiVersion = 2;
+  ro reportable attribute channelNumber = 3;
+  ro reportable attribute rssi = 4;
+  ro reportable attribute beaconLostCount = 5;
+  ro reportable attribute beaconRxCount = 6;
+  ro reportable attribute packetMulticastRxCount = 7;
+  ro reportable attribute packetMulticastTxCount = 8;
+  ro reportable attribute packetUnicastRxCount = 9;
+  ro reportable attribute packetUnicastTxCount = 10;
+  ro reportable attribute currentMaxRate = 11;
+  ro reportable attribute overrunCount = 12;
+  ro attribute featureMap = 65532;
+  ro reportable attribute clusterRevision = 65533;
+
+  // TODO: commands for cluster
+}
+
+
+// TODO: endpoints
