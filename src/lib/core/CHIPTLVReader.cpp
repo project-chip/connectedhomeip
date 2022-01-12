@@ -245,8 +245,8 @@ namespace {
 float BitCastToFloat(const uint64_t elemLenOrVal)
 {
     float f;
-    auto u32 = static_cast<uint32_t>(elemLenOrVal);
-    memcpy(&f, &u32, sizeof(f));
+    auto unsigned32 = static_cast<uint32_t>(elemLenOrVal);
+    memcpy(&f, &unsigned32, sizeof(f));
     return f;
 }
 } // namespace
