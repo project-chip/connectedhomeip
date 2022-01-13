@@ -32,8 +32,6 @@
 #include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/Server.h>
 
-
-
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
@@ -58,9 +56,6 @@ GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 } // namespace
-
-
-
 
 extern "C" void app_main()
 {

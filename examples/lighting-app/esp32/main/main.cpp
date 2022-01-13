@@ -26,12 +26,12 @@
 #include "freertos/task.h"
 #include "nvs_flash.h"
 #include "shell_extension/launch.h"
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <app/clusters/ota-requestor/BDXDownloader.h>
-#include <app/clusters/ota-requestor/OTARequestor.h>
 #include <platform/ESP32/OTAImageProcessorImpl.h>
 #include <platform/GenericOTARequestorDriver.h>
 
@@ -40,7 +40,6 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-
 #if CONFIG_ENABLE_OTA_REQUESTOR
 OTARequestor gRequestorCore;
 GenericOTARequestorDriver gRequestorUser;
@@ -48,13 +47,11 @@ BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 #endif
 
-
 LEDWidget AppLED;
 
 static const char * TAG = "light-app";
 
 static DeviceCallbacks EchoCallbacks;
-
 
 static void InitOTARequestor(void)
 {
