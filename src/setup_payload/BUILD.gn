@@ -14,15 +14,26 @@
 
 import("//build_overrides/chip.gni")
 
-static_library("setup_payload") {
-  output_name = "libSetupPayload"
-
+source_set("additional_data_payload") {
   sources = [
     "AdditionalDataPayload.h",
     "AdditionalDataPayloadGenerator.cpp",
     "AdditionalDataPayloadGenerator.h",
     "AdditionalDataPayloadParser.cpp",
     "AdditionalDataPayloadParser.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/crypto",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/support",
+  ]
+}
+
+static_library("setup_payload") {
+  output_name = "libSetupPayload"
+
+  sources = [
     "Base38.h",
     "Base38Decode.cpp",
     "Base38Decode.h",
@@ -45,6 +56,7 @@ static_library("setup_payload") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":additional_data_payload",
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

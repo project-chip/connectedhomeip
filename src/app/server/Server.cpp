@@ -159,7 +159,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 // for (iterate through all GroupDataProvider multicast Address)
 // {
 #ifdef CHIP_ENABLE_GROUP_MESSAGING_TESTS
-    err = mTransports.MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(1, 1234), true);
+    err = mTransports.MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(0, 1234), true);
     SuccessOrExit(err);
 #endif
     //}

@@ -101,6 +101,7 @@ typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * cont
 typedef void (*TestClusterClusterBooleanResponseCallback)(void * context, bool value);
 typedef void (*TestClusterClusterSimpleStructResponseCallback)(void * context, SimpleStruct arg1);
 typedef void (*TestClusterClusterTestAddArgumentsResponseCallback)(void * context, uint8_t returnValue);
+typedef void (*TestClusterClusterTestEmitTestEventResponseCallback)(void * context, uint64_t value);
 typedef void (*TestClusterClusterTestEnumsResponseCallback)(void * context, chip::VendorId arg1, uint8_t arg2);
 typedef void (*TestClusterClusterTestListInt8UReverseResponseCallback)(void * context,
                                                                        /* TYPE WARNING: array array defaults to */ uint8_t * arg1);

@@ -223,6 +223,7 @@ exit:
 
 bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
+    std::string inputname(name.data(), name.size());
     jboolean ret = JNI_FALSE;
     JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
 
@@ -232,7 +233,7 @@ bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharS
     VerifyOrExit(env != NULL, ChipLogError(Zcl, "env null"));
 
     {
-        UtfString jniInputname(env, name.data());
+        UtfString jniInputname(env, inputname.data());
         env->ExceptionClear();
         ret =
             env->CallBooleanMethod(mMediaInputManagerObject, mRenameInputMethod, static_cast<jint>(index), jniInputname.jniValue());

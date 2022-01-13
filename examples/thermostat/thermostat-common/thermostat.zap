@@ -13839,6 +13839,5 @@
       "endpointVersion": 1,
       "deviceIdentifier": 769
     }
-  ],
-  "log": []
+  ]
 }

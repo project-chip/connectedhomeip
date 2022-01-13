@@ -7089,7 +7089,7 @@ class LocalizationConfiguration(Cluster):
 
 
 @dataclass
-class LocalizationTimeFormat(Cluster):
+class TimeFormatLocalization(Cluster):
     id: typing.ClassVar[int] = 0x002C
 
     @ChipUtility.classproperty
@@ -7098,7 +7098,7 @@ class LocalizationTimeFormat(Cluster):
             Fields = [
                 ClusterObjectFieldDescriptor(Label="hourFormat", Tag=0x00000000, Type=uint),
                 ClusterObjectFieldDescriptor(Label="calendarType", Tag=0x00000001, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="supportedCalendarTypes", Tag=0x00000002, Type=typing.Optional[typing.List[LocalizationTimeFormat.Enums.CalendarType]]),
+                ClusterObjectFieldDescriptor(Label="supportedCalendarTypes", Tag=0x00000002, Type=typing.Optional[typing.List[TimeFormatLocalization.Enums.CalendarType]]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
@@ -7106,7 +7106,7 @@ class LocalizationTimeFormat(Cluster):
 
     hourFormat: 'uint' = None
     calendarType: 'typing.Optional[uint]' = None
-    supportedCalendarTypes: 'typing.Optional[typing.List[LocalizationTimeFormat.Enums.CalendarType]]' = None
+    supportedCalendarTypes: 'typing.Optional[typing.List[TimeFormatLocalization.Enums.CalendarType]]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -7178,9 +7178,9 @@ class LocalizationTimeFormat(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[LocalizationTimeFormat.Enums.CalendarType]])
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[typing.List[TimeFormatLocalization.Enums.CalendarType]])
 
-            value: 'typing.Optional[typing.List[LocalizationTimeFormat.Enums.CalendarType]]' = None
+            value: 'typing.Optional[typing.List[TimeFormatLocalization.Enums.CalendarType]]' = None
 
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
@@ -7219,101 +7219,6 @@ class LocalizationTimeFormat(Cluster):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x002C
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFD
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: 'uint' = 0
-
-
-
-@dataclass
-class LocalizationUnit(Cluster):
-    id: typing.ClassVar[int] = 0x002D
-
-    @ChipUtility.classproperty
-    def descriptor(cls) -> ClusterObjectDescriptor:
-        return ClusterObjectDescriptor(
-            Fields = [
-                ClusterObjectFieldDescriptor(Label="temperatureUnit", Tag=0x00000000, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
-                ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
-                ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
-            ])
-
-    temperatureUnit: 'typing.Optional[uint]' = None
-    attributeList: 'typing.List[uint]' = None
-    featureMap: 'typing.Optional[uint]' = None
-    clusterRevision: 'uint' = None
-
-    class Enums:
-        class TempUnit(IntEnum):
-            kFahrenheit = 0x00
-            kCelsius = 0x01
-            kKelvin = 0x02
-
-
-
-
-    class Attributes:
-        @dataclass
-        class TemperatureUnit(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x002D
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class AttributeList(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x002D
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFB
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
-
-            value: 'typing.List[uint]' = field(default_factory=lambda: [])
-
-        @dataclass
-        class FeatureMap(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x002D
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFC
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class ClusterRevision(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0x002D
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:

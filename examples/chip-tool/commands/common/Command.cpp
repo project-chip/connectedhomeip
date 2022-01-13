@@ -554,6 +554,21 @@ const char * Command::GetAttribute(void) const
     return nullptr;
 }
 
+const char * Command::GetEvent(void) const
+{
+    size_t argsCount = mArgs.size();
+    for (size_t i = 0; i < argsCount; i++)
+    {
+        Argument arg = mArgs.at(i);
+        if (arg.type == ArgumentType::Attribute)
+        {
+            return reinterpret_cast<const char *>(arg.value);
+        }
+    }
+
+    return nullptr;
+}
+
 size_t Command::AddArgumentToList(Argument && argument)
 {
     if (argument.isOptional() || mArgs.empty() || !mArgs.back().isOptional())
