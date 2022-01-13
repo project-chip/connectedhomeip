@@ -93,8 +93,6 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/ember-print.cpp
         ${CHIP_APP_BASE_DIR}/util/error-mapping.cpp
         ${CHIP_APP_BASE_DIR}/util/message.cpp
-        ${CHIP_APP_BASE_DIR}/util/process-cluster-message.cpp
-        ${CHIP_APP_BASE_DIR}/util/process-global-message.cpp
         ${CHIP_APP_BASE_DIR}/util/util.cpp
     )
 endfunction()

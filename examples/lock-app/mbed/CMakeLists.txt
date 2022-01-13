@@ -64,8 +64,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/util/ember-print.cpp
                ${CHIP_ROOT}/src/app/util/error-mapping.cpp
                ${CHIP_ROOT}/src/app/util/message.cpp
-               ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
-               ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
                ${CHIP_ROOT}/src/app/server/EchoHandler.cpp
                ${CHIP_ROOT}/src/app/server/Dnssd.cpp
