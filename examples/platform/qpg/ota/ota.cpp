@@ -52,7 +52,7 @@ void InitializeOTARequestor(void)
 {
     // Initialize and interconnect the Requestor and Image Processor objects
     SetRequestorInstance(&gRequestorCore);
-    
+
     gRequestorCore.Init(&Server::GetInstance(), &gRequestorUser, &gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
