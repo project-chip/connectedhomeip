@@ -503,8 +503,8 @@ Clusters._addUsedStructureNames = async function(clusterName, startType, allKnow
 }
 
 Clusters._computeUsedStructureNames = async function(structs) {
-  // FIXME: attributes by  cluster name only AFTER
-  // thigs are computed :(
+  // NOTE: this MUST be called only after attribute promise is resolved
+  // as iteration of `get*ByClusterName` needs that data.
   for (const cluster of this._clusters) {
     const attributes = await this.getAttributesByClusterName(cluster.name);
     for (const attribute of attributes) {
