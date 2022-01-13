@@ -93,7 +93,10 @@ volatile int apperror_cnt;
 
 // Header used for building the image GBL file
 #define APP_PROPERTIES_VERSION 1
-#define APP_PROPERTIES_ID { 0 }
+#define APP_PROPERTIES_ID                                                                                                          \
+    {                                                                                                                              \
+        0                                                                                                                          \
+    }
 
 __attribute__((used)) ApplicationProperties_t sl_app_properties = {
     /// @brief Magic value indicating that this is an ApplicationProperties_t

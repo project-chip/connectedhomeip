@@ -55,10 +55,10 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
-    static uint16_t        mWriteOffset; // End of last written block
-    static uint8_t         mSlotId;      // Bootloader storage slot
+    static uint16_t mWriteOffset; // End of last written block
+    static uint8_t mSlotId;       // Bootloader storage slot
     MutableByteSpan mBlock;
-    OTADownloader  *mDownloader;
+    OTADownloader * mDownloader;
 };
 
 } // namespace chip

@@ -16,15 +16,15 @@
  *    limitations under the License.
  */
 
-#include <app/clusters/ota-requestor/OTADownloader.h>
 #include "OTAImageProcessorImpl.h"
+#include <app/clusters/ota-requestor/OTADownloader.h>
 
 extern "C" {
 #include "platform/bootloader/api/btl_interface.h"
 }
 
 /// No error, operation OK
-#define SL_BOOTLOADER_OK                               0L
+#define SL_BOOTLOADER_OK 0L
 
 namespace chip {
 
@@ -60,17 +60,17 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
     // doesn't need to be offloaded to a different task. Revisit if necessary.
     err = bootloader_verifyImage(mSlotId, NULL);
     if (err != SL_BOOTLOADER_OK)
-        {
-            ChipLogError(SoftwareUpdate, "bootloader_verifyImage error %ld", err);
-            return CHIP_ERROR_INTERNAL;
-        }
+    {
+        ChipLogError(SoftwareUpdate, "bootloader_verifyImage error %ld", err);
+        return CHIP_ERROR_INTERNAL;
+    }
 
     err = bootloader_setImageToBootload(mSlotId);
     if (err != SL_BOOTLOADER_OK)
-        {
-            ChipLogError(SoftwareUpdate, "setImageToBootload error %ld", err);
-            return CHIP_ERROR_INTERNAL;
-        }
+    {
+        ChipLogError(SoftwareUpdate, "setImageToBootload error %ld", err);
+        return CHIP_ERROR_INTERNAL;
+    }
 
     // This reboots the device
     bootloader_rebootAndInstall();
@@ -110,7 +110,7 @@ CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 
 void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
 {
-    int32_t err = SL_BOOTLOADER_OK;
+    int32_t err           = SL_BOOTLOADER_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
 
     if (imageProcessor == nullptr)
@@ -125,7 +125,7 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     }
 
     bootloader_init();
-    mSlotId = 0; // Single slot until we support multiple images
+    mSlotId      = 0; // Single slot until we support multiple images
     mWriteOffset = 0;
 
     // Not calling bootloader_eraseStorageSlot(mSlotId) here because we erase during each write
@@ -160,7 +160,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
 
 void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 {
-    uint32_t err = SL_BOOTLOADER_OK;
+    uint32_t err          = SL_BOOTLOADER_OK;
     auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
     if (imageProcessor == nullptr)
     {
@@ -175,16 +175,16 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
     // TODO: Process block header if any
 
-    err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset,
-        reinterpret_cast<uint8_t *>(imageProcessor->mBlock.data()), imageProcessor->mBlock.size());
+    err = bootloader_eraseWriteStorage(mSlotId, mWriteOffset, reinterpret_cast<uint8_t *>(imageProcessor->mBlock.data()),
+                                       imageProcessor->mBlock.size());
 
     if (err)
-        {
-            ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage err %ld", err);
+    {
+        ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage err %ld", err);
 
-            imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
-            return;
-        }
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
+        return;
+    }
 
     mWriteOffset += imageProcessor->mBlock.size(); // Keep our own track of how far we've written
     imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
@@ -200,16 +200,16 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
     }
 
     // Allocate memory for block data if we don't have enough already
-    if(mBlock.size() < block.size())
-        {
-            ReleaseBlock();
+    if (mBlock.size() < block.size())
+    {
+        ReleaseBlock();
 
-            mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
-            if (mBlock.data() == nullptr)
-                {
-                    return CHIP_ERROR_NO_MEMORY;
-                }
+        mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
+        if (mBlock.data() == nullptr)
+        {
+            return CHIP_ERROR_NO_MEMORY;
         }
+    }
 
     // Store the actual block data
     CHIP_ERROR err = CopySpanToMutableSpan(block, mBlock);
