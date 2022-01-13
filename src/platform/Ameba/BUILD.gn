@@ -20,7 +20,6 @@ assert(chip_device_platform == "ameba")
 
 static_library("Ameba") {
   sources = [
-    "../FreeRTOS/SystemTimeSupport.cpp",
     "../SingletonConfigurationManager.cpp",
     "AmebaConfig.cpp",
     "AmebaConfig.h",
@@ -46,6 +45,7 @@ static_library("Ameba") {
     "ServiceProvisioning.h",
     "SoftwareUpdateManagerImpl.h",
     "SystemTimeSupport.cpp",
+    "SystemTimeSupport.h",
   ]
 
   deps = [ "${chip_root}/src/lib/dnssd:platform_header" ]
