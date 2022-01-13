@@ -151,13 +151,6 @@ void emberAfStackDown(void);
 void emberAfDecodeAndPrintCluster(chip::ClusterId cluster);
 void emberAfDecodeAndPrintClusterWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 
-bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           chip::Messaging::ExchangeContext * source, InterPanHeader * interPanHeader);
-
-bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, chip::Messaging::ExchangeContext * source,
-                                     InterPanHeader * interPanHeader, EmberAfClusterCommand * returnCmd);
-
 /**
  * Retrieves the difference between the two passed values.
  * This function assumes that the two values have the same endianness.
@@ -211,9 +204,6 @@ extern uint8_t emberAfIncomingZclSequenceNumber;
 void emberAfSetNoReplyForNextMessage(bool set);
 
 #define isThisDataTypeSentLittleEndianOTA(dataType) (!(emberAfIsThisDataTypeAStringType(dataType)))
-
-bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd);
-bool emAfProcessClusterSpecificCommand(EmberAfClusterCommand * cmd);
 
 extern uint8_t emberAfResponseType;
 

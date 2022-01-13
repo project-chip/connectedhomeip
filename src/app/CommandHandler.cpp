@@ -441,7 +441,17 @@ TLV::TLVWriter * CommandHandler::GetCommandDataIBTLVWriter()
 
 FabricIndex CommandHandler::GetAccessingFabricIndex() const
 {
-    return mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
+    FabricIndex fabric = kUndefinedFabricIndex;
+    if (mpExchangeCtx->GetSessionHandle()->IsGroupSession())
+    {
+        fabric = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetFabricIndex();
+    }
+    else
+    {
+        fabric = mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
+    }
+
+    return fabric;
 }
 
 CommandHandler * CommandHandler::Handle::Get()

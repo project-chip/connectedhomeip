@@ -540,12 +540,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return; // malformed packet
     }
 
-    Optional<SessionHandle> session = FindGroupSession(packetHeader.GetDestinationGroupId().Value());
-    if (!session.HasValue())
-    {
-        return;
-    }
-
     if (msg.IsNull())
     {
         ChipLogError(Inet, "Secure transport received Groupcast NULL packet, discarding");
@@ -603,7 +597,12 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
     if (mCB != nullptr)
     {
+        Optional<SessionHandle> session = CreateGroupSession(packetHeader.GetDestinationGroupId().Value());
+        VerifyOrReturn(session.HasValue(), ChipLogError(Inet, "Error when creating group session handle."));
+
         mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), peerAddress, isDuplicate, std::move(msg));
+
+        RemoveGroupSession(session.Value()->AsGroupSession());
     }
 }
 

@@ -371,13 +371,9 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            CHIPApplicationBasicClusterApplication * _Nonnull value;
-            value = [CHIPApplicationBasicClusterApplication new];
+            CHIPApplicationBasicClusterApplicationBasicApplication * _Nonnull value;
+            value = [CHIPApplicationBasicClusterApplicationBasicApplication new];
             value.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorId];
-            value.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorId];
-            value.applicationId = [[NSString alloc] initWithBytes:cppValue.applicationId.data()
-                                                           length:cppValue.applicationId.size()
-                                                         encoding:NSUTF8StringEncoding];
             value.applicationId = [[NSString alloc] initWithBytes:cppValue.applicationId.data()
                                                            length:cppValue.applicationId.size()
                                                          encoding:NSUTF8StringEncoding];

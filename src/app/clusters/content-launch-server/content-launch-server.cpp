@@ -177,12 +177,12 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     // auto searchIterator = commandData.search.begin();
     std::list<Parameter> parameterList;
 
-    app::CommandResponseHelper<Commands::LaunchResponse::Type> responser(commandObj, commandPath);
+    app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleLaunchContent(parameterList, autoplay, data, responser);
+        delegate->HandleLaunchContent(parameterList, autoplay, data, responder);
     }
 
 exit:
@@ -191,8 +191,8 @@ exit:
         ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchContentRequestCallback error: %s", err.AsString());
     }
 
-    // If isDelegateNull, no one will call responser, so IsResponsed will be false
-    if (!responser.IsResponsed())
+    // If isDelegateNull, no one will call responder, so HasSentResponse will be false
+    if (!responder.HasSentResponse())
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
@@ -213,12 +213,12 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     // auto brandingInformationIterator = commandData.brandingInformation.begin();
     std::list<BrandingInformation> brandingInformationList;
 
-    app::CommandResponseHelper<Commands::LaunchResponse::Type> responser(commandObj, commandPath);
+    app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
 
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList, responser);
+        delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList, responder);
     }
 
 exit:
@@ -227,8 +227,8 @@ exit:
         ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchURLCallback error: %s", err.AsString());
     }
 
-    // If isDelegateNull, no one will call responser, so IsResponsed will be false
-    if (!responser.IsResponsed())
+    // If isDelegateNull, no one will call responder, so HasSentResponse will be false
+    if (!responder.HasSentResponse())
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }

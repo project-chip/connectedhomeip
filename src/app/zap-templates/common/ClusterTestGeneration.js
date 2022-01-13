@@ -645,11 +645,6 @@ function isLiteralNull(value, options)
   return (value === null) || (value instanceof NullObject);
 }
 
-function expectedValueHasProp(value, name)
-{
-  return name in value;
-}
-
 function octetStringEscapedForCLiteral(value)
 {
   // Escape control characters, things outside the ASCII range, and single
@@ -693,6 +688,5 @@ exports.chip_tests_config_get_default_value = chip_tests_config_get_default_valu
 exports.chip_tests_config_get_type          = chip_tests_config_get_type;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
-exports.expectedValueHasProp                = expectedValueHasProp;
 exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;
 exports.if_include_struct_item_value        = if_include_struct_item_value;

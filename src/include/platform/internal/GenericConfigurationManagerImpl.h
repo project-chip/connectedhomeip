@@ -76,7 +76,7 @@ public:
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override;
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override;
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override;
-    CHIP_ERROR _IncrementLifetimeCounter();
+    CHIP_ERROR IncrementLifetimeCounter() override;
     CHIP_ERROR GetFailSafeArmed(bool & val) override;
     CHIP_ERROR SetFailSafeArmed(bool val) override;
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override;

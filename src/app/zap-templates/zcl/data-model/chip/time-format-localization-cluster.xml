@@ -38,9 +38,9 @@ limitations under the License.
   </enum>
   <cluster>
     <domain>General</domain>
-    <name>Localization Time Format</name>
+    <name>Time Format Localization</name>
     <code>0x002c</code>
-    <define>LOCALIZATION_TIME_FORMAT_CLUSTER</define>
+    <define>TIME_FORMAT_LOCALIZATION_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>Nodes should be expected to be deployed to any and all regions of the world. These global regions

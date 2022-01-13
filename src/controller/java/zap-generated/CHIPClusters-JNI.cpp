@@ -712,7 +712,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, hideAppRequest)
 
     chip::app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Type request;
 
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type();
+    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
@@ -763,7 +763,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type request;
 
     request.data        = chip::JniUtfString(env, static_cast<jstring>(data)).charSpan();
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type();
+    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
@@ -813,7 +813,7 @@ JNI_METHOD(void, ApplicationLauncherCluster, stopAppRequest)
 
     chip::app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Type request;
 
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type();
+    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
