@@ -400,10 +400,10 @@ EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, C
 {
     EmberAfAttributeMetadata * metadata = NULL;
     EmberAfAttributeSearchRecord record;
-    record.endpoint         = endpoint;
-    record.clusterId        = clusterId;
-    record.clusterMask      = mask;
-    record.attributeId      = attributeId;
+    record.endpoint    = endpoint;
+    record.clusterId   = clusterId;
+    record.clusterMask = mask;
+    record.attributeId = attributeId;
     emAfReadOrWriteAttribute(&record, &metadata,
                              NULL,   // buffer
                              0,      // buffer size
@@ -1269,10 +1269,10 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage)
                 if (!am->IsExternal())
                 {
                     EmberAfAttributeSearchRecord record;
-                    record.endpoint         = de->endpoint;
-                    record.clusterId        = cluster->clusterId;
-                    record.clusterMask      = (emberAfAttributeIsClient(am) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER);
-                    record.attributeId      = am->attributeId;
+                    record.endpoint    = de->endpoint;
+                    record.clusterId   = cluster->clusterId;
+                    record.clusterMask = (emberAfAttributeIsClient(am) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER);
+                    record.attributeId = am->attributeId;
 
                     if (ptr == nullptr)
                     {

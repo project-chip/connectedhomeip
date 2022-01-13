@@ -468,10 +468,10 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
 {
     EmberAfAttributeMetadata * metadata = NULL;
     EmberAfAttributeSearchRecord record;
-    record.endpoint         = endpoint;
-    record.clusterId        = cluster;
-    record.clusterMask      = mask;
-    record.attributeId      = attributeID;
+    record.endpoint    = endpoint;
+    record.clusterId   = cluster;
+    record.clusterMask = mask;
+    record.attributeId = attributeID;
     emAfReadOrWriteAttribute(&record, &metadata,
                              NULL,   // buffer
                              0,      // buffer size
@@ -614,11 +614,11 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     EmberAfAttributeMetadata * metadata = NULL;
     EmberAfAttributeSearchRecord record;
     EmberAfStatus status;
-    record.endpoint         = endpoint;
-    record.clusterId        = cluster;
-    record.clusterMask      = mask;
-    record.attributeId      = attributeID;
-    status                  = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
+    record.endpoint    = endpoint;
+    record.clusterId   = cluster;
+    record.clusterMask = mask;
+    record.attributeId = attributeID;
+    status             = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
                                       false); // write?
 
     if (status == EMBER_ZCL_STATUS_SUCCESS)
