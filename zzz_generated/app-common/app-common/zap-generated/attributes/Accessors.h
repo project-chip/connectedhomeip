@@ -1187,7 +1187,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Attributes
 } // namespace LocalizationConfiguration
 
-namespace LocalizationTimeFormat {
+namespace TimeFormatLocalization {
 namespace Attributes {
 
 namespace HourFormat {
@@ -1211,28 +1211,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ClusterRevision
 
 } // namespace Attributes
-} // namespace LocalizationTimeFormat
-
-namespace LocalizationUnit {
-namespace Attributes {
-
-namespace TemperatureUnit {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace TemperatureUnit
-
-namespace FeatureMap {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
-EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace LocalizationUnit
+} // namespace TimeFormatLocalization
 
 namespace PowerSourceConfiguration {
 namespace Attributes {
