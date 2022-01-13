@@ -25,16 +25,16 @@ server cluster AdministratorCommissioning = 60 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct OpenBasicCommissioningWindowRequest {
-    INT16U CommissioningTimeout;  
+    INT16U CommissioningTimeout;
   }
 
   request struct OpenCommissioningWindowRequest {
-    INT16U CommissioningTimeout;  
-    OCTET_STRING PAKEVerifier;  
-    INT16U Discriminator;  
-    INT32U Iterations;  
-    OCTET_STRING Salt;  
-    INT16U PasscodeID;  
+    INT16U CommissioningTimeout;
+    OCTET_STRING PAKEVerifier;
+    INT16U Discriminator;
+    INT32U Iterations;
+    OCTET_STRING Salt;
+    INT16U PasscodeID;
   }
 
   request struct RevokeCommissioningRequest {
@@ -153,151 +153,151 @@ server cluster ColorControl = 768 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ColorLoopSetRequest {
-    ColorLoopUpdateFlags updateFlags;  
-    ColorLoopAction action;  
-    ColorLoopDirection direction;  
-    INT16U time;  
-    INT16U startHue;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    ColorLoopUpdateFlags updateFlags;
+    ColorLoopAction action;
+    ColorLoopDirection direction;
+    INT16U time;
+    INT16U startHue;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct EnhancedMoveHueRequest {
-    HueMoveMode moveMode;  
-    INT16U rate;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    HueMoveMode moveMode;
+    INT16U rate;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct EnhancedMoveToHueRequest {
-    INT16U enhancedHue;  
-    HueDirection direction;  
-    INT16U transitionTime;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    INT16U enhancedHue;
+    HueDirection direction;
+    INT16U transitionTime;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct EnhancedMoveToHueAndSaturationRequest {
-    INT16U enhancedHue;  
-    INT8U saturation;  
-    INT16U transitionTime;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    INT16U enhancedHue;
+    INT8U saturation;
+    INT16U transitionTime;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct EnhancedStepHueRequest {
-    HueStepMode stepMode;  
-    INT16U stepSize;  
-    INT16U transitionTime;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    HueStepMode stepMode;
+    INT16U stepSize;
+    INT16U transitionTime;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct MoveColorRequest {
-    INT16S rateX;  
-    INT16S rateY;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    INT16S rateX;
+    INT16S rateY;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct MoveColorTemperatureRequest {
-    HueMoveMode moveMode;  
-    INT16U rate;  
-    INT16U colorTemperatureMinimum;  
-    INT16U colorTemperatureMaximum;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    HueMoveMode moveMode;
+    INT16U rate;
+    INT16U colorTemperatureMinimum;
+    INT16U colorTemperatureMaximum;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct MoveHueRequest {
-    HueMoveMode moveMode;  
-    INT8U rate;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    HueMoveMode moveMode;
+    INT8U rate;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct MoveSaturationRequest {
-    SaturationMoveMode moveMode;  
-    INT8U rate;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    SaturationMoveMode moveMode;
+    INT8U rate;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct MoveToColorRequest {
-    INT16U colorX;  
-    INT16U colorY;  
-    INT16U transitionTime;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    INT16U colorX;
+    INT16U colorY;
+    INT16U transitionTime;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct MoveToColorTemperatureRequest {
-    INT16U colorTemperature;  
-    INT16U transitionTime;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    INT16U colorTemperature;
+    INT16U transitionTime;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct MoveToHueRequest {
-    INT8U hue;  
-    HueDirection direction;  
-    INT16U transitionTime;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    INT8U hue;
+    HueDirection direction;
+    INT16U transitionTime;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct MoveToHueAndSaturationRequest {
-    INT8U hue;  
-    INT8U saturation;  
-    INT16U transitionTime;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    INT8U hue;
+    INT8U saturation;
+    INT16U transitionTime;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct MoveToSaturationRequest {
-    INT8U saturation;  
-    INT16U transitionTime;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    INT8U saturation;
+    INT16U transitionTime;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct StepColorRequest {
-    INT16S stepX;  
-    INT16S stepY;  
-    INT16U transitionTime;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    INT16S stepX;
+    INT16S stepY;
+    INT16U transitionTime;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct StepColorTemperatureRequest {
-    HueStepMode stepMode;  
-    INT16U stepSize;  
-    INT16U transitionTime;  
-    INT16U colorTemperatureMinimum;  
-    INT16U colorTemperatureMaximum;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    HueStepMode stepMode;
+    INT16U stepSize;
+    INT16U transitionTime;
+    INT16U colorTemperatureMinimum;
+    INT16U colorTemperatureMaximum;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct StepHueRequest {
-    HueStepMode stepMode;  
-    INT8U stepSize;  
-    INT8U transitionTime;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    HueStepMode stepMode;
+    INT8U stepSize;
+    INT8U transitionTime;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct StepSaturationRequest {
-    SaturationStepMode stepMode;  
-    INT8U stepSize;  
-    INT8U transitionTime;  
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    SaturationStepMode stepMode;
+    INT8U stepSize;
+    INT8U transitionTime;
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   request struct StopMoveStepRequest {
-    BITMAP8 optionsMask;  
-    BITMAP8 optionsOverride;  
+    BITMAP8 optionsMask;
+    BITMAP8 optionsOverride;
   }
 
   command ColorLoopSet(ColorLoopSetRequest): DefaultSuccess = 68;
@@ -356,9 +356,9 @@ server cluster DiagnosticLogs = 50 {
 
 
   request struct RetrieveLogsRequestRequest {
-    LogsIntent intent;  
-    LogsTransferProtocol requestedProtocol;  
-    OCTET_STRING transferFileDesignator;  
+    LogsIntent intent;
+    LogsTransferProtocol requestedProtocol;
+    OCTET_STRING transferFileDesignator;
   }
 
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
@@ -427,34 +427,34 @@ server cluster GeneralCommissioning = 48 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
-    INT16U expiryLengthSeconds;  
-    INT64U breadcrumb;  
-    INT32U timeoutMs;  
+    INT16U expiryLengthSeconds;
+    INT64U breadcrumb;
+    INT32U timeoutMs;
   }
 
   request struct CommissioningCompleteRequest {
   }
 
   request struct SetRegulatoryConfigRequest {
-    RegulatoryLocationType location;  
-    CHAR_STRING countryCode;  
-    INT64U breadcrumb;  
-    INT32U timeoutMs;  
+    RegulatoryLocationType location;
+    CHAR_STRING countryCode;
+    INT64U breadcrumb;
+    INT32U timeoutMs;
   }
 
   response struct ArmFailSafeResponse {
-    GeneralCommissioningError errorCode;  
-    CHAR_STRING debugText;  
+    GeneralCommissioningError errorCode;
+    CHAR_STRING debugText;
   }
 
   response struct CommissioningCompleteResponse {
-    GeneralCommissioningError errorCode;  
-    CHAR_STRING debugText;  
+    GeneralCommissioningError errorCode;
+    CHAR_STRING debugText;
   }
 
   response struct SetRegulatoryConfigResponse {
-    GeneralCommissioningError errorCode;  
-    CHAR_STRING debugText;  
+    GeneralCommissioningError errorCode;
+    CHAR_STRING debugText;
   }
 
   command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
@@ -579,19 +579,19 @@ server cluster Identify = 3 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
-    INT16U identifyTime;  
+    INT16U identifyTime;
   }
 
   request struct IdentifyQueryRequest {
   }
 
   request struct TriggerEffectRequest {
-    IdentifyEffectIdentifier effectIdentifier;  
-    IdentifyEffectVariant effectVariant;  
+    IdentifyEffectIdentifier effectIdentifier;
+    IdentifyEffectVariant effectVariant;
   }
 
   response struct IdentifyQueryResponse {
-    INT16U timeout;  
+    INT16U timeout;
   }
 
   command Identify(IdentifyRequest): DefaultSuccess = 0;
@@ -627,46 +627,46 @@ server cluster LevelControl = 8 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct MoveRequest {
-    MoveMode moveMode;  
-    INT8U rate;  
-    BITMAP8 optionMask;  
-    BITMAP8 optionOverride;  
+    MoveMode moveMode;
+    INT8U rate;
+    BITMAP8 optionMask;
+    BITMAP8 optionOverride;
   }
 
   request struct MoveToLevelRequest {
-    INT8U level;  
-    INT16U transitionTime;  
-    BITMAP8 optionMask;  
-    BITMAP8 optionOverride;  
+    INT8U level;
+    INT16U transitionTime;
+    BITMAP8 optionMask;
+    BITMAP8 optionOverride;
   }
 
   request struct MoveToLevelWithOnOffRequest {
-    INT8U level;  
-    INT16U transitionTime;  
+    INT8U level;
+    INT16U transitionTime;
   }
 
   request struct MoveWithOnOffRequest {
-    MoveMode moveMode;  
-    INT8U rate;  
+    MoveMode moveMode;
+    INT8U rate;
   }
 
   request struct StepRequest {
-    StepMode stepMode;  
-    INT8U stepSize;  
-    INT16U transitionTime;  
-    BITMAP8 optionMask;  
-    BITMAP8 optionOverride;  
+    StepMode stepMode;
+    INT8U stepSize;
+    INT16U transitionTime;
+    BITMAP8 optionMask;
+    BITMAP8 optionOverride;
   }
 
   request struct StepWithOnOffRequest {
-    StepMode stepMode;  
-    INT8U stepSize;  
-    INT16U transitionTime;  
+    StepMode stepMode;
+    INT8U stepSize;
+    INT16U transitionTime;
   }
 
   request struct StopRequest {
-    BITMAP8 optionMask;  
-    BITMAP8 optionOverride;  
+    BITMAP8 optionMask;
+    BITMAP8 optionOverride;
   }
 
   request struct StopWithOnOffRequest {
@@ -749,53 +749,53 @@ server cluster NetworkCommissioning = 49 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
-    OCTET_STRING OperationalDataset;  
-    INT64U Breadcrumb;  
+    OCTET_STRING OperationalDataset;
+    INT64U Breadcrumb;
   }
 
   request struct AddOrUpdateWiFiNetworkRequest {
-    OCTET_STRING SSID;  
-    OCTET_STRING Credentials;  
-    INT64U breadcrumb;  
+    OCTET_STRING SSID;
+    OCTET_STRING Credentials;
+    INT64U breadcrumb;
   }
 
   request struct ConnectNetworkRequest {
-    OCTET_STRING NetworkID;  
-    INT64U Breadcrumb;  
+    OCTET_STRING NetworkID;
+    INT64U Breadcrumb;
   }
 
   request struct RemoveNetworkRequest {
-    OCTET_STRING NetworkID;  
-    INT64U Breadcrumb;  
+    OCTET_STRING NetworkID;
+    INT64U Breadcrumb;
   }
 
   request struct ReorderNetworkRequest {
-    OCTET_STRING NetworkID;  
-    INT8U NetworkIndex;  
-    INT64U Breadcrumb;  
+    OCTET_STRING NetworkID;
+    INT8U NetworkIndex;
+    INT64U Breadcrumb;
   }
 
   request struct ScanNetworksRequest {
-    OCTET_STRING SSID;  
-    INT64U Breadcrumb;  
+    OCTET_STRING SSID;
+    INT64U Breadcrumb;
   }
 
   response struct ConnectNetworkResponse {
-    NetworkCommissioningStatus NetworkingStatus;  
-    CHAR_STRING DebugText;  
-    INT32S ErrorValue;  
+    NetworkCommissioningStatus NetworkingStatus;
+    CHAR_STRING DebugText;
+    INT32S ErrorValue;
   }
 
   response struct NetworkConfigResponse {
-    NetworkCommissioningStatus NetworkingStatus;  
-    CHAR_STRING DebugText;  
+    NetworkCommissioningStatus NetworkingStatus;
+    CHAR_STRING DebugText;
   }
 
   response struct ScanNetworksResponse {
-    NetworkCommissioningStatus NetworkingStatus;  
-    CHAR_STRING DebugText;  
-    WiFiInterfaceScanResult WiFiScanResults;  
-    ThreadInterfaceScanResult ThreadScanResults;  
+    NetworkCommissioningStatus NetworkingStatus;
+    CHAR_STRING DebugText;
+    optional WiFiInterfaceScanResult WiFiScanResults;
+    optional ThreadInterfaceScanResult ThreadScanResults;
   }
 
   command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
@@ -829,40 +829,40 @@ client cluster OtaSoftwareUpdateProvider = 41 {
 
 
   request struct ApplyUpdateRequestRequest {
-    OCTET_STRING updateToken;  
-    INT32U newVersion;  
+    OCTET_STRING updateToken;
+    INT32U newVersion;
   }
 
   request struct NotifyUpdateAppliedRequest {
-    OCTET_STRING updateToken;  
-    INT32U softwareVersion;  
+    OCTET_STRING updateToken;
+    INT32U softwareVersion;
   }
 
   request struct QueryImageRequest {
-    vendor_id vendorId;  
-    INT16U productId;  
-    INT32U softwareVersion;  
-    OTADownloadProtocol protocolsSupported;  
-    INT16U hardwareVersion;  
-    CHAR_STRING location;  
-    BOOLEAN requestorCanConsent;  
-    OCTET_STRING metadataForProvider;  
+    vendor_id vendorId;
+    INT16U productId;
+    INT32U softwareVersion;
+    OTADownloadProtocol protocolsSupported;
+    optional INT16U hardwareVersion;
+    optional CHAR_STRING location;
+    optional BOOLEAN requestorCanConsent;
+    optional OCTET_STRING metadataForProvider;
   }
 
   response struct ApplyUpdateResponse {
-    OTAApplyUpdateAction action;  
-    INT32U delayedActionTime;  
+    OTAApplyUpdateAction action;
+    INT32U delayedActionTime;
   }
 
   response struct QueryImageResponse {
-    OTAQueryStatus status;  
-    INT32U delayedActionTime;  
-    CHAR_STRING imageURI;  
-    INT32U softwareVersion;  
-    CHAR_STRING softwareVersionString;  
-    OCTET_STRING updateToken;  
-    BOOLEAN userConsentNeeded;  
-    OCTET_STRING metadataForRequestor;  
+    OTAQueryStatus status;
+    optional INT32U delayedActionTime;
+    optional CHAR_STRING imageURI;
+    optional INT32U softwareVersion;
+    optional CHAR_STRING softwareVersionString;
+    optional OCTET_STRING updateToken;
+    optional BOOLEAN userConsentNeeded;
+    optional OCTET_STRING metadataForRequestor;
   }
 
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
@@ -930,8 +930,8 @@ server cluster OnOff = 6 {
   }
 
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier EffectId;  
-    OnOffDelayedAllOffEffectVariant EffectVariant;  
+    OnOffEffectIdentifier EffectId;
+    OnOffDelayedAllOffEffectVariant EffectVariant;
   }
 
   request struct OnRequest {
@@ -941,9 +941,9 @@ server cluster OnOff = 6 {
   }
 
   request struct OnWithTimedOffRequest {
-    OnOffControl OnOffControl;  
-    int16u OnTime;  
-    int16u OffWaitTime;  
+    OnOffControl OnOffControl;
+    int16u OnTime;
+    int16u OffWaitTime;
   }
 
   request struct ToggleRequest {
@@ -994,64 +994,64 @@ server cluster OperationalCredentials = 62 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
-    OCTET_STRING NOCValue;  
-    OCTET_STRING ICACValue;  
-    OCTET_STRING IPKValue;  
-    NODE_ID CaseAdminNode;  
-    INT16U AdminVendorId;  
+    OCTET_STRING NOCValue;
+    optional OCTET_STRING ICACValue;
+    OCTET_STRING IPKValue;
+    NODE_ID CaseAdminNode;
+    INT16U AdminVendorId;
   }
 
   request struct AddTrustedRootCertificateRequest {
-    OCTET_STRING RootCertificate;  
+    OCTET_STRING RootCertificate;
   }
 
   request struct AttestationRequestRequest {
-    OCTET_STRING AttestationNonce;  
+    OCTET_STRING AttestationNonce;
   }
 
   request struct CertificateChainRequestRequest {
-    INT8U CertificateType;  
+    INT8U CertificateType;
   }
 
   request struct OpCSRRequestRequest {
-    OCTET_STRING CSRNonce;  
+    OCTET_STRING CSRNonce;
   }
 
   request struct RemoveFabricRequest {
-    INT8U FabricIndex;  
+    INT8U FabricIndex;
   }
 
   request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING TrustedRootIdentifier;  
+    OCTET_STRING TrustedRootIdentifier;
   }
 
   request struct UpdateFabricLabelRequest {
-    CHAR_STRING Label;  
+    CHAR_STRING Label;
   }
 
   request struct UpdateNOCRequest {
-    OCTET_STRING NOCValue;  
-    OCTET_STRING ICACValue;  
+    OCTET_STRING NOCValue;
+    optional OCTET_STRING ICACValue;
   }
 
   response struct AttestationResponse {
-    OCTET_STRING AttestationElements;  
-    OCTET_STRING Signature;  
+    OCTET_STRING AttestationElements;
+    OCTET_STRING Signature;
   }
 
   response struct CertificateChainResponse {
-    OCTET_STRING Certificate;  
+    OCTET_STRING Certificate;
   }
 
   response struct NOCResponse {
-    INT8U StatusCode;  
-    INT8U FabricIndex;  
-    CHAR_STRING DebugText;  
+    INT8U StatusCode;
+    INT8U FabricIndex;
+    CHAR_STRING DebugText;
   }
 
   response struct OpCSRResponse {
-    OCTET_STRING NOCSRElements;  
-    OCTET_STRING AttestationSignature;  
+    OCTET_STRING NOCSRElements;
+    OCTET_STRING AttestationSignature;
   }
 
   command AddNOC(AddNOCRequest): NOCResponse = 6;

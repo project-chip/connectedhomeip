@@ -25,16 +25,16 @@ server cluster AdministratorCommissioning = 60 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct OpenBasicCommissioningWindowRequest {
-    INT16U CommissioningTimeout;  
+    INT16U CommissioningTimeout;
   }
 
   request struct OpenCommissioningWindowRequest {
-    INT16U CommissioningTimeout;  
-    OCTET_STRING PAKEVerifier;  
-    INT16U Discriminator;  
-    INT32U Iterations;  
-    OCTET_STRING Salt;  
-    INT16U PasscodeID;  
+    INT16U CommissioningTimeout;
+    OCTET_STRING PAKEVerifier;
+    INT16U Discriminator;
+    INT32U Iterations;
+    OCTET_STRING Salt;
+    INT16U PasscodeID;
   }
 
   request struct RevokeCommissioningRequest {
@@ -91,17 +91,17 @@ server cluster Binding = 30 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct BindRequest {
-    NODE_ID nodeId;  
-    GROUP_ID groupId;  
-    ENDPOINT_NO endpointId;  
-    CLUSTER_ID clusterId;  
+    NODE_ID nodeId;
+    GROUP_ID groupId;
+    ENDPOINT_NO endpointId;
+    CLUSTER_ID clusterId;
   }
 
   request struct UnbindRequest {
-    NODE_ID nodeId;  
-    GROUP_ID groupId;  
-    ENDPOINT_NO endpointId;  
-    CLUSTER_ID clusterId;  
+    NODE_ID nodeId;
+    GROUP_ID groupId;
+    ENDPOINT_NO endpointId;
+    CLUSTER_ID clusterId;
   }
 
   command Bind(BindRequest): DefaultSuccess = 0;
@@ -143,9 +143,9 @@ server cluster DiagnosticLogs = 50 {
 
 
   request struct RetrieveLogsRequestRequest {
-    LogsIntent intent;  
-    LogsTransferProtocol requestedProtocol;  
-    OCTET_STRING transferFileDesignator;  
+    LogsIntent intent;
+    LogsTransferProtocol requestedProtocol;
+    OCTET_STRING transferFileDesignator;
   }
 
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
@@ -209,34 +209,34 @@ server cluster GeneralCommissioning = 48 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
-    INT16U expiryLengthSeconds;  
-    INT64U breadcrumb;  
-    INT32U timeoutMs;  
+    INT16U expiryLengthSeconds;
+    INT64U breadcrumb;
+    INT32U timeoutMs;
   }
 
   request struct CommissioningCompleteRequest {
   }
 
   request struct SetRegulatoryConfigRequest {
-    RegulatoryLocationType location;  
-    CHAR_STRING countryCode;  
-    INT64U breadcrumb;  
-    INT32U timeoutMs;  
+    RegulatoryLocationType location;
+    CHAR_STRING countryCode;
+    INT64U breadcrumb;
+    INT32U timeoutMs;
   }
 
   response struct ArmFailSafeResponse {
-    GeneralCommissioningError errorCode;  
-    CHAR_STRING debugText;  
+    GeneralCommissioningError errorCode;
+    CHAR_STRING debugText;
   }
 
   response struct CommissioningCompleteResponse {
-    GeneralCommissioningError errorCode;  
-    CHAR_STRING debugText;  
+    GeneralCommissioningError errorCode;
+    CHAR_STRING debugText;
   }
 
   response struct SetRegulatoryConfigResponse {
-    GeneralCommissioningError errorCode;  
-    CHAR_STRING debugText;  
+    GeneralCommissioningError errorCode;
+    CHAR_STRING debugText;
   }
 
   command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
@@ -362,49 +362,49 @@ server cluster Groups = 4 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
-    INT16U groupId;  
-    CHAR_STRING groupName;  
+    INT16U groupId;
+    CHAR_STRING groupName;
   }
 
   request struct AddGroupIfIdentifyingRequest {
-    INT16U groupId;  
-    CHAR_STRING groupName;  
+    INT16U groupId;
+    CHAR_STRING groupName;
   }
 
   request struct GetGroupMembershipRequest {
-    INT16U groupList;  
+    INT16U groupList;
   }
 
   request struct RemoveAllGroupsRequest {
   }
 
   request struct RemoveGroupRequest {
-    INT16U groupId;  
+    INT16U groupId;
   }
 
   request struct ViewGroupRequest {
-    INT16U groupId;  
+    INT16U groupId;
   }
 
   response struct AddGroupResponse {
-    ENUM8 status;  
-    INT16U groupId;  
+    ENUM8 status;
+    INT16U groupId;
   }
 
   response struct GetGroupMembershipResponse {
-    INT8U capacity;  
-    INT16U groupList;  
+    INT8U capacity;
+    INT16U groupList;
   }
 
   response struct RemoveGroupResponse {
-    ENUM8 status;  
-    INT16U groupId;  
+    ENUM8 status;
+    INT16U groupId;
   }
 
   response struct ViewGroupResponse {
-    ENUM8 status;  
-    INT16U groupId;  
-    CHAR_STRING groupName;  
+    ENUM8 status;
+    INT16U groupId;
+    CHAR_STRING groupName;
   }
 
   command AddGroup(AddGroupRequest): AddGroupResponse = 0;
@@ -443,14 +443,14 @@ client cluster Identify = 3 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
-    INT16U identifyTime;  
+    INT16U identifyTime;
   }
 
   request struct IdentifyQueryRequest {
   }
 
   response struct IdentifyQueryResponse {
-    INT16U timeout;  
+    INT16U timeout;
   }
 
   command Identify(IdentifyRequest): DefaultSuccess = 0;
@@ -485,14 +485,14 @@ server cluster Identify = 3 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
-    INT16U identifyTime;  
+    INT16U identifyTime;
   }
 
   request struct IdentifyQueryRequest {
   }
 
   response struct IdentifyQueryResponse {
-    INT16U timeout;  
+    INT16U timeout;
   }
 
   command Identify(IdentifyRequest): DefaultSuccess = 0;
@@ -566,53 +566,53 @@ server cluster NetworkCommissioning = 49 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
-    OCTET_STRING OperationalDataset;  
-    INT64U Breadcrumb;  
+    OCTET_STRING OperationalDataset;
+    INT64U Breadcrumb;
   }
 
   request struct AddOrUpdateWiFiNetworkRequest {
-    OCTET_STRING SSID;  
-    OCTET_STRING Credentials;  
-    INT64U breadcrumb;  
+    OCTET_STRING SSID;
+    OCTET_STRING Credentials;
+    INT64U breadcrumb;
   }
 
   request struct ConnectNetworkRequest {
-    OCTET_STRING NetworkID;  
-    INT64U Breadcrumb;  
+    OCTET_STRING NetworkID;
+    INT64U Breadcrumb;
   }
 
   request struct RemoveNetworkRequest {
-    OCTET_STRING NetworkID;  
-    INT64U Breadcrumb;  
+    OCTET_STRING NetworkID;
+    INT64U Breadcrumb;
   }
 
   request struct ReorderNetworkRequest {
-    OCTET_STRING NetworkID;  
-    INT8U NetworkIndex;  
-    INT64U Breadcrumb;  
+    OCTET_STRING NetworkID;
+    INT8U NetworkIndex;
+    INT64U Breadcrumb;
   }
 
   request struct ScanNetworksRequest {
-    OCTET_STRING SSID;  
-    INT64U Breadcrumb;  
+    OCTET_STRING SSID;
+    INT64U Breadcrumb;
   }
 
   response struct ConnectNetworkResponse {
-    NetworkCommissioningStatus NetworkingStatus;  
-    CHAR_STRING DebugText;  
-    INT32S ErrorValue;  
+    NetworkCommissioningStatus NetworkingStatus;
+    CHAR_STRING DebugText;
+    INT32S ErrorValue;
   }
 
   response struct NetworkConfigResponse {
-    NetworkCommissioningStatus NetworkingStatus;  
-    CHAR_STRING DebugText;  
+    NetworkCommissioningStatus NetworkingStatus;
+    CHAR_STRING DebugText;
   }
 
   response struct ScanNetworksResponse {
-    NetworkCommissioningStatus NetworkingStatus;  
-    CHAR_STRING DebugText;  
-    WiFiInterfaceScanResult WiFiScanResults;  
-    ThreadInterfaceScanResult ThreadScanResults;  
+    NetworkCommissioningStatus NetworkingStatus;
+    CHAR_STRING DebugText;
+    optional WiFiInterfaceScanResult WiFiScanResults;
+    optional ThreadInterfaceScanResult ThreadScanResults;
   }
 
   command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
@@ -647,40 +647,40 @@ server cluster OtaSoftwareUpdateProvider = 41 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ApplyUpdateRequestRequest {
-    OCTET_STRING updateToken;  
-    INT32U newVersion;  
+    OCTET_STRING updateToken;
+    INT32U newVersion;
   }
 
   request struct NotifyUpdateAppliedRequest {
-    OCTET_STRING updateToken;  
-    INT32U softwareVersion;  
+    OCTET_STRING updateToken;
+    INT32U softwareVersion;
   }
 
   request struct QueryImageRequest {
-    vendor_id vendorId;  
-    INT16U productId;  
-    INT32U softwareVersion;  
-    OTADownloadProtocol protocolsSupported;  
-    INT16U hardwareVersion;  
-    CHAR_STRING location;  
-    BOOLEAN requestorCanConsent;  
-    OCTET_STRING metadataForProvider;  
+    vendor_id vendorId;
+    INT16U productId;
+    INT32U softwareVersion;
+    OTADownloadProtocol protocolsSupported;
+    optional INT16U hardwareVersion;
+    optional CHAR_STRING location;
+    optional BOOLEAN requestorCanConsent;
+    optional OCTET_STRING metadataForProvider;
   }
 
   response struct ApplyUpdateResponse {
-    OTAApplyUpdateAction action;  
-    INT32U delayedActionTime;  
+    OTAApplyUpdateAction action;
+    INT32U delayedActionTime;
   }
 
   response struct QueryImageResponse {
-    OTAQueryStatus status;  
-    INT32U delayedActionTime;  
-    CHAR_STRING imageURI;  
-    INT32U softwareVersion;  
-    CHAR_STRING softwareVersionString;  
-    OCTET_STRING updateToken;  
-    BOOLEAN userConsentNeeded;  
-    OCTET_STRING metadataForRequestor;  
+    OTAQueryStatus status;
+    optional INT32U delayedActionTime;
+    optional CHAR_STRING imageURI;
+    optional INT32U softwareVersion;
+    optional CHAR_STRING softwareVersionString;
+    optional OCTET_STRING updateToken;
+    optional BOOLEAN userConsentNeeded;
+    optional OCTET_STRING metadataForRequestor;
   }
 
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
@@ -719,64 +719,64 @@ server cluster OperationalCredentials = 62 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
-    OCTET_STRING NOCValue;  
-    OCTET_STRING ICACValue;  
-    OCTET_STRING IPKValue;  
-    NODE_ID CaseAdminNode;  
-    INT16U AdminVendorId;  
+    OCTET_STRING NOCValue;
+    optional OCTET_STRING ICACValue;
+    OCTET_STRING IPKValue;
+    NODE_ID CaseAdminNode;
+    INT16U AdminVendorId;
   }
 
   request struct AddTrustedRootCertificateRequest {
-    OCTET_STRING RootCertificate;  
+    OCTET_STRING RootCertificate;
   }
 
   request struct AttestationRequestRequest {
-    OCTET_STRING AttestationNonce;  
+    OCTET_STRING AttestationNonce;
   }
 
   request struct CertificateChainRequestRequest {
-    INT8U CertificateType;  
+    INT8U CertificateType;
   }
 
   request struct OpCSRRequestRequest {
-    OCTET_STRING CSRNonce;  
+    OCTET_STRING CSRNonce;
   }
 
   request struct RemoveFabricRequest {
-    INT8U FabricIndex;  
+    INT8U FabricIndex;
   }
 
   request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING TrustedRootIdentifier;  
+    OCTET_STRING TrustedRootIdentifier;
   }
 
   request struct UpdateFabricLabelRequest {
-    CHAR_STRING Label;  
+    CHAR_STRING Label;
   }
 
   request struct UpdateNOCRequest {
-    OCTET_STRING NOCValue;  
-    OCTET_STRING ICACValue;  
+    OCTET_STRING NOCValue;
+    optional OCTET_STRING ICACValue;
   }
 
   response struct AttestationResponse {
-    OCTET_STRING AttestationElements;  
-    OCTET_STRING Signature;  
+    OCTET_STRING AttestationElements;
+    OCTET_STRING Signature;
   }
 
   response struct CertificateChainResponse {
-    OCTET_STRING Certificate;  
+    OCTET_STRING Certificate;
   }
 
   response struct NOCResponse {
-    INT8U StatusCode;  
-    INT8U FabricIndex;  
-    CHAR_STRING DebugText;  
+    INT8U StatusCode;
+    INT8U FabricIndex;
+    CHAR_STRING DebugText;
   }
 
   response struct OpCSRResponse {
-    OCTET_STRING NOCSRElements;  
-    OCTET_STRING AttestationSignature;  
+    OCTET_STRING NOCSRElements;
+    OCTET_STRING AttestationSignature;
   }
 
   command AddNOC(AddNOCRequest): NOCResponse = 6;
@@ -805,80 +805,80 @@ server cluster Scenes = 5 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
-    INT16U groupId;  
-    INT8U sceneId;  
-    INT16U transitionTime;  
-    CHAR_STRING sceneName;  
-    SceneExtensionFieldSet extensionFieldSets;  
+    INT16U groupId;
+    INT8U sceneId;
+    INT16U transitionTime;
+    CHAR_STRING sceneName;
+    SceneExtensionFieldSet extensionFieldSets;
   }
 
   request struct GetSceneMembershipRequest {
-    INT16U groupId;  
+    INT16U groupId;
   }
 
   request struct RecallSceneRequest {
-    INT16U groupId;  
-    INT8U sceneId;  
-    INT16U transitionTime;  
+    INT16U groupId;
+    INT8U sceneId;
+    INT16U transitionTime;
   }
 
   request struct RemoveAllScenesRequest {
-    INT16U groupId;  
+    INT16U groupId;
   }
 
   request struct RemoveSceneRequest {
-    INT16U groupId;  
-    INT8U sceneId;  
+    INT16U groupId;
+    INT8U sceneId;
   }
 
   request struct StoreSceneRequest {
-    INT16U groupId;  
-    INT8U sceneId;  
+    INT16U groupId;
+    INT8U sceneId;
   }
 
   request struct ViewSceneRequest {
-    INT16U groupId;  
-    INT8U sceneId;  
+    INT16U groupId;
+    INT8U sceneId;
   }
 
   response struct AddSceneResponse {
-    ENUM8 status;  
-    INT16U groupId;  
-    INT8U sceneId;  
+    ENUM8 status;
+    INT16U groupId;
+    INT8U sceneId;
   }
 
   response struct GetSceneMembershipResponse {
-    ENUM8 status;  
-    INT8U capacity;  
-    INT16U groupId;  
-    INT8U sceneCount;  
-    INT8U sceneList;  
+    ENUM8 status;
+    INT8U capacity;
+    INT16U groupId;
+    INT8U sceneCount;
+    INT8U sceneList;
   }
 
   response struct RemoveAllScenesResponse {
-    ENUM8 status;  
-    INT16U groupId;  
+    ENUM8 status;
+    INT16U groupId;
   }
 
   response struct RemoveSceneResponse {
-    ENUM8 status;  
-    INT16U groupId;  
-    INT8U sceneId;  
+    ENUM8 status;
+    INT16U groupId;
+    INT8U sceneId;
   }
 
   response struct StoreSceneResponse {
-    ENUM8 status;  
-    INT16U groupId;  
-    INT8U sceneId;  
+    ENUM8 status;
+    INT16U groupId;
+    INT8U sceneId;
   }
 
   response struct ViewSceneResponse {
-    ENUM8 status;  
-    INT16U groupId;  
-    INT8U sceneId;  
-    INT16U transitionTime;  
-    CHAR_STRING sceneName;  
-    SceneExtensionFieldSet extensionFieldSets;  
+    ENUM8 status;
+    INT16U groupId;
+    INT8U sceneId;
+    INT16U transitionTime;
+    CHAR_STRING sceneName;
+    SceneExtensionFieldSet extensionFieldSets;
   }
 
   command AddScene(AddSceneRequest): AddSceneResponse = 0;
@@ -945,36 +945,36 @@ server cluster Thermostat = 513 {
   }
 
   request struct GetWeeklyScheduleRequest {
-    DayOfWeek daysToReturn;  
-    ModeForSequence modeToReturn;  
+    DayOfWeek daysToReturn;
+    ModeForSequence modeToReturn;
   }
 
   request struct SetWeeklyScheduleRequest {
-    ENUM8 numberOfTransitionsForSequence;  
-    DayOfWeek dayOfWeekForSequence;  
-    ModeForSequence modeForSequence;  
-    INT8U payload;  
+    ENUM8 numberOfTransitionsForSequence;
+    DayOfWeek dayOfWeekForSequence;
+    ModeForSequence modeForSequence;
+    INT8U payload;
   }
 
   request struct SetpointRaiseLowerRequest {
-    SetpointAdjustMode mode;  
-    INT8S amount;  
+    SetpointAdjustMode mode;
+    INT8S amount;
   }
 
   response struct GetRelayStatusLogResponse {
-    INT16U timeOfDay;  
-    BITMAP16 relayStatus;  
-    INT16S localTemperature;  
-    INT8U humidityInPercentage;  
-    INT16S setpoint;  
-    INT16U unreadEntries;  
+    INT16U timeOfDay;
+    BITMAP16 relayStatus;
+    INT16S localTemperature;
+    INT8U humidityInPercentage;
+    INT16S setpoint;
+    INT16U unreadEntries;
   }
 
   response struct GetWeeklyScheduleResponse {
-    ENUM8 numberOfTransitionsForSequence;  
-    DayOfWeek dayOfWeekForSequence;  
-    ModeForSequence modeForSequence;  
-    INT8U payload;  
+    ENUM8 numberOfTransitionsForSequence;
+    DayOfWeek dayOfWeekForSequence;
+    ModeForSequence modeForSequence;
+    INT8U payload;
   }
 
   command ClearWeeklySchedule(ClearWeeklyScheduleRequest): DefaultSuccess = 3;

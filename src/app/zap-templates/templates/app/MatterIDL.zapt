@@ -70,7 +70,11 @@ struct {{name}} {
 
   request struct {{asUpperCamelCase name}}Request {
     {{#chip_cluster_command_arguments}}
-    {{type}} {{label}};  {{!TODO: these should have an index here}}
+    {{#if isOptional~}} optional {{/if~}}
+    {{~#if isNullable~}} nullable {{/if~}} {{type}} {{label}}
+    {{~#if isList~}}
+      []
+    {{~/if}}; {{~!TODO: a code may be useful here}}
     {{/chip_cluster_command_arguments}}
   }
   {{/chip_cluster_commands}}
@@ -78,7 +82,11 @@ struct {{name}} {
 
   response struct {{asUpperCamelCase name}} {
     {{#chip_cluster_response_arguments}}
-    {{type}} {{label}};  {{!TODO: these should have an index here}}
+    {{#if isOptional~}} optional {{/if~}}
+    {{~#if isNullable~}} nullable {{/if~}} {{type}} {{label}}
+    {{~#if isList~}}
+      []
+    {{~/if}}; {{~!TODO: a code may be useful here}}
     {{/chip_cluster_response_arguments}}
   }
   {{/chip_cluster_responses}}
