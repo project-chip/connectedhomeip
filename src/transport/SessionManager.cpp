@@ -309,8 +309,8 @@ CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optio
         mSecureSessions.ReleaseSession(session.Value()->AsSecureSession());
     }
 
-    ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", LS:%d PS:%d!",
-                  ChipLogValueX64(peerNodeId), localSessionId, peerSessionId);
+    ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", LS:%d PS:%d!", ChipLogValueX64(peerNodeId),
+                  localSessionId, peerSessionId);
     session = mSecureSessions.CreateNewSecureSession(pairing->GetSecureSessionType(), localSessionId, peerNodeId,
                                                      pairing->GetPeerCATs(), peerSessionId, fabric, pairing->GetMRPConfig());
     ReturnErrorCodeIf(!session.HasValue(), CHIP_ERROR_NO_MEMORY);
