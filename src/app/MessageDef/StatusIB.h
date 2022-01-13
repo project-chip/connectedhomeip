@@ -95,6 +95,21 @@ struct StatusIB
         StatusIB::Builder & EncodeStatusIB(const StatusIB & aStatusIB);
     };
 
+    /**
+     * Encapsulate a StatusIB in a CHIP_ERROR.  This can be done for any
+     * StatusIB, but will treat all success codes (including cluster-specific
+     * ones) as CHIP_NO_ERROR.  The resulting CHIP_ERROR will either be
+     * CHIP_NO_ERROR or test true for IsIMStatus().
+     */
+    CHIP_ERROR ToChipError() const;
+
+    /**
+     * Extract a CHIP_ERROR into this StatusIB.  If IsIMStatus is false for the
+     * error, this might do a best-effort attempt to come up with a
+     * corresponding StatusIB, defaulting to a generic Status::Failure.
+     */
+    void InitFromChipError(CHIP_ERROR aError);
+
     Protocols::InteractionModel::Status mStatus = Protocols::InteractionModel::Status::Success;
     Optional<ClusterStatus> mClusterStatus      = Optional<ClusterStatus>::Missing();
 
