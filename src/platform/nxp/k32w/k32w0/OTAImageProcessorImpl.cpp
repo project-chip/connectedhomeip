@@ -158,7 +158,7 @@ CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
         {
             return CHIP_ERROR_NO_MEMORY;
         }
-            mBlock = MutableByteSpan(mBlock_ptr, block.size());
+        mBlock = MutableByteSpan(mBlock_ptr, block.size());
     }
     CHIP_ERROR err = CopySpanToMutableSpan(block, mBlock);
     if (err != CHIP_NO_ERROR)
