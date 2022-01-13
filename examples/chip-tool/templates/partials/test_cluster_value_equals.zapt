@@ -17,6 +17,12 @@
       {{/each}}
       VerifyOrReturn(CheckNoMoreListItems<decltype({{actual}})>("{{label}}", iter_{{depth}}, {{expected.length}}));
     }
+{{else if isEvent}}
+    {{#zcl_events_fields_by_event_name type}}
+      {{#if (hasProperty ../expected label)}}
+        {{>valueEquals label=(concat ../label "." (asLowerCamelCase label)) actual=(concat ../actual "." (asLowerCamelCase label)) expected=(lookup ../expected label) depth=(incrementDepth depth)}}
+      {{/if}}
+    {{/zcl_events_fields_by_event_name}}
 {{else}}
   {{#if_is_struct type}}
     {{! Iterate over the actual types in the struct, so we pick up the right
