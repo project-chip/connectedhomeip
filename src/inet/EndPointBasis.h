@@ -19,77 +19,61 @@
 /**
  *    @file
  *      This file contains the basis class for all the various transport
- *      endpoint classes in the Inet layer, i.e. TCP, UDP, Raw and Tun.
+ *      endpoint classes in the Inet layer, i.e. TCP and UDP.
  */
 
 #pragma once
 
 #include <inet/InetConfig.h>
-
-#include <inet/IPAddress.h>
-#include <inet/InetLayerBasis.h>
-
+#include <lib/core/ReferenceCounted.h>
 #include <lib/support/DLLUtil.h>
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <system/SocketEvents.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-#include <Network/Network.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-struct udp_pcb;
-struct tcp_pcb;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
 namespace chip {
+
+namespace System {
+class Layer;
+} // namespace System
+
 namespace Inet {
+
+template <typename EndPointType>
+class EndPointManager;
+
+template <typename EndPointType>
+class EndPointDeletor;
 
 /**
  * Basis of internet transport endpoint classes.
  */
-class DLL_EXPORT EndPointBasis : public InetLayerBasis
+template <typename EndPointType>
+class DLL_EXPORT EndPointBasis : public ReferenceCounted<EndPointType, EndPointDeletor<EndPointType>>
 {
-protected:
-    void InitEndPointBasis(InetLayer & aInetLayer, void * aAppState = nullptr);
-    void DeferredFree(System::Object::ReleaseDeferralErrorTactic aTactic);
+public:
+    using EndPoint = EndPointType;
 
-#if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    nw_parameters_t mParameters;
-    IPAddressType mAddrType; /**< Protocol family, i.e. IPv4 or IPv6. */
-#endif
+    EndPointBasis(EndPointManager<EndPoint> & endPointManager) : mAppState(nullptr), mEndPointManager(endPointManager) {}
 
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-    static constexpr int kInvalidSocketFd = -1;
-    int mSocket;                     /**< Encapsulated socket descriptor. */
-    IPAddressType mAddrType;         /**< Protocol family, i.e. IPv4 or IPv6. */
-    System::SocketWatchToken mWatch; /**< Socket event watcher */
-#endif                               // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+    /**
+     *  Returns a reference to the endpoint fatory that owns this basis object.
+     */
+    EndPointManager<EndPoint> & GetEndPointManager() const { return mEndPointManager; }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    /** Encapsulated LwIP protocol control block */
-    union
-    {
-        const void * mVoid; /**< An untyped protocol control buffer reference */
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-        udp_pcb * mUDP; /**< User datagram protocol (UDP) control */
-#endif                  // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-        tcp_pcb * mTCP; /**< Transmission control protocol (TCP) control */
-#endif                  // INET_CONFIG_ENABLE_TCP_ENDPOINT
-    };
+    /**
+     *  Returns a reference to the System::Layer associated with this object.
+     */
+    chip::System::Layer & GetSystemLayer() const { return mEndPointManager.SystemLayer(); }
 
-    enum class LwIPEndPointType : uint8_t
-    {
-        Unknown = 0,
-        Raw     = 1,
-        UDP     = 2,
-        UCP     = 3,
-        TCP     = 4
-    } mLwIPEndPointType;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+    void * mAppState;
+
+private:
+    EndPointManager<EndPoint> & mEndPointManager; /**< Factory that owns this object. */
+};
+
+template <typename EndPointType>
+class EndPointDeletor
+{
+public:
+    static void Release(EndPointType * obj) { obj->GetEndPointManager().DeleteEndPoint(obj); }
 };
 
 } // namespace Inet

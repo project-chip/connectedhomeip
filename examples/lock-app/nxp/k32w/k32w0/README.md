@@ -32,9 +32,9 @@ network.
 
 ## Introduction
 
-![K32W061 DK6](../../platform/nxp/k32w/k32w0/doc/images/k32w-dk6.jpg)
+![K32W061 DK6](../../../../platform/nxp/k32w/k32w0/doc/images/k32w-dk6.jpg)
 
-The K32W0 lock example application provides a working demonstration of a
+The K32W061 lock example application provides a working demonstration of a
 connected door lock device, built using the Project CHIP codebase and the NXP
 K32W061 SDK. The example supports remote access (e.g.: using CHIP Tool from a
 mobile phone) and control of a simulated door lock over a low-power, 802.15.4
@@ -59,10 +59,10 @@ devices.
 ### SE051H Secure Element
 
 Deployment of this firmware configuration requires the K32W061 board setups
-using the K32W0/JN5189 module board, SE051 Expansion board and Generic Expansion
+using the K32W061 module board, SE051 Expansion board and Generic Expansion
 board as shown below:
 
-![SE051H  + K32W061 DK6](../../platform/nxp/k32w/k32w0/doc/images/k32w-se.jpg)
+![SE051H  + K32W061 DK6](../../../../platform/nxp/k32w/k32w0/doc/images/k32w-se.jpg)
 
 The SE051H Secure Element extension may be used for best in class security and
 offloading some of the Project CHIP cryptographic operations. Depending on your
@@ -170,20 +170,20 @@ distribution (the demo-application was compiled on Ubuntu 20.04).
     SDK. Once the account is created, login and follow the steps for downloading
     SDK_2_6_4_K32W061DK6. The SDK Builder UI selection should be similar with
     the one from the image below.
-    ![MCUXpresso SDK Download](../../platform/nxp/k32w/k32w0/doc/images/mcux-sdk-download.JPG)
+    ![MCUXpresso SDK Download](../../../../platform/nxp/k32w/k32w0/doc/images/mcux-sdk-download.JPG)
 
 -   Start building the application either with Secure Element or without
 
     -   with Secure Element
 
 ```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/SDK_2_6_4_K32W061DK6/
-user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/k32w_sdk/sdk_fixes/patch_k32w_sdk.sh
+user@ubuntu:~/Desktop/git/connectedhomeip$ export NXP_K32W061_SDK_ROOT=/home/user/Desktop/SDK_2_6_4_K32W061DK6/
+user@ubuntu:~/Desktop/git/connectedhomeip$ ./third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ source ./scripts/activate.sh
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/nxp/k32w/k32w0/
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${K32W061_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"mbedtls\" chip_with_se05x=1"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ gn gen out/debug --args="k32w0_sdk_root=\"${NXP_K32W061_SDK_ROOT}\" chip_with_OM15082=1 chip_with_ot_cli=0 is_debug=false chip_crypto=\"mbedtls\" chip_with_se05x=1"
 user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ ninja -C out/debug
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/nxp/k32w/k32w0$ $NXP_K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
     -   without Secure element
@@ -220,7 +220,7 @@ The resulting output file can be found in out/debug/chip-k32w061-lock-example.
 ## Flashing and debugging
 
 Program the firmware using the official
-[OpenThread Flash Instructions](https://github.com/openthread/openthread/blob/master/examples/platforms/k32w/k32w061/README.md#flash-binaries).
+[OpenThread Flash Instructions](https://github.com/openthread/ot-nxp/tree/main/src/k32w0/k32w061#flash-binaries).
 
 All you have to do is to replace the Openthread binaries from the above
 documentation with _out/debug/chip-k32w061-lock-example.bin_ if DK6Programmer is
@@ -247,13 +247,13 @@ Power Measurement Tool can be used inside MCUXpresso for checking the power
 consumption pattern: Window -> Show View -> Other -> Power Measurement Tool. The
 configuration for this tool is the next one:
 
-![POWER_CONF](../../platform/nxp/k32w/k32w0/doc/images/power_conf.JPG)
+![POWER_CONF](../../../../platform/nxp/k32w/k32w0/doc/images/power_conf.JPG)
 
 Also, please make sure that the J14 jumper is set to the _ENABLED_ position and
 no expansion board is attached to the DK6. A view from this tool is illustrated
 below:
 
-![POWER_VIEW](../../platform/nxp/k32w/k32w0/doc/images/power_view.JPG)
+![POWER_VIEW](../../../../platform/nxp/k32w/k32w0/doc/images/power_view.JPG)
 
 Please note that that the Power Measurement Tool is not very accurate and
 professional tools must be used if exact power consumption needs to be known.

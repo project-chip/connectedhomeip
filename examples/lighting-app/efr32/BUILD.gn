@@ -22,6 +22,7 @@ import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
+import("${chip_root}/src/platform/device.gni")
 
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
@@ -85,7 +86,7 @@ efr32_executable("lighting_app") {
     "${examples_plat_dir}/LEDWidget.cpp",
     "${examples_plat_dir}/heap_4_silabs.c",
     "${examples_plat_dir}/init_efrPlatform.cpp",
-    "${examples_plat_dir}/uart.c",
+    "${examples_plat_dir}/uart.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -100,9 +101,20 @@ efr32_executable("lighting_app") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    "${examples_plat_dir}:efr-matter-shell",
   ]
+
+  if (chip_openthread_ftd) {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    ]
+  } else {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+    ]
+  }
 
   include_dirs = [ "include" ]
 
@@ -114,22 +126,26 @@ efr32_executable("lighting_app") {
   }
 
   if (chip_enable_pw_rpc) {
-    defines += [ "PW_RPC_ENABLED" ]
+    defines += [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+    ]
+
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
       "${examples_plat_dir}/PigweedLogger.cpp",
-      "src/Rpc.cpp",
+      "${examples_plat_dir}/Rpc.cpp",
     ]
 
     deps += [
-      "$dir_pw_assert",
-      "$dir_pw_checksum",
       "$dir_pw_hdlc:rpc_channel_output",
-      "$dir_pw_stream",
       "$dir_pw_stream:sys_io_stream",
-      "$dir_pw_sys_io",
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
+      "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:device_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:lighting_service.nanopb_rpc",
@@ -167,12 +183,6 @@ efr32_executable("lighting_app") {
 
 group("efr32") {
   deps = [ ":lighting_app" ]
-  if (chip_enable_pw_rpc) {
-    deps += [
-      "${chip_root}/examples/common/pigweed/rpc_console/py:chip_rpc.install",
-      "${chip_root}/examples/common/pigweed/rpc_console/py:chip_rpc_wheel",
-    ]
-  }
 }
 
 group("default") {

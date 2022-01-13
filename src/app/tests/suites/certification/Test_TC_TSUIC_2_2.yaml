@@ -1,0 +1,178 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 12.2.2. [TC-TSUIC-2.2] Primary functionality with server as DUT
+
+config:
+    cluster: "Thermostat User Interface Configuration"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "Writes a value of 0 to TemperatureDisplayMode attribute of DUT"
+      command: "writeAttribute"
+      attribute: "temperature display mode"
+      PICS: A_TEMPERATURE_DISPLAY_MODE
+      arguments:
+          value: 0
+
+    #Disabled as UI prompts required for user action
+    - label: "Verify device temperature displayed in °C"
+      disabled: true
+
+    - label: "Writes a value of 1 to TemperatureDisplayMode attribute of DUT"
+      command: "writeAttribute"
+      attribute: "temperature display mode"
+      PICS: A_TEMPERATURE_DISPLAY_MODE
+      arguments:
+          value: 1
+
+    #Disabled as UI prompts required for user action
+    - label: "Verify device temperature displayed in °F"
+      disabled: true
+
+    #Disabled as write was successful
+    - label:
+          "Writes a value of greater than 1 to TemperatureDisplayMode attribute
+          of DUT"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "temperature display mode"
+      PICS: A_TEMPERATURE_DISPLAY_MODE
+      arguments:
+          value: 2
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Writes a value of 0 to KeypadLockout attribute of DUT"
+      command: "writeAttribute"
+      attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
+      arguments:
+          value: 0
+
+    #Disabled as UI prompts required for user action
+    - label: "Verify all device functionality available to the user"
+      disabled: true
+
+    - label: "Writes a value of 1 to KeypadLockout attribute of DUT"
+      command: "writeAttribute"
+      attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
+      arguments:
+          value: 1
+
+    #Disabled as UI prompts required for user action
+    - label: "Verify device operates at Level 1 reduced functionality"
+      disabled: true
+
+    - label: "Writes a value of 2 to KeypadLockout attribute of DUT"
+      command: "writeAttribute"
+      attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
+      arguments:
+          value: 2
+
+    #Disabled as UI prompts required for user action
+    - label: "Verify device operates at Level 2 reduced functionality"
+      disabled: true
+
+    - label: "Writes a value of 3 to KeypadLockout attribute of DUT"
+      command: "writeAttribute"
+      attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
+      arguments:
+          value: 3
+
+    #Disabled as UI prompts required for user action
+    - label: "Verify device operates at Level 3 reduced functionality"
+      disabled: true
+
+    - label: "Writes a value of 4 to KeypadLockout attribute of DUT"
+      command: "writeAttribute"
+      attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
+      arguments:
+          value: 4
+
+    #Disabled as UI prompts required for user action
+    - label: "Verify device operates at Level 4 reduced functionality"
+      disabled: true
+
+    - label: "Writes a value of 5 to KeypadLockout attribute of DUT"
+      command: "writeAttribute"
+      attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
+      arguments:
+          value: 5
+
+    #Disabled as UI prompts required for user action
+    - label: "Verify device operates at least functionality level"
+      disabled: true
+
+    #Disabled as write was successful
+    - label:
+          "Writes a value of greater than 5 to KeypadLockout attribute of DUT"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
+      arguments:
+          value: 6
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT"
+      command: "writeAttribute"
+      attribute: "schedule programming visibility"
+      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
+      arguments:
+          value: 0
+
+    #Disabled as UI prompts required for user action
+    - label:
+          "Verify local schedule programming functionality is enabled at the
+          thermostat"
+      disabled: true
+
+    - label:
+          "Writes a value of 1 to ScheduleProgrammingVisibility attribute of DUT"
+      command: "writeAttribute"
+      attribute: "schedule programming visibility"
+      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
+      arguments:
+          value: 1
+
+    #Disabled as UI prompts required for user action
+    - label:
+          "Verify local schedule programming functionality is disabled at the
+          thermostat"
+      disabled: true
+
+    #Disabled as write was successful
+    - label:
+          "Writes a value of greater than 1 to ScheduleProgrammingVisibility
+          attribute of DUT"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "schedule programming visibility"
+      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
+      arguments:
+          value: 2
+      response:
+          error: CONSTRAINT_ERROR

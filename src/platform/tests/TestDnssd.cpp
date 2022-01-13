@@ -42,7 +42,7 @@ static void HandleBrowse(void * context, DnssdService * services, size_t service
         printf("Mdns service size %zu\n", servicesSize);
         printf("Service name %s\n", services->mName);
         printf("Service type %s\n", services->mType);
-        NL_TEST_ASSERT(suite, ChipDnssdResolve(services, INET_NULL_INTERFACEID, HandleResolve, suite) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(suite, ChipDnssdResolve(services, chip::Inet::InterfaceId::Null(), HandleResolve, suite) == CHIP_NO_ERROR);
     }
 }
 
@@ -56,7 +56,7 @@ static void InitCallback(void * context, CHIP_ERROR error)
 
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
 
-    service.mInterface = INET_NULL_INTERFACEID;
+    service.mInterface = chip::Inet::InterfaceId::Null();
     service.mPort      = 80;
     strcpy(service.mName, "test");
     strcpy(service.mType, "_mock");
@@ -71,8 +71,8 @@ static void InitCallback(void * context, CHIP_ERROR error)
     service.mSubTypeSize   = 0;
 
     NL_TEST_ASSERT(suite, ChipDnssdPublishService(&service) == CHIP_NO_ERROR);
-    ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny, INET_NULL_INTERFACEID,
-                    HandleBrowse, suite);
+    ChipDnssdBrowse("_mock", DnssdServiceProtocol::kDnssdProtocolTcp, chip::Inet::IPAddressType::kAny,
+                    chip::Inet::InterfaceId::Null(), HandleBrowse, suite);
 }
 
 static void ErrorCallback(void * context, CHIP_ERROR error)

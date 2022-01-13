@@ -66,7 +66,11 @@ int main()
         goto exit;
     }
 
+#ifdef CONFIG_OPENTHREAD_MTD_SED
+    err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+#else
     err = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
+#endif
     if (err != CHIP_NO_ERROR)
     {
         LOG_ERR("ConnectivityMgr().SetThreadDeviceType() failed");

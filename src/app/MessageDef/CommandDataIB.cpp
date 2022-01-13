@@ -15,11 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines CommandDataIB parser and builder in CHIP interaction model
- *
- */
 
 #include "CommandDataIB.h"
 
@@ -31,28 +26,10 @@
 
 #include <app/AppBuildConfig.h>
 
-using namespace chip;
-using namespace chip::TLV;
-
 namespace chip {
 namespace app {
-CHIP_ERROR CommandDataIB::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // make a copy of the reader here
-    mReader.Init(aReader);
-
-    VerifyOrExit(chip::TLV::kTLVType_Structure == mReader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = mReader.EnterContainer(mOuterContainerType);
-
-exit:
-    return err;
-}
-
 CHIP_ERROR
-CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) const
+CommandDataIB::Parser::ParseData(TLV::TLVReader & aReader, int aDepth) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -62,14 +39,14 @@ CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) con
     }
     else
     {
-        if (chip::TLV::IsContextTag(aReader.GetTag()))
+        if (TLV::IsContextTag(aReader.GetTag()))
         {
-            PRETTY_PRINT("\t0x%" PRIx32 " = ", chip::TLV::TagNumFromTag(aReader.GetTag()));
+            PRETTY_PRINT("\t0x%" PRIx32 " = ", TLV::TagNumFromTag(aReader.GetTag()));
         }
-        else if (chip::TLV::IsProfileTag(aReader.GetTag()))
+        else if (TLV::IsProfileTag(aReader.GetTag()))
         {
-            PRETTY_PRINT("\t0x%" PRIx32 "::0x%" PRIx32 " = ", chip::TLV::ProfileIdFromTag(aReader.GetTag()),
-                         chip::TLV::TagNumFromTag(aReader.GetTag()));
+            PRETTY_PRINT("\t0x%" PRIx32 "::0x%" PRIx32 " = ", TLV::ProfileIdFromTag(aReader.GetTag()),
+                         TLV::TagNumFromTag(aReader.GetTag()));
         }
         else
         {
@@ -79,16 +56,16 @@ CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) con
 
     switch (aReader.GetType())
     {
-    case chip::TLV::kTLVType_Structure:
+    case TLV::kTLVType_Structure:
         PRETTY_PRINT("\t{");
         break;
 
-    case chip::TLV::kTLVType_Array:
+    case TLV::kTLVType_Array:
         PRETTY_PRINT_SAMELINE("[");
         PRETTY_PRINT("\t\t");
         break;
 
-    case chip::TLV::kTLVType_SignedInteger: {
+    case TLV::kTLVType_SignedInteger: {
         int64_t value_s64;
 
         err = aReader.Get(value_s64);
@@ -98,7 +75,7 @@ CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) con
         break;
     }
 
-    case chip::TLV::kTLVType_UnsignedInteger: {
+    case TLV::kTLVType_UnsignedInteger: {
         uint64_t value_u64;
 
         err = aReader.Get(value_u64);
@@ -108,7 +85,7 @@ CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) con
         break;
     }
 
-    case chip::TLV::kTLVType_FloatingPointNumber: {
+    case TLV::kTLVType_FloatingPointNumber: {
         double value_fp;
 
         err = aReader.Get(value_fp);
@@ -117,7 +94,7 @@ CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) con
         PRETTY_PRINT_SAMELINE("%lf, ", value_fp);
         break;
     }
-    case chip::TLV::kTLVType_Boolean: {
+    case TLV::kTLVType_Boolean: {
         bool value_b;
 
         err = aReader.Get(value_b);
@@ -127,7 +104,7 @@ CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) con
         break;
     }
 
-    case chip::TLV::kTLVType_UTF8String: {
+    case TLV::kTLVType_UTF8String: {
         char value_s[256];
 
         err = aReader.GetString(value_s, sizeof(value_s));
@@ -145,7 +122,7 @@ CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) con
         break;
     }
 
-    case chip::TLV::kTLVType_ByteString: {
+    case TLV::kTLVType_ByteString: {
         uint8_t value_b[256];
         uint32_t len, readerLen;
 
@@ -183,7 +160,7 @@ CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) con
         break;
     }
 
-    case chip::TLV::kTLVType_Null:
+    case TLV::kTLVType_Null:
         PRETTY_PRINT_SAMELINE("NULL");
         break;
 
@@ -192,10 +169,10 @@ CommandDataIB::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) con
         break;
     }
 
-    if (aReader.GetType() == chip::TLV::kTLVType_Structure || aReader.GetType() == chip::TLV::kTLVType_Array)
+    if (aReader.GetType() == TLV::kTLVType_Structure || aReader.GetType() == TLV::kTLVType_Array)
     {
-        const char terminating_char = (aReader.GetType() == chip::TLV::kTLVType_Structure) ? '}' : ']';
-        chip::TLV::TLVType type;
+        const char terminating_char = (aReader.GetType() == TLV::kTLVType_Structure) ? '}' : ']';
+        TLV::TLVType type;
 
         IgnoreUnusedVariable(terminating_char);
 
@@ -225,10 +202,9 @@ exit:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint16_t TagPresenceMask = 0;
-    chip::TLV::TLVReader reader;
-    uint32_t tagNum = 0;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    int TagPresenceMask = 0;
+    TLV::TLVReader reader;
 
     PRETTY_PRINT("CommandDataIB =");
     PRETTY_PRINT("{");
@@ -238,54 +214,29 @@ CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(chip::TLV::IsContextTag(reader.GetTag()), err = CHIP_ERROR_INVALID_TLV_TAG);
-
-        tagNum = chip::TLV::TagNumFromTag(reader.GetTag());
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
 
         switch (tagNum)
         {
-        case kCsTag_CommandPath:
+        case to_underlying(Tag::kPath):
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_CommandPath)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_CommandPath);
-            VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kPath))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kPath));
             {
                 CommandPathIB::Parser path;
-                err = path.Init(reader);
-                SuccessOrExit(err);
-
+                ReturnErrorOnFailure(path.Init(reader));
                 PRETTY_PRINT_INCDEPTH();
-                err = path.CheckSchemaValidity();
-                SuccessOrExit(err);
+                ReturnErrorOnFailure(path.CheckSchemaValidity());
                 PRETTY_PRINT_DECDEPTH();
             }
 
             break;
-        case kCsTag_Data:
+        case to_underlying(Tag::kData):
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_Data)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_Data);
-
-            err = ParseData(reader, 0);
-            SuccessOrExit(err);
-            break;
-        case kCsTag_StatusIB:
-            // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_StatusIB)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_StatusIB);
-
-            {
-                StatusIB::Parser status;
-                err = status.Init(reader);
-                SuccessOrExit(err);
-
-                PRETTY_PRINT_INCDEPTH();
-                err = status.CheckSchemaValidity();
-                SuccessOrExit(err);
-                PRETTY_PRINT_DECDEPTH();
-            }
-
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kData))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kData));
+            ReturnErrorOnFailure(ParseData(reader, 0));
             break;
         default:
             PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
@@ -296,114 +247,50 @@ CHIP_ERROR CommandDataIB::Parser::CheckSchemaValidity() const
     PRETTY_PRINT("},");
     PRETTY_PRINT("");
 
-    // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // check for at most field:
-        const uint16_t CheckDataField     = 1 << kCsTag_Data;
-        const uint16_t CheckStatusIBField = 1 << kCsTag_StatusIB;
+        const int RequiredFields = 1 << to_underlying(Tag::kPath);
 
-        if ((TagPresenceMask & CheckDataField) == CheckDataField && (TagPresenceMask & CheckStatusIBField) == CheckStatusIBField)
-        {
-            // kCsTag_Data and kCsTag_StatusIB both exist
-            err = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-        }
-        else
+        if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {
             err = CHIP_NO_ERROR;
         }
+        else
+        {
+            err = CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE;
+        }
     }
-    SuccessOrExit(err);
-    err = reader.ExitContainer(mOuterContainerType);
 
-exit:
-    return err;
+    ReturnErrorOnFailure(err);
+    ReturnErrorOnFailure(reader.ExitContainer(mOuterContainerType));
+    return CHIP_NO_ERROR;
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR CommandDataIB::Parser::GetCommandPath(CommandPathIB::Parser * const apCommandPath) const
+CHIP_ERROR CommandDataIB::Parser::GetPath(CommandPathIB::Parser * const apPath) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_CommandPath), reader);
-    SuccessOrExit(err);
-
-    VerifyOrExit(chip::TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-    err = apCommandPath->Init(reader);
-    SuccessOrExit(err);
-
-exit:
-    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
-
-    return err;
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kPath)), reader));
+    ReturnErrorOnFailure(apPath->Init(reader));
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandDataIB::Parser::GetData(chip::TLV::TLVReader * const apReader) const
+CHIP_ERROR CommandDataIB::Parser::GetData(TLV::TLVReader * const apReader) const
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_Data), *apReader);
-    SuccessOrExit(err);
-
-exit:
-    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
-
-    return err;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kData)), *apReader));
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandDataIB::Parser::GetStatusIB(StatusIB::Parser * const apStatusIB) const
+CommandPathIB::Builder & CommandDataIB::Builder::CreatePath()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-
-    err = mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_StatusIB), reader);
-    SuccessOrExit(err);
-
-    err = apStatusIB->Init(reader);
-    SuccessOrExit(err);
-
-exit:
-    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
-
-    return err;
-}
-
-CHIP_ERROR CommandDataIB::Builder::Init(chip::TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
-}
-
-CommandPathIB::Builder & CommandDataIB::Builder::CreateCommandPathBuilder()
-{
-    // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mCommandPathBuilder.ResetError(mError));
-
-    mError = mCommandPathBuilder.Init(mpWriter, kCsTag_CommandPath);
-
-exit:
-    // on error, mAttributePathBuilder would be un-/partial initialized and cannot be used to write anything
-    return mCommandPathBuilder;
-}
-
-StatusIB::Builder & CommandDataIB::Builder::CreateStatusIBBuilder()
-{
-    // skip if error has already been set
-    VerifyOrExit(CHIP_NO_ERROR == mError, mStatusIBBuilder.ResetError(mError));
-
-    mError = mStatusIBBuilder.Init(mpWriter, kCsTag_StatusIB);
-
-exit:
-    // on error, mStatusIBBuilder would be un-/partial initialized and cannot be used to write anything
-    return mStatusIBBuilder;
+    mError = mPath.Init(mpWriter, to_underlying(Tag::kPath));
+    return mPath;
 }
 
 CommandDataIB::Builder & CommandDataIB::Builder::EndOfCommandDataIB()
 {
     EndOfContainer();
-
     return *this;
 }
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

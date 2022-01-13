@@ -23,18 +23,83 @@
         {
             "name": "cluster_header",
             "path": "../../../app/zap-templates/partials/cluster_header.zapt"
+        },
+        {
+            "name": "encode_value",
+            "path": "partials/encode_value.zapt"
+        },
+        {
+            "name": "decode_value",
+            "path": "partials/decode_value.zapt"
+        },
+        {
+            "name": "list_attribute_callback_type",
+            "path": "partials/list_attribute_callback_type.zapt"
+        },
+        {
+            "name": "command_callback_responses",
+            "path": "partials/command_callback_responses.zapt"
+        },
+        {
+            "name": "java_type_for_argument",
+            "path": "partials/java_type_for_argument.zapt"
         }
     ],
     "templates": [
+        {
+            "path": "CHIPInvokeCallbacks.zapt",
+            "name": "CHIP cluster invoke callbacks for Java (native code)",
+            "output": "src/controller/java/zap-generated/CHIPInvokeCallbacks.h"
+        },
+        {
+            "path": "CHIPInvokeCallbacks-src.zapt",
+            "name": "CHIP cluster invoke callbacks for Java (native code)",
+            "output": "src/controller/java/zap-generated/CHIPInvokeCallbacks.cpp"
+        },
+        {
+            "path": "CHIPCallbackTypes.zapt",
+            "name": "CHIP cluster callback types",
+            "output": "src/controller/java/zap-generated/CHIPCallbackTypes.h"
+        },
         {
             "path": "CHIPClusters-JNI.zapt",
             "name": "CHIP ZCL API for Java (native code)",
             "output": "src/controller/java/zap-generated/CHIPClusters-JNI.cpp"
         },
         {
+            "path": "CHIPClustersRead-JNI.zapt",
+            "name": "CHIP ZCL API for Java (native code for reads)",
+            "output": "src/controller/java/zap-generated/CHIPClustersRead-JNI.cpp"
+        },
+        {
+            "path": "CHIPReadCallbacks.zapt",
+            "name": "CHIP cluster attribute read callback for Java (native code)",
+            "output": "src/controller/java/zap-generated/CHIPReadCallbacks.h"
+        },
+        {
+            "path": "CHIPReadCallbacks-src.zapt",
+            "name": "CHIP cluster attribute read callback for Java (native code)",
+            "output": "src/controller/java/zap-generated/CHIPReadCallbacks.cpp"
+        },
+        {
             "path": "ChipClusters-java.zapt",
             "name": "CHIP ZCL API for Java",
             "output": "src/controller/java/zap-generated/chip/devicecontroller/ChipClusters.java"
+        },
+        {
+            "path": "ClusterInfo-java.zapt",
+            "name": "Cluster information mapping for Java",
+            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterInfoMapping.java"
+        },
+        {
+            "path": "ClusterInfo-read-interaction.zapt",
+            "name": "Generate read interaction for cluster information map",
+            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterReadMapping.java"
+        },
+        {
+            "path": "ClusterInfo-write-interaction.zapt",
+            "name": "Generate write interaction for cluster information map",
+            "output": "src/controller/java/zap-generated/chip/devicecontroller/ClusterWriteMapping.java"
         }
     ]
 }

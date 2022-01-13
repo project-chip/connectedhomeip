@@ -1,0 +1,85 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Mode Select Cluster Tests
+
+config:
+    cluster: "Mode Select"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "Read CurrentMode"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: 0
+
+    - label: "Read OnMode"
+      command: "readAttribute"
+      attribute: "OnMode"
+      response:
+          value: 0
+
+    - label: "Read StartUpMode"
+      command: "readAttribute"
+      attribute: "StartUpMode"
+      response:
+          value: 0
+
+    - label: "Read Description"
+      command: "readAttribute"
+      attribute: "Description"
+      response:
+          value: "Coffee"
+
+    - label: "Read SupportedModes"
+      command: "readAttribute"
+      attribute: "SupportedModes"
+      response:
+          value:
+              [
+                  { Label: "Black", Mode: 0, SemanticTag: 0 },
+                  { Label: "Cappuccino", Mode: 4, SemanticTag: 0 },
+                  { Label: "Espresso", Mode: 7, SemanticTag: 0 },
+              ]
+          constraints:
+              - type: list
+              - minLength: 3
+              - maxLength: 3
+
+    - label: "Change to Supported Mode"
+      command: "changeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: 4
+
+    - label: "Verify Current Mode Change"
+      command: "readAttribute"
+      attribute: "CurrentMode"
+      response:
+          value: 4
+
+    - label: "Change to Unsupported Mode"
+      command: "changeToMode"
+      arguments:
+          values:
+              - name: "NewMode"
+                value: 2
+      response:
+          error: CONSTRAINT_ERROR

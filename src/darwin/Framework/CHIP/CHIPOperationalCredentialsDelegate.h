@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <memory>
+
 #import <Foundation/Foundation.h>
 #import <Security/Security.h>
 

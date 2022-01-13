@@ -21,9 +21,9 @@ const templateUtil = require(zapPath + 'generator/template-util.js');
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js');
 const iteratorUtil = require(zapPath + 'util/iterator-util.js');
 
-const { Clusters, asBlocks, asPromise } = require('../../common/ClustersHelper.js');
-const StringHelper                      = require('../../common/StringHelper.js');
-const ChipTypesHelper                   = require('../../common/ChipTypesHelper.js');
+const { asBlocks, ensureClusters } = require('../../common/ClustersHelper.js');
+const StringHelper                 = require('../../common/StringHelper.js');
+const ChipTypesHelper              = require('../../common/ChipTypesHelper.js');
 
 function throwErrorIfUndefined(item, errorMsg, conditions)
 {
@@ -80,13 +80,15 @@ function checkIsChipType(context, name)
 function getCommands(methodName)
 {
   const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
-  return clusterSide == 'client' ? Clusters.getClientCommands(clusterName) : Clusters.getServerCommands(clusterName);
+  return clusterSide == 'client' ? ensureClusters(this).getClientCommands(clusterName)
+                                 : ensureClusters(this).getServerCommands(clusterName);
 }
 
 function getResponses(methodName)
 {
   const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
-  return clusterSide == 'client' ? Clusters.getClientResponses(clusterName) : Clusters.getServerResponses(clusterName);
+  return clusterSide == 'client' ? ensureClusters(this).getClientResponses(clusterName)
+                                 : ensureClusters(this).getServerResponses(clusterName);
 }
 
 /**
@@ -96,7 +98,7 @@ function getResponses(methodName)
  */
 function chip_server_clusters(options)
 {
-  return asBlocks.call(this, Clusters.getServerClusters(), options);
+  return asBlocks.call(this, ensureClusters(this).getServerClusters(), options);
 }
 
 /**
@@ -105,7 +107,7 @@ function chip_server_clusters(options)
  */
 function chip_has_server_clusters(options)
 {
-  return asPromise.call(this, Clusters.getServerClusters().then(clusters => !!clusters.length));
+  return ensureClusters(this).getServerClusters().then(clusters => !!clusters.length);
 }
 
 /**
@@ -115,7 +117,7 @@ function chip_has_server_clusters(options)
  */
 function chip_client_clusters(options)
 {
-  return asBlocks.call(this, Clusters.getClientClusters(), options);
+  return asBlocks.call(this, ensureClusters(this).getClientClusters(), options);
 }
 
 /**
@@ -124,7 +126,7 @@ function chip_client_clusters(options)
  */
 function chip_has_client_clusters(options)
 {
-  return asPromise.call(this, Clusters.getClientClusters().then(clusters => !!clusters.length));
+  return ensureClusters(this).getClientClusters().then(clusters => !!clusters.length);
 }
 
 /**
@@ -134,7 +136,7 @@ function chip_has_client_clusters(options)
  */
 function chip_clusters(options)
 {
-  return asBlocks.call(this, Clusters.getClusters(), options);
+  return asBlocks.call(this, ensureClusters(this).getClusters(), options);
 }
 
 /**
@@ -143,7 +145,7 @@ function chip_clusters(options)
  */
 function chip_has_clusters(options)
 {
-  return asPromise.call(this, Clusters.getClusters().then(clusters => !!clusters.length));
+  return ensureClusters(this).getClusters().then(clusters => !!clusters.length);
 }
 
 /**
@@ -153,10 +155,34 @@ function chip_has_clusters(options)
  */
 function chip_server_global_responses(options)
 {
+  return asBlocks.call(this, getServerGlobalAttributeResponses(this), options);
+}
+
+async function if_in_global_responses(options)
+{
+  const attribute          = this.response.arguments[0];
+  const globalResponses    = await getServerGlobalAttributeResponses(this);
+  const responseTypeExists = globalResponses.find(
+      // Some fields of item/attribute here may be undefined.
+      item => item.isList == attribute.isList && item.isStruct == attribute.isStruct && item.chipType == attribute.chipType
+          && item.isNullable == attribute.isNullable && item.isOptional == attribute.isOptional)
+
+  if (responseTypeExists)
+  {
+    return options.fn(this);
+  }
+  else
+  {
+    return options.inverse(this);
+  }
+}
+
+function getServerGlobalAttributeResponses(context)
+{
   const sorter = (a, b) => a.chipCallback.name.localeCompare(b.chipCallback.name, 'en', { numeric : true });
 
   const reducer = (unique, item) => {
-    const { type, size, isList, chipCallback, chipType } = item.response.arguments[0];
+    const { type, size, isList, isOptional, isNullable, chipCallback, chipType } = item.response.arguments[0];
 
     // List-typed elements have a dedicated callback
     if (isList) {
@@ -167,11 +193,11 @@ function chip_server_global_responses(options)
       return unique;
     }
 
-    return [...unique, { chipCallback, chipType, size } ];
+    return [...unique, { chipCallback, chipType, size, isOptional, isNullable } ];
   };
 
   const filter = attributes => attributes.reduce(reducer, []).sort(sorter);
-  return asBlocks.call(this, Clusters.getAttributesByClusterSide('server').then(filter), options);
+  return ensureClusters(context).getAttributesByClusterSide('server').then(filter);
 }
 
 /**
@@ -281,10 +307,10 @@ function chip_cluster_response_arguments(options)
 function chip_server_has_list_attributes(options)
 {
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_has_list_attributes');
-  const attributes      = Clusters.getServerAttributes(clusterName);
+  const attributes      = ensureClusters(this).getServerAttributes(clusterName);
 
   const filter = attribute => attribute.isList;
-  return asPromise.call(this, attributes.then(items => items.find(filter)));
+  return attributes.then(items => items.find(filter));
 }
 
 /**
@@ -298,10 +324,10 @@ function chip_server_has_list_attributes(options)
 function chip_client_has_list_attributes(options)
 {
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_client_has_list_attributes');
-  const attributes      = Clusters.getClientAttributes(clusterName);
+  const attributes      = ensureClusters(this).getClientAttributes(clusterName);
 
   const filter = attribute => attribute.isList;
-  return asPromise.call(this, attributes.then(items => items.find(filter)));
+  return attributes.then(items => items.find(filter));
 }
 
 /**
@@ -316,9 +342,26 @@ function chip_client_has_list_attributes(options)
 function chip_server_cluster_attributes(options)
 {
   const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_cluster_attributes');
-  const attributes      = Clusters.getServerAttributes(clusterName);
+  const attributes      = ensureClusters(this).getServerAttributes(clusterName);
 
   return asBlocks.call(this, attributes, options);
+}
+
+/**
+ * Creates block iterator over the server side cluster attributes
+ * for a given cluster.
+ *
+ * This function is meant to be used inside a {{#chip_server_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_server_cluster_events(options)
+{
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_cluster_events');
+  const events          = ensureClusters(this).getServerEvents(clusterName);
+
+  return asBlocks.call(this, events, options);
 }
 
 function chip_attribute_list_entryTypes(options)
@@ -348,6 +391,27 @@ function chip_available_cluster_commands(options)
   return promise;
 }
 
+/**
+ * Checks whether a type is an enum for purposes of its chipType.  That includes
+ * both spec-defined enum types and types that we map to enum types in our code.
+ */
+async function if_chip_enum(type, options)
+{
+  if (type.toLowerCase() == 'vendor_id') {
+    return options.fn(this);
+  }
+
+  let pkgId       = await templateUtil.ensureZclPackageId(this);
+  let checkResult = await zclHelper.isEnum(this.global.db, type, pkgId);
+  let result;
+  if (checkResult != 'unknown') {
+    result = options.fn(this);
+  } else {
+    result = options.inverse(this);
+  }
+  return templateUtil.templatePromise(this.global, result);
+}
+
 //
 // Module exports
 //
@@ -365,5 +429,8 @@ exports.chip_cluster_responses                               = chip_cluster_resp
 exports.chip_cluster_response_arguments                      = chip_cluster_response_arguments
 exports.chip_attribute_list_entryTypes                       = chip_attribute_list_entryTypes;
 exports.chip_server_cluster_attributes                       = chip_server_cluster_attributes;
+exports.chip_server_cluster_events                           = chip_server_cluster_events;
 exports.chip_server_has_list_attributes                      = chip_server_has_list_attributes;
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
+exports.if_chip_enum                                         = if_chip_enum;
+exports.if_in_global_responses                               = if_in_global_responses;

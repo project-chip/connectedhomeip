@@ -19,22 +19,7 @@
 
 #include "CHIPClusters.h"
 
-#include <cstdint>
-
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/CommandSender.h>
-#include <app/InteractionModelEngine.h>
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/util/basic-types.h>
-#include <controller/CommandSenderAllocator.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/BufferWriter.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
 namespace chip {
@@ -48,6 +33,102 @@ namespace Controller {
 // TODO(#4502): onCompletion is not used by IM for now.
 // TODO(#4503): length should be passed to commands when byte string is in argument list.
 // TODO(#4503): Commands should take group id as an argument.
+
+// Binding Cluster Commands
+CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Binding::Commands::Bind::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // nodeId: nodeId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nodeId));
+    // groupId: groupId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // endpointId: endpointNo
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), endpointId));
+    // clusterId: clusterId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR BindingCluster::Unbind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  chip::NodeId nodeId, chip::GroupId groupId, chip::EndpointId endpointId,
+                                  chip::ClusterId clusterId)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Binding::Commands::Unbind::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // nodeId: nodeId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), nodeId));
+    // groupId: groupId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
+    // endpointId: endpointNo
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), endpointId));
+    // clusterId: clusterId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
 
 // GeneralCommissioning Cluster Commands
 CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuccessCallback,
@@ -138,7 +219,7 @@ exit:
 
 CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint8_t location,
-                                                            chip::ByteSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs)
+                                                            chip::CharSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -165,8 +246,7 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable
     // location: regulatoryLocationType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
     // countryCode: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(countryCode.data()), countryCode.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), countryCode));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
@@ -185,87 +265,103 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable
 exit:
     return err;
 }
-
-// GeneralCommissioning Cluster Attributes
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint64_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBasicCommissioningInfoList(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType>(
-    const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType>(
-    const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type &, void *,
-    CommandResponseSuccessCallback<
-        chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType>(
-    const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // NetworkCommissioning Cluster Commands
-CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * onSuccessCallback,
+CHIP_ERROR NetworkCommissioningCluster::AddOrUpdateThreadNetwork(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback,
+                                                                 chip::ByteSpan operationalDataset, uint64_t breadcrumb)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // operationalDataset: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), operationalDataset));
+    // breadcrumb: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR NetworkCommissioningCluster::AddOrUpdateWiFiNetwork(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
+                                                               chip::ByteSpan credentials, uint64_t breadcrumb)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // ssid: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), ssid));
+    // credentials: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentials));
+    // breadcrumb: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR NetworkCommissioningCluster::ConnectNetwork(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID,
-                                                       uint64_t breadcrumb, uint32_t timeoutMs)
+                                                       uint64_t breadcrumb)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -278,7 +374,7 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::DisableNetwork::Id,
+                                         NetworkCommissioning::Commands::ConnectNetwork::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -293,97 +389,6 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkID));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID,
-                                                      uint64_t breadcrumb, uint32_t timeoutMs)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, NetworkCommissioning::Commands::EnableNetwork::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // networkID: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkID));
-    // breadcrumb: int64u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint32_t timeoutMs)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -401,7 +406,7 @@ exit:
 
 CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID,
-                                                      uint64_t breadcrumb, uint32_t timeoutMs)
+                                                      uint64_t breadcrumb)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -428,8 +433,53 @@ CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onS
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkID));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR NetworkCommissioningCluster::ReorderNetwork(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID,
+                                                       uint8_t networkIndex, uint64_t breadcrumb)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         NetworkCommissioning::Commands::ReorderNetwork::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // networkID: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkID));
+    // networkIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkIndex));
+    // breadcrumb: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -447,7 +497,7 @@ exit:
 
 CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
-                                                     uint64_t breadcrumb, uint32_t timeoutMs)
+                                                     uint64_t breadcrumb)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -474,8 +524,6 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), ssid));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -490,53 +538,6 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
 exit:
     return err;
 }
-
-// NetworkCommissioning Cluster Attributes
-CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // OperationalCredentials Cluster Commands
 CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -802,7 +803,7 @@ exit:
 }
 
 CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, chip::ByteSpan label)
+                                                            Callback::Cancelable * onFailureCallback, chip::CharSpan label)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -827,8 +828,7 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // label: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(label.data()), label.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), label));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -843,131 +843,6 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
 exit:
     return err;
 }
-
-// OperationalCredentials Cluster Attributes
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             OperationalCredentialsClusterFabricsListListAttributeFilter);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeTrustedRootCertificates(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type,
-                           chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type,
-                           chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template <typename RequestDataT, typename ResponseDataT>
-CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
-                                      CommandResponseSuccessCallback<ResponseDataT> successCb,
-                                      CommandResponseFailureCallback failureCb)
-{
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
-
-    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
-        successCb(context, responseData);
-    };
-
-    auto onFailureCb = [context, failureCb](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
-        failureCb(context, app::ToEmberAfStatus(aIMStatus));
-    };
-
-    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                               requestData, onSuccessCb, onFailureCb);
-};
 
 } // namespace Controller
 } // namespace chip

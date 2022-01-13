@@ -36,6 +36,7 @@ from threading import Lock, Event, Condition
 from ctypes import *
 from .ChipUtility import ChipUtility
 from .exceptions import *
+import builtins
 
 __all__ = [
     "DeviceStatusStruct",
@@ -160,12 +161,16 @@ _ChipThreadTaskRunnerFunct = CFUNCTYPE(None, py_object)
 @_singleton
 class ChipStack(object):
     def __init__(self, installDefaultLogHandler=True, bluetoothAdapter=0):
+        builtins.enableDebugMode = False
+
         self.networkLock = Lock()
         self.completeEvent = Event()
+        self.commissioningCompleteEvent = Event()
         self._ChipStackLib = None
         self._chipDLLPath = None
         self.devMgr = None
         self.callbackRes = None
+        self.commissioningEventRes = None
         self._activeLogFunct = None
         self.addModulePrefixToLogMessage = True
 

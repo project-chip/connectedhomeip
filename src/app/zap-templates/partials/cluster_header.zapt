@@ -10,4 +10,9 @@
 {{#chip_server_cluster_attributes}}
 {{pad (concat "| * " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
 {{/chip_server_cluster_attributes}}
+{{pad "|" 79 '-'}}|
+{{pad "| Events: " 70 ' '}}{{pad "| " 9 ' '}}|
+{{#chip_server_cluster_events}}
+{{pad (concat "| * " (asUpperCamelCase name)) 70 ' '}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
+{{/chip_server_cluster_events}}
 {{pad '\*' 78 '-'}}*/

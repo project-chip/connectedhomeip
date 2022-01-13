@@ -49,10 +49,6 @@
 #define SWU_INTERVAl_WINDOW_MIN_MS (23 * 60 * 60 * 1000) // 23 hours
 #define SWU_INTERVAl_WINDOW_MAX_MS (24 * 60 * 60 * 1000) // 24 hours
 
-// ---- Thread Polling Config ----
-#define THREAD_ACTIVE_POLLING_INTERVAL_MS 100
-#define THREAD_INACTIVE_POLLING_INTERVAL_MS 1000
-
 // EFR Logging
 #ifdef __cplusplus
 extern "C" {

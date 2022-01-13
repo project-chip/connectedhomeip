@@ -53,17 +53,6 @@ struct FullQName
     FullQName(const QNamePart (&data)[N]) : names(data), nameCount(N)
     {}
 
-    void Output(chip::Encoding::BigEndian::BufferWriter & out) const
-    {
-        for (uint16_t i = 0; i < nameCount; i++)
-        {
-
-            out.Put8(static_cast<uint8_t>(strlen(names[i])));
-            out.Put(names[i]);
-        }
-        out.Put8(0); // end of qnames
-    }
-
     bool operator==(const FullQName & other) const;
     bool operator!=(const FullQName & other) const { return !(*this == other); }
 };
@@ -108,17 +97,10 @@ public:
     bool operator==(const FullQName & other) const;
     bool operator!=(const FullQName & other) const { return !(*this == other); }
 
-    void Put(chip::Encoding::BigEndian::BufferWriter & out) const
-    {
-        SerializedQNameIterator copy = *this;
-        while (copy.Next())
-        {
+    bool operator==(const SerializedQNameIterator & other) const;
+    bool operator!=(const SerializedQNameIterator & other) const { return !(*this == other); }
 
-            out.Put8(static_cast<uint8_t>(strlen(copy.Value())));
-            out.Put(copy.Value());
-        }
-        out.Put8(0); // end of qnames
-    }
+    size_t OffsetInCurrentValidData() const { return static_cast<size_t>(mCurrentPosition - mValidData.Start()); }
 
 private:
     static constexpr size_t kMaxValueSize = 63;

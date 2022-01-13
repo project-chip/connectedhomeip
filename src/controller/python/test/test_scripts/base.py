@@ -16,6 +16,7 @@
 #
 
 from dataclasses import dataclass
+from inspect import Attribute
 from typing import Any
 import typing
 from chip import ChipDeviceCtrl
@@ -27,6 +28,8 @@ import sys
 import logging
 import time
 import ctypes
+import chip.clusters as Clusters
+import chip.clusters.Attribute as Attribute
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -147,26 +150,9 @@ class BaseTestHelper:
                 f"Failed to close sessions with device {nodeid}: {ex}")
             return False
 
-    def TestNetworkCommissioning(self, nodeid: int, endpoint: int, group: int, dataset: str, network_id: str):
-        self.logger.info("Commissioning network to device {}".format(nodeid))
-        try:
-            self.devCtrl.ZCLSend("NetworkCommissioning", "AddThreadNetwork", nodeid, endpoint, group, {
-                "operationalDataset": bytes.fromhex(dataset),
-                "breadcrumb": 0,
-                "timeoutMs": 1000}, blocking=True)
-        except Exception as ex:
-            self.logger.exception("Failed to send AddThreadNetwork command")
-            return False
-        self.logger.info(
-            "Send EnableNetwork command to device {}".format(nodeid))
-        try:
-            self.devCtrl.ZCLSend("NetworkCommissioning", "EnableNetwork", nodeid, endpoint, group, {
-                "networkID": bytes.fromhex(network_id),
-                "breadcrumb": 0,
-                "timeoutMs": 1000}, blocking=True)
-        except Exception as ex:
-            self.logger.exception("Failed to send EnableNetwork command")
-            return False
+    def SetNetworkCommissioningParameters(self, dataset: str):
+        self.logger.info("Setting network commissioning parameters")
+        self.devCtrl.SetThreadOperationalDataset(bytes.fromhex(dataset))
         return True
 
     def TestOnOffCluster(self, nodeid: int, endpoint: int, group: int):
@@ -174,13 +160,13 @@ class BaseTestHelper:
             "Sending On/Off commands to device {} endpoint {}".format(nodeid, endpoint))
         err, resp = self.devCtrl.ZCLSend("OnOff", "On", nodeid,
                                          endpoint, group, {}, blocking=True)
-        if err != 0 or resp is None or resp.Status != 0:
+        if err != 0:
             self.logger.error(
                 "failed to send OnOff.On: error is {} with im response{}".format(err, resp))
             return False
         err, resp = self.devCtrl.ZCLSend("OnOff", "Off", nodeid,
                                          endpoint, group, {}, blocking=True)
-        if err != 0 or resp is None or resp.Status != 0:
+        if err != 0:
             self.logger.error(
                 "failed to send OnOff.Off: error is {} with im response {}".format(err, resp))
             return False
@@ -239,8 +225,8 @@ class BaseTestHelper:
             "VendorID": 9050,
             "ProductName": "TEST_PRODUCT",
             "ProductID": 65279,
-            "UserLabel": "",
-            "Location": "",
+            "NodeLabel": "Test",
+            "Location": "XX",
             "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",
             "SoftwareVersion": 0,
@@ -272,24 +258,28 @@ class BaseTestHelper:
             expected_status: IM.Status = IM.Status.Success
 
         requests = [
-            AttributeWriteRequest("Basic", "UserLabel", "Test"),
+            AttributeWriteRequest("Basic", "NodeLabel", "Test"),
             AttributeWriteRequest("Basic", "Location",
                                   "a pretty loooooooooooooog string", IM.Status.InvalidValue),
         ]
         failed_zcl = []
         for req in requests:
             try:
-                res = self.devCtrl.ZCLWriteAttribute(cluster=req.cluster,
-                                                     attribute=req.attribute,
-                                                     nodeid=nodeid,
-                                                     endpoint=endpoint,
-                                                     groupid=group,
-                                                     value=req.value)
-                TestResult(f"Write attribute {req.cluster}.{req.attribute}", res).assertStatusEqual(
-                    req.expected_status)
-                if req.expected_status != IM.Status.Success:
-                    # If the write interaction is expected to success, proceed to verify it.
-                    continue
+                try:
+                    self.devCtrl.ZCLWriteAttribute(cluster=req.cluster,
+                                                   attribute=req.attribute,
+                                                   nodeid=nodeid,
+                                                   endpoint=endpoint,
+                                                   groupid=group,
+                                                   value=req.value)
+                    if req.expected_status != IM.Status.Success:
+                        raise AssertionError(
+                            f"Write attribute {req.cluster}.{req.attribute} expects failure but got success response")
+                except Exception as ex:
+                    if req.expected_status != IM.Status.Success:
+                        continue
+                    else:
+                        raise ex
                 res = self.devCtrl.ZCLReadAttribute(
                     cluster=req.cluster, attribute=req.attribute, nodeid=nodeid, endpoint=endpoint, groupid=group)
                 TestResult(f"Read attribute {req.cluster}.{req.attribute}", res).assertValueEqual(
@@ -302,23 +292,22 @@ class BaseTestHelper:
         return True
 
     def TestSubscription(self, nodeid: int, endpoint: int):
-        class _subscriptionHandler(IM.OnSubscriptionReport):
-            def __init__(self, path: IM.AttributePath, logger: logging.Logger):
-                super(_subscriptionHandler, self).__init__()
-                self.subscriptionReceived = 0
-                self.path = path
-                self.countLock = threading.Lock()
-                self.cv = threading.Condition(self.countLock)
-                self.logger = logger
+        desiredPath = None
+        receivedUpdate = 0
+        updateLock = threading.Lock()
+        updateCv = threading.Condition(updateLock)
 
-            def OnData(self, path: IM.AttributePath, subscriptionId: int, data: typing.Any) -> None:
-                if path != self.path:
-                    return
-                logger.info(
-                    f"Received report from server: path: {path}, value: {data}, subscriptionId: {subscriptionId}")
-                with self.countLock:
-                    self.subscriptionReceived += 1
-                    self.cv.notify_all()
+        def OnValueChange(path: Attribute.TypedAttributePath, transaction: Attribute.SubscriptionTransaction) -> None:
+            nonlocal desiredPath, updateCv, updateLock, receivedUpdate
+            if path.Path != desiredPath:
+                return
+
+            data = transaction.GetAttribute(path)
+            logger.info(
+                f"Received report from server: path: {path.Path}, value: {data}")
+            with updateLock:
+                receivedUpdate += 1
+                updateCv.notify_all()
 
         class _conductAttributeChange(threading.Thread):
             def __init__(self, devCtrl: ChipDeviceCtrl.ChipDeviceController, nodeid: int, endpoint: int):
@@ -334,24 +323,34 @@ class BaseTestHelper:
                         "OnOff", "Toggle", self.nodeid, self.endpoint, 0, {})
 
         try:
-            subscribedPath = IM.AttributePath(
-                nodeId=nodeid, endpointId=endpoint, clusterId=6, attributeId=0)
+            desiredPath = Clusters.Attribute.AttributePath(
+                EndpointId=1, ClusterId=6, AttributeId=0)
             # OnOff Cluster, OnOff Attribute
-            handler = _subscriptionHandler(subscribedPath, self.logger)
-            IM.SetAttributeReportCallback(subscribedPath, handler)
-            self.devCtrl.ZCLSubscribeAttribute(
+            subscription = self.devCtrl.ZCLSubscribeAttribute(
                 "OnOff", "OnOff", nodeid, endpoint, 1, 10)
+            subscription.SetAttributeUpdateCallback(OnValueChange)
             changeThread = _conductAttributeChange(
                 self.devCtrl, nodeid, endpoint)
             # Reset the number of subscriptions received as subscribing causes a callback.
-            handler.subscriptionReceived = 0
             changeThread.start()
-            with handler.cv:
-                while handler.subscriptionReceived < 5:
-                    # We should observe 10 attribute changes
-                    handler.cv.wait()
-            changeThread.join()
-            return True
+            with updateCv:
+                while receivedUpdate < 5:
+                    # We should observe 5 attribute changes
+                    # The changing thread will change the value after 3 seconds. If we're waiting more than 10, assume something
+                    # is really wrong and bail out here with some information.
+                    if not updateCv.wait(10.0):
+                        self.logger.error(
+                            f"Failed to receive subscription update")
+                        break
+
+            # thread changes 5 times, and sleeps for 3 seconds in between. Add an additional 3 seconds of slack. Timeout is in seconds.
+            changeThread.join(18.0)
+            if changeThread.is_alive():
+                # Thread join timed out
+                self.logger.error(f"Failed to join change thread")
+                return False
+            return True if receivedUpdate == 5 else False
+
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")
             return False

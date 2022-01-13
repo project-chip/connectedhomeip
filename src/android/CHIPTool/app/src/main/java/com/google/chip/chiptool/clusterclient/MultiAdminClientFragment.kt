@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
@@ -24,7 +25,7 @@ class MultiAdminClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
 
-  private val scope = CoroutineScope(Dispatchers.Main + Job())
+  private lateinit var scope: CoroutineScope
 
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
@@ -33,6 +34,8 @@ class MultiAdminClientFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    scope = viewLifecycleOwner.lifecycleScope
+
     return inflater.inflate(R.layout.multi_admin_client_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
 
@@ -72,11 +75,6 @@ class MultiAdminClientFragment : Fragment() {
     override fun onError(error: Throwable?) {
       Log.d(TAG, "onError: $error")
     }
-  }
-
-  override fun onStop() {
-    super.onStop()
-    scope.cancel()
   }
 
   private suspend fun sendBasicCommissioningCommandClick() {

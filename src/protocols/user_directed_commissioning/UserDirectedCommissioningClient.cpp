@@ -18,12 +18,14 @@
 
 /**
  *    @file
- *      This file implements an object for a Matter User Directed Commissioning unsolicitied
+ *      This file implements an object for a Matter User Directed Commissioning unsolicited
  *      initiator (client).
  *
  */
 
 #include "UserDirectedCommissioning.h"
+
+#include <unistd.h>
 
 namespace chip {
 namespace Protocols {

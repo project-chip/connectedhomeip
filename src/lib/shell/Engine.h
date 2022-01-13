@@ -152,6 +152,15 @@ public:
      */
     void RunMainLoop();
 
+    /**
+     * Initialize the Shell::Engine.
+     *
+     * Activates the linked streamer, registers default commands, and sets up exit handlers.
+     *
+     * @return 0 for success, otherwise failed.
+     */
+    int Init();
+
 private:
     static void ProcessShellLineTask(intptr_t context);
 };

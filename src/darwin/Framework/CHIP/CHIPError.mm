@@ -63,10 +63,14 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Integrity check failed.", nil) }];
     }
 
-    if (errorCode == CHIP_NO_ERROR) {
+    if (errorCode == CHIP_ERROR_IM_CONSTRAINT_ERROR) {
         return [NSError errorWithDomain:CHIPErrorDomain
-                                   code:CHIPSuccess
-                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Success.", nil) }];
+                                   code:CHIPErrorCodeConstraintError
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Value out of range.", nil) }];
+    }
+
+    if (errorCode == CHIP_NO_ERROR) {
+        return nil;
     }
 
     return [NSError errorWithDomain:CHIPErrorDomain
@@ -86,10 +90,42 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
             errorWithDomain:CHIPErrorDomain
                        code:CHIPErrorCodeDuplicateExists
                    userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"A Duplicate entry or setting exists.", nil) }];
+    case EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT:
+        return
+            [NSError errorWithDomain:CHIPErrorDomain
+                                code:CHIPErrorCodeUnsupportedEndpoint
+                            userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Target endpoint does not exist.", nil) }];
+    case EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND:
+        return
+            [NSError errorWithDomain:CHIPErrorDomain
+                                code:CHIPErrorCodeUnsupportedCommand
+                            userInfo:@{
+                                NSLocalizedDescriptionKey : NSLocalizedString(@"Command is not supported on target cluster.", nil)
+                            }];
+    case EMBER_ZCL_STATUS_INVALID_COMMAND:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeInvalidCommand
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Command payload is invalid.", nil) }];
     case EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE:
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeUnsupportedAttribute
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Attribute is not supported.", nil) }];
+    case EMBER_ZCL_STATUS_CONSTRAINT_ERROR:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPErrorCodeConstraintError
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Value out of range.", nil) }];
+    case EMBER_ZCL_STATUS_UNSUPPORTED_WRITE:
+        return [NSError
+            errorWithDomain:CHIPErrorDomain
+                       code:CHIPErrorCodeUnsupportedWrite
+                   userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Attempt to write read-only attribute.", nil) }];
+    case EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER:
+        return
+            [NSError errorWithDomain:CHIPErrorDomain
+                                code:CHIPErrorCodeUnsupportedCluster
+                            userInfo:@{
+                                NSLocalizedDescriptionKey : NSLocalizedString(@"Cluster is not supported on target endpoint.", nil)
+                            }];
     default:
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeUndefinedError
@@ -100,8 +136,12 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
     }
 }
 
-+ (CHIP_ERROR)errorToCHIPErrorCode:(NSError *)error
++ (CHIP_ERROR)errorToCHIPErrorCode:(NSError * _Nullable)error
 {
+    if (error == nil) {
+        return CHIP_NO_ERROR;
+    }
+
     if (error.domain != CHIPErrorDomain) {
         return CHIP_ERROR_INTERNAL;
     }
@@ -119,10 +159,44 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
         return CHIP_ERROR_INCORRECT_STATE;
     case CHIPErrorCodeIntegrityCheckFailed:
         return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
-    case CHIPSuccess:
-        return CHIP_NO_ERROR;
+    case CHIPErrorCodeConstraintError:
+        return CHIP_ERROR_IM_CONSTRAINT_ERROR;
     default:
         return CHIP_ERROR_INTERNAL;
+    }
+}
+
++ (uint8_t)errorToZCLErrorCode:(NSError * _Nullable)error
+{
+    // If this is changed, change CHIPErrorTestUtils' version of
+    // errorToZCLErrorCode too.
+    if (error == nil) {
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+
+    if (error.domain != CHIPErrorDomain) {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+
+    switch (error.code) {
+    case CHIPErrorCodeDuplicateExists:
+        return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
+    case CHIPErrorCodeUnsupportedEndpoint:
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+    case CHIPErrorCodeUnsupportedCommand:
+        return EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND;
+    case CHIPErrorCodeInvalidCommand:
+        return EMBER_ZCL_STATUS_INVALID_COMMAND;
+    case CHIPErrorCodeUnsupportedAttribute:
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+    case CHIPErrorCodeConstraintError:
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    case CHIPErrorCodeUnsupportedWrite:
+        return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
+    case CHIPErrorCodeUnsupportedCluster:
+        return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
+    default:
+        return EMBER_ZCL_STATUS_FAILURE;
     }
 }
 @end

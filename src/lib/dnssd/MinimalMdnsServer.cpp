@@ -98,11 +98,12 @@ GlobalMinimalMdnsServer & GlobalMinimalMdnsServer::Instance()
     return _instance;
 }
 
-CHIP_ERROR GlobalMinimalMdnsServer::StartServer(chip::Inet::InetLayer * inetLayer, uint16_t port)
+CHIP_ERROR GlobalMinimalMdnsServer::StartServer(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
+                                                uint16_t port)
 {
     GlobalMinimalMdnsServer::Server().Shutdown();
     AllInterfaces allInterfaces;
-    return GlobalMinimalMdnsServer::Server().Listen(inetLayer, &allInterfaces, port);
+    return GlobalMinimalMdnsServer::Server().Listen(udpEndPointManager, &allInterfaces, port);
 }
 
 void GlobalMinimalMdnsServer::ShutdownServer()

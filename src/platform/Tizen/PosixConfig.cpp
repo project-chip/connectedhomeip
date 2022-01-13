@@ -49,7 +49,7 @@ const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceId         = { kConfigNa
 const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
 const PosixConfig::Key PosixConfig::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
 const PosixConfig::Key PosixConfig::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
-const PosixConfig::Key PosixConfig::kConfigKey_ProductRevision     = { kConfigNamespace_ChipFactory, "product-rev" };
+const PosixConfig::Key PosixConfig::kConfigKey_HardwareVersion     = { kConfigNamespace_ChipFactory, "hardware-ver" };
 const PosixConfig::Key PosixConfig::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
 const PosixConfig::Key PosixConfig::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
 const PosixConfig::Key PosixConfig::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
@@ -67,6 +67,9 @@ const PosixConfig::Key PosixConfig::kConfigKey_WiFiStationSecType = { kConfigNam
 const PosixConfig::Key PosixConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
 const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const PosixConfig::Key PosixConfig::kConfigKey_ActiveLocale       = { kConfigNamespace_ChipConfig, "active-locale" };
+const PosixConfig::Key PosixConfig::kConfigKey_HourFormat         = { kConfigNamespace_ChipConfig, "hour-format" };
+const PosixConfig::Key PosixConfig::kConfigKey_CalendarType       = { kConfigNamespace_ChipConfig, "calendar-type" };
 
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char PosixConfig::kGroupKeyNamePrefix[] = "gk-";

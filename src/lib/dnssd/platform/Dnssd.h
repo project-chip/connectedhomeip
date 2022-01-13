@@ -34,6 +34,7 @@
 #include <lib/core/Optional.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/dnssd/ServiceNaming.h>
+#include <system/TimeSource.h>
 
 namespace chip {
 namespace Dnssd {
@@ -66,7 +67,8 @@ struct DnssdService
     char mHostName[kHostNameMaxLength + 1] = "";
     char mType[kDnssdTypeMaxSize + 1];
     DnssdServiceProtocol mProtocol;
-    Inet::IPAddressType mAddressType;
+    Inet::IPAddressType mAddressType;   // Address record type to query or publish (A or AAAA)
+    Inet::IPAddressType mTransportType; // Transport to use for the query.
     uint16_t mPort;
     chip::Inet::InterfaceId mInterface;
     TextEntry * mTextEntries;
@@ -74,6 +76,8 @@ struct DnssdService
     const char ** mSubTypes;
     size_t mSubTypeSize;
     Optional<chip::Inet::IPAddress> mAddress;
+    // Time to live in seconds. Per rfc6762 section 10, because we have a hostname, our default TTL is 120 seconds
+    uint32_t mTtlSeconds = 120;
 };
 
 /**

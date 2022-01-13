@@ -16,14 +16,7 @@
  *
  */
 
-#import <CHIP/CHIPDevice.h>
-#import <CHIP/CHIPDeviceController.h>
-#import <CHIP/CHIPDevicePairingDelegate.h>
-#import <CHIP/CHIPManualSetupPayloadParser.h>
-#import <CHIP/CHIPPersistentStorageDelegate.h>
-#import <CHIP/CHIPQRCodeSetupPayloadParser.h>
-#import <CHIP/CHIPSetupPayload.h>
-#import <CHIP/zap-generated/CHIPClustersObjc.h>
+#import <CHIP/CHIP.h>
 #import <Foundation/Foundation.h>
 
 int main(int argc, const char * argv[]) { return EXIT_SUCCESS; }

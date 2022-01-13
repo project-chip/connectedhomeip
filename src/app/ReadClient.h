@@ -23,15 +23,17 @@
  */
 
 #pragma once
-
 #include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/EventHeader.h>
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
-#include <app/MessageDef/ReadRequest.h>
-#include <app/MessageDef/StatusResponse.h>
-#include <app/MessageDef/SubscribeRequest.h>
-#include <app/MessageDef/SubscribeResponse.h>
+#include <app/MessageDef/ReadRequestMessage.h>
+#include <app/MessageDef/StatusResponseMessage.h>
+#include <app/MessageDef/SubscribeRequestMessage.h>
+#include <app/MessageDef/SubscribeResponseMessage.h>
 #include <app/ReadPrepareParams.h>
+#include <app/data-model/Decode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -45,6 +47,9 @@
 
 namespace chip {
 namespace app {
+
+class InteractionModelEngine;
+
 /**
  *  @class ReadClient
  *
@@ -55,44 +60,168 @@ namespace app {
 class ReadClient : public Messaging::ExchangeDelegate
 {
 public:
+    class Callback
+    {
+    public:
+        virtual ~Callback() = default;
+
+        /**
+         * Used to signal the commencement of processing of the first attribute report received in a given exchange.
+         *
+         * This object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         */
+        virtual void OnReportBegin(const ReadClient * apReadClient) {}
+
+        /**
+         * Used to signal the completion of processing of the last attribute report in a given exchange.
+         *
+         * This object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         */
+        virtual void OnReportEnd(const ReadClient * apReadClient) {}
+
+        /**
+         * Used to deliver event data received through the Read and Subscribe interactions
+         *
+         * Only one of the apData and apStatus can be non-null.
+         *
+         * This object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
+         * @param[in] aEventHeader: The event header in report response.
+         * @param[in] apData: A TLVReader positioned right on the payload of the event.
+         * @param[in] apStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
+         *                     cluster-specific status code.
+         */
+        virtual void OnEventData(const ReadClient * apReadClient, const EventHeader & aEventHeader, TLV::TLVReader * apData,
+                                 const StatusIB * apStatus)
+        {}
+
+        /**
+         * Used to deliver attribute data received through the Read and Subscribe interactions.
+         *
+         * This callback will be called when:
+         *   - Receiving attribute data as response of Read interactions
+         *   - Receiving attribute data as reports of subscriptions
+         *   - Receiving attribute data as initial reports of subscriptions
+         *
+         * This object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * @param[in] apReadClient The read client object that initiated the read or subscribe transaction.
+         * @param[in] aPath        The attribute path field in report response.
+         * @param[in] apData       The attribute data of the given path, will be a nullptr if status is not Success.
+         * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
+         *                         optional cluster-specific status code.
+         */
+        virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath,
+                                     TLV::TLVReader * apData, const StatusIB & aStatus)
+        {}
+
+        /**
+         * OnSubscriptionEstablished will be called when a subscription is established for the given subscription transaction.
+         *
+         * This object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * @param[in] apReadClient The read client object that initiated the read transaction.
+         */
+        virtual void OnSubscriptionEstablished(const ReadClient * apReadClient) {}
+
+        /**
+         * OnError will be called when an error occurs *after* a successful call to SendRequest(). The following
+         * errors will be delivered through this call in the aError field:
+         *
+         * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
+         * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
+         * - CHIP_ERROR*: All other cases.
+         *
+         * This object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call to destroy the object.
+         *
+         * @param[in] apReadClient The read client object that initiated the attribute read transaction.
+         * @param[in] aError       A system error code that conveys the overall error code.
+         */
+        virtual void OnError(const ReadClient * apReadClient, CHIP_ERROR aError) {}
+
+        /**
+         * OnDone will be called when ReadClient has finished all work and is safe to destroy and free the
+         * allocated CommandSender object.
+         *
+         * This function will:
+         *      - Always be called exactly *once* for a given ReadClient instance.
+         *      - Be called even in error circumstances.
+         *      - Only be called after a successful call to SendRequest has been
+         *        made, when the read completes or the subscription is shut down.
+         *
+         * @param[in] apReadClient The read client object of the terminated read or subscribe interaction.
+         */
+        virtual void OnDone(ReadClient * apReadClient) = 0;
+    };
+
     enum class InteractionType : uint8_t
     {
         Read,
         Subscribe,
     };
-    /**
-     *  Shut down the Client. This terminates this instance of the object and releases
-     *  all held resources.  The object must not be used after Shutdown() is called.
-     *
-     *  SDK consumer can choose when to shut down the ReadClient.
-     *  The ReadClient will automatically shut itself down when it receives a
-     *  response or the response times out.  So manual shutdown is only needed
-     *  to shut down a ReadClient before one of those two things has happened,
-     *  (e.g. if SendReadRequest returned failure).
-     */
-    void Shutdown();
 
     /**
-     *  Send a Read Request.  There can be one Read Request outstanding on a given ReadClient.
-     *  If SendReadRequest returns success, no more Read Requests can be sent on this ReadClient
-     *  until the corresponding InteractionModelDelegate::ReadDone call happens with guarantee.
+     *
+     *  Constructor.
+     *
+     *  The callback passed in has to outlive this ReadClient object.
+     *
+     *  This object can outlive the InteractionModelEngine passed in. However, upon shutdown of the engine,
+     *  this object will cease to function correctly since it depends on the engine for a number of critical functions.
+     *
+     *  @param[in]    apImEngine       A valid pointer to the IM engine.
+     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
+     *  @param[in]    apCallback       InteractionModelDelegate set by application.
+     *  @param[in]    aInteractionType Type of interaction (read or subscribe)
+     *
+     *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
+     *  @retval #CHIP_NO_ERROR On success.
+     *
+     */
+    ReadClient(InteractionModelEngine * apImEngine, Messaging::ExchangeManager * apExchangeMgr, Callback & apCallback,
+               InteractionType aInteractionType);
+
+    /**
+     * Destructor.
+     *
+     * Will abort the exchange context if a valid one still exists. It will also cancel any
+     * liveness timers that may be active.
+     *
+     * OnDone() will not be called.
+     */
+    virtual ~ReadClient();
+
+    /*
+     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() above. This can only
+     * arise due to application-initiated destruction of the object when this object is handling receiving/sending
+     * message payloads. Abort() should be called first before the object is destroyed.
+     */
+    void Abort();
+
+    /**
+     *  Send a request.  There can be one request outstanding on a given ReadClient.
+     *  If SendRequest returns success, no more SendRequest calls can happen on this ReadClient
+     *  until the corresponding OnDone call has happened.
+     *
+     *  This will send either a Read Request or a Subscribe Request depending on
+     *  the InteractionType this read client was initialized with.
      *
      *  @retval #others fail to send read request
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
+    CHIP_ERROR SendRequest(ReadPrepareParams & aReadPrepareParams);
 
-    /**
-     *  Send a subscribe Request.  There can be one Subscribe Request outstanding on a given ReadClient.
-     *  If SendSubscribeRequest returns success, no more subscribe Requests can be sent on this ReadClient
-     *  until the corresponding InteractionModelDelegate::ReadDone call happens with guarantee.
-     *
-     *  @retval #others fail to send subscribe request
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
     CHIP_ERROR OnUnsolicitedReportData(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
-    uint64_t GetAppIdentifier() const { return mAppIdentifier; }
 
     auto GetSubscriptionId() const
     {
@@ -100,19 +229,21 @@ public:
         return mInteractionType == InteractionType::Subscribe ? returnType(mSubscriptionId) : returnType::Missing();
     }
 
+    FabricIndex GetFabricIndex() const { return mFabricIndex; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() const { return mInteractionType == InteractionType::Subscribe; };
-    CHIP_ERROR SendStatusResponse(CHIP_ERROR aError);
+
+    ReadClient * GetNextClient() { return mpNext; }
+    void SetNextClient(ReadClient * apClient) { mpNext = apClient; }
 
 private:
     friend class TestReadInteraction;
     friend class InteractionModelEngine;
 
-    enum class ClientState
+    enum class ClientState : uint8_t
     {
-        Uninitialized = 0,         ///< The client has not been initialized
-        Initialized,               ///< The client has been initialized and is ready for a SendReadRequest
+        Idle,                      ///< The client has been initialized and is ready for a SendRequest
         AwaitingInitialReport,     ///< The client is waiting for initial report
         AwaitingSubscribeResponse, ///< The client is waiting for subscribe response
         SubscriptionActive,        ///< The client is maintaining subscription
@@ -122,33 +253,6 @@ private:
     {
         return aSubscriptionId == mSubscriptionId && mInteractionType == InteractionType::Subscribe;
     }
-    /**
-     *  Initialize the client object. Within the lifetime
-     *  of this instance, this method is invoked once after object
-     *  construction until a call to Shutdown is made to terminate the
-     *  instance.
-     *
-     *  The following callbacks are expected to be invoked on the InteractionModelDelegate:
-     *      - EventStreamReceived
-     *      - OnReportData
-     *      - ReportProcessed
-     *      - ReadError
-     *      - ReadDone
-     *
-     *  When processing subscriptions, these callbacks are invoked as well:
-     *      - SubscribeResponseProcessed
-     *
-     *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
-     *  @param[in]    apDelegate       InteractionModelDelegate set by application.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
-     *  @retval #CHIP_NO_ERROR On success.
-     *
-     */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                    InteractionType aInteractionType, uint64_t aAppIdentifier);
-
-    virtual ~ReadClient() = default;
 
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
@@ -158,16 +262,17 @@ private:
      *  Check if current read client is being used
      *
      */
-    bool IsFree() const { return mState == ClientState::Uninitialized; }
-    bool IsSubscriptionTypeIdle() const { return mState == ClientState::SubscriptionActive; }
+    bool IsIdle() const { return mState == ClientState::Idle; }
+    bool IsSubscriptionIdle() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
-    CHIP_ERROR GenerateEventPathList(EventPathList::Builder & aEventPathListBuilder, EventPathParams * apEventPathParamsList,
-                                     size_t aEventPathParamsListSize);
-    CHIP_ERROR GenerateAttributePathList(AttributePathList::Builder & aAttributeathListBuilder,
+    CHIP_ERROR GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
+                                  size_t aEventPathParamsListSize);
+    CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);
-    CHIP_ERROR ProcessAttributeDataList(TLV::TLVReader & aAttributeDataListReader);
+    CHIP_ERROR ProcessAttributeReportIBs(TLV::TLVReader & aAttributeDataIBsReader);
+    CHIP_ERROR ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader);
 
     void ClearExchangeContext() { mpExchangeCtx = nullptr; }
     static void OnLivenessTimeoutCallback(System::Layer * apSystemLayer, void * apAppState);
@@ -175,27 +280,42 @@ private:
     CHIP_ERROR RefreshLivenessCheckTimer();
     void CancelLivenessCheckTimer();
     void MoveToState(const ClientState aTargetState);
+    CHIP_ERROR ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ConcreteDataAttributePath & aClusterInfo);
     CHIP_ERROR ProcessReportData(System::PacketBufferHandle && aPayload);
-    CHIP_ERROR AbortExistingExchangeContext();
     const char * GetStateStr() const;
 
-    /**
-     * Internal shutdown method that we use when we know what's going on with
-     * our exchange and don't need to manually close it.
+    // Specialized request-sending functions.
+    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams);
+    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aSubscribePrepareParams);
+
+    /*
+     * Called internally to signal the completion of all work on this object, gracefully close the
+     * exchange and finally, signal to the application that it's
+     * safe to release this object.
+     *
+     * If aError != CHIP_NO_ERROR, it is delivered to the application through the OnError callback first.
+     *
      */
-    void ShutdownInternal(CHIP_ERROR aError);
-    bool IsInitialReport() { return mInitialReport; }
+    void Close(CHIP_ERROR aError);
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
-    ClientState mState                         = ClientState::Uninitialized;
-    uint64_t mAppIdentifier                    = 0;
-    bool mInitialReport                        = true;
-    uint16_t mMinIntervalFloorSeconds          = 0;
-    uint16_t mMaxIntervalCeilingSeconds        = 0;
-    uint64_t mSubscriptionId                   = 0;
-    NodeId mPeerNodeId                         = kUndefinedNodeId;
-    InteractionType mInteractionType           = InteractionType::Read;
+    Callback & mpCallback;
+    ClientState mState                  = ClientState::Idle;
+    bool mIsInitialReport               = true;
+    bool mIsPrimingReports              = true;
+    bool mPendingMoreChunks             = false;
+    uint16_t mMinIntervalFloorSeconds   = 0;
+    uint16_t mMaxIntervalCeilingSeconds = 0;
+    uint64_t mSubscriptionId            = 0;
+    NodeId mPeerNodeId                  = kUndefinedNodeId;
+    FabricIndex mFabricIndex            = kUndefinedFabricIndex;
+    InteractionType mInteractionType    = InteractionType::Read;
+    Timestamp mEventTimestamp;
+    EventNumber mEventMin = 0;
+
+    ReadClient * mpNext                 = nullptr;
+    InteractionModelEngine * mpImEngine = nullptr;
 };
 
 }; // namespace app

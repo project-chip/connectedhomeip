@@ -99,10 +99,6 @@
 #define CHIP_CONFIG_MAX_CHANNEL_HANDLES 16
 #endif // CHIP_CONFIG_MAX_CHANNEL_HANDLES
 
-#ifndef CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
-#define CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT 6
-#endif // CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
-
 #ifndef CHIP_LOG_FILTERING
 #define CHIP_LOG_FILTERING 0
 #endif // CHIP_LOG_FILTERING
@@ -114,6 +110,18 @@
 #ifndef CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
 #define CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS 4
 #endif // CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
+
+/**
+ *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
+ *
+ *  @brief
+ *    Maximum number of administrators that can provision the device. Each admin
+ *    can provision the device with their unique operational credentials and manage
+ *    their access control lists.
+ */
+#ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
+#define CHIP_CONFIG_MAX_DEVICE_ADMINS 5 // 4 fabrics + 1 for rotation slack
+#endif
 
 // ==================== Security Configuration Overrides ====================
 

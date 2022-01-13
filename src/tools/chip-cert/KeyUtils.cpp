@@ -66,45 +66,6 @@ KeyFormat DetectKeyFormat(const uint8_t * key, uint32_t keyLen)
     return kKeyFormat_X509_DER;
 }
 
-bool SerializeKeyPair(EVP_PKEY * key, uint8_t * chipKey, uint32_t chipKeyBufSize, uint32_t & chipKeyLen)
-{
-    bool res                 = true;
-    const BIGNUM * privKeyBN = nullptr;
-    const EC_GROUP * group   = nullptr;
-    const EC_KEY * ecKey     = nullptr;
-    const EC_POINT * ecPoint = nullptr;
-    uint8_t * pubKey         = chipKey;
-    uint8_t * privKey        = chipKey + kP256_PublicKey_Length;
-    size_t pubKeyLen         = 0;
-    int privKeyLen           = 0;
-
-    VerifyOrExit(chipKeyBufSize >= kP256_PublicKey_Length + kP256_PrivateKey_Length, res = false);
-
-    ecKey = EVP_PKEY_get1_EC_KEY(key);
-    VerifyOrExit(ecKey != nullptr, res = false);
-
-    privKeyBN = EC_KEY_get0_private_key(ecKey);
-    VerifyOrExit(privKeyBN != nullptr, res = false);
-
-    group = EC_KEY_get0_group(ecKey);
-    VerifyOrExit(group != nullptr, res = false);
-
-    ecPoint = EC_KEY_get0_public_key(ecKey);
-    VerifyOrExit(ecPoint != nullptr, res = false);
-
-    pubKeyLen =
-        EC_POINT_point2oct(group, ecPoint, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubKey), kP256_PublicKey_Length, nullptr);
-    VerifyOrExit(pubKeyLen == kP256_PublicKey_Length, res = false);
-
-    privKeyLen = BN_bn2binpad(privKeyBN, privKey, kP256_PrivateKey_Length);
-    VerifyOrExit(privKeyLen == kP256_PrivateKey_Length, res = false);
-
-    chipKeyLen = kP256_PublicKey_Length + kP256_PrivateKey_Length;
-
-exit:
-    return res;
-}
-
 bool DeserializeKeyPair(const uint8_t * keyPair, uint32_t keyPairLen, EVP_PKEY * key)
 {
     bool res                = true;
@@ -143,6 +104,43 @@ exit:
 }
 
 } // namespace
+
+bool SerializeKeyPair(EVP_PKEY * key, P256SerializedKeypair & serializedKeypair)
+{
+    bool res                 = true;
+    const BIGNUM * privKeyBN = nullptr;
+    const EC_GROUP * group   = nullptr;
+    const EC_KEY * ecKey     = nullptr;
+    const EC_POINT * ecPoint = nullptr;
+    uint8_t * pubKey         = serializedKeypair;
+    uint8_t * privKey        = pubKey + kP256_PublicKey_Length;
+    size_t pubKeyLen         = 0;
+    int privKeyLen           = 0;
+
+    ecKey = EVP_PKEY_get1_EC_KEY(key);
+    VerifyOrExit(ecKey != nullptr, res = false);
+
+    privKeyBN = EC_KEY_get0_private_key(ecKey);
+    VerifyOrExit(privKeyBN != nullptr, res = false);
+
+    group = EC_KEY_get0_group(ecKey);
+    VerifyOrExit(group != nullptr, res = false);
+
+    ecPoint = EC_KEY_get0_public_key(ecKey);
+    VerifyOrExit(ecPoint != nullptr, res = false);
+
+    pubKeyLen =
+        EC_POINT_point2oct(group, ecPoint, POINT_CONVERSION_UNCOMPRESSED, Uint8::to_uchar(pubKey), kP256_PublicKey_Length, nullptr);
+    VerifyOrExit(pubKeyLen == kP256_PublicKey_Length, res = false);
+
+    privKeyLen = BN_bn2binpad(privKeyBN, privKey, kP256_PrivateKey_Length);
+    VerifyOrExit(privKeyLen == kP256_PrivateKey_Length, res = false);
+
+    serializedKeypair.SetLength(kP256_PublicKey_Length + kP256_PrivateKey_Length);
+
+exit:
+    return res;
+}
 
 bool ReadKey(const char * fileName, EVP_PKEY * key)
 {
@@ -250,6 +248,7 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
     uint32_t chipKeyBase64Len = BASE64_ENCODED_LEN(chipKeyLen);
     std::unique_ptr<uint8_t[]> chipKey(new uint8_t[chipKeyLen]);
     std::unique_ptr<uint8_t[]> chipKeyBase64(new uint8_t[chipKeyBase64Len]);
+    P256SerializedKeypair serializedKeypair;
 
     VerifyOrExit(key != nullptr, res = false);
 
@@ -278,12 +277,13 @@ bool WritePrivateKey(const char * fileName, EVP_PKEY * key, KeyFormat keyFmt)
         break;
     case kKeyFormat_Chip_Raw:
     case kKeyFormat_Chip_Base64:
-        res = SerializeKeyPair(key, chipKey.get(), chipKeyLen, chipKeyLen);
+        res = SerializeKeyPair(key, serializedKeypair);
         VerifyTrueOrExit(res);
 
         if (keyFmt == kKeyFormat_Chip_Base64)
         {
-            res = Base64Encode(chipKey.get(), chipKeyLen, chipKeyBase64.get(), chipKeyBase64Len, chipKeyBase64Len);
+            res = Base64Encode(serializedKeypair, static_cast<uint32_t>(serializedKeypair.Length()), chipKeyBase64.get(),
+                               chipKeyBase64Len, chipKeyBase64Len);
             VerifyTrueOrExit(res);
 
             keyToWrite    = chipKeyBase64.get();

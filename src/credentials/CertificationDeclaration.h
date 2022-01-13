@@ -27,6 +27,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/asn1/ASN1.h>
 #include <lib/asn1/ASN1Macros.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 
@@ -34,25 +35,70 @@ namespace chip {
 namespace Credentials {
 
 static constexpr uint32_t kMaxProductIdsCountPerCD = 100;
-
-static constexpr uint32_t kCertificationElements_TLVEncodedMaxLength = (1 + 1) + // Length of header and end of outer TLV structure.
-    (1 + sizeof(uint16_t)) * kMaxProductIdsCountPerCD + 3 + // Max encoding length of an array of 100 uint16_t elements.
-    (2 + sizeof(uint8_t)) * 2 +                             // Encoding length of two uint8_t element.
-    (2 + sizeof(uint16_t)) * 5;                             // Max total encoding length of five uint16_t elements.
-
+static constexpr uint32_t kCertificateIdLength     = 19;
+static constexpr uint32_t kCertificationElements_TLVEncodedMaxLength =
+    TLV::EstimateStructOverhead(sizeof(uint16_t), // FormatVersion
+                                sizeof(uint16_t), // VendorId
+                                // ProductIds. Formally, the following extression should be used here:
+                                //     ( TLV::EstimateStructOverhead(sizeof(uint16_t)) * kMaxProductIdsCountPerCD ),
+                                // Because exact structure of the elements of this array is known, more accurate estimate is used.
+                                (1 + sizeof(uint16_t)) * kMaxProductIdsCountPerCD,
+                                sizeof(uint32_t),     // DeviceTypeId
+                                kCertificateIdLength, // CertificateId
+                                sizeof(uint8_t),      // SecurityLevel
+                                sizeof(uint16_t),     // SecurityInformation
+                                sizeof(uint16_t),     // VersionNumber
+                                sizeof(uint8_t),      // CertificationType
+                                sizeof(uint16_t),     // DACOriginVendorId
+                                sizeof(uint16_t));    // DACOriginProductId
 static constexpr uint32_t kMaxCMSSignedCDMessage = 183 + kCertificationElements_TLVEncodedMaxLength;
 
 struct CertificationElements
 {
+    uint16_t FormatVersion;
     uint16_t VendorId;
     uint16_t ProductIds[kMaxProductIdsCountPerCD];
     uint8_t ProductIdsCount;
-    uint16_t ServerCategoryId;
-    uint16_t ClientCategoryId;
+    uint32_t DeviceTypeId;
+    char CertificateId[kCertificateIdLength + 1];
     uint8_t SecurityLevel;
     uint16_t SecurityInformation;
     uint16_t VersionNumber;
     uint8_t CertificationType;
+    uint16_t DACOriginVendorId;
+    uint16_t DACOriginProductId;
+    bool DACOriginVIDandPIDPresent;
+};
+
+struct CertificationElementsWithoutPIDs
+{
+    uint16_t formatVersion                       = 0;
+    uint16_t vendorId                            = VendorId::NotSpecified;
+    uint32_t deviceTypeId                        = 0;
+    uint8_t securityLevel                        = 0;
+    uint16_t securityInformation                 = 0;
+    uint16_t versionNumber                       = 0;
+    uint8_t certificationType                    = 0;
+    uint16_t dacOriginVendorId                   = VendorId::NotSpecified;
+    uint16_t dacOriginProductId                  = 0;
+    bool dacOriginVIDandPIDPresent               = false;
+    char certificateId[kCertificateIdLength + 1] = { 0 };
+};
+
+class CertificationElementsDecoder
+{
+public:
+    bool IsProductIdIn(const ByteSpan & encodedCertElements, uint16_t productId);
+
+private:
+    CHIP_ERROR PrepareToReadProductIdList(const ByteSpan & encodedCertElements);
+    CHIP_ERROR GetNextProductId(uint16_t & productId);
+
+    ByteSpan mCertificationDeclarationData;
+    bool mIsInitialized = false;
+    TLV::TLVReader mReader;
+    TLV::TLVType mOuterContainerType1 = TLV::kTLVType_Structure;
+    TLV::TLVType mOuterContainerType2 = TLV::kTLVType_Structure;
 };
 
 /**
@@ -74,6 +120,16 @@ CHIP_ERROR EncodeCertificationElements(const CertificationElements & certElement
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, CertificationElements & certElements);
+
+/**
+ * @brief Decode certification elements from TLV encoded structure.
+ *
+ * @param[in]  encodedCertElements  A byte span to read the TLV encoded certification elements.
+ * @param[out] certDeclContent         Decoded Certification Declaration Content.
+ *
+ * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+ **/
+CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, CertificationElementsWithoutPIDs & certDeclContent);
 
 /**
  * @brief Generate CMS signed message.

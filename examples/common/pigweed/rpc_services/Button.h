@@ -23,12 +23,12 @@
 namespace chip {
 namespace rpc {
 
-class Button : public generated::Button<Button>
+class Button : public pw_rpc::nanopb::Button::Service<Button>
 {
 public:
     virtual ~Button() = default;
 
-    virtual pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
+    virtual pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
     {
         return pw::Status::Unimplemented();
     }

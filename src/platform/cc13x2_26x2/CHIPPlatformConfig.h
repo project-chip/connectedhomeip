@@ -40,6 +40,7 @@
 #define CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER 0x2
 
 // ==================== Security Adaptations ====================
+#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY 2
 
 // This platform uses mbedtls, but these defines don't seem to be used in source
 #define CHIP_CONFIG_USE_OPENSSL_ECC 0
@@ -97,10 +98,6 @@
 #define CHIP_CONFIG_MAX_CHANNEL_HANDLES 16
 #endif // CHIP_CONFIG_MAX_CHANNEL_HANDLES
 
-#ifndef CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
-#define CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT 6
-#endif // CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
-
 #ifndef CHIP_LOG_FILTERING
 #define CHIP_LOG_FILTERING 0
 #endif // CHIP_LOG_FILTERING
@@ -112,6 +109,11 @@
 #ifndef CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
 #define CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS 4
 #endif // CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
+
+// Limit the number of device admins to ensure enough ressources for handling them
+#ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
+#define CHIP_CONFIG_MAX_DEVICE_ADMINS 5
+#endif // CHIP_CONFIG_MAX_DEVICE_ADMINS
 
 // ==================== Security Configuration Overrides ====================
 

@@ -58,18 +58,17 @@ protected:
     void _ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg);
     void _DispatchEvent(const ChipDeviceEvent * event);
 
-    CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
-    CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
-    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
-
-    CHIP_ERROR _GetRebootCount(uint16_t & rebootCount);
-    CHIP_ERROR _GetUpTime(uint64_t & upTime);
-    CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);
+    CHIP_ERROR
+    _GetFixedLabelList(EndpointId endpoint,
+                       AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+    CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
+                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
+                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
 
     // ===== Support methods that can be overridden by the implementation subclass.
 
-    void DispatchEventToSystemLayer(const ChipDeviceEvent * event);
     void DispatchEventToDeviceLayer(const ChipDeviceEvent * event);
     void DispatchEventToApplication(const ChipDeviceEvent * event);
     static void HandleMessageLayerActivityChanged(bool messageLayerIsActive);
@@ -84,43 +83,29 @@ private:
 extern template class GenericPlatformManagerImpl<PlatformManagerImpl>;
 
 template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetFixedLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_SetUserLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetUserLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetRebootCount(uint16_t & rebootCount)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetUpTime(uint64_t & upTime)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetTotalOperationalHours(uint32_t & totalOperationalHours)
-{
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-}
-
-template <class ImplClass>
-inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetBootReasons(uint8_t & bootReasons)
+inline CHIP_ERROR
+GenericPlatformManagerImpl<ImplClass>::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

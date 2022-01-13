@@ -29,17 +29,37 @@
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
+#define EMBER_AF_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_FIXED_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_GENERAL_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_NETWORK_COMMISSIONING_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_OTA_PROVIDER_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
+#define EMBER_AF_OTA_REQUESTOR_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 #define EMBER_AF_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER_ENDPOINT_COUNT (1)
+#define EMBER_AF_USER_LABEL_CLUSTER_SERVER_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
+
+// Use this macro to check if the server side of the Basic cluster is included
+#define ZCL_USING_BASIC_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_BASIC_SERVER
+#define EMBER_AF_PLUGIN_BASIC
+
+// Use this macro to check if the server side of the Fixed Label cluster is included
+#define ZCL_USING_FIXED_LABEL_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_FIXED_LABEL_SERVER
+#define EMBER_AF_PLUGIN_FIXED_LABEL
 
 // Use this macro to check if the server side of the General Commissioning cluster is included
 #define ZCL_USING_GENERAL_COMMISSIONING_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_COMMISSIONING_SERVER
 #define EMBER_AF_PLUGIN_GENERAL_COMMISSIONING
+
+// Use this macro to check if the server side of the Localization Configuration cluster is included
+#define ZCL_USING_LOCALIZATION_CONFIGURATION_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_LOCALIZATION_CONFIGURATION_SERVER
+#define EMBER_AF_PLUGIN_LOCALIZATION_CONFIGURATION
 
 // Use this macro to check if the server side of the Network Commissioning cluster is included
 #define ZCL_USING_NETWORK_COMMISSIONING_CLUSTER_SERVER
@@ -50,7 +70,17 @@
 #define ZCL_USING_OTA_PROVIDER_CLUSTER_CLIENT
 #define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_PROVIDER_CLIENT
 
+// Use this macro to check if the server side of the OTA Software Update Requestor cluster is included
+#define ZCL_USING_OTA_REQUESTOR_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_REQUESTOR_SERVER
+#define EMBER_AF_PLUGIN_OTA_SOFTWARE_UPDATE_REQUESTOR
+
 // Use this macro to check if the server side of the Operational Credentials cluster is included
 #define ZCL_USING_OPERATIONAL_CREDENTIALS_CLUSTER_SERVER
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS_SERVER
 #define EMBER_AF_PLUGIN_OPERATIONAL_CREDENTIALS
+
+// Use this macro to check if the server side of the User Label cluster is included
+#define ZCL_USING_USER_LABEL_CLUSTER_SERVER
+#define EMBER_AF_PLUGIN_USER_LABEL_SERVER
+#define EMBER_AF_PLUGIN_USER_LABEL

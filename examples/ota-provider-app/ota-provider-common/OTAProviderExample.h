@@ -18,8 +18,9 @@
 
 #pragma once
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
+#include <ota-provider-common/BdxOtaSender.h>
 
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.
@@ -30,15 +31,18 @@ public:
     OTAProviderExample();
 
     void SetOTAFilePath(const char * path);
+    BdxOtaSender * GetBdxOtaSender() { return &mBdxOtaSender; }
 
     // Inherited from OTAProviderDelegate
-    EmberAfStatus HandleQueryImage(chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId,
-                                   uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported,
-                                   const chip::Span<const char> & location, bool requestorCanConsent,
-                                   const chip::ByteSpan & metadataForServer) override;
-    EmberAfStatus HandleApplyUpdateRequest(chip::app::CommandHandler * commandObj, const chip::ByteSpan & updateToken,
-                                           uint32_t newVersion) override;
-    EmberAfStatus HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t softwareVersion) override;
+    EmberAfStatus HandleQueryImage(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::DecodableType & commandData) override;
+    EmberAfStatus HandleApplyUpdateRequest(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::DecodableType & commandData) override;
+    EmberAfStatus HandleNotifyUpdateApplied(
+        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
 
     enum queryImageBehaviorType
     {
@@ -50,6 +54,7 @@ public:
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
 
 private:
+    BdxOtaSender mBdxOtaSender;
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
     queryImageBehaviorType mQueryImageBehavior;

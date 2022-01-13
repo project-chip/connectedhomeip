@@ -72,6 +72,7 @@
 #include <app/util/debug-printing.h>
 #include <app/util/ember-print.h>
 
+#include <lib/support/Iterators.h>
 #include <lib/support/SafeInt.h>
 
 /** @name Attribute Storage */
@@ -146,6 +147,17 @@ bool emberAfContainsServerWithMfgCode(chip::EndpointId endpoint, chip::ClusterId
  * and will not return any other clusters that share that id.
  */
 bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId);
+
+/**
+ * @brief Returns true if endpoint of given index contains the ZCL server with specified id.
+ *
+ * This function returns true if
+ * the endpoint of given index contains server of a given cluster.
+ * If this function is used with a manufacturer specific clusterId
+ * then this will return the first cluster that it finds in the Cluster table.
+ * and will not return any other clusters that share that id.
+ */
+bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
 
 /**
  * @brief Returns true if endpoint contains cluster client.
@@ -363,25 +375,11 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
 #define emberAfClusterIsManufacturerSpecific(cluster) ((cluster)->clusterId >= 0xFC00)
 
 /**
- * @brief macro that returns true if attribute is read only.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsReadOnly(metadata) (((metadata)->mask & ATTRIBUTE_MASK_WRITABLE) == 0)
-
-/**
  * @brief macro that returns true if client attribute, and false if server.
  *
  * @param metadata EmberAfAttributeMetadata* to consider.
  */
 #define emberAfAttributeIsClient(metadata) (((metadata)->mask & ATTRIBUTE_MASK_CLIENT) != 0)
-
-/**
- * @brief macro that returns true if attribute is saved to token.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsTokenized(metadata) (((metadata)->mask & ATTRIBUTE_MASK_TOKENIZE) != 0)
 
 /**
  * @brief macro that returns true if attribute is saved in external storage.
@@ -396,13 +394,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
  * @param metadata EmberAfAttributeMetadata* to consider.
  */
 #define emberAfAttributeIsSingleton(metadata) (((metadata)->mask & ATTRIBUTE_MASK_SINGLETON) != 0)
-
-/**
- * @brief macro that returns true if attribute is manufacturer specific
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsManufacturerSpecific(metadata) (((metadata)->mask & ATTRIBUTE_MASK_MANUFACTURER_SPECIFIC) != 0)
 
 /**
  * @brief macro that returns size of attribute in bytes.
@@ -561,40 +552,6 @@ void emberAfCopyString(uint8_t * dest, const uint8_t * src, size_t size);
  * destination buffer not including the length bytes.
  */
 void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size);
-/*
- * @brief Function that determines the length of a zigbee Cluster Library string
- *   (where the first byte is assumed to be the length).
- */
-uint8_t emberAfStringLength(const uint8_t * buffer);
-/*
- * @brief Function that determines the length of a zigbee Cluster Library long string.
- *   (where the first two bytes are assumed to be the length).
- */
-uint16_t emberAfLongStringLength(const uint8_t * buffer);
-
-/*
- * @brief Function that copies (part of) a ZCL typed list into a buffer. The index parameter
- * may indicate a specific member of the list, or the list length, or the whole list if it
- * is equal to -1.
- *
- * Individual elements may be accessed by an index of type 16-bit unsigned integer.
- * Elements are numbered from 1 upwards. The element with index 0 is always of type
- * uint16, and holds the number of elements contained in the list, which may be zero.
- * If the zeroth element contains 0xffff, the list is a non value and is considered
- * undefined.
- *
- * When writing, dest points to the list to write to, src points to the value to write, and index is the index to write at.
- *
- * When reading (i.e write is false), dest is the location to read into, src points to the list, and index is the index to read
- * from.
- *
- * When reading or writing if the index leads to read or write outside of the
- * allocated size for the list, this function will return 0.
- *
- * @return The number of bytes copied
- */
-uint16_t emberAfCopyList(chip::ClusterId clusterId, EmberAfAttributeMetadata * am, bool write, uint8_t * dest, uint8_t * src,
-                         int32_t index);
 
 /*
  * @brief Function that determines the size of a zigbee Cluster Library
@@ -604,15 +561,6 @@ uint16_t emberAfCopyList(chip::ClusterId clusterId, EmberAfAttributeMetadata * a
  */
 uint16_t emberAfAttributeValueSize(chip::ClusterId clusterId, chip::AttributeId attributeId, EmberAfAttributeType dataType,
                                    const uint8_t * buffer);
-
-/*
- * @brief Function that determines the size of a zigbee Cluster Library
- * attribute List[T] where T could be of any type.
- * The size is expressed in bytes, and includes the used length consumed
- * by list entries plus the 2 bytes used to represent the number of actual
- * entries in the list.
- */
-uint16_t emberAfAttributeValueListSize(chip::ClusterId clusterId, chip::AttributeId attributeId, const uint8_t * buffer);
 
 /** @} END Attribute Storage */
 
@@ -676,12 +624,6 @@ bool emberAfEndpointIndexIsEnabled(uint16_t index);
  */
 bool emberAfIsThisDataTypeAStringType(EmberAfAttributeType dataType);
 
-/** @brief Returns true if the given attribute type is a string. */
-bool emberAfIsStringAttributeType(EmberAfAttributeType attributeType);
-
-/** @brief Returns true if the given attribute type is a long string. */
-bool emberAfIsLongStringAttributeType(EmberAfAttributeType attributeType);
-
 /** @brief Returns true if a given ZCL data type is a list type. */
 bool emberAfIsThisDataTypeAListType(EmberAfAttributeType dataType);
 
@@ -728,7 +670,7 @@ uint8_t emberAfGetLastSequenceNumber(void);
  *          greater than 4 is being compared
  *          1, if val2 is smaller.
  */
-int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint16_t len, bool signedNumber);
+int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber);
 
 /**
  * @brief populates the passed EUI64 with the local EUI64 MAC address.
@@ -1840,3 +1782,39 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
  * generated code.
  */
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
+
+namespace chip {
+namespace app {
+
+class EnabledEndpointsWithServerCluster
+{
+public:
+    EnabledEndpointsWithServerCluster(ClusterId clusterId);
+
+    // Instead of having a separate Iterator class, optimize for codesize by
+    // just reusing ourselves as our own iterator.  We could do a bit better
+    // here with C++17 and using a different type for the end iterator, but this
+    // is the best I've found with C++14 so far.
+    //
+    // This does mean that you can only iterate a given
+    // EnabledEndpointsWithServerCluster once, but that's OK given how we use it
+    // in practice.
+    EnabledEndpointsWithServerCluster & begin() { return *this; }
+    const EnabledEndpointsWithServerCluster & end() const { return *this; }
+
+    bool operator!=(const EnabledEndpointsWithServerCluster & other) const { return mEndpointIndex != mEndpointCount; }
+
+    EnabledEndpointsWithServerCluster & operator++();
+
+    EndpointId operator*() const { return emberAfEndpointFromIndex(mEndpointIndex); }
+
+private:
+    void EnsureMatchingEndpoint();
+
+    uint16_t mEndpointIndex = 0;
+    uint16_t mEndpointCount = emberAfEndpointCount();
+    ClusterId mClusterId;
+};
+
+} // namespace app
+} // namespace chip

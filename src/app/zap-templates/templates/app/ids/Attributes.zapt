@@ -25,27 +25,24 @@ static constexpr AttributeId Id = {{asMEI manufacturerCode code}};
 
 {{#zcl_clusters}}
 {{#zcl_attributes_server}}
-{{#if (hasSpecificAttributes)}}
 {{#first}}
 namespace {{asUpperCamelCase parent.label}} {
 namespace Attributes {
 
 {{/first}}
-{{#unless clusterRef}}
-namespace {{asUpperCamelCase label}} = Globals::Attributes::{{asUpperCamelCase label}};
-{{/unless}}
-{{#if clusterRef}}
 namespace {{asUpperCamelCase label}} {
+{{#if clusterRef}}
 static constexpr AttributeId Id = {{asMEI manufacturerCode code}};
-} // namespace {{asUpperCamelCase label}}
+{{else}}
+static constexpr AttributeId Id = Globals::Attributes::{{asUpperCamelCase label}}::Id;
 {{/if}}
+} // namespace {{asUpperCamelCase label}}
 
 {{#last}}
 } // namespace Attributes
 } // namespace {{asUpperCamelCase parent.label}}
 
 {{/last}}
-{{/if}}
 {{/zcl_attributes_server}}
 {{/zcl_clusters}}
 

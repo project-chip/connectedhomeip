@@ -30,7 +30,6 @@
 #include <lib/support/Pool.h>
 #include <lib/support/TypeTraits.h>
 #include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgrDelegate.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <transport/SessionManager.h>
@@ -50,7 +49,7 @@ static constexpr int16_t kAnyMessageType = -1;
  *    It works on be behalf of higher layers, creating ExchangeContexts and
  *    handling the registration/unregistration of unsolicited message handlers.
  */
-class DLL_EXPORT ExchangeManager : public SessionManagerDelegate
+class DLL_EXPORT ExchangeManager : public SessionMessageDelegate
 {
     friend class ExchangeContext;
 
@@ -100,7 +99,7 @@ public:
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(SessionHandle session, ExchangeDelegate * delegate);
+    ExchangeContext * NewContext(const SessionHandle & session, ExchangeDelegate * delegate);
 
     void ReleaseContext(ExchangeContext * ec) { mContextPool.ReleaseObject(ec); }
 
@@ -184,10 +183,6 @@ public:
      */
     void CloseAllContextsForDelegate(const ExchangeDelegate * delegate);
 
-    // TODO Store more than one delegate and add API to query delegates to check if incoming messages are for them.
-    // Do the same for the UMHs as well
-    void SetDelegate(ExchangeMgrDelegate * delegate) { mDelegate = delegate; }
-
     SessionManager * GetSessionManager() const { return mSessionManager; }
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
@@ -230,11 +225,8 @@ private:
     uint16_t mNextKeyId;
     State mState;
 
-    ExchangeMgrDelegate * mDelegate;
     SessionManager * mSessionManager;
     ReliableMessageMgr mReliableMessageMgr;
-
-    ApplicationExchangeDispatch mDefaultExchangeDispatch;
 
     FabricIndex mFabricIndex = 0;
 
@@ -245,17 +237,9 @@ private:
     CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source) override;
-
-    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SessionHandle session,
+    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const SessionHandle & session,
                            const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                            System::PacketBufferHandle && msgBuf) override;
-
-    void OnNewConnection(SessionHandle session) override;
-#if CHIP_CONFIG_TEST
-public: // Allow OnConnectionExpired to be called directly from tests.
-#endif  // CHIP_CONFIG_TEST
-    void OnConnectionExpired(SessionHandle session) override;
 };
 
 } // namespace Messaging

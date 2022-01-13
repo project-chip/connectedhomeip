@@ -33,11 +33,25 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
+/* OTA related includes */
+#include "OTAImageProcessorImpl.h"
+#include "OtaSupport.h"
+#include "platform/GenericOTARequestorDriver.h"
+#include "src/app/clusters/ota-requestor/BDXDownloader.h"
+#include "src/app/clusters/ota-requestor/OTARequestor.h"
+
 #include "Keyboard.h"
 #include "LED.h"
 #include "LEDWidget.h"
 #include "TimersManager.h"
 #include "app_config.h"
+
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
+#ifdef ENABLE_HSM_DEVICE_ATTESTATION
+#include "DeviceAttestationSe05xCredsExample.h"
+#endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 6000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
@@ -64,8 +78,19 @@ extern "C" void K32WUartProcess(void);
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace chip;
+;
 
 AppTask AppTask::sAppTask;
+
+/* OTA related variables */
+static OTARequestor gRequestorCore;
+DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+static BDXDownloader gDownloader;
+static OTAImageProcessorImpl gImageProcessor;
+
+static NodeId providerNodeId           = 2;
+static FabricIndex providerFabricIndex = 1;
 
 CHIP_ERROR AppTask::StartAppTask()
 {
@@ -90,7 +115,30 @@ CHIP_ERROR AppTask::Init()
     chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
+#ifdef ENABLE_HSM_DEVICE_ATTESTATION
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
+
+    // Initialize and interconnect the Requestor and Image Processor objects -- START
+    SetRequestorInstance(&gRequestorCore);
+
+    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
+    // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
+    // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
+    // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
+    OTAImageProcessorParams ipParams;
+    ipParams.imageFile = CharSpan("test.txt");
+    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+
+    // Connect the gDownloader and Image Processor objects
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    // Initialize and interconnect the Requestor and Image Processor objects -- END
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
@@ -100,11 +148,19 @@ CHIP_ERROR AppTask::Init()
     /* HW init leds */
     LED_Init();
 
+    if (LightingMgr().Init() != 0)
+    {
+        K32W_LOG("LightingMgr().Init() failed");
+        assert(0);
+    }
+
+    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
+
     /* start with all LEDS turnedd off */
     sStatusLED.Init(SYSTEM_STATE_LED);
 
     sLightLED.Init(LIGHT_STATE_LED);
-    sLightLED.Set(LightingMgr().IsTurnedOff());
+    sLightLED.Set(!LightingMgr().IsTurnedOff());
     UpdateClusterState();
 
     /* intialize the Keyboard and button press calback */
@@ -117,6 +173,7 @@ CHIP_ERROR AppTask::Init()
                                   (void *) this,    // init timer id = app task obj context
                                   TimerEventHandler // timer callback handler
     );
+
     if (sFunctionTimer == NULL)
     {
         err = APP_ERROR_CREATE_TIMER_FAILED;
@@ -124,25 +181,16 @@ CHIP_ERROR AppTask::Init()
         assert(err == CHIP_NO_ERROR);
     }
 
-    int status = LightingMgr().Init();
-    if (status != 0)
-    {
-        K32W_LOG("LightingMgr().Init() failed");
-        assert(status == 0);
-    }
-
-    LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-
     // Print the current software version
-    char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength + 1] = { 0 };
-    err = ConfigurationMgr().GetFirmwareRevisionString(currentFirmwareRev, sizeof(currentFirmwareRev));
+    char currentSoftwareVer[ConfigurationManager::kMaxSoftwareVersionLength + 1] = { 0 };
+    err = ConfigurationMgr().GetSoftwareVersionString(currentSoftwareVer, sizeof(currentSoftwareVer));
     if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Get version error");
         assert(err == CHIP_NO_ERROR);
     }
 
-    K32W_LOG("Current Firmware Version: %s", currentFirmwareRev);
+    K32W_LOG("Current Software Version: %s", currentSoftwareVer);
 
 #if CONFIG_CHIP_NFC_COMMISSIONING
     PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
@@ -219,12 +267,22 @@ void AppTask::AppTaskMain(void * pvParameter)
         sLightLED.Animate();
 
         HandleKeyboard();
+
+        if (gDownloader.GetState() == OTADownloader::State::kInProgress)
+        {
+            OTA_TransactionResume();
+
+            if (!EEPROM_isBusy())
+            {
+                gDownloader.FetchNextData();
+            }
+        }
     }
 }
 
 void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
 {
-    if ((pin_no != RESET_BUTTON) && (pin_no != LIGHT_BUTTON) && (pin_no != JOIN_BUTTON) && (pin_no != BLE_BUTTON))
+    if ((pin_no != RESET_BUTTON) && (pin_no != LIGHT_BUTTON) && (pin_no != OTA_BUTTON) && (pin_no != BLE_BUTTON))
     {
         return;
     }
@@ -242,9 +300,9 @@ void AppTask::ButtonEventHandler(uint8_t pin_no, uint8_t button_action)
     {
         button_event.Handler = LightActionEventHandler;
     }
-    else if (pin_no == JOIN_BUTTON)
+    else if (pin_no == OTA_BUTTON)
     {
-        button_event.Handler = JoinHandler;
+        button_event.Handler = OTAHandler;
     }
     else if (pin_no == BLE_BUTTON)
     {
@@ -296,7 +354,7 @@ void AppTask::HandleKeyboard(void)
             ButtonEventHandler(LIGHT_BUTTON, LIGHT_BUTTON_PUSH);
             break;
         case gKBD_EventPB3_c:
-            ButtonEventHandler(JOIN_BUTTON, JOIN_BUTTON_PUSH);
+            ButtonEventHandler(OTA_BUTTON, OTA_BUTTON_PUSH);
             break;
         case gKBD_EventPB4_c:
             ButtonEventHandler(BLE_BUTTON, BLE_BUTTON_PUSH);
@@ -424,43 +482,21 @@ void AppTask::LightActionEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::ThreadStart()
+void AppTask::OTAHandler(AppEvent * aEvent)
 {
-    chip::Thread::OperationalDataset dataset{};
-
-    constexpr uint8_t xpanid[]    = { 0xde, 0xad, 0x00, 0xbe, 0xef, 0x00, 0xca, 0xfe };
-    constexpr uint8_t masterkey[] = {
-        0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF
-    };
-    constexpr uint16_t panid   = 0xabcd;
-    constexpr uint16_t channel = 15;
-
-    dataset.SetNetworkName("OpenThread");
-    dataset.SetExtendedPanId(xpanid);
-    dataset.SetMasterKey(masterkey);
-    dataset.SetPanId(panid);
-    dataset.SetChannel(channel);
-
-    ThreadStackMgr().SetThreadEnabled(false);
-    ThreadStackMgr().SetThreadProvision(dataset.AsByteSpan());
-    ThreadStackMgr().SetThreadEnabled(true);
-}
-
-void AppTask::JoinHandler(AppEvent * aEvent)
-{
-    if (aEvent->ButtonEvent.PinNo != JOIN_BUTTON)
+    if (aEvent->ButtonEvent.PinNo != OTA_BUTTON)
         return;
 
     if (sAppTask.mFunction != kFunction_NoneSelected)
     {
-        K32W_LOG("Another function is scheduled. Could not initiate Thread Join!");
+        K32W_LOG("Another function is scheduled. Could not initiate OTA!");
         return;
     }
 
-    /* hard-code Thread Commissioning Parameters for the moment.
-     * In a future PR, these parameters will be sent via BLE.
-     */
-    ThreadStart();
+    // In this mode Provider node ID and fabric idx must be supplied explicitly from program args
+    gRequestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex, chip::kRootEndpointId);
+
+    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
 
 void AppTask::BleHandler(AppEvent * aEvent)

@@ -22,9 +22,12 @@
 
 #include <algorithm>
 #include <new>
+#include <tuple>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
+
+#include <lib/core/InPlace.h>
 
 namespace chip {
 
@@ -147,6 +150,13 @@ private:
 public:
     Variant() : mTypeId(kInvalidType) {}
 
+    template <typename T, class... Args>
+    constexpr explicit Variant(InPlaceTemplateType<T>, Args &&... args) :
+        mTypeId(VariantInternal::TupleIndexOfType<T, std::tuple<Ts...>>::value)
+    {
+        new (&mData) T(std::forward<Args>(args)...);
+    }
+
     Variant(const Variant<Ts...> & that) : mTypeId(that.mTypeId) { Curry::Copy(that.mTypeId, &that.mData, &mData); }
 
     Variant(Variant<Ts...> && that) : mTypeId(that.mTypeId)
@@ -188,6 +198,12 @@ public:
     std::size_t GetType() const { return mTypeId; }
 
     bool Valid() const { return (mTypeId != kInvalidType); }
+
+    template <typename T, typename... Args>
+    static Variant<Ts...> Create(Args &&... args)
+    {
+        return Variant<Ts...>(InPlaceTemplate<T>, std::forward<Args>(args)...);
+    }
 
     template <typename T, typename... Args>
     void Set(Args &&... args)

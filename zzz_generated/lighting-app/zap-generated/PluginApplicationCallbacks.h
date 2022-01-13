@@ -28,15 +28,21 @@
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
+    MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
+    MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
+    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOccupancySensingPluginServerInitCallback();                                                                              \
     MatterOnOffPluginClientInitCallback();                                                                                         \
     MatterOnOffPluginServerInitCallback();                                                                                         \
     MatterOnOffSwitchConfigurationPluginServerInitCallback();                                                                      \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
+    MatterSwitchPluginServerInitCallback();                                                                                        \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
+    MatterUserLabelPluginServerInitCallback();                                                                                     \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();

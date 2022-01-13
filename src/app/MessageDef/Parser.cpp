@@ -27,9 +27,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-using namespace chip;
-using namespace chip::TLV;
-
 namespace chip {
 namespace app {
 
@@ -41,7 +38,7 @@ void Parser::Init(const chip::TLV::TLVReader & aReader, chip::TLV::TLVType aOute
     mOuterContainerType = aOuterContainerType;
 }
 
-CHIP_ERROR Parser::GetReaderOnTag(const Tag aTagToFind, chip::TLV::TLVReader * const apReader) const
+CHIP_ERROR Parser::GetReaderOnTag(const TLV::Tag aTagToFind, chip::TLV::TLVReader * const apReader) const
 {
     return mReader.FindElementWithTag(aTagToFind, *apReader);
 }
@@ -50,5 +47,12 @@ void Parser::GetReader(chip::TLV::TLVReader * const apReader)
 {
     apReader->Init(mReader);
 }
-}; // namespace app
-}; // namespace chip
+
+CHIP_ERROR Parser::Next()
+{
+    CHIP_ERROR err = mReader.Next();
+    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
+    return err;
+}
+} // namespace app
+} // namespace chip

@@ -17,8 +17,11 @@
  */
 
 #include "DeviceCallbacks.h"
+#include "esp_check.h"
+#include "esp_err.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include "route_hook/esp_route_hook.h"
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/server/Dnssd.h>
@@ -81,6 +84,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
         chip::app::DnssdServer::Instance().StartServer();
+        ESP_ERROR_CHECK(esp_route_hook_init(esp_netif_get_handle_from_ifkey("WIFI_STA_DEF")));
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

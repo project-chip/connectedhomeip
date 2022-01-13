@@ -32,7 +32,6 @@
 #include <inet/InetError.h>
 #include <inet/InetInterface.h>
 #include <inet/InetLayer.h>
-#include <inet/InetLayerEvents.h>
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
 #include <inet/TCPEndPoint.h>

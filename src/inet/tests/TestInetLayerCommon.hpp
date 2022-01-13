@@ -34,7 +34,7 @@
 #include <inet/InetError.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-
+#include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 // Preprocessor Macros
@@ -146,10 +146,9 @@ extern void HandleSendTimerComplete(chip::System::Layer * aSystemLayer, void * a
 
 // UDP Endpoint Callback Handlers
 
-extern void HandleUDPMessageReceived(const chip::Inet::IPEndPointBasis * aEndPoint,
-                                     const chip::System::PacketBufferHandle & aBuffer,
+extern void HandleUDPMessageReceived(const chip::Inet::UDPEndPoint * aEndPoint, const chip::System::PacketBufferHandle & aBuffer,
                                      const chip::Inet::IPPacketInfo * aPacketInfo);
-extern void HandleUDPReceiveError(const chip::Inet::IPEndPointBasis * aEndPoint, const CHIP_ERROR & aError,
+extern void HandleUDPReceiveError(const chip::Inet::UDPEndPoint * aEndPoint, const CHIP_ERROR & aError,
                                   const chip::Inet::IPPacketInfo * aPacketInfo);
 
 } // namespace Common

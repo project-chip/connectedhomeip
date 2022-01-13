@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,7 +22,10 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <credentials/CHIPCert.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/CryptoContext.h>
+#include <transport/Session.h>
 #include <transport/SessionMessageCounter.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
@@ -37,54 +40,84 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
  * Defines state of a peer connection at a transport layer.
  *
  * Information contained within the state:
+ *   - SecureSessionType represents CASE or PASE session
  *   - PeerAddress represents how to talk to the peer
  *   - PeerNodeId is the unique ID of the peer
+ *   - PeerCATs represents CASE Authenticated Tags
  *   - SendMessageIndex is an ever increasing index for sending messages
- *   - LastActivityTimeMs is a monotonic timestamp of when this connection was
+ *   - LastActivityTime is a monotonic timestamp of when this connection was
  *     last used. Inactive connections can expire.
  *   - CryptoContext contains the encryption context of a connection
- *
- * TODO: to add any message ACK information
  */
-class SecureSession
+class SecureSession : public Session
 {
 public:
-    SecureSession() : mPeerAddress(PeerAddress::Uninitialized()) {}
-    SecureSession(const PeerAddress & addr) : mPeerAddress(addr) {}
-    SecureSession(PeerAddress && addr) : mPeerAddress(addr) {}
+    /**
+     *  @brief
+     *    Defines SecureSession Type. Currently supported types are PASE and CASE.
+     */
+    enum class Type : uint8_t
+    {
+        kUndefined = 0,
+        kPASE      = 1,
+        kCASE      = 2,
+    };
 
-    SecureSession(SecureSession &&)      = default;
-    SecureSession(const SecureSession &) = default;
-    SecureSession & operator=(const SecureSession &) = default;
-    SecureSession & operator=(SecureSession &&) = default;
+    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
+                  FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
+        mSecureSessionType(secureSessionType),
+        mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
+        mFabric(fabric), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+    {}
+    ~SecureSession() { NotifySessionReleased(); }
+
+    SecureSession(SecureSession &&)      = delete;
+    SecureSession(const SecureSession &) = delete;
+    SecureSession & operator=(const SecureSession &) = delete;
+    SecureSession & operator=(SecureSession &&) = delete;
+
+    Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
+#if CHIP_PROGRESS_LOGGING
+    const char * GetSessionTypeString() const override { return "secure"; };
+#endif
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const override;
+
+    bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
+
+    System::Clock::Milliseconds32 GetAckTimeout() const override
+    {
+        switch (mPeerAddress.GetTransportType())
+        {
+        case Transport::Type::kUdp:
+            return GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+        case Transport::Type::kTcp:
+            return System::Clock::Seconds16(30);
+        default:
+            break;
+        }
+        return System::Clock::Timeout();
+    }
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-    PeerAddress & GetPeerAddress() { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
+    Type GetSecureSessionType() const { return mSecureSessionType; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
-    void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
+    CATValues GetPeerCATs() const { return mPeerCATs; }
 
-    uint16_t GetPeerSessionId() const { return mPeerSessionId; }
-    void SetPeerSessionId(uint16_t id) { mPeerSessionId = id; }
+    void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
-    // TODO: Rename KeyID to SessionID
+    const ReliableMessageProtocolConfig & GetMRPConfig() const override { return mMRPConfig; }
+
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
-    void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }
+    uint16_t GetPeerSessionId() const { return mPeerSessionId; }
+    FabricIndex GetFabricIndex() const { return mFabric; }
 
-    uint64_t GetLastActivityTimeMs() const { return mLastActivityTimeMs; }
-    void SetLastActivityTimeMs(uint64_t value) { mLastActivityTimeMs = value; }
+    System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
+    void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
-
-    FabricIndex GetFabricIndex() const { return mFabric; }
-    void SetFabricIndex(FabricIndex fabricIndex) { mFabric = fabricIndex; }
-
-    bool IsInitialized()
-    {
-        return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerSessionId != UINT16_MAX ||
-                mLocalSessionId != UINT16_MAX);
-    }
 
     CHIP_ERROR EncryptBeforeSend(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
                                  MessageAuthenticationCode & mac) const
@@ -101,14 +134,18 @@ public:
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
+    const Type mSecureSessionType;
+    const NodeId mPeerNodeId;
+    const CATValues mPeerCATs;
+    const uint16_t mLocalSessionId;
+    const uint16_t mPeerSessionId;
+    const FabricIndex mFabric;
+
     PeerAddress mPeerAddress;
-    NodeId mPeerNodeId           = kUndefinedNodeId;
-    uint16_t mPeerSessionId      = UINT16_MAX;
-    uint16_t mLocalSessionId     = UINT16_MAX;
-    uint64_t mLastActivityTimeMs = 0;
+    System::Clock::Timestamp mLastActivityTime;
+    ReliableMessageProtocolConfig mMRPConfig;
     CryptoContext mCryptoContext;
     SessionMessageCounter mSessionMessageCounter;
-    FabricIndex mFabric = kUndefinedFabricIndex;
 };
 
 } // namespace Transport

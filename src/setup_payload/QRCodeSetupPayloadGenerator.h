@@ -114,6 +114,9 @@ public:
      *               producing the requested string.
      */
     CHIP_ERROR payloadBase38Representation(MutableCharSpan & outBuffer);
+
+    // TODO - Find the optimal value for maximum length of QR Code Base38 string
+    static constexpr uint16_t kMaxQRCodeBase38RepresentationLength = 128;
 };
 
 } // namespace chip

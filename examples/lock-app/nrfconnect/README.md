@@ -33,6 +33,7 @@ into an existing Matter network and can be controlled by this network.
 -   [Building](#building)
     -   [Removing build artifacts](#removing-build-artifacts)
     -   [Building with release configuration](#building-with-release-configuration)
+    -   [Building with low-power configuration](#building-with-low-power-configuration)
     -   [Building with Device Firmware Upgrade support](#building-with-device-firmware-upgrade-support)
 -   [Configuring the example](#configuring-the-example)
 -   [Flashing and debugging](#flashing-and-debugging)
@@ -360,6 +361,22 @@ features like logs and command-line interface, run the following command:
 
 Remember to replace _build-target_ with the build target name of the Nordic
 Semiconductor's kit you own.
+
+### Building with low-power configuration
+
+You can build the example using the low-power configuration, which enables
+Thread's Sleepy End Device mode and disables debug features, such as the UART
+console or the **LED 1** usage.
+
+To build for the low-power configuration, run the following command with
+_build-target_ replaced with the build target name of the Nordic Semiconductor's
+kit you own (for example `nrf52840dk_nrf52840`):
+
+    $ west build -b build-target -- -DOVERLAY_CONFIG=overlay-low_power.conf
+
+For example, use the following command for `nrf52840dk_nrf52840`:
+
+    $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=overlay-low_power.conf
 
 ### Building with Device Firmware Upgrade support
 

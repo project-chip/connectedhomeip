@@ -21,6 +21,7 @@
 
 #include <lib/dnssd/minimal_mdns/core/Constants.h>
 #include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 
 #include <lib/support/BufferWriter.h>
 
@@ -57,11 +58,11 @@ public:
 
     /// Append the given record to the underlying output.
     /// Updates header item count on success, does NOT update header on failure.
-    bool Append(HeaderRef & hdr, ResourceType asType, chip::Encoding::BigEndian::BufferWriter & out) const;
+    bool Append(HeaderRef & hdr, ResourceType asType, RecordWriter & out) const;
 
 protected:
     /// Output the data portion of the resource record.
-    virtual bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const = 0;
+    virtual bool WriteData(RecordWriter & out) const = 0;
 
     ResourceRecord(QType type, FullQName name) : mType(type), mQName(name) {}
 

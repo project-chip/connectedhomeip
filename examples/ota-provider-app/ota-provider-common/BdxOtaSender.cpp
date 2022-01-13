@@ -53,7 +53,7 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
 
     if (event.EventType != TransferSession::OutputEventType::kNone)
     {
-        ChipLogDetail(BDX, "OutputEvent type: %d", static_cast<uint16_t>(event.EventType));
+        ChipLogDetail(BDX, "OutputEvent type: %s", event.ToString(event.EventType));
     }
 
     switch (event.EventType)
@@ -117,10 +117,11 @@ void BdxOtaSender::HandleTransferSessionOutput(TransferSession::OutputEvent & ev
         VerifyOrReturn(otaFile.good() || otaFile.eof(), ChipLogError(BDX, "%s: file read failed", __FUNCTION__));
 
         blockData.Data   = blockBuf->Start();
-        blockData.Length = otaFile.gcount();
+        blockData.Length = static_cast<size_t>(otaFile.gcount());
         blockData.IsEof  = (blockData.Length < blockSize) ||
             (mNumBytesSent + static_cast<uint64_t>(blockData.Length) == mTransfer.GetTransferLength() || (otaFile.peek() == EOF));
         mNumBytesSent = static_cast<uint32_t>(mNumBytesSent + blockData.Length);
+        otaFile.close();
 
         VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlock(blockData),
                        ChipLogError(BDX, "%s: PrepareBlock failed: %s", __FUNCTION__, chip::ErrorStr(err)));

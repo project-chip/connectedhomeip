@@ -31,13 +31,6 @@ idf_component_register(INCLUDE_DIRS
                      "${CMAKE_SOURCE_DIR}/../../common/pigweed/esp32"
                       PRIV_REQUIRES bt chip)
 
-idf_component_get_property(chip_lib chip COMPONENT_LIB)
-
-set(WRAP_FUNCTIONS esp_log_write)
-target_link_libraries(${chip_lib} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
-
-set_property(TARGET ${chip_lib} APPEND PROPERTY LINK_LIBRARIES ${COMPONENT_LIB})
-
 get_filename_component(CHIP_ROOT ../third_party/connectedhomeip REALPATH)
 get_filename_component(IPV6_EXAMPLE_ROOT ../.. REALPATH)
 set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")

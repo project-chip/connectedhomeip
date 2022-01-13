@@ -19,11 +19,14 @@
 #pragma once
 
 #include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegate.h>
-#include <app/MessageDef/AttributeDataList.h>
+#include <app/MessageDef/AttributeDataIBs.h>
 #include <app/MessageDef/AttributeStatusIB.h>
-#include <app/MessageDef/WriteRequest.h>
+#include <app/MessageDef/StatusIB.h>
+#include <app/MessageDef/WriteRequestMessage.h>
 #include <app/data-model/Encode.h>
+#include <app/data-model/List.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
 #include <lib/support/CodeUtils.h>
@@ -34,6 +37,7 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 namespace chip {
 namespace app {
@@ -51,6 +55,56 @@ class InteractionModelEngine;
 class WriteClient : public Messaging::ExchangeDelegate
 {
 public:
+    class Callback
+    {
+    public:
+        virtual ~Callback() = default;
+
+        /**
+         * OnResponse will be called when a write response has been received
+         * and processed for the given path.
+         *
+         * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call before it shuts down the object.
+         *
+         * @param[in] apWriteClient   The write client object that initiated the write transaction.
+         * @param[in] aPath           The attribute path field in write response.
+         * @param[in] attributeStatus Attribute-specific status, containing an InteractionModel::Status code as well as
+         *                            an optional cluster-specific status code.
+         */
+        virtual void OnResponse(const WriteClient * apWriteClient, const ConcreteAttributePath & aPath, StatusIB attributeStatus) {}
+
+        /**
+         * OnError will be called when an error occurs *after* a successful call to SendWriteRequest(). The following
+         * errors will be delivered through this call in the aError field:
+         *
+         * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
+         * - CHIP_ERROR_*TLV*: A malformed, non-compliant response was received from the server.
+         * - CHIP_ERROR*: All other cases.
+         *
+         * The WriteClient object MUST continue to exist after this call is completed. The application shall wait until it
+         * receives an OnDone call before it shuts down the object.
+         *
+         * @param[in] apWriteClient The write client object that initiated the attribute write transaction.
+         * @param[in] aStatus       A status response if we got one; might be Status::Failure if we did not.
+         * @param[in] aError        A system error code that conveys the overall error code.
+         */
+        virtual void OnError(const WriteClient * apWriteClient, const StatusIB & aStatus, CHIP_ERROR aError) {}
+
+        /**
+         * OnDone will be called when WriteClient has finished all work and is reserved for future WriteClient ownership change.
+         * (#10366) Users may use this function to release their own objects related to this write interaction.
+         *
+         * This function will:
+         *      - Always be called exactly *once* for a given WriteClient instance.
+         *      - Be called even in error circumstances.
+         *      - Only be called after a successful call to SendWriteRequest has been made.
+         *
+         * @param[in] apWriteClient The write client object of the terminated write transaction.
+         */
+        virtual void OnDone(WriteClient * apWriteClient) = 0;
+    };
+
     /**
      *  Shutdown the WriteClient. This terminates this instance
      *  of the object and releases all held resources.
@@ -59,13 +113,11 @@ public:
 
     CHIP_ERROR PrepareAttribute(const AttributePathParams & attributePathParams);
     CHIP_ERROR FinishAttribute();
-    TLV::TLVWriter * GetAttributeDataElementTLVWriter();
+    TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 
-    uint64_t GetAppIdentifier() const { return mAppIdentifier; }
-    void SetAppIdentifier(uint64_t aAppIdentifier) { mAppIdentifier = aAppIdentifier; }
     NodeId GetSourceNodeId() const
     {
-        return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSecureSession().GetPeerNodeId() : kUndefinedNodeId;
+        return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetPeerNodeId() : kUndefinedNodeId;
     }
 
 private:
@@ -75,10 +127,12 @@ private:
 
     enum class State
     {
-        Uninitialized = 0, // The client has not been initialized
-        Initialized,       // The client has been initialized
-        AddAttribute,      // The client has added attribute and ready for a SendWriteRequest
-        AwaitingResponse,  // The client has sent out the write request message
+        Uninitialized = 0,   // The client has not been initialized
+        Initialized,         // The client has been initialized
+        AddAttribute,        // The client has added attribute and ready for a SendWriteRequest
+        AwaitingTimedStatus, // Sent a Tiemd Request, waiting for response.
+        AwaitingResponse,    // The client has sent out the write request message
+        ResponseReceived,    // We have gotten a response after sending write request
     };
 
     /**
@@ -95,8 +149,7 @@ private:
      *  If SendWriteRequest is never called, or the call fails, the API
      *  consumer is responsible for calling Shutdown on the WriteClient.
      */
-    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
-                                uint32_t timeout);
+    CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout);
 
     /**
      *  Initialize the client object. Within the lifetime
@@ -106,11 +159,12 @@ private:
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.
+     *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, InteractionModelDelegate * apDelegate,
-                    uint64_t aApplicationIdentifier);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, Callback * apDelegate,
+                    const Optional<uint16_t> & aTimedWriteTimeoutMs);
 
     virtual ~WriteClient() = default;
 
@@ -126,8 +180,6 @@ private:
     void MoveToState(const State aTargetState);
     CHIP_ERROR ProcessWriteResponseMessage(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAttributeStatusIB);
-    CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                      AttributeDataElement::Builder aAttributeDataElement);
     void ClearExistingExchangeContext();
     const char * GetStateStr() const;
     void ClearState();
@@ -138,14 +190,32 @@ private:
      */
     void ShutdownInternal();
 
+    // Handle a message received when we are expecting a status response to a
+    // Timed Request.  The caller is assumed to have already checked that our
+    // exchange context member is the one the message came in on.
+    //
+    // aStatusIB will be populated with the returned status if we can parse it
+    // successfully.
+    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
+                                 StatusIB & aStatusIB);
+
+    // Send our queued-up Write Request message.  Assumes the exchange is ready
+    // and mPendingWriteData is populated.
+    CHIP_ERROR SendWriteRequest();
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
-    InteractionModelDelegate * mpDelegate      = nullptr;
+    Callback * mpCallback                      = nullptr;
     State mState                               = State::Uninitialized;
     System::PacketBufferTLVWriter mMessageWriter;
-    WriteRequest::Builder mWriteRequestBuilder;
-    uint8_t mAttributeStatusIndex = 0;
-    uint64_t mAppIdentifier       = 0;
+    WriteRequestMessage::Builder mWriteRequestBuilder;
+    // TODO Maybe we should change PacketBufferTLVWriter so we can finalize it
+    // but have it hold on to the buffer, and get the buffer from it later.
+    // Then we could avoid this extra pointer-sized member.
+    System::PacketBufferHandle mPendingWriteData;
+    // If mTimedWriteTimeoutMs has a value, we are expected to do a timed
+    // write.
+    Optional<uint16_t> mTimedWriteTimeoutMs;
 };
 
 class WriteClientHandle
@@ -173,12 +243,16 @@ public:
      */
     WriteClient * operator->() const { return mpWriteClient; }
 
+    WriteClient * Get() const { return mpWriteClient; }
+
     /**
      *  Finalize the message and send it to the desired node. The underlying write object will always be released, and the user
      * should not use this object after calling this function.
+     *
+     * Note: In failure cases this will _synchronously_ invoke OnDone on the
+     * WriteClient::Callback before returning.
      */
-    CHIP_ERROR SendWriteRequest(NodeId aNodeId, FabricIndex aFabricIndex, Optional<SessionHandle> apSecureSession,
-                                uint32_t timeout = kImMessageTimeoutMsec);
+    CHIP_ERROR SendWriteRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
 
     /**
      *  Encode an attribute value that can be directly encoded using TLVWriter::Put
@@ -190,9 +264,9 @@ public:
 
         VerifyOrReturnError(mpWriteClient != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(mpWriteClient->PrepareAttribute(attributePath));
-        VerifyOrReturnError((writer = mpWriteClient->GetAttributeDataElementTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        VerifyOrReturnError((writer = mpWriteClient->GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(
-            DataModel::Encode(*writer, chip::TLV::ContextTag(chip::app::AttributeDataElement::kCsTag_Data), value));
+            DataModel::Encode(*writer, chip::TLV::ContextTag(to_underlying(chip::app::AttributeDataIB::Tag::kData)), value));
         ReturnErrorOnFailure(mpWriteClient->FinishAttribute());
 
         return CHIP_NO_ERROR;

@@ -19,13 +19,16 @@
 #pragma once
 
 #include "../common/CHIPCommand.h"
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/data-model/DecodableList.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <app/tests/suites/commands/log/LogCommands.h>
+#include <app/tests/suites/include/ConstraintsChecker.h>
+#include <app/tests/suites/include/PICSChecker.h>
+#include <app/tests/suites/include/ValueChecker.h>
 #include <lib/support/UnitTestUtils.h>
 #include <zap-generated/tests/CHIPClustersTest.h>
 
-class TestCommand : public CHIPCommand
+constexpr uint16_t kTimeoutInSeconds = 90;
+
+class TestCommand : public CHIPCommand, public ValueChecker, public ConstraintsChecker, public PICSChecker, public LogCommands
 {
 public:
     TestCommand(const char * commandName) :
@@ -34,160 +37,48 @@ public:
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
+        AddArgument("PICS", &mPICSFilePath);
     }
+
+    ~TestCommand(){};
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    uint16_t GetWaitDurationInSeconds() const override { return 30; }
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(kTimeoutInSeconds); }
 
     virtual void NextTest() = 0;
 
     /////////// GlobalCommands Interface /////////
-    CHIP_ERROR WaitForMs(uint32_t ms);
-    CHIP_ERROR Log(const char * message);
+    CHIP_ERROR Wait(chip::System::Clock::Timeout ms);
+    CHIP_ERROR WaitForMs(uint16_t ms) { return Wait(chip::System::Clock::Milliseconds32(ms)); }
+    CHIP_ERROR WaitForCommissionee();
 
 protected:
-    ChipDevice * mDevice;
+    std::map<std::string, ChipDevice *> mDevices;
     chip::NodeId mNodeId;
 
-    static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
-    static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
+    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
     static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
 
-    void Exit(std::string message);
+    CHIP_ERROR ContinueOnChipMainThread() override { return WaitForMs(0); };
+
+    void Exit(std::string message) override;
     void ThrowFailureResponse();
     void ThrowSuccessResponse();
 
-    bool CheckConstraintType(const char * itemName, const char * current, const char * expected);
-    bool CheckConstraintFormat(const char * itemName, const char * current, const char * expected);
-    bool CheckConstraintMinLength(const char * itemName, uint64_t current, uint64_t expected);
-    bool CheckConstraintMaxLength(const char * itemName, uint64_t current, uint64_t expected);
-    template <typename T>
-    bool CheckConstraintMinValue(const char * itemName, T current, T expected)
-    {
-        if (current < expected)
-        {
-            Exit(std::string(itemName) + " value < minValue: " + std::to_string(current) + " < " + std::to_string(expected));
-            return false;
-        }
-
-        return true;
-    }
-    template <typename T>
-    bool CheckConstraintMaxValue(const char * itemName, T current, T expected)
-    {
-        if (current > expected)
-        {
-            Exit(std::string(itemName) + " value > maxValue: " + std::to_string(current) + " > " + std::to_string(expected));
-            return false;
-        }
-
-        return true;
-    }
-    template <typename T>
-    bool CheckConstraintNotValue(const char * itemName, T current, T expected)
-    {
-        if (current == expected)
-        {
-            Exit(std::string(itemName) + " value == notValue: " + std::to_string(current) + " == " + std::to_string(expected));
-            return false;
-        }
-
-        return true;
-    }
-    template <typename T>
-    bool CheckValue(const char * itemName, T current, T expected)
-    {
-        if (current != expected)
-        {
-            Exit(std::string(itemName) + " value mismatch: " + std::to_string(current) + " != " + std::to_string(expected));
-            return false;
-        }
-
-        return true;
-    }
-    bool CheckValueAsList(const char * itemName, uint64_t current, uint64_t expected);
-
-    template <typename T>
-    bool CheckValueAsListHelper(const char * itemName, typename chip::app::DataModel::DecodableList<T>::Iterator iter)
-    {
-        if (iter.Next())
-        {
-            Exit(std::string(itemName) + " value mismatch: expected no more items but found " + std::to_string(iter.GetValue()));
-            return false;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            Exit(std::string(itemName) +
-                 " value mismatch: expected no more items but got an error: " + iter.GetStatus().AsString());
-            return false;
-        }
-        return true;
-    }
-
-    template <typename T, typename U, typename... ValueTypes>
-    bool CheckValueAsListHelper(const char * itemName, typename chip::app::DataModel::DecodableList<T>::Iterator & iter,
-                                const U & firstItem, ValueTypes &&... otherItems)
-    {
-        bool haveValue = iter.Next();
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            Exit(std::string(itemName) + " value mismatch: expected " + std::to_string(firstItem) +
-                 " but got error: " + iter.GetStatus().AsString());
-            return false;
-        }
-        if (!haveValue)
-        {
-            Exit(std::string(itemName) + " value mismatch: expected " + std::to_string(firstItem) +
-                 " but found nothing or an error");
-            return false;
-        }
-        if (iter.GetValue() != firstItem)
-        {
-            Exit(std::string(itemName) + " value mismatch: expected " + std::to_string(firstItem) + " but found " +
-                 std::to_string(iter.GetValue()));
-            return false;
-        }
-        return CheckValueAsListHelper<T>(itemName, iter, std::forward<ValueTypes>(otherItems)...);
-    }
-
-    template <typename T, typename... ValueTypes>
-    bool CheckValueAsList(const char * itemName, chip::app::DataModel::DecodableList<T> list, ValueTypes &&... items)
-    {
-        auto iter = list.begin();
-        return CheckValueAsListHelper<T>(itemName, iter, std::forward<ValueTypes>(items)...);
-    }
-
-    template <typename T>
-    bool CheckValueAsListLength(const char * itemName, chip::app::DataModel::DecodableList<T> list, uint64_t expectedLength)
-    {
-        auto iter      = list.begin();
-        uint64_t count = 0;
-        while (iter.Next())
-        {
-            ++count;
-        }
-        if (iter.GetStatus() != CHIP_NO_ERROR)
-        {
-            Exit(std::string(itemName) + " list length mismatch: expected " + std::to_string(expectedLength) + " but got an error");
-            return false;
-        }
-        return CheckValueAsList(itemName, count, expectedLength);
-    }
-
-    bool CheckValueAsString(const char * itemName, chip::ByteSpan current, const char * expected);
-
-    bool CheckValueAsString(const char * itemName, chip::CharSpan current, const char * expected);
-
-    chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
-    chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 
     void Wait()
     {
-        if (mDelayInMs)
+        if (mDelayInMs.HasValue())
         {
-            chip::test_utils::SleepMillis(mDelayInMs);
+            chip::test_utils::SleepMillis(mDelayInMs.Value());
         }
     };
-    uint64_t mDelayInMs = 0;
+    chip::Optional<uint64_t> mDelayInMs;
+    chip::Optional<char *> mPICSFilePath;
+    chip::Optional<chip::EndpointId> mEndpointId;
+    chip::Optional<uint16_t> mTimeout;
 };

@@ -31,25 +31,18 @@ public:
     static const int kDeviceNameSize     = 32;
     static const int kDeviceLocationSize = 32;
 
-    enum State_t
-    {
-        kState_On = 0,
-        kState_Off,
-    } State;
-
     enum Changed_t
     {
-        kChanged_Reachable = 0x01,
-        kChanged_State     = 0x02,
-        kChanged_Location  = 0x04,
-        kChanged_Name      = 0x08,
+        kChanged_Reachable = 1u << 0,
+        kChanged_Location  = 1u << 1,
+        kChanged_Name      = 1u << 2,
+        kChanged_Last      = kChanged_Name,
     } Changed;
 
     Device(const char * szDeviceName, const char * szLocation);
+    virtual ~Device() {}
 
-    bool IsOn();
     bool IsReachable();
-    void SetOnOff(bool aOn);
     void SetReachable(bool aReachable);
     void SetName(const char * szDeviceName);
     void SetLocation(const char * szLocation);
@@ -58,14 +51,71 @@ public:
     inline char * GetName() { return mName; };
     inline char * GetLocation() { return mLocation; };
 
-    using DeviceCallback_fn = std::function<void(Device *, Changed_t)>;
-    void SetChangeCallback(DeviceCallback_fn aChanged_CB);
-
 private:
-    State_t mState;
+    virtual void HandleDeviceChange(Device * device, Device::Changed_t changeMask) = 0;
+
+protected:
     bool mReachable;
     char mName[kDeviceNameSize];
     char mLocation[kDeviceLocationSize];
     chip::EndpointId mEndpointId;
+};
+
+class DeviceOnOff : public Device
+{
+public:
+    enum Changed_t
+    {
+        kChanged_OnOff = kChanged_Last << 1,
+    } Changed;
+
+    DeviceOnOff(const char * szDeviceName, const char * szLocation);
+
+    bool IsOn();
+    void SetOnOff(bool aOn);
+
+    using DeviceCallback_fn = std::function<void(DeviceOnOff *, DeviceOnOff::Changed_t)>;
+    void SetChangeCallback(DeviceCallback_fn aChanged_CB);
+
+private:
+    void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
+
+private:
+    bool mOn;
+    DeviceCallback_fn mChanged_CB;
+};
+
+class DeviceSwitch : public Device
+{
+public:
+    enum Changed_t
+    {
+        kChanged_NumberOfPositions = kChanged_Last << 1,
+        kChanged_CurrentPosition   = kChanged_Last << 2,
+        kChanged_MultiPressMax     = kChanged_Last << 3,
+    } Changed;
+
+    DeviceSwitch(const char * szDeviceName, const char * szLocation, uint32_t aFeatureMap);
+
+    void SetNumberOfPositions(uint8_t aNumberOfPositions);
+    void SetCurrentPosition(uint8_t aCurrentPosition);
+    void SetMultiPressMax(uint8_t aMultiPressMax);
+
+    inline uint8_t GetNumberOfPositions() { return mNumberOfPositions; };
+    inline uint8_t GetCurrentPosition() { return mCurrentPosition; };
+    inline uint8_t GetMultiPressMax() { return mMultiPressMax; };
+    inline uint32_t GetFeatureMap() { return mFeatureMap; };
+
+    using DeviceCallback_fn = std::function<void(DeviceSwitch *, DeviceSwitch::Changed_t)>;
+    void SetChangeCallback(DeviceCallback_fn aChanged_CB);
+
+private:
+    void HandleDeviceChange(Device * device, Device::Changed_t changeMask);
+
+private:
+    uint8_t mNumberOfPositions;
+    uint8_t mCurrentPosition;
+    uint8_t mMultiPressMax;
+    uint32_t mFeatureMap;
     DeviceCallback_fn mChanged_CB;
 };

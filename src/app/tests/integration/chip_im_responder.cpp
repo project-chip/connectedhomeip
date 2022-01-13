@@ -67,21 +67,17 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
 
-    chip::app::CommandPathParams commandPathParams = { kTestEndpointId, // Endpoint
-                                                       kTestGroupId,    // GroupId
-                                                       kTestClusterId,  // ClusterId
-                                                       kTestCommandId,  // CommandId
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    chip::app::ConcreteCommandPath path = {
+        kTestEndpointId, // Endpoint
+        kTestClusterId,  // ClusterId
+        kTestCommandId,  // CommandId
+    };
 
     // Add command data here
     if (statusCodeFlipper)
     {
-        chip::app::ConcreteCommandPath commandPath(kTestEndpointId, // Endpoint
-                                                   kTestClusterId,  // ClusterId
-                                                   kTestCommandId   // CommandId
-        );
         printf("responder constructing status code in command");
-        apCommandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+        apCommandObj->AddStatus(path, Protocols::InteractionModel::Status::Success);
     }
     else
     {
@@ -89,7 +85,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 
         chip::TLV::TLVWriter * writer;
 
-        ReturnOnFailure(apCommandObj->PrepareCommand(commandPathParams));
+        ReturnOnFailure(apCommandObj->PrepareCommand(path));
 
         writer = apCommandObj->GetCommandDataIBTLVWriter();
         ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1));
@@ -110,33 +106,23 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
     (void) apCommandObj;
 }
 
-CHIP_ERROR ReadSingleClusterData(const ConcreteAttributePath & aPath, TLV::TLVWriter * apWriter, bool * apDataExists)
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
+                                 AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    uint64_t version = 0;
-    VerifyOrExit(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(apWriter != nullptr, /* no op */);
-
-    err = AttributeValueEncoder(apWriter).Encode(kTestFieldValue1);
-    SuccessOrExit(err);
-    err = apWriter->Put(TLV::ContextTag(AttributeDataElement::kCsTag_DataVersion), version);
-
-exit:
-    return err;
+    ReturnErrorOnFailure(AttributeValueEncoder(aAttributeReports, 0, aPath, 0).Encode(kTestFieldValue1));
+    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePathParams attributePathParams;
-    attributePathParams.mNodeId     = 1;
-    attributePathParams.mEndpointId = 2;
-    attributePathParams.mClusterId  = 3;
-    attributePathParams.mFieldId    = 4;
-    attributePathParams.mListIndex  = 5;
-    attributePathParams.mFlags.Set(AttributePathParams::Flags::kFieldIdValid);
-
-    err = apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
+    attributePathParams.mEndpointId  = 2;
+    attributePathParams.mClusterId   = 3;
+    attributePathParams.mAttributeId = 4;
+    err                              = apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::Success);
     return err;
 }
 } // namespace app
@@ -156,13 +142,13 @@ chip::app::CircularEventBuffer gCircularEventBuffer[3];
 void InitializeEventLogging(chip::Messaging::ExchangeManager * apMgr)
 {
     chip::app::LogStorageResources logStorageResources[] = {
-        { &gCritEventBuffer[0], sizeof(gDebugEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Debug },
-        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Info },
-        { &gDebugEventBuffer[0], sizeof(gCritEventBuffer), nullptr, 0, nullptr, chip::app::PriorityLevel::Critical },
+        { &gDebugEventBuffer[0], sizeof(gDebugEventBuffer), chip::app::PriorityLevel::Debug },
+        { &gInfoEventBuffer[0], sizeof(gInfoEventBuffer), chip::app::PriorityLevel::Info },
+        { &gCritEventBuffer[0], sizeof(gCritEventBuffer), chip::app::PriorityLevel::Critical },
     };
 
     chip::app::EventManagement::CreateEventManagement(apMgr, sizeof(logStorageResources) / sizeof(logStorageResources[0]),
-                                                      gCircularEventBuffer, logStorageResources);
+                                                      gCircularEventBuffer, logStorageResources, nullptr, 0, nullptr);
 }
 
 void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
@@ -170,12 +156,11 @@ void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
     chip::app::ClusterInfo dirtyPath;
     dirtyPath.mClusterId  = kTestClusterId;
     dirtyPath.mEndpointId = kTestEndpointId;
-    dirtyPath.mFlags.Set(chip::app::ClusterInfo::Flags::kFieldIdValid);
     printf("MutateClusterHandler is triggered...");
     // send dirty change
     if (!testSyncReport)
     {
-        dirtyPath.mFieldId = 1;
+        dirtyPath.mAttributeId = 1;
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Seconds16(1), MutateClusterHandler, NULL);
@@ -183,7 +168,7 @@ void MutateClusterHandler(chip::System::Layer * systemLayer, void * appState)
     }
     else
     {
-        dirtyPath.mFieldId = 10; // unknown field
+        dirtyPath.mAttributeId = 10; // unknown field
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
         // send sync message(empty report)
         chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
@@ -210,8 +195,8 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
-    err = gTransportManager.Init(
-        chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::IPAddressType::kIPv6));
+    err = gTransportManager.Init(chip::Transport::UdpListenParameters(chip::DeviceLayer::UDPEndPointManager())
+                                     .SetAddressType(chip::Inet::IPAddressType::kIPv6));
     SuccessOrExit(err);
 
     err = gSessionManager.Init(&chip::DeviceLayer::SystemLayer(), &gTransportManager, &gMessageCounterManager);
@@ -228,8 +213,8 @@ int main(int argc, char * argv[])
 
     InitializeEventLogging(&gExchangeManager);
 
-    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing, chip::CryptoContext::SessionRole::kResponder,
-                                     gFabricIndex);
+    err = gSessionManager.NewPairing(gSession, peer, chip::kTestControllerNodeId, &gTestPairing,
+                                     chip::CryptoContext::SessionRole::kResponder, gFabricIndex);
     SuccessOrExit(err);
 
     printf("Listening for IM requests...\n");
@@ -248,7 +233,7 @@ exit:
     }
 
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();
-
+    gTransportManager.Close();
     ShutdownChip();
 
     return EXIT_SUCCESS;

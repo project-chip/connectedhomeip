@@ -19,7 +19,7 @@ import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/tools.gni")
-import("${chip_root}/src/platform/device.gni")
+import("${chip_root}/src/platform/python.gni")
 import("${dir_pw_unit_test}/test.gni")
 
 if (current_os == "mac") {
@@ -31,32 +31,46 @@ config("controller_wno_deprecate") {
 }
 
 shared_library("ChipDeviceCtrl") {
-  output_name = "_ChipDeviceCtrl"
+  if (chip_controller) {
+    output_name = "_ChipDeviceCtrl"
+  } else {
+    output_name = "_ChipServer"
+  }
   output_dir = "${target_out_dir}/chip"
   include_dirs = [ "." ]
 
   sources = [
-    "ChipCommissionableNodeController-ScriptBinding.cpp",
-    "ChipDeviceController-ScriptBinding.cpp",
-    "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.cpp",
-    "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h",
-    "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
-    "ChipDeviceController-ScriptDevicePairingDelegate.h",
-    "ChipDeviceController-StorageDelegate.cpp",
-    "ChipDeviceController-StorageDelegate.h",
-    "chip/clusters/CHIPClusters.cpp",
-    "chip/clusters/command.cpp",
-    "chip/discovery/NodeResolution.cpp",
-    "chip/interaction_model/Delegate.cpp",
-    "chip/interaction_model/Delegate.h",
-    "chip/internal/ChipThreadWork.cpp",
-    "chip/internal/ChipThreadWork.h",
-    "chip/internal/CommissionerImpl.cpp",
-    "chip/logging/LoggingRedirect.cpp",
-    "chip/native/StackInit.cpp",
     "chip/setup_payload/Generator.cpp",
     "chip/setup_payload/Parser.cpp",
   ]
+
+  if (chip_controller) {
+    sources += [
+      "ChipCommissionableNodeController-ScriptBinding.cpp",
+      "ChipDeviceController-ScriptBinding.cpp",
+      "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.cpp",
+      "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h",
+      "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
+      "ChipDeviceController-ScriptDevicePairingDelegate.h",
+      "ChipDeviceController-StorageDelegate.cpp",
+      "ChipDeviceController-StorageDelegate.h",
+      "chip/clusters/attribute.cpp",
+      "chip/clusters/command.cpp",
+      "chip/discovery/NodeResolution.cpp",
+      "chip/interaction_model/Delegate.cpp",
+      "chip/interaction_model/Delegate.h",
+      "chip/internal/ChipThreadWork.cpp",
+      "chip/internal/ChipThreadWork.h",
+      "chip/internal/CommissionerImpl.cpp",
+      "chip/logging/LoggingRedirect.cpp",
+      "chip/native/StackInit.cpp",
+    ]
+  } else {
+    sources += [
+      "chip/server/Options.cpp",
+      "chip/server/ServerInit.cpp",
+    ]
+  }
 
   if (chip_enable_ble) {
     if (current_os == "linux") {
@@ -75,7 +89,6 @@ shared_library("ChipDeviceCtrl") {
   public_deps = [
     "${chip_root}/src/app",
     "${chip_root}/src/app/server",
-    "${chip_root}/src/controller/data_model",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/dnssd",
@@ -84,6 +97,13 @@ shared_library("ChipDeviceCtrl") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
+
+  if (chip_controller) {
+    public_deps += [ "${chip_root}/src/controller/data_model" ]
+  } else {
+    public_deps += [ "$chip_data_model" ]
+  }
+
   configs += [ ":controller_wno_deprecate" ]
 }
 
@@ -101,7 +121,7 @@ pw_python_action("python") {
         "chip/ChipBluezMgr.py",
         "chip/ChipCommissionableNodeCtrl.py",
         "chip/ChipCoreBluetoothMgr.py",
-        "chip/ChipDeviceCtrl.py",
+        "chip/ChipReplStartup.py",
         "chip/ChipStack.py",
         "chip/ChipUtility.py",
         "chip/__init__.py",
@@ -111,11 +131,13 @@ pw_python_action("python") {
         "chip/ble/library_handle.py",
         "chip/ble/scan_devices.py",
         "chip/ble/types.py",
+        "chip/clusters/Attribute.py",
         "chip/clusters/CHIPClusters.py",
         "chip/clusters/ClusterObjects.py",
         "chip/clusters/Command.py",
         "chip/clusters/Objects.py",
         "chip/clusters/TestObjects.py",
+        "chip/clusters/Types.py",
         "chip/clusters/__init__.py",
         "chip/configuration/__init__.py",
         "chip/discovery/__init__.py",
@@ -136,10 +158,23 @@ pw_python_action("python") {
         "chip/setup_payload/setup_payload.py",
         "chip/tlv/__init__.py",
       ]
+
+      if (chip_controller) {
+        sources += [ "chip/ChipDeviceCtrl.py" ]
+      } else {
+        sources += [
+          "chip/server/__init__.py",
+          "chip/server/types.py",
+        ]
+      }
     },
     {
       src_dir = target_out_dir
-      sources = [ "${target_out_dir}/chip/_ChipDeviceCtrl.so" ]
+      if (chip_controller) {
+        sources = [ "${target_out_dir}/chip/_ChipDeviceCtrl.so" ]
+      } else {
+        sources = [ "${target_out_dir}/chip/_ChipServer.so" ]
+      }
     },
     {
       src_dir = "//"
@@ -172,7 +207,7 @@ pw_python_action("python") {
 
   if (current_cpu == "x64") {
     cpu_tag = "x86_64"
-  } else if (current_cpu == "arm64") {
+  } else if (current_cpu == "arm64" && current_os == "linux") {
     cpu_tag = "aarch64"
   } else {
     cpu_tag = current_cpu
@@ -202,6 +237,14 @@ pw_python_action("python") {
     "--plat-name",
     platform_tag,
   ]
+
+  if (chip_controller) {
+  } else {
+    args += [
+      "--server",
+      "True",
+    ]
+  }
 
   public_deps = [ ":ChipDeviceCtrl" ]
 

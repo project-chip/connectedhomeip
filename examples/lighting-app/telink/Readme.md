@@ -163,14 +163,12 @@ following states:
 1. Pair with device
 
     ```
-    ${CHIP_TOOL_DIR}/chip-tool pairing bypass ${NODE_ID_TO_ASSIGN} ${IP_ADDRESS_OF_CHIP_DEVICE} 5540
+    ${CHIP_TOOL_DIR}/chip-tool pairing qrcode ${NODE_ID_TO_ASSIGN} MT:D8XA0CQM00KA0648G00
     ```
 
     here:
 
     - \${NODE_ID_TO_ASSIGN} is the node id to assign to the lightbulb
-    - `${IP_ADDRESS_OF_CHIP_DEVICE}` is IPv6 address of CHIP device
-    - **5540** is the standard CHIP TCP port
 
 1. Switch on the light:
 

@@ -52,12 +52,12 @@ CHIP_ERROR ConnectivityManagerImpl::_Init(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mWiFiStationMode                = kWiFiStationMode_Disabled;
-    mWiFiAPMode                     = kWiFiAPMode_Disabled;
-    mWiFiAPState                    = kWiFiAPState_NotActive;
-    mLastAPDemandTime               = 0;
-    mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
-    mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
+    mWiFiStationMode              = kWiFiStationMode_Disabled;
+    mWiFiAPMode                   = kWiFiAPMode_Disabled;
+    mWiFiAPState                  = kWiFiAPState_NotActive;
+    mLastAPDemandTime             = System::Clock::kZero;
+    mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
+    mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
     WiFiMgr().Init();
@@ -111,55 +111,55 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiF
     return err;
 }
 
-uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS(void)
+System::Clock::Timeout ConnectivityManagerImpl::_GetWiFiStationReconnectInterval(void)
 {
-    return mWiFiStationReconnectIntervalMS;
+    return mWiFiStationReconnectInterval;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectIntervalMS(uint32_t val)
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectInterval(System::Clock::Timeout val)
 {
-    mWiFiStationReconnectIntervalMS = val;
+    mWiFiStationReconnectInterval = val;
 
     return CHIP_NO_ERROR;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
 {
-    bool isWifiStationEnabled = false;
+    bool isWiFiStationEnabled = false;
 
-    WiFiMgr().IsActivated(&isWifiStationEnabled);
+    WiFiMgr().IsActivated(&isWiFiStationEnabled);
 
-    return isWifiStationEnabled;
+    return isWiFiStationEnabled;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
 {
     CHIP_ERROR err                                  = CHIP_NO_ERROR;
     wifi_manager_connection_state_e connectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
-    bool isWifiStationConnected                     = false;
+    bool isWiFiStationConnected                     = false;
 
     err = WiFiMgr().GetConnectionState(&connectionState);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, isWifiStationConnected);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, isWiFiStationConnected);
 
     if (connectionState == WIFI_MANAGER_CONNECTION_STATE_CONNECTED)
-        isWifiStationConnected = true;
+        isWiFiStationConnected = true;
 
-    return isWifiStationConnected;
+    return isWiFiStationConnected;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
 {
     CHIP_ERROR err                                  = CHIP_NO_ERROR;
     wifi_manager_connection_state_e connectionState = WIFI_MANAGER_CONNECTION_STATE_DISCONNECTED;
-    bool isWifiStationProvisioned                   = false;
+    bool isWiFiStationProvisioned                   = false;
 
     err = WiFiMgr().GetConnectionState(&connectionState);
-    VerifyOrReturnError(err == CHIP_NO_ERROR, isWifiStationProvisioned);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, isWiFiStationProvisioned);
 
     if (connectionState >= WIFI_MANAGER_CONNECTION_STATE_ASSOCIATION)
-        isWifiStationProvisioned = true;
+        isWiFiStationProvisioned = true;
 
-    return isWifiStationProvisioned;
+    return isWiFiStationProvisioned;
 }
 
 void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
@@ -193,7 +193,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void) {}
 
 void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void) {}
 
-void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val) {}
+void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val) {}
 
 void ConnectivityManagerImpl::StartWiFiManagement(void)
 {

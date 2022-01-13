@@ -17,63 +17,54 @@
 
 #include "MediaInputManager.h"
 
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app/util/af.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/CodeUtils.h>
-#include <map>
-#include <string>
+using namespace chip;
+using namespace chip::app::Clusters::MediaInput;
 
-CHIP_ERROR MediaInputManager::Init()
+CHIP_ERROR MediaInputManager::HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    // TODO: Insert code here
 
-    // TODO: Store feature map once it is supported
-    std::map<std::string, bool> featureMap;
-    featureMap["NU"] = true;
-    SuccessOrExit(err);
-exit:
-    return err;
-}
-
-CHIP_ERROR MediaInputManager::proxyGetInputList(chip::app::AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
-        // TODO: Insert code here
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         int maximumVectorSize = 2;
-        char description[]    = "exampleDescription";
-        char name[]           = "exampleName";
-
         for (int i = 0; i < maximumVectorSize; ++i)
         {
-            chip::app::Clusters::MediaInput::Structs::MediaInputInfo::Type mediaInput;
-            mediaInput.description = chip::CharSpan(description, sizeof(description) - 1);
-            mediaInput.name        = chip::CharSpan(name, sizeof(name) - 1);
-            mediaInput.inputType   = EMBER_ZCL_MEDIA_INPUT_TYPE_HDMI;
-            mediaInput.index       = static_cast<uint8_t>(1 + i);
-            ReturnErrorOnFailure(encoder.Encode(mediaInput));
+            chip::app::Clusters::MediaInput::Structs::InputInfo::Type inputInfo;
+            inputInfo.description = chip::CharSpan("exampleDescription", strlen("exampleDescription"));
+            inputInfo.name        = chip::CharSpan("exampleName", strlen("exampleName"));
+            inputInfo.inputType   = chip::app::Clusters::MediaInput::InputTypeEnum::kHdmi;
+            inputInfo.index       = static_cast<uint8_t>(1 + i);
+
+            ReturnErrorOnFailure(encoder.Encode(inputInfo));
         }
 
         return CHIP_NO_ERROR;
     });
 }
 
-bool mediaInputClusterSelectInput(uint8_t input)
+uint8_t MediaInputManager::HandleGetCurrentInput()
+{
+    return 0;
+}
+
+bool MediaInputManager::HandleSelectInput(const uint8_t index)
 {
     // TODO: Insert code here
     return true;
 }
-bool mediaInputClusterShowInputStatus()
+
+bool MediaInputManager::HandleShowInputStatus()
 {
     // TODO: Insert code here
     return true;
 }
-bool mediaInputClusterHideInputStatus()
+
+bool MediaInputManager::HandleHideInputStatus()
 {
     // TODO: Insert code here
     return true;
 }
-bool mediaInputClusterRenameInput(uint8_t input, std::string name)
+
+bool MediaInputManager::HandleRenameInput(const uint8_t index, const chip::CharSpan & name)
 {
     // TODO: Insert code here
     return true;

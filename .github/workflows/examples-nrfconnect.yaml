@@ -29,24 +29,27 @@ jobs:
 
         env:
             BUILD_TYPE: nrfconnect
-            GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
-            GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-            GH_EVENT_PARENT: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-nrf-platform:0.5.18
+            image: connectedhomeip/chip-build-nrf-platform:0.5.40
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
-                - "/tmp/output_binaries:/tmp/output_binaries"
 
         steps:
             - name: Checkout
               uses: actions/checkout@v2
               with:
                   submodules: true
+
+            - name: Set up environment for size reports
+              if: ${{ !env.ACT }}
+              env:
+                  GH_CONTEXT: ${{ toJson(github) }}
+              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+
             - name: Bootstrap
               timeout-minutes: 25
               run: scripts/build/gn_bootstrap.sh
@@ -76,6 +79,14 @@ jobs:
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     nrfconnect nrf52840dk_nrf52840 lighting-app \
                     examples/lighting-app/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
+                    /tmp/bloat_reports/
+            - name: Build example nRF Connect SDK Lighting App on nRF52840 Dongle
+              timeout-minutes: 10
+              run: |
+                  scripts/examples/nrfconnect_example.sh lighting-app nrf52840dongle_nrf52840
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    nrfconnect nrf52840dongle_nrf52840 lighting-app \
+                    examples/lighting-app/nrfconnect/build/nrf52840dongle_nrf52840/zephyr/zephyr.elf \
                     /tmp/bloat_reports/
             - name: Build example nRF Connect SDK Lighting App on nRF52840 DK with RPC
               timeout-minutes: 10
@@ -144,34 +155,19 @@ jobs:
             - name: Run unit tests for Zephyr native_posix_64 platform
               timeout-minutes: 10
               run: |
-                  scripts/run_in_build_env.sh "scripts/tests/nrfconnect_native_posix_tests.sh native_posix_64"
-            - name: Copy aside build products
-              run: |
-                  mkdir -p /tmp/output_binaries/$BUILD_TYPE-build
-                  cp examples/lock-app/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
-                      /tmp/output_binaries/$BUILD_TYPE-build/chip-lock.elf
-                  cp examples/shell/nrfconnect/build/nrf52840dk_nrf52840/zephyr/zephyr.elf \
-                      /tmp/output_binaries/$BUILD_TYPE-build/chip-shell.elf
-            - name: Binary artifact suffix
-              id: outsuffix
-              uses: haya14busa/action-cond@v1.0.0
-              if: ${{ !env.ACT }}
-              with:
-                  cond: ${{ github.event.pull_request.number == '' }}
-                  if_true: "${{ github.sha }}"
-                  if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Uploading Binaries
+                  scripts/run_in_build_env.sh "./scripts/build/build_examples.py --target nrf-native-posix-64-tests build"
+            - name: Uploading Failed Test Logs
               uses: actions/upload-artifact@v2
-              if: ${{ !env.ACT }}
+              if: ${{ failure() }} && ${{ !env.ACT }}
               with:
-                  name:
-                      ${{ env.BUILD_TYPE }}-example-build-${{
-                      steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
+                  name: test-log
+                  path: |
+                      src/test_driver/nrfconnect/build/Testing/Temporary/LastTest.log
+
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
-                  name: Size,nRFConnect-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
+                  name: Size,nRFConnect-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
                   path: |
                       /tmp/bloat_reports/

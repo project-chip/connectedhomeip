@@ -40,6 +40,10 @@ source_set("logging_constants") {
   sources = [ "logging/Constants.h" ]
 }
 
+source_set("enforce_format") {
+  sources = [ "EnforceFormat.h" ]
+}
+
 source_set("chip_version_header") {
   sources = get_target_outputs(":gen_chip_version")
 
@@ -78,6 +82,7 @@ static_library("support") {
     "FibonacciUtils.h",
     "FixedBufferAllocator.cpp",
     "FixedBufferAllocator.h",
+    "Iterators.h",
     "LifetimePersistedCounter.cpp",
     "LifetimePersistedCounter.h",
     "ObjectLifeCycle.h",
@@ -92,6 +97,7 @@ static_library("support") {
     "SafeInt.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",
+    "StateMachine.h",
     "ThreadOperationalDataset.cpp",
     "ThreadOperationalDataset.h",
     "TimeUtils.cpp",
@@ -129,6 +135,7 @@ static_library("support") {
 
   public_deps = [
     ":chip_version_header",
+    ":enforce_format",
     ":logging_constants",
     "${chip_root}/src/lib/core:chip_config_header",
     "${chip_root}/src/platform:platform_buildconfig",

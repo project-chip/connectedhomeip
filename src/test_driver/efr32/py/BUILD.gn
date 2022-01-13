@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/python.gni")
+import("$dir_pw_build/python_dist.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 pw_python_package("nl_test_runner") {
@@ -32,4 +33,9 @@ pw_python_package("nl_test_runner") {
     "$dir_pw_rpc/py",
     "${chip_root}/src/test_driver/efr32:nl_test_service.python",
   ]
+}
+
+pw_python_wheels("nl_test_runner_wheel") {
+  packages = [ ":nl_test_runner" ]
+  directory = "$root_out_dir/chip_nl_test_runner_wheels"
 }

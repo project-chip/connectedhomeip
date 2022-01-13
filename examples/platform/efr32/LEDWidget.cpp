@@ -32,7 +32,7 @@ void LEDWidget::InitGpio(void)
 
 void LEDWidget::Init(const sl_led_t * led)
 {
-    mLastChangeTimeUS = 0;
+    mLastChangeTimeMS = 0;
     mBlinkOnTimeMS    = 0;
     mBlinkOffTimeMS   = 0;
     mLed              = led;
@@ -50,7 +50,7 @@ void LEDWidget::Invert(void)
 
 void LEDWidget::Set(bool state)
 {
-    mLastChangeTimeUS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
+    mLastChangeTimeMS = mBlinkOnTimeMS = mBlinkOffTimeMS = 0;
     if (mLed)
     {
         state ? sl_led_turn_on(mLed) : sl_led_turn_off(mLed);
@@ -73,14 +73,14 @@ void LEDWidget::Animate()
 {
     if (mBlinkOnTimeMS != 0 && mBlinkOffTimeMS != 0)
     {
-        Clock::MonotonicMicroseconds nowUS            = chip::System::SystemClock().GetMonotonicMicroseconds();
-        Clock::MonotonicMicroseconds stateDurUS       = ((sl_led_get_state(mLed)) ? mBlinkOnTimeMS : mBlinkOffTimeMS) * 1000LL;
-        Clock::MonotonicMicroseconds nextChangeTimeUS = mLastChangeTimeUS + stateDurUS;
+        uint64_t nowMS            = chip::System::SystemClock().GetMonotonicMilliseconds64().count();
+        uint64_t stateDurMS       = sl_led_get_state(mLed) ? mBlinkOnTimeMS : mBlinkOffTimeMS;
+        uint64_t nextChangeTimeMS = mLastChangeTimeMS + stateDurMS;
 
-        if (nextChangeTimeUS < nowUS)
+        if (nextChangeTimeMS < nowMS)
         {
             Invert();
-            mLastChangeTimeUS = nowUS;
+            mLastChangeTimeMS = nowMS;
         }
     }
 }

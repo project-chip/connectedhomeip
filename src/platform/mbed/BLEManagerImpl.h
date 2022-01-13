@@ -46,6 +46,7 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
+    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
     CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);

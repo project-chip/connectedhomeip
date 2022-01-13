@@ -46,10 +46,6 @@
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git
 	branch  = master
-[submodule "happy"]
-	path = third_party/happy/repo
-	url = https://github.com/openweave/happy.git
-	branch  = master
 [submodule "nanopb"]
 	path = third_party/nanopb/repo
 	url = https://github.com/nanopb/nanopb.git
@@ -163,3 +159,6 @@
 	path = third_party/pybind11/repo
 	url = https://github.com/pybind/pybind11
 	branch  = stable
+[submodule "p6/lwip"]
+	path = third_party/p6/p6_sdk/libs/lwip
+	url = https://github.com/lwip-tcpip/lwip.git

@@ -80,6 +80,11 @@ void TestExtendedPanId(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, dataset.SetExtendedPanId(kExtendedPanId) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, dataset.GetExtendedPanId(extendedPanId) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, memcmp(extendedPanId, kExtendedPanId, sizeof(kExtendedPanId)) == 0);
+
+    ByteSpan span;
+    NL_TEST_ASSERT(inSuite, dataset.GetExtendedPanIdAsByteSpan(span) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, span.size() == sizeof(kExtendedPanId));
+    NL_TEST_ASSERT(inSuite, memcmp(extendedPanId, span.data(), sizeof(kExtendedPanId)) == 0);
 }
 
 void TestMasterKey(nlTestSuite * inSuite, void * inContext)

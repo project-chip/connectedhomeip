@@ -89,5 +89,24 @@ limitations under the License.
     <attribute side="server" code="0x05" define="ACTIVE_HARDWARE_FAULTS" type="ARRAY" entryType="ENUM8" length="254" writable="false" optional="true">ActiveHardwareFaults</attribute>
     <attribute side="server" code="0x06" define="ACTIVE_RADIO_FAULTS" type="ARRAY" entryType="ENUM8" length="254" writable="false" optional="true">ActiveRadioFaults</attribute>
     <attribute side="server" code="0x07" define="ACTIVE_NETWORK_FAULTS" type="ARRAY" entryType="ENUM8" length="254" writable="false" optional="true">ActiveNetworkFaults</attribute>
+    <event side="server" code="0x00" name="HardwareFaultChange" priority="critical" optional="true">
+      <description>Indicate a change in the set of hardware faults currently detected by the Node.</description>
+      <field id="0" name="Current" type="HardwareFaultType" array="true"/>
+      <field id="1" name="Previous" type="HardwareFaultType" array="true"/>
+    </event>
+    <event side="server" code="0x01" name="RadioFaultChange" priority="critical" optional="true">
+      <description>Indicate a change in the set of radio faults currently detected by the Node.</description>
+      <field id="0" name="Current" type="RadioFaultType" array="true"/>
+      <field id="1" name="Previous" type="RadioFaultType" array="true"/>
+    </event>
+    <event side="server" code="0x02" name="NetworkFaultChange" priority="critical" optional="true">
+      <description>Indicate a change in the set of network faults currently detected by the Node.</description>
+      <field id="0" name="Current" type="NetworkFaultType" array="true"/>
+      <field id="1" name="Previous" type="NetworkFaultType" array="true"/>
+    </event>
+    <event side="server" code="0x03" name="BootReason" priority="critical" optional="false">
+      <description>Indicate the reason that caused the device to start-up.</description>
+      <field id="0" name="BootReason" type="BootReasonType"/>
+    </event>               
   </cluster>
 </configurator>

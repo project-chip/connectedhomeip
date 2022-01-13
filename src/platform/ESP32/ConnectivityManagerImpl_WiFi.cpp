@@ -24,6 +24,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <platform/ESP32/NetworkCommissioningDriver.h>
 #include <platform/internal/BLEManager.h>
 
 #include "esp_event.h"
@@ -133,7 +134,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
 {
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
-        mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
+        mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
@@ -142,7 +143,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
 {
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
-        mLastAPDemandTime = 0;
+        mLastAPDemandTime = System::Clock::kZero;
         DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
     }
 }
@@ -153,14 +154,14 @@ void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void)
     {
         if (mWiFiAPState == kWiFiAPState_Activating || mWiFiAPState == kWiFiAPState_Active)
         {
-            mLastAPDemandTime = System::SystemClock().GetMonotonicMilliseconds();
+            mLastAPDemandTime = System::SystemClock().GetMonotonicTimestamp();
         }
     }
 }
 
-void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
+void ConnectivityManagerImpl::_SetWiFiAPIdleTimeout(System::Clock::Timeout val)
 {
-    mWiFiAPIdleTimeoutMS = val;
+    mWiFiAPIdleTimeout = val;
     DeviceLayer::SystemLayer().ScheduleWork(DriveAPState, NULL);
 }
 
@@ -338,7 +339,7 @@ static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
     return frequency;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
+CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWiFiStatsCounters(void)
 {
     esp_err_t err;
     wifi_config_t wifiConfig;
@@ -366,7 +367,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
                   "Our bits are going to start overlapping");
     bssid = static_cast<uint16_t>((wifiConfig.sta.bssid[4] << 8) | wifiConfig.sta.bssid[5]);
     ChipLogProgress(DeviceLayer,
-                    "Wifi-Telemetry\n"
+                    "WiFi-Telemetry\n"
                     "BSSID: %x\n"
                     "freq: %d\n",
                     bssid, freq);
@@ -375,14 +376,14 @@ CHIP_ERROR ConnectivityManagerImpl::_GetAndLogWifiStatsCounters(void)
 
 CHIP_ERROR ConnectivityManagerImpl::InitWiFi()
 {
-    mLastStationConnectFailTime     = 0;
-    mLastAPDemandTime               = 0;
-    mWiFiStationMode                = kWiFiStationMode_Disabled;
-    mWiFiStationState               = kWiFiStationState_NotConnected;
-    mWiFiAPMode                     = kWiFiAPMode_Disabled;
-    mWiFiAPState                    = kWiFiAPState_NotActive;
-    mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
-    mWiFiAPIdleTimeoutMS            = CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT;
+    mLastStationConnectFailTime   = System::Clock::kZero;
+    mLastAPDemandTime             = System::Clock::kZero;
+    mWiFiStationMode              = kWiFiStationMode_Disabled;
+    mWiFiStationState             = kWiFiStationState_NotConnected;
+    mWiFiAPMode                   = kWiFiAPMode_Disabled;
+    mWiFiAPState                  = kWiFiAPState_NotActive;
+    mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
+    mWiFiAPIdleTimeout            = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
     mFlags.SetRaw(0);
 
     // TODO Initialize the Chip Addressing and Routing Module.
@@ -441,6 +442,10 @@ void ConnectivityManagerImpl::OnWiFiPlatformEvent(const ChipDeviceEvent * event)
         {
             switch (event->Platform.ESPSystemEvent.Id)
             {
+            case WIFI_EVENT_SCAN_DONE:
+                ChipLogProgress(DeviceLayer, "WIFI_EVENT_SCAN_DONE");
+                NetworkCommissioning::ESPWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
+                break;
             case WIFI_EVENT_STA_START:
                 ChipLogProgress(DeviceLayer, "WIFI_EVENT_STA_START");
                 DriveStationState();
@@ -551,7 +556,7 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             ChangeWiFiStationState(kWiFiStationState_Connected);
             ChipLogProgress(DeviceLayer, "WiFi station interface connected");
-            mLastStationConnectFailTime = 0;
+            mLastStationConnectFailTime = System::Clock::kZero;
             OnStationConnected();
         }
 
@@ -576,7 +581,7 @@ void ConnectivityManagerImpl::DriveStationState()
     // Otherwise the station interface is NOT connected to an AP, so...
     else
     {
-        uint64_t now = System::SystemClock().GetMonotonicMilliseconds();
+        System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
         // Advance the station state to NotConnected if it was previously Connected or Disconnecting,
         // or if a previous initiated connect attempt failed.
@@ -588,7 +593,7 @@ void ConnectivityManagerImpl::DriveStationState()
             if (prevState != kWiFiStationState_Connecting_Failed)
             {
                 ChipLogProgress(DeviceLayer, "WiFi station interface disconnected");
-                mLastStationConnectFailTime = 0;
+                mLastStationConnectFailTime = System::Clock::kZero;
                 OnStationDisconnected();
             }
             else
@@ -604,7 +609,8 @@ void ConnectivityManagerImpl::DriveStationState()
         {
             // Initiate a connection to the AP if we haven't done so before, or if enough
             // time has passed since the last attempt.
-            if (mLastStationConnectFailTime == 0 || now >= mLastStationConnectFailTime + mWiFiStationReconnectIntervalMS)
+            if (mLastStationConnectFailTime == System::Clock::kZero ||
+                now >= mLastStationConnectFailTime + mWiFiStationReconnectInterval)
             {
                 ChipLogProgress(DeviceLayer, "Attempting to connect WiFi station interface");
                 esp_err_t err = esp_wifi_connect();
@@ -620,12 +626,12 @@ void ConnectivityManagerImpl::DriveStationState()
             // Otherwise arrange another connection attempt at a suitable point in the future.
             else
             {
-                uint32_t timeToNextConnect = (uint32_t)((mLastStationConnectFailTime + mWiFiStationReconnectIntervalMS) - now);
+                System::Clock::Timeout timeToNextConnect = (mLastStationConnectFailTime + mWiFiStationReconnectInterval) - now;
 
-                ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRIu32 " ms", timeToNextConnect);
+                ChipLogProgress(DeviceLayer, "Next WiFi station reconnect in %" PRIu32 " ms",
+                                System::Clock::Milliseconds32(timeToNextConnect).count());
 
-                ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(timeToNextConnect),
-                                                                      DriveStationState, NULL));
+                ReturnOnFailure(DeviceLayer::SystemLayer().StartTimer(timeToNextConnect, DriveStationState, NULL));
             }
         }
     }
@@ -643,7 +649,7 @@ void ConnectivityManagerImpl::OnStationConnected()
     {
         ChipLogError(DeviceLayer, "esp_netif_create_ip6_linklocal() failed for WIFI_STA_DEF interface: %s", esp_err_to_name(err));
     }
-
+    NetworkCommissioning::ESPWiFiDriver::GetInstance().OnConnectWiFiNetwork();
     // TODO Invoke WARM to perform actions that occur when the WiFi station interface comes up.
 
     // Alert other components of the new state.
@@ -687,8 +693,6 @@ void ConnectivityManagerImpl::DriveAPState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     WiFiAPState targetState;
-    uint64_t now;
-    uint32_t apTimeout;
     bool espAPModeEnabled;
 
     // Determine if AP mode is currently enabled in the ESP WiFi layer.
@@ -739,18 +743,19 @@ void ConnectivityManagerImpl::DriveAPState()
         // has been demand for the AP within the idle timeout period.
         else if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
         {
-            now = System::SystemClock().GetMonotonicMilliseconds();
+            System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
 
-            if (mLastAPDemandTime != 0 && now < (mLastAPDemandTime + mWiFiAPIdleTimeoutMS))
+            if (mLastAPDemandTime != System::Clock::kZero && now < (mLastAPDemandTime + mWiFiAPIdleTimeout))
             {
                 targetState = kWiFiAPState_Active;
 
                 // Compute the amount of idle time before the AP should be deactivated and
                 // arm a timer to fire at that time.
-                apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
-                err       = DeviceLayer::SystemLayer().StartTimer(System::Clock::Milliseconds32(apTimeout), DriveAPState, NULL);
+                System::Clock::Timeout apTimeout = (mLastAPDemandTime + mWiFiAPIdleTimeout) - now;
+                err                              = DeviceLayer::SystemLayer().StartTimer(apTimeout, DriveAPState, NULL);
                 SuccessOrExit(err);
-                ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " ms", apTimeout);
+                ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " ms",
+                                System::Clock::Milliseconds32(apTimeout).count());
             }
             else
             {

@@ -37,6 +37,8 @@ void TestPtrResourceRecord(nlTestSuite * inSuite, void * inContext)
     HeaderRef header(headerBuffer);
 
     BigEndian::BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
     PtrResourceRecord record(kName, kPtr);
 
     record.SetTtl(123);
@@ -57,7 +59,7 @@ void TestPtrResourceRecord(nlTestSuite * inSuite, void * inContext)
         0                           // QNAME ends
     };
 
-    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output));
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, writer));
     NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
     NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
     NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);

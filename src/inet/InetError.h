@@ -23,9 +23,6 @@
  *      Error types, ranges, and mappings overrides may be made by
  *      defining the appropriate INET_CONFIG_* or _INET_CONFIG_*
  *      macros.
- *
- *  NOTE WELL: On some platforms, this header is included by C-language programs.
- *
  */
 
 #pragma once

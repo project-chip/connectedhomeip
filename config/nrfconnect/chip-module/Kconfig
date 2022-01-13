@@ -27,3 +27,18 @@ config CHIP_NFC_COMMISSIONING
 	imply NFC_NDEF_URI_MSG
 	help
 	  Enables NFC commissioning by sharing onboarding payload in NFC tag.
+
+# See config/zephyr/Kconfig for full definition
+config CHIP_OTA_REQUESTOR
+	bool
+	imply DFU_TARGET
+	imply STREAM_FLASH
+	imply STREAM_FLASH_ERASE
+
+config CHIP_OTA_REQUESTOR_BUFFER_SIZE
+	int "OTA Requestor image buffer size"
+	default 1024
+	depends on CHIP_OTA_REQUESTOR
+	help
+	  Configures size of the buffer used by OTA Requestor when downloading and
+	  writing a new firmware image to flash.

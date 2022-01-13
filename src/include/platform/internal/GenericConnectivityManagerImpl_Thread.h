@@ -63,8 +63,11 @@ protected:
     bool _IsThreadApplicationControlled();
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
     CHIP_ERROR _SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType);
-    void _GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig);
-    CHIP_ERROR _SetThreadPollingConfig(const ConnectivityManager::ThreadPollingConfig & pollingConfig);
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    CHIP_ERROR _GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR _SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig);
+    CHIP_ERROR _RequestSEDFastPollingMode(bool onOff);
+#endif
     bool _IsThreadAttached();
     bool _IsThreadProvisioned();
     void _ErasePersistentInfo();
@@ -138,19 +141,27 @@ GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadDeviceType(Connectiv
     return ThreadStackMgrImpl().SetThreadDeviceType(deviceType);
 }
 
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
 template <class ImplClass>
-inline void
-GenericConnectivityManagerImpl_Thread<ImplClass>::_GetThreadPollingConfig(ConnectivityManager::ThreadPollingConfig & pollingConfig)
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_Thread<ImplClass>::_GetSEDPollingConfig(ConnectivityManager::SEDPollingConfig & pollingConfig)
 {
-    ThreadStackMgrImpl().GetThreadPollingConfig(pollingConfig);
+    return ThreadStackMgrImpl().GetSEDPollingConfig(pollingConfig);
 }
 
 template <class ImplClass>
-inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_SetThreadPollingConfig(
-    const ConnectivityManager::ThreadPollingConfig & pollingConfig)
+inline CHIP_ERROR
+GenericConnectivityManagerImpl_Thread<ImplClass>::_SetSEDPollingConfig(const ConnectivityManager::SEDPollingConfig & pollingConfig)
 {
-    return ThreadStackMgrImpl().SetThreadPollingConfig(pollingConfig);
+    return ThreadStackMgrImpl().SetSEDPollingConfig(pollingConfig);
 }
+
+template <class ImplClass>
+inline CHIP_ERROR GenericConnectivityManagerImpl_Thread<ImplClass>::_RequestSEDFastPollingMode(bool onOff)
+{
+    return ThreadStackMgrImpl().RequestSEDFastPollingMode(onOff);
+}
+#endif
 
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_Thread<ImplClass>::_ResetThreadNetworkDiagnosticsCounts()

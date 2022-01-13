@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipClusters.OnOffCluster
 import chip.devicecontroller.ChipDeviceController
@@ -30,16 +31,13 @@ import kotlinx.android.synthetic.main.on_off_client_fragment.view.readBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.showSubscribeDialogBtn
 import kotlinx.android.synthetic.main.on_off_client_fragment.view.toggleBtn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 class OnOffClientFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
 
-  private val scope = CoroutineScope(Dispatchers.Main + Job())
+  private lateinit var scope: CoroutineScope
 
   private lateinit var addressUpdateFragment: AddressUpdateFragment
 
@@ -48,6 +46,8 @@ class OnOffClientFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
+    scope = viewLifecycleOwner.lifecycleScope
+
     return inflater.inflate(R.layout.on_off_client_fragment, container, false).apply {
       deviceController.setCompletionListener(ChipControllerCallback())
 
@@ -107,7 +107,9 @@ class OnOffClientFragment : Fragment() {
           minIntervalEd.text.toString().toInt(),
           maxIntervalEd.text.toString().toInt()
         )
-        dialog.dismiss()
+        requireActivity().runOnUiThread {
+          dialog.dismiss()
+        }
       }
     }
     dialog.show()
@@ -116,26 +118,20 @@ class OnOffClientFragment : Fragment() {
   private suspend fun sendSubscribeOnOffClick(minInterval: Int, maxInterval: Int) {
     val onOffCluster = getOnOffClusterForDevice()
 
-    val subscribeCallback = object : ChipClusters.DefaultClusterCallback {
-      override fun onSuccess() {
-        val message = "Subscribe on/off success"
+    val subscribeCallback = object : ChipClusters.BooleanAttributeCallback {
+      override fun onSuccess(value: Boolean) {
+        val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+        val time = formatter.format(Calendar.getInstance(Locale.getDefault()).time)
+        val message = "Subscribed on/off value at $time: ${if (value) "ON" else "OFF"}"
+
+        Log.v(TAG, message)
+        showReportMessage(message)
+      }
+
+      override fun onSubscriptionEstablished() {
+        val message = "Subscription for on/off established"
         Log.v(TAG, message)
         showMessage(message)
-
-        onOffCluster.reportOnOffAttribute(object : ChipClusters.BooleanAttributeCallback {
-          override fun onSuccess(on: Boolean) {
-            Log.v(TAG, "Report on/off attribute value: $on")
-
-            val formatter = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-            val time = formatter.format(Calendar.getInstance(Locale.getDefault()).time)
-            showReportMessage("Report on/off at $time: ${if (on) "ON" else "OFF"}")
-          }
-
-          override fun onError(ex: Exception) {
-            Log.e(TAG, "Error reporting on/off attribute", ex)
-            showReportMessage("Error reporting on/off attribute: $ex")
-          }
-        })
       }
 
       override fun onError(ex: Exception) {
@@ -164,11 +160,6 @@ class OnOffClientFragment : Fragment() {
     override fun onError(error: Throwable?) {
       Log.d(TAG, "onError: $error")
     }
-  }
-
-  override fun onStop() {
-    super.onStop()
-    scope.cancel()
   }
 
   private suspend fun sendLevelCommandClick() {

@@ -22,6 +22,8 @@ function atomicType(arg)
     return 'bool';
   case 'single':
     return 'float';
+  case 'double':
+    return 'double';
   case 'int40s':
   case 'int48s':
   case 'int56s':

@@ -24,6 +24,5 @@ idf_component_register(SRCS main.cpp
                       "${CHIP_SHELL_DIR}/shell_common/cmd_ping.cpp"
                       "${CHIP_SHELL_DIR}/shell_common/cmd_send.cpp"                      
                       PRIV_INCLUDE_DIRS
-                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src"
                       "${CHIP_SHELL_DIR}/shell_common/include"
                       PRIV_REQUIRES chip nvs_flash bt console esp32_mbedtls)

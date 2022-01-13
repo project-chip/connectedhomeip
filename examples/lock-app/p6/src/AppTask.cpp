@@ -122,7 +122,7 @@ CHIP_ERROR AppTask::Init()
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    P6_LOG("Current Firmware Version: %d", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+    P6_LOG("Current Software Version: %d", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     err = BoltLockMgr().Init();
     if (err != CHIP_NO_ERROR)
     {

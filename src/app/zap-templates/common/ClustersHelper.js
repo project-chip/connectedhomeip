@@ -21,6 +21,7 @@ const queryConfig       = require(zapPath + 'db/query-config.js')
 const queryCommand      = require(zapPath + 'db/query-command.js')
 const queryEndpoint     = require(zapPath + 'db/query-endpoint.js')
 const queryEndpointType = require(zapPath + 'db/query-endpoint-type.js')
+const queryEvent        = require(zapPath + 'db/query-event.js')
 const templateUtil      = require(zapPath + 'generator/template-util.js')
 const zclHelper         = require(zapPath + 'generator/helper-zcl.js')
 const zclQuery          = require(zapPath + 'db/query-zcl.js')
@@ -28,8 +29,17 @@ const zclQuery          = require(zapPath + 'db/query-zcl.js')
 const { Deferred }    = require('./Deferred.js');
 const ListHelper      = require('./ListHelper.js');
 const StringHelper    = require('./StringHelper.js');
-const StructHelper    = require('./StructHelper.js');
 const ChipTypesHelper = require('./ChipTypesHelper.js');
+
+// Helper for better error reporting.
+function ensureState(condition, error)
+{
+  if (!condition) {
+    let err = new Error(error);
+    console.log(`${error}: ` + err.stack);
+    throw err;
+  }
+}
 
 //
 // Load Step 1
@@ -85,6 +95,22 @@ function loadClusters()
       .then(clusters => clusters.filter(cluster => cluster.enabled == 1));
 }
 
+function loadCommandResponse(command, packageId)
+{
+  const { db, sessionId } = this.global;
+  return queryCommand.selectCommandById(db, command.id, packageId).then(commandDetails => {
+    if (commandDetails.responseRef == null) {
+      command.response = null;
+      return command;
+    }
+
+    return queryCommand.selectCommandById(db, commandDetails.responseRef, packageId).then(response => {
+      command.response = response;
+      return command;
+    });
+  });
+}
+
 function loadCommandArguments(command, packageId)
 {
   const { db, sessionId } = this.global;
@@ -101,6 +127,7 @@ function loadCommands(packageId)
       .then(endpointTypes => queryEndpointType.selectClustersAndEndpointDetailsFromEndpointTypes(db, endpointTypes))
       .then(endpointTypesAndClusters => queryCommand.selectCommandDetailsFromAllEndpointTypesAndClusters(
                 db, endpointTypesAndClusters, true))
+      .then(commands => Promise.all(commands.map(command => loadCommandResponse.call(this, command, packageId))))
       .then(commands => Promise.all(commands.map(command => loadCommandArguments.call(this, command, packageId))));
 }
 
@@ -122,6 +149,26 @@ function loadAttributes(packageId)
   //.then(attributes => Promise.all(attributes.map(attribute => types.typeSizeAttribute(db, packageId, attribute))
 }
 
+function loadEvents(packageId)
+{
+  const { db, sessionId } = this.global;
+  return queryEvent.selectAllEvents(db, packageId)
+      .then(events => { return queryEndpointType.selectEndpointTypeIds(db, sessionId)
+                    .then(endpointTypes => Promise.all(
+                              endpointTypes.map(({ endpointTypeId }) => queryEndpoint.selectEndpointClusters(db, endpointTypeId))))
+                    .then(clusters => clusters.flat(3))
+                    .then(clusters => {
+                      events.forEach(event => {
+                        const cluster = clusters.find(cluster => cluster.code == event.clusterCode && cluster.side == 'client');
+                        if (cluster) {
+                          event.clusterId   = cluster.clusterId;
+                          event.clusterName = cluster.name;
+                        }
+                      });
+                      return events.filter(event => clusters.find(cluster => cluster.code == event.clusterCode));
+                    }) })
+}
+
 function loadGlobalAttributes(packageId)
 {
   const { db, sessionId } = this.global;
@@ -134,54 +181,6 @@ function loadGlobalAttributes(packageId)
 // Load step 2
 //
 
-/**
- * This method converts a ZCL type to the length expected for the
- * BufferWriter.Put method.
- * TODO
- * Not all types are supported at the moment, so if there is any unsupported type
- * that we are trying to convert, it will throw an error.
- */
-function asPutLength(zclType)
-{
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'bool':
-    return '8';
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return type.replace(/[^0-9]/g, '');
-  default:
-    throw error = 'asPutLength: Unhandled type: ' + zclType;
-  }
-}
-
-function asPutCastType(zclType)
-{
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'bool':
-    return 'uint8_t';
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-    return 'u' + type;
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return type;
-  default:
-    throw error = 'asPutCastType: Unhandled type: ' + zclType;
-  }
-}
-
 function asChipCallback(item)
 {
   if (StringHelper.isOctetString(item.type)) {
@@ -192,7 +191,7 @@ function asChipCallback(item)
     return { name : 'CharString', type : 'const chip::CharSpan' };
   }
 
-  if (ListHelper.isList(item.type)) {
+  if (item.isList) {
     return { name : 'List', type : null };
   }
 
@@ -210,6 +209,10 @@ function asChipCallback(item)
     return { name : 'Int' + basicType.replace(/[^0-9]/g, '') + 'u', type : basicType };
   case 'bool':
     return { name : 'Boolean', type : 'bool' };
+  case 'float':
+    return { name : 'Float', type : 'float' };
+  case 'double':
+    return { name : 'Double', type : 'double' };
   default:
     return { name : 'Unsupported', type : null };
   }
@@ -249,9 +252,13 @@ function handleString(item, [ atomics, enums, bitmaps, structs ])
   const kLengthSizeInBytes = 2;
 
   item.atomicTypeId = atomic.atomicId;
-  item.chipType     = 'chip::ByteSpan';
-  item.size         = kLengthSizeInBytes + item.maxLength;
-  item.name         = item.name || item.label;
+  if (StringHelper.isOctetString(item.type)) {
+    item.chipType = 'chip::ByteSpan';
+  } else {
+    item.chipType = 'chip::CharSpan';
+  }
+  item.size = kLengthSizeInBytes + item.maxLength;
+  item.name = item.name || item.label;
   return true;
 }
 
@@ -267,8 +274,9 @@ function handleList(item, [ atomics, enums, bitmaps, structs ])
     throw new Error(item.label, 'List[T] is missing type "T" information');
   }
 
-  item.isList = true;
-  item.type   = entryType;
+  item.isList  = true;
+  item.isArray = true;
+  item.type    = entryType;
   enhancedItem(item, [ atomics, enums, bitmaps, structs ]);
 
   return true;
@@ -310,13 +318,11 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
 
   const atomic = getAtomic(atomics, itemType);
   if (atomic) {
-    item.name                = item.name || item.label;
-    item.isStruct            = false;
-    item.atomicTypeId        = atomic.atomicId;
-    item.size                = atomic.size;
-    item.chipType            = atomic.chipType;
-    item.chipTypePutLength   = asPutLength(atomic.chipType);
-    item.chipTypePutCastType = asPutCastType(atomic.chipType);
+    item.name         = item.name || item.label;
+    item.isStruct     = false;
+    item.atomicTypeId = atomic.atomicId;
+    item.size         = atomic.size;
+    item.chipType     = atomic.chipType;
     return true;
   }
 
@@ -371,53 +377,28 @@ function enhancedCommands(commands, types)
   });
 
   commands.forEach(command => {
-    command.isResponse                    = command.name.includes('Response');
+    // Flag things ending in "Response" so we can filter out unused responses,
+    // but don't stomp on a true isResponse value if it's set already because
+    // some other command had this one as its response.
+    command.isResponse                    = command.isResponse || command.name.includes('Response');
     command.isManufacturerSpecificCommand = !!this.mfgCode;
-  });
 
-  commands.forEach(command => {
-    // This filter uses the assumption that a response to a command has a well defined name, such as
-    // (response name) == (command name + 'Response') or s/Request/Response. This is very often the case,
-    // but this is not always true since some clusters use the same response to answer different commands, such as the
-    // operational cluster.
-    const automaticFilter = response => {
-      if (!response.isResponse) {
-        return false;
+    command.hasSpecificResponse = !!command.response;
+    if (command.response) {
+      const responseName   = command.response.name;
+      command.responseName = responseName;
+      // The 'response' property contains the response returned by the `selectCommandById`
+      // helper. But this one does not contains all the metadata informations added by
+      // `enhancedItem`, so instead of using the one from ZAP, retrieve the enhanced version.
+      command.response = commands.find(command => command.name == responseName);
+      // We might have failed to find a response if our configuration is weird
+      // in some way.
+      if (command.response) {
+        command.response.isResponse = true;
       }
-
-      if (response.clusterName != command.clusterName) {
-        return false;
-      }
-
-      if (response.name == command.name) {
-        return false;
-      }
-
-      return (response.name == (command.name + 'Response')) || (response.name == (command.name.replace('Request', 'Response')));
-    };
-
-    const manualFilter = response => {
-      switch (command.name) {
-      case 'AddNOC':
-      case 'UpdateNOC':
-      case 'UpdateFabricLabel':
-      case 'RemoveFabric':
-        return response.name == 'NOCResponse';
-      default:
-        return false;
-      }
-    };
-    const filter = response => automaticFilter(response) || manualFilter(response);
-
-    const response = commands.find(filter);
-    if (response) {
-      command.hasSpecificResponse = true;
-      command.responseName        = response.name;
-      command.response            = response;
     } else {
-      command.hasSpecificResponse = false;
-      command.responseName        = 'DefaultSuccess';
-      command.response            = { arguments : [] };
+      command.responseName = 'DefaultSuccess';
+      command.response     = { arguments : [] };
     }
   });
 
@@ -444,6 +425,23 @@ function enhancedCommands(commands, types)
   return commands;
 }
 
+function enhancedEvents(events, types)
+{
+  events.forEach(event => {
+    const argument = {
+      name : event.name,
+      type : event.name,
+      isList : false,
+      isArray : false,
+      isEvent : true,
+      isNullable : false,
+      label : event.name,
+    };
+    event.response = { arguments : [ argument ] };
+  });
+  return events;
+}
+
 function enhancedAttributes(attributes, globalAttributes, types)
 {
   attributes.forEach(attribute => {
@@ -460,8 +458,12 @@ function enhancedAttributes(attributes, globalAttributes, types)
       type : attribute.type,
       size : attribute.size,
       isList : attribute.isList,
+      isArray : attribute.isList,
+      isEvent : false,
+      isNullable : attribute.isNullable,
       chipType : attribute.chipType,
-      chipCallback : attribute.chipCallback
+      chipCallback : attribute.chipCallback,
+      label : attribute.name,
     };
     attribute.arguments = [ argument ];
     attribute.response  = { arguments : [ argument ] };
@@ -478,12 +480,14 @@ const Clusters = {
   ready : new Deferred()
 };
 
-Clusters.init = function(context, packageId) {
+Clusters.init = async function(context) {
   if (this.ready.running)
   {
     return this.ready;
   }
   this.ready.running = true;
+
+  let packageId = await templateUtil.ensureZclPackageId(context).catch(err => { console.log(err); throw err; });
 
   const loadTypes = [
     loadAtomics.call(context, packageId),
@@ -498,12 +502,14 @@ Clusters.init = function(context, packageId) {
     loadCommands.call(context, packageId),
     loadAttributes.call(context, packageId),
     loadGlobalAttributes.call(context, packageId),
+    loadEvents.call(context, packageId),
   ];
 
-  return Promise.all(promises).then(([types, clusters, commands, attributes, globalAttributes]) => {
+  return Promise.all(promises).then(([types, clusters, commands, attributes, globalAttributes, events]) => {
     this._clusters = clusters;
     this._commands = enhancedCommands(commands, types);
     this._attributes = enhancedAttributes(attributes, globalAttributes, types);
+    this._events = enhancedEvents(events, types);
 
     return this.ready.resolve();
   }, err => this.ready.reject(err));
@@ -515,14 +521,17 @@ Clusters.init = function(context, packageId) {
 //
 function asBlocks(promise, options)
 {
-  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise.then(data => templateUtil.collectBlocks(data, options, this)));
-  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => { console.log(err); throw err; });
+  return promise.then(data => templateUtil.collectBlocks(data, options, this))
 }
 
-function asPromise(promise)
+function ensureClusters(context)
 {
-  const fn = pkgId => Clusters.init(this, pkgId).then(() => promise);
-  return templateUtil.ensureZclPackageId(this).then(fn).catch(err => { console.log(err); throw err; });
+  // Kick off Clusters initialization.  This is async, but that's fine: all the
+  // getters on Clusters wait on that initialziation to complete.
+  ensureState(context, "Don't have a context");
+
+  Clusters.init(context);
+  return Clusters;
 }
 
 //
@@ -530,24 +539,35 @@ function asPromise(promise)
 //
 const kResponseFilter = (isResponse, item) => isResponse == item.isResponse;
 
+Clusters.ensureReady = function()
+{
+    ensureState(this.ready.running);
+    return this.ready;
+}
+
 Clusters.getClusters = function()
 {
-    return this.ready.then(() => this._clusters);
+    return this.ensureReady().then(() => this._clusters);
 }
 
 Clusters.getCommands = function()
 {
-    return this.ready.then(() => this._commands.filter(kResponseFilter.bind(null, false)));
+    return this.ensureReady().then(() => this._commands.filter(kResponseFilter.bind(null, false)));
 }
 
 Clusters.getResponses = function()
 {
-    return this.ready.then(() => this._commands.filter(kResponseFilter.bind(null, true)));
+    return this.ensureReady().then(() => this._commands.filter(kResponseFilter.bind(null, true)));
 }
 
 Clusters.getAttributes = function()
 {
-    return this.ready.then(() => this._attributes);
+    return this.ensureReady().then(() => this._attributes);
+}
+
+Clusters.getEvents = function()
+{
+    return this.ensureReady().then(() => this._events);
 }
 
 //
@@ -567,11 +587,16 @@ Clusters.getResponsesByClusterName = function(name)
 
 Clusters.getAttributesByClusterName = function(name)
 {
-    return this.ready.then(() => {
+    return this.ensureReady().then(() => {
       const clusterId = this._clusters.find(kNameFilter.bind(null, name)).id;
       const filter = attribute => attribute.clusterId == clusterId;
       return this.getAttributes().then(items => items.filter(filter));
     });
+}
+
+Clusters.getEventsByClusterName = function(name)
+{
+    return this.getEvents().then(items => items.filter(kNameFilter.bind(null, name)));
 }
 
 //
@@ -594,6 +619,12 @@ Clusters.getAttributesByClusterSide = function(side)
 {
     return this.getAttributes().then(items => items.filter(kSideFilter.bind(null, side)));
 }
+
+Clusters.getEventsByClusterSide = function(side)
+{
+    return this.getEvents().then(items => items.filter(kSideFilter.bind(null, side)));
+}
+
 
 //
 // Helpers: Client
@@ -618,6 +649,11 @@ Clusters.getClientResponses = function(name)
 Clusters.getClientAttributes = function(name)
 {
     return this.getAttributesByClusterName(name).then(items => items.filter(kClientSideFilter));
+}
+
+Clusters.getClientEvents = function(name)
+{
+    return this.getEventsByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
 //
@@ -645,9 +681,13 @@ Clusters.getServerAttributes = function(name)
     return this.getAttributesByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
+Clusters.getServerEvents = function(name)
+{
+    return this.getEventsByClusterName(name).then(items => items.filter(kServerSideFilter));
+}
+
 //
 // Module exports
 //
-exports.Clusters  = Clusters;
-exports.asBlocks  = asBlocks;
-exports.asPromise = asPromise;
+exports.asBlocks = asBlocks;
+exports.ensureClusters = ensureClusters;

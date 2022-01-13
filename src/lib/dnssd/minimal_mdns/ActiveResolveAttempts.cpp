@@ -26,6 +26,8 @@ using namespace chip;
 namespace mdns {
 namespace Minimal {
 
+constexpr chip::System::Clock::Timeout ActiveResolveAttempts::kMaxRetryDelay;
+
 void ActiveResolveAttempts::Reset()
 
 {
@@ -56,9 +58,9 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
     // Strategy when picking the peer id to use:
     //   1 if a matching peer id is already found, use that one
     //   2 if an 'unused' entry is found, use that
-    //   3 otherwise expire the one with the largest nextRetryDelaySec
-    //     or if equal nextRetryDelaySec, pick the one with the oldest
-    //     queryDueTimeMs
+    //   3 otherwise expire the one with the largest nextRetryDelay
+    //     or if equal nextRetryDelay, pick the one with the oldest
+    //     queryDueTime
 
     RetryEntry * entryToUse = &mRetryQueue[0];
 
@@ -94,12 +96,11 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
         //    - on same delay, use queryDueTime to determine the oldest request
         //      (the one with the smallest  due time was issued the longest time
         //       ago)
-        if (entry->nextRetryDelaySec > entryToUse->nextRetryDelaySec)
+        if (entry->nextRetryDelay > entryToUse->nextRetryDelay)
         {
             entryToUse = entry;
         }
-        else if ((entry->nextRetryDelaySec == entryToUse->nextRetryDelaySec) &&
-                 (entry->queryDueTimeMs < entryToUse->queryDueTimeMs))
+        else if ((entry->nextRetryDelay == entryToUse->nextRetryDelay) && (entry->queryDueTime < entryToUse->queryDueTime))
         {
             entryToUse = entry;
         }
@@ -117,16 +118,16 @@ void ActiveResolveAttempts::MarkPending(const PeerId & peerId)
         ChipLogError(Discovery, "Re-using pending resolve entry before reply was received.");
     }
 
-    entryToUse->peerId            = peerId;
-    entryToUse->queryDueTimeMs    = mClock->GetMonotonicMilliseconds();
-    entryToUse->nextRetryDelaySec = 1;
+    entryToUse->peerId         = peerId;
+    entryToUse->queryDueTime   = mClock->GetMonotonicTimestamp();
+    entryToUse->nextRetryDelay = System::Clock::Seconds16(1);
 }
 
-Optional<uint32_t> ActiveResolveAttempts::GetMsUntilNextExpectedResponse() const
+Optional<System::Clock::Timeout> ActiveResolveAttempts::GetTimeUntilNextExpectedResponse() const
 {
-    Optional<uint32_t> minDelay = Optional<uint32_t>::Missing();
+    Optional<System::Clock::Timeout> minDelay = Optional<System::Clock::Timeout>::Missing();
 
-    chip::System::Clock::MonotonicMilliseconds nowMs = mClock->GetMonotonicMilliseconds();
+    chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
     for (auto & entry : mRetryQueue)
     {
@@ -135,13 +136,13 @@ Optional<uint32_t> ActiveResolveAttempts::GetMsUntilNextExpectedResponse() const
             continue;
         }
 
-        if (nowMs >= entry.queryDueTimeMs)
+        if (now >= entry.queryDueTime)
         {
             // found an entry that needs processing right now
-            return Optional<uint32_t>::Value(0);
+            return Optional<System::Clock::Timeout>::Value(0);
         }
 
-        uint32_t entryDelay = static_cast<int>(entry.queryDueTimeMs - nowMs);
+        System::Clock::Timeout entryDelay = entry.queryDueTime - now;
         if (!minDelay.HasValue() || (minDelay.Value() > entryDelay))
         {
             minDelay.SetValue(entryDelay);
@@ -153,7 +154,7 @@ Optional<uint32_t> ActiveResolveAttempts::GetMsUntilNextExpectedResponse() const
 
 Optional<PeerId> ActiveResolveAttempts::NextScheduledPeer()
 {
-    chip::System::Clock::MonotonicMilliseconds nowMs = mClock->GetMonotonicMilliseconds();
+    chip::System::Clock::Timestamp now = mClock->GetMonotonicTimestamp();
 
     for (auto & entry : mRetryQueue)
     {
@@ -162,20 +163,20 @@ Optional<PeerId> ActiveResolveAttempts::NextScheduledPeer()
             continue; // not a pending item
         }
 
-        if (entry.queryDueTimeMs > nowMs)
+        if (entry.queryDueTime > now)
         {
             continue; // not yet due
         }
 
-        if (entry.nextRetryDelaySec > kMaxRetryDelaySec)
+        if (entry.nextRetryDelay > kMaxRetryDelay)
         {
             ChipLogError(Discovery, "Timeout waiting for mDNS resolution.");
             entry.peerId.SetNodeId(kUndefinedNodeId);
             continue;
         }
 
-        entry.queryDueTimeMs = nowMs + entry.nextRetryDelaySec * 1000L;
-        entry.nextRetryDelaySec *= 2;
+        entry.queryDueTime = now + entry.nextRetryDelay;
+        entry.nextRetryDelay *= 2;
 
         return Optional<PeerId>::Value(entry.peerId);
     }

@@ -14,9 +14,12 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        // NOTE: This build assumes CHIP was configured and built for armeabi-v7a. Deal with
-        // other archs later when build is sane.
-        //  ndk {abiFilters 'armeabi-v7a'}
+        if (matterSdkSourceBuild.toBoolean() && !matterBuildSrcDir.isEmpty()) {
+            ndk {
+                abiFilters = []
+                abiFilters.addAll(matterSourceBuildAbiFilters.split(';').collect { it as String })
+            }
+        }
 
         externalNativeBuild {
             cmake {
@@ -64,6 +67,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.android.volley:volley:1.2.1'
     def room_version = "2.2.5"
 
     implementation "androidx.room:room-runtime:$room_version"

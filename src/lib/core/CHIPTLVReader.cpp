@@ -245,8 +245,8 @@ namespace {
 float BitCastToFloat(const uint64_t elemLenOrVal)
 {
     float f;
-    auto u32 = static_cast<uint32_t>(elemLenOrVal);
-    memcpy(&f, &u32, sizeof(f));
+    auto unsigned32 = static_cast<uint32_t>(elemLenOrVal);
+    memcpy(&f, &unsigned32, sizeof(f));
     return f;
 }
 } // namespace
@@ -576,7 +576,7 @@ CHIP_ERROR TLVReader::Skip()
  */
 void TLVReader::ClearElementState()
 {
-    mElemTag      = AnonymousTag;
+    mElemTag      = AnonymousTag();
     mControlByte  = kTLVControlByte_NotSpecified;
     mElemLenOrVal = 0;
 }
@@ -737,7 +737,7 @@ CHIP_ERROR TLVReader::VerifyElement()
     {
         if (mContainerType == kTLVType_NotSpecified)
             return CHIP_ERROR_INVALID_TLV_ELEMENT;
-        if (mElemTag != AnonymousTag)
+        if (mElemTag != AnonymousTag())
             return CHIP_ERROR_INVALID_TLV_TAG;
     }
     else
@@ -751,11 +751,11 @@ CHIP_ERROR TLVReader::VerifyElement()
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_Structure:
-            if (mElemTag == AnonymousTag)
+            if (mElemTag == AnonymousTag())
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_Array:
-            if (mElemTag != AnonymousTag)
+            if (mElemTag != AnonymousTag())
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_UnknownContainer:
@@ -815,7 +815,7 @@ Tag TLVReader::ReadTag(TLVTagControl tagControl, const uint8_t *& p)
         return ProfileTag(vendorId, profileNum, LittleEndian::Read32(p));
     case TLVTagControl::Anonymous:
     default:
-        return AnonymousTag;
+        return AnonymousTag();
     }
 }
 
@@ -946,6 +946,28 @@ CHIP_ERROR TLVReader::FindElementWithTag(Tag tag, TLVReader & destReader) const
 exit:
     ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
 
+    return err;
+}
+
+CHIP_ERROR TLVReader::CountRemainingInContainer(size_t * size) const
+{
+    if (mContainerType == kTLVType_NotSpecified)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    TLVReader tempReader(*this);
+    size_t count = 0;
+    CHIP_ERROR err;
+    while ((err = tempReader.Next()) == CHIP_NO_ERROR)
+    {
+        ++count;
+    };
+    if (err == CHIP_END_OF_TLV)
+    {
+        *size = count;
+        return CHIP_NO_ERROR;
+    }
     return err;
 }
 

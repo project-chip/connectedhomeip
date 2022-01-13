@@ -22,11 +22,9 @@
 #include <cinttypes>
 
 #include <app-common/zap-generated/enums.h>
-#include <app/Command.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
-#include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/SafeInt.h>
@@ -35,7 +33,6 @@
 
 using namespace ::chip;
 using namespace ::chip::app::DataModel;
-using namespace ::chip::app::List;
 
 namespace {
 [[maybe_unused]] constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
@@ -131,22 +128,20 @@ namespace {
         return true;                                                                                                               \
     }
 
-// TODO: These IM related callbacks contains small or no generated code, should be put into seperate file to reduce the size of
-// template. Singleton instance of the callbacks manager
-
+// Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                               uint8_t action, uint32_t delayedActionTime)
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                                        uint8_t action, uint32_t delayedActionTime)
 {
-    ChipLogProgress(Zcl, "ApplyUpdateRequestResponse:");
+    ChipLogProgress(Zcl, "ApplyUpdateResponse:");
     ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
     ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback");
 
-    Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback> * cb =
-        Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback> * cb =
+        Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, action, delayedActionTime);
     return true;
 }

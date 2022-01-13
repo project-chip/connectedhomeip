@@ -42,18 +42,18 @@ constexpr pw::containers::FlatMap<uint8_t, uint32_t, 73> kChannelToFreqMap({ {
 
 // Class handles the event handlers needed for station startup.
 // Creating the object will register all handlers needed, destroying will
-// unregister. The object is only needed during initalization, after the station
+// unregister. The object is only needed during initialization, after the station
 // is up it is safe to destroy this object.
-class WifiInitStationEventHandler
+class WiFiInitStationEventHandler
 {
 public:
-    WifiInitStationEventHandler()
+    WiFiInitStationEventHandler()
     {
         handler_context_.event_group = xEventGroupCreate();
         esp_event_handler_register(WIFI_EVENT, ESP_EVENT_ANY_ID, &EventHandler, &handler_context_);
     }
 
-    ~WifiInitStationEventHandler()
+    ~WiFiInitStationEventHandler()
     {
         vEventGroupDelete(handler_context_.event_group);
         esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &EventHandler);
@@ -61,8 +61,8 @@ public:
 
     pw::Status WaitForStationUp()
     {
-        EventBits_t bits = xEventGroupWaitBits(handler_context_.event_group, kWifiStationUpBit, pdFALSE, pdFALSE, portMAX_DELAY);
-        if (!(bits & kWifiStationUpBit))
+        EventBits_t bits = xEventGroupWaitBits(handler_context_.event_group, kWiFiStationUpBit, pdFALSE, pdFALSE, portMAX_DELAY);
+        if (!(bits & kWiFiStationUpBit))
         {
             return pw::Status::Unknown();
         }
@@ -70,7 +70,7 @@ public:
     }
 
 private:
-    static constexpr uint8_t kWifiStationUpBit = BIT0;
+    static constexpr uint8_t kWiFiStationUpBit = BIT0;
     struct HandlerContext
     {
         size_t retry_count = 0;
@@ -84,7 +84,7 @@ private:
         if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START)
         {
             ESP_LOGI(TAG, "EVENT: WIFI_EVENT_STATION_START");
-            xEventGroupSetBits(context->event_group, kWifiStationUpBit);
+            xEventGroupSetBits(context->event_group, kWiFiStationUpBit);
         }
     }
 };
@@ -93,10 +93,10 @@ private:
 // Creating the object will register all handlers needed, destroying will
 // unregister. The object is only needed during connection, once connected
 // is up it is safe to destroy this object.
-class WifiConnectionEventHandler
+class WiFiConnectionEventHandler
 {
 public:
-    WifiConnectionEventHandler(esp_netif_t * esp_netif)
+    WiFiConnectionEventHandler(esp_netif_t * esp_netif)
     {
         handler_context_.esp_netif   = esp_netif;
         handler_context_.event_group = xEventGroupCreate();
@@ -105,7 +105,7 @@ public:
         esp_event_handler_register(IP_EVENT, IP_EVENT_GOT_IP6, &EventHandler, &handler_context_);
     }
 
-    ~WifiConnectionEventHandler()
+    ~WiFiConnectionEventHandler()
     {
         esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &EventHandler);
         esp_event_handler_unregister(WIFI_EVENT, ESP_EVENT_ANY_ID, &EventHandler);
@@ -114,16 +114,16 @@ public:
         vEventGroupDelete(handler_context_.event_group);
     }
 
-    // Waits for the events to determine if connected succesfully.
+    // Waits for the events to determine if connected successfully.
     pw::Status WaitForConnection(chip_rpc_ConnectionResult * result)
     {
-        EventBits_t bits = xEventGroupWaitBits(handler_context_.event_group, kWifiFailBit | kWifiIpv6ConnectedBit, pdFALSE, pdFALSE,
+        EventBits_t bits = xEventGroupWaitBits(handler_context_.event_group, kWiFiFailBit | kWiFiIpv6ConnectedBit, pdFALSE, pdFALSE,
                                                portMAX_DELAY);
-        if (bits & kWifiIpv6ConnectedBit)
+        if (bits & kWiFiIpv6ConnectedBit)
         {
             result->error = chip_rpc_CONNECTION_ERROR_OK;
         }
-        else if (bits & kWifiFailBit)
+        else if (bits & kWiFiFailBit)
         {
             result->error = handler_context_.error_code;
             return pw::Status::Unavailable();
@@ -138,9 +138,9 @@ public:
 
 private:
     static constexpr size_t kWiFiConnectRetryMax   = 5;
-    static constexpr uint8_t kWifiIpv6ConnectedBit = BIT0;
-    static constexpr uint8_t kWifiIpv4ConnectedBit = BIT1;
-    static constexpr uint8_t kWifiFailBit          = BIT2;
+    static constexpr uint8_t kWiFiIpv6ConnectedBit = BIT0;
+    static constexpr uint8_t kWiFiIpv4ConnectedBit = BIT1;
+    static constexpr uint8_t kWiFiFailBit          = BIT2;
 
     struct HandlerContext
     {
@@ -167,7 +167,7 @@ private:
             {
                 context->error_code =
                     static_cast<_chip_rpc_CONNECTION_ERROR>((static_cast<system_event_sta_disconnected_t *>(event_data))->reason);
-                xEventGroupSetBits(context->event_group, kWifiFailBit);
+                xEventGroupSetBits(context->event_group, kWiFiFailBit);
             }
         }
         else if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_CONNECTED)
@@ -179,13 +179,13 @@ private:
         {
             auto * event = static_cast<ip_event_got_ip_t *>(event_data);
             ESP_LOGI(TAG, "got ip4: " IPSTR, IP2STR(&event->ip_info.ip));
-            xEventGroupSetBits(context->event_group, kWifiIpv4ConnectedBit);
+            xEventGroupSetBits(context->event_group, kWiFiIpv4ConnectedBit);
         }
         else if (event_base == IP_EVENT && event_id == IP_EVENT_GOT_IP6)
         {
             auto * event = static_cast<ip_event_got_ip6_t *>(event_data);
             ESP_LOGI(TAG, "got ip6: " IPV6STR, IPV62STR(event->ip6_info.ip));
-            xEventGroupSetBits(context->event_group, kWifiIpv6ConnectedBit);
+            xEventGroupSetBits(context->event_group, kWiFiIpv6ConnectedBit);
         }
     }
 };
@@ -197,9 +197,9 @@ wifi_ap_record_t scan_records[kScanRecordsMax] = { 0 };
 
 } // namespace
 
-Wifi Wifi::instance_;
+WiFi WiFi::instance_;
 
-pw::Status Wifi::Init()
+pw::Status WiFi::Init()
 {
     wifi_connected_semaphore_ = xSemaphoreCreateBinary();
     PW_TRY(EspToPwStatus(esp_netif_init()));
@@ -207,7 +207,7 @@ pw::Status Wifi::Init()
     esp_netif_ = esp_netif_create_default_wifi_sta();
     PW_TRY(EspToPwStatus(esp_netif_dhcpc_stop(esp_netif_)));
 
-    WifiInitStationEventHandler event_handler;
+    WiFiInitStationEventHandler event_handler;
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
     PW_TRY(EspToPwStatus(esp_wifi_init(&cfg)));
@@ -218,7 +218,7 @@ pw::Status Wifi::Init()
     return pw::OkStatus();
 }
 
-pw::Status Wifi::Connect(ServerContext &, const chip_rpc_ConnectionData & request, chip_rpc_ConnectionResult & response)
+pw::Status WiFi::Connect(const chip_rpc_ConnectionData & request, chip_rpc_ConnectionResult & response)
 {
     wifi_config_t wifi_config {
         .sta = {
@@ -240,7 +240,7 @@ pw::Status Wifi::Connect(ServerContext &, const chip_rpc_ConnectionData & reques
     memcpy(wifi_config.sta.password, request.secret.bytes,
            std::min(sizeof(wifi_config.sta.password), static_cast<size_t>(request.secret.size)));
 
-    WifiConnectionEventHandler event_handler(esp_netif_);
+    WiFiConnectionEventHandler event_handler(esp_netif_);
     PW_TRY(EspToPwStatus(esp_wifi_set_config(WIFI_IF_STA, &wifi_config)));
     esp_err_t err = esp_wifi_connect();
 
@@ -263,7 +263,7 @@ pw::Status Wifi::Connect(ServerContext &, const chip_rpc_ConnectionData & reques
     return pw::OkStatus();
 }
 
-void Wifi::StartScan(ServerContext &, const chip_rpc_ScanConfig & request, ServerWriter<chip_rpc_ScanResults> & writer)
+void WiFi::StartScan(const chip_rpc_ScanConfig & request, ServerWriter<chip_rpc_ScanResults> & writer)
 {
     wifi_scan_config_t scan_config{ 0 };
     if (request.ssid_count != 0)
@@ -321,13 +321,13 @@ void Wifi::StartScan(ServerContext &, const chip_rpc_ScanConfig & request, Serve
     writer.Finish();
 }
 
-void Wifi::WifiEventHandler(void * arg, esp_event_base_t event_base, int32_t event_id, void * event_data)
+void WiFi::WiFiEventHandler(void * arg, esp_event_base_t event_base, int32_t event_id, void * event_data)
 {
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
         ESP_LOGI(TAG, "******** DISCONNECTED FROM AP *********");
-        esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &WifiEventHandler);
-        esp_event_handler_unregister(IP_EVENT, IP_EVENT_GOT_IP6, &WifiEventHandler);
+        esp_event_handler_unregister(WIFI_EVENT, WIFI_EVENT_STA_DISCONNECTED, &WiFiEventHandler);
+        esp_event_handler_unregister(IP_EVENT, IP_EVENT_GOT_IP6, &WiFiEventHandler);
     }
     else if (event_base == IP_EVENT && event_id == IP_EVENT_GOT_IP6)
     {

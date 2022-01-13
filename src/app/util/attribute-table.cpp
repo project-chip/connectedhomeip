@@ -50,6 +50,7 @@
 #include <app-common/zap-generated/callback.h>
 #include <app/util/af-main.h>
 #include <app/util/error-mapping.h>
+#include <app/util/odd-sized-integers.h>
 
 #include <app/reporting/reporting.h>
 #include <protocols/interaction_model/Constants.h>
@@ -170,80 +171,6 @@ EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(EndpointId endpoint
     return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_CLIENT, manufacturerCode, dataPtr, readLength, NULL);
 }
 
-bool emberAfReadSequentialAttributesAddToResponse(EndpointId endpoint, ClusterId clusterId, AttributeId startAttributeId,
-                                                  uint8_t mask, uint16_t manufacturerCode, uint8_t maxAttributeIds,
-                                                  bool includeAccessControl)
-{
-    uint16_t i;
-    uint16_t discovered = 0;
-    uint16_t skipped    = 0;
-    uint16_t total      = 0;
-
-    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(endpoint, clusterId, mask, manufacturerCode);
-
-    EmberAfAttributeSearchRecord record;
-    record.endpoint         = endpoint;
-    record.clusterId        = clusterId;
-    record.clusterMask      = mask;
-    record.attributeId      = startAttributeId;
-    record.manufacturerCode = manufacturerCode;
-
-    // If we don't have the cluster or it doesn't match the search, we're done.
-    if (cluster == NULL || !emAfMatchCluster(cluster, &record))
-    {
-        return true;
-    }
-
-    for (i = 0; i < cluster->attributeCount; i++)
-    {
-        EmberAfAttributeMetadata * metadata = &cluster->attributes[i];
-
-        // If the cluster is not manufacturer-specific, an attribute is considered
-        // only if its manufacturer code matches that of the command (which may be
-        // unset).
-        if (!emberAfClusterIsManufacturerSpecific(cluster))
-        {
-            record.attributeId = metadata->attributeId;
-            if (!emAfMatchAttribute(cluster, metadata, &record))
-            {
-                continue;
-            }
-        }
-
-        if (metadata->attributeId < startAttributeId)
-        {
-            skipped++;
-        }
-        else if (discovered < maxAttributeIds)
-        {
-            emberAfPutInt32uInResp(metadata->attributeId);
-            emberAfPutInt8uInResp(metadata->attributeType);
-            if (includeAccessControl)
-            {
-                // bit 0 : Readable <-- All our attributes are readable
-                // bit 1 : Writable <-- The only thing we track in the attribute metadata mask
-                // bit 2 : Reportable <-- All our attributes are reportable
-                emberAfPutInt8uInResp((metadata->mask & ATTRIBUTE_MASK_WRITABLE) ? 0x07 : 0x05);
-            }
-            discovered++;
-        }
-        else
-        {
-            // MISRA requires ..else if.. to have terminating else.
-        }
-        total++;
-    }
-
-    // We are finished if there are no more attributes to find, which means the
-    // number of attributes discovered plus the number skipped equals the total
-    // attributes in the cluster.  For manufacturer-specific clusters, the total
-    // includes all attributes in the cluster.  For standard ZCL clusters, if the
-    // the manufacturer code is set, the total is the number of attributes that
-    // match the manufacturer code.  Otherwise, the total is the number of
-    // standard ZCL attributes in the cluster.
-    return (discovered + skipped == total);
-}
-
 static void emberAfAttributeDecodeAndPrintCluster(ClusterId cluster, uint16_t mfgCode)
 {
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
@@ -263,7 +190,6 @@ void emberAfPrintAttributeTable(void)
     decltype(EmberAfEndpointType::clusterCount) clusterIndex;
     uint16_t attributeIndex;
     EmberAfStatus status;
-    uint16_t mfgCode;
     for (endpointIndex = 0; endpointIndex < emberAfEndpointCount(); endpointIndex++)
     {
         EmberAfDefinedEndpoint * ep = &(emAfEndpoints[endpointIndex]);
@@ -286,24 +212,15 @@ void emberAfPrintAttributeTable(void)
                 emberAfAttributesPrint(ChipLogFormatMEI " / %p / " ChipLogFormatMEI " / ", ChipLogValueMEI(cluster->clusterId),
                                        (emberAfAttributeIsClient(metaData) ? "clnt" : "srvr"),
                                        ChipLogValueMEI(metaData->attributeId));
-                mfgCode = emAfGetManufacturerCodeForAttribute(cluster, metaData);
-                if (mfgCode == EMBER_AF_NULL_MANUFACTURER_CODE)
-                {
-                    emberAfAttributesPrint("----");
-                }
-                else
-                {
-                    emberAfAttributesPrint("%2x", mfgCode);
-                }
-                emberAfAttributesPrint(" / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
-                                       (emberAfAttributeIsReadOnly(metaData) ? "RO" : "RW"),
-                                       (emberAfAttributeIsTokenized(metaData)
-                                            ? " token "
-                                            : (emberAfAttributeIsExternal(metaData) ? "extern " : "  RAM  ")));
+                emberAfAttributesPrint("----");
+                emberAfAttributesPrint(
+                    " / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
+                    (metaData->IsReadOnly() ? "RO" : "RW"),
+                    (metaData->IsNonVolatile() ? " nonvolatile " : (metaData->IsExternal() ? " extern " : "  RAM  ")));
                 emberAfAttributesFlush();
                 status = emAfReadAttribute(ep->endpoint, cluster->clusterId, metaData->attributeId,
                                            (emberAfAttributeIsClient(metaData) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER),
-                                           mfgCode, data, ATTRIBUTE_LARGEST, NULL);
+                                           EMBER_AF_NULL_MANUFACTURER_CODE, data, ATTRIBUTE_LARGEST, NULL);
                 if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
                 {
                     emberAfAttributesPrintln("Unsupported");
@@ -326,7 +243,7 @@ void emberAfPrintAttributeTable(void)
                     UNUSED_VAR(length);
                     emberAfAttributesPrintBuffer(data, length, true);
                     emberAfAttributesFlush();
-                    emberAfAttributeDecodeAndPrintCluster(cluster->clusterId, mfgCode);
+                    emberAfAttributeDecodeAndPrintCluster(cluster->clusterId, EMBER_AF_NULL_MANUFACTURER_CODE);
                 }
             }
         }
@@ -468,6 +385,62 @@ kickout:
 //------------------------------------------------------------------------------
 // Internal Functions
 
+// Helper for determining whether a value is a null value.
+template <typename T>
+static bool IsNullValue(const uint8_t * data)
+{
+    using Traits = app::NumericAttributeTraits<T>;
+    // We don't know how data is aligned, so safely copy it over to the relevant
+    // StorageType value.
+    typename Traits::StorageType val;
+    memcpy(&val, data, sizeof(val));
+    return Traits::IsNullValue(val);
+}
+
+static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttributeSigned)
+{
+    if (dataLen > 4)
+    {
+        // We don't support this, just like emberAfCompareValues does not.
+        return false;
+    }
+
+    switch (dataLen)
+    {
+    case 1: {
+        if (isAttributeSigned)
+        {
+            return IsNullValue<int8_t>(data);
+        }
+        return IsNullValue<uint8_t>(data);
+    }
+    case 2: {
+        if (isAttributeSigned)
+        {
+            return IsNullValue<int16_t>(data);
+        }
+        return IsNullValue<uint16_t>(data);
+    }
+    case 3: {
+        if (isAttributeSigned)
+        {
+            return IsNullValue<app::OddSizedInteger<3, true>>(data);
+        }
+        return IsNullValue<app::OddSizedInteger<3, false>>(data);
+    }
+    case 4: {
+        if (isAttributeSigned)
+        {
+            return IsNullValue<int32_t>(data);
+        }
+        return IsNullValue<uint32_t>(data);
+    }
+    }
+
+    // Not reached.
+    return false;
+}
+
 // writes an attribute (identified by clusterID and attrID to the given value.
 // this returns:
 // - EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE: if attribute isnt supported by the device (the
@@ -495,11 +468,10 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
 {
     EmberAfAttributeMetadata * metadata = NULL;
     EmberAfAttributeSearchRecord record;
-    record.endpoint         = endpoint;
-    record.clusterId        = cluster;
-    record.clusterMask      = mask;
-    record.attributeId      = attributeID;
-    record.manufacturerCode = manufacturerCode;
+    record.endpoint    = endpoint;
+    record.clusterId   = cluster;
+    record.clusterMask = mask;
+    record.attributeId = attributeID;
     emAfReadOrWriteAttribute(&record, &metadata,
                              NULL,   // buffer
                              0,      // buffer size
@@ -524,7 +496,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
             return EMBER_ZCL_STATUS_INVALID_DATA_TYPE;
         }
 
-        if (emberAfAttributeIsReadOnly(metadata))
+        if (metadata->IsReadOnly())
         {
             emberAfAttributesPrintln("%pattr not writable", "WRITE ERR: ");
             emberAfAttributesFlush();
@@ -538,35 +510,37 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     {
         EmberAfDefaultAttributeValue minv = metadata->defaultValue.ptrToMinMaxValue->minValue;
         EmberAfDefaultAttributeValue maxv = metadata->defaultValue.ptrToMinMaxValue->maxValue;
-        bool isAttributeSigned            = emberAfIsTypeSigned(metadata->attributeType);
         uint16_t dataLen                  = emberAfAttributeSize(metadata);
+        const uint8_t * minBytes;
+        const uint8_t * maxBytes;
         if (dataLen <= 2)
         {
-            int8_t minR, maxR;
-            uint8_t * minI = (uint8_t *) &(minv.defaultValue);
-            uint8_t * maxI = (uint8_t *) &(maxv.defaultValue);
+            minBytes = reinterpret_cast<const uint8_t *>(&(minv.defaultValue));
+            maxBytes = reinterpret_cast<const uint8_t *>(&(maxv.defaultValue));
 // On big endian cpu with length 1 only the second byte counts
 #if (BIGENDIAN_CPU)
             if (dataLen == 1)
             {
-                minI++;
-                maxI++;
+                minBytes++;
+                maxBytes++;
             }
 #endif // BIGENDIAN_CPU
-            minR = emberAfCompareValues(minI, data, dataLen, isAttributeSigned);
-            maxR = emberAfCompareValues(maxI, data, dataLen, isAttributeSigned);
-            if ((minR == 1) || (maxR == -1))
-            {
-                return EMBER_ZCL_STATUS_INVALID_VALUE;
-            }
         }
         else
         {
-            if ((emberAfCompareValues(minv.ptrToDefaultValue, data, dataLen, isAttributeSigned) == 1) ||
-                (emberAfCompareValues(maxv.ptrToDefaultValue, data, dataLen, isAttributeSigned) == -1))
-            {
-                return EMBER_ZCL_STATUS_INVALID_VALUE;
-            }
+            minBytes = minv.ptrToDefaultValue;
+            maxBytes = maxv.ptrToDefaultValue;
+        }
+
+        bool isAttributeSigned = emberAfIsTypeSigned(metadata->attributeType);
+        bool isOutOfRange      = emberAfCompareValues(minBytes, data, dataLen, isAttributeSigned) == 1 ||
+            emberAfCompareValues(maxBytes, data, dataLen, isAttributeSigned) == -1;
+
+        if (isOutOfRange &&
+            // null value is always in-range for a nullable attribute.
+            (!metadata->IsNullable() || !IsNullValue(data, dataLen, isAttributeSigned)))
+        {
+            return EMBER_ZCL_STATUS_INVALID_VALUE;
         }
     }
 
@@ -605,9 +579,9 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
             return status;
         }
 
-        // Save the attribute to token if needed
-        // Function itself will weed out tokens that are not tokenized.
-        emAfSaveAttributeToToken(data, endpoint, cluster, metadata);
+        // Save the attribute to persistent storage if needed
+        // The callee will weed out attributes that do not need to be stored.
+        emAfSaveAttributeToStorageIfNeeded(data, endpoint, cluster, metadata);
 
         MatterReportingAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType, data);
 
@@ -640,12 +614,11 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     EmberAfAttributeMetadata * metadata = NULL;
     EmberAfAttributeSearchRecord record;
     EmberAfStatus status;
-    record.endpoint         = endpoint;
-    record.clusterId        = cluster;
-    record.clusterMask      = mask;
-    record.attributeId      = attributeID;
-    record.manufacturerCode = manufacturerCode;
-    status                  = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
+    record.endpoint    = endpoint;
+    record.clusterId   = cluster;
+    record.clusterMask = mask;
+    record.attributeId = attributeID;
+    status             = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
                                       false); // write?
 
     if (status == EMBER_ZCL_STATUS_SUCCESS)

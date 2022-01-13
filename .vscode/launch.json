@@ -192,7 +192,7 @@
             "name": "Debug Mbed unit tests",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/mbed",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed/unit_tests",
             "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-unit-tests.elf",
             "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/pigweed/bin/", // Pigweed environment bootstraping required
             "servertype": "openocd",
@@ -225,7 +225,7 @@
             "name": "Debug Mbed unit tests [remote]",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/mbed",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed/unit_tests",
             "executable": "./build-${input:mbedTarget}/${input:mbedDebugProfile}/chip-mbed-unit-tests.elf",
             "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/pigweed/bin/", // Pigweed environment bootstraping required
             "servertype": "external",
@@ -252,7 +252,7 @@
             "name": "Flash Mbed unit tests",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/mbed",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed//unit_tests",
             "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests.elf",
             "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/pigweed/bin/", // Pigweed environment bootstraping required
             "servertype": "openocd",
@@ -277,7 +277,7 @@
             "name": "Flash Mbed unit tests [remote]",
             "type": "cortex-debug",
             "request": "launch",
-            "cwd": "${workspaceRoot}/src/test_driver/mbed",
+            "cwd": "${workspaceRoot}/src/test_driver/mbed/unit_tests",
             "executable": "./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests.elf",
             "armToolchainPath": "${env:PW_ENVIRONMENT_ROOT}/cipd/pigweed/bin/", // Pigweed environment bootstraping required
             "servertype": "external",
@@ -310,7 +310,13 @@
             "type": "pickString",
             "id": "mbedApp",
             "description": "What mbed application do you want to use?",
-            "options": ["lock-app", "lighting-app"],
+            "options": [
+                "lock-app",
+                "lighting-app",
+                "pigweed-app",
+                "all-clusters-app",
+                "shell"
+            ],
             "default": "lock-app"
         },
         {

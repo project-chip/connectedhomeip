@@ -28,6 +28,7 @@ static_library("android") {
   sources = [
     "../DeviceSafeQueue.cpp",
     "../DeviceSafeQueue.h",
+    "../SingletonConfigurationManager.cpp",
     "AndroidChipPlatform-JNI.cpp",
     "AndroidConfig.cpp",
     "AndroidConfig.h",
@@ -41,6 +42,8 @@ static_library("android") {
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "DnssdImpl.cpp",
     "DnssdImpl.h",
     "KeyValueStoreManagerImpl.cpp",

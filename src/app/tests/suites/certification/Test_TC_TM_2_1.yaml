@@ -19,9 +19,13 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       response:
           constraints:
               type: int16
@@ -29,7 +33,7 @@ tests:
     - label: "read the mandatory attribute: MinMeasuredValue"
       disabled: true
       command: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       response:
           constraints:
               type: int16
@@ -39,7 +43,7 @@ tests:
     - label: "read the mandatory attribute: MaxMeasuredValue"
       disabled: true
       command: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       response:
           constraints:
               type: int16
@@ -47,7 +51,7 @@ tests:
               maxValue: 32767
 
     - label: "read the optional attribute: Tolerance"
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:

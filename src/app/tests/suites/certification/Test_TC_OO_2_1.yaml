@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "read the mandatory attribute: OnOff"
       command: "readAttribute"
       attribute: "OnOff"
@@ -26,13 +30,12 @@ tests:
           value: 0
 
     - label: "write the default value of mandatory attribute: OnOff"
-      disabled: true
       command: "writeAttribute"
       attribute: "OnOff"
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "reads back mandatory attribute: OnOff"
       command: "readAttribute"
@@ -65,13 +68,12 @@ tests:
           value: 0
 
     - label: "write the default value to LT attribute: GlobalSceneControl"
-      disabled: true
       command: "writeAttribute"
       attribute: "GlobalSceneControl"
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write the default value to LT attribute: OnTime"
       command: "writeAttribute"
@@ -92,7 +94,6 @@ tests:
           value: 0
 
     - label: "reads back LT attribute: GlobalSceneControl"
-      disabled: true
       command: "readAttribute"
       attribute: "GlobalSceneControl"
       response:

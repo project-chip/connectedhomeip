@@ -19,10 +19,18 @@ function getTests()
 {
   const BinaryInput = [
     'Test_TC_BI_1_1',
+    'Test_TC_BI_2_1',
+    'Test_TC_BI_2_2',
+  ];
+
+  const BooleanState = [
+    'Test_TC_BOOL_1_1',
+    'Test_TC_BOOL_2_1',
   ];
 
   const ColorControl = [
     'Test_TC_CC_1_1',
+    'Test_TC_CC_2_1',
     'Test_TC_CC_3_1',
     'Test_TC_CC_3_2',
     'Test_TC_CC_3_3',
@@ -41,11 +49,27 @@ function getTests()
     'Test_TC_CC_7_3',
     'Test_TC_CC_7_4',
     'Test_TC_CC_8_1',
+    'Test_TC_CC_9_1',
+    'Test_TC_CC_9_2',
+    'Test_TC_CC_9_3',
+  ];
+
+  const DeviceDiscovery = [
+    'Test_TC_DD_1_5',
+    'Test_TC_DD_1_6',
+    'Test_TC_DD_1_7',
+    'Test_TC_DD_1_8',
+    'Test_TC_DD_1_9',
   ];
 
   const DeviceManagement = [
     'Test_TC_DM_1_1',
     'Test_TC_DM_3_1',
+    'Test_TC_DM_2_2',
+  ];
+
+  const ElectricalMeasurement = [
+    'Test_TC_EMR_1_1',
   ];
 
   const FlowMeasurement = [
@@ -54,47 +78,94 @@ function getTests()
     'Test_TC_FLW_2_2',
   ];
 
+  const IlluminanceMeasurement = [
+    'Test_TC_ILL_1_1',
+  ];
+
   const OccupancySensing = [
     'Test_TC_OCC_1_1',
+    'Test_TC_OCC_2_1',
+    'Test_TC_OCC_2_2',
   ];
 
   const LevelControl = [
     'Test_TC_LVL_1_1',
     'Test_TC_LVL_2_1',
+    'Test_TC_LVL_2_2',
     'Test_TC_LVL_3_1',
+    'Test_TC_LVL_4_1',
+    'Test_TC_LVL_5_1',
+    'Test_TC_LVL_6_1',
   ];
 
   const MediaControl = [
     'Test_TC_MC_1_1',
+    'Test_TC_MC_2_1',
+    'Test_TC_MC_3_1',
+    'Test_TC_MC_3_2',
+    'Test_TC_MC_3_3',
+    'Test_TC_MC_3_4',
+    'Test_TC_MC_3_5',
+    'Test_TC_MC_3_6',
+    'Test_TC_MC_3_7',
+    'Test_TC_MC_3_8',
+    'Test_TC_MC_3_9',
+    'Test_TC_MC_3_10',
+    'Test_TC_MC_3_11',
+    'Test_TC_MC_5_1',
+    'Test_TC_MC_5_2',
+    'Test_TC_MC_5_3',
+    'Test_TC_MC_6_1',
+    'Test_TC_MC_6_2',
+    'Test_TC_MC_6_3',
+    'Test_TC_MC_6_4',
+    'Test_TC_MC_7_1',
+    'Test_TC_MC_7_2',
+    'Test_TC_MC_8_1',
+    'Test_TC_MC_9_1',
   ];
 
   const OnOff = [
     'Test_TC_OO_1_1',
     'Test_TC_OO_2_1',
     'Test_TC_OO_2_2',
+    'Test_TC_OO_2_3',
+  ];
+
+  const PressureMeasurement = [
+    'Test_TC_PRS_1_1',
+    'Test_TC_PRS_2_1',
   ];
 
   const PumpConfigurationControl = [
     'Test_TC_PCC_1_1',
     'Test_TC_PCC_2_1',
+    'Test_TC_PCC_2_2',
+    'Test_TC_PCC_2_3',
   ];
 
   const RelativeHumidityMeasurement = [
     'Test_TC_RH_1_1',
+    'Test_TC_RH_2_1',
+    'Test_TC_RH_2_2',
   ];
 
   const TemperatureMeasurement = [
     'Test_TC_TM_1_1',
     'Test_TC_TM_2_1',
+    'Test_TC_TM_2_2',
   ];
 
   const Thermostat = [
     'Test_TC_TSTAT_1_1',
+    'Test_TC_TSTAT_2_1',
+    'Test_TC_TSTAT_2_2',
   ];
 
   const ThermostatUserConfiguration = [
     'Test_TC_TSUIC_1_1',
     'Test_TC_TSUIC_2_1',
+    'Test_TC_TSUIC_2_2',
   ];
 
   const ThreadNetworkDiagnostics = [
@@ -104,6 +175,9 @@ function getTests()
   const WindowCovering = [
     'Test_TC_WNCV_1_1',
     'Test_TC_WNCV_2_1',
+    'Test_TC_WNCV_2_2',
+    'Test_TC_WNCV_2_4',
+    'Test_TC_WNCV_2_5',
     'Test_TC_WNCV_3_1',
     'Test_TC_WNCV_3_2',
     'Test_TC_WNCV_3_3',
@@ -118,8 +192,9 @@ function getTests()
     'TV_WakeOnLanCluster',
     'TV_ApplicationBasicCluster',
     'TV_MediaPlaybackCluster',
-    'TV_TvChannelCluster',
+    'TV_ChannelCluster',
     'TV_LowPowerCluster',
+    'TV_ContentLauncherCluster',
     'TV_MediaInputCluster',
   ];
 
@@ -129,8 +204,22 @@ function getTests()
     'TestConstraints',
     'TestDelayCommands',
     'TestLogCommands',
+    'TestSaveAs',
+    'TestConfigVariables',
     'TestDescriptorCluster',
+    'TestBasicInformation',
+    'TestIdentifyCluster',
+    'TestGroupsCluster',
+    'TestGroupKeyManagementCluster',
     'TestOperationalCredentialsCluster',
+    'TestModeSelectCluster',
+    'TestGroupMessaging',
+  ];
+
+  const SoftwareDiagnostics = [
+    'Test_TC_SWDIAG_1_1',
+    'Test_TC_SWDIAG_2_1',
+    'Test_TC_SWDIAG_3_1',
   ];
 
   const Subscriptions = [
@@ -139,13 +228,18 @@ function getTests()
 
   const tests = [
     BinaryInput, //
+    BooleanState, //
     ColorControl, //
+    DeviceDiscovery, //
     DeviceManagement, //
+    ElectricalMeasurement, //
     FlowMeasurement, //
+    IlluminanceMeasurement, //
     LevelControl, //
     MediaControl, //
     OccupancySensing, //
     OnOff, //
+    PressureMeasurement, //
     PumpConfigurationControl, //
     RelativeHumidityMeasurement, //
     TemperatureMeasurement, //
@@ -155,6 +249,7 @@ function getTests()
     WindowCovering, //
     TV, //
     Others, //
+    SoftwareDiagnostics, //
     Subscriptions, //
   ];
   return tests.flat(1);
