@@ -44,7 +44,6 @@ class TestInteractionModelEngine
 {
 public:
     static void TestClusterInfoPushRelease(nlTestSuite * apSuite, void * apContext);
-    static void TestMergeOverlappedAttributePath(nlTestSuite * apSuite, void * apContext);
     static int GetClusterInfoListLength(ClusterInfo * apClusterInfoList);
 };
 
@@ -90,37 +89,6 @@ void TestInteractionModelEngine::TestClusterInfoPushRelease(nlTestSuite * apSuit
     InteractionModelEngine::GetInstance()->ReleaseClusterInfoList(clusterInfoList);
     NL_TEST_ASSERT(apSuite, GetClusterInfoListLength(clusterInfoList) == 0);
 }
-
-void TestInteractionModelEngine::TestMergeOverlappedAttributePath(nlTestSuite * apSuite, void * apContext)
-{
-    TestContext & ctx = *static_cast<TestContext *>(apContext);
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    err               = InteractionModelEngine::GetInstance()->Init(&ctx.GetExchangeManager(), nullptr);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    ClusterInfo clusterInfoList[2];
-
-    clusterInfoList[0].mAttributeId = 1;
-    clusterInfoList[1].mAttributeId = 2;
-
-    {
-        chip::app::ClusterInfo testClusterInfo;
-        testClusterInfo.mAttributeId = 3;
-        NL_TEST_ASSERT(apSuite,
-                       !InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
-    }
-    {
-        chip::app::ClusterInfo testClusterInfo;
-        NL_TEST_ASSERT(apSuite,
-                       InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
-    }
-    {
-        chip::app::ClusterInfo testClusterInfo;
-        testClusterInfo.mAttributeId = 1;
-        testClusterInfo.mListIndex   = 2;
-        NL_TEST_ASSERT(apSuite,
-                       InteractionModelEngine::GetInstance()->MergeOverlappedAttributePath(clusterInfoList, testClusterInfo));
-    }
-}
 } // namespace app
 } // namespace chip
 
@@ -130,7 +98,6 @@ namespace {
 const nlTest sTests[] =
         {
                 NL_TEST_DEF("TestClusterInfoPushRelease", chip::app::TestInteractionModelEngine::TestClusterInfoPushRelease),
-                NL_TEST_DEF("TestMergeOverlappedAttributePath", chip::app::TestInteractionModelEngine::TestMergeOverlappedAttributePath),
                 NL_TEST_SENTINEL()
         };
 // clang-format on
