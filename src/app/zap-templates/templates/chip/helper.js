@@ -347,6 +347,23 @@ function chip_server_cluster_attributes(options)
   return asBlocks.call(this, attributes, options);
 }
 
+/**
+ * Creates block iterator over the server side cluster attributes
+ * for a given cluster.
+ *
+ * This function is meant to be used inside a {{#chip_server_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_server_cluster_events(options)
+{
+  const { clusterName } = checkIsInsideClusterBlock(this, 'chip_server_cluster_events');
+  const events          = ensureClusters(this).getServerEvents(clusterName);
+
+  return asBlocks.call(this, events, options);
+}
+
 function chip_attribute_list_entryTypes(options)
 {
   checkIsInsideAttributeBlock(this, 'chip_attribute_list_entry_types');
@@ -412,6 +429,7 @@ exports.chip_cluster_responses                               = chip_cluster_resp
 exports.chip_cluster_response_arguments                      = chip_cluster_response_arguments
 exports.chip_attribute_list_entryTypes                       = chip_attribute_list_entryTypes;
 exports.chip_server_cluster_attributes                       = chip_server_cluster_attributes;
+exports.chip_server_cluster_events                           = chip_server_cluster_events;
 exports.chip_server_has_list_attributes                      = chip_server_has_list_attributes;
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
 exports.if_chip_enum                                         = if_chip_enum;
