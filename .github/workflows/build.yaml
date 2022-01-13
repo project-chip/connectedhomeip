@@ -279,7 +279,7 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Setup and Build Simulated Device
-              timeout-minutes: 5
+              timeout-minutes: 10
               run: |
                     BUILD_TYPE=simulated
                     GN_ARGS='chip_tests_zap_config="app1" chip_project_config_include_dirs=["../../examples/placeholder/linux/apps/app1/include", "../../config/standalone"] chip_config_network_layer_ble=false'
@@ -309,6 +309,7 @@ jobs:
                   name: crash-log-darwin
                   path: ~/Library/Logs/DiagnosticReports/
             - name: Perform CodeQL Analysis
+              if: ${{ github.event_name == 'push' && github.event.ref == 'refs/heads/master' }}
               uses: github/codeql-action/analyze@v1
             # TODO Log Upload https://github.com/project-chip/connectedhomeip/issues/2227
             # TODO https://github.com/project-chip/connectedhomeip/issues/1512
