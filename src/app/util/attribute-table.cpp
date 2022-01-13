@@ -171,80 +171,6 @@ EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(EndpointId endpoint
     return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_CLIENT, manufacturerCode, dataPtr, readLength, NULL);
 }
 
-bool emberAfReadSequentialAttributesAddToResponse(EndpointId endpoint, ClusterId clusterId, AttributeId startAttributeId,
-                                                  uint8_t mask, uint16_t manufacturerCode, uint8_t maxAttributeIds,
-                                                  bool includeAccessControl)
-{
-    uint16_t i;
-    uint16_t discovered = 0;
-    uint16_t skipped    = 0;
-    uint16_t total      = 0;
-
-    EmberAfCluster * cluster = emberAfFindClusterWithMfgCode(endpoint, clusterId, mask, manufacturerCode);
-
-    EmberAfAttributeSearchRecord record;
-    record.endpoint         = endpoint;
-    record.clusterId        = clusterId;
-    record.clusterMask      = mask;
-    record.attributeId      = startAttributeId;
-    record.manufacturerCode = manufacturerCode;
-
-    // If we don't have the cluster or it doesn't match the search, we're done.
-    if (cluster == NULL || !emAfMatchCluster(cluster, &record))
-    {
-        return true;
-    }
-
-    for (i = 0; i < cluster->attributeCount; i++)
-    {
-        EmberAfAttributeMetadata * metadata = &cluster->attributes[i];
-
-        // If the cluster is not manufacturer-specific, an attribute is considered
-        // only if its manufacturer code matches that of the command (which may be
-        // unset).
-        if (!emberAfClusterIsManufacturerSpecific(cluster))
-        {
-            record.attributeId = metadata->attributeId;
-            if (!emAfMatchAttribute(cluster, metadata, &record))
-            {
-                continue;
-            }
-        }
-
-        if (metadata->attributeId < startAttributeId)
-        {
-            skipped++;
-        }
-        else if (discovered < maxAttributeIds)
-        {
-            emberAfPutInt32uInResp(metadata->attributeId);
-            emberAfPutInt8uInResp(metadata->attributeType);
-            if (includeAccessControl)
-            {
-                // bit 0 : Readable <-- All our attributes are readable
-                // bit 1 : Writable <-- The only thing we track in the attribute metadata mask
-                // bit 2 : Reportable <-- All our attributes are reportable
-                emberAfPutInt8uInResp((metadata->mask & ATTRIBUTE_MASK_WRITABLE) ? 0x07 : 0x05);
-            }
-            discovered++;
-        }
-        else
-        {
-            // MISRA requires ..else if.. to have terminating else.
-        }
-        total++;
-    }
-
-    // We are finished if there are no more attributes to find, which means the
-    // number of attributes discovered plus the number skipped equals the total
-    // attributes in the cluster.  For manufacturer-specific clusters, the total
-    // includes all attributes in the cluster.  For standard ZCL clusters, if the
-    // the manufacturer code is set, the total is the number of attributes that
-    // match the manufacturer code.  Otherwise, the total is the number of
-    // standard ZCL attributes in the cluster.
-    return (discovered + skipped == total);
-}
-
 static void emberAfAttributeDecodeAndPrintCluster(ClusterId cluster, uint16_t mfgCode)
 {
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)
@@ -546,7 +472,6 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
     record.clusterId        = cluster;
     record.clusterMask      = mask;
     record.attributeId      = attributeID;
-    record.manufacturerCode = manufacturerCode;
     emAfReadOrWriteAttribute(&record, &metadata,
                              NULL,   // buffer
                              0,      // buffer size
@@ -693,7 +618,6 @@ EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attribut
     record.clusterId        = cluster;
     record.clusterMask      = mask;
     record.attributeId      = attributeID;
-    record.manufacturerCode = manufacturerCode;
     status                  = emAfReadOrWriteAttribute(&record, &metadata, dataPtr, readLength,
                                       false); // write?
 

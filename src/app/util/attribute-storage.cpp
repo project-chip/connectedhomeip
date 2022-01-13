@@ -404,7 +404,6 @@ EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(EndpointId endpoint, C
     record.clusterId        = clusterId;
     record.clusterMask      = mask;
     record.attributeId      = attributeId;
-    record.manufacturerCode = manufacturerCode;
     emAfReadOrWriteAttribute(&record, &metadata,
                              NULL,   // buffer
                              0,      // buffer size
@@ -1274,7 +1273,6 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage)
                     record.clusterId        = cluster->clusterId;
                     record.clusterMask      = (emberAfAttributeIsClient(am) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER);
                     record.attributeId      = am->attributeId;
-                    record.manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE;
 
                     if (ptr == nullptr)
                     {
