@@ -51,11 +51,6 @@
 #include <platform/ThreadStackManager.h>
 #endif
 
-// Bootloader
-extern "C" {
-#include "platform/bootloader/api/btl_interface.h"
-}
-
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
@@ -442,8 +437,6 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     }
 }
 
-#define STORAGE_SLOT 0
-
 void AppTask::ActionCompleted(LightingManager::Action_t aAction)
 {
     // action has been completed bon the light
@@ -461,27 +454,6 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction)
         UpdateClusterState();
         sAppTask.mSyncClusterToButtonAction = false;
     }
-
-    // The rest of this function is temporary test code, trying to get
-    // bootloader to work
-    // !!!!! DO NOT MERGE INTO MASTER !!!!!!!!!!!
-    static bool firstTime = true;
-
-    if(firstTime == true) {
-        bootloader_init();
-        firstTime = false;
-    }
-
-    BootloaderStorageSlot_t slotInfo;
-    bootloader_getStorageSlotInfo(STORAGE_SLOT, &slotInfo);
-    EFR32_LOG("Boot slot info: image addr: 0x%x size: %d", slotInfo.address, slotInfo.length);
-
-    // This call to bootloader_getStorageInfo() corrupts the stack
-    BootloaderStorageInformation_t bootInfo;
-    bootloader_getStorageInfo(&bootInfo);
-    EFR32_LOG("Boot info: storageType %d, numStorageSlots %d info 0x%x", bootInfo.storageType, bootInfo.numStorageSlots,bootInfo.info );
-
-    EFR32_LOG("Sorage info: descr: %s version: %d size %d", bootInfo.info->partDescription, bootInfo.info->version, bootInfo.info->partSize);
 }
 
 void AppTask::PostLightActionRequest(int32_t aActor, LightingManager::Action_t aAction)

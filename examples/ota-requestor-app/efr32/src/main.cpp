@@ -92,7 +92,6 @@ volatile int apperror_cnt;
 #include "platform/bootloader/api/application_properties.h"
 
 // Header used for building the image GBL file
-
 #define APP_PROPERTIES_VERSION 1
 #define APP_PROPERTIES_ID { 0 }
 

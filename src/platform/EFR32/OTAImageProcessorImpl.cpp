@@ -54,9 +54,10 @@ CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
     uint32_t err = SL_BOOTLOADER_OK;
 
-    ChipLogError(SoftwareUpdate, "LISS Apply() is called ");
+    ChipLogError(SoftwareUpdate, "OTAImageProcessorImpl::Apply()");
+
     // Assuming that bootloader_verifyImage() call is not too expensive and
-    // doesn't need to be offloaded to a different task
+    // doesn't need to be offloaded to a different task. Revisit if necessary.
     err = bootloader_verifyImage(mSlotId, NULL);
     if (err != SL_BOOTLOADER_OK)
         {
@@ -124,9 +125,10 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
     }
 
     bootloader_init();
-    mSlotId = 0; // Single slot unless we support multiple images
+    mSlotId = 0; // Single slot until we support multiple images
     mWriteOffset = 0;
-    //  err = bootloader_eraseStorageSlot(mSlotId);
+
+    // Not calling bootloader_eraseStorageSlot(mSlotId) here because we erase during each write
 
     imageProcessor->mDownloader->OnPreparedForDownload(err == SL_BOOTLOADER_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL);
 }
@@ -152,7 +154,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    // Not clearing the imag storage area as it will be done during preparation for the next download
+    // Not clearing the image storage area as it is done during each write
     imageProcessor->ReleaseBlock();
 }
 
