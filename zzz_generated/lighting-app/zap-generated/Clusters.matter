@@ -327,10 +327,10 @@ server cluster Descriptor = 29 {
     INT16U kRevision = 2;
   }
 
-  attribute(readonly, reportable) DeviceType deviceList = 0;
-  attribute(readonly, reportable) CLUSTER_ID serverList = 1;
-  attribute(readonly, reportable) CLUSTER_ID clientList = 2;
-  attribute(readonly, reportable) ENDPOINT_NO partsList = 3;
+  attribute(readonly, reportable) DeviceType deviceList[] = 0;
+  attribute(readonly, reportable) CLUSTER_ID serverList[] = 1;
+  attribute(readonly, reportable) CLUSTER_ID clientList[] = 2;
+  attribute(readonly, reportable) ENDPOINT_NO partsList[] = 3;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -397,7 +397,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster FixedLabel = 64 {
-  attribute(readonly) LabelStruct labelList = 0;
+  attribute(readonly) LabelStruct labelList[] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
@@ -420,7 +420,7 @@ server cluster GeneralCommissioning = 48 {
   }
 
   attribute(writable, reportable) int64u breadcrumb = 0;
-  attribute(readonly, reportable) BasicCommissioningInfoType basicCommissioningInfoList = 1;
+  attribute(readonly, reportable) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
   attribute(readonly) enum8 regulatoryConfig = 2;
   attribute(readonly) enum8 locationCapability = 3;
   attribute(readonly) bitmap32 featureMap = 65532;
@@ -540,14 +540,14 @@ server cluster GeneralDiagnostics = 51 {
     kBootReason = 0,
   }
 
-  attribute(readonly, reportable) NetworkInterfaceType networkInterfaces = 0;
+  attribute(readonly, reportable) NetworkInterfaceType networkInterfaces[] = 0;
   attribute(readonly, reportable) int16u rebootCount = 1;
   attribute(readonly, reportable) int64u upTime = 2;
   attribute(readonly, reportable) int32u totalOperationalHours = 3;
   attribute(readonly, reportable) enum8 bootReasons = 4;
-  attribute(readonly, reportable) ENUM8 activeHardwareFaults = 5;
-  attribute(readonly, reportable) ENUM8 activeRadioFaults = 6;
-  attribute(readonly, reportable) ENUM8 activeNetworkFaults = 7;
+  attribute(readonly, reportable) ENUM8 activeHardwareFaults[] = 5;
+  attribute(readonly, reportable) ENUM8 activeRadioFaults[] = 6;
+  attribute(readonly, reportable) ENUM8 activeNetworkFaults[] = 7;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -684,7 +684,7 @@ server cluster LevelControl = 8 {
 
 server cluster LocalizationConfiguration = 43 {
   attribute(writable) char_string activeLocale = 1;
-  attribute(readonly) CHAR_STRING supportedLocales = 2;
+  attribute(readonly) CHAR_STRING supportedLocales[] = 2;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -738,7 +738,7 @@ server cluster NetworkCommissioning = 49 {
   }
 
   attribute(readonly) int8u maxNetworks = 0;
-  attribute(readonly) NetworkInfo networks = 1;
+  attribute(readonly) NetworkInfo networks[] = 1;
   attribute(readonly) int8u scanMaxTimeSeconds = 2;
   attribute(readonly) int8u connectMaxTimeSeconds = 3;
   attribute(writable) boolean interfaceEnabled = 4;
@@ -986,10 +986,10 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING kLabel = 6;
   }
 
-  attribute(readonly, reportable) FabricDescriptor fabricsList = 1;
+  attribute(readonly, reportable) FabricDescriptor fabricsList[] = 1;
   attribute(readonly, reportable) int8u supportedFabrics = 2;
   attribute(readonly, reportable) int8u commissionedFabrics = 3;
-  attribute(readonly, reportable) OCTET_STRING trustedRootCertificates = 4;
+  attribute(readonly, reportable) OCTET_STRING trustedRootCertificates[] = 4;
   attribute(readonly, reportable) fabric_idx currentFabricIndex = 5;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
@@ -1078,7 +1078,7 @@ server cluster SoftwareDiagnostics = 52 {
     kSoftwareFault = 0,
   }
 
-  attribute(readonly, reportable) ThreadMetrics threadMetrics = 0;
+  attribute(readonly, reportable) ThreadMetrics threadMetrics[] = 0;
   attribute(readonly, reportable) int64u currentHeapFree = 1;
   attribute(readonly, reportable) int64u currentHeapUsed = 2;
   attribute(readonly, reportable) int64u currentHeapHighWatermark = 3;
@@ -1208,8 +1208,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   attribute(readonly, reportable) int64u extendedPanId = 4;
   attribute(readonly, reportable) octet_string meshLocalPrefix = 5;
   attribute(readonly, reportable) int64u overrunCount = 6;
-  attribute(readonly, reportable) NeighborTable neighborTableList = 7;
-  attribute(readonly, reportable) RouteTable routeTableList = 8;
+  attribute(readonly, reportable) NeighborTable neighborTableList[] = 7;
+  attribute(readonly, reportable) RouteTable routeTableList[] = 8;
   attribute(readonly, reportable) int32u partitionId = 9;
   attribute(readonly, reportable) int8u weighting = 10;
   attribute(readonly, reportable) int8u dataVersion = 11;
@@ -1260,10 +1260,10 @@ server cluster ThreadNetworkDiagnostics = 53 {
   attribute(readonly, reportable) int64u activeTimestamp = 56;
   attribute(readonly, reportable) int64u pendingTimestamp = 57;
   attribute(readonly, reportable) int32u delay = 58;
-  attribute(readonly, reportable) SecurityPolicy securityPolicy = 59;
+  attribute(readonly, reportable) SecurityPolicy securityPolicy[] = 59;
   attribute(readonly, reportable) octet_string channelMask = 60;
-  attribute(readonly, reportable) OperationalDatasetComponents operationalDatasetComponents = 61;
-  attribute(readonly, reportable) NetworkFault activeNetworkFaultsList = 62;
+  attribute(readonly, reportable) OperationalDatasetComponents operationalDatasetComponents[] = 61;
+  attribute(readonly, reportable) NetworkFault activeNetworkFaultsList[] = 62;
   attribute(readonly) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
@@ -1274,7 +1274,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
 }
 
 server cluster UserLabel = 65 {
-  attribute(writable) LabelStruct labelList = 0;
+  attribute(writable) LabelStruct labelList[] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 

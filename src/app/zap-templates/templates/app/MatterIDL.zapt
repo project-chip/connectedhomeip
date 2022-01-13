@@ -53,7 +53,10 @@ struct {{name}} {
     {{~#if isReportableAttribute~}}
       , reportable
     {{~/if~}}
-    ) {{type}} {{asLowerCamelCase name}} = {{code}};
+    ) {{type}} {{asLowerCamelCase name~}}
+    {{~#if isList~}}
+      []
+    {{~/if}} = {{code}};
   {{/chip_cluster_attributes}}
   {{#chip_cluster_commands}}
 
