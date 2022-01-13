@@ -330,7 +330,7 @@
 #define ZCL_ACTIVE_LOCALE_ATTRIBUTE_ID (0x0001)
 #define ZCL_SUPPORTED_LOCALES_ATTRIBUTE_ID (0x0002)
 
-// Attribute ids for cluster: Localization Time Format
+// Attribute ids for cluster: Time Format Localization
 
 // Client attributes
 
@@ -338,13 +338,6 @@
 #define ZCL_HOUR_FORMAT_ATTRIBUTE_ID (0x0000)
 #define ZCL_CALENDAR_TYPE_ATTRIBUTE_ID (0x0001)
 #define ZCL_SUPPORTED_CALENDAR_TYPES_ATTRIBUTE_ID (0x0002)
-
-// Attribute ids for cluster: Localization Unit
-
-// Client attributes
-
-// Server attributes
-#define ZCL_TEMPERATURE_UNIT_ATTRIBUTE_ID (0x0000)
 
 // Attribute ids for cluster: Power Source Configuration
 

@@ -94,12 +94,9 @@ static constexpr ClusterId Id = 0x0000002A;
 namespace LocalizationConfiguration {
 static constexpr ClusterId Id = 0x0000002B;
 } // namespace LocalizationConfiguration
-namespace LocalizationTimeFormat {
+namespace TimeFormatLocalization {
 static constexpr ClusterId Id = 0x0000002C;
-} // namespace LocalizationTimeFormat
-namespace LocalizationUnit {
-static constexpr ClusterId Id = 0x0000002D;
-} // namespace LocalizationUnit
+} // namespace TimeFormatLocalization
 namespace PowerSourceConfiguration {
 static constexpr ClusterId Id = 0x0000002E;
 } // namespace PowerSourceConfiguration
