@@ -142,29 +142,30 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
 
 CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
 {
-    if ((block.data() == nullptr) || block.empty())
+    if (!IsSpanUsable(block))
     {
+        ReleaseBlock();
         return CHIP_NO_ERROR;
     }
-
-    // Allocate memory for block data if it has not been done yet
-    if (mBlock.empty())
+    if (mBlock.size() < block.size())
     {
-        mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
-        if (mBlock.data() == nullptr)
+        if (!mBlock.empty())
+        {
+            ReleaseBlock();
+        }
+        uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
+        if (mBlock_ptr == nullptr)
         {
             return CHIP_ERROR_NO_MEMORY;
         }
+            mBlock = MutableByteSpan(mBlock_ptr, block.size());
     }
-
-    // Store the actual block data
     CHIP_ERROR err = CopySpanToMutableSpan(block, mBlock);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-
     return CHIP_NO_ERROR;
 }
 
