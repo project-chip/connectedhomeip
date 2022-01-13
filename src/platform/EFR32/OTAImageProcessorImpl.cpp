@@ -179,7 +179,7 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         reinterpret_cast<uint8_t *>(imageProcessor->mBlock.data()), imageProcessor->mBlock.size());
 
     if (err)
-        {  
+        {
             ChipLogError(SoftwareUpdate, "bootloader_eraseWriteStorage err %ld", err);
 
             imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
