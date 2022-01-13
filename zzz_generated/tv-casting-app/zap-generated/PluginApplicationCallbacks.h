@@ -22,18 +22,19 @@
 #include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
 #define MATTER_PLUGINS_INIT                                                                                                        \
-    MatterAccountLoginPluginServerInitCallback();                                                                                  \
+    MatterAccountLoginPluginClientInitCallback();                                                                                  \
     MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
-    MatterApplicationBasicPluginServerInitCallback();                                                                              \
-    MatterApplicationLauncherPluginServerInitCallback();                                                                           \
-    MatterAudioOutputPluginServerInitCallback();                                                                                   \
+    MatterApplicationBasicPluginClientInitCallback();                                                                              \
+    MatterApplicationLauncherPluginClientInitCallback();                                                                           \
+    MatterAudioOutputPluginClientInitCallback();                                                                                   \
     MatterBarrierControlPluginServerInitCallback();                                                                                \
     MatterBasicPluginServerInitCallback();                                                                                         \
     MatterBinaryInputBasicPluginServerInitCallback();                                                                              \
     MatterBindingPluginServerInitCallback();                                                                                       \
     MatterBridgedDeviceBasicPluginServerInitCallback();                                                                            \
+    MatterChannelPluginClientInitCallback();                                                                                       \
     MatterColorControlPluginServerInitCallback();                                                                                  \
-    MatterContentLauncherPluginServerInitCallback();                                                                               \
+    MatterContentLauncherPluginClientInitCallback();                                                                               \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
     MatterDoorLockPluginServerInitCallback();                                                                                      \
@@ -46,10 +47,11 @@
     MatterGroupsPluginServerInitCallback();                                                                                        \
     MatterIasZonePluginServerInitCallback();                                                                                       \
     MatterIdentifyPluginServerInitCallback();                                                                                      \
-    MatterKeypadInputPluginServerInitCallback();                                                                                   \
+    MatterKeypadInputPluginClientInitCallback();                                                                                   \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
-    MatterMediaInputPluginServerInitCallback();                                                                                    \
-    MatterMediaPlaybackPluginServerInitCallback();                                                                                 \
+    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
+    MatterMediaInputPluginClientInitCallback();                                                                                    \
+    MatterMediaPlaybackPluginClientInitCallback();                                                                                 \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOtaSoftwareUpdateProviderPluginServerInitCallback();                                                                     \
     MatterOccupancySensingPluginServerInitCallback();                                                                              \
@@ -60,8 +62,7 @@
     MatterScenesPluginServerInitCallback();                                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterSwitchPluginServerInitCallback();                                                                                        \
-    MatterTvChannelPluginServerInitCallback();                                                                                     \
-    MatterTargetNavigatorPluginServerInitCallback();                                                                               \
+    MatterTargetNavigatorPluginClientInitCallback();                                                                               \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \
     MatterTestClusterPluginServerInitCallback();                                                                                   \
     MatterThermostatPluginServerInitCallback();                                                                                    \

@@ -53,7 +53,7 @@ CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::Tag expectedTag, TL
 
     ChipLogDetail(SecureChannel, "Found MRP parameters in the message");
 
-    // Both TLV elements in the strucutre are optional. If the first element is present, process it and move
+    // Both TLV elements in the structure are optional. If the first element is present, process it and move
     // the TLV reader to the next element.
     if (TLV::TagNumFromTag(tlvReader.GetTag()) == 1)
     {

@@ -13,6 +13,10 @@
         {
             "name": "header",
             "path": "../../zap-templates/partials/header.zapt"
+        },
+        {
+            "name": "cluster_objects_struct",
+            "path": "../../zap-templates/partials/cluster-objects-struct.zapt"
         }
     ],
     "templates": [

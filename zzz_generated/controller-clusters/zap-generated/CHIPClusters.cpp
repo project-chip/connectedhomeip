@@ -35,11 +35,10 @@ namespace Controller {
 // TODO(#4503): Commands should take group id as an argument.
 
 // AccessControl Cluster Commands
-// AccessControl Cluster Attributes
 
 // AccountLogin Cluster Commands
-CHIP_ERROR AccountLoginCluster::GetSetupPIN(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            chip::CharSpan tempAccountIdentifier)
+CHIP_ERROR AccountLoginCluster::GetSetupPINRequest(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan tempAccountIdentifier)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -51,7 +50,7 @@ CHIP_ERROR AccountLoginCluster::GetSetupPIN(Callback::Cancelable * onSuccessCall
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AccountLogin::Commands::GetSetupPIN::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AccountLogin::Commands::GetSetupPINRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -79,8 +78,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR AccountLoginCluster::Login(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      chip::CharSpan tempAccountIdentifier, chip::CharSpan setupPIN)
+CHIP_ERROR AccountLoginCluster::LoginRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             chip::CharSpan tempAccountIdentifier, chip::CharSpan setupPIN)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -92,7 +91,7 @@ CHIP_ERROR AccountLoginCluster::Login(Callback::Cancelable * onSuccessCallback, 
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AccountLogin::Commands::Login::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AccountLogin::Commands::LoginRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -122,7 +121,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR AccountLoginCluster::Logout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR AccountLoginCluster::LogoutRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -134,7 +133,7 @@ CHIP_ERROR AccountLoginCluster::Logout(Callback::Cancelable * onSuccessCallback,
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AccountLogin::Commands::Logout::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AccountLogin::Commands::LogoutRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -158,24 +157,6 @@ CHIP_ERROR AccountLoginCluster::Logout(Callback::Cancelable * onSuccessCallback,
     sender.release();
 exit:
     return err;
-}
-
-// AccountLogin Cluster Attributes
-CHIP_ERROR AccountLoginCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR AccountLoginCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 // AdministratorCommissioning Cluster Commands
@@ -317,189 +298,12 @@ exit:
     return err;
 }
 
-// AdministratorCommissioning Cluster Attributes
-CHIP_ERROR AdministratorCommissioningCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback,
-                                                                                uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR AdministratorCommissioningCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // ApplicationBasic Cluster Commands
-CHIP_ERROR ApplicationBasicCluster::ChangeStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t status)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationBasic::Commands::ChangeStatus::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // status: applicationBasicStatus
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-// ApplicationBasic Cluster Attributes
-CHIP_ERROR ApplicationBasicCluster::SubscribeAttributeVendorName(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ApplicationBasic::Attributes::VendorName::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReportAttributeVendorName(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ApplicationBasic::Attributes::VendorName::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::SubscribeAttributeVendorId(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ApplicationBasic::Attributes::VendorId::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReportAttributeVendorId(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ApplicationBasic::Attributes::VendorId::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::SubscribeAttributeApplicationName(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ApplicationBasic::Attributes::ApplicationName::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReportAttributeApplicationName(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ApplicationBasic::Attributes::ApplicationName::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::SubscribeAttributeProductId(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ApplicationBasic::Attributes::ProductId::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReportAttributeProductId(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ApplicationBasic::Attributes::ProductId::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::SubscribeAttributeApplicationStatus(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ApplicationBasic::Attributes::ApplicationStatus::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReportAttributeApplicationStatus(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ApplicationBasic::Attributes::ApplicationStatus::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::SubscribeAttributeApplicationVersion(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ApplicationBasic::Attributes::ApplicationVersion::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReportAttributeApplicationVersion(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ApplicationBasic::Attributes::ApplicationVersion::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // ApplicationLauncher Cluster Commands
-CHIP_ERROR ApplicationLauncherCluster::HideApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint16_t catalogVendorId, chip::CharSpan applicationId)
+CHIP_ERROR ApplicationLauncherCluster::HideAppRequest(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                                                      chip::CharSpan applicationId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -511,7 +315,7 @@ CHIP_ERROR ApplicationLauncherCluster::HideApp(Callback::Cancelable * onSuccessC
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationLauncher::Commands::HideApp::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationLauncher::Commands::HideAppRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -541,8 +345,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR ApplicationLauncherCluster::LaunchApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 chip::CharSpan data, uint16_t catalogVendorId, chip::CharSpan applicationId)
+CHIP_ERROR ApplicationLauncherCluster::LaunchAppRequest(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, chip::CharSpan data,
+                                                        uint16_t catalogVendorId, chip::CharSpan applicationId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -554,7 +359,8 @@ CHIP_ERROR ApplicationLauncherCluster::LaunchApp(Callback::Cancelable * onSucces
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationLauncher::Commands::LaunchApp::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         ApplicationLauncher::Commands::LaunchAppRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -586,8 +392,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR ApplicationLauncherCluster::StopApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint16_t catalogVendorId, chip::CharSpan applicationId)
+CHIP_ERROR ApplicationLauncherCluster::StopAppRequest(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                                                      chip::CharSpan applicationId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -599,7 +406,7 @@ CHIP_ERROR ApplicationLauncherCluster::StopApp(Callback::Cancelable * onSuccessC
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationLauncher::Commands::StopApp::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationLauncher::Commands::StopAppRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -629,27 +436,9 @@ exit:
     return err;
 }
 
-// ApplicationLauncher Cluster Attributes
-CHIP_ERROR ApplicationLauncherCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ApplicationLauncherCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // AudioOutput Cluster Commands
-CHIP_ERROR AudioOutputCluster::RenameOutput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint8_t index, chip::CharSpan name)
+CHIP_ERROR AudioOutputCluster::RenameOutputRequest(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback, uint8_t index, chip::CharSpan name)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -661,7 +450,7 @@ CHIP_ERROR AudioOutputCluster::RenameOutput(Callback::Cancelable * onSuccessCall
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AudioOutput::Commands::RenameOutput::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AudioOutput::Commands::RenameOutputRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -691,8 +480,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR AudioOutputCluster::SelectOutput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint8_t index)
+CHIP_ERROR AudioOutputCluster::SelectOutputRequest(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback, uint8_t index)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -704,7 +493,7 @@ CHIP_ERROR AudioOutputCluster::SelectOutput(Callback::Cancelable * onSuccessCall
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AudioOutput::Commands::SelectOutput::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AudioOutput::Commands::SelectOutputRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -730,41 +519,6 @@ CHIP_ERROR AudioOutputCluster::SelectOutput(Callback::Cancelable * onSuccessCall
     sender.release();
 exit:
     return err;
-}
-
-// AudioOutput Cluster Attributes
-CHIP_ERROR AudioOutputCluster::SubscribeAttributeCurrentAudioOutput(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = AudioOutput::Attributes::CurrentAudioOutput::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR AudioOutputCluster::ReportAttributeCurrentAudioOutput(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(AudioOutput::Attributes::CurrentAudioOutput::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR AudioOutputCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR AudioOutputCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 // BarrierControl Cluster Commands
@@ -849,92 +603,6 @@ exit:
     return err;
 }
 
-// BarrierControl Cluster Attributes
-CHIP_ERROR BarrierControlCluster::SubscribeAttributeBarrierMovingState(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = BarrierControl::Attributes::BarrierMovingState::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BarrierControlCluster::ReportAttributeBarrierMovingState(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(BarrierControl::Attributes::BarrierMovingState::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR BarrierControlCluster::SubscribeAttributeBarrierSafetyStatus(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = BarrierControl::Attributes::BarrierSafetyStatus::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BarrierControlCluster::ReportAttributeBarrierSafetyStatus(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(BarrierControl::Attributes::BarrierSafetyStatus::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR BarrierControlCluster::SubscribeAttributeBarrierCapabilities(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = BarrierControl::Attributes::BarrierCapabilities::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BarrierControlCluster::ReportAttributeBarrierCapabilities(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(BarrierControl::Attributes::BarrierCapabilities::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR BarrierControlCluster::SubscribeAttributeBarrierPosition(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = BarrierControl::Attributes::BarrierPosition::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BarrierControlCluster::ReportAttributeBarrierPosition(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(BarrierControl::Attributes::BarrierPosition::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR BarrierControlCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BarrierControlCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // Basic Cluster Commands
 CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
@@ -974,399 +642,7 @@ exit:
     return err;
 }
 
-// Basic Cluster Attributes
-CHIP_ERROR BasicCluster::SubscribeAttributeInteractionModelVersion(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::InteractionModelVersion::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeInteractionModelVersion(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::InteractionModelVersion::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeVendorName(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                      uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::VendorName::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeVendorName(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::VendorName::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeVendorID(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::VendorID::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeVendorID(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::VendorID::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeProductName(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::ProductName::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeProductName(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::ProductName::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeProductID(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::ProductID::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeProductID(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::ProductID::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeNodeLabel(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::NodeLabel::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeNodeLabel(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::NodeLabel::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeLocation(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::Location::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeLocation(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::Location::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::HardwareVersion::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeHardwareVersion(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::HardwareVersion::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::HardwareVersionString::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeHardwareVersionString(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::HardwareVersionString::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::SoftwareVersion::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeSoftwareVersion(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::SoftwareVersion::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::SoftwareVersionString::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeSoftwareVersionString(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::SoftwareVersionString::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::ManufacturingDate::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeManufacturingDate(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::ManufacturingDate::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributePartNumber(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                      uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::PartNumber::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributePartNumber(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::PartNumber::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeProductURL(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                      uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::ProductURL::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeProductURL(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::ProductURL::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeProductLabel(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::ProductLabel::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeProductLabel(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::ProductLabel::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeSerialNumber(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::SerialNumber::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeSerialNumber(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::SerialNumber::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::LocalConfigDisabled::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeLocalConfigDisabled(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::LocalConfigDisabled::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeReachable(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Basic::Attributes::Reachable::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeReachable(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Basic::Attributes::Reachable::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // BinaryInputBasic Cluster Commands
-// BinaryInputBasic Cluster Attributes
-CHIP_ERROR BinaryInputBasicCluster::SubscribeAttributeOutOfService(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = BinaryInputBasic::Attributes::OutOfService::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::ReportAttributeOutOfService(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(BinaryInputBasic::Attributes::OutOfService::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::SubscribeAttributePresentValue(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = BinaryInputBasic::Attributes::PresentValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::ReportAttributePresentValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(BinaryInputBasic::Attributes::PresentValue::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::SubscribeAttributeStatusFlags(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = BinaryInputBasic::Attributes::StatusFlags::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::ReportAttributeStatusFlags(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(BinaryInputBasic::Attributes::StatusFlags::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // Binding Cluster Commands
 CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1464,59 +740,7 @@ exit:
     return err;
 }
 
-// Binding Cluster Attributes
-CHIP_ERROR BindingCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BindingCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // BooleanState Cluster Commands
-// BooleanState Cluster Attributes
-CHIP_ERROR BooleanStateCluster::SubscribeAttributeStateValue(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = BooleanState::Attributes::StateValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BooleanStateCluster::ReportAttributeStateValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(BooleanState::Attributes::StateValue::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR BooleanStateCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BooleanStateCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // BridgedActions Cluster Commands
 CHIP_ERROR BridgedActionsCluster::DisableAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -2055,58 +1279,134 @@ exit:
     return err;
 }
 
-// BridgedActions Cluster Attributes
-CHIP_ERROR BridgedActionsCluster::SubscribeAttributeSetupUrl(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = BridgedActions::Attributes::SetupUrl::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BridgedActionsCluster::ReportAttributeSetupUrl(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(BridgedActions::Attributes::SetupUrl::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BridgedActionsCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BridgedActionsCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // BridgedDeviceBasic Cluster Commands
-// BridgedDeviceBasic Cluster Attributes
-CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
+
+// Channel Cluster Commands
+CHIP_ERROR ChannelCluster::ChangeChannelByNumberRequest(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, uint16_t majorNumber,
+                                                        uint16_t minorNumber)
 {
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         Channel::Commands::ChangeChannelByNumberRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // majorNumber: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), majorNumber));
+    // minorNumber: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), minorNumber));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
 
-CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
+CHIP_ERROR ChannelCluster::ChangeChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                chip::CharSpan match)
 {
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Channel::Commands::ChangeChannelRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // match: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), match));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR ChannelCluster::SkipChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t count)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Channel::Commands::SkipChannelRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // count: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), count));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
 
 // ColorControl Cluster Commands
@@ -3053,911 +2353,10 @@ exit:
     return err;
 }
 
-// ColorControl Cluster Attributes
-CHIP_ERROR ColorControlCluster::SubscribeAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::CurrentHue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentHue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::CurrentHue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::CurrentSaturation::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentSaturation(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::CurrentSaturation::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeRemainingTime(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::RemainingTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeRemainingTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::RemainingTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeCurrentX(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::CurrentX::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentX(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::CurrentX::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::CurrentY::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentY(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::CurrentY::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeDriftCompensation(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::DriftCompensation::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeDriftCompensation(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::DriftCompensation::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeCompensationText(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::CompensationText::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeCompensationText(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::CompensationText::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorTemperature::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorTemperature(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorTemperature::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorMode(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorControlOptions(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorControlOptions::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorControlOptions(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorControlOptions::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeNumberOfPrimaries(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::NumberOfPrimaries::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeNumberOfPrimaries(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::NumberOfPrimaries::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary1X(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary1X::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary1X(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary1X::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary1Y(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary1Y::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary1Y(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary1Y::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary1Intensity(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary1Intensity::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary1Intensity(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary1Intensity::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary2X(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary2X::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary2X(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary2X::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary2Y(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary2Y::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary2Y(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary2Y::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary2Intensity(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary2Intensity::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary2Intensity(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary2Intensity::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary3X(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary3X::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary3X(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary3X::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary3Y(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary3Y::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary3Y(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary3Y::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary3Intensity(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary3Intensity::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary3Intensity(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary3Intensity::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary4X(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary4X::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary4X(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary4X::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary4Y(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary4Y::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary4Y(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary4Y::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary4Intensity(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary4Intensity::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary4Intensity(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary4Intensity::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary5X(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary5X::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary5X(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary5X::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary5Y(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary5Y::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary5Y(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary5Y::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary5Intensity(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary5Intensity::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary5Intensity(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary5Intensity::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary6X(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary6X::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary6X(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary6X::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary6Y(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary6Y::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary6Y(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary6Y::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributePrimary6Intensity(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::Primary6Intensity::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributePrimary6Intensity(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::Primary6Intensity::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeWhitePointX(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                              uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::WhitePointX::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeWhitePointX(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::WhitePointX::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeWhitePointY(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                              uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::WhitePointY::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeWhitePointY(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::WhitePointY::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorPointRX(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorPointRX::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorPointRX(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorPointRX::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorPointRY(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorPointRY::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorPointRY(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorPointRY::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorPointRIntensity::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorPointRIntensity(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorPointRIntensity::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorPointGX(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorPointGX::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorPointGX(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorPointGX::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorPointGY(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorPointGY::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorPointGY(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorPointGY::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorPointGIntensity::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorPointGIntensity(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorPointGIntensity::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorPointBX(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorPointBX::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorPointBX(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorPointBX::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorPointBY(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorPointBY::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorPointBY(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorPointBY::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorPointBIntensity::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorPointBIntensity(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorPointBIntensity::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeEnhancedCurrentHue(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::EnhancedCurrentHue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeEnhancedCurrentHue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::EnhancedCurrentHue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeEnhancedColorMode(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::EnhancedColorMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeEnhancedColorMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::EnhancedColorMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorLoopActive(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorLoopActive::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorLoopActive(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorLoopActive::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorLoopDirection(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorLoopDirection::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorLoopDirection(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorLoopDirection::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorLoopTime(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorLoopTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorLoopTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorLoopTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorLoopStartEnhancedHue(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorLoopStartEnhancedHue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorLoopStartEnhancedHue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorLoopStartEnhancedHue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorLoopStoredEnhancedHue(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorLoopStoredEnhancedHue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorLoopStoredEnhancedHue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorCapabilities(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorCapabilities::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorCapabilities(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorCapabilities::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorTempPhysicalMin(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorTempPhysicalMin::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorTempPhysicalMin(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorTempPhysicalMin::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorTempPhysicalMax(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::ColorTempPhysicalMax::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorTempPhysicalMax(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorTempPhysicalMax::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeCoupleColorTempToLevelMinMireds(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::CoupleColorTempToLevelMinMireds::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeCoupleColorTempToLevelMinMireds(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::CoupleColorTempToLevelMinMireds::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback,
-                                                                                uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ColorControl::Attributes::StartUpColorTemperatureMireds::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::StartUpColorTemperatureMireds::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // ContentLauncher Cluster Commands
-CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 bool autoPlay, chip::CharSpan data, uint8_t type, chip::CharSpan value)
+CHIP_ERROR ContentLauncherCluster::LaunchContentRequest(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, bool autoPlay,
+                                                        chip::CharSpan data)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3969,7 +2368,8 @@ CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSucces
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ContentLauncher::Commands::LaunchContent::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         ContentLauncher::Commands::LaunchContentRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -3984,10 +2384,6 @@ CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSucces
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), autoPlay));
     // data: charString
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data));
-    // type: contentLaunchParameterEnum
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), type));
-    // value: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), value));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -4003,8 +2399,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR ContentLauncherCluster::LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             chip::CharSpan contentURL, chip::CharSpan displayString, chip::CharSpan providerName)
+CHIP_ERROR ContentLauncherCluster::LaunchURLRequest(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, chip::CharSpan contentURL,
+                                                    chip::CharSpan displayString, chip::CharSpan providerName)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -4016,7 +2413,7 @@ CHIP_ERROR ContentLauncherCluster::LaunchURL(Callback::Cancelable * onSuccessCal
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ContentLauncher::Commands::LaunchURL::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ContentLauncher::Commands::LaunchURLRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -4048,59 +2445,7 @@ exit:
     return err;
 }
 
-// ContentLauncher Cluster Attributes
-CHIP_ERROR ContentLauncherCluster::SubscribeAttributeSupportedStreamingProtocols(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback,
-                                                                                 uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ContentLauncher::Attributes::SupportedStreamingProtocols::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ContentLauncherCluster::ReportAttributeSupportedStreamingProtocols(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ContentLauncher::Attributes::SupportedStreamingProtocols::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ContentLauncherCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ContentLauncherCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // Descriptor Cluster Commands
-// Descriptor Cluster Attributes
-CHIP_ERROR DescriptorCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DescriptorCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // DiagnosticLogs Cluster Commands
 CHIP_ERROR DiagnosticLogsCluster::RetrieveLogsRequest(Callback::Cancelable * onSuccessCallback,
@@ -4148,8 +2493,6 @@ CHIP_ERROR DiagnosticLogsCluster::RetrieveLogsRequest(Callback::Cancelable * onS
 exit:
     return err;
 }
-
-// DiagnosticLogs Cluster Attributes
 
 // DoorLock Cluster Commands
 CHIP_ERROR DoorLockCluster::ClearCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -4508,416 +2851,7 @@ exit:
     return err;
 }
 
-// DoorLock Cluster Attributes
-CHIP_ERROR DoorLockCluster::SubscribeAttributeLockState(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::LockState::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeLockState(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::LockState::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeLockType(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::LockType::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeLockType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::LockType::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                              uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::ActuatorEnabled::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeActuatorEnabled(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::ActuatorEnabled::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeDoorState(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::DoorState::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeDoorState(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::DoorState::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeLanguage(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::Language::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeLanguage(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::Language::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeAutoRelockTime(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::AutoRelockTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeAutoRelockTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::AutoRelockTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeSoundVolume(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::SoundVolume::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeSoundVolume(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::SoundVolume::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeOperatingMode(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::OperatingMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeOperatingMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::OperatingMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeEnableOneTouchLocking(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::EnableOneTouchLocking::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeEnableOneTouchLocking(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::EnableOneTouchLocking::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeEnablePrivacyModeButton(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::EnablePrivacyModeButton::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeEnablePrivacyModeButton(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::EnablePrivacyModeButton::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeWrongCodeEntryLimit(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::WrongCodeEntryLimit::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeWrongCodeEntryLimit(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::WrongCodeEntryLimit::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                              uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // ElectricalMeasurement Cluster Commands
-// ElectricalMeasurement Cluster Attributes
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeMeasurementType(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ElectricalMeasurement::Attributes::MeasurementType::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeMeasurementType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ElectricalMeasurement::Attributes::MeasurementType::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeTotalActivePower(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ElectricalMeasurement::Attributes::TotalActivePower::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeTotalActivePower(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ElectricalMeasurement::Attributes::TotalActivePower::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32sAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeRmsVoltage(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ElectricalMeasurement::Attributes::RmsVoltage::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeRmsVoltage(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ElectricalMeasurement::Attributes::RmsVoltage::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeRmsVoltageMin(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ElectricalMeasurement::Attributes::RmsVoltageMin::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeRmsVoltageMin(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ElectricalMeasurement::Attributes::RmsVoltageMin::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeRmsVoltageMax(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ElectricalMeasurement::Attributes::RmsVoltageMax::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeRmsVoltageMax(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ElectricalMeasurement::Attributes::RmsVoltageMax::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeRmsCurrent(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ElectricalMeasurement::Attributes::RmsCurrent::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeRmsCurrent(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ElectricalMeasurement::Attributes::RmsCurrent::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeRmsCurrentMin(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ElectricalMeasurement::Attributes::RmsCurrentMin::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeRmsCurrentMin(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ElectricalMeasurement::Attributes::RmsCurrentMin::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeRmsCurrentMax(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ElectricalMeasurement::Attributes::RmsCurrentMax::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeRmsCurrentMax(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ElectricalMeasurement::Attributes::RmsCurrentMax::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeActivePower(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ElectricalMeasurement::Attributes::ActivePower::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeActivePower(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ElectricalMeasurement::Attributes::ActivePower::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeActivePowerMin(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ElectricalMeasurement::Attributes::ActivePowerMin::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeActivePowerMin(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ElectricalMeasurement::Attributes::ActivePowerMin::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeActivePowerMax(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ElectricalMeasurement::Attributes::ActivePowerMax::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeActivePowerMax(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ElectricalMeasurement::Attributes::ActivePowerMax::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // EthernetNetworkDiagnostics Cluster Commands
 CHIP_ERROR EthernetNetworkDiagnosticsCluster::ResetCounts(Callback::Cancelable * onSuccessCallback,
@@ -4960,282 +2894,9 @@ exit:
     return err;
 }
 
-// EthernetNetworkDiagnostics Cluster Attributes
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::SubscribeAttributePHYRate(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = EthernetNetworkDiagnostics::Attributes::PHYRate::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributePHYRate(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(EthernetNetworkDiagnostics::Attributes::PHYRate::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::SubscribeAttributeFullDuplex(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = EthernetNetworkDiagnostics::Attributes::FullDuplex::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributeFullDuplex(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(EthernetNetworkDiagnostics::Attributes::FullDuplex::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::SubscribeAttributePacketRxCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributePacketRxCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(EthernetNetworkDiagnostics::Attributes::PacketRxCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::SubscribeAttributePacketTxCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributePacketTxCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(EthernetNetworkDiagnostics::Attributes::PacketTxCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::SubscribeAttributeTxErrCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = EthernetNetworkDiagnostics::Attributes::TxErrCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributeTxErrCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(EthernetNetworkDiagnostics::Attributes::TxErrCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::SubscribeAttributeCollisionCount(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = EthernetNetworkDiagnostics::Attributes::CollisionCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributeCollisionCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(EthernetNetworkDiagnostics::Attributes::CollisionCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::SubscribeAttributeOverrunCount(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = EthernetNetworkDiagnostics::Attributes::OverrunCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributeOverrunCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(EthernetNetworkDiagnostics::Attributes::OverrunCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::SubscribeAttributeCarrierDetect(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributeCarrierDetect(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(EthernetNetworkDiagnostics::Attributes::CarrierDetect::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::SubscribeAttributeTimeSinceReset(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributeTimeSinceReset(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(EthernetNetworkDiagnostics::Attributes::TimeSinceReset::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback,
-                                                                                uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // FixedLabel Cluster Commands
-// FixedLabel Cluster Attributes
-CHIP_ERROR FixedLabelCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR FixedLabelCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // FlowMeasurement Cluster Commands
-// FlowMeasurement Cluster Attributes
-CHIP_ERROR FlowMeasurementCluster::SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = FlowMeasurement::Attributes::MeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR FlowMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(FlowMeasurement::Attributes::MeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR FlowMeasurementCluster::SubscribeAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = FlowMeasurement::Attributes::MinMeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR FlowMeasurementCluster::ReportAttributeMinMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(FlowMeasurement::Attributes::MinMeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR FlowMeasurementCluster::SubscribeAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = FlowMeasurement::Attributes::MaxMeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR FlowMeasurementCluster::ReportAttributeMaxMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(FlowMeasurement::Attributes::MaxMeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR FlowMeasurementCluster::SubscribeAttributeTolerance(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = FlowMeasurement::Attributes::Tolerance::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR FlowMeasurementCluster::ReportAttributeTolerance(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(FlowMeasurement::Attributes::Tolerance::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR FlowMeasurementCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR FlowMeasurementCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // GeneralCommissioning Cluster Commands
 CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuccessCallback,
@@ -5373,145 +3034,189 @@ exit:
     return err;
 }
 
-// GeneralCommissioning Cluster Attributes
-CHIP_ERROR GeneralCommissioningCluster::SubscribeAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = GeneralCommissioning::Attributes::Breadcrumb::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::ReportAttributeBreadcrumb(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(GeneralCommissioning::Attributes::Breadcrumb::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // GeneralDiagnostics Cluster Commands
-// GeneralDiagnostics Cluster Attributes
-CHIP_ERROR GeneralDiagnosticsCluster::SubscribeAttributeRebootCount(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = GeneralDiagnostics::Attributes::RebootCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::ReportAttributeRebootCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(GeneralDiagnostics::Attributes::RebootCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::SubscribeAttributeUpTime(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = GeneralDiagnostics::Attributes::UpTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::ReportAttributeUpTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(GeneralDiagnostics::Attributes::UpTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::SubscribeAttributeTotalOperationalHours(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = GeneralDiagnostics::Attributes::TotalOperationalHours::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::ReportAttributeTotalOperationalHours(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(GeneralDiagnostics::Attributes::TotalOperationalHours::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::SubscribeAttributeBootReasons(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = GeneralDiagnostics::Attributes::BootReasons::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::ReportAttributeBootReasons(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(GeneralDiagnostics::Attributes::BootReasons::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // GroupKeyManagement Cluster Commands
-// GroupKeyManagement Cluster Attributes
-CHIP_ERROR GroupKeyManagementCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
+CHIP_ERROR GroupKeyManagementCluster::KeySetRead(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint16_t groupKeySetID)
 {
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, GroupKeyManagement::Commands::KeySetRead::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // groupKeySetID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySetID));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
 
-CHIP_ERROR GroupKeyManagementCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
+CHIP_ERROR GroupKeyManagementCluster::KeySetReadAllIndices(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback, uint16_t groupKeySetIDs)
 {
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         GroupKeyManagement::Commands::KeySetReadAllIndices::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // groupKeySetIDs: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySetIDs));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR GroupKeyManagementCluster::KeySetRemove(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback, uint16_t groupKeySetID)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, GroupKeyManagement::Commands::KeySetRemove::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // groupKeySetID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySetID));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR GroupKeyManagementCluster::KeySetWrite(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t groupKeySetID,
+                                                  uint8_t securityPolicy, chip::ByteSpan epochKey0, uint64_t epochStartTime0,
+                                                  chip::ByteSpan epochKey1, uint64_t epochStartTime1, chip::ByteSpan epochKey2,
+                                                  uint64_t epochStartTime2)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, GroupKeyManagement::Commands::KeySetWrite::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // groupKeySetID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySetID));
+    // securityPolicy: groupKeySecurityPolicy
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), securityPolicy));
+    // epochKey0: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey0));
+    // epochStartTime0: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime0));
+    // epochKey1: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey1));
+    // epochStartTime1: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime1));
+    // epochKey2: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey2));
+    // epochStartTime2: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime2));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
 
 // Groups Cluster Commands
@@ -5762,41 +3467,6 @@ exit:
     return err;
 }
 
-// Groups Cluster Attributes
-CHIP_ERROR GroupsCluster::SubscribeAttributeNameSupport(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Groups::Attributes::NameSupport::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR GroupsCluster::ReportAttributeNameSupport(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Groups::Attributes::NameSupport::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR GroupsCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR GroupsCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // Identify Cluster Commands
 CHIP_ERROR IdentifyCluster::Identify(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                      uint16_t identifyTime)
@@ -5920,165 +3590,11 @@ exit:
     return err;
 }
 
-// Identify Cluster Attributes
-CHIP_ERROR IdentifyCluster::SubscribeAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Identify::Attributes::IdentifyTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR IdentifyCluster::ReportAttributeIdentifyTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Identify::Attributes::IdentifyTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR IdentifyCluster::SubscribeAttributeIdentifyType(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Identify::Attributes::IdentifyType::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR IdentifyCluster::ReportAttributeIdentifyType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Identify::Attributes::IdentifyType::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR IdentifyCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                              uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR IdentifyCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // IlluminanceMeasurement Cluster Commands
-// IlluminanceMeasurement Cluster Attributes
-CHIP_ERROR IlluminanceMeasurementCluster::SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = IlluminanceMeasurement::Attributes::MeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR IlluminanceMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(IlluminanceMeasurement::Attributes::MeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR IlluminanceMeasurementCluster::SubscribeAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = IlluminanceMeasurement::Attributes::MinMeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR IlluminanceMeasurementCluster::ReportAttributeMinMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(IlluminanceMeasurement::Attributes::MinMeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR IlluminanceMeasurementCluster::SubscribeAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = IlluminanceMeasurement::Attributes::MaxMeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR IlluminanceMeasurementCluster::ReportAttributeMaxMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(IlluminanceMeasurement::Attributes::MaxMeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR IlluminanceMeasurementCluster::SubscribeAttributeTolerance(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = IlluminanceMeasurement::Attributes::Tolerance::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR IlluminanceMeasurementCluster::ReportAttributeTolerance(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(IlluminanceMeasurement::Attributes::Tolerance::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR IlluminanceMeasurementCluster::SubscribeAttributeLightSensorType(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = IlluminanceMeasurement::Attributes::LightSensorType::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR IlluminanceMeasurementCluster::ReportAttributeLightSensorType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(IlluminanceMeasurement::Attributes::LightSensorType::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR IlluminanceMeasurementCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR IlluminanceMeasurementCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // KeypadInput Cluster Commands
-CHIP_ERROR KeypadInputCluster::SendKey(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint8_t keyCode)
+CHIP_ERROR KeypadInputCluster::SendKeyRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint8_t keyCode)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6090,7 +3606,7 @@ CHIP_ERROR KeypadInputCluster::SendKey(Callback::Cancelable * onSuccessCallback,
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, KeypadInput::Commands::SendKey::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, KeypadInput::Commands::SendKeyRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6101,7 +3617,7 @@ CHIP_ERROR KeypadInputCluster::SendKey(Callback::Cancelable * onSuccessCallback,
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // keyCode: keypadInputCecKeyCode
+    // keyCode: cecKeyCode
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), keyCode));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -6116,24 +3632,6 @@ CHIP_ERROR KeypadInputCluster::SendKey(Callback::Cancelable * onSuccessCallback,
     sender.release();
 exit:
     return err;
-}
-
-// KeypadInput Cluster Attributes
-CHIP_ERROR KeypadInputCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR KeypadInputCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 // LevelControl Cluster Commands
@@ -6494,261 +3992,7 @@ exit:
     return err;
 }
 
-// LevelControl Cluster Attributes
-CHIP_ERROR LevelControlCluster::SubscribeAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::CurrentLevel::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeCurrentLevel(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::CurrentLevel::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeRemainingTime(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::RemainingTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeRemainingTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::RemainingTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeMinLevel(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::MinLevel::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeMinLevel(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::MinLevel::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeMaxLevel(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::MaxLevel::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeMaxLevel(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::MaxLevel::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeCurrentFrequency(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::CurrentFrequency::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeCurrentFrequency(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::CurrentFrequency::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeMinFrequency(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::MinFrequency::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeMinFrequency(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::MinFrequency::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeMaxFrequency(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::MaxFrequency::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeMaxFrequency(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::MaxFrequency::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeOptions(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::Options::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeOptions(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::Options::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeOnOffTransitionTime(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::OnOffTransitionTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeOnOffTransitionTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::OnOffTransitionTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeOnLevel(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::OnLevel::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeOnLevel(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::OnLevel::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeOnTransitionTime(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::OnTransitionTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeOnTransitionTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::OnTransitionTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeOffTransitionTime(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::OffTransitionTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeOffTransitionTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::OffTransitionTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeDefaultMoveRate(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::DefaultMoveRate::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeDefaultMoveRate(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::DefaultMoveRate::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeStartUpCurrentLevel(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = LevelControl::Attributes::StartUpCurrentLevel::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeStartUpCurrentLevel(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::StartUpCurrentLevel::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
+// LocalizationConfiguration Cluster Commands
 
 // LowPower Cluster Commands
 CHIP_ERROR LowPowerCluster::Sleep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -6789,26 +4033,9 @@ exit:
     return err;
 }
 
-// LowPower Cluster Attributes
-CHIP_ERROR LowPowerCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                              uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LowPowerCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // MediaInput Cluster Commands
-CHIP_ERROR MediaInputCluster::HideInputStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaInputCluster::HideInputStatusRequest(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6820,7 +4047,7 @@ CHIP_ERROR MediaInputCluster::HideInputStatus(Callback::Cancelable * onSuccessCa
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::HideInputStatus::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::HideInputStatusRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6846,8 +4073,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaInputCluster::RenameInput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint8_t index, chip::CharSpan name)
+CHIP_ERROR MediaInputCluster::RenameInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint8_t index, chip::CharSpan name)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6859,7 +4086,7 @@ CHIP_ERROR MediaInputCluster::RenameInput(Callback::Cancelable * onSuccessCallba
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::RenameInput::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::RenameInputRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6889,8 +4116,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaInputCluster::SelectInput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint8_t index)
+CHIP_ERROR MediaInputCluster::SelectInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint8_t index)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6902,7 +4129,7 @@ CHIP_ERROR MediaInputCluster::SelectInput(Callback::Cancelable * onSuccessCallba
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::SelectInput::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::SelectInputRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6930,7 +4157,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaInputCluster::ShowInputStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaInputCluster::ShowInputStatusRequest(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6942,7 +4170,7 @@ CHIP_ERROR MediaInputCluster::ShowInputStatus(Callback::Cancelable * onSuccessCa
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::ShowInputStatus::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::ShowInputStatusRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6966,46 +4194,11 @@ CHIP_ERROR MediaInputCluster::ShowInputStatus(Callback::Cancelable * onSuccessCa
     sender.release();
 exit:
     return err;
-}
-
-// MediaInput Cluster Attributes
-CHIP_ERROR MediaInputCluster::SubscribeAttributeCurrentMediaInput(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = MediaInput::Attributes::CurrentMediaInput::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR MediaInputCluster::ReportAttributeCurrentMediaInput(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(MediaInput::Attributes::CurrentMediaInput::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR MediaInputCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR MediaInputCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 // MediaPlayback Cluster Commands
-CHIP_ERROR MediaPlaybackCluster::MediaFastForward(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::FastForwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7017,7 +4210,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaFastForward(Callback::Cancelable * onSucce
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaFastForward::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::FastForwardRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7043,7 +4236,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaNext(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7055,7 +4248,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaNext(Callback::Cancelable * onSuccessCallb
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaNext::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::NextRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7081,7 +4274,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaPause(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::PauseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7093,7 +4286,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaPause(Callback::Cancelable * onSuccessCall
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaPause::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::PauseRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7119,7 +4312,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaPlay(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::PlayRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7131,7 +4324,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaPlay(Callback::Cancelable * onSuccessCallb
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaPlay::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::PlayRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7157,7 +4350,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaPrevious(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::PreviousRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7169,7 +4362,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaPrevious(Callback::Cancelable * onSuccessC
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaPrevious::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::PreviousRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7195,7 +4388,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaRewind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::RewindRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7207,7 +4400,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaRewind(Callback::Cancelable * onSuccessCal
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaRewind::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::RewindRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7233,8 +4426,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaSeek(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint64_t position)
+CHIP_ERROR MediaPlaybackCluster::SeekRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint64_t position)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7246,7 +4439,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaSeek(Callback::Cancelable * onSuccessCallb
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaSeek::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SeekRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7274,8 +4467,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaSkipBackward(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
+CHIP_ERROR MediaPlaybackCluster::SkipBackwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7287,7 +4480,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaSkipBackward(Callback::Cancelable * onSucc
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaSkipBackward::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SkipBackwardRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7315,8 +4508,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaSkipForward(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
+CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7328,7 +4521,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaSkipForward(Callback::Cancelable * onSucce
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaSkipForward::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SkipForwardRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7356,7 +4549,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaStartOver(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7368,7 +4562,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaStartOver(Callback::Cancelable * onSuccess
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaStartOver::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::StartOverRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7394,7 +4588,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaStop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7406,7 +4600,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaStop(Callback::Cancelable * onSuccessCallb
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaStop::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::StopRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7430,109 +4624,6 @@ CHIP_ERROR MediaPlaybackCluster::MediaStop(Callback::Cancelable * onSuccessCallb
     sender.release();
 exit:
     return err;
-}
-
-// MediaPlayback Cluster Attributes
-CHIP_ERROR MediaPlaybackCluster::SubscribeAttributePlaybackState(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = MediaPlayback::Attributes::PlaybackState::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReportAttributePlaybackState(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(MediaPlayback::Attributes::PlaybackState::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::SubscribeAttributeStartTime(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = MediaPlayback::Attributes::StartTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReportAttributeStartTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(MediaPlayback::Attributes::StartTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::SubscribeAttributeDuration(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = MediaPlayback::Attributes::Duration::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReportAttributeDuration(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(MediaPlayback::Attributes::Duration::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::SubscribeAttributeSeekRangeEnd(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = MediaPlayback::Attributes::SeekRangeEnd::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReportAttributeSeekRangeEnd(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(MediaPlayback::Attributes::SeekRangeEnd::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::SubscribeAttributeSeekRangeStart(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = MediaPlayback::Attributes::SeekRangeStart::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReportAttributeSeekRangeStart(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(MediaPlayback::Attributes::SeekRangeStart::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 // ModeSelect Cluster Commands
@@ -7575,92 +4666,6 @@ CHIP_ERROR ModeSelectCluster::ChangeToMode(Callback::Cancelable * onSuccessCallb
     sender.release();
 exit:
     return err;
-}
-
-// ModeSelect Cluster Attributes
-CHIP_ERROR ModeSelectCluster::SubscribeAttributeCurrentMode(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ModeSelect::Attributes::CurrentMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ModeSelectCluster::ReportAttributeCurrentMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ModeSelect::Attributes::CurrentMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ModeSelectCluster::SubscribeAttributeOnMode(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ModeSelect::Attributes::OnMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ModeSelectCluster::ReportAttributeOnMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ModeSelect::Attributes::OnMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ModeSelectCluster::SubscribeAttributeStartUpMode(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ModeSelect::Attributes::StartUpMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ModeSelectCluster::ReportAttributeStartUpMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ModeSelect::Attributes::StartUpMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ModeSelectCluster::SubscribeAttributeDescription(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ModeSelect::Attributes::Description::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ModeSelectCluster::ReportAttributeDescription(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ModeSelect::Attributes::Description::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR ModeSelectCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ModeSelectCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 // NetworkCommissioning Cluster Commands
@@ -7936,41 +4941,6 @@ exit:
     return err;
 }
 
-// NetworkCommissioning Cluster Attributes
-CHIP_ERROR NetworkCommissioningCluster::SubscribeAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::FeatureMap::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR NetworkCommissioningCluster::ReportAttributeFeatureMap(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::FeatureMap::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR NetworkCommissioningCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR NetworkCommissioningCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // OtaSoftwareUpdateProvider Cluster Commands
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback,
                                                                 Callback::Cancelable * onFailureCallback,
@@ -8121,29 +5091,12 @@ exit:
     return err;
 }
 
-// OtaSoftwareUpdateProvider Cluster Attributes
-CHIP_ERROR OtaSoftwareUpdateProviderCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // OtaSoftwareUpdateRequestor Cluster Commands
 CHIP_ERROR OtaSoftwareUpdateRequestorCluster::AnnounceOtaProvider(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback,
-                                                                  chip::NodeId providerLocation, chip::VendorId vendorId,
-                                                                  uint8_t announcementReason, chip::ByteSpan metadataForNode)
+                                                                  chip::NodeId providerNodeId, chip::VendorId vendorId,
+                                                                  uint8_t announcementReason, chip::ByteSpan metadataForNode,
+                                                                  chip::EndpointId endpoint)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -8167,14 +5120,16 @@ CHIP_ERROR OtaSoftwareUpdateRequestorCluster::AnnounceOtaProvider(Callback::Canc
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // providerLocation: nodeId
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), providerLocation));
+    // providerNodeId: nodeId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), providerNodeId));
     // vendorId: vendorId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
     // announcementReason: OTAAnnouncementReason
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), announcementReason));
     // metadataForNode: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), metadataForNode));
+    // endpoint: endpointNo
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), endpoint));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -8190,127 +5145,7 @@ exit:
     return err;
 }
 
-// OtaSoftwareUpdateRequestor Cluster Attributes
-CHIP_ERROR OtaSoftwareUpdateRequestorCluster::SubscribeAttributeDefaultOtaProvider(Callback::Cancelable * onSuccessCallback,
-                                                                                   Callback::Cancelable * onFailureCallback,
-                                                                                   uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OtaSoftwareUpdateRequestorCluster::ReportAttributeDefaultOtaProvider(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::Id, onReportCallback,
-                                     BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR OtaSoftwareUpdateRequestorCluster::SubscribeAttributeUpdatePossible(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OtaSoftwareUpdateRequestorCluster::ReportAttributeUpdatePossible(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR OtaSoftwareUpdateRequestorCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback,
-                                                                                uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OtaSoftwareUpdateRequestorCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // OccupancySensing Cluster Commands
-// OccupancySensing Cluster Attributes
-CHIP_ERROR OccupancySensingCluster::SubscribeAttributeOccupancy(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OccupancySensing::Attributes::Occupancy::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OccupancySensingCluster::ReportAttributeOccupancy(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OccupancySensing::Attributes::Occupancy::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OccupancySensingCluster::SubscribeAttributeOccupancySensorType(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OccupancySensing::Attributes::OccupancySensorType::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OccupancySensingCluster::ReportAttributeOccupancySensorType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OccupancySensing::Attributes::OccupancySensorType::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OccupancySensingCluster::SubscribeAttributeOccupancySensorTypeBitmap(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback,
-                                                                                uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OccupancySensingCluster::ReportAttributeOccupancySensorTypeBitmap(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OccupancySensing::Attributes::OccupancySensorTypeBitmap::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OccupancySensingCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OccupancySensingCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // OnOff Cluster Commands
 CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -8553,177 +5388,7 @@ exit:
     return err;
 }
 
-// OnOff Cluster Attributes
-CHIP_ERROR OnOffCluster::SubscribeAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OnOff::Attributes::OnOff::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OnOff::Attributes::OnOff::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::SubscribeAttributeGlobalSceneControl(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                              uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OnOff::Attributes::GlobalSceneControl::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReportAttributeGlobalSceneControl(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OnOff::Attributes::GlobalSceneControl::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::SubscribeAttributeOnTime(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OnOff::Attributes::OnTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReportAttributeOnTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OnOff::Attributes::OnTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::SubscribeAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OnOff::Attributes::OffWaitTime::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReportAttributeOffWaitTime(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OnOff::Attributes::OffWaitTime::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::SubscribeAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OnOff::Attributes::StartUpOnOff::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReportAttributeStartUpOnOff(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OnOff::Attributes::StartUpOnOff::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::SubscribeAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                      uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::FeatureMap::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReportAttributeFeatureMap(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::FeatureMap::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // OnOffSwitchConfiguration Cluster Commands
-// OnOffSwitchConfiguration Cluster Attributes
-CHIP_ERROR OnOffSwitchConfigurationCluster::SubscribeAttributeSwitchType(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OnOffSwitchConfiguration::Attributes::SwitchType::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::ReportAttributeSwitchType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OnOffSwitchConfiguration::Attributes::SwitchType::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::SubscribeAttributeSwitchActions(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OnOffSwitchConfiguration::Attributes::SwitchActions::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::ReportAttributeSwitchActions(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OnOffSwitchConfiguration::Attributes::SwitchActions::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // OperationalCredentials Cluster Commands
 CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -9117,850 +5782,15 @@ exit:
     return err;
 }
 
-// OperationalCredentials Cluster Attributes
-CHIP_ERROR OperationalCredentialsCluster::SubscribeAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OperationalCredentials::Attributes::SupportedFabrics::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReportAttributeSupportedFabrics(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OperationalCredentials::Attributes::SupportedFabrics::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::SubscribeAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback,
-                                                                                uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OperationalCredentials::Attributes::CommissionedFabrics::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReportAttributeCommissionedFabrics(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OperationalCredentials::Attributes::CommissionedFabrics::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::SubscribeAttributeCurrentFabricIndex(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = OperationalCredentials::Attributes::CurrentFabricIndex::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReportAttributeCurrentFabricIndex(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OperationalCredentials::Attributes::CurrentFabricIndex::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // PowerSource Cluster Commands
-// PowerSource Cluster Attributes
-CHIP_ERROR PowerSourceCluster::SubscribeAttributeStatus(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PowerSource::Attributes::Status::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PowerSourceCluster::ReportAttributeStatus(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PowerSource::Attributes::Status::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::SubscribeAttributeOrder(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PowerSource::Attributes::Order::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PowerSourceCluster::ReportAttributeOrder(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PowerSource::Attributes::Order::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::SubscribeAttributeDescription(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PowerSource::Attributes::Description::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PowerSourceCluster::ReportAttributeDescription(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PowerSource::Attributes::Description::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::SubscribeAttributeBatteryVoltage(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PowerSource::Attributes::BatteryVoltage::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PowerSourceCluster::ReportAttributeBatteryVoltage(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PowerSource::Attributes::BatteryVoltage::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::SubscribeAttributeBatteryPercentRemaining(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PowerSource::Attributes::BatteryPercentRemaining::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PowerSourceCluster::ReportAttributeBatteryPercentRemaining(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PowerSource::Attributes::BatteryPercentRemaining::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::SubscribeAttributeBatteryTimeRemaining(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PowerSource::Attributes::BatteryTimeRemaining::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PowerSourceCluster::ReportAttributeBatteryTimeRemaining(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PowerSource::Attributes::BatteryTimeRemaining::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::SubscribeAttributeBatteryChargeLevel(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PowerSource::Attributes::BatteryChargeLevel::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PowerSourceCluster::ReportAttributeBatteryChargeLevel(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PowerSource::Attributes::BatteryChargeLevel::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::SubscribeAttributeBatteryChargeState(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PowerSource::Attributes::BatteryChargeState::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PowerSourceCluster::ReportAttributeBatteryChargeState(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PowerSource::Attributes::BatteryChargeState::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::SubscribeAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::FeatureMap::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PowerSourceCluster::ReportAttributeFeatureMap(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::FeatureMap::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PowerSourceCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // PowerSourceConfiguration Cluster Commands
-// PowerSourceConfiguration Cluster Attributes
 
 // PressureMeasurement Cluster Commands
-// PressureMeasurement Cluster Attributes
-CHIP_ERROR PressureMeasurementCluster::SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PressureMeasurement::Attributes::MeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PressureMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PressureMeasurement::Attributes::MeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PressureMeasurementCluster::SubscribeAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PressureMeasurement::Attributes::MinMeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PressureMeasurementCluster::ReportAttributeMinMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PressureMeasurement::Attributes::MinMeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PressureMeasurementCluster::SubscribeAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PressureMeasurement::Attributes::MaxMeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PressureMeasurementCluster::ReportAttributeMaxMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PressureMeasurement::Attributes::MaxMeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PressureMeasurementCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PressureMeasurementCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // PumpConfigurationAndControl Cluster Commands
-// PumpConfigurationAndControl Cluster Attributes
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMaxPressure(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MaxPressure::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMaxPressure(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MaxPressure::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMaxSpeed(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MaxSpeed::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMaxSpeed(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MaxSpeed::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMaxFlow(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MaxFlow::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMaxFlow(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MaxFlow::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMinConstPressure(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MinConstPressure::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMinConstPressure(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MinConstPressure::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMaxConstPressure(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MaxConstPressure::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMaxConstPressure(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MaxConstPressure::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMinCompPressure(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback,
-                                                                                 uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MinCompPressure::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMinCompPressure(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MinCompPressure::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMaxCompPressure(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback,
-                                                                                 uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MaxCompPressure::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMaxCompPressure(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MaxCompPressure::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMinConstSpeed(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MinConstSpeed::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMinConstSpeed(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MinConstSpeed::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMaxConstSpeed(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MaxConstSpeed::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMaxConstSpeed(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MaxConstSpeed::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMinConstFlow(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MinConstFlow::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMinConstFlow(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MinConstFlow::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMaxConstFlow(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MaxConstFlow::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMaxConstFlow(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MaxConstFlow::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMinConstTemp(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MinConstTemp::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMinConstTemp(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MinConstTemp::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeMaxConstTemp(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::MaxConstTemp::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeMaxConstTemp(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::MaxConstTemp::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributePumpStatus(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::PumpStatus::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributePumpStatus(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::PumpStatus::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback,
-                                                                                        Callback::Cancelable * onFailureCallback,
-                                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::EffectiveOperationMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeEffectiveOperationMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::EffectiveOperationMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeEffectiveControlMode(Callback::Cancelable * onSuccessCallback,
-                                                                                      Callback::Cancelable * onFailureCallback,
-                                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::EffectiveControlMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeEffectiveControlMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::EffectiveControlMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeCapacity(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::Capacity::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeCapacity(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::Capacity::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeSpeed(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::Speed::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeSpeed(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::Speed::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeLifetimeRunningHours(Callback::Cancelable * onSuccessCallback,
-                                                                                      Callback::Cancelable * onFailureCallback,
-                                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::LifetimeRunningHours::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeLifetimeRunningHours(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::LifetimeRunningHours::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributePower(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::Power::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributePower(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::Power::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeLifetimeEnergyConsumed(Callback::Cancelable * onSuccessCallback,
-                                                                                        Callback::Cancelable * onFailureCallback,
-                                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeLifetimeEnergyConsumed(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::OperationMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeOperationMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::OperationMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeControlMode(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::ControlMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeControlMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::ControlMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeAlarmMask(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = PumpConfigurationAndControl::Attributes::AlarmMask::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeAlarmMask(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::AlarmMask::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::FeatureMap::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeFeatureMap(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::FeatureMap::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback,
-                                                                                 uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // RelativeHumidityMeasurement Cluster Commands
-// RelativeHumidityMeasurement Cluster Attributes
-CHIP_ERROR RelativeHumidityMeasurementCluster::SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = RelativeHumidityMeasurement::Attributes::MeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(RelativeHumidityMeasurement::Attributes::MeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::SubscribeAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::ReportAttributeMinMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(RelativeHumidityMeasurement::Attributes::MinMeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::SubscribeAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::ReportAttributeMaxMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::SubscribeAttributeTolerance(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = RelativeHumidityMeasurement::Attributes::Tolerance::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::ReportAttributeTolerance(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(RelativeHumidityMeasurement::Attributes::Tolerance::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback,
-                                                                                 uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // Scenes Cluster Commands
 CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -10273,109 +6103,6 @@ exit:
     return err;
 }
 
-// Scenes Cluster Attributes
-CHIP_ERROR ScenesCluster::SubscribeAttributeSceneCount(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Scenes::Attributes::SceneCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ScenesCluster::ReportAttributeSceneCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Scenes::Attributes::SceneCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ScenesCluster::SubscribeAttributeCurrentScene(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                         uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Scenes::Attributes::CurrentScene::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ScenesCluster::ReportAttributeCurrentScene(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Scenes::Attributes::CurrentScene::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ScenesCluster::SubscribeAttributeCurrentGroup(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                         uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Scenes::Attributes::CurrentGroup::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ScenesCluster::ReportAttributeCurrentGroup(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Scenes::Attributes::CurrentGroup::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ScenesCluster::SubscribeAttributeSceneValid(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Scenes::Attributes::SceneValid::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ScenesCluster::ReportAttributeSceneValid(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Scenes::Attributes::SceneValid::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR ScenesCluster::SubscribeAttributeNameSupport(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Scenes::Attributes::NameSupport::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ScenesCluster::ReportAttributeNameSupport(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Scenes::Attributes::NameSupport::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ScenesCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ScenesCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // SoftwareDiagnostics Cluster Commands
 CHIP_ERROR SoftwareDiagnosticsCluster::ResetWatermarks(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
@@ -10417,310 +6144,12 @@ exit:
     return err;
 }
 
-// SoftwareDiagnostics Cluster Attributes
-CHIP_ERROR SoftwareDiagnosticsCluster::SubscribeAttributeCurrentHeapFree(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = SoftwareDiagnostics::Attributes::CurrentHeapFree::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR SoftwareDiagnosticsCluster::ReportAttributeCurrentHeapFree(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(SoftwareDiagnostics::Attributes::CurrentHeapFree::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR SoftwareDiagnosticsCluster::SubscribeAttributeCurrentHeapUsed(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR SoftwareDiagnosticsCluster::ReportAttributeCurrentHeapUsed(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(SoftwareDiagnostics::Attributes::CurrentHeapUsed::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR SoftwareDiagnosticsCluster::SubscribeAttributeCurrentHeapHighWatermark(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR SoftwareDiagnosticsCluster::ReportAttributeCurrentHeapHighWatermark(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR SoftwareDiagnosticsCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR SoftwareDiagnosticsCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // Switch Cluster Commands
-// Switch Cluster Attributes
-CHIP_ERROR SwitchCluster::SubscribeAttributeNumberOfPositions(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                              uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Switch::Attributes::NumberOfPositions::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR SwitchCluster::ReportAttributeNumberOfPositions(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Switch::Attributes::NumberOfPositions::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR SwitchCluster::SubscribeAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Switch::Attributes::CurrentPosition::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR SwitchCluster::ReportAttributeCurrentPosition(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Switch::Attributes::CurrentPosition::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR SwitchCluster::SubscribeAttributeMultiPressMax(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Switch::Attributes::MultiPressMax::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR SwitchCluster::ReportAttributeMultiPressMax(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Switch::Attributes::MultiPressMax::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR SwitchCluster::SubscribeAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::FeatureMap::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR SwitchCluster::ReportAttributeFeatureMap(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::FeatureMap::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR SwitchCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR SwitchCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-// TvChannel Cluster Commands
-CHIP_ERROR TvChannelCluster::ChangeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           chip::CharSpan match)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TvChannel::Commands::ChangeChannel::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // match: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), match));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR TvChannelCluster::ChangeChannelByNumber(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint16_t majorNumber,
-                                                   uint16_t minorNumber)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TvChannel::Commands::ChangeChannelByNumber::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // majorNumber: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), majorNumber));
-    // minorNumber: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), minorNumber));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR TvChannelCluster::SkipChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         uint16_t count)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TvChannel::Commands::SkipChannel::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // count: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), count));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-// TvChannel Cluster Attributes
-CHIP_ERROR TvChannelCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TvChannelCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // TargetNavigator Cluster Commands
-CHIP_ERROR TargetNavigatorCluster::NavigateTarget(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback, uint8_t target, chip::CharSpan data)
+CHIP_ERROR TargetNavigatorCluster::NavigateTargetRequest(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback, uint8_t target,
+                                                         chip::CharSpan data)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -10732,7 +6161,8 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTarget(Callback::Cancelable * onSucce
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TargetNavigator::Commands::NavigateTarget::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         TargetNavigator::Commands::NavigateTargetRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -10762,110 +6192,7 @@ exit:
     return err;
 }
 
-// TargetNavigator Cluster Attributes
-CHIP_ERROR TargetNavigatorCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TargetNavigatorCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // TemperatureMeasurement Cluster Commands
-// TemperatureMeasurement Cluster Attributes
-CHIP_ERROR TemperatureMeasurementCluster::SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TemperatureMeasurement::Attributes::MeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TemperatureMeasurement::Attributes::MeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::SubscribeAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TemperatureMeasurement::Attributes::MinMeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMinMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TemperatureMeasurement::Attributes::MinMeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::SubscribeAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TemperatureMeasurement::Attributes::MaxMeasuredValue::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMaxMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::SubscribeAttributeTolerance(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TemperatureMeasurement::Attributes::Tolerance::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeTolerance(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TemperatureMeasurement::Attributes::Tolerance::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // TestCluster Cluster Commands
 CHIP_ERROR TestClusterCluster::SimpleStructEchoRequest(Callback::Cancelable * onSuccessCallback,
@@ -10991,6 +6318,53 @@ CHIP_ERROR TestClusterCluster::TestAddArguments(Callback::Cancelable * onSuccess
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg1));
     // arg2: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg2));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR TestClusterCluster::TestEmitTestEventRequest(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, uint8_t arg1, uint8_t arg2,
+                                                        bool arg3)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         TestCluster::Commands::TestEmitTestEventRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // arg1: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg1));
+    // arg2: simpleEnum
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg2));
+    // arg3: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg3));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -11631,1214 +7005,6 @@ exit:
     return err;
 }
 
-// TestCluster Cluster Attributes
-CHIP_ERROR TestClusterCluster::SubscribeAttributeBoolean(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                         uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Boolean::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeBoolean(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Boolean::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeBitmap8(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                         uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Bitmap8::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeBitmap8(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Bitmap8::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeBitmap16(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Bitmap16::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeBitmap16(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Bitmap16::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeBitmap32(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Bitmap32::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeBitmap32(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Bitmap32::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeBitmap64(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Bitmap64::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeBitmap64(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Bitmap64::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt8u(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int8u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt8u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int8u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt16u(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int16u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt16u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int16u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt24u(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int24u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt24u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int24u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt32u(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int32u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt32u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int32u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt40u(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int40u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt40u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int40u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt48u(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int48u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt48u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int48u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt56u(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int56u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt56u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int56u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt64u(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int64u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt64u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int64u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt8s(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int8s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt8s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int8s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt16s(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int16s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt16s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int16s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt24s(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int24s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt24s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int24s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt32s(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int32s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt32s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int32s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt40s(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int40s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt40s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int40s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt48s(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int48s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt48s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int48s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt56s(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int56s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt56s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int56s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeInt64s(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Int64s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeInt64s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Int64s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeEnum8(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Enum8::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeEnum8(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Enum8::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeEnum16(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Enum16::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeEnum16(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Enum16::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeFloatSingle(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::FloatSingle::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeFloatSingle(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::FloatSingle::Id, onReportCallback,
-                                     BasicAttributeFilter<FloatAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeFloatDouble(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::FloatDouble::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeFloatDouble(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::FloatDouble::Id, onReportCallback,
-                                     BasicAttributeFilter<DoubleAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeOctetString(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::OctetString::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeOctetString(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::OctetString::Id, onReportCallback,
-                                     BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeLongOctetString(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::LongOctetString::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeLongOctetString(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::LongOctetString::Id, onReportCallback,
-                                     BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeCharString(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::CharString::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeCharString(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::CharString::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeLongCharString(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::LongCharString::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeLongCharString(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::LongCharString::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeEpochUs(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                         uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::EpochUs::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeEpochUs(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::EpochUs::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeEpochS(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::EpochS::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeEpochS(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::EpochS::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeVendorId(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::VendorId::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeVendorId(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::VendorId::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeEnumAttr(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                          uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::EnumAttr::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeEnumAttr(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::EnumAttr::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeRangeRestrictedInt8u(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::RangeRestrictedInt8u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeRangeRestrictedInt8u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::RangeRestrictedInt8u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeRangeRestrictedInt8s(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::RangeRestrictedInt8s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeRangeRestrictedInt8s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::RangeRestrictedInt8s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeRangeRestrictedInt16u(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::RangeRestrictedInt16u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeRangeRestrictedInt16u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::RangeRestrictedInt16u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeRangeRestrictedInt16s(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::RangeRestrictedInt16s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeRangeRestrictedInt16s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::RangeRestrictedInt16s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::Unsupported::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeUnsupported(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::Unsupported::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableBoolean(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableBoolean::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableBoolean(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableBoolean::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableBitmap8(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableBitmap8::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableBitmap8(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableBitmap8::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableBitmap16(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableBitmap16::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableBitmap16(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableBitmap16::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableBitmap32(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableBitmap32::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableBitmap32(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableBitmap32::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableBitmap64(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableBitmap64::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableBitmap64(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableBitmap64::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt8u(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt8u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt8u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt8u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt16u(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt16u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt16u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt16u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt24u(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt24u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt24u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt24u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt32u(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt32u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt32u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt32u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt40u(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt40u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt40u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt40u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt48u(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt48u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt48u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt48u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt56u(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt56u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt56u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt56u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt64u(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt64u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt64u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt64u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt8s(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt8s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt8s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt8s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt16s(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt16s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt16s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt16s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt24s(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt24s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt24s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt24s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt32s(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt32s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt32s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt32s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt40s(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt40s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt40s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt40s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt48s(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt48s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt48s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt48s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt56s(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt56s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt56s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt56s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableInt64s(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableInt64s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableInt64s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableInt64s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableEnum8(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableEnum8::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableEnum8(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableEnum8::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableEnum16(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableEnum16::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableEnum16(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableEnum16::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableFloatSingle(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableFloatSingle::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableFloatSingle(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableFloatSingle::Id, onReportCallback,
-                                     BasicAttributeFilter<FloatAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableFloatDouble(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableFloatDouble::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableFloatDouble(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableFloatDouble::Id, onReportCallback,
-                                     BasicAttributeFilter<DoubleAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableOctetString(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableOctetString::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableOctetString(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableOctetString::Id, onReportCallback,
-                                     BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableCharString(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableCharString::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableCharString(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableCharString::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableEnumAttr(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableEnumAttr::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableEnumAttr(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableEnumAttr::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableRangeRestrictedInt8u(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableRangeRestrictedInt8u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableRangeRestrictedInt8u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableRangeRestrictedInt8u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableRangeRestrictedInt8s(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableRangeRestrictedInt8s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableRangeRestrictedInt8s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableRangeRestrictedInt8s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableRangeRestrictedInt16u(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableRangeRestrictedInt16u::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableRangeRestrictedInt16u(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableRangeRestrictedInt16u::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableRangeRestrictedInt16s(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = TestCluster::Attributes::NullableRangeRestrictedInt16s::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeNullableRangeRestrictedInt16s(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TestCluster::Attributes::NullableRangeRestrictedInt16s::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // Thermostat Cluster Commands
 CHIP_ERROR ThermostatCluster::ClearWeeklySchedule(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
@@ -13051,400 +7217,7 @@ exit:
     return err;
 }
 
-// Thermostat Cluster Attributes
-CHIP_ERROR ThermostatCluster::SubscribeAttributeLocalTemperature(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::LocalTemperature::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeLocalTemperature(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::LocalTemperature::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeAbsMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::AbsMinHeatSetpointLimit::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeAbsMinHeatSetpointLimit(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::AbsMinHeatSetpointLimit::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeAbsMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::AbsMaxHeatSetpointLimit::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeAbsMaxHeatSetpointLimit(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::AbsMaxHeatSetpointLimit::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeAbsMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::AbsMinCoolSetpointLimit::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeAbsMinCoolSetpointLimit(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::AbsMinCoolSetpointLimit::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeAbsMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::AbsMaxCoolSetpointLimit::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeAbsMaxCoolSetpointLimit(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::AbsMaxCoolSetpointLimit::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::OccupiedCoolingSetpoint::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::OccupiedCoolingSetpoint::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::OccupiedHeatingSetpoint::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::OccupiedHeatingSetpoint::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::MinHeatSetpointLimit::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeMinHeatSetpointLimit(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::MinHeatSetpointLimit::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::MaxHeatSetpointLimit::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeMaxHeatSetpointLimit(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::MaxHeatSetpointLimit::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::MinCoolSetpointLimit::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeMinCoolSetpointLimit(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::MinCoolSetpointLimit::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                     uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::MaxCoolSetpointLimit::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeMaxCoolSetpointLimit(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::MaxCoolSetpointLimit::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeMinSetpointDeadBand(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::MinSetpointDeadBand::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeMinSetpointDeadBand(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::MinSetpointDeadBand::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::ControlSequenceOfOperation::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeControlSequenceOfOperation(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::ControlSequenceOfOperation::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeSystemMode(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::SystemMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeSystemMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::SystemMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeStartOfWeek(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::StartOfWeek::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeStartOfWeek(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::StartOfWeek::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeNumberOfWeeklyTransitions(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::NumberOfWeeklyTransitions::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeNumberOfWeeklyTransitions(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::NumberOfWeeklyTransitions::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeNumberOfDailyTransitions(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Thermostat::Attributes::NumberOfDailyTransitions::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeNumberOfDailyTransitions(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::NumberOfDailyTransitions::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::FeatureMap::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeFeatureMap(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::FeatureMap::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // ThermostatUserInterfaceConfiguration Cluster Commands
-// ThermostatUserInterfaceConfiguration Cluster Attributes
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::SubscribeAttributeTemperatureDisplayMode(
-    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR
-ThermostatUserInterfaceConfigurationCluster::ReportAttributeTemperatureDisplayMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::SubscribeAttributeKeypadLockout(Callback::Cancelable * onSuccessCallback,
-                                                                                        Callback::Cancelable * onFailureCallback,
-                                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::ReportAttributeKeypadLockout(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::SubscribeAttributeScheduleProgrammingVisibility(
-    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR
-ThermostatUserInterfaceConfigurationCluster::ReportAttributeScheduleProgrammingVisibility(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::Id,
-                                     onReportCallback, BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                                          Callback::Cancelable * onFailureCallback,
-                                                                                          uint16_t minInterval,
-                                                                                          uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // ThreadNetworkDiagnostics Cluster Commands
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::ResetCounts(Callback::Cancelable * onSuccessCallback,
@@ -13487,1048 +7260,9 @@ exit:
     return err;
 }
 
-// ThreadNetworkDiagnostics Cluster Attributes
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeChannel(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::Channel::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeChannel(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::Channel::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRoutingRole(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RoutingRole::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRoutingRole(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RoutingRole::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeNetworkName(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::NetworkName::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeNetworkName(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::NetworkName::Id, onReportCallback,
-                                     BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributePanId(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::PanId::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributePanId(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::PanId::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeExtendedPanId(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeExtendedPanId(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::ExtendedPanId::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeMeshLocalPrefix(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeMeshLocalPrefix(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::Id, onReportCallback,
-                                     BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeOverrunCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::OverrunCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeOverrunCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::OverrunCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributePartitionId(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::PartitionId::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributePartitionId(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::PartitionId::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeWeighting(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::Weighting::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeWeighting(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::Weighting::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeDataVersion(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::DataVersion::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeDataVersion(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::DataVersion::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeStableDataVersion(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback,
-                                                                                uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeStableDataVersion(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::StableDataVersion::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeLeaderRouterId(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeLeaderRouterId(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::LeaderRouterId::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeDetachedRoleCount(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback,
-                                                                                uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeDetachedRoleCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeChildRoleCount(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::ChildRoleCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeChildRoleCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::ChildRoleCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRouterRoleCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RouterRoleCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRouterRoleCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RouterRoleCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeLeaderRoleCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeLeaderRoleCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeAttachAttemptCount(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback,
-                                                                                 uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeAttachAttemptCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributePartitionIdChangeCount(Callback::Cancelable * onSuccessCallback,
-                                                                                     Callback::Cancelable * onFailureCallback,
-                                                                                     uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributePartitionIdChangeCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeBetterPartitionAttachAttemptCount(
-    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR
-ThreadNetworkDiagnosticsCluster::ReportAttributeBetterPartitionAttachAttemptCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeParentChangeCount(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback,
-                                                                                uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::ParentChangeCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeParentChangeCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::ParentChangeCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxTotalCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxTotalCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxTotalCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxTotalCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxUnicastCount(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxUnicastCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxUnicastCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxUnicastCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxBroadcastCount(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxBroadcastCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxAckRequestedCount(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxAckRequestedCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxAckedCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxAckedCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxAckedCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxAckedCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxNoAckRequestedCount(Callback::Cancelable * onSuccessCallback,
-                                                                                    Callback::Cancelable * onFailureCallback,
-                                                                                    uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxNoAckRequestedCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxDataCount(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxDataCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxDataCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxDataCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxDataPollCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxDataPollCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxDataPollCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxDataPollCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxBeaconCount(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxBeaconCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxBeaconCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxBeaconCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxBeaconRequestCount(Callback::Cancelable * onSuccessCallback,
-                                                                                   Callback::Cancelable * onFailureCallback,
-                                                                                   uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxBeaconRequestCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxOtherCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxOtherCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxOtherCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxOtherCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxRetryCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxRetryCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxRetryCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxRetryCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxDirectMaxRetryExpiryCount(Callback::Cancelable * onSuccessCallback,
-                                                                                          Callback::Cancelable * onFailureCallback,
-                                                                                          uint16_t minInterval,
-                                                                                          uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxDirectMaxRetryExpiryCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxIndirectMaxRetryExpiryCount(
-    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxIndirectMaxRetryExpiryCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxErrCcaCount(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxErrCcaCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxErrAbortCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxErrAbortCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeTxErrBusyChannelCount(Callback::Cancelable * onSuccessCallback,
-                                                                                    Callback::Cancelable * onFailureCallback,
-                                                                                    uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeTxErrBusyChannelCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxTotalCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxTotalCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxTotalCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxTotalCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxUnicastCount(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxUnicastCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxUnicastCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxUnicastCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxBroadcastCount(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxBroadcastCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxDataCount(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxDataCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxDataCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxDataCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxDataPollCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxDataPollCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxDataPollCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxDataPollCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxBeaconCount(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxBeaconCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxBeaconCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxBeaconCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxBeaconRequestCount(Callback::Cancelable * onSuccessCallback,
-                                                                                   Callback::Cancelable * onFailureCallback,
-                                                                                   uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxBeaconRequestCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxOtherCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxOtherCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxOtherCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxOtherCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxAddressFilteredCount(Callback::Cancelable * onSuccessCallback,
-                                                                                     Callback::Cancelable * onFailureCallback,
-                                                                                     uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxAddressFilteredCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxDestAddrFilteredCount(Callback::Cancelable * onSuccessCallback,
-                                                                                      Callback::Cancelable * onFailureCallback,
-                                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxDestAddrFilteredCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxDuplicatedCount(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback,
-                                                                                uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxDuplicatedCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxErrNoFrameCount(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback,
-                                                                                uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxErrNoFrameCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxErrUnknownNeighborCount(Callback::Cancelable * onSuccessCallback,
-                                                                                        Callback::Cancelable * onFailureCallback,
-                                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxErrUnknownNeighborCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxErrInvalidSrcAddrCount(Callback::Cancelable * onSuccessCallback,
-                                                                                       Callback::Cancelable * onFailureCallback,
-                                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxErrInvalidSrcAddrCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxErrSecCount(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxErrSecCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxErrSecCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxErrSecCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxErrFcsCount(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxErrFcsCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeRxErrOtherCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeRxErrOtherCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeActiveTimestamp(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeActiveTimestamp(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributePendingTimestamp(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributePendingTimestamp(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::PendingTimestamp::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeDelay(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::Delay::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeDelay(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::Delay::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeChannelMask(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = ThreadNetworkDiagnostics::Attributes::ChannelMask::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeChannelMask(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::ChannelMask::Id, onReportCallback,
-                                     BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback,
-                                                                              uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 // UserLabel Cluster Commands
-// UserLabel Cluster Attributes
 
 // WakeOnLan Cluster Commands
-// WakeOnLan Cluster Attributes
-CHIP_ERROR WakeOnLanCluster::SubscribeAttributeWakeOnLanMacAddress(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WakeOnLan::Attributes::WakeOnLanMacAddress::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WakeOnLanCluster::ReportAttributeWakeOnLanMacAddress(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WakeOnLan::Attributes::WakeOnLanMacAddress::Id, onReportCallback,
-                                     BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR WakeOnLanCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WakeOnLanCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // WiFiNetworkDiagnostics Cluster Commands
 CHIP_ERROR WiFiNetworkDiagnosticsCluster::ResetCounts(Callback::Cancelable * onSuccessCallback,
@@ -14568,245 +7302,6 @@ CHIP_ERROR WiFiNetworkDiagnosticsCluster::ResetCounts(Callback::Cancelable * onS
     sender.release();
 exit:
     return err;
-}
-
-// WiFiNetworkDiagnostics Cluster Attributes
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributeBssid(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::Bssid::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributeBssid(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::Bssid::Id, onReportCallback,
-                                     BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributeSecurityType(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::SecurityType::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributeSecurityType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::SecurityType::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributeWiFiVersion(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributeWiFiVersion(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::WiFiVersion::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributeChannelNumber(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::ChannelNumber::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributeChannelNumber(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::ChannelNumber::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributeRssi(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::Rssi::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributeRssi(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::Rssi::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8sAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributeBeaconLostCount(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributeBeaconLostCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributeBeaconRxCount(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributeBeaconRxCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::BeaconRxCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributePacketMulticastRxCount(Callback::Cancelable * onSuccessCallback,
-                                                                                   Callback::Cancelable * onFailureCallback,
-                                                                                   uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributePacketMulticastRxCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributePacketMulticastTxCount(Callback::Cancelable * onSuccessCallback,
-                                                                                   Callback::Cancelable * onFailureCallback,
-                                                                                   uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributePacketMulticastTxCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributePacketUnicastRxCount(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback,
-                                                                                 uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributePacketUnicastRxCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributePacketUnicastTxCount(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback,
-                                                                                 uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributePacketUnicastTxCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributeCurrentMaxRate(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributeCurrentMaxRate(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributeOverrunCount(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback,
-                                                                         uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WiFiNetworkDiagnostics::Attributes::OverrunCount::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributeOverrunCount(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WiFiNetworkDiagnostics::Attributes::OverrunCount::Id, onReportCallback,
-                                     BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 // WindowCovering Cluster Commands
@@ -14849,8 +7344,8 @@ exit:
 }
 
 CHIP_ERROR WindowCoveringCluster::GoToLiftPercentage(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t liftPercentageValue,
-                                                     uint16_t liftPercent100thsValue)
+                                                     Callback::Cancelable * onFailureCallback, chip::Percent liftPercentageValue,
+                                                     chip::Percent100ths liftPercent100thsValue)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -14873,9 +7368,9 @@ CHIP_ERROR WindowCoveringCluster::GoToLiftPercentage(Callback::Cancelable * onSu
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // liftPercentageValue: int8u
+    // liftPercentageValue: percent
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), liftPercentageValue));
-    // liftPercent100thsValue: int16u
+    // liftPercent100thsValue: percent100ths
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), liftPercent100thsValue));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -14934,8 +7429,8 @@ exit:
 }
 
 CHIP_ERROR WindowCoveringCluster::GoToTiltPercentage(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t tiltPercentageValue,
-                                                     uint16_t tiltPercent100thsValue)
+                                                     Callback::Cancelable * onFailureCallback, chip::Percent tiltPercentageValue,
+                                                     chip::Percent100ths tiltPercent100thsValue)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -14958,9 +7453,9 @@ CHIP_ERROR WindowCoveringCluster::GoToTiltPercentage(Callback::Cancelable * onSu
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // tiltPercentageValue: int8u
+    // tiltPercentageValue: percent
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), tiltPercentageValue));
-    // tiltPercent100thsValue: int16u
+    // tiltPercent100thsValue: percent100ths
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), tiltPercent100thsValue));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -15092,347 +7587,6 @@ CHIP_ERROR WindowCoveringCluster::UpOrOpen(Callback::Cancelable * onSuccessCallb
     sender.release();
 exit:
     return err;
-}
-
-// WindowCovering Cluster Attributes
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeType(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                         uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::Type::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::Type::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::CurrentPositionLift::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionLift(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::CurrentPositionLift::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback,
-                                                                        uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::CurrentPositionTilt::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionTilt(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::CurrentPositionTilt::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeConfigStatus(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::ConfigStatus::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeConfigStatus(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::ConfigStatus::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::CurrentPositionLiftPercentage::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::CurrentPositionLiftPercentage::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::CurrentPositionTiltPercentage::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::CurrentPositionTiltPercentage::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeOperationalStatus(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::OperationalStatus::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeOperationalStatus(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::OperationalStatus::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                    Callback::Cancelable * onFailureCallback,
-                                                                                    uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                    Callback::Cancelable * onFailureCallback,
-                                                                                    uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeEndProductType(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::EndProductType::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeEndProductType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::EndProductType::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                     Callback::Cancelable * onFailureCallback,
-                                                                                     uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                     Callback::Cancelable * onFailureCallback,
-                                                                                     uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeInstalledOpenLimitLift(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::InstalledOpenLimitLift::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeInstalledOpenLimitLift(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::InstalledOpenLimitLift::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeInstalledClosedLimitLift(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::InstalledClosedLimitLift::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeInstalledClosedLimitLift(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::InstalledClosedLimitLift::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeInstalledOpenLimitTilt(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback,
-                                                                           uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::InstalledOpenLimitTilt::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeInstalledOpenLimitTilt(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::InstalledOpenLimitTilt::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeInstalledClosedLimitTilt(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback,
-                                                                             uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::InstalledClosedLimitTilt::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeInstalledClosedLimitTilt(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::InstalledClosedLimitTilt::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeMode(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                         uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::Mode::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeMode(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::Mode::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = WindowCovering::Attributes::SafetyStatus::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeSafetyStatus(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::SafetyStatus::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::FeatureMap::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeFeatureMap(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::FeatureMap::Id, onReportCallback,
-                                     BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 } // namespace Controller

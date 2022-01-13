@@ -108,46 +108,78 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
         }
         {{/if}}
         {{#if hasExpectedConstraints}}
-        {{#if expectedConstraints.minLength}}
+        {{#if (hasProperty expectedConstraints "minLength")}}
         {
           {{> actualValue}}
           XCTAssertGreaterThanOrEqual([actualValue length], {{expectedConstraints.minLength}});
         }
         {{/if}}
-        {{#if expectedConstraints.startsWith}}
+        {{#if (hasProperty expectedConstraints "startsWith")}}
         {
           {{> actualValue}}
           XCTAssertTrue([actualValue hasPrefix:@"{{expectedConstraints.startsWith}}"]);
         }
         {{/if}}
-        {{#if expectedConstraints.endsWith}}
+        {{#if (hasProperty expectedConstraints "endsWith")}}
         {
           {{> actualValue}}
           XCTAssertTrue([actualValue hasSuffix:@"{{expectedConstraints.endsWith}}"]);
         }
         {{/if}}
-        {{#if expectedConstraints.maxLength}}
+        {{#if (hasProperty expectedConstraints "isLowerCase")}}
+        {
+          {{> actualValue}}
+          BOOL isLowerCase = [actualValue isEqualToString:[actualValue lowercaseString]];
+          XCTAssert{{#if expectedConstraints.isLowerCase}}True{{else}}False{{/if}}(isLowerCase);
+        }
+        {{/if}}
+        {{#if (hasProperty expectedConstraints "isUpperCase")}}
+        {
+          {{> actualValue}}
+          BOOL isUpperCase = [actualValue isEqualToString:[actualValue uppercaseString]];
+          XCTAssert{{#if expectedConstraints.isUpperCase}}True{{else}}False{{/if}}(isUpperCase);
+        }
+        {{/if}}
+        {{#if (hasProperty expectedConstraints "isHexString")}}
+        {
+          {{> actualValue}}
+          NSCharacterSet *chars = [[NSCharacterSet characterSetWithCharactersInString:@"0123456789ABCDEF"] invertedSet];
+          BOOL isHexString = (NSNotFound == [actualValue rangeOfCharacterFromSet:chars].location);
+          XCTAssert{{#if expectedConstraints.isHexString}}True{{else}}False{{/if}}(isHexString);
+        }
+        {{/if}}
+        {{#if (hasProperty expectedConstraints "maxLength")}}
         {
           {{> actualValue}}
           XCTAssertLessThanOrEqual([actualValue length], {{expectedConstraints.maxLength}});
         }
         {{/if}}
-        {{#if expectedConstraints.minValue}}
+        {{#if (hasProperty expectedConstraints "minValue")}}
         {
           {{> actualValue}}
-          XCTAssertGreaterThanOrEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.minValue}});
+          if (actualValue != nil) {
+            XCTAssertGreaterThanOrEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.minValue type}});
+          }
         }
         {{/if}}
-        {{#if expectedConstraints.maxValue}}
+        {{#if (hasProperty expectedConstraints "maxValue")}}
         {
           {{> actualValue}}
-          XCTAssertLessThanOrEqual([actualValue  {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.maxValue}});
+          if (actualValue != nil) {
+            XCTAssertLessThanOrEqual([actualValue  {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.maxValue type}});
+          }
         }
         {{/if}}
-        {{#if expectedConstraints.notValue}}
+        {{#if (hasProperty expectedConstraints "notValue")}}
         {
           {{> actualValue}}
-          XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.notValue}});
+        {{#if (isLiteralNull expectedConstraints.notValue)}}
+          XCTAssertFalse(actualValue == nil);
+        {{else}}
+          if (actualValue != nil) {
+            XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.notValue type}});
+          }
+        {{/if}}
         }
         {{/if}}
         {{/if}}

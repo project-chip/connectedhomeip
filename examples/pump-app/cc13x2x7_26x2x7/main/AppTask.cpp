@@ -20,6 +20,7 @@
 #include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 
 #include <app-common/zap-generated/attribute-id.h>
@@ -31,6 +32,7 @@
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
 
+#include <app/EventLogging.h>
 #include <app/util/af-types.h>
 #include <app/util/af.h>
 
@@ -52,10 +54,13 @@
 
 #define PCC_CLUSTER_ENDPOINT 1
 #define ONOFF_CLUSTER_ENDPOINT 1
+#define EXTENDED_DISCOVERY_TIMEOUT_SEC 20
 
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
-using namespace ::chip::app::Clusters;
+using namespace chip;
+using namespace chip::app;
+using namespace chip::Credentials;
+using namespace chip::DeviceLayer;
+using namespace chip::app::Clusters;
 
 static TaskHandle_t sAppTaskHandle;
 static QueueHandle_t sAppEventQueue;
@@ -139,6 +144,10 @@ int AppTask::Init()
         while (1)
             ;
     }
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(EXTENDED_DISCOVERY_TIMEOUT_SEC);
+#endif
 
     // Init ZCL Data Model and start server
     PLAT_LOG("Initialize Server");
@@ -319,12 +328,15 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     case AppEvent::kEventType_ButtonLeft:
         if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
         {
+            // Post event for demonstration purposes
+            sAppTask.PostEvents();
+
             // Toggle BLE advertisements
             if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
             {
                 if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() == CHIP_NO_ERROR)
                 {
-                    PLAT_LOG("Enabled BLE Advertisement");
+                    PLAT_LOG("Enabled BLE Advertisements");
                 }
                 else
                 {
@@ -357,6 +369,23 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
+void AppTask::InitOnOffClusterState()
+{
+
+    EmberStatus status;
+
+    ChipLogProgress(NotSpecified, "Init On/Off clusterstate");
+
+    // Write false as pump always boots in stopped mode
+    status = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, false);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Init On/Off state  %" PRIx8, status);
+    }
+}
+
+void AppTask::InitPCCClusterState() {}
+
 void AppTask::UpdateClusterState()
 {
     EmberStatus status;
@@ -364,10 +393,8 @@ void AppTask::UpdateClusterState()
     ChipLogProgress(NotSpecified, "UpdateClusterState");
 
     // Write the new values
-
     bool onOffState = !PumpMgr().IsStopped();
-
-    status = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, onOffState);
+    status          = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, onOffState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Updating On/Off state  %" PRIx8, status);
@@ -462,5 +489,22 @@ void AppTask::UpdateClusterState()
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
         ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %" PRIx8, status);
+    }
+}
+
+void AppTask::PostEvents()
+{
+    // Example on posting events - here we post the general fault event on endpoints with PCC Server enabled
+    for (auto endpoint : EnabledEndpointsWithServerCluster(PumpConfigurationAndControl::Id))
+    {
+        PumpConfigurationAndControl::Events::GeneralFault::Type event;
+        EventNumber eventNumber;
+
+        ChipLogProgress(Zcl, "AppTask: Post PCC GeneralFault event");
+        // Using default priority for the event
+        if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+        {
+            ChipLogError(Zcl, "AppTask: Failed to record GeneralFault event");
+        }
     }
 }

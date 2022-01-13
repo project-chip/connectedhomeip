@@ -148,7 +148,7 @@
                       completionHandler:^(NSError * _Nullable error) {
                           NSString * resultString = (error == nil)
                               ? @"Bind command: success!"
-                              : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
+                              : [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code];
                           NSLog(resultString, nil);
                       }];
             } else {
@@ -180,7 +180,7 @@
                         completionHandler:^(NSError * _Nullable error) {
                             NSString * resultString = (error == nil)
                                 ? @"Unbind command: success!"
-                                : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
+                                : [NSString stringWithFormat:@"An error occurred: 0x%02lx", error.code];
                             NSLog(resultString, nil);
                         }];
             } else {

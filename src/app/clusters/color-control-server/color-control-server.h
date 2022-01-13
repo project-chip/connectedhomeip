@@ -234,7 +234,7 @@ private:
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
     /**********************************************************
-     * Attributes Decleration
+     * Attributes Declaration
      *********************************************************/
     static ColorControlServer instance;
 

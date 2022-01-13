@@ -16,12 +16,14 @@
  */
 #pragma once
 
+#include <algorithm>
+#include <stdint.h>
+#include <sys/types.h>
+
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
-#include <stdint.h>
-#include <sys/types.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -30,9 +32,6 @@ namespace Credentials {
 class GroupDataProvider
 {
 public:
-    static constexpr uint16_t kMaxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC;
-    static constexpr uint16_t kMaxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC;
-
     struct GroupInfo
     {
         static constexpr size_t kGroupNameMax = CHIP_CONFIG_MAX_GROUP_NAME_LENGTH;
@@ -142,6 +141,27 @@ public:
     };
 
     /**
+     *  Interface to listen for changes in the Group info.
+     */
+    class GroupListener
+    {
+    public:
+        virtual ~GroupListener() = default;
+        /**
+         *  Callback invoked when a new group is added.
+         *
+         *  @param[in] new_group  GroupInfo structure of the new group.
+         */
+        virtual void OnGroupAdded(chip::FabricIndex fabric_index, const GroupInfo & new_group) = 0;
+        /**
+         *  Callback invoked when an existing group is removed.
+         *
+         *  @param[in] removed_state  GroupInfo structure of the removed group.
+         */
+        virtual void OnGroupRemoved(chip::FabricIndex fabric_index, const GroupInfo & old_group) = 0;
+    };
+
+    /**
      * Template used to iterate the stored group data
      */
     template <typename T>
@@ -174,12 +194,20 @@ public:
     using EndpointIterator  = Iterator<GroupEndpoint>;
     using KeySetIterator    = Iterator<KeySet>;
 
-    GroupDataProvider()          = default;
+    GroupDataProvider(uint16_t maxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC,
+                      uint16_t maxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC) :
+        mMaxGroupsPerFabric(maxGroupsPerFabric),
+        mMaxGroupKeysPerFabric(maxGroupKeysPerFabric)
+    {}
+
     virtual ~GroupDataProvider() = default;
 
     // Not copyable
     GroupDataProvider(const GroupDataProvider &) = delete;
     GroupDataProvider & operator=(const GroupDataProvider &) = delete;
+
+    uint16_t GetMaxGroupsPerFabric() { return mMaxGroupsPerFabric; }
+    uint16_t GetMaxGroupKeysPerFabric() { return mMaxGroupKeysPerFabric; }
 
     /**
      *  Initialize the GroupDataProvider, including any persistent data store
@@ -211,16 +239,16 @@ public:
     // Iterators
     /**
      *  Creates an iterator that may be used to obtain the list of groups associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the group table during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
     virtual GroupInfoIterator * IterateGroupInfo(chip::FabricIndex fabric_index) = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of (group, endpoint) pairs associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the group table during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
@@ -233,14 +261,16 @@ public:
     virtual CHIP_ERROR SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & info) = 0;
     virtual CHIP_ERROR GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & info)       = 0;
     virtual CHIP_ERROR RemoveGroupKeyAt(chip::FabricIndex fabric_index, size_t index)                     = 0;
+    virtual CHIP_ERROR RemoveGroupKeys(chip::FabricIndex fabric_index)                                    = 0;
+
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the keyset mappings during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of GroupKeyIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual GroupKeyIterator * IterateGroupKey(chip::FabricIndex fabric_index) = 0;
+    virtual GroupKeyIterator * IterateGroupKeys(chip::FabricIndex fabric_index) = 0;
 
     //
     // Key Sets
@@ -251,8 +281,8 @@ public:
     virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, chip::KeysetId keyset_id)             = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of key sets associated with the given fabric.
-     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
-     *  the iterator's Release() method must be called after the iteration is finished.
+     *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
+     *  Modifying the key sets table during the iteration is currently not supported, and may yield unexpected behaviour.
      *  @retval An instance of KeySetIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
@@ -263,6 +293,22 @@ public:
 
     // General
     virtual CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle & msg) = 0;
+
+    // Listener
+    void SetListener(GroupListener * listener) { mListener = listener; };
+    void RemoveListener() { mListener = nullptr; };
+
+protected:
+    void GroupAdded(chip::FabricIndex fabric_index, const GroupInfo & new_group)
+    {
+        if (mListener)
+        {
+            mListener->OnGroupAdded(fabric_index, new_group);
+        }
+    }
+    const uint16_t mMaxGroupsPerFabric;
+    const uint16_t mMaxGroupKeysPerFabric;
+    GroupListener * mListener = nullptr;
 };
 
 /**

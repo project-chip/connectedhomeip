@@ -319,8 +319,8 @@ static constexpr chip::ClusterId ZCL_IAS_WD_CLUSTER_ID = 0x0502;
 // Definitions for cluster: Wake on LAN
 static constexpr chip::ClusterId ZCL_WAKE_ON_LAN_CLUSTER_ID = 0x0503;
 
-// Definitions for cluster: TV Channel
-static constexpr chip::ClusterId ZCL_TV_CHANNEL_CLUSTER_ID = 0x0504;
+// Definitions for cluster: Channel
+static constexpr chip::ClusterId ZCL_CHANNEL_CLUSTER_ID = 0x0504;
 
 // Definitions for cluster: Target Navigator
 static constexpr chip::ClusterId ZCL_TARGET_NAVIGATOR_CLUSTER_ID = 0x0505;

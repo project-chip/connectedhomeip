@@ -49,7 +49,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-using TestContext = chip::Test::LoopbackMessagingContext<Test::LoopbackTransport>;
+using TestContext = Test::LoopbackMessagingContext<>;
 
 enum : uint8_t
 {
@@ -97,7 +97,7 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
-    auto sessionPeerToLocal = ctx.GetSecureSessionManager().GetSecureSession(ec1->GetSessionHandle());
+    auto sessionPeerToLocal = ec1->GetSessionHandle()->AsSecureSession();
     NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerNodeId() == ctx.GetBobNodeId());
     NL_TEST_ASSERT(inSuite, sessionPeerToLocal->GetPeerSessionId() == ctx.GetBobKeyId());
     NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
@@ -105,7 +105,7 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec2 = ctx.NewExchangeToAlice(&mockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
-    auto sessionLocalToPeer = ctx.GetSecureSessionManager().GetSecureSession(ec2->GetSessionHandle());
+    auto sessionLocalToPeer = ec2->GetSessionHandle()->AsSecureSession();
     NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerNodeId() == ctx.GetAliceNodeId());
     NL_TEST_ASSERT(inSuite, sessionLocalToPeer->GetPeerSessionId() == ctx.GetAliceKeyId());
 
@@ -121,7 +121,7 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
 
     // Expire the session this exchange is supposedly on.
-    ctx.GetExchangeManager().ExpireExchangesForSession(ec1->GetSessionHandle());
+    ctx.GetSecureSessionManager().ExpirePairing(ec1->GetSessionHandle());
 
     MockAppDelegate receiveDelegate;
     CHIP_ERROR err =
@@ -138,6 +138,9 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
 
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // recreate closed session.
+    NL_TEST_ASSERT(inSuite, ctx.CreateSessionAliceToBob() == CHIP_NO_ERROR);
 }
 
 void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
@@ -153,10 +156,12 @@ void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
     ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
 
-    // Expire the session this exchange is supposedly on.  This should close the
-    // exchange.
-    ctx.GetExchangeManager().ExpireExchangesForSession(ec1->GetSessionHandle());
+    // Expire the session this exchange is supposedly on.  This should close the exchange.
+    ctx.GetSecureSessionManager().ExpirePairing(ec1->GetSessionHandle());
     NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
+
+    // recreate closed session.
+    NL_TEST_ASSERT(inSuite, ctx.CreateSessionAliceToBob() == CHIP_NO_ERROR);
 }
 
 void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)

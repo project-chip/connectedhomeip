@@ -91,7 +91,10 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_FailSafeArmed      = { kConfi
 const AndroidConfig::Key AndroidConfig::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_ActiveLocale       = { kConfigNamespace_ChipConfig, "active-locale" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_HourFormat         = { kConfigNamespace_ChipConfig, "hour-format" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_CalendarType       = { kConfigNamespace_ChipConfig, "calendar-type" };
 
 // Prefix used for NVS keys that contain Chip group encryption keys.
 const char AndroidConfig::kGroupKeyNamePrefix[] = "gk-";

@@ -55,7 +55,9 @@ public:
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>
+class DLL_EXPORT ExchangeContext : public ReliableMessageContext,
+                                   public ReferenceCounted<ExchangeContext, ExchangeContextDeletor>,
+                                   public SessionReleaseDelegate
 {
     friend class ExchangeManager;
     friend class ExchangeContextDeletor;
@@ -63,7 +65,8 @@ class DLL_EXPORT ExchangeContext : public ReliableMessageContext, public Referen
 public:
     typedef System::Clock::Timeout Timeout; // Type used to express the timeout in this ExchangeContext
 
-    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator, ExchangeDelegate * delegate);
+    ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, const SessionHandle & session, bool Initiator,
+                    ExchangeDelegate * delegate);
 
     ~ExchangeContext();
 
@@ -74,9 +77,15 @@ public:
      */
     bool IsInitiator() const;
 
-    bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
+    bool IsEncryptionRequired() const { return mDispatch.IsEncryptionRequired(); }
 
-    bool IsGroupExchangeContext() const { return (mSession && mSession.Get().IsGroupSession()); }
+    bool IsGroupExchangeContext() const
+    {
+        return (mSession && mSession->GetSessionType() == Transport::Session::SessionType::kGroup);
+    }
+
+    // Implement SessionReleaseDelegate
+    void OnSessionReleased() override;
 
     /**
      *  Send a CHIP message on this exchange.
@@ -149,7 +158,7 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
-    ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
+    ExchangeMessageDispatch & GetMessageDispatch() { return mDispatch; }
 
     SessionHandle GetSessionHandle() const { return mSession.Get(); }
     bool HasSessionHandle() const { return mSession; }
@@ -166,27 +175,15 @@ public:
 
     void SetResponseTimeout(Timeout timeout);
 
-    // TODO: move following 5 functions into SessionHandle once we can access session vars w/o using a SessionManager
-    /*
-     * Get the overall acknowledge timeout period for the underneath transport(MRP+UDP/TCP)
-     */
-    System::Clock::Milliseconds32 GetAckTimeout();
-
-    bool IsUDPTransport();
-    bool IsTCPTransport();
-    bool IsBLETransport();
-    // Helper function for easily accessing MRP config
-    const ReliableMessageProtocolConfig & GetMRPConfig() const;
-
 private:
     Timeout mResponseTimeout{ 0 }; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
 
-    ExchangeMessageDispatch * mDispatch = nullptr;
+    ExchangeMessageDispatch & mDispatch;
 
-    SessionHolder mSession; // The connection state
-    uint16_t mExchangeId;   // Assigned exchange ID.
+    SessionHolderWithDelegate mSession; // The connection state
+    uint16_t mExchangeId;               // Assigned exchange ID.
 
     /**
      *  Determine whether a response is currently expected for a message that was sent over
@@ -226,12 +223,7 @@ private:
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
      */
-    bool MatchExchange(SessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
-
-    /**
-     * Notify the exchange that its connection has expired.
-     */
-    void OnConnectionExpired();
+    bool MatchExchange(const SessionHandle & session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     /**
      * Notify our delegate, if any, that we have timed out waiting for a

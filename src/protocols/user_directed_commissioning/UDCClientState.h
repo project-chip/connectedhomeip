@@ -108,7 +108,7 @@ public:
 
 private:
     PeerAddress mPeerAddress;
-    char mInstanceName[Dnssd::Commissionable::kInstanceNameMaxLength + 1];
+    char mInstanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
     char mDeviceName[Dnssd::kMaxDeviceNameLen + 1];
     uint16_t mLongDiscriminator = 0;
     uint16_t mVendorId;

@@ -758,9 +758,8 @@ CHIP_ERROR UDPEndPointImplSockets::IPv4JoinLeaveMulticastGroupImpl(InterfaceId a
 
     for (InterfaceAddressIterator lAddressIterator; lAddressIterator.HasCurrent(); lAddressIterator.Next())
     {
-        const IPAddress lCurrentAddress = lAddressIterator.GetAddress();
-
-        if (lAddressIterator.GetInterfaceId() == aInterfaceId)
+        IPAddress lCurrentAddress;
+        if ((lAddressIterator.GetInterfaceId() == aInterfaceId) && (lAddressIterator.GetAddress(lCurrentAddress) == CHIP_NO_ERROR))
         {
             if (lCurrentAddress.IsIPv4())
             {

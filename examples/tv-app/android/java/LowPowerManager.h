@@ -18,24 +18,20 @@
 
 #pragma once
 
+#include <app/clusters/low-power-server/low-power-server.h>
+
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 
-class LowPowerManager
+class LowPowerManager : public chip::app::Clusters::LowPower::Delegate
 {
 public:
+    static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
-    bool Sleep();
+
+    bool HandleSleep() override;
 
 private:
-    friend LowPowerManager & LowPowerMgr();
-
-    static LowPowerManager sInstance;
     jobject mLowPowerManagerObject = nullptr;
     jmethodID mSleepMethod         = nullptr;
 };
-
-inline LowPowerManager & LowPowerMgr()
-{
-    return LowPowerManager::sInstance;
-}

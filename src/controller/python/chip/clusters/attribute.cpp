@@ -33,13 +33,6 @@ using namespace chip::app;
 
 using PyObject = void;
 
-extern "C" {
-// Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
-chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t n, ...);
-chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext, DeviceProxy * device, bool isSubscription,
-                                                              uint32_t minInterval, uint32_t maxInterval, size_t n, ...);
-}
-
 namespace chip {
 namespace python {
 
@@ -105,7 +98,7 @@ public:
             // at the end.)
             TLV::TLVWriter writer;
             writer.Init(buffer.get(), bufferLen);
-            CHIP_ERROR err = writer.CopyElement(TLV::AnonymousTag, *apData);
+            CHIP_ERROR err = writer.CopyElement(TLV::AnonymousTag(), *apData);
             if (err != CHIP_NO_ERROR)
             {
                 app::StatusIB status;
@@ -140,7 +133,7 @@ public:
             // at the end.)
             TLV::TLVWriter writer;
             writer.Init(buffer);
-            err = writer.CopyElement(TLV::AnonymousTag, *apData);
+            err = writer.CopyElement(TLV::AnonymousTag(), *apData);
             if (err != CHIP_NO_ERROR)
             {
                 this->OnError(apReadClient, err);
@@ -171,7 +164,8 @@ public:
     void OnDone(ReadClient * apReadClient) override
     {
         gOnReadDoneCallback(mAppContext);
-        // delete apReadClient;
+
+        delete apReadClient;
         delete this;
     };
 
@@ -179,6 +173,16 @@ private:
     BufferedReadCallback mBufferedReadCallback;
     PyObject * mAppContext;
 };
+
+extern "C" {
+// Encodes n attribute write requests, follows 3 * n arguments, in the (AttributeWritePath*=void *, uint8_t*, size_t) order.
+chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device,
+                                                                uint16_t timedWriteTimeoutMs, size_t n, ...);
+chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient,
+                                                              ReadClientCallback ** pCallback, DeviceProxy * device,
+                                                              bool isSubscription, uint32_t minInterval, uint32_t maxInterval,
+                                                              size_t n, ...);
+}
 
 using OnWriteResponseCallback = void (*)(PyObject * appContext, chip::EndpointId endpointId, chip::ClusterId clusterId,
                                          chip::AttributeId attributeId,
@@ -246,7 +250,8 @@ void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttribute
     gOnReportEndCallback               = onReportEndCallback;
 }
 
-chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device, size_t n, ...)
+chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContext, DeviceProxy * device,
+                                                                uint16_t timedWriteTimeoutMs, size_t n, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -256,7 +261,9 @@ chip::ChipError::StorageType pychip_WriteClient_WriteAttributes(void * appContex
     va_list args;
     va_start(args, n);
 
-    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewWriteClient(client, callback.get()));
+    SuccessOrExit(err = app::InteractionModelEngine::GetInstance()->NewWriteClient(
+                      client, callback.get(),
+                      timedWriteTimeoutMs != 0 ? Optional<uint16_t>(timedWriteTimeoutMs) : Optional<uint16_t>::Missing()));
 
     {
         for (size_t i = 0; i < n; i++)
@@ -294,8 +301,19 @@ exit:
     return err.AsInteger();
 }
 
-chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext, DeviceProxy * device, bool isSubscription,
-                                                              uint32_t minInterval, uint32_t maxInterval, size_t n, ...)
+void pychip_ReadClient_Abort(ReadClient * apReadClient, ReadClientCallback * apCallback)
+{
+    VerifyOrDie(apReadClient != nullptr);
+    VerifyOrDie(apCallback != nullptr);
+
+    delete apReadClient;
+    delete apCallback;
+}
+
+chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext, ReadClient ** pReadClient,
+                                                              ReadClientCallback ** pCallback, DeviceProxy * device,
+                                                              bool isSubscription, uint32_t minInterval, uint32_t maxInterval,
+                                                              size_t n, ...)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -305,6 +323,7 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
     va_start(args, n);
 
     std::unique_ptr<AttributePathParams[]> readPaths(new AttributePathParams[n]);
+    std::unique_ptr<ReadClient> readClient;
 
     {
         for (size_t i = 0; i < n; i++)
@@ -319,13 +338,13 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
     }
 
     Optional<SessionHandle> session = device->GetSecureSession();
-    ReadClient * readClient;
-
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NOT_CONNECTED);
+
+    readClient = std::make_unique<ReadClient>(
+        InteractionModelEngine::GetInstance(), device->GetExchangeManager(), *callback->GetBufferedReadCallback(),
+        isSubscription ? ReadClient::InteractionType::Subscribe : ReadClient::InteractionType::Read);
+
     {
-        app::InteractionModelEngine::GetInstance()->NewReadClient(
-            &readClient, isSubscription ? ReadClient::InteractionType::Subscribe : ReadClient::InteractionType::Read,
-            callback->GetBufferedReadCallback());
         ReadPrepareParams params(session.Value());
         params.mpAttributePathParamsList    = readPaths.get();
         params.mAttributePathParamsListSize = n;
@@ -337,14 +356,14 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
         }
 
         err = readClient->SendRequest(params);
-
-        if (err != CHIP_NO_ERROR)
-        {
-            readClient->Shutdown();
-        }
+        SuccessOrExit(err);
     }
 
+    *pReadClient = readClient.get();
+    *pCallback   = callback.get();
+
     callback.release();
+    readClient.release();
 
 exit:
     va_end(args);
@@ -362,6 +381,7 @@ chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, Dev
     va_start(args, n);
 
     std::unique_ptr<EventPathParams[]> readPaths(new EventPathParams[n]);
+    std::unique_ptr<ReadClient> readClient;
 
     {
         for (size_t i = 0; i < n; i++)
@@ -376,13 +396,13 @@ chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, Dev
     }
 
     Optional<SessionHandle> session = device->GetSecureSession();
-    ReadClient * readClient;
-
     VerifyOrExit(session.HasValue(), err = CHIP_ERROR_NOT_CONNECTED);
+
+    readClient =
+        std::make_unique<ReadClient>(InteractionModelEngine::GetInstance(), device->GetExchangeManager(), *callback.get(),
+                                     isSubscription ? ReadClient::InteractionType::Subscribe : ReadClient::InteractionType::Read);
+
     {
-        app::InteractionModelEngine::GetInstance()->NewReadClient(
-            &readClient, isSubscription ? ReadClient::InteractionType::Subscribe : ReadClient::InteractionType::Read,
-            callback.get());
         ReadPrepareParams params(session.Value());
         params.mpEventPathParamsList    = readPaths.get();
         params.mEventPathParamsListSize = n;
@@ -394,14 +414,11 @@ chip::ChipError::StorageType pychip_ReadClient_ReadEvents(void * appContext, Dev
         }
 
         err = readClient->SendRequest(params);
-
-        if (err != CHIP_NO_ERROR)
-        {
-            readClient->Shutdown();
-        }
+        SuccessOrExit(err);
     }
 
     callback.release();
+    readClient.release();
 
 exit:
     va_end(args);

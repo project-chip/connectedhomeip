@@ -690,7 +690,7 @@ class DeviceMgrCmd(Cmd):
             group.add_argument(
                 '-s', help='discover commissionable nodes with given short discriminator', type=int)
             group.add_argument(
-                '-v', help='discover commissionable nodes wtih given vendor ID', type=int)
+                '-v', help='discover commissionable nodes with given vendor ID', type=int)
             group.add_argument(
                 '-t', help='discover commissionable nodes with given device type', type=int)
             group.add_argument(
@@ -904,7 +904,7 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("set-pairing-wifi-credential")
                 return
-            self.devCtrl.SetWifiCredentials(
+            self.devCtrl.SetWiFiCredentials(
                 args[0].encode("utf-8"), args[1].encode("utf-8"))
         except Exception as ex:
             print(str(ex))
@@ -920,7 +920,7 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("set-pairing-thread-credential")
                 return
-            self.devCtrl.SetThreadOperationalDataset(args[0].encode("utf-8"))
+            self.devCtrl.SetThreadOperationalDataset(bytes.fromhex(args[0]))
         except Exception as ex:
             print(str(ex))
             return

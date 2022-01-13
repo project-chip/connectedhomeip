@@ -68,6 +68,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
     case ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID:
         emberAfBridgedDeviceBasicClusterInitCallback(endpoint);
         break;
+    case ZCL_CHANNEL_CLUSTER_ID:
+        emberAfChannelClusterInitCallback(endpoint);
+        break;
     case ZCL_COLOR_CONTROL_CLUSTER_ID:
         emberAfColorControlClusterInitCallback(endpoint);
         break;
@@ -118,6 +121,9 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_LEVEL_CONTROL_CLUSTER_ID:
         emberAfLevelControlClusterInitCallback(endpoint);
+        break;
+    case ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID:
+        emberAfLocalizationConfigurationClusterInitCallback(endpoint);
         break;
     case ZCL_LOW_POWER_CLUSTER_ID:
         emberAfLowPowerClusterInitCallback(endpoint);
@@ -175,9 +181,6 @@ void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
         break;
     case ZCL_SWITCH_CLUSTER_ID:
         emberAfSwitchClusterInitCallback(endpoint);
-        break;
-    case ZCL_TV_CHANNEL_CLUSTER_ID:
-        emberAfTvChannelClusterInitCallback(endpoint);
         break;
     case ZCL_TARGET_NAVIGATOR_CLUSTER_ID:
         emberAfTargetNavigatorClusterInitCallback(endpoint);
@@ -280,6 +283,11 @@ void __attribute__((weak)) emberAfBridgedDeviceBasicClusterInitCallback(Endpoint
     // To prevent warning
     (void) endpoint;
 }
+void __attribute__((weak)) emberAfChannelClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
 void __attribute__((weak)) emberAfColorControlClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
@@ -361,6 +369,11 @@ void __attribute__((weak)) emberAfKeypadInputClusterInitCallback(EndpointId endp
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfLevelControlClusterInitCallback(EndpointId endpoint)
+{
+    // To prevent warning
+    (void) endpoint;
+}
+void __attribute__((weak)) emberAfLocalizationConfigurationClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -456,11 +469,6 @@ void __attribute__((weak)) emberAfSoftwareDiagnosticsClusterInitCallback(Endpoin
     (void) endpoint;
 }
 void __attribute__((weak)) emberAfSwitchClusterInitCallback(EndpointId endpoint)
-{
-    // To prevent warning
-    (void) endpoint;
-}
-void __attribute__((weak)) emberAfTvChannelClusterInitCallback(EndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;

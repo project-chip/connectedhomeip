@@ -63,13 +63,13 @@ private:
      *********************************************************/
 
 #ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
-    bool areStartUpOnOffServerAttributesTokenized(chip::EndpointId endpoint);
+    bool areStartUpOnOffServerAttributesNonVolatile(chip::EndpointId endpoint);
 #endif // ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
     EmberEventControl * getEventControl(chip::EndpointId endpoint);
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);
 
     /**********************************************************
-     * Attributes Decleration
+     * Attributes Declaration
      *********************************************************/
 
     static OnOffServer instance;
@@ -92,7 +92,7 @@ struct OnOffEffect
 
         /*
          * effectVariant's type depends on the effect effectIdentifier so we don't know the type at compile time.
-         * Casting to uint8_t for more flexibilty since the type can be OnOffDelayedAllOffEffectVariant or
+         * Casting to uint8_t for more flexibility since the type can be OnOffDelayedAllOffEffectVariant or
          * OnOffDelayedAllOffEffectVariant
          */
         uint8_t effectVariant = static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS));

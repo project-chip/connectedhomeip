@@ -317,26 +317,34 @@
 // Client attributes
 
 // Server attributes
-#define ZCL_DEFAULT_OTA_PROVIDER_ATTRIBUTE_ID (0x0001)
-#define ZCL_UPDATE_POSSIBLE_ATTRIBUTE_ID (0x0002)
+#define ZCL_DEFAULT_OTA_PROVIDERS_ATTRIBUTE_ID (0x0000)
+#define ZCL_UPDATE_POSSIBLE_ATTRIBUTE_ID (0x0001)
+#define ZCL_UPDATE_STATE_ATTRIBUTE_ID (0x0002)
+#define ZCL_UPDATE_STATE_PROGRESS_ATTRIBUTE_ID (0x0003)
 
 // Attribute ids for cluster: Localization Configuration
 
 // Client attributes
 
 // Server attributes
+#define ZCL_ACTIVE_LOCALE_ATTRIBUTE_ID (0x0001)
+#define ZCL_SUPPORTED_LOCALES_ATTRIBUTE_ID (0x0002)
 
 // Attribute ids for cluster: Localization Time Format
 
 // Client attributes
 
 // Server attributes
+#define ZCL_HOUR_FORMAT_ATTRIBUTE_ID (0x0000)
+#define ZCL_CALENDAR_TYPE_ATTRIBUTE_ID (0x0001)
+#define ZCL_SUPPORTED_CALENDAR_TYPES_ATTRIBUTE_ID (0x0002)
 
 // Attribute ids for cluster: Localization Unit
 
 // Client attributes
 
 // Server attributes
+#define ZCL_TEMPERATURE_UNIT_ATTRIBUTE_ID (0x0000)
 
 // Attribute ids for cluster: Power Source Configuration
 
@@ -600,8 +608,10 @@
 // Client attributes
 
 // Server attributes
-#define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
-#define ZCL_GROUPKEYS_ATTRIBUTE_ID (0x0001)
+#define ZCL_GROUP_KEY_MAP_ATTRIBUTE_ID (0x0000)
+#define ZCL_GROUP_TABLE_ATTRIBUTE_ID (0x0001)
+#define ZCL_MAX_GROUPS_PER_FABRIC_ATTRIBUTE_ID (0x0002)
+#define ZCL_MAX_GROUP_KEYS_PER_FABRIC_ATTRIBUTE_ID (0x0003)
 
 // Attribute ids for cluster: Fixed Label
 
@@ -740,12 +750,7 @@
 #define ZCL_WC_INSTALLED_CLOSED_LIMIT_LIFT_ATTRIBUTE_ID (0x0011)
 #define ZCL_WC_INSTALLED_OPEN_LIMIT_TILT_ATTRIBUTE_ID (0x0012)
 #define ZCL_WC_INSTALLED_CLOSED_LIMIT_TILT_ATTRIBUTE_ID (0x0013)
-#define ZCL_WC_VELOCITY_LIFT_ATTRIBUTE_ID (0x0014)
-#define ZCL_WC_ACCELERATION_TIME_LIFT_ATTRIBUTE_ID (0x0015)
-#define ZCL_WC_DECELERATION_TIME_LIFT_ATTRIBUTE_ID (0x0016)
 #define ZCL_WC_MODE_ATTRIBUTE_ID (0x0017)
-#define ZCL_WC_INTERMEDIATE_SETPOINTS_LIFT_ATTRIBUTE_ID (0x0018)
-#define ZCL_WC_INTERMEDIATE_SETPOINTS_TILT_ATTRIBUTE_ID (0x0019)
 #define ZCL_WC_SAFETY_STATUS_ATTRIBUTE_ID (0x001A)
 
 // Attribute ids for cluster: Barrier Control
@@ -1361,14 +1366,14 @@
 // Server attributes
 #define ZCL_WAKE_ON_LAN_MAC_ADDRESS_ATTRIBUTE_ID (0x0000)
 
-// Attribute ids for cluster: TV Channel
+// Attribute ids for cluster: Channel
 
 // Client attributes
 
 // Server attributes
-#define ZCL_TV_CHANNEL_LIST_ATTRIBUTE_ID (0x0000)
-#define ZCL_TV_CHANNEL_LINEUP_ATTRIBUTE_ID (0x0001)
-#define ZCL_TV_CHANNEL_CURRENT_CHANNEL_ATTRIBUTE_ID (0x0002)
+#define ZCL_CHANNEL_LIST_ATTRIBUTE_ID (0x0000)
+#define ZCL_CHANNEL_LINEUP_ATTRIBUTE_ID (0x0001)
+#define ZCL_CHANNEL_CURRENT_CHANNEL_ATTRIBUTE_ID (0x0002)
 
 // Attribute ids for cluster: Target Navigator
 
@@ -1416,7 +1421,7 @@
 // Client attributes
 
 // Server attributes
-#define ZCL_CONTENT_LAUNCHER_ACCEPTS_HEADER_ATTRIBUTE_ID (0x0000)
+#define ZCL_CONTENT_LAUNCHER_ACCEPT_HEADER_ATTRIBUTE_ID (0x0000)
 #define ZCL_CONTENT_LAUNCHER_SUPPORTED_STREAMING_PROTOCOLS_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Audio Output
@@ -1447,6 +1452,7 @@
 #define ZCL_APPLICATION_APP_ATTRIBUTE_ID (0x0004)
 #define ZCL_APPLICATION_STATUS_ATTRIBUTE_ID (0x0005)
 #define ZCL_APPLICATION_VERSION_ATTRIBUTE_ID (0x0006)
+#define ZCL_APPLICATION_ALLOWED_VENDOR_LIST_ATTRIBUTE_ID (0x0007)
 
 // Attribute ids for cluster: Account Login
 

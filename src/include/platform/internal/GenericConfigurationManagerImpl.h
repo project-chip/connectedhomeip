@@ -91,7 +91,9 @@ public:
     CHIP_ERROR GetRegulatoryLocation(uint8_t & location) override;
     CHIP_ERROR StoreRegulatoryLocation(uint8_t location) override;
     CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen) override;
+    CHIP_ERROR GetActiveLocale(char * buf, size_t bufSize, size_t & codeLen) override;
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override;
+    CHIP_ERROR StoreActiveLocale(const char * code, size_t codeLen) override;
     CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override;
     CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) override;
     CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
@@ -108,6 +110,10 @@ public:
     CHIP_ERROR GetLocalConfigDisabled(bool & disabled) override;
     CHIP_ERROR GetReachable(bool & reachable) override;
     CHIP_ERROR GetUniqueId(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetHourFormat(uint8_t & format) override;
+    CHIP_ERROR StoreHourFormat(uint8_t format) override;
+    CHIP_ERROR GetCalendarType(uint8_t & type) override;
+    CHIP_ERROR StoreCalendarType(uint8_t type) override;
     CHIP_ERROR RunUnitTests(void) override;
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;

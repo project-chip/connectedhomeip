@@ -37,6 +37,32 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace detail {
+// Structs shared across multiple clusters.
+namespace Structs {
+namespace LabelStruct {
+enum class Fields
+{
+    kLabel = 1,
+    kValue = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan label;
+    chip::CharSpan value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace LabelStruct
+} // namespace Structs
+} // namespace detail
+
 namespace PowerConfiguration {
 
 namespace Attributes {
@@ -728,9 +754,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -949,9 +975,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -1236,9 +1262,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -1701,9 +1727,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -2701,9 +2727,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -3088,9 +3114,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -3173,9 +3199,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -3708,9 +3734,9 @@ struct TypeInfo
 namespace OnLevel {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint8_t>;
-    using DecodableType    = DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnLevel::Id; }
@@ -3720,9 +3746,9 @@ struct TypeInfo
 namespace OnTransitionTime {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint16_t>;
-    using DecodableType    = DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnTransitionTime::Id; }
@@ -3732,9 +3758,9 @@ struct TypeInfo
 namespace OffTransitionTime {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint16_t>;
-    using DecodableType    = DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OffTransitionTime::Id; }
@@ -3744,9 +3770,9 @@ struct TypeInfo
 namespace DefaultMoveRate {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint8_t>;
-    using DecodableType    = DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultMoveRate::Id; }
@@ -3768,9 +3794,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -4083,9 +4109,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -4260,9 +4286,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -4434,9 +4460,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -5501,9 +5527,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -5958,9 +5984,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -6017,9 +6043,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PulseWidthModulation::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -6096,9 +6122,10 @@ namespace Attributes {
 namespace DeviceList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::DeviceType::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::DeviceType::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::DeviceType::DecodableType> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::Descriptor::Structs::DeviceType::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DeviceList::Id; }
@@ -6108,9 +6135,9 @@ struct TypeInfo
 namespace ServerList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::ClusterId>;
-    using DecodableType    = DataModel::DecodableList<chip::ClusterId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::ClusterId> &;
+    using Type             = chip::app::DataModel::List<const chip::ClusterId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::ClusterId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ClusterId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ServerList::Id; }
@@ -6120,9 +6147,9 @@ struct TypeInfo
 namespace ClientList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::ClusterId>;
-    using DecodableType    = DataModel::DecodableList<chip::ClusterId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::ClusterId> &;
+    using Type             = chip::app::DataModel::List<const chip::ClusterId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::ClusterId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ClusterId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClientList::Id; }
@@ -6132,9 +6159,9 @@ struct TypeInfo
 namespace PartsList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::EndpointId>;
-    using DecodableType    = DataModel::DecodableList<chip::EndpointId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::EndpointId> &;
+    using Type             = chip::app::DataModel::List<const chip::EndpointId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::EndpointId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::EndpointId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartsList::Id; }
@@ -6144,9 +6171,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -6304,9 +6331,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -6383,9 +6410,9 @@ enum class Fields
 struct Type
 {
 public:
-    DataModel::Nullable<uint32_t> cluster;
-    DataModel::Nullable<uint16_t> endpoint;
-    DataModel::Nullable<uint32_t> deviceType;
+    DataModel::Nullable<chip::ClusterId> cluster;
+    DataModel::Nullable<chip::EndpointId> endpoint;
+    DataModel::Nullable<chip::DeviceTypeId> deviceType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6457,9 +6484,11 @@ namespace Attributes {
 namespace Acl {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::AccessControlEntry::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::AccessControlEntry::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::AccessControlEntry::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Acl::Id; }
@@ -6469,9 +6498,11 @@ struct TypeInfo
 namespace Extension {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::ExtensionEntry::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::ExtensionEntry::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::ExtensionEntry::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Extension::Id; }
@@ -6481,9 +6512,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -6811,9 +6842,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -7488,9 +7519,11 @@ namespace Attributes {
 namespace ActionList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::ActionStruct::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::ActionStruct::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::ActionStruct::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::BridgedActions::Structs::ActionStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActionList::Id; }
@@ -7500,9 +7533,11 @@ struct TypeInfo
 namespace EndpointList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::EndpointListStruct::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::EndpointListStruct::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::EndpointListStruct::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EndpointList::Id; }
@@ -7524,9 +7559,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -7731,9 +7766,9 @@ struct TypeInfo
 namespace VendorID {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::VendorId;
+    using DecodableType    = chip::VendorId;
+    using DecodableArgType = chip::VendorId;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
@@ -7935,9 +7970,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -8128,9 +8163,6 @@ public:
 } // namespace Events
 } // namespace Basic
 namespace OtaSoftwareUpdateProvider {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAApplyUpdateAction
 enum class OTAApplyUpdateAction : uint8_t
 {
@@ -8138,12 +8170,6 @@ enum class OTAApplyUpdateAction : uint8_t
     kAwaitNextAction = 0x01,
     kDiscontinue     = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTAApplyUpdateAction            = EmberAfOTAApplyUpdateAction;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTADownloadProtocol
 enum class OTADownloadProtocol : uint8_t
 {
@@ -8152,9 +8178,6 @@ enum class OTADownloadProtocol : uint8_t
     kHttps           = 0x02,
     kVendorSpecific  = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTADownloadProtocol             = EmberAfOTADownloadProtocol;
-#endif
 // Enum for OTAQueryStatus
 enum class OTAQueryStatus : uint8_t
 {
@@ -8413,9 +8436,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -8463,24 +8486,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace OtaSoftwareUpdateProvider
 namespace OtaSoftwareUpdateRequestor {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for ChangeReasonEnum
-enum class ChangeReasonEnum : uint8_t
-{
-    kUnknown         = 0x00,
-    kSuccess         = 0x01,
-    kFailure         = 0x02,
-    kTimeOut         = 0x03,
-    kDelayByProvider = 0x04,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ChangeReasonEnum                = EmberAfChangeReasonEnum;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for OTAAnnouncementReason
 enum class OTAAnnouncementReason : uint8_t
 {
@@ -8488,14 +8493,17 @@ enum class OTAAnnouncementReason : uint8_t
     kUpdateAvailable       = 0x01,
     kUrgentUpdateAvailable = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTAAnnouncementReason           = EmberAfOTAAnnouncementReason;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for UpdateStateEnum
-enum class UpdateStateEnum : uint8_t
+// Enum for OTAChangeReasonEnum
+enum class OTAChangeReasonEnum : uint8_t
+{
+    kUnknown         = 0x00,
+    kSuccess         = 0x01,
+    kFailure         = 0x02,
+    kTimeOut         = 0x03,
+    kDelayByProvider = 0x04,
+};
+// Enum for OTAUpdateStateEnum
+enum class OTAUpdateStateEnum : uint8_t
 {
     kUnknown              = 0x00,
     kIdle                 = 0x01,
@@ -8507,9 +8515,32 @@ enum class UpdateStateEnum : uint8_t
     kRollingBack          = 0x07,
     kDelayedOnUserConsent = 0x08,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using UpdateStateEnum                 = EmberAfUpdateStateEnum;
-#endif
+
+namespace Structs {
+namespace ProviderLocation {
+enum class Fields
+{
+    kFabricIndex    = 0,
+    kProviderNodeID = 1,
+    kEndpoint       = 2,
+};
+
+struct Type
+{
+public:
+    chip::FabricIndex fabricIndex;
+    chip::NodeId providerNodeID;
+    chip::EndpointId endpoint;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
+};
+
+using DecodableType = Type;
+
+} // namespace ProviderLocation
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -8525,10 +8556,11 @@ namespace Commands {
 namespace AnnounceOtaProvider {
 enum class Fields
 {
-    kProviderLocation   = 0,
+    kProviderNodeId     = 0,
     kVendorId           = 1,
     kAnnouncementReason = 2,
     kMetadataForNode    = 3,
+    kEndpoint           = 4,
 };
 
 struct Type
@@ -8538,10 +8570,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AnnounceOtaProvider::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    chip::NodeId providerLocation;
+    chip::NodeId providerNodeId;
     chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
     Optional<chip::ByteSpan> metadataForNode;
+    chip::EndpointId endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -8556,10 +8589,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::AnnounceOtaProvider::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    chip::NodeId providerLocation;
+    chip::NodeId providerNodeId;
     chip::VendorId vendorId;
     OTAAnnouncementReason announcementReason;
     Optional<chip::ByteSpan> metadataForNode;
+    chip::EndpointId endpoint;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace AnnounceOtaProvider
@@ -8567,18 +8601,20 @@ public:
 
 namespace Attributes {
 
-namespace DefaultOtaProvider {
+namespace DefaultOtaProviders {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOtaProvider::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOtaProviders::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace DefaultOtaProvider
+} // namespace DefaultOtaProviders
 namespace UpdatePossible {
 struct TypeInfo
 {
@@ -8591,12 +8627,36 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UpdatePossible
+namespace UpdateState {
+struct TypeInfo
+{
+    using Type             = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using DecodableType    = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+    using DecodableArgType = chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UpdateState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UpdateState
+namespace UpdateStateProgress {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::UpdateStateProgress::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace UpdateStateProgress
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -8636,8 +8696,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::DefaultOtaProvider::TypeInfo::DecodableType defaultOtaProvider;
+        Attributes::DefaultOtaProviders::TypeInfo::DecodableType defaultOtaProviders;
         Attributes::UpdatePossible::TypeInfo::DecodableType updatePossible;
+        Attributes::UpdateState::TypeInfo::DecodableType updateState;
+        Attributes::UpdateStateProgress::TypeInfo::DecodableType updateStateProgress;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
@@ -8664,10 +8726,10 @@ public:
     static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    UpdateStateEnum previousState;
-    UpdateStateEnum newState;
-    ChangeReasonEnum reason;
-    uint32_t targetSoftwareVersion;
+    DataModel::Nullable<OTAUpdateStateEnum> previousState;
+    OTAUpdateStateEnum newState;
+    OTAChangeReasonEnum reason;
+    DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8679,10 +8741,10 @@ public:
     static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
 
-    UpdateStateEnum previousState;
-    UpdateStateEnum newState;
-    ChangeReasonEnum reason;
-    uint32_t targetSoftwareVersion;
+    DataModel::Nullable<OTAUpdateStateEnum> previousState;
+    OTAUpdateStateEnum newState;
+    OTAChangeReasonEnum reason;
+    DataModel::Nullable<uint32_t> targetSoftwareVersion;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8745,7 +8807,7 @@ public:
     uint32_t softwareVersion;
     uint64_t bytesDownloaded;
     uint8_t progressPercent;
-    int64_t platformCode;
+    DataModel::Nullable<int64_t> platformCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -8760,7 +8822,7 @@ public:
     uint32_t softwareVersion;
     uint64_t bytesDownloaded;
     uint8_t progressPercent;
-    int64_t platformCode;
+    DataModel::Nullable<int64_t> platformCode;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8771,12 +8833,36 @@ namespace LocalizationConfiguration {
 
 namespace Attributes {
 
+namespace ActiveLocale {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ActiveLocale::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ActiveLocale
+namespace SupportedLocales {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedLocales::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedLocales
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -8816,6 +8902,8 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::ActiveLocale::TypeInfo::DecodableType activeLocale;
+        Attributes::SupportedLocales::TypeInfo::DecodableType supportedLocales;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
@@ -8824,15 +8912,73 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace LocalizationConfiguration
 namespace LocalizationTimeFormat {
+// Enum for CalendarType
+enum class CalendarType : uint8_t
+{
+    kBuddhist  = 0x00,
+    kChinese   = 0x01,
+    kCoptic    = 0x02,
+    kEthiopian = 0x03,
+    kGregorian = 0x04,
+    kHebrew    = 0x05,
+    kIndian    = 0x06,
+    kIslamic   = 0x07,
+    kJapanese  = 0x08,
+    kKorean    = 0x09,
+    kPersian   = 0x0A,
+    kTaiwanese = 0x0B,
+};
+// Enum for HourFormat
+enum class HourFormat : uint8_t
+{
+    k12hr = 0x00,
+    k24hr = 0x01,
+};
 
 namespace Attributes {
 
+namespace HourFormat {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::HourFormat::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace HourFormat
+namespace CalendarType {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CalendarType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace CalendarType
+namespace SupportedCalendarTypes {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::LocalizationTimeFormat::CalendarType>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::LocalizationTimeFormat::CalendarType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::LocalizationTimeFormat::CalendarType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedCalendarTypes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace SupportedCalendarTypes
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -8872,6 +9018,9 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::HourFormat::TypeInfo::DecodableType hourFormat;
+        Attributes::CalendarType::TypeInfo::DecodableType calendarType;
+        Attributes::SupportedCalendarTypes::TypeInfo::DecodableType supportedCalendarTypes;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
@@ -8880,15 +9029,34 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace LocalizationTimeFormat
 namespace LocalizationUnit {
+// Enum for TempUnit
+enum class TempUnit : uint8_t
+{
+    kFahrenheit = 0x00,
+    kCelsius    = 0x01,
+    kKelvin     = 0x02,
+};
 
 namespace Attributes {
 
+namespace TemperatureUnit {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureUnit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace TemperatureUnit
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -8928,6 +9096,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
+        Attributes::TemperatureUnit::TypeInfo::DecodableType temperatureUnit;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
@@ -8942,9 +9111,9 @@ namespace Attributes {
 namespace Sources {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const uint8_t>;
-    using DecodableType    = DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const uint8_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Sources::Id; }
@@ -8954,9 +9123,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -9140,9 +9309,9 @@ struct TypeInfo
 namespace ActiveWiredFaults {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const uint8_t>;
-    using DecodableType    = DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const uint8_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveWiredFaults::Id; }
@@ -9236,9 +9405,9 @@ struct TypeInfo
 namespace ActiveBatteryFaults {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const uint8_t>;
-    using DecodableType    = DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const uint8_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatteryFaults::Id; }
@@ -9380,9 +9549,9 @@ struct TypeInfo
 namespace ActiveBatteryChargeFaults {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const uint8_t>;
-    using DecodableType    = DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const uint8_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatteryChargeFaults::Id; }
@@ -9392,9 +9561,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -9481,9 +9650,6 @@ enum class GeneralCommissioningError : uint8_t
     kInvalidAuthentication = 0x02,
     kNotCommissioning      = 0x03,
 };
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for RegulatoryLocationType
 enum class RegulatoryLocationType : uint8_t
 {
@@ -9491,9 +9657,6 @@ enum class RegulatoryLocationType : uint8_t
     kOutdoor       = 0x01,
     kIndoorOutdoor = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RegulatoryLocationType          = EmberAfRegulatoryLocationType;
-#endif
 
 namespace Structs {
 namespace BasicCommissioningInfoType {
@@ -9783,9 +9946,12 @@ struct TypeInfo
 namespace BasicCommissioningInfoList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::BasicCommissioningInfoType::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::BasicCommissioningInfoType::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::BasicCommissioningInfoType::DecodableType> &;
+    using Type =
+        chip::app::DataModel::List<const chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BasicCommissioningInfoList::Id; }
@@ -9819,9 +9985,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -9889,6 +10055,15 @@ enum class NetworkCommissioningStatus : uint8_t
     kIPV6Failed             = 0x0A,
     kIPBindFailed           = 0x0B,
     kUnknownError           = 0x0C,
+};
+// Enum for WiFiBand
+enum class WiFiBand : uint8_t
+{
+    k2g4  = 0x00,
+    k3g65 = 0x01,
+    k5g   = 0x02,
+    k6g   = 0x03,
+    k60g  = 0x04,
 };
 
 namespace Structs {
@@ -9961,8 +10136,8 @@ public:
     uint8_t security;
     chip::ByteSpan ssid;
     chip::ByteSpan bssid;
-    uint8_t channel;
-    uint32_t wiFiBand;
+    uint16_t channel;
+    WiFiBand wiFiBand;
     int8_t rssi;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -10078,8 +10253,8 @@ public:
 
     NetworkCommissioningStatus networkingStatus;
     chip::CharSpan debugText;
-    DataModel::List<const Structs::WiFiInterfaceScanResult::Type> wiFiScanResults;
-    DataModel::List<const Structs::ThreadInterfaceScanResult::Type> threadScanResults;
+    Optional<DataModel::List<const Structs::WiFiInterfaceScanResult::Type>> wiFiScanResults;
+    Optional<DataModel::List<const Structs::ThreadInterfaceScanResult::Type>> threadScanResults;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -10096,8 +10271,8 @@ public:
 
     NetworkCommissioningStatus networkingStatus;
     chip::CharSpan debugText;
-    DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType> wiFiScanResults;
-    DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType> threadScanResults;
+    Optional<DataModel::DecodableList<Structs::WiFiInterfaceScanResult::DecodableType>> wiFiScanResults;
+    Optional<DataModel::DecodableList<Structs::ThreadInterfaceScanResult::DecodableType>> threadScanResults;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ScanNetworksResponse
@@ -10374,9 +10549,11 @@ struct TypeInfo
 namespace Networks {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::NetworkInfo::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::NetworkInfo::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::NetworkInfo::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Networks::Id; }
@@ -10422,9 +10599,9 @@ struct TypeInfo
 namespace LastNetworkingStatus {
 struct TypeInfo
 {
-    using Type             = NetworkCommissioningStatus;
-    using DecodableType    = NetworkCommissioningStatus;
-    using DecodableArgType = NetworkCommissioningStatus;
+    using Type             = chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus;
+    using DecodableType    = chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus;
+    using DecodableArgType = chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastNetworkingStatus::Id; }
@@ -10458,9 +10635,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -10641,9 +10818,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -10812,9 +10989,11 @@ namespace Attributes {
 namespace NetworkInterfaces {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::NetworkInterfaceType::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::NetworkInterfaceType::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::NetworkInterfaceType::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NetworkInterfaces::Id; }
@@ -10872,9 +11051,9 @@ struct TypeInfo
 namespace ActiveHardwareFaults {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const uint8_t>;
-    using DecodableType    = DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const uint8_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveHardwareFaults::Id; }
@@ -10884,9 +11063,9 @@ struct TypeInfo
 namespace ActiveRadioFaults {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const uint8_t>;
-    using DecodableType    = DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const uint8_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveRadioFaults::Id; }
@@ -10896,9 +11075,9 @@ struct TypeInfo
 namespace ActiveNetworkFaults {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const uint8_t>;
-    using DecodableType    = DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const uint8_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaults::Id; }
@@ -10908,9 +11087,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -11207,9 +11386,11 @@ namespace Attributes {
 namespace ThreadMetrics {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::ThreadMetrics::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::ThreadMetrics::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::ThreadMetrics::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThreadMetrics::Id; }
@@ -11255,9 +11436,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -11649,9 +11830,11 @@ struct TypeInfo
 namespace NeighborTableList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::NeighborTable::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::NeighborTable::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::NeighborTable::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NeighborTableList::Id; }
@@ -11661,9 +11844,11 @@ struct TypeInfo
 namespace RouteTableList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::RouteTable::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::RouteTable::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::RouteTable::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RouteTableList::Id; }
@@ -12273,9 +12458,11 @@ struct TypeInfo
 namespace SecurityPolicy {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::SecurityPolicy::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::SecurityPolicy::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::SecurityPolicy::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SecurityPolicy::Id; }
@@ -12297,9 +12484,12 @@ struct TypeInfo
 namespace OperationalDatasetComponents {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::OperationalDatasetComponents::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::OperationalDatasetComponents::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::OperationalDatasetComponents::DecodableType> &;
+    using Type = chip::app::DataModel::List<
+        const chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalDatasetComponents::Id; }
@@ -12309,9 +12499,10 @@ struct TypeInfo
 namespace ActiveNetworkFaultsList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const NetworkFault>;
-    using DecodableType    = DataModel::DecodableList<NetworkFault>;
-    using DecodableArgType = const DataModel::DecodableList<NetworkFault> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaultsList::Id; }
@@ -12321,9 +12512,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -12718,9 +12909,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -13060,9 +13251,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -13125,9 +13316,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -13501,9 +13692,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -13608,9 +13799,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -14092,9 +14283,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -14738,9 +14929,11 @@ namespace Attributes {
 namespace FabricsList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::FabricDescriptor::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::FabricDescriptor::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::FabricDescriptor::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FabricsList::Id; }
@@ -14774,9 +14967,9 @@ struct TypeInfo
 namespace TrustedRootCertificates {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::ByteSpan>;
-    using DecodableType    = DataModel::DecodableList<chip::ByteSpan>;
-    using DecodableArgType = const DataModel::DecodableList<chip::ByteSpan> &;
+    using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TrustedRootCertificates::Id; }
@@ -14798,9 +14991,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -14861,46 +15054,84 @@ enum class GroupKeySecurityPolicy : uint8_t
 };
 
 namespace Structs {
-namespace GroupKey {
+namespace GroupInfo {
 enum class Fields
 {
-    kVendorId               = 1,
-    kGroupKeyIndex          = 2,
-    kGroupKeyRoot           = 3,
-    kGroupKeyEpochStartTime = 4,
-    kGroupKeySecurityPolicy = 5,
+    kFabricIndex = 0,
+    kGroupId     = 1,
+    kEndpoints   = 2,
+    kGroupName   = 3,
 };
 
 struct Type
 {
 public:
-    uint16_t vendorId;
-    uint16_t groupKeyIndex;
-    chip::ByteSpan groupKeyRoot;
-    uint64_t groupKeyEpochStartTime;
-    GroupKeySecurityPolicy groupKeySecurityPolicy;
+    uint16_t fabricIndex;
+    uint16_t groupId;
+    DataModel::List<const uint16_t> endpoints;
+    chip::CharSpan groupName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    uint16_t fabricIndex;
+    uint16_t groupId;
+    DataModel::DecodableList<uint16_t> endpoints;
+    chip::CharSpan groupName;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace GroupInfo
+namespace GroupKey {
+enum class Fields
+{
+    kFabricIndex   = 0,
+    kGroupId       = 1,
+    kGroupKeySetID = 2,
+};
+
+struct Type
+{
+public:
+    chip::FabricIndex fabricIndex;
+    uint16_t groupId;
+    uint16_t groupKeySetID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
 using DecodableType = Type;
 
 } // namespace GroupKey
-namespace GroupState {
+namespace GroupKeySet {
 enum class Fields
 {
-    kVendorId         = 1,
-    kVendorGroupId    = 2,
-    kGroupKeySetIndex = 3,
+    kGroupKeySetID   = 0,
+    kSecurityPolicy  = 1,
+    kEpochKey0       = 2,
+    kEpochStartTime0 = 3,
+    kEpochKey1       = 4,
+    kEpochStartTime1 = 5,
+    kEpochKey2       = 6,
+    kEpochStartTime2 = 7,
 };
 
 struct Type
 {
 public:
-    uint16_t vendorId;
-    uint16_t vendorGroupId;
-    uint16_t groupKeySetIndex;
+    uint16_t groupKeySetID;
+    GroupKeySecurityPolicy securityPolicy;
+    chip::ByteSpan epochKey0;
+    uint64_t epochStartTime0;
+    chip::ByteSpan epochKey1;
+    uint64_t epochStartTime1;
+    chip::ByteSpan epochKey2;
+    uint64_t epochStartTime2;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -14908,41 +15139,299 @@ public:
 
 using DecodableType = Type;
 
-} // namespace GroupState
+} // namespace GroupKeySet
 } // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace KeySetWrite {
+struct Type;
+struct DecodableType;
+} // namespace KeySetWrite
+
+namespace KeySetRead {
+struct Type;
+struct DecodableType;
+} // namespace KeySetRead
+
+namespace KeySetReadResponse {
+struct Type;
+struct DecodableType;
+} // namespace KeySetReadResponse
+
+namespace KeySetRemove {
+struct Type;
+struct DecodableType;
+} // namespace KeySetRemove
+
+namespace KeySetReadAllIndices {
+struct Type;
+struct DecodableType;
+} // namespace KeySetReadAllIndices
+
+namespace KeySetReadAllIndicesResponse {
+struct Type;
+struct DecodableType;
+} // namespace KeySetReadAllIndicesResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace KeySetWrite {
+enum class Fields
+{
+    kGroupKeySet = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::Type groupKeySet;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::DecodableType groupKeySet;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetWrite
+namespace KeySetRead {
+enum class Fields
+{
+    kGroupKeySetID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRead::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRead::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetRead
+namespace KeySetReadResponse {
+enum class Fields
+{
+    kGroupKeySet = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::Type groupKeySet;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::DecodableType groupKeySet;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetReadResponse
+namespace KeySetRemove {
+enum class Fields
+{
+    kGroupKeySetID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRemove::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRemove::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetRemove
+namespace KeySetReadAllIndices {
+enum class Fields
+{
+    kGroupKeySetIDs = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::List<const uint16_t> groupKeySetIDs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::DecodableList<uint16_t> groupKeySetIDs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetReadAllIndices
+namespace KeySetReadAllIndicesResponse {
+enum class Fields
+{
+    kGroupKeySetIDs = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndicesResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::List<const uint16_t> groupKeySetIDs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndicesResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::DecodableList<uint16_t> groupKeySetIDs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetReadAllIndicesResponse
+} // namespace Commands
 
 namespace Attributes {
 
-namespace Groups {
+namespace GroupKeyMap {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::GroupState::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::GroupState::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::GroupState::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Groups::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeyMap::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace Groups
-namespace GroupKeys {
+} // namespace GroupKeyMap
+namespace GroupTable {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::GroupKey::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::GroupKey::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::GroupKey::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeys::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::GroupTable::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace GroupKeys
+} // namespace GroupTable
+namespace MaxGroupsPerFabric {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxGroupsPerFabric::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxGroupsPerFabric
+namespace MaxGroupKeysPerFabric {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxGroupKeysPerFabric::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace MaxGroupKeysPerFabric
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -14982,8 +15471,10 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::Groups::TypeInfo::DecodableType groups;
-        Attributes::GroupKeys::TypeInfo::DecodableType groupKeys;
+        Attributes::GroupKeyMap::TypeInfo::DecodableType groupKeyMap;
+        Attributes::GroupTable::TypeInfo::DecodableType groupTable;
+        Attributes::MaxGroupsPerFabric::TypeInfo::DecodableType maxGroupsPerFabric;
+        Attributes::MaxGroupKeysPerFabric::TypeInfo::DecodableType maxGroupKeysPerFabric;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
@@ -14994,26 +15485,7 @@ struct TypeInfo
 namespace FixedLabel {
 
 namespace Structs {
-namespace LabelStruct {
-enum class Fields
-{
-    kLabel = 1,
-    kValue = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan label;
-    chip::CharSpan value;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-
-using DecodableType = Type;
-
-} // namespace LabelStruct
+namespace LabelStruct = Clusters::detail::Structs::LabelStruct;
 } // namespace Structs
 
 namespace Attributes {
@@ -15021,9 +15493,10 @@ namespace Attributes {
 namespace LabelList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::LabelStruct::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::LabelStruct::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::LabelStruct::DecodableType> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::FixedLabel::Structs::LabelStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LabelList::Id; }
@@ -15033,9 +15506,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -15086,26 +15559,7 @@ struct TypeInfo
 namespace UserLabel {
 
 namespace Structs {
-namespace LabelStruct {
-enum class Fields
-{
-    kLabel = 1,
-    kValue = 2,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan label;
-    chip::CharSpan value;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-
-using DecodableType = Type;
-
-} // namespace LabelStruct
+namespace LabelStruct = Clusters::detail::Structs::LabelStruct;
 } // namespace Structs
 
 namespace Attributes {
@@ -15113,9 +15567,10 @@ namespace Attributes {
 namespace LabelList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::LabelStruct::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::LabelStruct::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::LabelStruct::DecodableType> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::UserLabel::Structs::LabelStruct::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LabelList::Id; }
@@ -15125,9 +15580,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -15182,9 +15637,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -15238,9 +15693,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyDiscovery::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -15294,9 +15749,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ProxyValid::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -15362,9 +15817,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -15556,9 +16011,11 @@ struct TypeInfo
 namespace SupportedModes {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::ModeOptionStruct::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::ModeOptionStruct::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::ModeOptionStruct::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
@@ -15604,9 +16061,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -15725,9 +16182,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -18099,9 +18556,9 @@ namespace Attributes {
 namespace LockState {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<DlLockState>;
-    using DecodableType    = DataModel::Nullable<DlLockState>;
-    using DecodableArgType = const DataModel::Nullable<DlLockState> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LockState::Id; }
@@ -18111,9 +18568,9 @@ struct TypeInfo
 namespace LockType {
 struct TypeInfo
 {
-    using Type             = DlLockType;
-    using DecodableType    = DlLockType;
-    using DecodableArgType = DlLockType;
+    using Type             = chip::app::Clusters::DoorLock::DlLockType;
+    using DecodableType    = chip::app::Clusters::DoorLock::DlLockType;
+    using DecodableArgType = chip::app::Clusters::DoorLock::DlLockType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LockType::Id; }
@@ -18135,9 +18592,9 @@ struct TypeInfo
 namespace DoorState {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<DlDoorState>;
-    using DecodableType    = DataModel::Nullable<DlDoorState>;
-    using DecodableArgType = const DataModel::Nullable<DlDoorState> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DoorState::Id; }
@@ -18387,9 +18844,9 @@ struct TypeInfo
 namespace OperatingMode {
 struct TypeInfo
 {
-    using Type             = DlOperatingMode;
-    using DecodableType    = DlOperatingMode;
-    using DecodableArgType = DlOperatingMode;
+    using Type             = chip::app::Clusters::DoorLock::DlOperatingMode;
+    using DecodableType    = chip::app::Clusters::DoorLock::DlOperatingMode;
+    using DecodableArgType = chip::app::Clusters::DoorLock::DlOperatingMode;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperatingMode::Id; }
@@ -18639,9 +19096,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -18965,6 +19422,16 @@ enum class WcConfigStatus : uint8_t
     kTiltEncoderControlled     = 0x40,
 };
 
+// Bitmap for WcFeature
+enum class WcFeature : uint32_t
+{
+    kLift              = 0x1,
+    kTilt              = 0x2,
+    kPositionAwareLift = 0x4,
+    kAbsolutePosition  = 0x8,
+    kPositionAwareTilt = 0x10,
+};
+
 // Bitmap for WcMode
 enum class WcMode : uint8_t
 {
@@ -18997,16 +19464,6 @@ enum class WcSafetyStatus : uint16_t
     kHardwareFailure     = 0x200,
     kManualOperation     = 0x400,
     kProtection          = 0x800,
-};
-
-// Bitmap for WindowCoveringFeature
-enum class WindowCoveringFeature : uint32_t
-{
-    kLift              = 0x1,
-    kTilt              = 0x2,
-    kPositionAwareLift = 0x4,
-    kAbsolutePosition  = 0x8,
-    kPositionAwareTilt = 0x10,
 };
 
 namespace Commands {
@@ -19180,8 +19637,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToLiftPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    uint8_t liftPercentageValue;
-    uint16_t liftPercent100thsValue;
+    chip::Percent liftPercentageValue;
+    chip::Percent100ths liftPercent100thsValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -19196,8 +19653,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToLiftPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    uint8_t liftPercentageValue;
-    uint16_t liftPercent100thsValue;
+    chip::Percent liftPercentageValue;
+    chip::Percent100ths liftPercent100thsValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GoToLiftPercentage
@@ -19247,8 +19704,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToTiltPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    uint8_t tiltPercentageValue;
-    uint16_t tiltPercent100thsValue;
+    chip::Percent tiltPercentageValue;
+    chip::Percent100ths tiltPercent100thsValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -19263,8 +19720,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GoToTiltPercentage::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
 
-    uint8_t tiltPercentageValue;
-    uint16_t tiltPercent100thsValue;
+    chip::Percent tiltPercentageValue;
+    chip::Percent100ths tiltPercent100thsValue;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GoToTiltPercentage
@@ -19311,9 +19768,9 @@ struct TypeInfo
 namespace CurrentPositionLift {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLift::Id; }
@@ -19323,9 +19780,9 @@ struct TypeInfo
 namespace CurrentPositionTilt {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTilt::Id; }
@@ -19371,9 +19828,9 @@ struct TypeInfo
 namespace CurrentPositionLiftPercentage {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercentage::Id; }
@@ -19383,9 +19840,9 @@ struct TypeInfo
 namespace CurrentPositionTiltPercentage {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercentage::Id; }
@@ -19407,9 +19864,9 @@ struct TypeInfo
 namespace TargetPositionLiftPercent100ths {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent100ths> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionLiftPercent100ths::Id; }
@@ -19419,9 +19876,9 @@ struct TypeInfo
 namespace TargetPositionTiltPercent100ths {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent100ths> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionTiltPercent100ths::Id; }
@@ -19443,9 +19900,9 @@ struct TypeInfo
 namespace CurrentPositionLiftPercent100ths {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent100ths> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercent100ths::Id; }
@@ -19455,9 +19912,9 @@ struct TypeInfo
 namespace CurrentPositionTiltPercent100ths {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::Percent100ths>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::Percent100ths> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercent100ths::Id; }
@@ -19512,42 +19969,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstalledClosedLimitTilt
-namespace VelocityLift {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::VelocityLift::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace VelocityLift
-namespace AccelerationTimeLift {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AccelerationTimeLift::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AccelerationTimeLift
-namespace DecelerationTimeLift {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::DecelerationTimeLift::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace DecelerationTimeLift
 namespace Mode {
 struct TypeInfo
 {
@@ -19560,30 +19981,6 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Mode
-namespace IntermediateSetpointsLift {
-struct TypeInfo
-{
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::IntermediateSetpointsLift::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace IntermediateSetpointsLift
-namespace IntermediateSetpointsTilt {
-struct TypeInfo
-{
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::IntermediateSetpointsTilt::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace IntermediateSetpointsTilt
 namespace SafetyStatus {
 struct TypeInfo
 {
@@ -19599,9 +19996,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -19661,12 +20058,7 @@ struct TypeInfo
         Attributes::InstalledClosedLimitLift::TypeInfo::DecodableType installedClosedLimitLift;
         Attributes::InstalledOpenLimitTilt::TypeInfo::DecodableType installedOpenLimitTilt;
         Attributes::InstalledClosedLimitTilt::TypeInfo::DecodableType installedClosedLimitTilt;
-        Attributes::VelocityLift::TypeInfo::DecodableType velocityLift;
-        Attributes::AccelerationTimeLift::TypeInfo::DecodableType accelerationTimeLift;
-        Attributes::DecelerationTimeLift::TypeInfo::DecodableType decelerationTimeLift;
         Attributes::Mode::TypeInfo::DecodableType mode;
-        Attributes::IntermediateSetpointsLift::TypeInfo::DecodableType intermediateSetpointsLift;
-        Attributes::IntermediateSetpointsTilt::TypeInfo::DecodableType intermediateSetpointsTilt;
         Attributes::SafetyStatus::TypeInfo::DecodableType safetyStatus;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
@@ -19880,9 +20272,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -20194,9 +20586,9 @@ struct TypeInfo
 namespace LifetimeRunningHours {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint32_t>;
-    using DecodableType    = DataModel::Nullable<uint32_t>;
-    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeRunningHours::Id; }
@@ -20218,9 +20610,9 @@ struct TypeInfo
 namespace LifetimeEnergyConsumed {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint32_t>;
-    using DecodableType    = DataModel::Nullable<uint32_t>;
-    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeEnergyConsumed::Id; }
@@ -20266,9 +20658,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -21682,9 +22074,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -21805,9 +22197,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -21959,9 +22351,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -22059,9 +22451,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -23790,9 +24182,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -24090,9 +24482,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -24168,9 +24560,9 @@ namespace Attributes {
 namespace MeasuredValue {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint16_t>;
-    using DecodableType    = DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
@@ -24180,9 +24572,9 @@ struct TypeInfo
 namespace MinMeasuredValue {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint16_t>;
-    using DecodableType    = DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
@@ -24192,9 +24584,9 @@ struct TypeInfo
 namespace MaxMeasuredValue {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint16_t>;
-    using DecodableType    = DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
@@ -24216,9 +24608,9 @@ struct TypeInfo
 namespace LightSensorType {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint8_t>;
-    using DecodableType    = DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LightSensorType::Id; }
@@ -24228,9 +24620,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -24337,9 +24729,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -24505,9 +24897,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -24618,9 +25010,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -24726,9 +25118,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -24930,9 +25322,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -25047,9 +25439,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -25155,9 +25547,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -25263,9 +25655,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -25371,9 +25763,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -25479,9 +25871,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -25587,9 +25979,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -25695,9 +26087,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -25803,9 +26195,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -25911,9 +26303,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -26019,9 +26411,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -26127,9 +26519,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -26235,9 +26627,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -26343,9 +26735,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -26451,9 +26843,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -26559,9 +26951,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -26667,9 +27059,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -26775,9 +27167,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -26883,9 +27275,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -26991,9 +27383,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -27099,9 +27491,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -27207,9 +27599,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -27315,9 +27707,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -27423,9 +27815,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -27531,9 +27923,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -27639,9 +28031,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -27747,9 +28139,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -27855,9 +28247,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -27963,9 +28355,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -28071,9 +28463,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -28179,9 +28571,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -28651,9 +29043,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -29640,9 +30032,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -29815,9 +30207,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -29884,9 +30276,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -29934,21 +30326,21 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace WakeOnLan
-namespace TvChannel {
-// Enum for TvChannelErrorType
-enum class TvChannelErrorType : uint8_t
+namespace Channel {
+// Enum for ErrorTypeEnum
+enum class ErrorTypeEnum : uint8_t
 {
     kMultipleMatches = 0x00,
     kNoMatches       = 0x01,
 };
-// Enum for TvChannelLineupInfoType
-enum class TvChannelLineupInfoType : uint8_t
+// Enum for LineupInfoTypeEnum
+enum class LineupInfoTypeEnum : uint8_t
 {
     kMso = 0x00,
 };
 
 namespace Structs {
-namespace TvChannelInfo {
+namespace ChannelInfo {
 enum class Fields
 {
     kMajorNumber       = 1,
@@ -29973,8 +30365,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace TvChannelInfo
-namespace TvChannelLineupInfo {
+} // namespace ChannelInfo
+namespace LineupInfo {
 enum class Fields
 {
     kOperatorName   = 1,
@@ -29989,7 +30381,7 @@ public:
     chip::CharSpan operatorName;
     chip::CharSpan lineupName;
     chip::CharSpan postalCode;
-    TvChannelLineupInfoType lineupInfoType;
+    LineupInfoTypeEnum lineupInfoType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -29997,36 +30389,36 @@ public:
 
 using DecodableType = Type;
 
-} // namespace TvChannelLineupInfo
+} // namespace LineupInfo
 } // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace ChangeChannel {
+namespace ChangeChannelRequest {
 struct Type;
 struct DecodableType;
-} // namespace ChangeChannel
+} // namespace ChangeChannelRequest
 
 namespace ChangeChannelResponse {
 struct Type;
 struct DecodableType;
 } // namespace ChangeChannelResponse
 
-namespace ChangeChannelByNumber {
+namespace ChangeChannelByNumberRequest {
 struct Type;
 struct DecodableType;
-} // namespace ChangeChannelByNumber
+} // namespace ChangeChannelByNumberRequest
 
-namespace SkipChannel {
+namespace SkipChannelRequest {
 struct Type;
 struct DecodableType;
-} // namespace SkipChannel
+} // namespace SkipChannelRequest
 
 } // namespace Commands
 
 namespace Commands {
-namespace ChangeChannel {
+namespace ChangeChannelRequest {
 enum class Fields
 {
     kMatch = 0,
@@ -30036,14 +30428,14 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeChannelRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     chip::CharSpan match;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType;
+    using ResponseType = Clusters::Channel::Commands::ChangeChannelResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -30051,13 +30443,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeChannelRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     chip::CharSpan match;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ChangeChannel
+}; // namespace ChangeChannelRequest
 namespace ChangeChannelResponse {
 enum class Fields
 {
@@ -30070,10 +30462,10 @@ struct Type
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    Structs::TvChannelInfo::Type channelMatch;
-    TvChannelErrorType errorType;
+    Structs::ChannelInfo::Type channelMatch;
+    ErrorTypeEnum errorType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -30086,14 +30478,14 @@ struct DecodableType
 {
 public:
     static constexpr CommandId GetCommandId() { return Commands::ChangeChannelResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
-    Structs::TvChannelInfo::DecodableType channelMatch;
-    TvChannelErrorType errorType;
+    Structs::ChannelInfo::DecodableType channelMatch;
+    ErrorTypeEnum errorType;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ChangeChannelResponse
-namespace ChangeChannelByNumber {
+namespace ChangeChannelByNumberRequest {
 enum class Fields
 {
     kMajorNumber = 0,
@@ -30104,8 +30496,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeChannelByNumber::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeChannelByNumberRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     uint16_t majorNumber;
     uint16_t minorNumber;
@@ -30120,15 +30512,15 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeChannelByNumber::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ChangeChannelByNumberRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     uint16_t majorNumber;
     uint16_t minorNumber;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ChangeChannelByNumber
-namespace SkipChannel {
+}; // namespace ChangeChannelByNumberRequest
+namespace SkipChannelRequest {
 enum class Fields
 {
     kCount = 0,
@@ -30138,8 +30530,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipChannelRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     uint16_t count;
 
@@ -30153,13 +30545,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SkipChannel::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipChannelRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
     uint16_t count;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SkipChannel
+}; // namespace SkipChannelRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -30167,11 +30559,12 @@ namespace Attributes {
 namespace ChannelList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::TvChannelInfo::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::TvChannelInfo::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::TvChannelInfo::DecodableType> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::Channel::Structs::ChannelInfo::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30179,11 +30572,11 @@ struct TypeInfo
 namespace ChannelLineup {
 struct TypeInfo
 {
-    using Type             = Structs::TvChannelLineupInfo::Type;
-    using DecodableType    = Structs::TvChannelLineupInfo::DecodableType;
-    using DecodableArgType = const Structs::TvChannelLineupInfo::DecodableType &;
+    using Type             = chip::app::Clusters::Channel::Structs::LineupInfo::Type;
+    using DecodableType    = chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::Channel::Structs::LineupInfo::DecodableType &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelLineup::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30191,11 +30584,11 @@ struct TypeInfo
 namespace CurrentChannel {
 struct TypeInfo
 {
-    using Type             = Structs::TvChannelInfo::Type;
-    using DecodableType    = Structs::TvChannelInfo::DecodableType;
-    using DecodableArgType = const Structs::TvChannelInfo::DecodableType &;
+    using Type             = chip::app::Clusters::Channel::Structs::ChannelInfo::Type;
+    using DecodableType    = chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentChannel::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30203,11 +30596,11 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30219,7 +30612,7 @@ struct TypeInfo
     using DecodableType    = uint32_t;
     using DecodableArgType = uint32_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30231,7 +30624,7 @@ struct TypeInfo
     using DecodableType    = uint16_t;
     using DecodableArgType = uint16_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -30241,7 +30634,7 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::Channel::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
@@ -30254,10 +30647,10 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-} // namespace TvChannel
+} // namespace Channel
 namespace TargetNavigator {
-// Enum for NavigateTargetStatus
-enum class NavigateTargetStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,
@@ -30265,7 +30658,7 @@ enum class NavigateTargetStatus : uint8_t
 };
 
 namespace Structs {
-namespace NavigateTargetTargetInfo {
+namespace TargetInfo {
 enum class Fields
 {
     kIdentifier = 1,
@@ -30284,16 +30677,16 @@ public:
 
 using DecodableType = Type;
 
-} // namespace NavigateTargetTargetInfo
+} // namespace TargetInfo
 } // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace NavigateTarget {
+namespace NavigateTargetRequest {
 struct Type;
 struct DecodableType;
-} // namespace NavigateTarget
+} // namespace NavigateTargetRequest
 
 namespace NavigateTargetResponse {
 struct Type;
@@ -30303,7 +30696,7 @@ struct DecodableType;
 } // namespace Commands
 
 namespace Commands {
-namespace NavigateTarget {
+namespace NavigateTargetRequest {
 enum class Fields
 {
     kTarget = 0,
@@ -30314,7 +30707,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::NavigateTarget::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NavigateTargetRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     uint8_t target;
@@ -30330,14 +30723,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::NavigateTarget::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NavigateTargetRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
     uint8_t target;
     chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace NavigateTarget
+}; // namespace NavigateTargetRequest
 namespace NavigateTargetResponse {
 enum class Fields
 {
@@ -30352,7 +30745,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
-    NavigateTargetStatus status;
+    StatusEnum status;
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -30368,7 +30761,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::NavigateTargetResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
 
-    NavigateTargetStatus status;
+    StatusEnum status;
     chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -30380,9 +30773,11 @@ namespace Attributes {
 namespace TargetNavigatorList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::NavigateTargetTargetInfo::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::NavigateTargetTargetInfo::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::NavigateTargetTargetInfo::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetNavigatorList::Id; }
@@ -30404,9 +30799,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -30456,25 +30851,16 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace TargetNavigator
 namespace MediaPlayback {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for MediaPlaybackState
-enum class MediaPlaybackState : uint8_t
+// Enum for PlaybackStateEnum
+enum class PlaybackStateEnum : uint8_t
 {
     kPlaying    = 0x00,
     kPaused     = 0x01,
     kNotPlaying = 0x02,
     kBuffering  = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MediaPlaybackState              = EmberAfMediaPlaybackState;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for MediaPlaybackStatus
-enum class MediaPlaybackStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess                = 0x00,
     kInvalidStateForCommand = 0x01,
@@ -30483,12 +30869,9 @@ enum class MediaPlaybackStatus : uint8_t
     kSpeedOutOfRange        = 0x04,
     kSeekOutOfRange         = 0x05,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MediaPlaybackStatus             = EmberAfMediaPlaybackStatus;
-#endif
 
 namespace Structs {
-namespace MediaPlaybackPosition {
+namespace PlaybackPosition {
 enum class Fields
 {
     kUpdatedAt = 1,
@@ -30507,126 +30890,76 @@ public:
 
 using DecodableType = Type;
 
-} // namespace MediaPlaybackPosition
+} // namespace PlaybackPosition
 } // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace MediaPlay {
+namespace PlayRequest {
 struct Type;
 struct DecodableType;
-} // namespace MediaPlay
+} // namespace PlayRequest
 
-namespace MediaPlayResponse {
+namespace PauseRequest {
 struct Type;
 struct DecodableType;
-} // namespace MediaPlayResponse
+} // namespace PauseRequest
 
-namespace MediaPause {
+namespace StopRequest {
 struct Type;
 struct DecodableType;
-} // namespace MediaPause
+} // namespace StopRequest
 
-namespace MediaPauseResponse {
+namespace StartOverRequest {
 struct Type;
 struct DecodableType;
-} // namespace MediaPauseResponse
+} // namespace StartOverRequest
 
-namespace MediaStop {
+namespace PreviousRequest {
 struct Type;
 struct DecodableType;
-} // namespace MediaStop
+} // namespace PreviousRequest
 
-namespace MediaStopResponse {
+namespace NextRequest {
 struct Type;
 struct DecodableType;
-} // namespace MediaStopResponse
+} // namespace NextRequest
 
-namespace MediaStartOver {
+namespace RewindRequest {
 struct Type;
 struct DecodableType;
-} // namespace MediaStartOver
+} // namespace RewindRequest
 
-namespace MediaStartOverResponse {
+namespace FastForwardRequest {
 struct Type;
 struct DecodableType;
-} // namespace MediaStartOverResponse
+} // namespace FastForwardRequest
 
-namespace MediaPrevious {
+namespace SkipForwardRequest {
 struct Type;
 struct DecodableType;
-} // namespace MediaPrevious
+} // namespace SkipForwardRequest
 
-namespace MediaPreviousResponse {
+namespace SkipBackwardRequest {
 struct Type;
 struct DecodableType;
-} // namespace MediaPreviousResponse
+} // namespace SkipBackwardRequest
 
-namespace MediaNext {
+namespace PlaybackResponse {
 struct Type;
 struct DecodableType;
-} // namespace MediaNext
+} // namespace PlaybackResponse
 
-namespace MediaNextResponse {
+namespace SeekRequest {
 struct Type;
 struct DecodableType;
-} // namespace MediaNextResponse
-
-namespace MediaRewind {
-struct Type;
-struct DecodableType;
-} // namespace MediaRewind
-
-namespace MediaRewindResponse {
-struct Type;
-struct DecodableType;
-} // namespace MediaRewindResponse
-
-namespace MediaFastForward {
-struct Type;
-struct DecodableType;
-} // namespace MediaFastForward
-
-namespace MediaFastForwardResponse {
-struct Type;
-struct DecodableType;
-} // namespace MediaFastForwardResponse
-
-namespace MediaSkipForward {
-struct Type;
-struct DecodableType;
-} // namespace MediaSkipForward
-
-namespace MediaSkipForwardResponse {
-struct Type;
-struct DecodableType;
-} // namespace MediaSkipForwardResponse
-
-namespace MediaSkipBackward {
-struct Type;
-struct DecodableType;
-} // namespace MediaSkipBackward
-
-namespace MediaSkipBackwardResponse {
-struct Type;
-struct DecodableType;
-} // namespace MediaSkipBackwardResponse
-
-namespace MediaSeek {
-struct Type;
-struct DecodableType;
-} // namespace MediaSeek
-
-namespace MediaSeekResponse {
-struct Type;
-struct DecodableType;
-} // namespace MediaSeekResponse
+} // namespace SeekRequest
 
 } // namespace Commands
 
 namespace Commands {
-namespace MediaPlay {
+namespace PlayRequest {
 enum class Fields
 {
 };
@@ -30635,12 +30968,12 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaPlay::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PlayRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -30648,45 +30981,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaPlay::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PlayRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaPlay
-namespace MediaPlayResponse {
-enum class Fields
-{
-    kMediaPlaybackStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaPlayResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaPlayResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace MediaPlayResponse
-namespace MediaPause {
+}; // namespace PlayRequest
+namespace PauseRequest {
 enum class Fields
 {
 };
@@ -30695,12 +30996,12 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaPause::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PauseRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -30708,45 +31009,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaPause::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PauseRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaPause
-namespace MediaPauseResponse {
-enum class Fields
-{
-    kMediaPlaybackStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaPauseResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaPauseResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace MediaPauseResponse
-namespace MediaStop {
+}; // namespace PauseRequest
+namespace StopRequest {
 enum class Fields
 {
 };
@@ -30755,12 +31024,12 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaStop::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StopRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -30768,45 +31037,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaStop::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StopRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaStop
-namespace MediaStopResponse {
-enum class Fields
-{
-    kMediaPlaybackStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaStopResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaStopResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace MediaStopResponse
-namespace MediaStartOver {
+}; // namespace StopRequest
+namespace StartOverRequest {
 enum class Fields
 {
 };
@@ -30815,12 +31052,12 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaStartOver::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StartOverRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -30828,45 +31065,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaStartOver::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StartOverRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaStartOver
-namespace MediaStartOverResponse {
-enum class Fields
-{
-    kMediaPlaybackStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaStartOverResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaStartOverResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace MediaStartOverResponse
-namespace MediaPrevious {
+}; // namespace StartOverRequest
+namespace PreviousRequest {
 enum class Fields
 {
 };
@@ -30875,12 +31080,12 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaPrevious::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PreviousRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -30888,45 +31093,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaPrevious::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PreviousRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaPrevious
-namespace MediaPreviousResponse {
-enum class Fields
-{
-    kMediaPlaybackStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaPreviousResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaPreviousResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace MediaPreviousResponse
-namespace MediaNext {
+}; // namespace PreviousRequest
+namespace NextRequest {
 enum class Fields
 {
 };
@@ -30935,12 +31108,12 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaNext::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NextRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -30948,45 +31121,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaNext::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::NextRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaNext
-namespace MediaNextResponse {
-enum class Fields
-{
-    kMediaPlaybackStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaNextResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaNextResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace MediaNextResponse
-namespace MediaRewind {
+}; // namespace NextRequest
+namespace RewindRequest {
 enum class Fields
 {
 };
@@ -30995,12 +31136,12 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaRewind::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RewindRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -31008,45 +31149,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaRewind::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RewindRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaRewind
-namespace MediaRewindResponse {
-enum class Fields
-{
-    kMediaPlaybackStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaRewindResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaRewindResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace MediaRewindResponse
-namespace MediaFastForward {
+}; // namespace RewindRequest
+namespace FastForwardRequest {
 enum class Fields
 {
 };
@@ -31055,12 +31164,12 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaFastForward::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::FastForwardRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -31068,45 +31177,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaFastForward::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::FastForwardRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaFastForward
-namespace MediaFastForwardResponse {
-enum class Fields
-{
-    kMediaPlaybackStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaFastForwardResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaFastForwardResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace MediaFastForwardResponse
-namespace MediaSkipForward {
+}; // namespace FastForwardRequest
+namespace SkipForwardRequest {
 enum class Fields
 {
     kDeltaPositionMilliseconds = 0,
@@ -31116,14 +31193,14 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaSkipForward::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipForwardRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t deltaPositionMilliseconds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -31131,46 +31208,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaSkipForward::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipForwardRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t deltaPositionMilliseconds;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaSkipForward
-namespace MediaSkipForwardResponse {
-enum class Fields
-{
-    kMediaPlaybackStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaSkipForwardResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaSkipForwardResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace MediaSkipForwardResponse
-namespace MediaSkipBackward {
+}; // namespace SkipForwardRequest
+namespace SkipBackwardRequest {
 enum class Fields
 {
     kDeltaPositionMilliseconds = 0,
@@ -31180,14 +31225,14 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaSkipBackward::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipBackwardRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t deltaPositionMilliseconds;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -31195,27 +31240,27 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaSkipBackward::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SkipBackwardRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t deltaPositionMilliseconds;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaSkipBackward
-namespace MediaSkipBackwardResponse {
+}; // namespace SkipBackwardRequest
+namespace PlaybackResponse {
 enum class Fields
 {
-    kMediaPlaybackStatus = 0,
+    kStatus = 0,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaSkipBackwardResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    MediaPlaybackStatus mediaPlaybackStatus;
+    StatusEnum status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -31227,14 +31272,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaSkipBackwardResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::PlaybackResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
-    MediaPlaybackStatus mediaPlaybackStatus;
+    StatusEnum status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaSkipBackwardResponse
-namespace MediaSeek {
+}; // namespace PlaybackResponse
+namespace SeekRequest {
 enum class Fields
 {
     kPosition = 0,
@@ -31244,14 +31289,14 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaSeek::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SeekRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t position;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType;
+    using ResponseType = Clusters::MediaPlayback::Commands::PlaybackResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -31259,45 +31304,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaSeek::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SeekRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
 
     uint64_t position;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace MediaSeek
-namespace MediaSeekResponse {
-enum class Fields
-{
-    kMediaPlaybackStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::MediaSeekResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::MediaSeekResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-
-    MediaPlaybackStatus mediaPlaybackStatus;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace MediaSeekResponse
+}; // namespace SeekRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -31305,9 +31318,9 @@ namespace Attributes {
 namespace PlaybackState {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::MediaPlayback::PlaybackStateEnum;
+    using DecodableType    = chip::app::Clusters::MediaPlayback::PlaybackStateEnum;
+    using DecodableArgType = chip::app::Clusters::MediaPlayback::PlaybackStateEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PlaybackState::Id; }
@@ -31341,9 +31354,9 @@ struct TypeInfo
 namespace Position {
 struct TypeInfo
 {
-    using Type             = Structs::MediaPlaybackPosition::Type;
-    using DecodableType    = Structs::MediaPlaybackPosition::DecodableType;
-    using DecodableArgType = const Structs::MediaPlaybackPosition::DecodableType &;
+    using Type             = chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type;
+    using DecodableType    = chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Position::Id; }
@@ -31389,9 +31402,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -31446,11 +31459,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace MediaPlayback
 namespace MediaInput {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for MediaInputType
-enum class MediaInputType : uint8_t
+// Enum for InputTypeEnum
+enum class InputTypeEnum : uint8_t
 {
     kInternal  = 0x00,
     kAux       = 0x01,
@@ -31465,12 +31475,15 @@ enum class MediaInputType : uint8_t
     kUsb       = 0x0A,
     kOther     = 0x0B,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MediaInputType                  = EmberAfMediaInputType;
-#endif
+
+// Bitmap for MediaInputFeature
+enum class MediaInputFeature : uint32_t
+{
+    kNameUpdates = 0x1,
+};
 
 namespace Structs {
-namespace MediaInputInfo {
+namespace InputInfo {
 enum class Fields
 {
     kIndex       = 1,
@@ -31483,7 +31496,7 @@ struct Type
 {
 public:
     uint8_t index;
-    MediaInputType inputType;
+    InputTypeEnum inputType;
     chip::CharSpan name;
     chip::CharSpan description;
 
@@ -31493,36 +31506,36 @@ public:
 
 using DecodableType = Type;
 
-} // namespace MediaInputInfo
+} // namespace InputInfo
 } // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace SelectInput {
+namespace SelectInputRequest {
 struct Type;
 struct DecodableType;
-} // namespace SelectInput
+} // namespace SelectInputRequest
 
-namespace ShowInputStatus {
+namespace ShowInputStatusRequest {
 struct Type;
 struct DecodableType;
-} // namespace ShowInputStatus
+} // namespace ShowInputStatusRequest
 
-namespace HideInputStatus {
+namespace HideInputStatusRequest {
 struct Type;
 struct DecodableType;
-} // namespace HideInputStatus
+} // namespace HideInputStatusRequest
 
-namespace RenameInput {
+namespace RenameInputRequest {
 struct Type;
 struct DecodableType;
-} // namespace RenameInput
+} // namespace RenameInputRequest
 
 } // namespace Commands
 
 namespace Commands {
-namespace SelectInput {
+namespace SelectInputRequest {
 enum class Fields
 {
     kIndex = 0,
@@ -31532,7 +31545,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SelectInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectInputRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     uint8_t index;
@@ -31547,14 +31560,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SelectInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectInputRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     uint8_t index;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SelectInput
-namespace ShowInputStatus {
+}; // namespace SelectInputRequest
+namespace ShowInputStatusRequest {
 enum class Fields
 {
 };
@@ -31563,7 +31576,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ShowInputStatus::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ShowInputStatusRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -31576,13 +31589,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ShowInputStatus::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ShowInputStatusRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ShowInputStatus
-namespace HideInputStatus {
+}; // namespace ShowInputStatusRequest
+namespace HideInputStatusRequest {
 enum class Fields
 {
 };
@@ -31591,7 +31604,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::HideInputStatus::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::HideInputStatusRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -31604,13 +31617,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::HideInputStatus::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::HideInputStatusRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace HideInputStatus
-namespace RenameInput {
+}; // namespace HideInputStatusRequest
+namespace RenameInputRequest {
 enum class Fields
 {
     kIndex = 0,
@@ -31621,7 +31634,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::RenameInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RenameInputRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     uint8_t index;
@@ -31637,14 +31650,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::RenameInput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RenameInputRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
 
     uint8_t index;
     chip::CharSpan name;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace RenameInput
+}; // namespace RenameInputRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -31652,9 +31665,10 @@ namespace Attributes {
 namespace MediaInputList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::MediaInputInfo::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::MediaInputInfo::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::MediaInputInfo::DecodableType> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::MediaInput::Structs::InputInfo::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MediaInputList::Id; }
@@ -31676,9 +31690,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -31775,9 +31789,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -31825,11 +31839,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace LowPower
 namespace KeypadInput {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for KeypadInputCecKeyCode
-enum class KeypadInputCecKeyCode : uint8_t
+// Enum for CecKeyCode
+enum class CecKeyCode : uint8_t
 {
     kSelect                    = 0x00,
     kUp                        = 0x01,
@@ -31918,30 +31929,29 @@ enum class KeypadInputCecKeyCode : uint8_t
     kF5                        = 0x75,
     kData                      = 0x76,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using KeypadInputCecKeyCode           = EmberAfKeypadInputCecKeyCode;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for KeypadInputStatus
-enum class KeypadInputStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess                  = 0x00,
     kUnsupportedKey           = 0x01,
     kInvalidKeyInCurrentState = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using KeypadInputStatus               = EmberAfKeypadInputStatus;
-#endif
+
+// Bitmap for KeypadInputFeature
+enum class KeypadInputFeature : uint32_t
+{
+    kNavigationKeyCodes = 0x1,
+    kLocationKeys       = 0x2,
+    kNumberKeys         = 0x4,
+};
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace SendKey {
+namespace SendKeyRequest {
 struct Type;
 struct DecodableType;
-} // namespace SendKey
+} // namespace SendKeyRequest
 
 namespace SendKeyResponse {
 struct Type;
@@ -31951,7 +31961,7 @@ struct DecodableType;
 } // namespace Commands
 
 namespace Commands {
-namespace SendKey {
+namespace SendKeyRequest {
 enum class Fields
 {
     kKeyCode = 0,
@@ -31961,10 +31971,10 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SendKeyRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    KeypadInputCecKeyCode keyCode;
+    CecKeyCode keyCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -31976,13 +31986,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SendKey::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SendKeyRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    KeypadInputCecKeyCode keyCode;
+    CecKeyCode keyCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SendKey
+}; // namespace SendKeyRequest
 namespace SendKeyResponse {
 enum class Fields
 {
@@ -31996,7 +32006,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    KeypadInputStatus status;
+    StatusEnum status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32011,7 +32021,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SendKeyResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
 
-    KeypadInputStatus status;
+    StatusEnum status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SendKeyResponse
@@ -32022,9 +32032,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -32072,14 +32082,14 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace KeypadInput
 namespace ContentLauncher {
-// Enum for ContentLaunchMetricType
-enum class ContentLaunchMetricType : uint8_t
+// Enum for MetricTypeEnum
+enum class MetricTypeEnum : uint8_t
 {
     kPixels     = 0x00,
     kPercentage = 0x01,
 };
-// Enum for ContentLaunchParameterEnum
-enum class ContentLaunchParameterEnum : uint8_t
+// Enum for ParameterEnum
+enum class ParameterEnum : uint8_t
 {
     kActor      = 0x00,
     kChannel    = 0x01,
@@ -32095,22 +32105,30 @@ enum class ContentLaunchParameterEnum : uint8_t
     kSportsTeam = 0x0B,
     kType       = 0x0C,
 };
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for ContentLaunchStatus
-enum class ContentLaunchStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kUrlNotAvailable = 0x01,
     kAuthFailed      = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ContentLaunchStatus             = EmberAfContentLaunchStatus;
-#endif
+
+// Bitmap for ContentLauncherFeature
+enum class ContentLauncherFeature : uint32_t
+{
+    kContentSearch = 0x1,
+    kURLPlayback   = 0x2,
+};
+
+// Bitmap for SupportedStreamingProtocol
+enum class SupportedStreamingProtocol : uint32_t
+{
+    kDash = 0x1,
+    kHls  = 0x2,
+};
 
 namespace Structs {
-namespace ContentLaunchDimension {
+namespace Dimension {
 enum class Fields
 {
     kWidth  = 1,
@@ -32123,7 +32141,7 @@ struct Type
 public:
     double width;
     double height;
-    ContentLaunchMetricType metric;
+    MetricTypeEnum metric;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -32131,8 +32149,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ContentLaunchDimension
-namespace ContentLaunchAdditionalInfo {
+} // namespace Dimension
+namespace AdditionalInfo {
 enum class Fields
 {
     kName  = 1,
@@ -32151,8 +32169,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ContentLaunchAdditionalInfo
-namespace ContentLaunchParamater {
+} // namespace AdditionalInfo
+namespace Parameter {
 enum class Fields
 {
     kType           = 1,
@@ -32163,9 +32181,9 @@ enum class Fields
 struct Type
 {
 public:
-    ContentLaunchParameterEnum type;
+    ParameterEnum type;
     chip::CharSpan value;
-    DataModel::List<const Structs::ContentLaunchAdditionalInfo::Type> externalIDList;
+    DataModel::List<const Structs::AdditionalInfo::Type> externalIDList;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -32173,14 +32191,36 @@ public:
 struct DecodableType
 {
 public:
-    ContentLaunchParameterEnum type;
+    ParameterEnum type;
     chip::CharSpan value;
-    DataModel::DecodableList<Structs::ContentLaunchAdditionalInfo::DecodableType> externalIDList;
+    DataModel::DecodableList<Structs::AdditionalInfo::DecodableType> externalIDList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 
-} // namespace ContentLaunchParamater
-namespace ContentLaunchStyleInformation {
+} // namespace Parameter
+namespace ContentSearch {
+enum class Fields
+{
+    kParameterList = 1,
+};
+
+struct Type
+{
+public:
+    DataModel::List<const Structs::Parameter::Type> parameterList;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    DataModel::DecodableList<Structs::Parameter::DecodableType> parameterList;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace ContentSearch
+namespace StyleInformation {
 enum class Fields
 {
     kImageUrl = 1,
@@ -32193,7 +32233,7 @@ struct Type
 public:
     chip::CharSpan imageUrl;
     chip::CharSpan color;
-    Structs::ContentLaunchDimension::Type size;
+    Structs::Dimension::Type size;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -32201,8 +32241,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ContentLaunchStyleInformation
-namespace ContentLaunchBrandingInformation {
+} // namespace StyleInformation
+namespace BrandingInformation {
 enum class Fields
 {
     kProviderName = 1,
@@ -32217,11 +32257,11 @@ struct Type
 {
 public:
     chip::CharSpan providerName;
-    Structs::ContentLaunchStyleInformation::Type background;
-    Structs::ContentLaunchStyleInformation::Type logo;
-    Structs::ContentLaunchStyleInformation::Type progressBar;
-    Structs::ContentLaunchStyleInformation::Type splash;
-    Structs::ContentLaunchStyleInformation::Type waterMark;
+    Structs::StyleInformation::Type background;
+    Structs::StyleInformation::Type logo;
+    Structs::StyleInformation::Type progressBar;
+    Structs::StyleInformation::Type splash;
+    Structs::StyleInformation::Type waterMark;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -32229,36 +32269,31 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ContentLaunchBrandingInformation
+} // namespace BrandingInformation
 } // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace LaunchContent {
+namespace LaunchContentRequest {
 struct Type;
 struct DecodableType;
-} // namespace LaunchContent
+} // namespace LaunchContentRequest
 
-namespace LaunchContentResponse {
+namespace LaunchURLRequest {
 struct Type;
 struct DecodableType;
-} // namespace LaunchContentResponse
+} // namespace LaunchURLRequest
 
-namespace LaunchURL {
+namespace LaunchResponse {
 struct Type;
 struct DecodableType;
-} // namespace LaunchURL
-
-namespace LaunchURLResponse {
-struct Type;
-struct DecodableType;
-} // namespace LaunchURLResponse
+} // namespace LaunchResponse
 
 } // namespace Commands
 
 namespace Commands {
-namespace LaunchContent {
+namespace LaunchContentRequest {
 enum class Fields
 {
     kAutoPlay = 0,
@@ -32270,16 +32305,16 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::LaunchContent::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchContentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     bool autoPlay;
     chip::CharSpan data;
-    DataModel::List<const Structs::ContentLaunchParamater::Type> search;
+    DataModel::List<const Structs::ContentSearch::Type> search;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType;
+    using ResponseType = Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -32287,51 +32322,16 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::LaunchContent::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchContentRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     bool autoPlay;
     chip::CharSpan data;
-    DataModel::DecodableList<Structs::ContentLaunchParamater::DecodableType> search;
+    DataModel::DecodableList<Structs::ContentSearch::DecodableType> search;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace LaunchContent
-namespace LaunchContentResponse {
-enum class Fields
-{
-    kContentLaunchStatus = 0,
-    kData                = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::LaunchContentResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-
-    ContentLaunchStatus contentLaunchStatus;
-    chip::CharSpan data;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::LaunchContentResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-
-    ContentLaunchStatus contentLaunchStatus;
-    chip::CharSpan data;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace LaunchContentResponse
-namespace LaunchURL {
+}; // namespace LaunchContentRequest
+namespace LaunchURLRequest {
 enum class Fields
 {
     kContentURL          = 0,
@@ -32343,16 +32343,16 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::LaunchURL::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchURLRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan contentURL;
     chip::CharSpan displayString;
-    DataModel::List<const Structs::ContentLaunchBrandingInformation::Type> brandingInformation;
+    Structs::BrandingInformation::Type brandingInformation;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType;
+    using ResponseType = Clusters::ContentLauncher::Commands::LaunchResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -32360,30 +32360,30 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::LaunchURL::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchURLRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
     chip::CharSpan contentURL;
     chip::CharSpan displayString;
-    DataModel::DecodableList<Structs::ContentLaunchBrandingInformation::DecodableType> brandingInformation;
+    Structs::BrandingInformation::DecodableType brandingInformation;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace LaunchURL
-namespace LaunchURLResponse {
+}; // namespace LaunchURLRequest
+namespace LaunchResponse {
 enum class Fields
 {
-    kContentLaunchStatus = 0,
-    kData                = 1,
+    kStatus = 0,
+    kData   = 1,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::LaunchURLResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    ContentLaunchStatus contentLaunchStatus;
+    StatusEnum status;
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32396,30 +32396,30 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::LaunchURLResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    ContentLaunchStatus contentLaunchStatus;
+    StatusEnum status;
     chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace LaunchURLResponse
+}; // namespace LaunchResponse
 } // namespace Commands
 
 namespace Attributes {
 
-namespace AcceptsHeaderList {
+namespace AcceptHeaderList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::ByteSpan>;
-    using DecodableType    = DataModel::DecodableList<chip::ByteSpan>;
-    using DecodableArgType = const DataModel::DecodableList<chip::ByteSpan> &;
+    using Type             = chip::app::DataModel::List<const chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::CharSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptsHeaderList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AcceptHeaderList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace AcceptsHeaderList
+} // namespace AcceptHeaderList
 namespace SupportedStreamingProtocols {
 struct TypeInfo
 {
@@ -32435,9 +32435,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -32477,7 +32477,7 @@ struct TypeInfo
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
-        Attributes::AcceptsHeaderList::TypeInfo::DecodableType acceptsHeaderList;
+        Attributes::AcceptHeaderList::TypeInfo::DecodableType acceptHeaderList;
         Attributes::SupportedStreamingProtocols::TypeInfo::DecodableType supportedStreamingProtocols;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
@@ -32487,11 +32487,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ContentLauncher
 namespace AudioOutput {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for AudioOutputType
-enum class AudioOutputType : uint8_t
+// Enum for OutputTypeEnum
+enum class OutputTypeEnum : uint8_t
 {
     kHdmi      = 0x00,
     kBt        = 0x01,
@@ -32500,12 +32497,15 @@ enum class AudioOutputType : uint8_t
     kInternal  = 0x04,
     kOther     = 0x05,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using AudioOutputType                 = EmberAfAudioOutputType;
-#endif
+
+// Bitmap for AudiouOutputFeature
+enum class AudiouOutputFeature : uint32_t
+{
+    kNameUpdates = 0x1,
+};
 
 namespace Structs {
-namespace AudioOutputInfo {
+namespace OutputInfo {
 enum class Fields
 {
     kIndex      = 1,
@@ -32517,7 +32517,7 @@ struct Type
 {
 public:
     uint8_t index;
-    AudioOutputType outputType;
+    OutputTypeEnum outputType;
     chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32526,26 +32526,26 @@ public:
 
 using DecodableType = Type;
 
-} // namespace AudioOutputInfo
+} // namespace OutputInfo
 } // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace SelectOutput {
+namespace SelectOutputRequest {
 struct Type;
 struct DecodableType;
-} // namespace SelectOutput
+} // namespace SelectOutputRequest
 
-namespace RenameOutput {
+namespace RenameOutputRequest {
 struct Type;
 struct DecodableType;
-} // namespace RenameOutput
+} // namespace RenameOutputRequest
 
 } // namespace Commands
 
 namespace Commands {
-namespace SelectOutput {
+namespace SelectOutputRequest {
 enum class Fields
 {
     kIndex = 0,
@@ -32555,7 +32555,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SelectOutput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectOutputRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
 
     uint8_t index;
@@ -32570,14 +32570,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SelectOutput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SelectOutputRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
 
     uint8_t index;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SelectOutput
-namespace RenameOutput {
+}; // namespace SelectOutputRequest
+namespace RenameOutputRequest {
 enum class Fields
 {
     kIndex = 0,
@@ -32588,7 +32588,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::RenameOutput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RenameOutputRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
 
     uint8_t index;
@@ -32604,14 +32604,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::RenameOutput::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::RenameOutputRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
 
     uint8_t index;
     chip::CharSpan name;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace RenameOutput
+}; // namespace RenameOutputRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -32619,9 +32619,10 @@ namespace Attributes {
 namespace AudioOutputList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::AudioOutputInfo::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::AudioOutputInfo::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::AudioOutputInfo::DecodableType> &;
+    using Type          = chip::app::DataModel::List<const chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type>;
+    using DecodableType = chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AudioOutputList::Id; }
@@ -32643,9 +32644,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -32695,22 +32696,29 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace AudioOutput
 namespace ApplicationLauncher {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for ApplicationLauncherStatus
-enum class ApplicationLauncherStatus : uint8_t
+// Enum for StatusEnum
+enum class StatusEnum : uint8_t
 {
     kSuccess         = 0x00,
     kAppNotAvailable = 0x01,
     kSystemBusy      = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ApplicationLauncherStatus       = EmberAfApplicationLauncherStatus;
-#endif
+
+// Bitmap for ApplicationLauncherFeature
+enum class ApplicationLauncherFeature : uint32_t
+{
+    kApplicationPlatform = 0x1,
+};
+
+// Bitmap for ChannelFeature
+enum class ChannelFeature : uint32_t
+{
+    kChannelList = 0x1,
+    kLineupInfo  = 0x2,
+};
 
 namespace Structs {
-namespace ApplicationLauncherApp {
+namespace Application {
 enum class Fields
 {
     kCatalogVendorId = 1,
@@ -32729,8 +32737,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ApplicationLauncherApp
-namespace ApplicationLauncherEndpoint {
+} // namespace Application
+namespace ApplicationEP {
 enum class Fields
 {
     kApplication = 1,
@@ -32740,7 +32748,7 @@ enum class Fields
 struct Type
 {
 public:
-    Structs::ApplicationLauncherApp::Type application;
+    Structs::Application::Type application;
     chip::CharSpan endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32749,46 +32757,36 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ApplicationLauncherEndpoint
+} // namespace ApplicationEP
 } // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace LaunchApp {
+namespace LaunchAppRequest {
 struct Type;
 struct DecodableType;
-} // namespace LaunchApp
+} // namespace LaunchAppRequest
 
-namespace LaunchAppResponse {
+namespace StopAppRequest {
 struct Type;
 struct DecodableType;
-} // namespace LaunchAppResponse
+} // namespace StopAppRequest
 
-namespace StopApp {
+namespace HideAppRequest {
 struct Type;
 struct DecodableType;
-} // namespace StopApp
+} // namespace HideAppRequest
 
-namespace StopAppResponse {
+namespace LauncherResponse {
 struct Type;
 struct DecodableType;
-} // namespace StopAppResponse
-
-namespace HideApp {
-struct Type;
-struct DecodableType;
-} // namespace HideApp
-
-namespace HideAppResponse {
-struct Type;
-struct DecodableType;
-} // namespace HideAppResponse
+} // namespace LauncherResponse
 
 } // namespace Commands
 
 namespace Commands {
-namespace LaunchApp {
+namespace LaunchAppRequest {
 enum class Fields
 {
     kData        = 0,
@@ -32799,15 +32797,15 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::LaunchApp::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
-    Structs::ApplicationLauncherApp::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType;
+    using ResponseType = Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -32815,50 +32813,15 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::LaunchApp::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LaunchAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
-    Structs::ApplicationLauncherApp::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace LaunchApp
-namespace LaunchAppResponse {
-enum class Fields
-{
-    kStatus = 0,
-    kData   = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::LaunchAppResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-
-    ApplicationLauncherStatus status;
-    chip::CharSpan data;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::LaunchAppResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-
-    ApplicationLauncherStatus status;
-    chip::CharSpan data;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace LaunchAppResponse
-namespace StopApp {
+}; // namespace LaunchAppRequest
+namespace StopAppRequest {
 enum class Fields
 {
     kApplication = 0,
@@ -32868,14 +32831,14 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApp::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType;
+    using ResponseType = Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -32883,49 +32846,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApp::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace StopApp
-namespace StopAppResponse {
-enum class Fields
-{
-    kStatus = 0,
-    kData   = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::StopAppResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-
-    ApplicationLauncherStatus status;
-    chip::CharSpan data;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::StopAppResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-
-    ApplicationLauncherStatus status;
-    chip::CharSpan data;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace StopAppResponse
-namespace HideApp {
+}; // namespace StopAppRequest
+namespace HideAppRequest {
 enum class Fields
 {
     kApplication = 0,
@@ -32935,14 +32863,14 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApp::Type application;
+    Structs::Application::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType;
+    using ResponseType = Clusters::ApplicationLauncher::Commands::LauncherResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -32950,14 +32878,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::ApplicationLauncherApp::DecodableType application;
+    Structs::Application::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace HideApp
-namespace HideAppResponse {
+}; // namespace HideAppRequest
+namespace LauncherResponse {
 enum class Fields
 {
     kStatus = 0,
@@ -32968,10 +32896,10 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::HideAppResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    ApplicationLauncherStatus status;
+    StatusEnum status;
     chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32984,14 +32912,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::HideAppResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LauncherResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    ApplicationLauncherStatus status;
+    StatusEnum status;
     chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace HideAppResponse
+}; // namespace LauncherResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -32999,9 +32927,9 @@ namespace Attributes {
 namespace ApplicationLauncherList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const uint16_t>;
-    using DecodableType    = DataModel::DecodableList<uint16_t>;
-    using DecodableArgType = const DataModel::DecodableList<uint16_t> &;
+    using Type             = chip::app::DataModel::List<const uint16_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationLauncherList::Id; }
@@ -33011,9 +32939,9 @@ struct TypeInfo
 namespace ApplicationLauncherApp {
 struct TypeInfo
 {
-    using Type             = Structs::ApplicationLauncherEndpoint::Type;
-    using DecodableType    = Structs::ApplicationLauncherEndpoint::DecodableType;
-    using DecodableArgType = const Structs::ApplicationLauncherEndpoint::DecodableType &;
+    using Type             = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type;
+    using DecodableType    = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationLauncherApp::Id; }
@@ -33023,9 +32951,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -33075,8 +33003,8 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
-// Enum for ApplicationBasicStatus
-enum class ApplicationBasicStatus : uint8_t
+// Enum for ApplicationStatusEnum
+enum class ApplicationStatusEnum : uint8_t
 {
     kStopped               = 0x00,
     kActiveVisibleFocus    = 0x01,
@@ -33085,7 +33013,7 @@ enum class ApplicationBasicStatus : uint8_t
 };
 
 namespace Structs {
-namespace ApplicationBasicApp {
+namespace Application {
 enum class Fields
 {
     kCatalogVendorId = 1,
@@ -33104,53 +33032,8 @@ public:
 
 using DecodableType = Type;
 
-} // namespace ApplicationBasicApp
+} // namespace Application
 } // namespace Structs
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace ChangeStatus {
-struct Type;
-struct DecodableType;
-} // namespace ChangeStatus
-
-} // namespace Commands
-
-namespace Commands {
-namespace ChangeStatus {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ChangeStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-
-    ApplicationBasicStatus status;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ChangeStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-
-    ApplicationBasicStatus status;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ChangeStatus
-} // namespace Commands
 
 namespace Attributes {
 
@@ -33205,9 +33088,9 @@ struct TypeInfo
 namespace ApplicationApp {
 struct TypeInfo
 {
-    using Type             = Structs::ApplicationBasicApp::Type;
-    using DecodableType    = Structs::ApplicationBasicApp::DecodableType;
-    using DecodableArgType = const Structs::ApplicationBasicApp::DecodableType &;
+    using Type             = chip::app::Clusters::ApplicationBasic::Structs::Application::Type;
+    using DecodableType    = chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationApp::Id; }
@@ -33217,9 +33100,9 @@ struct TypeInfo
 namespace ApplicationStatus {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum;
+    using DecodableType    = chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum;
+    using DecodableArgType = chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationStatus::Id; }
@@ -33238,12 +33121,24 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationVersion
+namespace AllowedVendorList {
+struct TypeInfo
+{
+    using Type             = chip::app::DataModel::List<const chip::VendorId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::VendorId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::VendorId> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AllowedVendorList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AllowedVendorList
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -33290,6 +33185,7 @@ struct TypeInfo
         Attributes::ApplicationApp::TypeInfo::DecodableType applicationApp;
         Attributes::ApplicationStatus::TypeInfo::DecodableType applicationStatus;
         Attributes::ApplicationVersion::TypeInfo::DecodableType applicationVersion;
+        Attributes::AllowedVendorList::TypeInfo::DecodableType allowedVendorList;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
@@ -33302,30 +33198,30 @@ namespace AccountLogin {
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
-namespace GetSetupPIN {
+namespace GetSetupPINRequest {
 struct Type;
 struct DecodableType;
-} // namespace GetSetupPIN
+} // namespace GetSetupPINRequest
 
 namespace GetSetupPINResponse {
 struct Type;
 struct DecodableType;
 } // namespace GetSetupPINResponse
 
-namespace Login {
+namespace LoginRequest {
 struct Type;
 struct DecodableType;
-} // namespace Login
+} // namespace LoginRequest
 
-namespace Logout {
+namespace LogoutRequest {
 struct Type;
 struct DecodableType;
-} // namespace Logout
+} // namespace LogoutRequest
 
 } // namespace Commands
 
 namespace Commands {
-namespace GetSetupPIN {
+namespace GetSetupPINRequest {
 enum class Fields
 {
     kTempAccountIdentifier = 0,
@@ -33335,7 +33231,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetSetupPIN::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetSetupPINRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     chip::CharSpan tempAccountIdentifier;
@@ -33344,19 +33240,19 @@ public:
 
     using ResponseType = Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::GetSetupPIN::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetSetupPINRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     chip::CharSpan tempAccountIdentifier;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace GetSetupPIN
+}; // namespace GetSetupPINRequest
 namespace GetSetupPINResponse {
 enum class Fields
 {
@@ -33376,7 +33272,7 @@ public:
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
@@ -33389,7 +33285,7 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetSetupPINResponse
-namespace Login {
+namespace LoginRequest {
 enum class Fields
 {
     kTempAccountIdentifier = 0,
@@ -33400,7 +33296,7 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Login::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LoginRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     chip::CharSpan tempAccountIdentifier;
@@ -33416,15 +33312,15 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::Login::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LoginRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     chip::CharSpan tempAccountIdentifier;
     chip::CharSpan setupPIN;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace Login
-namespace Logout {
+}; // namespace LoginRequest
+namespace LogoutRequest {
 enum class Fields
 {
 };
@@ -33433,25 +33329,25 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Logout::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogoutRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
 
-    static constexpr bool MustUseTimedInvoke() { return false; }
+    static constexpr bool MustUseTimedInvoke() { return true; }
 };
 
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::Logout::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::LogoutRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace Logout
+}; // namespace LogoutRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -33459,9 +33355,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -35377,9 +35273,9 @@ struct TypeInfo
 namespace ListInt8u {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const uint8_t>;
-    using DecodableType    = DataModel::DecodableList<uint8_t>;
-    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
+    using Type             = chip::app::DataModel::List<const uint8_t>;
+    using DecodableType    = chip::app::DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListInt8u::Id; }
@@ -35389,9 +35285,9 @@ struct TypeInfo
 namespace ListOctetString {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::ByteSpan>;
-    using DecodableType    = DataModel::DecodableList<chip::ByteSpan>;
-    using DecodableArgType = const DataModel::DecodableList<chip::ByteSpan> &;
+    using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListOctetString::Id; }
@@ -35401,9 +35297,11 @@ struct TypeInfo
 namespace ListStructOctetString {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::TestListStructOctet::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::TestListStructOctet::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::TestListStructOctet::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListStructOctetString::Id; }
@@ -35485,9 +35383,11 @@ struct TypeInfo
 namespace ListNullablesAndOptionalsStruct {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const Structs::NullablesAndOptionalsStruct::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::NullablesAndOptionalsStruct::DecodableType> &;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type>;
+    using DecodableType =
+        chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListNullablesAndOptionalsStruct::Id; }
@@ -35497,9 +35397,9 @@ struct TypeInfo
 namespace EnumAttr {
 struct TypeInfo
 {
-    using Type             = SimpleEnum;
-    using DecodableType    = SimpleEnum;
-    using DecodableArgType = SimpleEnum;
+    using Type             = chip::app::Clusters::TestCluster::SimpleEnum;
+    using DecodableType    = chip::app::Clusters::TestCluster::SimpleEnum;
+    using DecodableArgType = chip::app::Clusters::TestCluster::SimpleEnum;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnumAttr::Id; }
@@ -35509,9 +35409,9 @@ struct TypeInfo
 namespace StructAttr {
 struct TypeInfo
 {
-    using Type             = Structs::SimpleStruct::Type;
-    using DecodableType    = Structs::SimpleStruct::DecodableType;
-    using DecodableArgType = const Structs::SimpleStruct::DecodableType &;
+    using Type             = chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type;
+    using DecodableType    = chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StructAttr::Id; }
@@ -35569,9 +35469,9 @@ struct TypeInfo
 namespace ListLongOctetString {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::ByteSpan>;
-    using DecodableType    = DataModel::DecodableList<chip::ByteSpan>;
-    using DecodableArgType = const DataModel::DecodableList<chip::ByteSpan> &;
+    using Type             = chip::app::DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListLongOctetString::Id; }
@@ -35605,9 +35505,9 @@ struct TypeInfo
 namespace NullableBoolean {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<bool>;
-    using DecodableType    = DataModel::Nullable<bool>;
-    using DecodableArgType = const DataModel::Nullable<bool> &;
+    using Type             = chip::app::DataModel::Nullable<bool>;
+    using DecodableType    = chip::app::DataModel::Nullable<bool>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<bool> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBoolean::Id; }
@@ -35617,9 +35517,9 @@ struct TypeInfo
 namespace NullableBitmap8 {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint8_t>;
-    using DecodableType    = DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap8::Id; }
@@ -35629,9 +35529,9 @@ struct TypeInfo
 namespace NullableBitmap16 {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint16_t>;
-    using DecodableType    = DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap16::Id; }
@@ -35641,9 +35541,9 @@ struct TypeInfo
 namespace NullableBitmap32 {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint32_t>;
-    using DecodableType    = DataModel::Nullable<uint32_t>;
-    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap32::Id; }
@@ -35653,9 +35553,9 @@ struct TypeInfo
 namespace NullableBitmap64 {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint64_t>;
-    using DecodableType    = DataModel::Nullable<uint64_t>;
-    using DecodableArgType = const DataModel::Nullable<uint64_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap64::Id; }
@@ -35665,9 +35565,9 @@ struct TypeInfo
 namespace NullableInt8u {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint8_t>;
-    using DecodableType    = DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt8u::Id; }
@@ -35677,9 +35577,9 @@ struct TypeInfo
 namespace NullableInt16u {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint16_t>;
-    using DecodableType    = DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt16u::Id; }
@@ -35689,9 +35589,9 @@ struct TypeInfo
 namespace NullableInt24u {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint32_t>;
-    using DecodableType    = DataModel::Nullable<uint32_t>;
-    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt24u::Id; }
@@ -35701,9 +35601,9 @@ struct TypeInfo
 namespace NullableInt32u {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint32_t>;
-    using DecodableType    = DataModel::Nullable<uint32_t>;
-    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt32u::Id; }
@@ -35713,9 +35613,9 @@ struct TypeInfo
 namespace NullableInt40u {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint64_t>;
-    using DecodableType    = DataModel::Nullable<uint64_t>;
-    using DecodableArgType = const DataModel::Nullable<uint64_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt40u::Id; }
@@ -35725,9 +35625,9 @@ struct TypeInfo
 namespace NullableInt48u {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint64_t>;
-    using DecodableType    = DataModel::Nullable<uint64_t>;
-    using DecodableArgType = const DataModel::Nullable<uint64_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt48u::Id; }
@@ -35737,9 +35637,9 @@ struct TypeInfo
 namespace NullableInt56u {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint64_t>;
-    using DecodableType    = DataModel::Nullable<uint64_t>;
-    using DecodableArgType = const DataModel::Nullable<uint64_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt56u::Id; }
@@ -35749,9 +35649,9 @@ struct TypeInfo
 namespace NullableInt64u {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint64_t>;
-    using DecodableType    = DataModel::Nullable<uint64_t>;
-    using DecodableArgType = const DataModel::Nullable<uint64_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt64u::Id; }
@@ -35761,9 +35661,9 @@ struct TypeInfo
 namespace NullableInt8s {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<int8_t>;
-    using DecodableType    = DataModel::Nullable<int8_t>;
-    using DecodableArgType = const DataModel::Nullable<int8_t> &;
+    using Type             = chip::app::DataModel::Nullable<int8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt8s::Id; }
@@ -35773,9 +35673,9 @@ struct TypeInfo
 namespace NullableInt16s {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<int16_t>;
-    using DecodableType    = DataModel::Nullable<int16_t>;
-    using DecodableArgType = const DataModel::Nullable<int16_t> &;
+    using Type             = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt16s::Id; }
@@ -35785,9 +35685,9 @@ struct TypeInfo
 namespace NullableInt24s {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<int32_t>;
-    using DecodableType    = DataModel::Nullable<int32_t>;
-    using DecodableArgType = const DataModel::Nullable<int32_t> &;
+    using Type             = chip::app::DataModel::Nullable<int32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt24s::Id; }
@@ -35797,9 +35697,9 @@ struct TypeInfo
 namespace NullableInt32s {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<int32_t>;
-    using DecodableType    = DataModel::Nullable<int32_t>;
-    using DecodableArgType = const DataModel::Nullable<int32_t> &;
+    using Type             = chip::app::DataModel::Nullable<int32_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int32_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt32s::Id; }
@@ -35809,9 +35709,9 @@ struct TypeInfo
 namespace NullableInt40s {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<int64_t>;
-    using DecodableType    = DataModel::Nullable<int64_t>;
-    using DecodableArgType = const DataModel::Nullable<int64_t> &;
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt40s::Id; }
@@ -35821,9 +35721,9 @@ struct TypeInfo
 namespace NullableInt48s {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<int64_t>;
-    using DecodableType    = DataModel::Nullable<int64_t>;
-    using DecodableArgType = const DataModel::Nullable<int64_t> &;
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt48s::Id; }
@@ -35833,9 +35733,9 @@ struct TypeInfo
 namespace NullableInt56s {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<int64_t>;
-    using DecodableType    = DataModel::Nullable<int64_t>;
-    using DecodableArgType = const DataModel::Nullable<int64_t> &;
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt56s::Id; }
@@ -35845,9 +35745,9 @@ struct TypeInfo
 namespace NullableInt64s {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<int64_t>;
-    using DecodableType    = DataModel::Nullable<int64_t>;
-    using DecodableArgType = const DataModel::Nullable<int64_t> &;
+    using Type             = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int64_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int64_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt64s::Id; }
@@ -35857,9 +35757,9 @@ struct TypeInfo
 namespace NullableEnum8 {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint8_t>;
-    using DecodableType    = DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnum8::Id; }
@@ -35869,9 +35769,9 @@ struct TypeInfo
 namespace NullableEnum16 {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint16_t>;
-    using DecodableType    = DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnum16::Id; }
@@ -35881,9 +35781,9 @@ struct TypeInfo
 namespace NullableFloatSingle {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<float>;
-    using DecodableType    = DataModel::Nullable<float>;
-    using DecodableArgType = const DataModel::Nullable<float> &;
+    using Type             = chip::app::DataModel::Nullable<float>;
+    using DecodableType    = chip::app::DataModel::Nullable<float>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<float> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableFloatSingle::Id; }
@@ -35893,9 +35793,9 @@ struct TypeInfo
 namespace NullableFloatDouble {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<double>;
-    using DecodableType    = DataModel::Nullable<double>;
-    using DecodableArgType = const DataModel::Nullable<double> &;
+    using Type             = chip::app::DataModel::Nullable<double>;
+    using DecodableType    = chip::app::DataModel::Nullable<double>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<double> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableFloatDouble::Id; }
@@ -35905,9 +35805,9 @@ struct TypeInfo
 namespace NullableOctetString {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<chip::ByteSpan>;
-    using DecodableType    = DataModel::Nullable<chip::ByteSpan>;
-    using DecodableArgType = const DataModel::Nullable<chip::ByteSpan> &;
+    using Type             = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::ByteSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::ByteSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableOctetString::Id; }
@@ -35917,9 +35817,9 @@ struct TypeInfo
 namespace NullableCharString {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<chip::CharSpan>;
-    using DecodableType    = DataModel::Nullable<chip::CharSpan>;
-    using DecodableArgType = const DataModel::Nullable<chip::CharSpan> &;
+    using Type             = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::CharSpan>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::CharSpan> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableCharString::Id; }
@@ -35929,9 +35829,9 @@ struct TypeInfo
 namespace NullableEnumAttr {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<SimpleEnum>;
-    using DecodableType    = DataModel::Nullable<SimpleEnum>;
-    using DecodableArgType = const DataModel::Nullable<SimpleEnum> &;
+    using Type             = chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum>;
+    using DecodableType    = chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnumAttr::Id; }
@@ -35941,9 +35841,10 @@ struct TypeInfo
 namespace NullableStruct {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<Structs::SimpleStruct::Type>;
-    using DecodableType    = DataModel::Nullable<Structs::SimpleStruct::DecodableType>;
-    using DecodableArgType = const DataModel::Nullable<Structs::SimpleStruct::DecodableType> &;
+    using Type          = chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>;
+    using DecodableType = chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType>;
+    using DecodableArgType =
+        const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableStruct::Id; }
@@ -35953,9 +35854,9 @@ struct TypeInfo
 namespace NullableRangeRestrictedInt8u {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint8_t>;
-    using DecodableType    = DataModel::Nullable<uint8_t>;
-    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt8u::Id; }
@@ -35965,9 +35866,9 @@ struct TypeInfo
 namespace NullableRangeRestrictedInt8s {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<int8_t>;
-    using DecodableType    = DataModel::Nullable<int8_t>;
-    using DecodableArgType = const DataModel::Nullable<int8_t> &;
+    using Type             = chip::app::DataModel::Nullable<int8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt8s::Id; }
@@ -35977,9 +35878,9 @@ struct TypeInfo
 namespace NullableRangeRestrictedInt16u {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<uint16_t>;
-    using DecodableType    = DataModel::Nullable<uint16_t>;
-    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+    using Type             = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt16u::Id; }
@@ -35989,9 +35890,9 @@ struct TypeInfo
 namespace NullableRangeRestrictedInt16s {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<int16_t>;
-    using DecodableType    = DataModel::Nullable<int16_t>;
-    using DecodableArgType = const DataModel::Nullable<int16_t> &;
+    using Type             = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<int16_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<int16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt16s::Id; }
@@ -36001,9 +35902,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -36625,9 +36526,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -36825,9 +36726,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -37037,9 +36938,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -37290,9 +37191,9 @@ namespace Attributes {
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -37620,9 +37521,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
@@ -39396,9 +39297,9 @@ struct TypeInfo
 namespace AttributeList {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const chip::AttributeId>;
-    using DecodableType    = DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const DataModel::DecodableList<chip::AttributeId> &;
+    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }

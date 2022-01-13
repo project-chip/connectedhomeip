@@ -28,7 +28,7 @@
 #include "Rpc.h"
 #endif
 
-#ifdef CONFIG_USB
+#ifdef CONFIG_USB_DEVICE_STACK
 #include <usb/usb_device.h>
 #endif
 
@@ -47,7 +47,7 @@ int main(void)
     int ret        = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#ifdef CONFIG_USB
+#ifdef CONFIG_USB_DEVICE_STACK
     ret = usb_enable(nullptr);
     if (ret)
     {

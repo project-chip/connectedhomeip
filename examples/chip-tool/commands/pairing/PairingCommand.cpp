@@ -70,16 +70,17 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 
 CommissioningParameters PairingCommand::GetCommissioningParameters()
 {
-    CommissioningParameters commissioningParams;
-    if (mNetworkType == PairingNetworkType::WiFi)
+    switch (mNetworkType)
     {
-        commissioningParams.SetWifiCredentials(Controller::WifiCredentials(mSSID, mPassword));
+    case PairingNetworkType::WiFi:
+        return CommissioningParameters().SetWiFiCredentials(Controller::WiFiCredentials(mSSID, mPassword));
+    case PairingNetworkType::Thread:
+        return CommissioningParameters().SetThreadOperationalDataset(mOperationalDataset);
+    case PairingNetworkType::Ethernet:
+    case PairingNetworkType::None:
+        return CommissioningParameters();
     }
-    else if (mNetworkType == PairingNetworkType::Thread)
-    {
-        commissioningParams.SetThreadOperationalDataset(mOperationalDataset);
-    }
-    return commissioningParams;
+    return CommissioningParameters();
 }
 
 CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
@@ -107,10 +108,10 @@ CHIP_ERROR PairingCommand::PairWithMdns(NodeId remoteId)
     {
     case chip::Dnssd::DiscoveryFilterType::kNone:
         break;
-    case chip::Dnssd::DiscoveryFilterType::kShort:
-    case chip::Dnssd::DiscoveryFilterType::kLong:
+    case chip::Dnssd::DiscoveryFilterType::kShortDiscriminator:
+    case chip::Dnssd::DiscoveryFilterType::kLongDiscriminator:
     case chip::Dnssd::DiscoveryFilterType::kCompressedFabricId:
-    case chip::Dnssd::DiscoveryFilterType::kVendor:
+    case chip::Dnssd::DiscoveryFilterType::kVendorId:
     case chip::Dnssd::DiscoveryFilterType::kDeviceType:
         filter.code = mDiscoveryFilterCode;
         break;

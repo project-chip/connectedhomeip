@@ -136,7 +136,7 @@ CHIP_ERROR ChipCertificateSet::LoadCert(const ByteSpan chipCert, BitFlags<CertDe
 
     reader.Init(chipCert);
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag));
+    ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag()));
 
     return LoadCert(reader, decodeFlags, chipCert);
 }

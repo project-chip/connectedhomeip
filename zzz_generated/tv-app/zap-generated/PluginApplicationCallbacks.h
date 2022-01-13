@@ -28,7 +28,9 @@
     MatterApplicationLauncherPluginServerInitCallback();                                                                           \
     MatterAudioOutputPluginServerInitCallback();                                                                                   \
     MatterBasicPluginServerInitCallback();                                                                                         \
+    MatterBindingPluginClientInitCallback();                                                                                       \
     MatterBindingPluginServerInitCallback();                                                                                       \
+    MatterChannelPluginServerInitCallback();                                                                                       \
     MatterContentLauncherPluginServerInitCallback();                                                                               \
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
@@ -40,6 +42,7 @@
     MatterGroupKeyManagementPluginServerInitCallback();                                                                            \
     MatterKeypadInputPluginServerInitCallback();                                                                                   \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
+    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterLowPowerPluginServerInitCallback();                                                                                      \
     MatterMediaInputPluginServerInitCallback();                                                                                    \
     MatterMediaPlaybackPluginServerInitCallback();                                                                                 \
@@ -51,7 +54,6 @@
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterRelativeHumidityMeasurementPluginServerInitCallback();                                                                   \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
-    MatterTvChannelPluginServerInitCallback();                                                                                     \
     MatterTargetNavigatorPluginServerInitCallback();                                                                               \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
     MatterUserLabelPluginServerInitCallback();                                                                                     \

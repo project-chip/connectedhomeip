@@ -819,7 +819,7 @@ void BLEManagerImpl::SetAdvertisingData(void)
         localDeviceNameLen = strlen(sInstance.mDeviceName);
     }
 
-    /* First element is the advertisment flags */
+    /* First element is the advertisement flags */
     adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_FLAG;
     adv_elem[num_elem].len         = sizeof(uint8_t);
     adv_elem[num_elem].p_data      = &flag;

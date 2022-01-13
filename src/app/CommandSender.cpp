@@ -60,7 +60,7 @@ CHIP_ERROR CommandSender::AllocateBuffer()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandSender::SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout)
+CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
     VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
@@ -171,7 +171,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
 
     while (CHIP_NO_ERROR == (err = invokeResponsesReader.Next()))
     {
-        VerifyOrReturnError(TLV::AnonymousTag == invokeResponsesReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
+        VerifyOrReturnError(TLV::AnonymousTag() == invokeResponsesReader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         InvokeResponseIB::Parser invokeResponse;
         ReturnErrorOnFailure(invokeResponse.Init(invokeResponsesReader));
         ReturnErrorOnFailure(ProcessInvokeResponseIB(invokeResponse));
@@ -282,7 +282,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
             {
                 ChipLogProgress(DataManagement,
                                 "Received Command Response Status for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
-                                " Command=" ChipLogFormatMEI " Status=0x%" PRIx16,
+                                " Command=" ChipLogFormatMEI " Status=0x%" PRIx8,
                                 endpointId, ChipLogValueMEI(clusterId), ChipLogValueMEI(commandId),
                                 to_underlying(statusIB.mStatus));
             }

@@ -1,0 +1,52 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name:
+    7.1.9. [TC-DD-1.9] Manual Pairing Code Payload Verification [DUT -
+    Commissioner]
+
+config:
+    cluster: "Basic"
+    endpoint: 0
+
+tests:
+    - label: "Precondition"
+      cluster: "LogCommands"
+      command: "Log"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Verify that the manual pairing code is printed on the
+                    device or in additional provided materials"
+
+    - label: "Step 1"
+      cluster: "LogCommands"
+      command: "Log"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Provide the 11 digit or 21 digit pairing code from the
+                    Device in text speech or any format supported by DUT"
+
+    - label: "Step 1 verification"
+      cluster: "LogCommands"
+      command: "Log"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Verify that the manual pairing code can be provided to DUT
+                    and parsed to onboard the device onto the CHIP network"

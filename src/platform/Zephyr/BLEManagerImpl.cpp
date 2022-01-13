@@ -35,6 +35,7 @@
 #include <bluetooth/addr.h>
 #include <bluetooth/gatt.h>
 #include <logging/log.h>
+#include <random/rand32.h>
 #include <sys/byteorder.h>
 #include <sys/util.h>
 
@@ -85,22 +86,40 @@ struct bt_gatt_service sChipoBleService = BT_GATT_SERVICE(sChipoBleAttributes);
 // This value should be adjusted accordingly if the service declaration changes.
 constexpr int kCHIPoBLE_CCC_AttributeIndex = 3;
 
-void InitRandomStaticAddress()
+CHIP_ERROR InitRandomStaticAddress()
 {
-#if !CONFIG_BT_PRIVACY
-    // When the BT privacy feature is disabled, generate a random static address once per boot.
-    // This must be done before bt_enable() has been called.
+    // Generate a random static address for the default identity.
+    // This must be done before bt_enable() as after that updating the default identity is not possible.
+    int error = 0;
     bt_addr_le_t addr;
 
-    int error = bt_addr_le_create_static(&addr);
-    VerifyOrReturn(error == 0, ChipLogError(DeviceLayer, "Failed to create BLE address: %d", error));
+#if CONFIG_BT_HOST_CRYPTO
+    // When CONFIG_BT_HOST_CRYPTO is enabled, bt_addr_le_create_static() depends on HCI transport
+    // which is not yet started at this point, so use a different method for generating the address
+    addr.type = BT_ADDR_LE_RANDOM;
+    error     = sys_csrand_get(addr.a.val, sizeof(addr.a.val));
+    BT_ADDR_SET_STATIC(&addr.a);
+#else
+    error = bt_addr_le_create_static(&addr);
+#endif
+
+    if (error)
+    {
+        ChipLogError(DeviceLayer, "Failed to create BLE address: %d", error);
+        return System::MapErrorZephyr(error);
+    }
 
     error = bt_id_create(&addr, nullptr);
-    VerifyOrReturn(error == 0, ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", error));
 
-    ChipLogProgress(DeviceLayer, "BLE address was set to %02X:%02X:%02X:%02X:%02X:%02X", addr.a.val[5], addr.a.val[4],
-                    addr.a.val[3], addr.a.val[2], addr.a.val[1], addr.a.val[0]);
-#endif
+    if (error)
+    {
+        ChipLogError(DeviceLayer, "Failed to create BLE identity: %d", error);
+        return System::MapErrorZephyr(error);
+    }
+
+    ChipLogProgress(DeviceLayer, "BLE address: %02X:%02X:%02X:%02X:%02X:%02X", addr.a.val[5], addr.a.val[4], addr.a.val[3],
+                    addr.a.val[2], addr.a.val[1], addr.a.val[0]);
+    return CHIP_NO_ERROR;
 }
 
 } // unnamed namespace
@@ -116,7 +135,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
 
-    InitRandomStaticAddress();
+    ReturnErrorOnFailure(InitRandomStaticAddress());
     int err = bt_enable(NULL);
     VerifyOrReturnError(err == 0, MapErrorZephyr(err));
 
@@ -221,7 +240,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     const uint8_t advFlags        = BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR;
     const bool isAdvertisingRerun = mFlags.Has(Flags::kAdvertising);
 
-    // At first run always select fast advertising, on the next attemp slow down interval.
+    // At first run always select fast advertising, on the next attempt slow down interval.
     const uint32_t intervalMin = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MIN
                                                                             : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL_MIN;
     const uint32_t intervalMax = mFlags.Has(Flags::kFastAdvertisingEnabled) ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL_MAX
@@ -250,7 +269,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
 
     // Initialize service data
-    static_assert(sizeof(serviceData) == 9, "Size of BLE advertisement data changed! Was that intentional?");
+    static_assert(sizeof(serviceData) == 10, "Size of BLE advertisement data changed! Was that intentional?");
     chip::Encoding::LittleEndian::Put16(serviceData.uuid, UUID16_CHIPoBLEService.val);
     ReturnErrorOnFailure(ConfigurationMgr().GetBLEDeviceIdentificationInfo(serviceData.deviceIdInfo));
 

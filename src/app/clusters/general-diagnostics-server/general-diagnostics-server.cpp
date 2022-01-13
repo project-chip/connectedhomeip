@@ -101,7 +101,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadListIfSupported(CHIP_ERROR (Diagnost
     }
     else
     {
-        err = aEncoder.Encode(DataModel::List<uint8_t>());
+        err = aEncoder.EncodeEmptyList();
     }
 
     return err;
@@ -127,7 +127,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEnco
     }
     else
     {
-        err = aEncoder.Encode(DataModel::List<EndpointId>());
+        err = aEncoder.EncodeEmptyList();
     }
 
     return err;

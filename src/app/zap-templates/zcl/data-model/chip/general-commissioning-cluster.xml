@@ -67,7 +67,7 @@ limitations under the License.
       <arg name="debugText" type="CHAR_STRING"/>
     </command>
     <command source="client" code="0x04" name="CommissioningComplete" optional="false" cli="chip fabric_commissioning commissioningcomplete">
-      <description>Signals the Commissionee that the Commissioner has sucessfully completed all steps of commissioning</description>
+      <description>Signals the Commissionee that the Commissioner has successfully completed all steps of commissioning</description>
     </command>
     <command source="server" code="0x05" name="CommissioningCompleteResponse" optional="false" cli="chip fabric_commissioning commissioningcompleteresponse">
       <description>Sender expects CommissioningCompleteResponse command if the CommissioningComplete command was correctly received</description>

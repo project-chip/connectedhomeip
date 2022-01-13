@@ -30,6 +30,7 @@ namespace Controller {
 
 // The command status will be used for python script.
 // use packed attribute so we can unpack it from python and no need to worry about padding.
+// This struct needs to match the IMCommandStatus definition in delegate.py
 struct __attribute__((packed)) CommandStatus
 {
     Protocols::InteractionModel::Status status;
@@ -43,7 +44,7 @@ struct __attribute__((packed)) CommandStatus
 static_assert(std::is_same<chip::EndpointId, uint16_t>::value && std::is_same<chip::ClusterId, uint32_t>::value &&
                   std::is_same<chip::CommandId, uint32_t>::value,
               "Members in CommandStatus does not match interaction_model/delegate.py");
-static_assert(sizeof(CommandStatus) == 2 + 1 + 2 + 4 + 4 + 1, "Size of CommandStatus might contain padding");
+static_assert(sizeof(CommandStatus) == 1 + 1 + 2 + 4 + 4 + 1, "Size of CommandStatus might contain padding");
 
 struct __attribute__((packed)) AttributePath
 {
@@ -57,6 +58,7 @@ static_assert(std::is_same<chip::EndpointId, uint16_t>::value && std::is_same<ch
               "Members in AttributePath does not match interaction_model/delegate.py");
 static_assert(sizeof(AttributePath) == 2 + 4 + 4, "AttributePath might contain padding");
 
+// This struct needs to match the IMWriteStatus definition in delegate.py
 struct __attribute__((packed)) AttributeWriteStatus
 {
     chip::NodeId nodeId;
@@ -69,7 +71,7 @@ struct __attribute__((packed)) AttributeWriteStatus
 static_assert(std::is_same<chip::EndpointId, uint16_t>::value && std::is_same<chip::ClusterId, uint32_t>::value &&
                   std::is_same<chip::FieldId, uint32_t>::value,
               "Members in AttributeWriteStatus does not match interaction_model/delegate.py");
-static_assert(sizeof(AttributeWriteStatus) == 8 + 8 + 2 + 2 + 4 + 4, "Size of AttributeWriteStatus might contain padding");
+static_assert(sizeof(AttributeWriteStatus) == 8 + 8 + 1 + 2 + 4 + 4, "Size of AttributeWriteStatus might contain padding");
 
 extern "C" {
 typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,
@@ -80,17 +82,11 @@ typedef void (*PythonInteractionModelDelegate_OnCommandResponseFunct)(uint64_t c
 
 typedef void (*PythonInteractionModelDelegate_OnWriteResponseStatusFunct)(void * writeStatusBuf, uint32_t writeStatusBufLen);
 
-typedef void (*PythonInteractionModelDelegate_OnReportDataFunct)(chip::NodeId nodeId, uint64_t readClientAppIdentifier,
-                                                                 uint64_t subscriptionId, void * attributePathBuf,
-                                                                 size_t attributePathBufLen, uint8_t * readTlvData,
-                                                                 size_t readTlvDataLen, uint16_t statusCode);
-
 void pychip_InteractionModelDelegate_SetCommandResponseStatusCallback(
     PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct f);
 void pychip_InteractionModelDelegate_SetCommandResponseProtocolErrorCallback(
     PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct f);
 void pychip_InteractionModelDelegate_SetCommandResponseErrorCallback(PythonInteractionModelDelegate_OnCommandResponseFunct f);
-void pychip_InteractionModelDelegate_SetOnReportDataCallback(PythonInteractionModelDelegate_OnReportDataFunct f);
 void pychip_InteractionModelDelegate_SetOnWriteResponseStatusCallback(PythonInteractionModelDelegate_OnWriteResponseStatusFunct f);
 }
 
@@ -100,13 +96,6 @@ public:
     void OnResponse(app::CommandSender * apCommandSender, const app::ConcreteCommandPath & aPath, const app::StatusIB & aStatus,
                     TLV::TLVReader * aData) override;
     void OnError(const app::CommandSender * apCommandSender, const app::StatusIB & aStatus, CHIP_ERROR aError) override;
-
-    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteDataAttributePath & aPath,
-                         TLV::TLVReader * apData, const app::StatusIB & status) override;
-
-    void OnEventData(const app::ReadClient * apReadClient, const app::EventHeader & aEventHeader, TLV::TLVReader * apData,
-                     const app::StatusIB * apStatus) override
-    {}
 
     static PythonInteractionModelDelegate & Instance();
 
@@ -124,13 +113,10 @@ public:
 
     void SetOnWriteResponseStatusCallback(PythonInteractionModelDelegate_OnWriteResponseStatusFunct f) { onWriteResponseFunct = f; }
 
-    void SetOnReportDataCallback(PythonInteractionModelDelegate_OnReportDataFunct f) { onReportDataFunct = f; }
-
 private:
     PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct commandResponseStatusFunct   = nullptr;
     PythonInteractionModelDelegate_OnCommandResponseProtocolErrorFunct commandResponseProtocolErrorFunct = nullptr;
     PythonInteractionModelDelegate_OnCommandResponseFunct commandResponseErrorFunct                      = nullptr;
-    PythonInteractionModelDelegate_OnReportDataFunct onReportDataFunct                                   = nullptr;
     PythonInteractionModelDelegate_OnWriteResponseStatusFunct onWriteResponseFunct                       = nullptr;
 };
 

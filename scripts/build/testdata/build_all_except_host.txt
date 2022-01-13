@@ -7,6 +7,9 @@ bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {ro
 # Generating ameba-amebad-light
 bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-light lighting-app'
 
+# Generating ameba-amebad-pigweed
+bash -c '$AMEBA_PATH/project/realtek_amebaD_va0_example/GCC-RELEASE/build.sh {root} ninja {out}/ameba-amebad-pigweed pigweed-app'
+
 # Generating JARs for Java build rules test
 python3 build/chip/java/tests/generate_jars_for_test.py
 
@@ -329,6 +332,17 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
 idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge reconfigure'
 
+# Generating esp32-devkitc-light
+mkdir -p {out}/esp32-devkitc-light
+
+cp examples/lighting-app/esp32/sdkconfig.defaults {out}/esp32-devkitc-light/sdkconfig.defaults
+
+rm -f examples/lighting-app/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light reconfigure'
+
 # Generating esp32-devkitc-lock
 mkdir -p {out}/esp32-devkitc-lock
 
@@ -410,6 +424,17 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only reconfigure'
 
+# Generating esp32-qemu-tests
+mkdir -p {out}/esp32-qemu-tests
+
+cp src/test_driver/esp32/sdkconfig_qemu.defaults {out}/esp32-qemu-tests/sdkconfig.defaults
+
+rm -f src/test_driver/esp32/sdkconfig
+
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
+idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests reconfigure'
+
 # Generating infineon-p6-all-clusters
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters
 
@@ -418,6 +443,31 @@ gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/exa
 
 # Generating infineon-p6-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0' {out}/k32w-light
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-light-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-light-release
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-lock-low-power-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=1 is_debug=false' {out}/k32w-lock-low-power-release
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-lock-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-lock-release
+
+{root}/third_party/nxp/k32w0_sdk/sdk_fixes/patch_k32w_sdk.sh
+
+# Generating k32w-shell-release
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/shell/nxp/k32w/k32w0 '--args=k32w0_sdk_root="TEST_NXP_K32W061_SDK_ROOT" chip_with_low_power=0 is_debug=false' {out}/k32w-shell-release
 
 # Generating config mbed-CY8CPROTO_062_4343W-all-clusters-debug
 mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug --mbed-os-path {root}/third_party/mbed-os/repo
@@ -514,65 +564,70 @@ bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-native-posix-64-tests -b native_posix_64 {root}/src/test_driver/nrfconnect'
 
-# Generating nrf-nrf52840-light
+# Generating nrf-nrf52840dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-light -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dk-light -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect'
 
-# Generating nrf-nrf52840-light-rpc
+# Generating nrf-nrf52840dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-light-rpc -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
+west build --cmake-only -d {out}/nrf-nrf52840dk-light-rpc -b nrf52840dk_nrf52840 {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
-# Generating nrf-nrf52840-lock
+# Generating nrf-nrf52840dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dk-lock -b nrf52840dk_nrf52840 {root}/examples/lock-app/nrfconnect'
 
-# Generating nrf-nrf52840-pump
+# Generating nrf-nrf52840dk-pump
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-pump -b nrf52840dk_nrf52840 {root}/examples/pump-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dk-pump -b nrf52840dk_nrf52840 {root}/examples/pump-app/nrfconnect'
 
-# Generating nrf-nrf52840-pump-controller
+# Generating nrf-nrf52840dk-pump-controller
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-pump-controller -b nrf52840dk_nrf52840 {root}/examples/pump-controller-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dk-pump-controller -b nrf52840dk_nrf52840 {root}/examples/pump-controller-app/nrfconnect'
 
-# Generating nrf-nrf52840-shell
+# Generating nrf-nrf52840dk-shell
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf52840-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dk-shell -b nrf52840dk_nrf52840 {root}/examples/shell/nrfconnect'
 
-# Generating nrf-nrf5340-light
+# Generating nrf-nrf52840dongle-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf52840dongle-light -b nrf52840dongle_nrf52840 {root}/examples/lighting-app/nrfconnect'
 
-# Generating nrf-nrf5340-light-rpc
+# Generating nrf-nrf5340dk-light
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-light-rpc -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
+west build --cmake-only -d {out}/nrf-nrf5340dk-light -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect'
 
-# Generating nrf-nrf5340-lock
+# Generating nrf-nrf5340dk-light-rpc
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-lock -b nrf5340dk_nrf5340_cpuapp {root}/examples/lock-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf5340dk-light-rpc -b nrf5340dk_nrf5340_cpuapp {root}/examples/lighting-app/nrfconnect -- -DOVERLAY_CONFIG=rpc.overlay'
 
-# Generating nrf-nrf5340-pump
+# Generating nrf-nrf5340dk-lock
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-pump -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf5340dk-lock -b nrf5340dk_nrf5340_cpuapp {root}/examples/lock-app/nrfconnect'
 
-# Generating nrf-nrf5340-pump-controller
+# Generating nrf-nrf5340dk-pump
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-pump-controller -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-controller-app/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf5340dk-pump -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-app/nrfconnect'
 
-# Generating nrf-nrf5340-shell
+# Generating nrf-nrf5340dk-pump-controller
 bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
 export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
-west build --cmake-only -d {out}/nrf-nrf5340-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
+west build --cmake-only -d {out}/nrf-nrf5340dk-pump-controller -b nrf5340dk_nrf5340_cpuapp {root}/examples/pump-controller-app/nrfconnect'
+
+# Generating nrf-nrf5340dk-shell
+bash -c 'source "$ZEPHYR_BASE/zephyr-env.sh";
+export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
+west build --cmake-only -d {out}/nrf-nrf5340dk-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
 
 # Generating qpg-qpg6100-lock
 gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
@@ -592,6 +647,9 @@ ninja -C {out}/ameba-amebad-all-clusters
 
 # Building ameba-amebad-light
 ninja -C {out}/ameba-amebad-light
+
+# Building ameba-amebad-pigweed
+ninja -C {out}/ameba-amebad-pigweed
 
 # Building APP android-androidstudio-arm-chip-tool
 {root}/src/android/CHIPTool/gradlew -p {root}/src/android/CHIPTool -PmatterBuildSrcDir={out}/android-androidstudio-arm-chip-tool -PmatterSdkSourceBuild=true -PmatterSourceBuildAbiFilters=armeabi-v7a assembleDebug
@@ -928,6 +986,13 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-bridge/sdkconfig.defaults
 idf.py -C examples/bridge-app/esp32 -B {out}/esp32-devkitc-bridge build'
 
+rm -f examples/lighting-app/esp32/sdkconfig
+
+# Building esp32-devkitc-light
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-devkitc-light/sdkconfig.defaults
+idf.py -C examples/lighting-app/esp32 -B {out}/esp32-devkitc-light build'
+
 rm -f examples/lock-app/esp32/sdkconfig
 
 # Building esp32-devkitc-lock
@@ -977,6 +1042,13 @@ bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh;
 export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfig.defaults
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only build'
 
+rm -f src/test_driver/esp32/sdkconfig
+
+# Building esp32-qemu-tests
+bash -c 'source $IDF_PATH/export.sh; source scripts/activate.sh; 
+export SDKCONFIG_DEFAULTS={out}/esp32-qemu-tests/sdkconfig.defaults
+idf.py -C src/test_driver/esp32 -B {out}/esp32-qemu-tests build'
+
 # Building infineon-p6-all-clusters
 ninja -C {out}/infineon-p6-all-clusters
 
@@ -985,6 +1057,21 @@ ninja -C {out}/infineon-p6-light
 
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock
+
+# Building k32w-light
+ninja -C {out}/k32w-light
+
+# Building k32w-light-release
+ninja -C {out}/k32w-light-release
+
+# Building k32w-lock-low-power-release
+ninja -C {out}/k32w-lock-low-power-release
+
+# Building k32w-lock-release
+ninja -C {out}/k32w-lock-release
+
+# Building k32w-shell-release
+ninja -C {out}/k32w-shell-release
 
 # Remove old artifacts mbed-CY8CPROTO_062_4343W-all-clusters-debug
 bash -c 'rm -rf {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug/chip-*'
@@ -1082,41 +1169,44 @@ ninja -C {out}/nrf-native-posix-64-tests
 # Run Tests nrf-native-posix-64-tests
 ctest --build-nocmake -V --output-on-failure --test-dir {out}/nrf-native-posix-64-tests
 
-# Building nrf-nrf52840-light
-ninja -C {out}/nrf-nrf52840-light
+# Building nrf-nrf52840dk-light
+ninja -C {out}/nrf-nrf52840dk-light
 
-# Building nrf-nrf52840-light-rpc
-ninja -C {out}/nrf-nrf52840-light-rpc
+# Building nrf-nrf52840dk-light-rpc
+ninja -C {out}/nrf-nrf52840dk-light-rpc
 
-# Building nrf-nrf52840-lock
-ninja -C {out}/nrf-nrf52840-lock
+# Building nrf-nrf52840dk-lock
+ninja -C {out}/nrf-nrf52840dk-lock
 
-# Building nrf-nrf52840-pump
-ninja -C {out}/nrf-nrf52840-pump
+# Building nrf-nrf52840dk-pump
+ninja -C {out}/nrf-nrf52840dk-pump
 
-# Building nrf-nrf52840-pump-controller
-ninja -C {out}/nrf-nrf52840-pump-controller
+# Building nrf-nrf52840dk-pump-controller
+ninja -C {out}/nrf-nrf52840dk-pump-controller
 
-# Building nrf-nrf52840-shell
-ninja -C {out}/nrf-nrf52840-shell
+# Building nrf-nrf52840dk-shell
+ninja -C {out}/nrf-nrf52840dk-shell
 
-# Building nrf-nrf5340-light
-ninja -C {out}/nrf-nrf5340-light
+# Building nrf-nrf52840dongle-light
+ninja -C {out}/nrf-nrf52840dongle-light
 
-# Building nrf-nrf5340-light-rpc
-ninja -C {out}/nrf-nrf5340-light-rpc
+# Building nrf-nrf5340dk-light
+ninja -C {out}/nrf-nrf5340dk-light
 
-# Building nrf-nrf5340-lock
-ninja -C {out}/nrf-nrf5340-lock
+# Building nrf-nrf5340dk-light-rpc
+ninja -C {out}/nrf-nrf5340dk-light-rpc
 
-# Building nrf-nrf5340-pump
-ninja -C {out}/nrf-nrf5340-pump
+# Building nrf-nrf5340dk-lock
+ninja -C {out}/nrf-nrf5340dk-lock
 
-# Building nrf-nrf5340-pump-controller
-ninja -C {out}/nrf-nrf5340-pump-controller
+# Building nrf-nrf5340dk-pump
+ninja -C {out}/nrf-nrf5340dk-pump
 
-# Building nrf-nrf5340-shell
-ninja -C {out}/nrf-nrf5340-shell
+# Building nrf-nrf5340dk-pump-controller
+ninja -C {out}/nrf-nrf5340dk-pump-controller
+
+# Building nrf-nrf5340dk-shell
+ninja -C {out}/nrf-nrf5340dk-shell
 
 # Building qpg-qpg6100-lock
 ninja -C {out}/qpg-qpg6100-lock

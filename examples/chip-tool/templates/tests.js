@@ -54,6 +54,14 @@ function getTests()
     'Test_TC_CC_9_3',
   ];
 
+  const DeviceDiscovery = [
+    'Test_TC_DD_1_5',
+    'Test_TC_DD_1_6',
+    'Test_TC_DD_1_7',
+    'Test_TC_DD_1_8',
+    'Test_TC_DD_1_9',
+  ];
+
   const DeviceManagement = [
     'Test_TC_DM_1_1',
     'Test_TC_DM_3_1',
@@ -171,8 +179,9 @@ function getTests()
     'TV_WakeOnLanCluster',
     'TV_ApplicationBasicCluster',
     'TV_MediaPlaybackCluster',
-    'TV_TvChannelCluster',
+    'TV_ChannelCluster',
     'TV_LowPowerCluster',
+    'TV_ContentLauncherCluster',
     'TV_MediaInputCluster',
   ];
 
@@ -183,19 +192,21 @@ function getTests()
     'TestDelayCommands',
     'TestLogCommands',
     'TestSaveAs',
+    'TestConfigVariables',
     'TestDescriptorCluster',
     'TestBasicInformation',
     'TestIdentifyCluster',
     'TestGroupsCluster',
+    'TestGroupKeyManagementCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
     'TestGroupMessaging',
   ];
 
   const SoftwareDiagnostics = [
-    'Test_TC_DIAGSW_1_1',
-    'Test_TC_DIAGSW_2_1',
-    'Test_TC_DIAGSW_3_2',
+    'Test_TC_SWDIAG_1_1',
+    'Test_TC_SWDIAG_2_1',
+    'Test_TC_SWDIAG_3_1',
   ];
 
   const Subscriptions = [
@@ -206,6 +217,7 @@ function getTests()
     BinaryInput, //
     BooleanState, //
     ColorControl, //
+    DeviceDiscovery, //
     DeviceManagement, //
     ElectricalMeasurement, //
     FlowMeasurement, //

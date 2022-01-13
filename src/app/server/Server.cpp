@@ -75,9 +75,7 @@ Server Server::sServer;
 static uint8_t sInfoEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE];
 static uint8_t sDebugEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE];
 static uint8_t sCritEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE];
-static ::chip::PersistedCounter sCritEventIdCounter;
-static ::chip::PersistedCounter sInfoEventIdCounter;
-static ::chip::PersistedCounter sDebugEventIdCounter;
+static ::chip::PersistedCounter sGlobalEventIdCounter;
 static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
@@ -94,7 +92,8 @@ Server::Server() :
         .dnsCache          = nullptr,
         .devicePool        = &mDevicePool,
         .dnsResolver       = nullptr,
-    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage)
+    }), mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage),
+    mAttributePersister(mServerStorage)
 {}
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
@@ -108,6 +107,11 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 
     mCommissioningWindowManager.SetAppDelegate(delegate);
     mCommissioningWindowManager.SetSessionIDAllocator(&mSessionIDAllocator);
+
+    // Set up attribute persistence before we try to bring up the data model
+    // handler.
+    SetAttributePersistenceProvider(&mAttributePersister);
+
     InitDataModelHandler(&mExchangeMgr);
 
 #if CHIP_DEVICE_LAYER_TARGET_DARWIN
@@ -129,6 +133,9 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mTransports.Init(UdpListenParameters(DeviceLayer::UDPEndPointManager())
                                .SetAddressType(IPAddressType::kIPv6)
                                .SetListenPort(mSecuredServicePort)
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+                               .SetNativeParams(chip::DeviceLayer::ThreadStackMgrImpl().OTInstance())
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
 
 #if INET_CONFIG_ENABLE_IPV4
                                ,
@@ -147,10 +154,10 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #endif
     SuccessOrExit(err);
 
-    // Enable Group Listening
-    // TODO : Fix this once GroupDataProvider is implemented #Issue 11075
-    // for (iterate through all GroupDataProvider multicast Address)
-    // {
+// Enable Group Listening
+// TODO : Fix this once GroupDataProvider is implemented #Issue 11075
+// for (iterate through all GroupDataProvider multicast Address)
+// {
 #ifdef CHIP_ENABLE_GROUP_MESSAGING_TESTS
     err = mTransports.MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(1, 1234), true);
     SuccessOrExit(err);
@@ -171,21 +178,18 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
 #if CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
     // Initialize event logging subsystem
     {
-        ::chip::Platform::PersistedStorage::Key debugEventIdCounterStorageKey = CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY;
-        ::chip::Platform::PersistedStorage::Key critEventIdCounterStorageKey  = CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY;
-        ::chip::Platform::PersistedStorage::Key infoEventIdCounterStorageKey  = CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY;
+        ::chip::Platform::PersistedStorage::Key globalEventIdCounterStorageKey =
+            CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_GLOBAL_EIDC_KEY;
 
         ::chip::app::LogStorageResources logStorageResources[] = {
-            { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), &debugEventIdCounterStorageKey,
-              CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sDebugEventIdCounter, ::chip::app::PriorityLevel::Debug },
-            { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), &infoEventIdCounterStorageKey,
-              CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sInfoEventIdCounter, ::chip::app::PriorityLevel::Info },
-            { &sCritEventBuffer[0], sizeof(sCritEventBuffer), &critEventIdCounterStorageKey,
-              CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sCritEventIdCounter, ::chip::app::PriorityLevel::Critical }
+            { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), ::chip::app::PriorityLevel::Debug },
+            { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), ::chip::app::PriorityLevel::Info },
+            { &sCritEventBuffer[0], sizeof(sCritEventBuffer), ::chip::app::PriorityLevel::Critical }
         };
 
         chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
-                                                       &logStorageResources[0]);
+                                                       &logStorageResources[0], &globalEventIdCounterStorageKey,
+                                                       CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sGlobalEventIdCounter);
     }
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
@@ -199,12 +203,13 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
         ChipLogProgress(AppServer, "Rendezvous and secure pairing skipped");
         SuccessOrExit(err = AddTestCommissioning());
     }
-    else if ((DeviceLayer::ConnectivityMgr().IsWiFiStationProvisioned() || DeviceLayer::ConnectivityMgr().IsThreadProvisioned()) &&
-             (GetFabricTable().FabricCount() != 0))
+    else if (GetFabricTable().FabricCount() != 0)
     {
         // The device is already commissioned, proactively disable BLE advertisement.
         ChipLogProgress(AppServer, "Fabric already commissioned. Disabling BLE advertisement");
+#if CONFIG_NETWORK_LAYER_BLE
         chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+#endif
     }
     else
     {
@@ -265,7 +270,7 @@ CHIP_ERROR Server::SendUserDirectedCommissioningRequest(chip::Transport::PeerAdd
     ChipLogDetail(AppServer, "SendUserDirectedCommissioningRequest2");
 
     CHIP_ERROR err;
-    char nameBuffer[chip::Dnssd::Commissionable::kInstanceNameMaxLength + 1];
+    char nameBuffer[chip::Dnssd::Commission::kInstanceNameMaxLength + 1];
     err = app::DnssdServer::Instance().GetCommissionableInstanceName(nameBuffer, sizeof(nameBuffer));
     if (err != CHIP_NO_ERROR)
     {

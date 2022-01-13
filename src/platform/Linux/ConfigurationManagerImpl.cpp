@@ -25,7 +25,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <ifaddrs.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
@@ -94,15 +94,21 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))
     {
-        uint32_t location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR;
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
         err               = WriteConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, location);
         SuccessOrExit(err);
     }
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_LocationCapability))
     {
-        uint32_t location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR;
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
         err               = WriteConfigValue(PosixConfig::kConfigKey_LocationCapability, location);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ActiveLocale))
+    {
+        err = WriteConfigValueStr(PosixConfig::kConfigKey_ActiveLocale, "en-US", strlen("en-US"));
         SuccessOrExit(err);
     }
 

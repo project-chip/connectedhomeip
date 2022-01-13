@@ -80,18 +80,21 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/clusters/identify-server/identify-server.cpp
                ${CHIP_ROOT}/src/app/clusters/diagnostic-logs-server/diagnostic-logs-server.cpp
                ${CHIP_ROOT}/src/app/clusters/ethernet-network-diagnostics-server/ethernet-network-diagnostics-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/localization-configuration-server/localization-configuration-server.cpp
                ${CHIP_ROOT}/src/app/clusters/fixed-label-server/fixed-label-server.cpp
                ${CHIP_ROOT}/src/app/clusters/user-label-server/user-label-server.cpp               
                ${CHIP_ROOT}/src/app/clusters/thread-network-diagnostics-server/thread-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/wifi-network-diagnostics-server/wifi-network-diagnostics-server.cpp
                ${CHIP_ROOT}/src/app/clusters/software-diagnostics-server/software-diagnostics-server.cpp
+               ${CHIP_ROOT}/src/app/clusters/switch-server/switch-server.cpp
                ${CHIP_ROOT}/src/app/clusters/general-diagnostics-server/general-diagnostics-server.cpp               	       
+               ${CHIP_ROOT}/src/app/clusters/group-key-mgmt-server/group-key-mgmt-server.cpp
                ${CHIP_ROOT}/src/app/clusters/general-commissioning-server/general-commissioning-server.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off-server.cpp
                ${CHIP_ROOT}/src/app/clusters/operational-credentials-server/operational-credentials-server.cpp
                ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
                ${CHIP_ROOT}/src/app/clusters/color-control-server/color-control-server.cpp
                ${CHIP_ROOT}/src/app/clusters/occupancy-sensor-server/occupancy-sensor-server.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning-ember.cpp
-               ${CHIP_ROOT}/src/app/clusters/network-commissioning/network-commissioning.cpp
+               ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-ember.cpp
+               ${CHIP_ROOT}/src/app/clusters/network-commissioning-old/network-commissioning-old.cpp
                )

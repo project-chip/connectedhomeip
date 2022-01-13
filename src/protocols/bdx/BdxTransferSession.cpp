@@ -123,7 +123,7 @@ void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp c
         break;
     }
 
-    // If there's no other pending output but an error occured or was received, then continue to output the error.
+    // If there's no other pending output but an error occurred or was received, then continue to output the error.
     // This ensures that when the TransferSession encounters an error and needs to send a StatusReport, both a kMsgToSend and a
     // kInternalError output event will be emitted.
     if (event.EventType == OutputEventType::kNone && mState == TransferState::kErrorState)

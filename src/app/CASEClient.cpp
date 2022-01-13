@@ -38,8 +38,6 @@ CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddres
     Messaging::ExchangeContext * exchange = mInitParams.exchangeMgr->NewContext(session.Value(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
-    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mInitParams.sessionManager));
-
     uint16_t keyID = 0;
     ReturnErrorOnFailure(mInitParams.idAllocator->Allocate(keyID));
 
@@ -66,7 +64,7 @@ void CASEClient::OnSessionEstablishmentError(CHIP_ERROR error)
 
 void CASEClient::OnSessionEstablished()
 {
-    // On successfull CASE connection, the local session ID will be used for the derived secure session.
+    // On successful CASE connection, the local session ID will be used for the derived secure session.
     if (mConnectionSuccessCallback)
     {
         mConnectionSuccessCallback(mConectionContext, this);

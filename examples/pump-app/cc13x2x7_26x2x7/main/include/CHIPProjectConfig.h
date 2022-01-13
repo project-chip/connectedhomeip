@@ -33,8 +33,8 @@
 #define CHIP_CONFIG_REQUIRE_AUTH 1
 
 #if BUILD_RELEASE // release build
-
-#else // development build
+// Note: Default Pairing/PIN/Serial Numbers being used. These should not be enabled for production builds
+#endif // BUILD_RELEASE
 
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -50,8 +50,6 @@
  * is found in CHIP NV storage.
  */
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
-
-#endif // BUILD_RELEASE
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID

@@ -27,10 +27,10 @@ namespace Credentials {
 constexpr size_t kExpectedAttestationNonceSize = 32;
 
 /**
- *  @brief Take the attestation elements buffer and return each component seperately.
+ *  @brief Take the attestation elements buffer and return each component separately.
  *         All output data stays valid while attestationElements buffer is valid.
  *
- *  @param[in]    attestationElements ByteSpan containg source of Attestation Elements data.
+ *  @param[in]    attestationElements ByteSpan containing source of Attestation Elements data.
  *  @param[out]   certificationDeclaration
  *  @param[out]   attestationNonce
  *  @param[out]   timestamp
@@ -81,6 +81,20 @@ CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements,
 CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonce, const ByteSpan & vendor_reserved1,
                                   const ByteSpan & vendor_reserved2, const ByteSpan & vendor_reserved3,
                                   MutableByteSpan & nocsrElements);
+
+/**
+ *  @brief Take the NOCSR elements buffer and return each component seperately.
+ *         All output data stays valid while nocsrElements buffer is valid.
+ *
+ *  @param[in]  nocsrElements ByteSpan containg source of NOCSR Elements data
+ *  @param[out] csr Certificate Signing Request Body
+ *  @param[out] csrNonce CSR Nonce
+ *  @param[out] vendor_reserved1 Optional vendor_reserved1 blob, empty if omitted
+ *  @param[out] vendor_reserved2 Optional vendor_reserved2 blob, empty if omitted
+ *  @param[out] vendor_reserved3 Optional vendor_reserved3 blob, empty if omitted
+ */
+CHIP_ERROR DeconstructNOCSRElements(const ByteSpan & nocsrElements, ByteSpan & csr, ByteSpan & csrNonce,
+                                    ByteSpan & vendor_reserved1, ByteSpan & vendor_reserved2, ByteSpan & vendor_reserved3);
 
 } // namespace Credentials
 } // namespace chip

@@ -30,7 +30,10 @@ namespace detail {
 template <typename DecodableAttributeType>
 struct ReportAttributeParams : public app::ReadPrepareParams
 {
-    ReportAttributeParams(SessionHandle sessionHandle) : app::ReadPrepareParams(sessionHandle) { mKeepSubscriptions = false; }
+    ReportAttributeParams(const SessionHandle & sessionHandle) : app::ReadPrepareParams(sessionHandle)
+    {
+        mKeepSubscriptions = false;
+    }
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType mOnReportCb;
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType mOnErrorCb;
     typename TypedReadAttributeCallback<DecodableAttributeType>::OnSubscriptionEstablishedCallbackType
@@ -43,7 +46,6 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
                            AttributeId attributeId, ReportAttributeParams<DecodableAttributeType> && readParams)
 {
     app::AttributePathParams attributePath(endpointId, clusterId, attributeId);
-    app::ReadClient * readClient         = nullptr;
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
     CHIP_ERROR err                       = CHIP_NO_ERROR;
 
@@ -51,6 +53,7 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
     readParams.mAttributePathParamsListSize = 1;
 
     auto onDone = [](app::ReadClient * apReadClient, TypedReadAttributeCallback<DecodableAttributeType> * callback) {
+        chip::Platform::Delete(apReadClient);
         chip::Platform::Delete(callback);
     };
 
@@ -58,15 +61,10 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
         clusterId, attributeId, readParams.mOnReportCb, readParams.mOnErrorCb, onDone, readParams.mOnSubscriptionEstablishedCb);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(engine->NewReadClient(&readClient, readParams.mReportType, &(callback->GetBufferedCallback())));
+    auto readClient =
+        chip::Platform::MakeUnique<app::ReadClient>(engine, exchangeMgr, callback->GetBufferedCallback(), readParams.mReportType);
 
-    err = readClient->SendRequest(readParams);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        readClient->Shutdown();
-        return err;
-    }
+    ReturnErrorOnFailure(readClient->SendRequest(readParams));
 
     //
     // At this point, we'll get a callback through the OnDone callback above regardless of success or failure
@@ -74,6 +72,8 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
     // object now to prevent it from being reclaimed at the end of this scoped block.
     //
     callback.release();
+    readClient.release();
+
     return err;
 }
 
@@ -84,7 +84,7 @@ CHIP_ERROR ReportAttribute(Messaging::ExchangeManager * exchangeMgr, EndpointId 
  * basis, we have a helper that's just templated on the type.
  */
 template <typename DecodableAttributeType>
-CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
                          ClusterId clusterId, AttributeId attributeId,
                          typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType onSuccessCb,
                          typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb)
@@ -106,7 +106,7 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const Session
  */
 template <typename AttributeTypeInfo>
 CHIP_ERROR
-ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
               typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnSuccessCallbackType onSuccessCb,
               typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb)
 {
@@ -117,7 +117,7 @@ ReadAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sess
 
 // Helper for SubscribeAttribute to reduce the amount of code generated.
 template <typename DecodableAttributeType>
-CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
                               ClusterId clusterId, AttributeId attributeId,
                               typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType onReportCb,
                               typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb,
@@ -142,7 +142,7 @@ CHIP_ERROR SubscribeAttribute(Messaging::ExchangeManager * exchangeMgr, const Se
  */
 template <typename AttributeTypeInfo>
 CHIP_ERROR SubscribeAttribute(
-    Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+    Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnSuccessCallbackType onReportCb,
     typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb,
     uint16_t aMinIntervalFloorSeconds, uint16_t aMaxIntervalCeilingSeconds,
@@ -159,7 +159,7 @@ namespace detail {
 template <typename DecodableEventType>
 struct ReportEventParams : public app::ReadPrepareParams
 {
-    ReportEventParams(SessionHandle sessionHandle) : app::ReadPrepareParams(sessionHandle) { mKeepSubscriptions = false; }
+    ReportEventParams(const SessionHandle & sessionHandle) : app::ReadPrepareParams(sessionHandle) { mKeepSubscriptions = false; }
     typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType mOnReportCb;
     typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType mOnErrorCb;
     typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablishedCb =
@@ -174,7 +174,6 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
     ClusterId clusterId = DecodableEventType::GetClusterId();
     EventId eventId     = DecodableEventType::GetEventId();
     app::EventPathParams eventPath(endpointId, clusterId, eventId);
-    app::ReadClient * readClient         = nullptr;
     app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
     CHIP_ERROR err                       = CHIP_NO_ERROR;
 
@@ -182,6 +181,7 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
     readParams.mEventPathParamsListSize = 1;
 
     auto onDone = [](app::ReadClient * apReadClient, TypedReadEventCallback<DecodableEventType> * callback) {
+        chip::Platform::Delete(apReadClient);
         chip::Platform::Delete(callback);
     };
 
@@ -190,14 +190,8 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
 
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(engine->NewReadClient(&readClient, readParams.mReportType, callback.get()));
-
-    err = readClient->SendRequest(readParams);
-    if (err != CHIP_NO_ERROR)
-    {
-        readClient->Shutdown();
-        return err;
-    }
+    auto readClient = chip::Platform::MakeUnique<app::ReadClient>(engine, apExchangeMgr, *callback.get(), readParams.mReportType);
+    ReturnErrorOnFailure(readClient->SendRequest(readParams));
 
     //
     // At this point, we'll get a callback through the OnDone callback above regardless of success or failure
@@ -205,6 +199,8 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
     // object now to prevent it from being reclaimed at the end of this scoped block.
     //
     callback.release();
+    readClient.release();
+
     return err;
 }
 
@@ -220,7 +216,7 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
  * GetEventId() methods is expected to work.
  */
 template <typename DecodableEventType>
-CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
                      typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb)
 {
@@ -235,7 +231,7 @@ CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHand
  * similarly to ReadEvent but keeps reporting events as they are emitted.
  */
 template <typename DecodableEventType>
-CHIP_ERROR SubscribeEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
+CHIP_ERROR SubscribeEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
                           typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType onReportCb,
                           typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb,
                           uint16_t minIntervalFloorSeconds, uint16_t maxIntervalCeilingSeconds,

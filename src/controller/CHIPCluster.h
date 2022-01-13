@@ -139,9 +139,17 @@ public:
             }
         };
 
-        return chip::Controller::WriteAttribute<AttrType>(
-            (mSessionHandle.HasValue() ? mSessionHandle.Value() : mDevice->GetSecureSession().Value()), mEndpoint, clusterId,
-            attributeId, requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
+        if (mGroupSession)
+        {
+            return chip::Controller::WriteAttribute<AttrType>(mGroupSession.Get(), mEndpoint, clusterId, attributeId, requestData,
+                                                              onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
+        }
+        else
+        {
+            return chip::Controller::WriteAttribute<AttrType>(mDevice->GetSecureSession().Value(), mEndpoint, clusterId,
+                                                              attributeId, requestData, onSuccessCb, onFailureCb,
+                                                              aTimedWriteTimeoutMs, onDoneCb);
+        }
     }
 
     template <typename AttributeInfo>
@@ -259,25 +267,10 @@ public:
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}
 
-    /**
-     * @brief
-     *   Request attribute reports from the device. Add a callback
-     *   handler, that'll be called when the reports are received from the device.
-     *
-     * @param[in] attributeId       The report target attribute id
-     * @param[in] reportHandler     The handler function that's called on receiving attribute reports
-     *                              The reporting handler continues to be called as long as the callback
-     *                              is active. The user can stop the reporting by cancelling the callback.
-     *                              Reference: chip::Callback::Cancel()
-     * @param[in] tlvDataFilter     Filter interface for processing data from TLV
-     */
-    CHIP_ERROR RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * reportHandler,
-                                         app::TLVDataFilter tlvDataFilter);
-
     const ClusterId mClusterId;
     DeviceProxy * mDevice;
     EndpointId mEndpoint;
-    chip::Optional<SessionHandle> mSessionHandle;
+    SessionHolder mGroupSession;
 };
 
 } // namespace Controller

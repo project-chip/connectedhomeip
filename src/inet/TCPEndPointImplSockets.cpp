@@ -80,12 +80,12 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
         // Enable SO_REUSEPORT.  This permits coexistence between an
         // untargetted CHIP client and other services that listen on
         // a CHIP port on a specific address (such as a CHIP client
-        // with TARGETTED_LISTEN or TCP proxying services).  Note that
+        // with TARGETED_LISTEN or TCP proxying services).  Note that
         // one of the costs of this implementation is the
         // non-deterministic connection dispatch when multple clients
-        // listen on the address wih the same degreee of selectivity,
+        // listen on the address with the same degreee of selectivity,
         // e.g. two untargetted-listen CHIP clients, or two
-        // targetted-listen CHIP clients with the same node id.
+        // targeted-listen CHIP clients with the same node id.
 
         if (setsockopt(mSocket, SOL_SOCKET, SO_REUSEPORT, &n, sizeof(n)) != 0)
         {
@@ -556,12 +556,6 @@ CHIP_ERROR TCPEndPointImplSockets::DriveSendingImpl()
             OnDataSent(this, lenSent);
         }
 
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-        // TCP Send is not Idle; Set state and notify if needed
-
-        SetTCPSendIdleAndNotifyChange(false);
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
         mBytesWrittenSinceLastProbe += lenSent;
 
@@ -675,27 +669,12 @@ void TCPEndPointImplSockets::TCPUserTimeoutHandler()
     // Set the timer running flag to false
     mUserTimeoutTimerRunning = false;
 
-    CHIP_ERROR err     = CHIP_NO_ERROR;
     bool isProgressing = false;
-    err                = CheckConnectionProgress(isProgressing);
-    SuccessOrExit(err);
+    CHIP_ERROR err     = CheckConnectionProgress(isProgressing);
 
-    if (mLastTCPKernelSendQueueLen == 0)
+    if (err == CHIP_NO_ERROR && mLastTCPKernelSendQueueLen != 0)
     {
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-        // If the kernel TCP send queue as well as the TCPEndPoint
-        // send queue have been flushed then notify application
-        // that all data has been acknowledged.
-
-        if (mSendQueue.IsNull())
-        {
-            SetTCPSendIdleAndNotifyChange(true);
-        }
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    }
-    else
-    // There is data in the TCP Send Queue
-    {
+        // There is data in the TCP Send Queue
         if (isProgressing)
         {
             // Data is flowing, so restart the UserTimeout timer
@@ -706,31 +685,14 @@ void TCPEndPointImplSockets::TCPUserTimeoutHandler()
         }
         else
         {
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-            // Data flow is not progressing.
-            // Decrement the remaining max TCP send queue polls.
-
-            mTCPSendQueueRemainingPollCount--;
-
-            VerifyOrExit(mTCPSendQueueRemainingPollCount != 0, err = INET_ERROR_TCP_USER_TIMEOUT);
-
-            // Restart timer to poll again
-
-            ScheduleNextTCPUserTimeoutPoll(mTCPSendQueuePollPeriodMillis);
-#else
             // Close the connection as the TCP UserTimeout has expired
-
-            ExitNow(err = INET_ERROR_TCP_USER_TIMEOUT);
-#endif // !INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
+            err = INET_ERROR_TCP_USER_TIMEOUT;
         }
     }
-
-exit:
 
     if (err != CHIP_NO_ERROR)
     {
         // Close the connection as the TCP UserTimeout has expired
-
         DoClose(err, false);
     }
 }
@@ -748,10 +710,8 @@ CHIP_ERROR TCPEndPointImplSockets::BindSrcAddrFromIntf(IPAddressType addrType, I
     bool ipAddrFound = false;
     for (InterfaceAddressIterator addrIter; addrIter.HasCurrent(); addrIter.Next())
     {
-        const IPAddress curAddr     = addrIter.GetAddress();
-        const InterfaceId curIntfId = addrIter.GetInterfaceId();
-
-        if (curIntfId == intfId)
+        IPAddress curAddr;
+        if ((addrIter.GetInterfaceId() == intfId) && (addrIter.GetAddress(curAddr) == CHIP_NO_ERROR))
         {
             // Search for an IPv4 address on the TargetInterface
 
@@ -965,15 +925,6 @@ void TCPEndPointImplSockets::ReceiveData()
         // If the output queue has been flushed then stop the timer.
 
         StopTCPUserTimeoutTimer();
-
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-        // Notify up if all outstanding data has been acknowledged
-
-        if (mSendQueue.IsNull())
-        {
-            SetTCPSendIdleAndNotifyChange(true);
-        }
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
     }
     else if (isProgressing && mUserTimeoutTimerRunning)
     {

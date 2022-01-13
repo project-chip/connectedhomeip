@@ -68,14 +68,14 @@ JNI_METHOD(jlong, AccountLoginCluster, initWithDevice)(JNIEnv * env, jobject sel
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, AccountLoginCluster, getSetupPIN)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring tempAccountIdentifier)
+JNI_METHOD(void, AccountLoginCluster, getSetupPINRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring tempAccountIdentifier, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
 
-    chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type request;
+    chip::app::Clusters::AccountLogin::Commands::GetSetupPINRequest::Type request;
 
     request.tempAccountIdentifier = chip::JniUtfString(env, static_cast<jstring>(tempAccountIdentifier)).charSpan();
 
@@ -101,7 +101,8 @@ JNI_METHOD(void, AccountLoginCluster, getSetupPIN)
         chip::Callback::Callback<CHIPAccountLoginClusterGetSetupPINResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -109,14 +110,15 @@ JNI_METHOD(void, AccountLoginCluster, getSetupPIN)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, AccountLoginCluster, login)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring tempAccountIdentifier, jstring setupPIN)
+JNI_METHOD(void, AccountLoginCluster, loginRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring tempAccountIdentifier, jstring setupPIN,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
 
-    chip::app::Clusters::AccountLogin::Commands::Login::Type request;
+    chip::app::Clusters::AccountLogin::Commands::LoginRequest::Type request;
 
     request.tempAccountIdentifier = chip::JniUtfString(env, static_cast<jstring>(tempAccountIdentifier)).charSpan();
     request.setupPIN              = chip::JniUtfString(env, static_cast<jstring>(setupPIN)).charSpan();
@@ -140,7 +142,15 @@ JNI_METHOD(void, AccountLoginCluster, login)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -148,13 +158,14 @@ JNI_METHOD(void, AccountLoginCluster, login)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, AccountLoginCluster, logout)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, AccountLoginCluster, logoutRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
 
-    chip::app::Clusters::AccountLogin::Commands::Logout::Type request;
+    chip::app::Clusters::AccountLogin::Commands::LogoutRequest::Type request;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -175,7 +186,8 @@ JNI_METHOD(void, AccountLoginCluster, logout)(JNIEnv * env, jobject self, jlong 
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -230,7 +242,7 @@ JNI_METHOD(jlong, AdministratorCommissioningCluster, initWithDevice)(JNIEnv * en
 }
 
 JNI_METHOD(void, AdministratorCommissioningCluster, openBasicCommissioningWindow)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject commissioningTimeout)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject commissioningTimeout, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -260,7 +272,15 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openBasicCommissioningWindow
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -270,7 +290,7 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openBasicCommissioningWindow
 }
 JNI_METHOD(void, AdministratorCommissioningCluster, openCommissioningWindow)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject commissioningTimeout, jbyteArray PAKEVerifier,
- jobject discriminator, jobject iterations, jbyteArray salt, jobject passcodeID)
+ jobject discriminator, jobject iterations, jbyteArray salt, jobject passcodeID, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -307,7 +327,15 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openCommissioningWindow)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -316,7 +344,7 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openCommissioningWindow)
     onFailure.release();
 }
 JNI_METHOD(void, AdministratorCommissioningCluster, revokeCommissioning)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -343,7 +371,15 @@ JNI_METHOD(void, AdministratorCommissioningCluster, revokeCommissioning)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -398,44 +434,6 @@ JNI_METHOD(jlong, ApplicationBasicCluster, initWithDevice)(JNIEnv * env, jobject
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, ApplicationBasicCluster, changeStatus)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject status)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ApplicationBasicCluster * cppCluster;
-
-    chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type request;
-
-    request.status = static_cast<decltype(request.status)>(chip::JniReferences::GetInstance().IntegerToPrimitive(status));
-
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-
-    cppCluster = reinterpret_cast<ApplicationBasicCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
-                                                                                       CHIP_ERROR_INCORRECT_STATE));
-
-    onSuccess.release();
-    onFailure.release();
-}
 JNI_METHOD(void, ApplicationBasicCluster, subscribeVendorNameAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -704,21 +702,22 @@ JNI_METHOD(jlong, ApplicationLauncherCluster, initWithDevice)(JNIEnv * env, jobj
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, ApplicationLauncherCluster, hideApp)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject catalogVendorId, jstring applicationId)
+JNI_METHOD(void, ApplicationLauncherCluster, hideAppRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject catalogVendorId, jstring applicationId,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationLauncherCluster * cppCluster;
 
-    chip::app::Clusters::ApplicationLauncher::Commands::HideApp::Type request;
+    chip::app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Type request;
 
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::Type();
+    request.application = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type();
 
-    std::unique_ptr<CHIPApplicationLauncherClusterHideAppResponseCallback,
-                    void (*)(CHIPApplicationLauncherClusterHideAppResponseCallback *)>
-        onSuccess(Platform::New<CHIPApplicationLauncherClusterHideAppResponseCallback>(callback),
-                  Platform::Delete<CHIPApplicationLauncherClusterHideAppResponseCallback>);
+    std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
+                    void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
+        onSuccess(Platform::New<CHIPApplicationLauncherClusterLauncherResponseCallback>(callback),
+                  Platform::Delete<CHIPApplicationLauncherClusterLauncherResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -734,10 +733,18 @@ JNI_METHOD(void, ApplicationLauncherCluster, hideApp)
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPApplicationLauncherClusterHideAppResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -745,22 +752,23 @@ JNI_METHOD(void, ApplicationLauncherCluster, hideApp)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, ApplicationLauncherCluster, launchApp)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring data, jobject catalogVendorId, jstring applicationId)
+JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring data, jobject catalogVendorId, jstring applicationId,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationLauncherCluster * cppCluster;
 
-    chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type request;
+    chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type request;
 
     request.data        = chip::JniUtfString(env, static_cast<jstring>(data)).charSpan();
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::Type();
+    request.application = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type();
 
-    std::unique_ptr<CHIPApplicationLauncherClusterLaunchAppResponseCallback,
-                    void (*)(CHIPApplicationLauncherClusterLaunchAppResponseCallback *)>
-        onSuccess(Platform::New<CHIPApplicationLauncherClusterLaunchAppResponseCallback>(callback),
-                  Platform::Delete<CHIPApplicationLauncherClusterLaunchAppResponseCallback>);
+    std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
+                    void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
+        onSuccess(Platform::New<CHIPApplicationLauncherClusterLauncherResponseCallback>(callback),
+                  Platform::Delete<CHIPApplicationLauncherClusterLauncherResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -776,10 +784,18 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchApp)
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -787,21 +803,22 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchApp)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, ApplicationLauncherCluster, stopApp)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject catalogVendorId, jstring applicationId)
+JNI_METHOD(void, ApplicationLauncherCluster, stopAppRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject catalogVendorId, jstring applicationId,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationLauncherCluster * cppCluster;
 
-    chip::app::Clusters::ApplicationLauncher::Commands::StopApp::Type request;
+    chip::app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Type request;
 
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::Type();
+    request.application = chip::app::Clusters::ApplicationLauncher::Structs::Application::Type();
 
-    std::unique_ptr<CHIPApplicationLauncherClusterStopAppResponseCallback,
-                    void (*)(CHIPApplicationLauncherClusterStopAppResponseCallback *)>
-        onSuccess(Platform::New<CHIPApplicationLauncherClusterStopAppResponseCallback>(callback),
-                  Platform::Delete<CHIPApplicationLauncherClusterStopAppResponseCallback>);
+    std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
+                    void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
+        onSuccess(Platform::New<CHIPApplicationLauncherClusterLauncherResponseCallback>(callback),
+                  Platform::Delete<CHIPApplicationLauncherClusterLauncherResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -817,10 +834,18 @@ JNI_METHOD(void, ApplicationLauncherCluster, stopApp)
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPApplicationLauncherClusterStopAppResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPApplicationLauncherClusterLauncherResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -874,14 +899,14 @@ JNI_METHOD(jlong, AudioOutputCluster, initWithDevice)(JNIEnv * env, jobject self
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, AudioOutputCluster, renameOutput)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject index, jstring name)
+JNI_METHOD(void, AudioOutputCluster, renameOutputRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject index, jstring name, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AudioOutputCluster * cppCluster;
 
-    chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type request;
+    chip::app::Clusters::AudioOutput::Commands::RenameOutputRequest::Type request;
 
     request.index = static_cast<decltype(request.index)>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
     request.name  = chip::JniUtfString(env, static_cast<jstring>(name)).charSpan();
@@ -905,7 +930,15 @@ JNI_METHOD(void, AudioOutputCluster, renameOutput)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -913,13 +946,14 @@ JNI_METHOD(void, AudioOutputCluster, renameOutput)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, AudioOutputCluster, selectOutput)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject index)
+JNI_METHOD(void, AudioOutputCluster, selectOutputRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject index, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     AudioOutputCluster * cppCluster;
 
-    chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type request;
+    chip::app::Clusters::AudioOutput::Commands::SelectOutputRequest::Type request;
 
     request.index = static_cast<decltype(request.index)>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
 
@@ -942,7 +976,15 @@ JNI_METHOD(void, AudioOutputCluster, selectOutput)(JNIEnv * env, jobject self, j
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -1034,7 +1076,7 @@ JNI_METHOD(jlong, BarrierControlCluster, initWithDevice)(JNIEnv * env, jobject s
 }
 
 JNI_METHOD(void, BarrierControlCluster, barrierControlGoToPercent)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject percentOpen)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject percentOpen, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1064,7 +1106,15 @@ JNI_METHOD(void, BarrierControlCluster, barrierControlGoToPercent)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -1072,7 +1122,8 @@ JNI_METHOD(void, BarrierControlCluster, barrierControlGoToPercent)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, BarrierControlCluster, barrierControlStop)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, BarrierControlCluster, barrierControlStop)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1099,7 +1150,15 @@ JNI_METHOD(void, BarrierControlCluster, barrierControlStop)(JNIEnv * env, jobjec
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -1301,7 +1360,8 @@ JNI_METHOD(jlong, BasicCluster, initWithDevice)(JNIEnv * env, jobject self, jlon
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, BasicCluster, mfgSpecificPing)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, BasicCluster, mfgSpecificPing)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1328,7 +1388,15 @@ JNI_METHOD(void, BasicCluster, mfgSpecificPing)(JNIEnv * env, jobject self, jlon
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -1413,8 +1481,9 @@ JNI_METHOD(void, BasicCluster, subscribeVendorIDAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    std::unique_ptr<CHIPBasicVendorIDAttributeCallback, void (*)(CHIPBasicVendorIDAttributeCallback *)> onSuccess(
+        Platform::New<CHIPBasicVendorIDAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPBasicVendorIDAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -1437,7 +1506,7 @@ JNI_METHOD(void, BasicCluster, subscribeVendorIDAttribute)
 
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+                                                   CHIPBasicVendorIDAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -1520,7 +1589,7 @@ JNI_METHOD(void, BasicCluster, subscribeProductIDAttribute)
 }
 
 JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo;
@@ -1548,7 +1617,16 @@ JNI_METHOD(void, BasicCluster, writeNodeLabelAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -1594,7 +1672,7 @@ JNI_METHOD(void, BasicCluster, subscribeNodeLabelAttribute)
 }
 
 JNI_METHOD(void, BasicCluster, writeLocationAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Basic::Attributes::Location::TypeInfo;
@@ -1622,7 +1700,16 @@ JNI_METHOD(void, BasicCluster, writeLocationAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -1999,7 +2086,7 @@ JNI_METHOD(void, BasicCluster, subscribeSerialNumberAttribute)
 }
 
 JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo;
@@ -2027,7 +2114,16 @@ JNI_METHOD(void, BasicCluster, writeLocalConfigDisabledAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -2155,7 +2251,7 @@ JNI_METHOD(jlong, BinaryInputBasicCluster, initWithDevice)(JNIEnv * env, jobject
 }
 
 JNI_METHOD(void, BinaryInputBasicCluster, writeOutOfServiceAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo;
@@ -2183,7 +2279,16 @@ JNI_METHOD(void, BinaryInputBasicCluster, writeOutOfServiceAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -2230,7 +2335,7 @@ JNI_METHOD(void, BinaryInputBasicCluster, subscribeOutOfServiceAttribute)
 }
 
 JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo;
@@ -2258,7 +2363,16 @@ JNI_METHOD(void, BinaryInputBasicCluster, writePresentValueAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -2388,7 +2502,7 @@ JNI_METHOD(jlong, BindingCluster, initWithDevice)(JNIEnv * env, jobject self, jl
 
 JNI_METHOD(void, BindingCluster, bind)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject nodeId, jobject groupId, jobject endpointId,
- jobject clusterId)
+ jobject clusterId, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2421,7 +2535,15 @@ JNI_METHOD(void, BindingCluster, bind)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -2431,7 +2553,7 @@ JNI_METHOD(void, BindingCluster, bind)
 }
 JNI_METHOD(void, BindingCluster, unbind)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject nodeId, jobject groupId, jobject endpointId,
- jobject clusterId)
+ jobject clusterId, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2464,7 +2586,15 @@ JNI_METHOD(void, BindingCluster, unbind)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -2602,7 +2732,7 @@ JNI_METHOD(jlong, BridgedActionsCluster, initWithDevice)(JNIEnv * env, jobject s
 }
 
 JNI_METHOD(void, BridgedActionsCluster, disableAction)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2634,7 +2764,15 @@ JNI_METHOD(void, BridgedActionsCluster, disableAction)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -2643,7 +2781,8 @@ JNI_METHOD(void, BridgedActionsCluster, disableAction)
     onFailure.release();
 }
 JNI_METHOD(void, BridgedActionsCluster, disableActionWithDuration)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject duration)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject duration,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2676,7 +2815,15 @@ JNI_METHOD(void, BridgedActionsCluster, disableActionWithDuration)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -2685,7 +2832,7 @@ JNI_METHOD(void, BridgedActionsCluster, disableActionWithDuration)
     onFailure.release();
 }
 JNI_METHOD(void, BridgedActionsCluster, enableAction)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2717,7 +2864,15 @@ JNI_METHOD(void, BridgedActionsCluster, enableAction)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -2726,7 +2881,8 @@ JNI_METHOD(void, BridgedActionsCluster, enableAction)
     onFailure.release();
 }
 JNI_METHOD(void, BridgedActionsCluster, enableActionWithDuration)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject duration)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject duration,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2759,7 +2915,15 @@ JNI_METHOD(void, BridgedActionsCluster, enableActionWithDuration)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -2768,7 +2932,7 @@ JNI_METHOD(void, BridgedActionsCluster, enableActionWithDuration)
     onFailure.release();
 }
 JNI_METHOD(void, BridgedActionsCluster, instantAction)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2800,7 +2964,15 @@ JNI_METHOD(void, BridgedActionsCluster, instantAction)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -2809,7 +2981,8 @@ JNI_METHOD(void, BridgedActionsCluster, instantAction)
     onFailure.release();
 }
 JNI_METHOD(void, BridgedActionsCluster, instantActionWithTransition)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject transitionTime)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject transitionTime,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2843,7 +3016,15 @@ JNI_METHOD(void, BridgedActionsCluster, instantActionWithTransition)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -2852,7 +3033,7 @@ JNI_METHOD(void, BridgedActionsCluster, instantActionWithTransition)
     onFailure.release();
 }
 JNI_METHOD(void, BridgedActionsCluster, pauseAction)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2884,7 +3065,15 @@ JNI_METHOD(void, BridgedActionsCluster, pauseAction)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -2893,7 +3082,8 @@ JNI_METHOD(void, BridgedActionsCluster, pauseAction)
     onFailure.release();
 }
 JNI_METHOD(void, BridgedActionsCluster, pauseActionWithDuration)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject duration)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject duration,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2926,7 +3116,15 @@ JNI_METHOD(void, BridgedActionsCluster, pauseActionWithDuration)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -2935,7 +3133,7 @@ JNI_METHOD(void, BridgedActionsCluster, pauseActionWithDuration)
     onFailure.release();
 }
 JNI_METHOD(void, BridgedActionsCluster, resumeAction)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2967,7 +3165,15 @@ JNI_METHOD(void, BridgedActionsCluster, resumeAction)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -2976,7 +3182,7 @@ JNI_METHOD(void, BridgedActionsCluster, resumeAction)
     onFailure.release();
 }
 JNI_METHOD(void, BridgedActionsCluster, startAction)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3008,7 +3214,15 @@ JNI_METHOD(void, BridgedActionsCluster, startAction)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3017,7 +3231,8 @@ JNI_METHOD(void, BridgedActionsCluster, startAction)
     onFailure.release();
 }
 JNI_METHOD(void, BridgedActionsCluster, startActionWithDuration)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject duration)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject duration,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3050,7 +3265,15 @@ JNI_METHOD(void, BridgedActionsCluster, startActionWithDuration)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3059,7 +3282,7 @@ JNI_METHOD(void, BridgedActionsCluster, startActionWithDuration)
     onFailure.release();
 }
 JNI_METHOD(void, BridgedActionsCluster, stopAction)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject actionID, jobject invokeID, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3091,7 +3314,15 @@ JNI_METHOD(void, BridgedActionsCluster, stopAction)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3219,6 +3450,196 @@ JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeClusterRevisionAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(jlong, ChannelCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    chip::DeviceLayer::StackLock lock;
+    ChannelCluster * cppCluster = new ChannelCluster();
+
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
+JNI_METHOD(void, ChannelCluster, changeChannelByNumberRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject majorNumber, jobject minorNumber,
+ jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChannelCluster * cppCluster;
+
+    chip::app::Clusters::Channel::Commands::ChangeChannelByNumberRequest::Type request;
+
+    request.majorNumber =
+        static_cast<decltype(request.majorNumber)>(chip::JniReferences::GetInstance().IntegerToPrimitive(majorNumber));
+    request.minorNumber =
+        static_cast<decltype(request.minorNumber)>(chip::JniReferences::GetInstance().IntegerToPrimitive(minorNumber));
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<ChannelCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ChannelCluster, changeChannelRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring match, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChannelCluster * cppCluster;
+
+    chip::app::Clusters::Channel::Commands::ChangeChannelRequest::Type request;
+
+    request.match = chip::JniUtfString(env, static_cast<jstring>(match)).charSpan();
+
+    std::unique_ptr<CHIPChannelClusterChangeChannelResponseCallback, void (*)(CHIPChannelClusterChangeChannelResponseCallback *)>
+        onSuccess(Platform::New<CHIPChannelClusterChangeChannelResponseCallback>(callback),
+                  Platform::Delete<CHIPChannelClusterChangeChannelResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<ChannelCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPChannelClusterChangeChannelResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ChannelCluster, skipChannelRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject count, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ChannelCluster * cppCluster;
+
+    chip::app::Clusters::Channel::Commands::SkipChannelRequest::Type request;
+
+    request.count = static_cast<decltype(request.count)>(chip::JniReferences::GetInstance().IntegerToPrimitive(count));
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<ChannelCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ChannelCluster, subscribeClusterRevisionAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    ChannelCluster * cppCluster = reinterpret_cast<ChannelCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Channel::Attributes::ClusterRevision::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPChannelClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(jlong, ColorControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -3230,7 +3651,7 @@ JNI_METHOD(jlong, ColorControlCluster, initWithDevice)(JNIEnv * env, jobject sel
 
 JNI_METHOD(void, ColorControlCluster, colorLoopSet)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject updateFlags, jobject action, jobject direction,
- jobject time, jobject startHue, jobject optionsMask, jobject optionsOverride)
+ jobject time, jobject startHue, jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3268,7 +3689,15 @@ JNI_METHOD(void, ColorControlCluster, colorLoopSet)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3278,7 +3707,7 @@ JNI_METHOD(void, ColorControlCluster, colorLoopSet)
 }
 JNI_METHOD(void, ColorControlCluster, enhancedMoveHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject moveMode, jobject rate, jobject optionsMask,
- jobject optionsOverride)
+ jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3312,7 +3741,15 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveHue)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3322,7 +3759,7 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveHue)
 }
 JNI_METHOD(void, ColorControlCluster, enhancedMoveToHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject enhancedHue, jobject direction, jobject transitionTime,
- jobject optionsMask, jobject optionsOverride)
+ jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3359,7 +3796,15 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHue)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3369,7 +3814,7 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHue)
 }
 JNI_METHOD(void, ColorControlCluster, enhancedMoveToHueAndSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject enhancedHue, jobject saturation, jobject transitionTime,
- jobject optionsMask, jobject optionsOverride)
+ jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3407,7 +3852,15 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHueAndSaturation)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3417,7 +3870,7 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHueAndSaturation)
 }
 JNI_METHOD(void, ColorControlCluster, enhancedStepHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject stepMode, jobject stepSize, jobject transitionTime,
- jobject optionsMask, jobject optionsOverride)
+ jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3453,7 +3906,15 @@ JNI_METHOD(void, ColorControlCluster, enhancedStepHue)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3463,7 +3924,7 @@ JNI_METHOD(void, ColorControlCluster, enhancedStepHue)
 }
 JNI_METHOD(void, ColorControlCluster, moveColor)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject rateX, jobject rateY, jobject optionsMask,
- jobject optionsOverride)
+ jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3497,7 +3958,15 @@ JNI_METHOD(void, ColorControlCluster, moveColor)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3507,7 +3976,7 @@ JNI_METHOD(void, ColorControlCluster, moveColor)
 }
 JNI_METHOD(void, ColorControlCluster, moveColorTemperature)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject moveMode, jobject rate, jobject colorTemperatureMinimum,
- jobject colorTemperatureMaximum, jobject optionsMask, jobject optionsOverride)
+ jobject colorTemperatureMaximum, jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3545,7 +4014,15 @@ JNI_METHOD(void, ColorControlCluster, moveColorTemperature)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3555,7 +4032,7 @@ JNI_METHOD(void, ColorControlCluster, moveColorTemperature)
 }
 JNI_METHOD(void, ColorControlCluster, moveHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject moveMode, jobject rate, jobject optionsMask,
- jobject optionsOverride)
+ jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3589,7 +4066,15 @@ JNI_METHOD(void, ColorControlCluster, moveHue)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3599,7 +4084,7 @@ JNI_METHOD(void, ColorControlCluster, moveHue)
 }
 JNI_METHOD(void, ColorControlCluster, moveSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject moveMode, jobject rate, jobject optionsMask,
- jobject optionsOverride)
+ jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3633,7 +4118,15 @@ JNI_METHOD(void, ColorControlCluster, moveSaturation)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3643,7 +4136,7 @@ JNI_METHOD(void, ColorControlCluster, moveSaturation)
 }
 JNI_METHOD(void, ColorControlCluster, moveToColor)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject colorX, jobject colorY, jobject transitionTime,
- jobject optionsMask, jobject optionsOverride)
+ jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3679,7 +4172,15 @@ JNI_METHOD(void, ColorControlCluster, moveToColor)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3689,7 +4190,7 @@ JNI_METHOD(void, ColorControlCluster, moveToColor)
 }
 JNI_METHOD(void, ColorControlCluster, moveToColorTemperature)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject colorTemperature, jobject transitionTime,
- jobject optionsMask, jobject optionsOverride)
+ jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3725,7 +4226,15 @@ JNI_METHOD(void, ColorControlCluster, moveToColorTemperature)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3735,7 +4244,7 @@ JNI_METHOD(void, ColorControlCluster, moveToColorTemperature)
 }
 JNI_METHOD(void, ColorControlCluster, moveToHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject hue, jobject direction, jobject transitionTime,
- jobject optionsMask, jobject optionsOverride)
+ jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3771,7 +4280,15 @@ JNI_METHOD(void, ColorControlCluster, moveToHue)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3781,7 +4298,7 @@ JNI_METHOD(void, ColorControlCluster, moveToHue)
 }
 JNI_METHOD(void, ColorControlCluster, moveToHueAndSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject hue, jobject saturation, jobject transitionTime,
- jobject optionsMask, jobject optionsOverride)
+ jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3818,7 +4335,15 @@ JNI_METHOD(void, ColorControlCluster, moveToHueAndSaturation)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3828,7 +4353,7 @@ JNI_METHOD(void, ColorControlCluster, moveToHueAndSaturation)
 }
 JNI_METHOD(void, ColorControlCluster, moveToSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject saturation, jobject transitionTime, jobject optionsMask,
- jobject optionsOverride)
+ jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3864,7 +4389,15 @@ JNI_METHOD(void, ColorControlCluster, moveToSaturation)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3874,7 +4407,7 @@ JNI_METHOD(void, ColorControlCluster, moveToSaturation)
 }
 JNI_METHOD(void, ColorControlCluster, stepColor)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject stepX, jobject stepY, jobject transitionTime,
- jobject optionsMask, jobject optionsOverride)
+ jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3910,7 +4443,15 @@ JNI_METHOD(void, ColorControlCluster, stepColor)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3920,7 +4461,8 @@ JNI_METHOD(void, ColorControlCluster, stepColor)
 }
 JNI_METHOD(void, ColorControlCluster, stepColorTemperature)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject stepMode, jobject stepSize, jobject transitionTime,
- jobject colorTemperatureMinimum, jobject colorTemperatureMaximum, jobject optionsMask, jobject optionsOverride)
+ jobject colorTemperatureMinimum, jobject colorTemperatureMaximum, jobject optionsMask, jobject optionsOverride,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -3960,7 +4502,15 @@ JNI_METHOD(void, ColorControlCluster, stepColorTemperature)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -3970,7 +4520,7 @@ JNI_METHOD(void, ColorControlCluster, stepColorTemperature)
 }
 JNI_METHOD(void, ColorControlCluster, stepHue)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject stepMode, jobject stepSize, jobject transitionTime,
- jobject optionsMask, jobject optionsOverride)
+ jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4006,7 +4556,15 @@ JNI_METHOD(void, ColorControlCluster, stepHue)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -4016,7 +4574,7 @@ JNI_METHOD(void, ColorControlCluster, stepHue)
 }
 JNI_METHOD(void, ColorControlCluster, stepSaturation)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject stepMode, jobject stepSize, jobject transitionTime,
- jobject optionsMask, jobject optionsOverride)
+ jobject optionsMask, jobject optionsOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4052,7 +4610,15 @@ JNI_METHOD(void, ColorControlCluster, stepSaturation)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -4061,7 +4627,8 @@ JNI_METHOD(void, ColorControlCluster, stepSaturation)
     onFailure.release();
 }
 JNI_METHOD(void, ColorControlCluster, stopMoveStep)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject optionsMask, jobject optionsOverride)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject optionsMask, jobject optionsOverride,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4093,7 +4660,15 @@ JNI_METHOD(void, ColorControlCluster, stopMoveStep)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -4436,7 +5011,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorModeAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorControlOptionsAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo;
@@ -4464,7 +5039,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorControlOptionsAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5214,7 +5798,7 @@ JNI_METHOD(void, ColorControlCluster, subscribePrimary6IntensityAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeWhitePointXAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo;
@@ -5242,7 +5826,16 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointXAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5289,7 +5882,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeWhitePointXAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeWhitePointYAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo;
@@ -5317,7 +5910,16 @@ JNI_METHOD(void, ColorControlCluster, writeWhitePointYAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5364,7 +5966,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeWhitePointYAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointRXAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo;
@@ -5392,7 +5994,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRXAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5439,7 +6050,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointRXAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointRYAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo;
@@ -5467,7 +6078,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRYAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5514,7 +6134,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointRYAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointRIntensityAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo;
@@ -5542,7 +6162,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointRIntensityAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5589,7 +6218,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointRIntensityAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointGXAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo;
@@ -5617,7 +6246,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGXAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5664,7 +6302,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointGXAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointGYAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo;
@@ -5692,7 +6330,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGYAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5739,7 +6386,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointGYAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointGIntensityAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo;
@@ -5767,7 +6414,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointGIntensityAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5814,7 +6470,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointGIntensityAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointBXAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo;
@@ -5842,7 +6498,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBXAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5889,7 +6554,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointBXAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointBYAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo;
@@ -5917,7 +6582,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBYAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -5964,7 +6638,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeColorPointBYAttribute)
 }
 
 JNI_METHOD(void, ColorControlCluster, writeColorPointBIntensityAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo;
@@ -5992,7 +6666,16 @@ JNI_METHOD(void, ColorControlCluster, writeColorPointBIntensityAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -6449,7 +7132,7 @@ JNI_METHOD(void, ColorControlCluster, subscribeCoupleColorTempToLevelMinMiredsAt
 }
 
 JNI_METHOD(void, ColorControlCluster, writeStartUpColorTemperatureMiredsAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo;
@@ -6477,7 +7160,16 @@ JNI_METHOD(void, ColorControlCluster, writeStartUpColorTemperatureMiredsAttribut
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -6569,25 +7261,23 @@ JNI_METHOD(jlong, ContentLauncherCluster, initWithDevice)(JNIEnv * env, jobject 
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, ContentLauncherCluster, launchContent)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject autoPlay, jstring data, jobject type, jstring value,
- jobject externalIDList)
+JNI_METHOD(void, ContentLauncherCluster, launchContentRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject autoPlay, jstring data, jobject parameterList,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ContentLauncherCluster * cppCluster;
 
-    chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type request;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Type request;
 
     request.autoPlay = static_cast<decltype(request.autoPlay)>(chip::JniReferences::GetInstance().BooleanToPrimitive(autoPlay));
     request.data     = chip::JniUtfString(env, static_cast<jstring>(data)).charSpan();
-    request.search =
-        chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchParamater::Type>();
+    request.search   = chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>();
 
-    std::unique_ptr<CHIPContentLauncherClusterLaunchContentResponseCallback,
-                    void (*)(CHIPContentLauncherClusterLaunchContentResponseCallback *)>
-        onSuccess(Platform::New<CHIPContentLauncherClusterLaunchContentResponseCallback>(callback),
-                  Platform::Delete<CHIPContentLauncherClusterLaunchContentResponseCallback>);
+    std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
+        onSuccess(Platform::New<CHIPContentLauncherClusterLaunchResponseCallback>(callback),
+                  Platform::Delete<CHIPContentLauncherClusterLaunchResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -6603,10 +7293,18 @@ JNI_METHOD(void, ContentLauncherCluster, launchContent)
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPContentLauncherClusterLaunchContentResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPContentLauncherClusterLaunchResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -6614,25 +7312,23 @@ JNI_METHOD(void, ContentLauncherCluster, launchContent)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, ContentLauncherCluster, launchURL)
+JNI_METHOD(void, ContentLauncherCluster, launchURLRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring contentURL, jstring displayString, jstring providerName,
- jobject background, jobject logo, jobject progressBar, jobject splash, jobject waterMark)
+ jobject background, jobject logo, jobject progressBar, jobject splash, jobject waterMark, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ContentLauncherCluster * cppCluster;
 
-    chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type request;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Type request;
 
-    request.contentURL    = chip::JniUtfString(env, static_cast<jstring>(contentURL)).charSpan();
-    request.displayString = chip::JniUtfString(env, static_cast<jstring>(displayString)).charSpan();
-    request.brandingInformation =
-        chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchBrandingInformation::Type>();
+    request.contentURL          = chip::JniUtfString(env, static_cast<jstring>(contentURL)).charSpan();
+    request.displayString       = chip::JniUtfString(env, static_cast<jstring>(displayString)).charSpan();
+    request.brandingInformation = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type();
 
-    std::unique_ptr<CHIPContentLauncherClusterLaunchURLResponseCallback,
-                    void (*)(CHIPContentLauncherClusterLaunchURLResponseCallback *)>
-        onSuccess(Platform::New<CHIPContentLauncherClusterLaunchURLResponseCallback>(callback),
-                  Platform::Delete<CHIPContentLauncherClusterLaunchURLResponseCallback>);
+    std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
+        onSuccess(Platform::New<CHIPContentLauncherClusterLaunchResponseCallback>(callback),
+                  Platform::Delete<CHIPContentLauncherClusterLaunchResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -6648,10 +7344,18 @@ JNI_METHOD(void, ContentLauncherCluster, launchURL)
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPContentLauncherClusterLaunchURLResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPContentLauncherClusterLaunchResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -6661,7 +7365,7 @@ JNI_METHOD(void, ContentLauncherCluster, launchURL)
 }
 
 JNI_METHOD(void, ContentLauncherCluster, writeSupportedStreamingProtocolsAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo;
@@ -6689,7 +7393,16 @@ JNI_METHOD(void, ContentLauncherCluster, writeSupportedStreamingProtocolsAttribu
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -6829,7 +7542,7 @@ JNI_METHOD(jlong, DiagnosticLogsCluster, initWithDevice)(JNIEnv * env, jobject s
 
 JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject intent, jobject requestedProtocol,
- jbyteArray transferFileDesignator)
+ jbyteArray transferFileDesignator, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6864,7 +7577,15 @@ JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)
         chip::Callback::Callback<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -6882,7 +7603,8 @@ JNI_METHOD(jlong, DoorLockCluster, initWithDevice)(JNIEnv * env, jobject self, j
 }
 
 JNI_METHOD(void, DoorLockCluster, clearCredential)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject credentialType, jobject credentialIndex)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject credentialType, jobject credentialIndex,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6911,7 +7633,15 @@ JNI_METHOD(void, DoorLockCluster, clearCredential)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -6919,7 +7649,8 @@ JNI_METHOD(void, DoorLockCluster, clearCredential)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, DoorLockCluster, clearUser)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject userIndex)
+JNI_METHOD(void, DoorLockCluster, clearUser)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject userIndex, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6948,7 +7679,15 @@ JNI_METHOD(void, DoorLockCluster, clearUser)(JNIEnv * env, jobject self, jlong c
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -6957,7 +7696,8 @@ JNI_METHOD(void, DoorLockCluster, clearUser)(JNIEnv * env, jobject self, jlong c
     onFailure.release();
 }
 JNI_METHOD(void, DoorLockCluster, getCredentialStatus)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject credentialType, jobject credentialIndex)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject credentialType, jobject credentialIndex,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -6989,7 +7729,15 @@ JNI_METHOD(void, DoorLockCluster, getCredentialStatus)
         chip::Callback::Callback<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -6997,7 +7745,8 @@ JNI_METHOD(void, DoorLockCluster, getCredentialStatus)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, DoorLockCluster, getUser)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject userIndex)
+JNI_METHOD(void, DoorLockCluster, getUser)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject userIndex, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7027,7 +7776,15 @@ JNI_METHOD(void, DoorLockCluster, getUser)(JNIEnv * env, jobject self, jlong clu
     auto successFn = chip::Callback::Callback<CHIPDoorLockClusterGetUserResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -7035,7 +7792,8 @@ JNI_METHOD(void, DoorLockCluster, getUser)(JNIEnv * env, jobject self, jlong clu
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, DoorLockCluster, lockDoor)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject pinCode)
+JNI_METHOD(void, DoorLockCluster, lockDoor)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject pinCode, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7065,7 +7823,15 @@ JNI_METHOD(void, DoorLockCluster, lockDoor)(JNIEnv * env, jobject self, jlong cl
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -7075,7 +7841,7 @@ JNI_METHOD(void, DoorLockCluster, lockDoor)(JNIEnv * env, jobject self, jlong cl
 }
 JNI_METHOD(void, DoorLockCluster, setCredential)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject operationType, jobject credentialType,
- jobject credentialIndex, jbyteArray credentialData, jobject userIndex, jobject userStatus)
+ jobject credentialIndex, jbyteArray credentialData, jobject userIndex, jobject userStatus, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7112,7 +7878,15 @@ JNI_METHOD(void, DoorLockCluster, setCredential)
         chip::Callback::Callback<CHIPDoorLockClusterSetCredentialResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -7122,7 +7896,7 @@ JNI_METHOD(void, DoorLockCluster, setCredential)
 }
 JNI_METHOD(void, DoorLockCluster, setUser)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject operationType, jobject userIndex, jstring userName,
- jobject userUniqueId, jobject userStatus, jobject userType, jobject credentialRule)
+ jobject userUniqueId, jobject userStatus, jobject userType, jobject credentialRule, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7172,7 +7946,15 @@ JNI_METHOD(void, DoorLockCluster, setUser)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -7180,7 +7962,8 @@ JNI_METHOD(void, DoorLockCluster, setUser)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, DoorLockCluster, unlockDoor)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject pinCode)
+JNI_METHOD(void, DoorLockCluster, unlockDoor)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject pinCode, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -7210,7 +7993,15 @@ JNI_METHOD(void, DoorLockCluster, unlockDoor)(JNIEnv * env, jobject self, jlong 
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -7370,7 +8161,7 @@ JNI_METHOD(void, DoorLockCluster, subscribeDoorStateAttribute)
 }
 
 JNI_METHOD(void, DoorLockCluster, writeLanguageAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::Language::TypeInfo;
@@ -7398,7 +8189,16 @@ JNI_METHOD(void, DoorLockCluster, writeLanguageAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -7445,7 +8245,7 @@ JNI_METHOD(void, DoorLockCluster, subscribeLanguageAttribute)
 }
 
 JNI_METHOD(void, DoorLockCluster, writeAutoRelockTimeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::AutoRelockTime::TypeInfo;
@@ -7473,7 +8273,16 @@ JNI_METHOD(void, DoorLockCluster, writeAutoRelockTimeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -7520,7 +8329,7 @@ JNI_METHOD(void, DoorLockCluster, subscribeAutoRelockTimeAttribute)
 }
 
 JNI_METHOD(void, DoorLockCluster, writeSoundVolumeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::SoundVolume::TypeInfo;
@@ -7548,7 +8357,16 @@ JNI_METHOD(void, DoorLockCluster, writeSoundVolumeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -7595,7 +8413,7 @@ JNI_METHOD(void, DoorLockCluster, subscribeSoundVolumeAttribute)
 }
 
 JNI_METHOD(void, DoorLockCluster, writeOperatingModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::OperatingMode::TypeInfo;
@@ -7623,7 +8441,16 @@ JNI_METHOD(void, DoorLockCluster, writeOperatingModeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -7670,7 +8497,7 @@ JNI_METHOD(void, DoorLockCluster, subscribeOperatingModeAttribute)
 }
 
 JNI_METHOD(void, DoorLockCluster, writeEnableOneTouchLockingAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::EnableOneTouchLocking::TypeInfo;
@@ -7698,7 +8525,16 @@ JNI_METHOD(void, DoorLockCluster, writeEnableOneTouchLockingAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -7745,7 +8581,7 @@ JNI_METHOD(void, DoorLockCluster, subscribeEnableOneTouchLockingAttribute)
 }
 
 JNI_METHOD(void, DoorLockCluster, writeEnablePrivacyModeButtonAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::EnablePrivacyModeButton::TypeInfo;
@@ -7773,7 +8609,16 @@ JNI_METHOD(void, DoorLockCluster, writeEnablePrivacyModeButtonAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -7820,7 +8665,7 @@ JNI_METHOD(void, DoorLockCluster, subscribeEnablePrivacyModeButtonAttribute)
 }
 
 JNI_METHOD(void, DoorLockCluster, writeWrongCodeEntryLimitAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::DoorLock::Attributes::WrongCodeEntryLimit::TypeInfo;
@@ -7848,7 +8693,16 @@ JNI_METHOD(void, DoorLockCluster, writeWrongCodeEntryLimitAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -8393,7 +9247,8 @@ JNI_METHOD(jlong, EthernetNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * en
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, resetCounts)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -8420,7 +9275,15 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, j
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9055,7 +9918,8 @@ JNI_METHOD(jlong, GeneralCommissioningCluster, initWithDevice)(JNIEnv * env, job
 }
 
 JNI_METHOD(void, GeneralCommissioningCluster, armFailSafe)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject expiryLengthSeconds, jobject breadcrumb, jobject timeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject expiryLengthSeconds, jobject breadcrumb, jobject timeoutMs,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9090,7 +9954,15 @@ JNI_METHOD(void, GeneralCommissioningCluster, armFailSafe)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9098,7 +9970,8 @@ JNI_METHOD(void, GeneralCommissioningCluster, armFailSafe)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, GeneralCommissioningCluster, commissioningComplete)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, GeneralCommissioningCluster, commissioningComplete)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9129,7 +10002,15 @@ JNI_METHOD(void, GeneralCommissioningCluster, commissioningComplete)(JNIEnv * en
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9139,7 +10020,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, commissioningComplete)(JNIEnv * en
 }
 JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject location, jstring countryCode, jobject breadcrumb,
- jobject timeoutMs)
+ jobject timeoutMs, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9175,7 +10056,15 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9185,7 +10074,7 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)
 }
 
 JNI_METHOD(void, GeneralCommissioningCluster, writeBreadcrumbAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo;
@@ -9213,7 +10102,16 @@ JNI_METHOD(void, GeneralCommissioningCluster, writeBreadcrumbAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -9499,6 +10397,201 @@ JNI_METHOD(jlong, GroupKeyManagementCluster, initWithDevice)(JNIEnv * env, jobje
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, GroupKeyManagementCluster, keySetRead)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetID, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    GroupKeyManagementCluster * cppCluster;
+
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type request;
+
+    request.groupKeySetID =
+        static_cast<decltype(request.groupKeySetID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySetID));
+
+    std::unique_ptr<CHIPGroupKeyManagementClusterKeySetReadResponseCallback,
+                    void (*)(CHIPGroupKeyManagementClusterKeySetReadResponseCallback *)>
+        onSuccess(Platform::New<CHIPGroupKeyManagementClusterKeySetReadResponseCallback>(callback),
+                  Platform::Delete<CHIPGroupKeyManagementClusterKeySetReadResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GroupKeyManagementCluster, keySetReadAllIndices)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetIDs, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    GroupKeyManagementCluster * cppCluster;
+
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Type request;
+
+    request.groupKeySetIDs = chip::app::DataModel::List<const uint16_t>();
+
+    std::unique_ptr<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback,
+                    void (*)(CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback *)>
+        onSuccess(Platform::New<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback>(callback),
+                  Platform::Delete<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GroupKeyManagementCluster, keySetRemove)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetID, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    GroupKeyManagementCluster * cppCluster;
+
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type request;
+
+    request.groupKeySetID =
+        static_cast<decltype(request.groupKeySetID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySetID));
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GroupKeyManagementCluster, keySetWrite)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetID, jobject securityPolicy,
+ jbyteArray epochKey0, jobject epochStartTime0, jbyteArray epochKey1, jobject epochStartTime1, jbyteArray epochKey2,
+ jobject epochStartTime2, jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    GroupKeyManagementCluster * cppCluster;
+
+    chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type request;
+
+    request.groupKeySet = chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type();
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, GroupKeyManagementCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -9546,7 +10639,7 @@ JNI_METHOD(jlong, GroupsCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
 }
 
 JNI_METHOD(void, GroupsCluster, addGroup)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jstring groupName)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jstring groupName, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9577,7 +10670,15 @@ JNI_METHOD(void, GroupsCluster, addGroup)
     auto successFn = chip::Callback::Callback<CHIPGroupsClusterAddGroupResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9586,7 +10687,7 @@ JNI_METHOD(void, GroupsCluster, addGroup)
     onFailure.release();
 }
 JNI_METHOD(void, GroupsCluster, addGroupIfIdentifying)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jstring groupName)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jstring groupName, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9616,7 +10717,15 @@ JNI_METHOD(void, GroupsCluster, addGroupIfIdentifying)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9625,7 +10734,7 @@ JNI_METHOD(void, GroupsCluster, addGroupIfIdentifying)
     onFailure.release();
 }
 JNI_METHOD(void, GroupsCluster, getGroupMembership)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupList)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupList, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9657,7 +10766,15 @@ JNI_METHOD(void, GroupsCluster, getGroupMembership)
         chip::Callback::Callback<CHIPGroupsClusterGetGroupMembershipResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9665,7 +10782,8 @@ JNI_METHOD(void, GroupsCluster, getGroupMembership)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, GroupsCluster, removeAllGroups)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, GroupsCluster, removeAllGroups)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9692,7 +10810,15 @@ JNI_METHOD(void, GroupsCluster, removeAllGroups)(JNIEnv * env, jobject self, jlo
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9700,7 +10826,8 @@ JNI_METHOD(void, GroupsCluster, removeAllGroups)(JNIEnv * env, jobject self, jlo
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, GroupsCluster, removeGroup)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId)
+JNI_METHOD(void, GroupsCluster, removeGroup)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9731,7 +10858,15 @@ JNI_METHOD(void, GroupsCluster, removeGroup)(JNIEnv * env, jobject self, jlong c
         chip::Callback::Callback<CHIPGroupsClusterRemoveGroupResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9739,7 +10874,8 @@ JNI_METHOD(void, GroupsCluster, removeGroup)(JNIEnv * env, jobject self, jlong c
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, GroupsCluster, viewGroup)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId)
+JNI_METHOD(void, GroupsCluster, viewGroup)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9769,7 +10905,15 @@ JNI_METHOD(void, GroupsCluster, viewGroup)(JNIEnv * env, jobject self, jlong clu
     auto successFn = chip::Callback::Callback<CHIPGroupsClusterViewGroupResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9860,7 +11004,8 @@ JNI_METHOD(jlong, IdentifyCluster, initWithDevice)(JNIEnv * env, jobject self, j
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, IdentifyCluster, identify)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject identifyTime)
+JNI_METHOD(void, IdentifyCluster, identify)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject identifyTime, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9890,7 +11035,15 @@ JNI_METHOD(void, IdentifyCluster, identify)(JNIEnv * env, jobject self, jlong cl
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9898,7 +11051,8 @@ JNI_METHOD(void, IdentifyCluster, identify)(JNIEnv * env, jobject self, jlong cl
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, IdentifyCluster, identifyQuery)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, IdentifyCluster, identifyQuery)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9927,7 +11081,15 @@ JNI_METHOD(void, IdentifyCluster, identifyQuery)(JNIEnv * env, jobject self, jlo
         chip::Callback::Callback<CHIPIdentifyClusterIdentifyQueryResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9936,7 +11098,8 @@ JNI_METHOD(void, IdentifyCluster, identifyQuery)(JNIEnv * env, jobject self, jlo
     onFailure.release();
 }
 JNI_METHOD(void, IdentifyCluster, triggerEffect)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject effectIdentifier, jobject effectVariant)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject effectIdentifier, jobject effectVariant,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -9968,7 +11131,15 @@ JNI_METHOD(void, IdentifyCluster, triggerEffect)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -9978,7 +11149,7 @@ JNI_METHOD(void, IdentifyCluster, triggerEffect)
 }
 
 JNI_METHOD(void, IdentifyCluster, writeIdentifyTimeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo;
@@ -10006,7 +11177,16 @@ JNI_METHOD(void, IdentifyCluster, writeIdentifyTimeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -10377,13 +11557,14 @@ JNI_METHOD(jlong, KeypadInputCluster, initWithDevice)(JNIEnv * env, jobject self
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, KeypadInputCluster, sendKey)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject keyCode)
+JNI_METHOD(void, KeypadInputCluster, sendKeyRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject keyCode, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     KeypadInputCluster * cppCluster;
 
-    chip::app::Clusters::KeypadInput::Commands::SendKey::Type request;
+    chip::app::Clusters::KeypadInput::Commands::SendKeyRequest::Type request;
 
     request.keyCode = static_cast<decltype(request.keyCode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(keyCode));
 
@@ -10408,7 +11589,15 @@ JNI_METHOD(void, KeypadInputCluster, sendKey)(JNIEnv * env, jobject self, jlong 
         chip::Callback::Callback<CHIPKeypadInputClusterSendKeyResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -10464,7 +11653,7 @@ JNI_METHOD(jlong, LevelControlCluster, initWithDevice)(JNIEnv * env, jobject sel
 
 JNI_METHOD(void, LevelControlCluster, move)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject moveMode, jobject rate, jobject optionMask,
- jobject optionOverride)
+ jobject optionOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10498,7 +11687,15 @@ JNI_METHOD(void, LevelControlCluster, move)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -10508,7 +11705,7 @@ JNI_METHOD(void, LevelControlCluster, move)
 }
 JNI_METHOD(void, LevelControlCluster, moveToLevel)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject level, jobject transitionTime, jobject optionMask,
- jobject optionOverride)
+ jobject optionOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10543,7 +11740,15 @@ JNI_METHOD(void, LevelControlCluster, moveToLevel)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -10552,7 +11757,8 @@ JNI_METHOD(void, LevelControlCluster, moveToLevel)
     onFailure.release();
 }
 JNI_METHOD(void, LevelControlCluster, moveToLevelWithOnOff)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject level, jobject transitionTime)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject level, jobject transitionTime,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10583,7 +11789,15 @@ JNI_METHOD(void, LevelControlCluster, moveToLevelWithOnOff)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -10592,7 +11806,7 @@ JNI_METHOD(void, LevelControlCluster, moveToLevelWithOnOff)
     onFailure.release();
 }
 JNI_METHOD(void, LevelControlCluster, moveWithOnOff)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject moveMode, jobject rate)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject moveMode, jobject rate, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10622,7 +11836,15 @@ JNI_METHOD(void, LevelControlCluster, moveWithOnOff)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -10632,7 +11854,7 @@ JNI_METHOD(void, LevelControlCluster, moveWithOnOff)
 }
 JNI_METHOD(void, LevelControlCluster, step)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject stepMode, jobject stepSize, jobject transitionTime,
- jobject optionMask, jobject optionOverride)
+ jobject optionMask, jobject optionOverride, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10668,7 +11890,15 @@ JNI_METHOD(void, LevelControlCluster, step)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -10677,7 +11907,8 @@ JNI_METHOD(void, LevelControlCluster, step)
     onFailure.release();
 }
 JNI_METHOD(void, LevelControlCluster, stepWithOnOff)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject stepMode, jobject stepSize, jobject transitionTime)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject stepMode, jobject stepSize, jobject transitionTime,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10709,7 +11940,15 @@ JNI_METHOD(void, LevelControlCluster, stepWithOnOff)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -10718,7 +11957,8 @@ JNI_METHOD(void, LevelControlCluster, stepWithOnOff)
     onFailure.release();
 }
 JNI_METHOD(void, LevelControlCluster, stop)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject optionMask, jobject optionOverride)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject optionMask, jobject optionOverride,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10750,7 +11990,15 @@ JNI_METHOD(void, LevelControlCluster, stop)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -10758,7 +12006,8 @@ JNI_METHOD(void, LevelControlCluster, stop)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, LevelControlCluster, stopWithOnOff)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, LevelControlCluster, stopWithOnOff)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -10785,7 +12034,15 @@ JNI_METHOD(void, LevelControlCluster, stopWithOnOff)(JNIEnv * env, jobject self,
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -11054,7 +12311,7 @@ JNI_METHOD(void, LevelControlCluster, subscribeMaxFrequencyAttribute)
 }
 
 JNI_METHOD(void, LevelControlCluster, writeOptionsAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo;
@@ -11082,7 +12339,16 @@ JNI_METHOD(void, LevelControlCluster, writeOptionsAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -11129,7 +12395,7 @@ JNI_METHOD(void, LevelControlCluster, subscribeOptionsAttribute)
 }
 
 JNI_METHOD(void, LevelControlCluster, writeOnOffTransitionTimeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo;
@@ -11157,7 +12423,16 @@ JNI_METHOD(void, LevelControlCluster, writeOnOffTransitionTimeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -11204,7 +12479,7 @@ JNI_METHOD(void, LevelControlCluster, subscribeOnOffTransitionTimeAttribute)
 }
 
 JNI_METHOD(void, LevelControlCluster, writeOnLevelAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo;
@@ -11237,7 +12512,16 @@ JNI_METHOD(void, LevelControlCluster, writeOnLevelAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -11285,7 +12569,7 @@ JNI_METHOD(void, LevelControlCluster, subscribeOnLevelAttribute)
 }
 
 JNI_METHOD(void, LevelControlCluster, writeOnTransitionTimeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo;
@@ -11318,7 +12602,16 @@ JNI_METHOD(void, LevelControlCluster, writeOnTransitionTimeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -11367,7 +12660,7 @@ JNI_METHOD(void, LevelControlCluster, subscribeOnTransitionTimeAttribute)
 }
 
 JNI_METHOD(void, LevelControlCluster, writeOffTransitionTimeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo;
@@ -11400,7 +12693,16 @@ JNI_METHOD(void, LevelControlCluster, writeOffTransitionTimeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -11449,7 +12751,7 @@ JNI_METHOD(void, LevelControlCluster, subscribeOffTransitionTimeAttribute)
 }
 
 JNI_METHOD(void, LevelControlCluster, writeDefaultMoveRateAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo;
@@ -11482,7 +12784,16 @@ JNI_METHOD(void, LevelControlCluster, writeDefaultMoveRateAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -11530,7 +12841,7 @@ JNI_METHOD(void, LevelControlCluster, subscribeDefaultMoveRateAttribute)
 }
 
 JNI_METHOD(void, LevelControlCluster, writeStartUpCurrentLevelAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo;
@@ -11558,7 +12869,16 @@ JNI_METHOD(void, LevelControlCluster, writeStartUpCurrentLevelAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -11640,6 +12960,61 @@ JNI_METHOD(void, LevelControlCluster, subscribeClusterRevisionAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(jlong, LocalizationConfigurationCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    chip::DeviceLayer::StackLock lock;
+    LocalizationConfigurationCluster * cppCluster = new LocalizationConfigurationCluster();
+
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
+JNI_METHOD(void, LocalizationConfigurationCluster, writeActiveLocaleAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    using TypeInfo = chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo;
+    TypeInfo::Type cppValue;
+
+    cppValue = chip::JniUtfString(env, static_cast<jstring>(value)).charSpan();
+
+    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
+        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                = CHIP_NO_ERROR;
+    LocalizationConfigurationCluster * cppCluster = reinterpret_cast<LocalizationConfigurationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(jlong, LowPowerCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -11649,7 +13024,8 @@ JNI_METHOD(jlong, LowPowerCluster, initWithDevice)(JNIEnv * env, jobject self, j
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, LowPowerCluster, sleep)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, LowPowerCluster, sleep)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -11676,7 +13052,15 @@ JNI_METHOD(void, LowPowerCluster, sleep)(JNIEnv * env, jobject self, jlong clust
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -11730,13 +13114,14 @@ JNI_METHOD(jlong, MediaInputCluster, initWithDevice)(JNIEnv * env, jobject self,
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, MediaInputCluster, hideInputStatus)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, MediaInputCluster, hideInputStatusRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
-    chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type request;
+    chip::app::Clusters::MediaInput::Commands::HideInputStatusRequest::Type request;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -11757,7 +13142,15 @@ JNI_METHOD(void, MediaInputCluster, hideInputStatus)(JNIEnv * env, jobject self,
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -11765,14 +13158,14 @@ JNI_METHOD(void, MediaInputCluster, hideInputStatus)(JNIEnv * env, jobject self,
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaInputCluster, renameInput)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject index, jstring name)
+JNI_METHOD(void, MediaInputCluster, renameInputRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject index, jstring name, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
-    chip::app::Clusters::MediaInput::Commands::RenameInput::Type request;
+    chip::app::Clusters::MediaInput::Commands::RenameInputRequest::Type request;
 
     request.index = static_cast<decltype(request.index)>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
     request.name  = chip::JniUtfString(env, static_cast<jstring>(name)).charSpan();
@@ -11796,7 +13189,15 @@ JNI_METHOD(void, MediaInputCluster, renameInput)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -11804,13 +13205,14 @@ JNI_METHOD(void, MediaInputCluster, renameInput)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaInputCluster, selectInput)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject index)
+JNI_METHOD(void, MediaInputCluster, selectInputRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject index, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
-    chip::app::Clusters::MediaInput::Commands::SelectInput::Type request;
+    chip::app::Clusters::MediaInput::Commands::SelectInputRequest::Type request;
 
     request.index = static_cast<decltype(request.index)>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
 
@@ -11833,7 +13235,15 @@ JNI_METHOD(void, MediaInputCluster, selectInput)(JNIEnv * env, jobject self, jlo
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -11841,13 +13251,14 @@ JNI_METHOD(void, MediaInputCluster, selectInput)(JNIEnv * env, jobject self, jlo
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaInputCluster, showInputStatus)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, MediaInputCluster, showInputStatusRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
-    chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type request;
+    chip::app::Clusters::MediaInput::Commands::ShowInputStatusRequest::Type request;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -11868,7 +13279,15 @@ JNI_METHOD(void, MediaInputCluster, showInputStatus)(JNIEnv * env, jobject self,
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -11959,18 +13378,18 @@ JNI_METHOD(jlong, MediaPlaybackCluster, initWithDevice)(JNIEnv * env, jobject se
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, MediaPlaybackCluster, mediaFastForward)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, MediaPlaybackCluster, fastForwardRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
-    chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::FastForwardRequest::Type request;
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaFastForwardResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaFastForwardResponseCallback *)>
-        onSuccess(Platform::New<CHIPMediaPlaybackClusterMediaFastForwardResponseCallback>(callback),
-                  Platform::Delete<CHIPMediaPlaybackClusterMediaFastForwardResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
+                  Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -11986,10 +13405,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaFastForward)(JNIEnv * env, jobject s
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -11997,18 +13424,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaFastForward)(JNIEnv * env, jobject s
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaPlaybackCluster, mediaNext)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, MediaPlaybackCluster, nextRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
-    chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::NextRequest::Type request;
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaNextResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaNextResponseCallback *)>
-        onSuccess(Platform::New<CHIPMediaPlaybackClusterMediaNextResponseCallback>(callback),
-                  Platform::Delete<CHIPMediaPlaybackClusterMediaNextResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
+                  Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -12024,10 +13451,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaNext)(JNIEnv * env, jobject self, jl
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPMediaPlaybackClusterMediaNextResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12035,18 +13470,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaNext)(JNIEnv * env, jobject self, jl
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaPlaybackCluster, mediaPause)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, MediaPlaybackCluster, pauseRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
-    chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::PauseRequest::Type request;
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaPauseResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaPauseResponseCallback *)>
-        onSuccess(Platform::New<CHIPMediaPlaybackClusterMediaPauseResponseCallback>(callback),
-                  Platform::Delete<CHIPMediaPlaybackClusterMediaPauseResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
+                  Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -12062,10 +13497,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPause)(JNIEnv * env, jobject self, j
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPMediaPlaybackClusterMediaPauseResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12073,18 +13516,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPause)(JNIEnv * env, jobject self, j
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaPlaybackCluster, mediaPlay)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, MediaPlaybackCluster, playRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
-    chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::PlayRequest::Type request;
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaPlayResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaPlayResponseCallback *)>
-        onSuccess(Platform::New<CHIPMediaPlaybackClusterMediaPlayResponseCallback>(callback),
-                  Platform::Delete<CHIPMediaPlaybackClusterMediaPlayResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
+                  Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -12100,10 +13543,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPlay)(JNIEnv * env, jobject self, jl
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPMediaPlaybackClusterMediaPlayResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12111,18 +13562,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPlay)(JNIEnv * env, jobject self, jl
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaPlaybackCluster, mediaPrevious)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, MediaPlaybackCluster, previousRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
-    chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::PreviousRequest::Type request;
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaPreviousResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaPreviousResponseCallback *)>
-        onSuccess(Platform::New<CHIPMediaPlaybackClusterMediaPreviousResponseCallback>(callback),
-                  Platform::Delete<CHIPMediaPlaybackClusterMediaPreviousResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
+                  Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -12138,10 +13589,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPrevious)(JNIEnv * env, jobject self
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPMediaPlaybackClusterMediaPreviousResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12149,18 +13608,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaPrevious)(JNIEnv * env, jobject self
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaPlaybackCluster, mediaRewind)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, MediaPlaybackCluster, rewindRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
-    chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::RewindRequest::Type request;
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaRewindResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaRewindResponseCallback *)>
-        onSuccess(Platform::New<CHIPMediaPlaybackClusterMediaRewindResponseCallback>(callback),
-                  Platform::Delete<CHIPMediaPlaybackClusterMediaRewindResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
+                  Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -12176,10 +13635,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaRewind)(JNIEnv * env, jobject self, 
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPMediaPlaybackClusterMediaRewindResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12187,20 +13654,20 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaRewind)(JNIEnv * env, jobject self, 
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaPlaybackCluster, mediaSeek)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject position)
+JNI_METHOD(void, MediaPlaybackCluster, seekRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject position, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
-    chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::SeekRequest::Type request;
 
     request.position = static_cast<decltype(request.position)>(chip::JniReferences::GetInstance().LongToPrimitive(position));
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaSeekResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaSeekResponseCallback *)>
-        onSuccess(Platform::New<CHIPMediaPlaybackClusterMediaSeekResponseCallback>(callback),
-                  Platform::Delete<CHIPMediaPlaybackClusterMediaSeekResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
+                  Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -12216,10 +13683,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSeek)(JNIEnv * env, jobject self, jl
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPMediaPlaybackClusterMediaSeekResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12227,22 +13702,21 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSeek)(JNIEnv * env, jobject self, jl
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaPlaybackCluster, mediaSkipBackward)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject deltaPositionMilliseconds)
+JNI_METHOD(void, MediaPlaybackCluster, skipBackwardRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject deltaPositionMilliseconds, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
-    chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::SkipBackwardRequest::Type request;
 
     request.deltaPositionMilliseconds = static_cast<decltype(request.deltaPositionMilliseconds)>(
         chip::JniReferences::GetInstance().LongToPrimitive(deltaPositionMilliseconds));
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback *)>
-        onSuccess(Platform::New<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback>(callback),
-                  Platform::Delete<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
+                  Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -12257,11 +13731,19 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSkipBackward)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
-    auto successFn = chip::Callback::Callback<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackType>::FromCancelable(
-        onSuccess->Cancel());
+    auto successFn =
+        chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12269,22 +13751,21 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSkipBackward)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaPlaybackCluster, mediaSkipForward)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject deltaPositionMilliseconds)
+JNI_METHOD(void, MediaPlaybackCluster, skipForwardRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject deltaPositionMilliseconds, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
-    chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::SkipForwardRequest::Type request;
 
     request.deltaPositionMilliseconds = static_cast<decltype(request.deltaPositionMilliseconds)>(
         chip::JniReferences::GetInstance().LongToPrimitive(deltaPositionMilliseconds));
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback *)>
-        onSuccess(Platform::New<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback>(callback),
-                  Platform::Delete<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
+                  Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -12300,10 +13781,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSkipForward)
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12311,18 +13800,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaSkipForward)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaPlaybackCluster, mediaStartOver)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, MediaPlaybackCluster, startOverRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
-    chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::StartOverRequest::Type request;
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaStartOverResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaStartOverResponseCallback *)>
-        onSuccess(Platform::New<CHIPMediaPlaybackClusterMediaStartOverResponseCallback>(callback),
-                  Platform::Delete<CHIPMediaPlaybackClusterMediaStartOverResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
+                  Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -12338,10 +13827,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaStartOver)(JNIEnv * env, jobject sel
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPMediaPlaybackClusterMediaStartOverResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12349,18 +13846,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaStartOver)(JNIEnv * env, jobject sel
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, MediaPlaybackCluster, mediaStop)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, MediaPlaybackCluster, stopRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
-    chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type request;
+    chip::app::Clusters::MediaPlayback::Commands::StopRequest::Type request;
 
-    std::unique_ptr<CHIPMediaPlaybackClusterMediaStopResponseCallback,
-                    void (*)(CHIPMediaPlaybackClusterMediaStopResponseCallback *)>
-        onSuccess(Platform::New<CHIPMediaPlaybackClusterMediaStopResponseCallback>(callback),
-                  Platform::Delete<CHIPMediaPlaybackClusterMediaStopResponseCallback>);
+    std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
+                  Platform::Delete<CHIPMediaPlaybackClusterPlaybackResponseCallback>);
     std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
         Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
@@ -12376,10 +13873,18 @@ JNI_METHOD(void, MediaPlaybackCluster, mediaStop)(JNIEnv * env, jobject self, jl
                        env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
 
     auto successFn =
-        chip::Callback::Callback<CHIPMediaPlaybackClusterMediaStopResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+        chip::Callback::Callback<CHIPMediaPlaybackClusterPlaybackResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12618,7 +14123,8 @@ JNI_METHOD(jlong, ModeSelectCluster, initWithDevice)(JNIEnv * env, jobject self,
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, ModeSelectCluster, changeToMode)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject newMode)
+JNI_METHOD(void, ModeSelectCluster, changeToMode)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject newMode, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12647,7 +14153,15 @@ JNI_METHOD(void, ModeSelectCluster, changeToMode)(JNIEnv * env, jobject self, jl
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12694,7 +14208,7 @@ JNI_METHOD(void, ModeSelectCluster, subscribeCurrentModeAttribute)
 }
 
 JNI_METHOD(void, ModeSelectCluster, writeOnModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo;
@@ -12722,7 +14236,16 @@ JNI_METHOD(void, ModeSelectCluster, writeOnModeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -12888,7 +14411,8 @@ JNI_METHOD(jlong, NetworkCommissioningCluster, initWithDevice)(JNIEnv * env, job
 }
 
 JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateThreadNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray operationalDataset, jobject breadcrumb)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray operationalDataset, jobject breadcrumb,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12921,7 +14445,15 @@ JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateThreadNetwork)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12930,7 +14462,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateThreadNetwork)
     onFailure.release();
 }
 JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateWiFiNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jbyteArray credentials, jobject breadcrumb)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jbyteArray credentials, jobject breadcrumb,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -12964,7 +14497,15 @@ JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateWiFiNetwork)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -12973,7 +14514,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateWiFiNetwork)
     onFailure.release();
 }
 JNI_METHOD(void, NetworkCommissioningCluster, connectNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject breadcrumb)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject breadcrumb,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13006,7 +14548,15 @@ JNI_METHOD(void, NetworkCommissioningCluster, connectNetwork)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -13015,7 +14565,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, connectNetwork)
     onFailure.release();
 }
 JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject breadcrumb)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject breadcrumb,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13048,7 +14599,15 @@ JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -13057,7 +14616,8 @@ JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
     onFailure.release();
 }
 JNI_METHOD(void, NetworkCommissioningCluster, reorderNetwork)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject networkIndex, jobject breadcrumb)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray networkID, jobject networkIndex, jobject breadcrumb,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13092,7 +14652,15 @@ JNI_METHOD(void, NetworkCommissioningCluster, reorderNetwork)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -13101,7 +14669,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, reorderNetwork)
     onFailure.release();
 }
 JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jobject breadcrumb)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray ssid, jobject breadcrumb, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13134,7 +14702,15 @@ JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -13144,7 +14720,7 @@ JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)
 }
 
 JNI_METHOD(void, NetworkCommissioningCluster, writeInterfaceEnabledAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo;
@@ -13172,7 +14748,16 @@ JNI_METHOD(void, NetworkCommissioningCluster, writeInterfaceEnabledAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -13264,7 +14849,8 @@ JNI_METHOD(jlong, OtaSoftwareUpdateProviderCluster, initWithDevice)(JNIEnv * env
 }
 
 JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, applyUpdateRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray updateToken, jobject newVersion)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray updateToken, jobject newVersion,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13297,7 +14883,15 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, applyUpdateRequest)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -13306,7 +14900,8 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, applyUpdateRequest)
     onFailure.release();
 }
 JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, notifyUpdateApplied)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray updateToken, jobject softwareVersion)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray updateToken, jobject softwareVersion,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13337,7 +14932,15 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, notifyUpdateApplied)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -13347,7 +14950,8 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, notifyUpdateApplied)
 }
 JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject vendorId, jobject productId, jobject softwareVersion,
- jobject protocolsSupported, jobject hardwareVersion, jobject location, jobject requestorCanConsent, jobject metadataForProvider)
+ jobject protocolsSupported, jobject hardwareVersion, jobject location, jobject requestorCanConsent, jobject metadataForProvider,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13395,7 +14999,15 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -13451,8 +15063,8 @@ JNI_METHOD(jlong, OtaSoftwareUpdateRequestorCluster, initWithDevice)(JNIEnv * en
 }
 
 JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject providerLocation, jobject vendorId,
- jobject announcementReason, jobject metadataForNode)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject providerNodeId, jobject vendorId,
+ jobject announcementReason, jobject metadataForNode, jobject endpoint, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13460,14 +15072,15 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
 
     chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type request;
 
-    request.providerLocation =
-        static_cast<decltype(request.providerLocation)>(chip::JniReferences::GetInstance().LongToPrimitive(providerLocation));
+    request.providerNodeId =
+        static_cast<decltype(request.providerNodeId)>(chip::JniReferences::GetInstance().LongToPrimitive(providerNodeId));
     request.vendorId = static_cast<decltype(request.vendorId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(vendorId));
     request.announcementReason = static_cast<decltype(request.announcementReason)>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(announcementReason));
     chip::JniReferences::GetInstance().GetOptionalValue(metadataForNode, metadataForNode);
     request.metadataForNode =
         chip::Optional<chip::ByteSpan>(chip::JniByteArray(env, static_cast<jbyteArray>(metadataForNode)).byteSpan());
+    request.endpoint = static_cast<decltype(request.endpoint)>(chip::JniReferences::GetInstance().IntegerToPrimitive(endpoint));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -13488,86 +15101,18 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
-
-    onSuccess.release();
-    onFailure.release();
-}
-
-JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, writeDefaultOtaProviderAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value)
-{
-    chip::DeviceLayer::StackLock lock;
-    using TypeInfo = chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo;
-    TypeInfo::Type cppValue;
-
-    cppValue = chip::JniByteArray(env, static_cast<jbyteArray>(value)).byteSpan();
-
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
-
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
-
-    CHIP_ERROR err                                 = CHIP_NO_ERROR;
-    OtaSoftwareUpdateRequestorCluster * cppCluster = reinterpret_cast<OtaSoftwareUpdateRequestorCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    VerifyOrReturn(
-        err == CHIP_NO_ERROR,
-        chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
-
-    onSuccess.release();
-    onFailure.release();
-}
-JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeDefaultOtaProviderAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
-{
-    chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPOctetStringAttributeCallback, void (*)(CHIPOctetStringAttributeCallback *)> onSuccess(
-        Platform::New<CHIPOctetStringAttributeCallback>(callback, true), chip::Platform::Delete<CHIPOctetStringAttributeCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
-
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
-
-    CHIP_ERROR err                                 = CHIP_NO_ERROR;
-    OtaSoftwareUpdateRequestorCluster * cppCluster = reinterpret_cast<OtaSoftwareUpdateRequestorCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    using TypeInfo = chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo;
-    auto successFn =
-        chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterDefaultOtaProviderAttributeCallbackType>::FromCancelable(
-            onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -13603,6 +15148,85 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeUpdatePossibleAttri
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPBooleanAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeUpdateStateAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    OtaSoftwareUpdateRequestorCluster * cppCluster = reinterpret_cast<OtaSoftwareUpdateRequestorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdateState::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterUpdateStateAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeUpdateStateProgressAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback,
+                    void (*)(CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback *)>
+        onSuccess(Platform::New<CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    OtaSoftwareUpdateRequestorCluster * cppCluster = reinterpret_cast<OtaSoftwareUpdateRequestorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdateStateProgress::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterUpdateStateProgressAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -13815,7 +15439,7 @@ JNI_METHOD(jlong, OnOffCluster, initWithDevice)(JNIEnv * env, jobject self, jlon
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, OnOffCluster, off)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, OnOffCluster, off)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13842,7 +15466,15 @@ JNI_METHOD(void, OnOffCluster, off)(JNIEnv * env, jobject self, jlong clusterPtr
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -13851,7 +15483,8 @@ JNI_METHOD(void, OnOffCluster, off)(JNIEnv * env, jobject self, jlong clusterPtr
     onFailure.release();
 }
 JNI_METHOD(void, OnOffCluster, offWithEffect)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject effectId, jobject effectVariant)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject effectId, jobject effectVariant,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13882,7 +15515,15 @@ JNI_METHOD(void, OnOffCluster, offWithEffect)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -13890,7 +15531,7 @@ JNI_METHOD(void, OnOffCluster, offWithEffect)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, OnOffCluster, on)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, OnOffCluster, on)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13917,7 +15558,15 @@ JNI_METHOD(void, OnOffCluster, on)(JNIEnv * env, jobject self, jlong clusterPtr,
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -13925,7 +15574,8 @@ JNI_METHOD(void, OnOffCluster, on)(JNIEnv * env, jobject self, jlong clusterPtr,
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, OnOffCluster, onWithRecallGlobalScene)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, OnOffCluster, onWithRecallGlobalScene)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13952,7 +15602,15 @@ JNI_METHOD(void, OnOffCluster, onWithRecallGlobalScene)(JNIEnv * env, jobject se
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -13961,7 +15619,8 @@ JNI_METHOD(void, OnOffCluster, onWithRecallGlobalScene)(JNIEnv * env, jobject se
     onFailure.release();
 }
 JNI_METHOD(void, OnOffCluster, onWithTimedOff)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject onOffControl, jobject onTime, jobject offWaitTime)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject onOffControl, jobject onTime, jobject offWaitTime,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -13994,7 +15653,15 @@ JNI_METHOD(void, OnOffCluster, onWithTimedOff)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -14002,7 +15669,7 @@ JNI_METHOD(void, OnOffCluster, onWithTimedOff)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, OnOffCluster, toggle)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, OnOffCluster, toggle)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14029,7 +15696,15 @@ JNI_METHOD(void, OnOffCluster, toggle)(JNIEnv * env, jobject self, jlong cluster
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -14111,7 +15786,8 @@ JNI_METHOD(void, OnOffCluster, subscribeGlobalSceneControlAttribute)
     onFailure.release();
 }
 
-JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo;
@@ -14139,7 +15815,16 @@ JNI_METHOD(void, OnOffCluster, writeOnTimeAttribute)(JNIEnv * env, jobject self,
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -14185,7 +15870,7 @@ JNI_METHOD(void, OnOffCluster, subscribeOnTimeAttribute)
 }
 
 JNI_METHOD(void, OnOffCluster, writeOffWaitTimeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo;
@@ -14213,7 +15898,16 @@ JNI_METHOD(void, OnOffCluster, writeOffWaitTimeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -14260,7 +15954,7 @@ JNI_METHOD(void, OnOffCluster, subscribeOffWaitTimeAttribute)
 }
 
 JNI_METHOD(void, OnOffCluster, writeStartUpOnOffAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo;
@@ -14288,7 +15982,16 @@ JNI_METHOD(void, OnOffCluster, writeStartUpOnOffAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -14454,7 +16157,7 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, subscribeSwitchTypeAttribute)
 }
 
 JNI_METHOD(void, OnOffSwitchConfigurationCluster, writeSwitchActionsAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo;
@@ -14482,7 +16185,16 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, writeSwitchActionsAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -14577,7 +16289,7 @@ JNI_METHOD(jlong, OperationalCredentialsCluster, initWithDevice)(JNIEnv * env, j
 
 JNI_METHOD(void, OperationalCredentialsCluster, addNOC)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray NOCValue, jobject ICACValue, jbyteArray IPKValue,
- jobject caseAdminNode, jobject adminVendorId)
+ jobject caseAdminNode, jobject adminVendorId, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14616,7 +16328,15 @@ JNI_METHOD(void, OperationalCredentialsCluster, addNOC)
         chip::Callback::Callback<CHIPOperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -14625,7 +16345,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, addNOC)
     onFailure.release();
 }
 JNI_METHOD(void, OperationalCredentialsCluster, addTrustedRootCertificate)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray rootCertificate)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray rootCertificate, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14654,7 +16374,15 @@ JNI_METHOD(void, OperationalCredentialsCluster, addTrustedRootCertificate)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -14663,7 +16391,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, addTrustedRootCertificate)
     onFailure.release();
 }
 JNI_METHOD(void, OperationalCredentialsCluster, attestationRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray attestationNonce)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray attestationNonce, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14695,7 +16423,15 @@ JNI_METHOD(void, OperationalCredentialsCluster, attestationRequest)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -14704,7 +16440,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, attestationRequest)
     onFailure.release();
 }
 JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject certificateType)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject certificateType, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14738,7 +16474,15 @@ JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -14747,7 +16491,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
     onFailure.release();
 }
 JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray CSRNonce)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray CSRNonce, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14779,7 +16523,15 @@ JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)
         chip::Callback::Callback<CHIPOperationalCredentialsClusterOpCSRResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -14788,7 +16540,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)
     onFailure.release();
 }
 JNI_METHOD(void, OperationalCredentialsCluster, removeFabric)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject fabricIndex)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject fabricIndex, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14821,7 +16573,15 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeFabric)
         chip::Callback::Callback<CHIPOperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -14830,7 +16590,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeFabric)
     onFailure.release();
 }
 JNI_METHOD(void, OperationalCredentialsCluster, removeTrustedRootCertificate)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray trustedRootIdentifier)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray trustedRootIdentifier, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14859,7 +16619,15 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeTrustedRootCertificate)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -14868,7 +16636,7 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeTrustedRootCertificate)
     onFailure.release();
 }
 JNI_METHOD(void, OperationalCredentialsCluster, updateFabricLabel)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring label)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring label, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14900,7 +16668,15 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateFabricLabel)
         chip::Callback::Callback<CHIPOperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -14909,7 +16685,8 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateFabricLabel)
     onFailure.release();
 }
 JNI_METHOD(void, OperationalCredentialsCluster, updateNOC)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray NOCValue, jobject ICACValue)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray NOCValue, jobject ICACValue,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -14943,7 +16720,15 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateNOC)
         chip::Callback::Callback<CHIPOperationalCredentialsClusterNOCResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -16342,7 +18127,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeSpeedAttribute)
 }
 
 JNI_METHOD(void, PumpConfigurationAndControlCluster, writeLifetimeRunningHoursAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo;
@@ -16375,7 +18160,16 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeLifetimeRunningHoursAt
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -16463,7 +18257,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribePowerAttribute)
 }
 
 JNI_METHOD(void, PumpConfigurationAndControlCluster, writeLifetimeEnergyConsumedAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo;
@@ -16496,7 +18290,16 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeLifetimeEnergyConsumed
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -16547,7 +18350,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeLifetimeEnergyCons
 }
 
 JNI_METHOD(void, PumpConfigurationAndControlCluster, writeOperationModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo;
@@ -16575,7 +18378,16 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeOperationModeAttribute
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -16623,7 +18435,7 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeOperationModeAttri
 }
 
 JNI_METHOD(void, PumpConfigurationAndControlCluster, writeControlModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo;
@@ -16651,7 +18463,16 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, writeControlModeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -17019,7 +18840,7 @@ JNI_METHOD(jlong, ScenesCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
 
 JNI_METHOD(void, ScenesCluster, addScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject sceneId, jobject transitionTime,
- jstring sceneName, jobject clusterId, jobject length, jobject value)
+ jstring sceneName, jobject clusterId, jobject length, jobject value, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17055,7 +18876,15 @@ JNI_METHOD(void, ScenesCluster, addScene)
     auto successFn = chip::Callback::Callback<CHIPScenesClusterAddSceneResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -17063,7 +18892,8 @@ JNI_METHOD(void, ScenesCluster, addScene)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, ScenesCluster, getSceneMembership)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId)
+JNI_METHOD(void, ScenesCluster, getSceneMembership)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17095,7 +18925,15 @@ JNI_METHOD(void, ScenesCluster, getSceneMembership)(JNIEnv * env, jobject self, 
         chip::Callback::Callback<CHIPScenesClusterGetSceneMembershipResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -17104,7 +18942,8 @@ JNI_METHOD(void, ScenesCluster, getSceneMembership)(JNIEnv * env, jobject self, 
     onFailure.release();
 }
 JNI_METHOD(void, ScenesCluster, recallScene)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject sceneId, jobject transitionTime)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject sceneId, jobject transitionTime,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17136,7 +18975,15 @@ JNI_METHOD(void, ScenesCluster, recallScene)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -17144,7 +18991,8 @@ JNI_METHOD(void, ScenesCluster, recallScene)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, ScenesCluster, removeAllScenes)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId)
+JNI_METHOD(void, ScenesCluster, removeAllScenes)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17175,7 +19023,15 @@ JNI_METHOD(void, ScenesCluster, removeAllScenes)(JNIEnv * env, jobject self, jlo
         chip::Callback::Callback<CHIPScenesClusterRemoveAllScenesResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -17184,7 +19040,7 @@ JNI_METHOD(void, ScenesCluster, removeAllScenes)(JNIEnv * env, jobject self, jlo
     onFailure.release();
 }
 JNI_METHOD(void, ScenesCluster, removeScene)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject sceneId)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject sceneId, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17216,7 +19072,15 @@ JNI_METHOD(void, ScenesCluster, removeScene)
         chip::Callback::Callback<CHIPScenesClusterRemoveSceneResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -17225,7 +19089,7 @@ JNI_METHOD(void, ScenesCluster, removeScene)
     onFailure.release();
 }
 JNI_METHOD(void, ScenesCluster, storeScene)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject sceneId)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject sceneId, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17256,7 +19120,15 @@ JNI_METHOD(void, ScenesCluster, storeScene)
     auto successFn = chip::Callback::Callback<CHIPScenesClusterStoreSceneResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -17265,7 +19137,7 @@ JNI_METHOD(void, ScenesCluster, storeScene)
     onFailure.release();
 }
 JNI_METHOD(void, ScenesCluster, viewScene)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject sceneId)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject sceneId, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17296,7 +19168,15 @@ JNI_METHOD(void, ScenesCluster, viewScene)
     auto successFn = chip::Callback::Callback<CHIPScenesClusterViewSceneResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -17535,7 +19415,8 @@ JNI_METHOD(jlong, SoftwareDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobj
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, SoftwareDiagnosticsCluster, resetWatermarks)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, SoftwareDiagnosticsCluster, resetWatermarks)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -17562,7 +19443,15 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, resetWatermarks)(JNIEnv * env, jobj
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -17913,170 +19802,6 @@ JNI_METHOD(void, SwitchCluster, subscribeClusterRevisionAttribute)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(jlong, TvChannelCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
-{
-    chip::DeviceLayer::StackLock lock;
-    TvChannelCluster * cppCluster = new TvChannelCluster();
-
-    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
-    return reinterpret_cast<jlong>(cppCluster);
-}
-
-JNI_METHOD(void, TvChannelCluster, changeChannel)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring match)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TvChannelCluster * cppCluster;
-
-    chip::app::Clusters::TvChannel::Commands::ChangeChannel::Type request;
-
-    request.match = chip::JniUtfString(env, static_cast<jstring>(match)).charSpan();
-
-    std::unique_ptr<CHIPTvChannelClusterChangeChannelResponseCallback,
-                    void (*)(CHIPTvChannelClusterChangeChannelResponseCallback *)>
-        onSuccess(Platform::New<CHIPTvChannelClusterChangeChannelResponseCallback>(callback),
-                  Platform::Delete<CHIPTvChannelClusterChangeChannelResponseCallback>);
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-
-    cppCluster = reinterpret_cast<TvChannelCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    auto successFn =
-        chip::Callback::Callback<CHIPTvChannelClusterChangeChannelResponseCallbackType>::FromCancelable(onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
-                                                                                       CHIP_ERROR_INCORRECT_STATE));
-
-    onSuccess.release();
-    onFailure.release();
-}
-JNI_METHOD(void, TvChannelCluster, changeChannelByNumber)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject majorNumber, jobject minorNumber)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TvChannelCluster * cppCluster;
-
-    chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type request;
-
-    request.majorNumber =
-        static_cast<decltype(request.majorNumber)>(chip::JniReferences::GetInstance().IntegerToPrimitive(majorNumber));
-    request.minorNumber =
-        static_cast<decltype(request.minorNumber)>(chip::JniReferences::GetInstance().IntegerToPrimitive(minorNumber));
-
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-
-    cppCluster = reinterpret_cast<TvChannelCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
-                                                                                       CHIP_ERROR_INCORRECT_STATE));
-
-    onSuccess.release();
-    onFailure.release();
-}
-JNI_METHOD(void, TvChannelCluster, skipChannel)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject count)
-{
-    chip::DeviceLayer::StackLock lock;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TvChannelCluster * cppCluster;
-
-    chip::app::Clusters::TvChannel::Commands::SkipChannel::Type request;
-
-    request.count = static_cast<decltype(request.count)>(chip::JniReferences::GetInstance().IntegerToPrimitive(count));
-
-    std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
-        Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
-
-    cppCluster = reinterpret_cast<TvChannelCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
-                                                                                       CHIP_ERROR_INCORRECT_STATE));
-
-    onSuccess.release();
-    onFailure.release();
-}
-JNI_METHOD(void, TvChannelCluster, subscribeClusterRevisionAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
-{
-    chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
-    VerifyOrReturn(onSuccess.get() != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
-
-    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
-        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
-    VerifyOrReturn(onFailure.get() != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
-
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    TvChannelCluster * cppCluster = reinterpret_cast<TvChannelCluster *>(clusterPtr);
-    VerifyOrReturn(cppCluster != nullptr,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
-
-    using TypeInfo = chip::app::Clusters::TvChannel::Attributes::ClusterRevision::TypeInfo;
-    auto successFn =
-        chip::Callback::Callback<CHIPTvChannelClusterClusterRevisionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
-    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
-                       env, callback, "Error subscribing to attribute", err));
-
-    onSuccess.release();
-    onFailure.release();
-}
 JNI_METHOD(jlong, TargetNavigatorCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -18086,14 +19811,14 @@ JNI_METHOD(jlong, TargetNavigatorCluster, initWithDevice)(JNIEnv * env, jobject 
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, TargetNavigatorCluster, navigateTarget)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject target, jstring data)
+JNI_METHOD(void, TargetNavigatorCluster, navigateTargetRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject target, jstring data, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TargetNavigatorCluster * cppCluster;
 
-    chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type request;
+    chip::app::Clusters::TargetNavigator::Commands::NavigateTargetRequest::Type request;
 
     request.target = static_cast<decltype(request.target)>(chip::JniReferences::GetInstance().IntegerToPrimitive(target));
     request.data   = chip::JniUtfString(env, static_cast<jstring>(data)).charSpan();
@@ -18120,10 +19845,56 @@ JNI_METHOD(void, TargetNavigatorCluster, navigateTarget)
         chip::Callback::Callback<CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, TargetNavigatorCluster, subscribeCurrentNavigatorTargetAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    TargetNavigatorCluster * cppCluster = reinterpret_cast<TargetNavigatorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPTargetNavigatorClusterCurrentNavigatorTargetAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -18373,7 +20144,7 @@ JNI_METHOD(jlong, TestClusterCluster, initWithDevice)(JNIEnv * env, jobject self
 
 JNI_METHOD(void, TestClusterCluster, simpleStructEchoRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jbyteArray d, jstring e,
- jobject f, jobject g, jobject h)
+ jobject f, jobject g, jobject h, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18405,7 +20176,15 @@ JNI_METHOD(void, TestClusterCluster, simpleStructEchoRequest)
         chip::Callback::Callback<CHIPTestClusterClusterSimpleStructResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18413,7 +20192,8 @@ JNI_METHOD(void, TestClusterCluster, simpleStructEchoRequest)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, TestClusterCluster, test)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, TestClusterCluster, test)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18440,7 +20220,15 @@ JNI_METHOD(void, TestClusterCluster, test)(JNIEnv * env, jobject self, jlong clu
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18449,7 +20237,7 @@ JNI_METHOD(void, TestClusterCluster, test)(JNIEnv * env, jobject self, jlong clu
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testAddArguments)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject arg2)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject arg2, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18482,7 +20270,67 @@ JNI_METHOD(void, TestClusterCluster, testAddArguments)
         chip::Callback::Callback<CHIPTestClusterClusterTestAddArgumentsResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
+                                                                                       CHIP_ERROR_INCORRECT_STATE));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, TestClusterCluster, testEmitTestEventRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject arg2, jobject arg3,
+ jobject timedInvokeTimeoutMs)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster;
+
+    chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type request;
+
+    request.arg1 = static_cast<decltype(request.arg1)>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg1));
+    request.arg2 = static_cast<decltype(request.arg2)>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg2));
+    request.arg3 = static_cast<decltype(request.arg3)>(chip::JniReferences::GetInstance().BooleanToPrimitive(arg3));
+
+    std::unique_ptr<CHIPTestClusterClusterTestEmitTestEventResponseCallback,
+                    void (*)(CHIPTestClusterClusterTestEmitTestEventResponseCallback *)>
+        onSuccess(Platform::New<CHIPTestClusterClusterTestEmitTestEventResponseCallback>(callback),
+                  Platform::Delete<CHIPTestClusterClusterTestEmitTestEventResponseCallback>);
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native callback", CHIP_ERROR_NO_MEMORY));
+
+    cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error getting native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    auto successFn =
+        chip::Callback::Callback<CHIPTestClusterClusterTestEmitTestEventResponseCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18491,7 +20339,7 @@ JNI_METHOD(void, TestClusterCluster, testAddArguments)
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testEnumsRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject arg2)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject arg2, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18523,7 +20371,15 @@ JNI_METHOD(void, TestClusterCluster, testEnumsRequest)
         chip::Callback::Callback<CHIPTestClusterClusterTestEnumsResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18532,7 +20388,7 @@ JNI_METHOD(void, TestClusterCluster, testEnumsRequest)
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testListInt8UArgumentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18563,7 +20419,15 @@ JNI_METHOD(void, TestClusterCluster, testListInt8UArgumentRequest)
         chip::Callback::Callback<CHIPTestClusterClusterBooleanResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18572,7 +20436,7 @@ JNI_METHOD(void, TestClusterCluster, testListInt8UArgumentRequest)
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testListInt8UReverseRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18604,7 +20468,15 @@ JNI_METHOD(void, TestClusterCluster, testListInt8UReverseRequest)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18614,7 +20486,7 @@ JNI_METHOD(void, TestClusterCluster, testListInt8UReverseRequest)
 }
 JNI_METHOD(void, TestClusterCluster, testListNestedStructListArgumentRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jobject d, jobject e,
- jbyteArray f, jobject g)
+ jbyteArray f, jobject g, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18645,7 +20517,15 @@ JNI_METHOD(void, TestClusterCluster, testListNestedStructListArgumentRequest)
         chip::Callback::Callback<CHIPTestClusterClusterBooleanResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18655,7 +20535,7 @@ JNI_METHOD(void, TestClusterCluster, testListNestedStructListArgumentRequest)
 }
 JNI_METHOD(void, TestClusterCluster, testListStructArgumentRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jbyteArray d, jstring e,
- jobject f, jobject g, jobject h)
+ jobject f, jobject g, jobject h, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18686,7 +20566,15 @@ JNI_METHOD(void, TestClusterCluster, testListStructArgumentRequest)
         chip::Callback::Callback<CHIPTestClusterClusterBooleanResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18695,7 +20583,7 @@ JNI_METHOD(void, TestClusterCluster, testListStructArgumentRequest)
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testNestedStructArgumentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18726,7 +20614,15 @@ JNI_METHOD(void, TestClusterCluster, testNestedStructArgumentRequest)
         chip::Callback::Callback<CHIPTestClusterClusterBooleanResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18736,7 +20632,7 @@ JNI_METHOD(void, TestClusterCluster, testNestedStructArgumentRequest)
 }
 JNI_METHOD(void, TestClusterCluster, testNestedStructListArgumentRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jobject d, jobject e,
- jbyteArray f, jobject g)
+ jbyteArray f, jobject g, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18767,7 +20663,15 @@ JNI_METHOD(void, TestClusterCluster, testNestedStructListArgumentRequest)
         chip::Callback::Callback<CHIPTestClusterClusterBooleanResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18775,7 +20679,8 @@ JNI_METHOD(void, TestClusterCluster, testNestedStructListArgumentRequest)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, TestClusterCluster, testNotHandled)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, TestClusterCluster, testNotHandled)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18802,7 +20707,15 @@ JNI_METHOD(void, TestClusterCluster, testNotHandled)(JNIEnv * env, jobject self,
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18811,7 +20724,7 @@ JNI_METHOD(void, TestClusterCluster, testNotHandled)(JNIEnv * env, jobject self,
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testNullableOptionalRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18850,7 +20763,15 @@ JNI_METHOD(void, TestClusterCluster, testNullableOptionalRequest)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18859,7 +20780,7 @@ JNI_METHOD(void, TestClusterCluster, testNullableOptionalRequest)
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testSimpleOptionalArgumentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18890,7 +20811,15 @@ JNI_METHOD(void, TestClusterCluster, testSimpleOptionalArgumentRequest)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18898,7 +20827,8 @@ JNI_METHOD(void, TestClusterCluster, testSimpleOptionalArgumentRequest)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, TestClusterCluster, testSpecific)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, TestClusterCluster, testSpecific)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18928,7 +20858,15 @@ JNI_METHOD(void, TestClusterCluster, testSpecific)(JNIEnv * env, jobject self, j
         chip::Callback::Callback<CHIPTestClusterClusterTestSpecificResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18938,7 +20876,7 @@ JNI_METHOD(void, TestClusterCluster, testSpecific)(JNIEnv * env, jobject self, j
 }
 JNI_METHOD(void, TestClusterCluster, testStructArgumentRequest)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jbyteArray d, jstring e,
- jobject f, jobject g, jobject h)
+ jobject f, jobject g, jobject h, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -18969,7 +20907,15 @@ JNI_METHOD(void, TestClusterCluster, testStructArgumentRequest)
         chip::Callback::Callback<CHIPTestClusterClusterBooleanResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -18977,7 +20923,8 @@ JNI_METHOD(void, TestClusterCluster, testStructArgumentRequest)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, TestClusterCluster, testUnknownCommand)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, TestClusterCluster, testUnknownCommand)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19004,7 +20951,15 @@ JNI_METHOD(void, TestClusterCluster, testUnknownCommand)(JNIEnv * env, jobject s
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -19012,7 +20967,8 @@ JNI_METHOD(void, TestClusterCluster, testUnknownCommand)(JNIEnv * env, jobject s
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, TestClusterCluster, timedInvokeRequest)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, TestClusterCluster, timedInvokeRequest)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -19039,7 +20995,8 @@ JNI_METHOD(void, TestClusterCluster, timedInvokeRequest)(JNIEnv * env, jobject s
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall, 10000);
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -19049,7 +21006,7 @@ JNI_METHOD(void, TestClusterCluster, timedInvokeRequest)(JNIEnv * env, jobject s
 }
 
 JNI_METHOD(void, TestClusterCluster, writeBooleanAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo;
@@ -19077,7 +21034,16 @@ JNI_METHOD(void, TestClusterCluster, writeBooleanAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19124,7 +21090,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeBooleanAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeBitmap8Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo;
@@ -19152,7 +21118,16 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap8Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19199,7 +21174,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeBitmap8Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeBitmap16Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo;
@@ -19227,7 +21202,16 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap16Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19274,7 +21258,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeBitmap16Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeBitmap32Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo;
@@ -19302,7 +21286,16 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap32Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19349,7 +21342,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeBitmap32Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeBitmap64Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo;
@@ -19377,7 +21370,16 @@ JNI_METHOD(void, TestClusterCluster, writeBitmap64Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19424,7 +21426,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeBitmap64Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt8uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo;
@@ -19452,7 +21454,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt8uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19499,7 +21510,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt8uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt16uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo;
@@ -19527,7 +21538,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt16uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19574,7 +21594,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt16uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt24uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int24u::TypeInfo;
@@ -19602,7 +21622,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt24uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19649,7 +21678,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt24uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt32uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo;
@@ -19677,7 +21706,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt32uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19724,7 +21762,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt32uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt40uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int40u::TypeInfo;
@@ -19752,7 +21790,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt40uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19799,7 +21846,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt40uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt48uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int48u::TypeInfo;
@@ -19827,7 +21874,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt48uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19874,7 +21930,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt48uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt56uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int56u::TypeInfo;
@@ -19902,7 +21958,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt56uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -19949,7 +22014,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt56uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt64uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo;
@@ -19977,7 +22042,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt64uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20024,7 +22098,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt64uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt8sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo;
@@ -20052,7 +22126,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt8sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20099,7 +22182,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt8sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt16sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo;
@@ -20127,7 +22210,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt16sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20174,7 +22266,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt16sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt24sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int24s::TypeInfo;
@@ -20202,7 +22294,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt24sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20249,7 +22350,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt24sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt32sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo;
@@ -20277,7 +22378,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt32sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20324,7 +22434,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt32sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt40sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int40s::TypeInfo;
@@ -20352,7 +22462,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt40sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20399,7 +22518,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt40sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt48sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int48s::TypeInfo;
@@ -20427,7 +22546,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt48sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20474,7 +22602,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt48sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt56sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int56s::TypeInfo;
@@ -20502,7 +22630,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt56sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20549,7 +22686,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt56sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeInt64sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo;
@@ -20577,7 +22714,16 @@ JNI_METHOD(void, TestClusterCluster, writeInt64sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20624,7 +22770,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeInt64sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeEnum8Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo;
@@ -20652,7 +22798,16 @@ JNI_METHOD(void, TestClusterCluster, writeEnum8Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20699,7 +22854,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeEnum8Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeEnum16Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo;
@@ -20727,7 +22882,16 @@ JNI_METHOD(void, TestClusterCluster, writeEnum16Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20774,7 +22938,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeEnum16Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeFloatSingleAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo;
@@ -20802,7 +22966,16 @@ JNI_METHOD(void, TestClusterCluster, writeFloatSingleAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20849,7 +23022,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeFloatSingleAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeFloatDoubleAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo;
@@ -20877,7 +23050,16 @@ JNI_METHOD(void, TestClusterCluster, writeFloatDoubleAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20924,7 +23106,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeFloatDoubleAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeOctetStringAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo;
@@ -20952,7 +23134,16 @@ JNI_METHOD(void, TestClusterCluster, writeOctetStringAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -20999,7 +23190,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeOctetStringAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeLongOctetStringAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo;
@@ -21027,7 +23218,16 @@ JNI_METHOD(void, TestClusterCluster, writeLongOctetStringAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21074,7 +23274,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeLongOctetStringAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo;
@@ -21102,7 +23302,16 @@ JNI_METHOD(void, TestClusterCluster, writeCharStringAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21149,7 +23358,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeCharStringAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo;
@@ -21177,7 +23386,16 @@ JNI_METHOD(void, TestClusterCluster, writeLongCharStringAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21224,7 +23442,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeLongCharStringAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeEpochUsAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo;
@@ -21252,7 +23470,16 @@ JNI_METHOD(void, TestClusterCluster, writeEpochUsAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21299,7 +23526,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeEpochUsAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeEpochSAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo;
@@ -21327,7 +23554,16 @@ JNI_METHOD(void, TestClusterCluster, writeEpochSAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21374,7 +23610,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeEpochSAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeVendorIdAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo;
@@ -21402,7 +23638,16 @@ JNI_METHOD(void, TestClusterCluster, writeVendorIdAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21450,7 +23695,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeVendorIdAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeEnumAttrAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::EnumAttr::TypeInfo;
@@ -21478,7 +23723,16 @@ JNI_METHOD(void, TestClusterCluster, writeEnumAttrAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21525,7 +23779,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeEnumAttrAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt8uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo;
@@ -21553,7 +23807,16 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt8uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21600,7 +23863,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeRangeRestrictedInt8uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt8sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo;
@@ -21628,7 +23891,16 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt8sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21675,7 +23947,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeRangeRestrictedInt8sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt16uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo;
@@ -21703,7 +23975,16 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt16uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21750,7 +24031,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeRangeRestrictedInt16uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt16sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo;
@@ -21778,7 +24059,16 @@ JNI_METHOD(void, TestClusterCluster, writeRangeRestrictedInt16sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21825,7 +24115,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeRangeRestrictedInt16sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeTimedWriteBooleanAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo;
@@ -21853,7 +24143,9 @@ JNI_METHOD(void, TestClusterCluster, writeTimedWriteBooleanAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall, 10000);
+
+    err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                               chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21863,7 +24155,7 @@ JNI_METHOD(void, TestClusterCluster, writeTimedWriteBooleanAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeUnsupportedAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo;
@@ -21891,7 +24183,16 @@ JNI_METHOD(void, TestClusterCluster, writeUnsupportedAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -21938,7 +24239,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeUnsupportedAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableBooleanAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo;
@@ -21971,7 +24272,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBooleanAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22019,7 +24329,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableBooleanAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableBitmap8Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo;
@@ -22052,7 +24362,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap8Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22100,7 +24419,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableBitmap8Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableBitmap16Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo;
@@ -22133,7 +24452,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap16Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22181,7 +24509,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableBitmap16Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableBitmap32Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo;
@@ -22214,7 +24542,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap32Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22262,7 +24599,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableBitmap32Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableBitmap64Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo;
@@ -22295,7 +24632,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableBitmap64Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22343,7 +24689,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableBitmap64Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt8uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo;
@@ -22376,7 +24722,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt8uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22424,7 +24779,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt8uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt16uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo;
@@ -22457,7 +24812,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt16uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22505,7 +24869,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt16uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt24uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt24u::TypeInfo;
@@ -22538,7 +24902,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt24uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22586,7 +24959,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt24uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt32uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo;
@@ -22619,7 +24992,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt32uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22667,7 +25049,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt32uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt40uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt40u::TypeInfo;
@@ -22700,7 +25082,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt40uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22748,7 +25139,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt40uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt48uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt48u::TypeInfo;
@@ -22781,7 +25172,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt48uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22829,7 +25229,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt48uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt56uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt56u::TypeInfo;
@@ -22862,7 +25262,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt56uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22910,7 +25319,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt56uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt64uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo;
@@ -22943,7 +25352,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt64uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -22991,7 +25409,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt64uAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt8sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo;
@@ -23024,7 +25442,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt8sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23072,7 +25499,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt8sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt16sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo;
@@ -23105,7 +25532,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt16sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23153,7 +25589,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt16sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt24sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt24s::TypeInfo;
@@ -23186,7 +25622,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt24sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23234,7 +25679,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt24sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt32sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo;
@@ -23267,7 +25712,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt32sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23315,7 +25769,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt32sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt40sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt40s::TypeInfo;
@@ -23348,7 +25802,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt40sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23396,7 +25859,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt40sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt48sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt48s::TypeInfo;
@@ -23429,7 +25892,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt48sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23477,7 +25949,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt48sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt56sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt56s::TypeInfo;
@@ -23510,7 +25982,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt56sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23558,7 +26039,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt56sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableInt64sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo;
@@ -23591,7 +26072,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableInt64sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23639,7 +26129,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableInt64sAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableEnum8Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo;
@@ -23672,7 +26162,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum8Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23720,7 +26219,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableEnum8Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableEnum16Attribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo;
@@ -23753,7 +26252,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnum16Attribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23801,7 +26309,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableEnum16Attribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableFloatSingleAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo;
@@ -23834,7 +26342,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableFloatSingleAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23883,7 +26400,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableFloatSingleAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableFloatDoubleAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo;
@@ -23916,7 +26433,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableFloatDoubleAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -23965,7 +26491,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableFloatDoubleAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableOctetStringAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jbyteArray value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo;
@@ -23999,7 +26525,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableOctetStringAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24048,7 +26583,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableOctetStringAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableCharStringAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo;
@@ -24082,7 +26617,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableCharStringAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24131,7 +26675,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableCharStringAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableEnumAttrAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo;
@@ -24165,7 +26709,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableEnumAttrAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24213,7 +26766,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableEnumAttrAttribute)
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt8uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo;
@@ -24246,7 +26799,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt8uAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24297,7 +26859,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableRangeRestrictedInt8uAttrib
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt8sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo;
@@ -24330,7 +26892,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt8sAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24381,7 +26952,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableRangeRestrictedInt8sAttrib
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt16uAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo;
@@ -24414,7 +26985,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt16uAttribute
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24465,7 +27045,7 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableRangeRestrictedInt16uAttri
 }
 
 JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt16sAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo;
@@ -24498,7 +27078,16 @@ JNI_METHOD(void, TestClusterCluster, writeNullableRangeRestrictedInt16sAttribute
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -24593,7 +27182,8 @@ JNI_METHOD(jlong, ThermostatCluster, initWithDevice)(JNIEnv * env, jobject self,
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, ThermostatCluster, clearWeeklySchedule)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, ThermostatCluster, clearWeeklySchedule)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -24620,7 +27210,15 @@ JNI_METHOD(void, ThermostatCluster, clearWeeklySchedule)(JNIEnv * env, jobject s
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -24628,7 +27226,8 @@ JNI_METHOD(void, ThermostatCluster, clearWeeklySchedule)(JNIEnv * env, jobject s
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -24658,7 +27257,15 @@ JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)(JNIEnv * env, jobject sel
         chip::Callback::Callback<CHIPThermostatClusterGetRelayStatusLogResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -24667,7 +27274,8 @@ JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)(JNIEnv * env, jobject sel
     onFailure.release();
 }
 JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject daysToReturn, jobject modeToReturn)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject daysToReturn, jobject modeToReturn,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -24702,7 +27310,15 @@ JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)
         chip::Callback::Callback<CHIPThermostatClusterGetWeeklyScheduleResponseCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -24712,7 +27328,7 @@ JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)
 }
 JNI_METHOD(void, ThermostatCluster, setWeeklySchedule)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject numberOfTransitionsForSequence,
- jobject dayOfWeekForSequence, jobject modeForSequence, jobject payload)
+ jobject dayOfWeekForSequence, jobject modeForSequence, jobject payload, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -24747,7 +27363,15 @@ JNI_METHOD(void, ThermostatCluster, setWeeklySchedule)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -24756,7 +27380,7 @@ JNI_METHOD(void, ThermostatCluster, setWeeklySchedule)
     onFailure.release();
 }
 JNI_METHOD(void, ThermostatCluster, setpointRaiseLower)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject mode, jobject amount)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject mode, jobject amount, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -24786,7 +27410,15 @@ JNI_METHOD(void, ThermostatCluster, setpointRaiseLower)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -24981,7 +27613,7 @@ JNI_METHOD(void, ThermostatCluster, subscribeAbsMaxCoolSetpointLimitAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeOccupiedCoolingSetpointAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo;
@@ -25009,7 +27641,16 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedCoolingSetpointAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25056,7 +27697,7 @@ JNI_METHOD(void, ThermostatCluster, subscribeOccupiedCoolingSetpointAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeOccupiedHeatingSetpointAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo;
@@ -25084,7 +27725,16 @@ JNI_METHOD(void, ThermostatCluster, writeOccupiedHeatingSetpointAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25131,7 +27781,7 @@ JNI_METHOD(void, ThermostatCluster, subscribeOccupiedHeatingSetpointAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeMinHeatSetpointLimitAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo;
@@ -25159,7 +27809,16 @@ JNI_METHOD(void, ThermostatCluster, writeMinHeatSetpointLimitAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25206,7 +27865,7 @@ JNI_METHOD(void, ThermostatCluster, subscribeMinHeatSetpointLimitAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeMaxHeatSetpointLimitAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo;
@@ -25234,7 +27893,16 @@ JNI_METHOD(void, ThermostatCluster, writeMaxHeatSetpointLimitAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25281,7 +27949,7 @@ JNI_METHOD(void, ThermostatCluster, subscribeMaxHeatSetpointLimitAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeMinCoolSetpointLimitAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo;
@@ -25309,7 +27977,16 @@ JNI_METHOD(void, ThermostatCluster, writeMinCoolSetpointLimitAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25356,7 +28033,7 @@ JNI_METHOD(void, ThermostatCluster, subscribeMinCoolSetpointLimitAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo;
@@ -25384,7 +28061,16 @@ JNI_METHOD(void, ThermostatCluster, writeMaxCoolSetpointLimitAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25431,7 +28117,7 @@ JNI_METHOD(void, ThermostatCluster, subscribeMaxCoolSetpointLimitAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeMinSetpointDeadBandAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo;
@@ -25459,7 +28145,16 @@ JNI_METHOD(void, ThermostatCluster, writeMinSetpointDeadBandAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25506,7 +28201,7 @@ JNI_METHOD(void, ThermostatCluster, subscribeMinSetpointDeadBandAttribute)
 }
 
 JNI_METHOD(void, ThermostatCluster, writeControlSequenceOfOperationAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo;
@@ -25534,7 +28229,16 @@ JNI_METHOD(void, ThermostatCluster, writeControlSequenceOfOperationAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25581,7 +28285,7 @@ JNI_METHOD(void, ThermostatCluster, subscribeControlSequenceOfOperationAttribute
 }
 
 JNI_METHOD(void, ThermostatCluster, writeSystemModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo;
@@ -25609,7 +28313,16 @@ JNI_METHOD(void, ThermostatCluster, writeSystemModeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25850,7 +28563,7 @@ JNI_METHOD(jlong, ThermostatUserInterfaceConfigurationCluster, initWithDevice)
 }
 
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDisplayModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo;
@@ -25879,7 +28592,16 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeTemperatureDi
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -25928,7 +28650,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeTemperatu
 }
 
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockoutAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo;
@@ -25957,7 +28679,16 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeKeypadLockout
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -26006,7 +28737,7 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeKeypadLoc
 }
 
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgrammingVisibilityAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo;
@@ -26035,7 +28766,16 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, writeScheduleProgr
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
@@ -26129,7 +28869,8 @@ JNI_METHOD(jlong, ThreadNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env,
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, resetCounts)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -26156,7 +28897,15 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, job
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -28487,7 +31236,8 @@ JNI_METHOD(jlong, WiFiNetworkDiagnosticsCluster, initWithDevice)(JNIEnv * env, j
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, resetCounts)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -28514,7 +31264,15 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, resetCounts)(JNIEnv * env, jobje
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -29055,7 +31813,8 @@ JNI_METHOD(jlong, WindowCoveringCluster, initWithDevice)(JNIEnv * env, jobject s
     return reinterpret_cast<jlong>(cppCluster);
 }
 
-JNI_METHOD(void, WindowCoveringCluster, downOrClose)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, WindowCoveringCluster, downOrClose)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -29082,7 +31841,15 @@ JNI_METHOD(void, WindowCoveringCluster, downOrClose)(JNIEnv * env, jobject self,
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -29091,7 +31858,8 @@ JNI_METHOD(void, WindowCoveringCluster, downOrClose)(JNIEnv * env, jobject self,
     onFailure.release();
 }
 JNI_METHOD(void, WindowCoveringCluster, goToLiftPercentage)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject liftPercentageValue, jobject liftPercent100thsValue)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject liftPercentageValue, jobject liftPercent100thsValue,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -29123,7 +31891,15 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftPercentage)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -29132,7 +31908,7 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftPercentage)
     onFailure.release();
 }
 JNI_METHOD(void, WindowCoveringCluster, goToLiftValue)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject liftValue)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject liftValue, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -29161,7 +31937,15 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftValue)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -29170,7 +31954,8 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftValue)
     onFailure.release();
 }
 JNI_METHOD(void, WindowCoveringCluster, goToTiltPercentage)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject tiltPercentageValue, jobject tiltPercent100thsValue)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject tiltPercentageValue, jobject tiltPercent100thsValue,
+ jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -29202,7 +31987,15 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltPercentage)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -29211,7 +32004,7 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltPercentage)
     onFailure.release();
 }
 JNI_METHOD(void, WindowCoveringCluster, goToTiltValue)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject tiltValue)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject tiltValue, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -29240,7 +32033,15 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltValue)
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -29248,7 +32049,8 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltValue)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, WindowCoveringCluster, stopMotion)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, WindowCoveringCluster, stopMotion)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -29275,7 +32077,15 @@ JNI_METHOD(void, WindowCoveringCluster, stopMotion)(JNIEnv * env, jobject self, 
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -29283,7 +32093,8 @@ JNI_METHOD(void, WindowCoveringCluster, stopMotion)(JNIEnv * env, jobject self, 
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, WindowCoveringCluster, upOrOpen)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
+JNI_METHOD(void, WindowCoveringCluster, upOrOpen)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -29310,7 +32121,15 @@ JNI_METHOD(void, WindowCoveringCluster, upOrOpen)(JNIEnv * env, jobject self, jl
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    if (timedInvokeTimeoutMs == nullptr)
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                        chip::JniReferences::GetInstance().IntegerToPrimitive(timedInvokeTimeoutMs));
+    }
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
@@ -29359,8 +32178,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionLiftAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    std::unique_ptr<CHIPWindowCoveringCurrentPositionLiftAttributeCallback,
+                    void (*)(CHIPWindowCoveringCurrentPositionLiftAttributeCallback *)>
+        onSuccess(Platform::New<CHIPWindowCoveringCurrentPositionLiftAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPWindowCoveringCurrentPositionLiftAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -29382,9 +32203,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionLiftAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPWindowCoveringCurrentPositionLiftAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -29396,8 +32217,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionTiltAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    std::unique_ptr<CHIPWindowCoveringCurrentPositionTiltAttributeCallback,
+                    void (*)(CHIPWindowCoveringCurrentPositionTiltAttributeCallback *)>
+        onSuccess(Platform::New<CHIPWindowCoveringCurrentPositionTiltAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPWindowCoveringCurrentPositionTiltAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -29419,9 +32242,9 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionTiltAttribute)
         onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPWindowCoveringCurrentPositionTiltAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -29470,8 +32293,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionLiftPercentageAt
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    std::unique_ptr<CHIPWindowCoveringCurrentPositionLiftPercentageAttributeCallback,
+                    void (*)(CHIPWindowCoveringCurrentPositionLiftPercentageAttributeCallback *)>
+        onSuccess(Platform::New<CHIPWindowCoveringCurrentPositionLiftPercentageAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPWindowCoveringCurrentPositionLiftPercentageAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -29494,9 +32319,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionLiftPercentageAt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPWindowCoveringCurrentPositionLiftPercentageAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -29508,8 +32334,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionTiltPercentageAt
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt8uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    std::unique_ptr<CHIPWindowCoveringCurrentPositionTiltPercentageAttributeCallback,
+                    void (*)(CHIPWindowCoveringCurrentPositionTiltPercentageAttributeCallback *)>
+        onSuccess(Platform::New<CHIPWindowCoveringCurrentPositionTiltPercentageAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPWindowCoveringCurrentPositionTiltPercentageAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -29532,9 +32360,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionTiltPercentageAt
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPWindowCoveringCurrentPositionTiltPercentageAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -29583,8 +32412,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeTargetPositionLiftPercent100ths
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    std::unique_ptr<CHIPWindowCoveringTargetPositionLiftPercent100thsAttributeCallback,
+                    void (*)(CHIPWindowCoveringTargetPositionLiftPercent100thsAttributeCallback *)>
+        onSuccess(Platform::New<CHIPWindowCoveringTargetPositionLiftPercent100thsAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPWindowCoveringTargetPositionLiftPercent100thsAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -29607,9 +32438,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeTargetPositionLiftPercent100ths
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPWindowCoveringTargetPositionLiftPercent100thsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -29621,8 +32453,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeTargetPositionTiltPercent100ths
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    std::unique_ptr<CHIPWindowCoveringTargetPositionTiltPercent100thsAttributeCallback,
+                    void (*)(CHIPWindowCoveringTargetPositionTiltPercent100thsAttributeCallback *)>
+        onSuccess(Platform::New<CHIPWindowCoveringTargetPositionTiltPercent100thsAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPWindowCoveringTargetPositionTiltPercent100thsAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -29645,9 +32479,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeTargetPositionTiltPercent100ths
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPWindowCoveringTargetPositionTiltPercent100thsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -29696,8 +32531,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionLiftPercent100th
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    std::unique_ptr<CHIPWindowCoveringCurrentPositionLiftPercent100thsAttributeCallback,
+                    void (*)(CHIPWindowCoveringCurrentPositionLiftPercent100thsAttributeCallback *)>
+        onSuccess(Platform::New<CHIPWindowCoveringCurrentPositionLiftPercent100thsAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPWindowCoveringCurrentPositionLiftPercent100thsAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -29720,9 +32557,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionLiftPercent100th
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPWindowCoveringCurrentPositionLiftPercent100thsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -29734,8 +32572,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionTiltPercent100th
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        Platform::New<CHIPInt16uAttributeCallback>(callback, true), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    std::unique_ptr<CHIPWindowCoveringCurrentPositionTiltPercent100thsAttributeCallback,
+                    void (*)(CHIPWindowCoveringCurrentPositionTiltPercent100thsAttributeCallback *)>
+        onSuccess(Platform::New<CHIPWindowCoveringCurrentPositionTiltPercent100thsAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPWindowCoveringCurrentPositionTiltPercent100thsAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -29758,9 +32598,10 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeCurrentPositionTiltPercent100th
             onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
-                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
-                                                   CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPWindowCoveringCurrentPositionTiltPercent100thsAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -29920,7 +32761,7 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeInstalledClosedLimitTiltAttribu
 }
 
 JNI_METHOD(void, WindowCoveringCluster, writeModeAttribute)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo;
@@ -29948,7 +32789,16 @@ JNI_METHOD(void, WindowCoveringCluster, writeModeAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+
+    if (timedWriteTimeoutMs == nullptr)
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    }
+    else
+    {
+        err = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   chip::JniReferences::GetInstance().IntegerToPrimitive(timedWriteTimeoutMs));
+    }
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));

@@ -65,13 +65,6 @@ uint8_t emberAfPluginScenesServerEntriesInUse = 0;
 EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[EMBER_AF_PLUGIN_SCENES_TABLE_SIZE];
 #endif
 
-static FabricIndex GetFabricIndex(app::CommandHandler * commandObj)
-{
-    VerifyOrReturnError(nullptr != commandObj, 0);
-    VerifyOrReturnError(nullptr != commandObj->GetExchangeContext(), 0);
-    return commandObj->GetExchangeContext()->GetSessionHandle().GetFabricIndex();
-}
-
 static bool readServerAttribute(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, const char * name,
                                 uint8_t * data, uint8_t size)
 {
@@ -252,7 +245,7 @@ bool emberAfScenesClusterViewSceneCallback(app::CommandHandler * commandObj, con
 bool emberAfScenesClusterRemoveSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                              const Commands::RemoveScene::DecodableType & commandData)
 {
-    auto fabricIndex = GetFabricIndex(commandObj);
+    auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto & groupId   = commandData.groupId;
     auto & sceneId   = commandData.sceneId;
 
@@ -311,7 +304,7 @@ exit:
 bool emberAfScenesClusterRemoveAllScenesCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                  const Commands::RemoveAllScenes::DecodableType & commandData)
 {
-    auto fabricIndex = GetFabricIndex(commandObj);
+    auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto & groupId   = commandData.groupId;
 
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
@@ -363,7 +356,7 @@ exit:
 bool emberAfScenesClusterStoreSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                             const Commands::StoreScene::DecodableType & commandData)
 {
-    auto fabricIndex = GetFabricIndex(commandObj);
+    auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto & groupId   = commandData.groupId;
     auto & sceneId   = commandData.sceneId;
 
@@ -399,7 +392,7 @@ exit:
 bool emberAfScenesClusterRecallSceneCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                              const Commands::RecallScene::DecodableType & commandData)
 {
-    auto fabricIndex = GetFabricIndex(commandObj);
+    auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto & groupId   = commandData.groupId;
     auto & sceneId   = commandData.sceneId;
 
@@ -437,7 +430,7 @@ bool emberAfScenesClusterRecallSceneCallback(app::CommandHandler * commandObj, c
 bool emberAfScenesClusterGetSceneMembershipCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                     const Commands::GetSceneMembership::DecodableType & commandData)
 {
-    auto fabricIndex = GetFabricIndex(commandObj);
+    auto fabricIndex = commandObj->GetAccessingFabricIndex();
     auto & groupId   = commandData.groupId;
 
     CHIP_ERROR err       = CHIP_NO_ERROR;
@@ -768,7 +761,7 @@ bool emberAfPluginScenesServerParseAddScene(
     EmberAfSceneTableEntry entry;
     EmberAfStatus status;
     bool enhanced       = (cmd->commandId == ZCL_ENHANCED_ADD_SCENE_COMMAND_ID);
-    auto fabricIndex    = GetFabricIndex(commandObj);
+    auto fabricIndex    = commandObj->GetAccessingFabricIndex();
     EndpointId endpoint = cmd->apsFrame->destinationEndpoint;
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
 
@@ -1105,7 +1098,7 @@ bool emberAfPluginScenesServerParseViewScene(app::CommandHandler * commandObj, c
     EmberAfSceneTableEntry entry = {};
     EmberAfStatus status         = EMBER_ZCL_STATUS_NOT_FOUND;
     bool enhanced                = (cmd->commandId == ZCL_ENHANCED_VIEW_SCENE_COMMAND_ID);
-    FabricIndex fabricIndex      = GetFabricIndex(commandObj);
+    FabricIndex fabricIndex      = commandObj->GetAccessingFabricIndex();
     EndpointId endpoint          = cmd->apsFrame->destinationEndpoint;
 
     emberAfScenesClusterPrintln("RX: %pViewScene 0x%2x, 0x%x", (enhanced ? "Enhanced" : ""), groupId, sceneId);

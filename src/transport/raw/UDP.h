@@ -19,7 +19,7 @@
 /**
  *    @file
  *      This file defines the CHIP Connection object that maintains a UDP connection.
- *      It binds to any avaiable local addr and port and begins listening.
+ *      It binds to any available local addr and port and begins listening.
  *
  */
 
@@ -33,6 +33,10 @@
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPCore.h>
 #include <transport/raw/Base.h>
+
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+struct otInstance;
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
 
 namespace chip {
 namespace Transport {
@@ -71,11 +75,23 @@ public:
         return *this;
     }
 
+    /**
+     * Networking Stack Native parameter (optional)
+     */
+    void * GetNativeParams() const { return mNativeParams; }
+    UdpListenParameters & SetNativeParams(void * params)
+    {
+        mNativeParams = params;
+
+        return *this;
+    }
+
 private:
     Inet::EndPointManager<Inet::UDPEndPoint> * mEndPointManager;   ///< Associated endpoint factory
     Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
     uint16_t mListenPort             = CHIP_PORT;                  ///< UDP listen port
     Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();  ///< Interface to listen on
+    void * mNativeParams             = nullptr;
 };
 
 /** Implements a transport using UDP. */
@@ -132,6 +148,8 @@ private:
     // UDP message receive handler.
     static void OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle && buffer,
                              const Inet::IPPacketInfo * pktInfo);
+
+    static void OnUdpError(Inet::UDPEndPoint * endPoint, CHIP_ERROR err, const Inet::IPPacketInfo * pktInfo);
 
     Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                       ///< UDP socket used by the transport
     Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kUnknown; ///< Socket listening type

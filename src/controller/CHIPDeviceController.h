@@ -173,8 +173,7 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
  *   relevant information when the application tries to communicate with the device
  */
-class DLL_EXPORT DeviceController : public SessionReleaseDelegate,
-                                    public SessionRecoveryDelegate,
+class DLL_EXPORT DeviceController : public SessionRecoveryDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
                                     public AbstractDnssdDiscoveryController,
 #endif
@@ -200,7 +199,7 @@ public:
      *  grab the CHIP stack lock.
      *
      *  This will also not stop the CHIP event queue / thread (if one exists).  Consumers are expected to
-     *  ensure this happend before calling this method.
+     *  ensure this happened before calling this method.
      */
     virtual CHIP_ERROR Shutdown();
 
@@ -221,7 +220,7 @@ public:
                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->FindOrEstablishSession(mFabricInfo, deviceId, onConnection, onFailure);
+        return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
     }
 
     /**
@@ -269,7 +268,7 @@ public:
      * @param[in] option          The commissioning window can be opened using the original setup code, or an
      *                            onboarding token can be generated using a random setup PIN code (or with
      *                            the PIN code provied in the setupPayload).
-     * @param[out] payload        The generated setup payload.
+     * @param[in,out] payload     The generated setup payload.
      *                            - The payload is generated only if the user didn't ask for using the original setup code.
      *                            - If the user asked to use the provided setup PIN, the PIN must be provided as part of
      *                              this payload
@@ -279,7 +278,10 @@ public:
     CHIP_ERROR OpenCommissioningWindow(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
                                        uint8_t option, SetupPayload & payload)
     {
-        return OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr);
+        mSuggestedSetUpPINCode = payload.setUpPINCode;
+        ReturnErrorOnFailure(OpenCommissioningWindowWithCallback(deviceId, timeout, iteration, discriminator, option, nullptr));
+        payload = mSetupPayload;
+        return CHIP_NO_ERROR;
     }
 
     /**
@@ -374,9 +376,6 @@ protected:
 
     ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 
-    //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(SessionHandle session) override;
-
     //////////// SessionRecoveryDelegate Implementation ///////////////
     void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
@@ -394,15 +393,18 @@ private:
     Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
 
     static void OnPIDReadResponse(void * context, uint16_t value);
-    static void OnVIDReadResponse(void * context, uint16_t value);
+    static void OnVIDReadResponse(void * context, VendorId value);
     static void OnVIDPIDReadFailureResponse(void * context, EmberAfStatus status);
 
     CHIP_ERROR OpenCommissioningWindowInternal();
+
+    PeerId GetPeerIdWithCommissioningWindowOpen() { return mFabricInfo->GetPeerIdForNode(mDeviceWithCommissioningWindowOpen); }
 
     // TODO - Support opening commissioning window simultaneously on multiple devices
     Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
     SetupPayload mSetupPayload;
     NodeId mDeviceWithCommissioningWindowOpen;
+    uint32_t mSuggestedSetUpPINCode = 0;
 
     uint16_t mCommissioningWindowTimeout;
     uint16_t mCommissioningWindowIteration;
@@ -574,7 +576,7 @@ public:
      */
     CHIP_ERROR ValidateAttestationInfo(const ByteSpan & attestationElements, const ByteSpan & signature,
                                        const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
-                                       CommissioneeDeviceProxy * proxy);
+                                       DeviceProxy * proxy);
 
     void CommissioningStageComplete(CHIP_ERROR err);
 
@@ -694,9 +696,6 @@ private:
 
     void OnSessionEstablishmentTimeout();
 
-    //////////// SessionReleaseDelegate Implementation ///////////////
-    void OnSessionReleased(SessionHandle session) override;
-
     static void OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState);
 
     /* This function sends a Device Attestation Certificate chain request to the device.
@@ -708,21 +707,21 @@ private:
      */
     CHIP_ERROR SendAttestationRequestCommand(DeviceProxy * device, const ByteSpan & attestationNonce);
     /* This function sends an OpCSR request to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificateSigningRequestCommand(DeviceProxy * device, const ByteSpan & csrNonce);
     /* This function sends the operational credentials to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendOperationalCertificate(DeviceProxy * device, const ByteSpan & nocCertBuf, const ByteSpan & icaCertBuf);
     /* This function sends the trusted root certificate to the device.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
      */
     CHIP_ERROR SendTrustedRootCertificate(DeviceProxy * device, const ByteSpan & rcac);
 
     /* This function is called by the commissioner code when the device completes
        the operational credential provisioning process.
-       The function does not hold a refernce to the device object.
+       The function does not hold a reference to the device object.
        */
     CHIP_ERROR OnOperationalCredentialsProvisioningCompletion(CommissioneeDeviceProxy * device);
 
@@ -757,7 +756,9 @@ private:
     static void OnRootCertFailureResponse(void * context, uint8_t status);
 
     static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+
+    static void OnDeviceAttestationInformationVerification(void * context, Credentials::AttestationVerificationResult result);
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
                                            const ByteSpan & rcac);
@@ -770,8 +771,11 @@ private:
      * @param[in] proxy           device proxy
      * @param[in] NOCSRElements   CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
      * @param[in] AttestationSignature       Cryptographic signature generated for all the above fields.
+     * @param[in] dac               device attestation certificate
+     * @param[in] csrNonce          certificate signing request nonce
      */
-    CHIP_ERROR ProcessOpCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature);
+    CHIP_ERROR ProcessOpCSR(DeviceProxy * proxy, const ByteSpan & NOCSRElements, const ByteSpan & AttestationSignature,
+                            ByteSpan dac, ByteSpan csrNonce);
 
     /**
      * @brief
@@ -781,7 +785,7 @@ private:
 
     void HandleAttestationResult(CHIP_ERROR err);
 
-    CommissioneeDeviceProxy * FindCommissioneeDevice(SessionHandle session);
+    CommissioneeDeviceProxy * FindCommissioneeDevice(const SessionHandle & session);
     CommissioneeDeviceProxy * FindCommissioneeDevice(NodeId id);
     void ReleaseCommissioneeDevice(CommissioneeDeviceProxy * device);
 
@@ -804,6 +808,8 @@ private:
 
     Callback::Callback<OnDeviceConnected> mOnDeviceConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+
+    Callback::Callback<Credentials::OnAttestationInformationVerification> mDeviceAttestationInformationVerificationCallback;
 
     Callback::Callback<OnNOCChainGeneration> mDeviceNOCChainCallback;
     SetUpCodePairer mSetUpCodePairer;

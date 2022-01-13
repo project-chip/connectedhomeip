@@ -31,6 +31,11 @@ AutoCommissioner::~AutoCommissioner()
     ReleasePAI();
 }
 
+void AutoCommissioner::SetOperationalCredentialsDelegate(OperationalCredentialsDelegate * operationalCredentialsDelegate)
+{
+    mOperationalCredentialsDelegate = operationalCredentialsDelegate;
+}
+
 CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParameters & params)
 {
     mParams = params;
@@ -46,9 +51,9 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         ChipLogProgress(Controller, "Setting thread operational dataset from parameters");
         mParams.SetThreadOperationalDataset(ByteSpan(mThreadOperationalDataset, dataset.size()));
     }
-    if (params.HasWifiCredentials())
+    if (params.HasWiFiCredentials())
     {
-        WifiCredentials creds = params.GetWifiCredentials().Value();
+        WiFiCredentials creds = params.GetWiFiCredentials().Value();
         if (creds.ssid.size() > CommissioningParameters::kMaxSsidLen ||
             creds.credentials.size() > CommissioningParameters::kMaxCredentialsLen)
         {
@@ -57,8 +62,8 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
         memcpy(mSsid, creds.ssid.data(), creds.ssid.size());
         memcpy(mCredentials, creds.credentials.data(), creds.credentials.size());
         ChipLogProgress(Controller, "Setting wifi credentials from parameters");
-        mParams.SetWifiCredentials(
-            WifiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
+        mParams.SetWiFiCredentials(
+            WiFiCredentials(ByteSpan(mSsid, creds.ssid.size()), ByteSpan(mCredentials, creds.credentials.size())));
     }
     // If the AttestationNonce is passed in, using that else using a random one..
     if (params.HasAttestationNonce())
@@ -105,6 +110,8 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
     case CommissioningStage::kSendDACCertificateRequest:
         return CommissioningStage::kSendAttestationRequest;
     case CommissioningStage::kSendAttestationRequest:
+        return CommissioningStage::kAttestationVerification;
+    case CommissioningStage::kAttestationVerification:
         return CommissioningStage::kSendOpCertSigningRequest;
     case CommissioningStage::kSendOpCertSigningRequest:
         return CommissioningStage::kGenerateNOCChain;
@@ -116,9 +123,9 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
         // TODO(cecille): device attestation casues operational cert provisioinging to happen, This should be a separate stage.
         // For thread and wifi, this should go to network setup then enable. For on-network we can skip right to finding the
         // operational network because the provisioning of certificates will trigger the device to start operational advertising.
-        if (mParams.HasWifiCredentials())
+        if (mParams.HasWiFiCredentials())
         {
-            return CommissioningStage::kWifiNetworkSetup;
+            return CommissioningStage::kWiFiNetworkSetup;
         }
         else if (mParams.HasThreadOperationalDataset())
         {
@@ -132,26 +139,26 @@ CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStag
             return CommissioningStage::kSendComplete;
 #endif
         }
-    case CommissioningStage::kWifiNetworkSetup:
+    case CommissioningStage::kWiFiNetworkSetup:
         if (mParams.HasThreadOperationalDataset())
         {
             return CommissioningStage::kThreadNetworkSetup;
         }
         else
         {
-            return CommissioningStage::kWifiNetworkEnable;
+            return CommissioningStage::kWiFiNetworkEnable;
         }
     case CommissioningStage::kThreadNetworkSetup:
-        if (mParams.HasWifiCredentials())
+        if (mParams.HasWiFiCredentials())
         {
-            return CommissioningStage::kWifiNetworkEnable;
+            return CommissioningStage::kWiFiNetworkEnable;
         }
         else
         {
             return CommissioningStage::kThreadNetworkEnable;
         }
 
-    case CommissioningStage::kWifiNetworkEnable:
+    case CommissioningStage::kWiFiNetworkEnable:
         if (mParams.HasThreadOperationalDataset())
         {
             return CommissioningStage::kThreadNetworkEnable;
@@ -227,9 +234,17 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         SetDAC(report.requestedCertificate.certificate);
         break;
     case CommissioningStage::kSendAttestationRequest:
-        ReturnErrorOnFailure(mCommissioner->ValidateAttestationInfo(
-            report.attestationResponse.attestationElements, report.attestationResponse.signature,
-            mParams.GetAttestationNonce().Value(), GetPAI(), GetDAC(), mCommissioneeDeviceProxy));
+        // These don't need to be deep copied to local memory because they are used in this one step then never again.
+        mParams.SetAttestationElements(report.attestationResponse.attestationElements)
+            .SetAttestationSignature(report.attestationResponse.signature);
+        // TODO: Does this need to be done at runtime? Seems like this could be done earlier and we woouldn't need to hold a
+        // reference to the operational credential delegate here
+        if (mOperationalCredentialsDelegate != nullptr)
+        {
+            MutableByteSpan nonce(mCSRNonce);
+            ReturnErrorOnFailure(mOperationalCredentialsDelegate->ObtainCsrNonce(nonce));
+            mParams.SetCSRNonce(ByteSpan(mCSRNonce, sizeof(mCSRNonce)));
+        }
         break;
     case CommissioningStage::kSendOpCertSigningRequest: {
         NOCChainGenerationParameters nocParams;
@@ -305,6 +320,7 @@ CHIP_ERROR AutoCommissioner::SetDAC(const ByteSpan & dac)
     VerifyOrReturnError(mDAC != nullptr, CHIP_ERROR_NO_MEMORY);
     mDACLen = static_cast<uint16_t>(dac.size());
     memcpy(mDAC, dac.data(), mDACLen);
+    mParams.SetDAC(ByteSpan(mDAC, mDACLen));
 
     return CHIP_NO_ERROR;
 }
@@ -341,6 +357,7 @@ CHIP_ERROR AutoCommissioner::SetPAI(const chip::ByteSpan & pai)
     VerifyOrReturnError(mPAI != nullptr, CHIP_ERROR_NO_MEMORY);
     mPAILen = static_cast<uint16_t>(pai.size());
     memcpy(mPAI, pai.data(), mPAILen);
+    mParams.SetPAI(ByteSpan(mPAI, mPAILen));
 
     return CHIP_NO_ERROR;
 }

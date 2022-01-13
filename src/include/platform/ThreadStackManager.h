@@ -40,9 +40,9 @@ namespace DeviceLayer {
 class PlatformManagerImpl;
 class ThreadStackManagerImpl;
 class ConfigurationManagerImpl;
+class DeviceControlServer;
 
 namespace Internal {
-class DeviceControlServer;
 class BLEManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
@@ -88,6 +88,7 @@ public:
     bool TryLockThreadStack();
     void UnlockThreadStack();
     bool HaveRouteToAddress(const chip::Inet::IPAddress & destAddr);
+    CHIP_ERROR GetThreadProvision(ByteSpan & netInfo);
     CHIP_ERROR GetAndLogThreadStatsCounters();
     CHIP_ERROR GetAndLogThreadTopologyMinimal();
     CHIP_ERROR GetAndLogThreadTopologyFull();
@@ -124,10 +125,10 @@ private:
 
     friend class PlatformManagerImpl;
     friend class ConfigurationManagerImpl;
+    friend class DeviceControlServer;
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     friend class Internal::BLEManagerImpl;
 #endif
-    friend class Internal::DeviceControlServer;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
     template <class>
@@ -147,7 +148,6 @@ private:
     bool IsThreadEnabled();
     bool IsThreadProvisioned();
     bool IsThreadAttached();
-    CHIP_ERROR GetThreadProvision(ByteSpan & netInfo);
     void ErasePersistentInfo();
     ConnectivityManager::ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ConnectivityManager::ThreadDeviceType threadRole);

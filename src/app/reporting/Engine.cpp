@@ -48,20 +48,6 @@ void Engine::Shutdown()
     mpGlobalDirtySet = nullptr;
 }
 
-EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents)
-{
-    EventNumber event_count             = 0;
-    EventNumber * vendedEventNumberList = apReadHandler->GetVendedEventNumberList();
-    for (size_t index = 0; index < kNumPriorityLevel; index++)
-    {
-        if (vendedEventNumberList[index] > apInitialEvents[index])
-        {
-            event_count += vendedEventNumberList[index] - apInitialEvents[index];
-        }
-    }
-    return event_count;
-}
-
 CHIP_ERROR
 Engine::RetrieveClusterData(const SubjectDescriptor & aSubjectDescriptor, AttributeReportIBs::Builder & aAttributeReportIBs,
                             const ConcreteReadAttributePath & aPath, AttributeValueEncoder::AttributeEncodeState * aEncoderState)
@@ -237,7 +223,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     TLV::TLVWriter backup;
     bool eventClean                = true;
     ClusterInfo * clusterInfoList  = apReadHandler->GetEventClusterInfolist();
-    EventNumber * eventNumberList  = apReadHandler->GetVendedEventNumberList();
+    EventNumber & eventMin         = apReadHandler->GetEventMin();
     EventManagement & eventManager = EventManagement::GetInstance();
     bool hasMoreChunks             = false;
 
@@ -260,52 +246,39 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     {
         EventReportIBs::Builder & eventReportIBs = aReportDataBuilder.CreateEventReports();
         SuccessOrExit(err = aReportDataBuilder.GetError());
-        while (apReadHandler->GetCurrentPriority() != PriorityLevel::Invalid)
-        {
-            uint8_t priorityIndex = static_cast<uint8_t>(apReadHandler->GetCurrentPriority());
-            err = eventManager.FetchEventsSince(*(eventReportIBs.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
-                                                eventNumberList[priorityIndex], eventCount);
+        err = eventManager.FetchEventsSince(*(eventReportIBs.GetWriter()), clusterInfoList, eventMin, eventCount);
 
-            if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
+        if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
+        {
+            err           = CHIP_NO_ERROR;
+            hasMoreChunks = false;
+        }
+        else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
+        {
+            // when first cluster event is too big to fit in the packet, ignore that cluster event.
+            if (eventCount == 0)
             {
-                // We have successfully reached the end of the log for
-                // the current priority. Advance to the next
-                // priority level.
+                eventMin++;
+                ChipLogDetail(DataManagement, "<RE:Run> first cluster event is too big so that it fails to fit in the packet!");
                 err = CHIP_NO_ERROR;
-                apReadHandler->MoveToNextScheduledDirtyPriority();
-                hasMoreChunks = false;
-            }
-            else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
-            {
-                // when first cluster event is too big to fit in the packet, ignore that cluster event.
-                if (eventCount == 0)
-                {
-                    eventNumberList[priorityIndex]++;
-                    ChipLogDetail(DataManagement, "<RE:Run> first cluster event is too big so that it fails to fit in the packet!");
-                    err = CHIP_NO_ERROR;
-                }
-                else
-                {
-                    // `FetchEventsSince` has filled the available space
-                    // within the allowed buffer before it fit all the
-                    // available events.  This is an expected condition,
-                    // so we do not propagate the error to higher levels;
-                    // instead, we terminate the event processing for now
-                    // (we will get another chance immediately afterwards,
-                    // with a ew buffer) and do not advance the processing
-                    // to the next priority level.
-                    err = CHIP_NO_ERROR;
-                    break;
-                }
-                hasMoreChunks = true;
             }
             else
             {
-                // All other errors are propagated to higher level.
-                // Exiting here and returning an error will lead to
-                // abandoning subscription.
-                ExitNow();
+                // `FetchEventsSince` has filled the available space
+                // within the allowed buffer before it fit all the
+                // available events.  This is an expected condition,
+                // so we do not propagate the error to higher levels;
+                // instead, we terminate the event processing for now
+                err = CHIP_NO_ERROR;
             }
+            hasMoreChunks = true;
+        }
+        else
+        {
+            // All other errors are propagated to higher level.
+            // Exiting here and returning an error will lead to
+            // abandoning subscription.
+            ExitNow();
         }
 
         eventReportIBs.EndOfEventReports();
@@ -341,7 +314,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     ReportDataMessage::Builder reportDataBuilder;
     chip::System::PacketBufferHandle bufHandle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     uint16_t reservedSize                      = 0;
-    bool hasMoreChunks;
+    bool hasMoreChunks                         = false;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -459,16 +432,24 @@ CHIP_ERROR Engine::ScheduleRun()
         return CHIP_NO_ERROR;
     }
 
-    if (InteractionModelEngine::GetInstance()->GetExchangeManager() != nullptr)
-    {
-        mRunScheduled = true;
-        return InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->ScheduleWork(Run,
-                                                                                                                             this);
-    }
-    else
+    Messaging::ExchangeManager * exchangeManager = InteractionModelEngine::GetInstance()->GetExchangeManager();
+    if (exchangeManager == nullptr)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
+    SessionManager * sessionManager = exchangeManager->GetSessionManager();
+    if (sessionManager == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    System::Layer * systemLayer = sessionManager->SystemLayer();
+    if (systemLayer == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    ReturnErrorOnFailure(systemLayer->ScheduleWork(Run, this));
+    mRunScheduled = true;
+    return CHIP_NO_ERROR;
 }
 
 void Engine::Run()
@@ -587,10 +568,45 @@ void Engine::OnReportConfirm()
     ChipLogDetail(DataManagement, "<RE> OnReportConfirm: NumReports = %" PRIu32, mNumReportsInFlight);
 }
 
+void Engine::GetMinEventLogPosition(uint32_t & aMinLogPosition)
+{
+    for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
+    {
+        if (handler.IsFree() || handler.IsReadType())
+        {
+            continue;
+        }
+
+        uint32_t initialWrittenEventsBytes = handler.GetLastWrittenEventsBytes();
+        if (initialWrittenEventsBytes < aMinLogPosition)
+        {
+            aMinLogPosition = initialWrittenEventsBytes;
+        }
+    }
+}
+
+CHIP_ERROR Engine::ScheduleBufferPressureEventDelivery(uint32_t aBytesWritten)
+{
+    uint32_t minEventLogPosition = aBytesWritten;
+    GetMinEventLogPosition(minEventLogPosition);
+    if (aBytesWritten - minEventLogPosition > CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD)
+    {
+        ChipLogProgress(DataManagement, "<RE> Buffer overfilled CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD %d, schedule engine run",
+                        CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD);
+        return ScheduleRun();
+    }
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
 {
     for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
     {
+        if (handler.IsFree() || handler.IsReadType())
+        {
+            continue;
+        }
+
         for (auto clusterInfo = handler.GetEventClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
         {
             if (clusterInfo->IsEventPathSupersetOf(aPath))
@@ -598,10 +614,24 @@ CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
                 ChipLogProgress(DataManagement, "<RE> Unblock Urgent Event Delivery for readHandler[%d]",
                                 InteractionModelEngine::GetInstance()->GetReadHandlerArrayIndex(&handler));
                 handler.UnblockUrgentEventDelivery();
+                break;
             }
         }
     }
     return ScheduleRun();
+}
+
+CHIP_ERROR Engine::ScheduleEventDelivery(ConcreteEventPath & aPath, EventOptions::Type aUrgent, uint32_t aBytesWritten)
+{
+    if (aUrgent != EventOptions::Type::kUrgent)
+    {
+        return ScheduleBufferPressureEventDelivery(aBytesWritten);
+    }
+    else
+    {
+        return ScheduleUrgentEventDelivery(aPath);
+    }
+    return CHIP_NO_ERROR;
 }
 
 }; // namespace reporting

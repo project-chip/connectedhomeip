@@ -62,56 +62,63 @@ const CATValues kPeer3CATs;
 
 void TestBasicFunctionality(nlTestSuite * inSuite, void * inContext)
 {
-    SecureSession * statePtr;
-    SecureSessionTable<2, Time::Source::kTest> connections;
-    connections.GetTimeSource().SetMonotonicTimestamp(100_ms64);
+    SecureSessionTable<2> connections;
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+    clock.SetMonotonic(100_ms64);
     CATValues peerCATs;
 
     // Node ID 1, peer key 1, local key 2
-    statePtr = connections.CreateNewSecureSession(kPeer1SessionType, 2, kPeer1NodeId, kPeer1CATs, 1, 0 /* fabricIndex */,
-                                                  gDefaultMRPConfig);
-    NL_TEST_ASSERT(inSuite, statePtr != nullptr);
-    NL_TEST_ASSERT(inSuite, statePtr->GetSecureSessionType() == kPeer1SessionType);
-    NL_TEST_ASSERT(inSuite, statePtr->GetPeerNodeId() == kPeer1NodeId);
-    peerCATs = statePtr->GetPeerCATs();
+    auto optionalSession = connections.CreateNewSecureSession(kPeer1SessionType, 2, kPeer1NodeId, kPeer1CATs, 1,
+                                                              0 /* fabricIndex */, gDefaultMRPConfig);
+    NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
+    NL_TEST_ASSERT(inSuite, optionalSession.Value()->AsSecureSession()->GetSecureSessionType() == kPeer1SessionType);
+    NL_TEST_ASSERT(inSuite, optionalSession.Value()->AsSecureSession()->GetPeerNodeId() == kPeer1NodeId);
+    peerCATs = optionalSession.Value()->AsSecureSession()->GetPeerCATs();
     NL_TEST_ASSERT(inSuite, memcmp(&peerCATs, &kPeer1CATs, sizeof(CATValues)) == 0);
 
     // Node ID 2, peer key 3, local key 4
-    statePtr = connections.CreateNewSecureSession(kPeer2SessionType, 4, kPeer2NodeId, kPeer2CATs, 3, 0 /* fabricIndex */,
-                                                  gDefaultMRPConfig);
-    NL_TEST_ASSERT(inSuite, statePtr != nullptr);
-    NL_TEST_ASSERT(inSuite, statePtr->GetSecureSessionType() == kPeer2SessionType);
-    NL_TEST_ASSERT(inSuite, statePtr->GetPeerNodeId() == kPeer2NodeId);
-    NL_TEST_ASSERT(inSuite, statePtr->GetLastActivityTime() == 100_ms64);
-    peerCATs = statePtr->GetPeerCATs();
+    optionalSession = connections.CreateNewSecureSession(kPeer2SessionType, 4, kPeer2NodeId, kPeer2CATs, 3, 0 /* fabricIndex */,
+                                                         gDefaultMRPConfig);
+    NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
+    NL_TEST_ASSERT(inSuite, optionalSession.Value()->AsSecureSession()->GetSecureSessionType() == kPeer2SessionType);
+    NL_TEST_ASSERT(inSuite, optionalSession.Value()->AsSecureSession()->GetPeerNodeId() == kPeer2NodeId);
+    NL_TEST_ASSERT(inSuite, optionalSession.Value()->AsSecureSession()->GetLastActivityTime() == 100_ms64);
+    peerCATs = optionalSession.Value()->AsSecureSession()->GetPeerCATs();
     NL_TEST_ASSERT(inSuite, memcmp(&peerCATs, &kPeer2CATs, sizeof(CATValues)) == 0);
 
     // Insufficient space for new connections. Object is max size 2
-    statePtr = connections.CreateNewSecureSession(kPeer3SessionType, 6, kPeer3NodeId, kPeer3CATs, 5, 0 /* fabricIndex */,
-                                                  gDefaultMRPConfig);
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    optionalSession = connections.CreateNewSecureSession(kPeer3SessionType, 6, kPeer3NodeId, kPeer3CATs, 5, 0 /* fabricIndex */,
+                                                         gDefaultMRPConfig);
+    NL_TEST_ASSERT(inSuite, !optionalSession.HasValue());
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 void TestFindByKeyId(nlTestSuite * inSuite, void * inContext)
 {
-    SecureSession * statePtr;
-    SecureSessionTable<2, Time::Source::kTest> connections;
+    SecureSessionTable<2> connections;
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
 
     // Node ID 1, peer key 1, local key 2
-    statePtr = connections.CreateNewSecureSession(kPeer1SessionType, 2, kPeer1NodeId, kPeer1CATs, 1, 0 /* fabricIndex */,
-                                                  gDefaultMRPConfig);
-    NL_TEST_ASSERT(inSuite, statePtr != nullptr);
+    auto optionalSession = connections.CreateNewSecureSession(kPeer1SessionType, 2, kPeer1NodeId, kPeer1CATs, 1,
+                                                              0 /* fabricIndex */, gDefaultMRPConfig);
+    NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
 
-    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(1));
-    NL_TEST_ASSERT(inSuite, connections.FindSecureSessionByLocalKey(2));
+    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(1).HasValue());
+    NL_TEST_ASSERT(inSuite, connections.FindSecureSessionByLocalKey(2).HasValue());
 
     // Node ID 2, peer key 3, local key 4
-    statePtr = connections.CreateNewSecureSession(kPeer2SessionType, 4, kPeer2NodeId, kPeer2CATs, 3, 0 /* fabricIndex */,
-                                                  gDefaultMRPConfig);
-    NL_TEST_ASSERT(inSuite, statePtr != nullptr);
+    optionalSession = connections.CreateNewSecureSession(kPeer2SessionType, 4, kPeer2NodeId, kPeer2CATs, 3, 0 /* fabricIndex */,
+                                                         gDefaultMRPConfig);
+    NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
 
-    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(3));
-    NL_TEST_ASSERT(inSuite, connections.FindSecureSessionByLocalKey(4));
+    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(3).HasValue());
+    NL_TEST_ASSERT(inSuite, connections.FindSecureSessionByLocalKey(4).HasValue());
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 struct ExpiredCallInfo
@@ -124,29 +131,32 @@ struct ExpiredCallInfo
 void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
 {
     ExpiredCallInfo callInfo;
-    SecureSession * statePtr;
-    SecureSessionTable<2, Time::Source::kTest> connections;
+    SecureSessionTable<2> connections;
 
-    connections.GetTimeSource().SetMonotonicTimestamp(100_ms64);
+    System::Clock::Internal::MockClock clock;
+    System::Clock::ClockBase * realClock = &System::SystemClock();
+    System::Clock::Internal::SetSystemClockForTesting(&clock);
+
+    clock.SetMonotonic(100_ms64);
 
     // Node ID 1, peer key 1, local key 2
-    statePtr = connections.CreateNewSecureSession(kPeer1SessionType, 2, kPeer1NodeId, kPeer1CATs, 1, 0 /* fabricIndex */,
-                                                  gDefaultMRPConfig);
-    NL_TEST_ASSERT(inSuite, statePtr != nullptr);
-    statePtr->SetPeerAddress(kPeer1Addr);
+    auto optionalSession = connections.CreateNewSecureSession(kPeer1SessionType, 2, kPeer1NodeId, kPeer1CATs, 1,
+                                                              0 /* fabricIndex */, gDefaultMRPConfig);
+    NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
+    optionalSession.Value()->AsSecureSession()->SetPeerAddress(kPeer1Addr);
 
-    connections.GetTimeSource().SetMonotonicTimestamp(200_ms64);
+    clock.SetMonotonic(200_ms64);
     // Node ID 2, peer key 3, local key 4
-    statePtr = connections.CreateNewSecureSession(kPeer2SessionType, 4, kPeer2NodeId, kPeer2CATs, 3, 0 /* fabricIndex */,
-                                                  gDefaultMRPConfig);
-    NL_TEST_ASSERT(inSuite, statePtr != nullptr);
-    statePtr->SetPeerAddress(kPeer2Addr);
+    optionalSession = connections.CreateNewSecureSession(kPeer2SessionType, 4, kPeer2NodeId, kPeer2CATs, 3, 0 /* fabricIndex */,
+                                                         gDefaultMRPConfig);
+    NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
+    optionalSession.Value()->AsSecureSession()->SetPeerAddress(kPeer2Addr);
 
     // cannot add before expiry
-    connections.GetTimeSource().SetMonotonicTimestamp(300_ms64);
-    statePtr = connections.CreateNewSecureSession(kPeer3SessionType, 6, kPeer3NodeId, kPeer3CATs, 5, 0 /* fabricIndex */,
-                                                  gDefaultMRPConfig);
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    clock.SetMonotonic(300_ms64);
+    optionalSession = connections.CreateNewSecureSession(kPeer3SessionType, 6, kPeer3NodeId, kPeer3CATs, 5, 0 /* fabricIndex */,
+                                                         gDefaultMRPConfig);
+    NL_TEST_ASSERT(inSuite, !optionalSession.HasValue());
 
     // at time 300, this expires ip addr 1
     connections.ExpireInactiveSessions(150_ms64, [&callInfo](const SecureSession & state) {
@@ -157,27 +167,28 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callInfo.callCount == 1);
     NL_TEST_ASSERT(inSuite, callInfo.lastCallNodeId == kPeer1NodeId);
     NL_TEST_ASSERT(inSuite, callInfo.lastCallPeerAddress == kPeer1Addr);
-    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(2));
+    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(2).HasValue());
 
     // now that the connections were expired, we can add peer3
-    connections.GetTimeSource().SetMonotonicTimestamp(300_ms64);
+    clock.SetMonotonic(300_ms64);
     // Node ID 3, peer key 5, local key 6
-    statePtr = connections.CreateNewSecureSession(kPeer3SessionType, 6, kPeer3NodeId, kPeer3CATs, 5, 0 /* fabricIndex */,
-                                                  gDefaultMRPConfig);
-    NL_TEST_ASSERT(inSuite, statePtr != nullptr);
-    statePtr->SetPeerAddress(kPeer3Addr);
+    optionalSession = connections.CreateNewSecureSession(kPeer3SessionType, 6, kPeer3NodeId, kPeer3CATs, 5, 0 /* fabricIndex */,
+                                                         gDefaultMRPConfig);
+    NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
+    optionalSession.Value()->AsSecureSession()->SetPeerAddress(kPeer3Addr);
 
-    connections.GetTimeSource().SetMonotonicTimestamp(400_ms64);
-    NL_TEST_ASSERT(inSuite, statePtr = connections.FindSecureSessionByLocalKey(4));
+    clock.SetMonotonic(400_ms64);
+    optionalSession = connections.FindSecureSessionByLocalKey(4);
+    NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
 
-    connections.MarkSessionActive(statePtr);
-    NL_TEST_ASSERT(inSuite, statePtr->GetLastActivityTime() == connections.GetTimeSource().GetMonotonicTimestamp());
+    optionalSession.Value()->AsSecureSession()->MarkActive();
+    NL_TEST_ASSERT(inSuite, optionalSession.Value()->AsSecureSession()->GetLastActivityTime() == clock.GetMonotonicTimestamp());
 
     // At this time:
     //   Peer 3 active at time 300
     //   Peer 2 active at time 400
 
-    connections.GetTimeSource().SetMonotonicTimestamp(500_ms64);
+    clock.SetMonotonic(500_ms64);
     callInfo.callCount = 0;
     connections.ExpireInactiveSessions(150_ms64, [&callInfo](const SecureSession & state) {
         callInfo.callCount++;
@@ -189,20 +200,20 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callInfo.callCount == 1);
     NL_TEST_ASSERT(inSuite, callInfo.lastCallNodeId == kPeer3NodeId);
     NL_TEST_ASSERT(inSuite, callInfo.lastCallPeerAddress == kPeer3Addr);
-    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(2));
-    NL_TEST_ASSERT(inSuite, connections.FindSecureSessionByLocalKey(4));
-    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(6));
+    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(2).HasValue());
+    NL_TEST_ASSERT(inSuite, connections.FindSecureSessionByLocalKey(4).HasValue());
+    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(6).HasValue());
 
     // Node ID 1, peer key 1, local key 2
-    statePtr = connections.CreateNewSecureSession(kPeer1SessionType, 2, kPeer1NodeId, kPeer1CATs, 1, 0 /* fabricIndex */,
-                                                  gDefaultMRPConfig);
-    NL_TEST_ASSERT(inSuite, statePtr != nullptr);
-    NL_TEST_ASSERT(inSuite, connections.FindSecureSessionByLocalKey(2));
-    NL_TEST_ASSERT(inSuite, connections.FindSecureSessionByLocalKey(4));
-    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(6));
+    optionalSession = connections.CreateNewSecureSession(kPeer1SessionType, 2, kPeer1NodeId, kPeer1CATs, 1, 0 /* fabricIndex */,
+                                                         gDefaultMRPConfig);
+    NL_TEST_ASSERT(inSuite, optionalSession.HasValue());
+    NL_TEST_ASSERT(inSuite, connections.FindSecureSessionByLocalKey(2).HasValue());
+    NL_TEST_ASSERT(inSuite, connections.FindSecureSessionByLocalKey(4).HasValue());
+    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(6).HasValue());
 
     // peer 1 and 2 are active
-    connections.GetTimeSource().SetMonotonicTimestamp(1000_ms64);
+    clock.SetMonotonic(1000_ms64);
     callInfo.callCount = 0;
     connections.ExpireInactiveSessions(100_ms64, [&callInfo](const SecureSession & state) {
         callInfo.callCount++;
@@ -210,9 +221,11 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
         callInfo.lastCallPeerAddress = state.GetPeerAddress();
     });
     NL_TEST_ASSERT(inSuite, callInfo.callCount == 2); // everything expired
-    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(2));
-    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(4));
-    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(6));
+    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(2).HasValue());
+    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(4).HasValue());
+    NL_TEST_ASSERT(inSuite, !connections.FindSecureSessionByLocalKey(6).HasValue());
+
+    System::Clock::Internal::SetSystemClockForTesting(realClock);
 }
 
 } // namespace

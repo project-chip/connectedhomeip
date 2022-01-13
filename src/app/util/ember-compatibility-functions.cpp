@@ -76,18 +76,24 @@ EmberAfAttributeType BaseType(EmberAfAttributeType type)
     case ZCL_FABRIC_IDX_ATTRIBUTE_TYPE: // Fabric Index
     case ZCL_BITMAP8_ATTRIBUTE_TYPE:    // 8-bit bitmap
     case ZCL_ENUM8_ATTRIBUTE_TYPE:      // 8-bit enumeration
+    case ZCL_PERCENT_ATTRIBUTE_TYPE:    // Percentage
+        static_assert(std::is_same<chip::Percent, uint8_t>::value,
+                      "chip::Percent is expected to be uint8_t, change this when necessary");
         return ZCL_INT8U_ATTRIBUTE_TYPE;
 
-    case ZCL_ENDPOINT_NO_ATTRIBUTE_TYPE: // Endpoint Number
-    case ZCL_GROUP_ID_ATTRIBUTE_TYPE:    // Group Id
-    case ZCL_VENDOR_ID_ATTRIBUTE_TYPE:   // Vendor Id
-    case ZCL_ENUM16_ATTRIBUTE_TYPE:      // 16-bit enumeration
-    case ZCL_BITMAP16_ATTRIBUTE_TYPE:    // 16-bit bitmap
-    case ZCL_STATUS_ATTRIBUTE_TYPE:      // Status Code
+    case ZCL_ENDPOINT_NO_ATTRIBUTE_TYPE:   // Endpoint Number
+    case ZCL_GROUP_ID_ATTRIBUTE_TYPE:      // Group Id
+    case ZCL_VENDOR_ID_ATTRIBUTE_TYPE:     // Vendor Id
+    case ZCL_ENUM16_ATTRIBUTE_TYPE:        // 16-bit enumeration
+    case ZCL_BITMAP16_ATTRIBUTE_TYPE:      // 16-bit bitmap
+    case ZCL_STATUS_ATTRIBUTE_TYPE:        // Status Code
+    case ZCL_PERCENT100THS_ATTRIBUTE_TYPE: // 100ths of a percent
         static_assert(std::is_same<chip::EndpointId, uint16_t>::value,
-                      "chip::EndpointId is expected to be uint8_t, change this when necessary");
+                      "chip::EndpointId is expected to be uint16_t, change this when necessary");
         static_assert(std::is_same<chip::GroupId, uint16_t>::value,
                       "chip::GroupId is expected to be uint16_t, change this when necessary");
+        static_assert(std::is_same<chip::Percent100ths, uint16_t>::value,
+                      "chip::Percent100ths is expected to be uint16_t, change this when necessary");
         return ZCL_INT16U_ATTRIBUTE_TYPE;
 
     case ZCL_CLUSTER_ID_ATTRIBUTE_TYPE: // Cluster Id
@@ -363,34 +369,31 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
                   " (expanded=%d)",
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId), aPath.mExpanded);
 
+    // Check attribute existence. This includes attributes with registered metadata, but also specially handled
+    // mandatory global attributes (which just check for cluster on endpoint).
+
+    EmberAfCluster * attributeCluster            = nullptr;
+    EmberAfAttributeMetadata * attributeMetadata = nullptr;
+
     if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
     {
-        // This is not in our attribute metadata, so we just check for this
-        // endpoint+cluster existing.
-        EmberAfCluster * cluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
-        if (cluster)
-        {
-            AttributeListReader reader(cluster);
-            bool ignored; // Our reader always tries to encode
-            return ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState, &reader,
-                                          &ignored);
-        }
-
-        // else to save codesize just fall through and do the metadata search
-        // (which we know will fail and error out);
+        attributeCluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
+    }
+    else
+    {
+        attributeMetadata =
+            emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
     }
 
-    EmberAfAttributeMetadata * attributeMetadata =
-        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
-
-    if (attributeMetadata == nullptr)
+    if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
-
-        // This path is not actually supported.
         return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
     }
+
+    // Check access control. A failed check will disallow the operation, and may or may not generate an attribute report
+    // depending on whether the path was expanded.
 
     {
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
@@ -413,19 +416,25 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
         }
     }
 
-    // Value encoder will encode the whole AttributeReport, including the path, value and the version.
-    // The AttributeValueEncoder may encode more than one AttributeReportIB for the list chunking feature.
-    if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
-    {
-        bool triedEncode;
-        ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState,
-                                                    attrOverride, &triedEncode));
+    // Read attribute using attribute override, if appropriate. This includes registered overrides, but also
+    // specially handled mandatory global attributes (which use unregistered overrides).
 
-        if (triedEncode)
+    {
+        // Special handling for mandatory global attributes: these are always for attribute list, using a special
+        // reader (which can be lightweight constructed even from nullptr).
+        AttributeListReader reader(attributeCluster);
+        AttributeAccessInterface * attributeOverride =
+            (attributeCluster != nullptr) ? &reader : findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
+        if (attributeOverride)
         {
-            return CHIP_NO_ERROR;
+            bool triedEncode;
+            ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState,
+                                                        attributeOverride, &triedEncode));
+            ReturnErrorCodeIf(triedEncode, CHIP_NO_ERROR);
         }
     }
+
+    // Read attribute using Ember, if it doesn't have an override.
 
     AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
     ReturnErrorOnFailure(aAttributeReports.GetError());
@@ -433,7 +442,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
     TLV::TLVWriter backup;
     attributeReport.Checkpoint(backup);
 
-    // We have verified that the attribute exists.
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 

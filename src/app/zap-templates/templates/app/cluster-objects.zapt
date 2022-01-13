@@ -20,6 +20,17 @@ namespace chip {
 namespace app {
 namespace Clusters {
 
+namespace detail {
+// Structs shared across multiple clusters.
+namespace Structs {
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+{{> cluster_objects_struct header=true}}
+{{/if}}
+{{/zcl_structs}}
+} // namespace Structs
+} // namespace detail
+
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
 {{#zcl_enums}}
@@ -55,43 +66,11 @@ k{{asUpperCamelCase label}} = {{asHex mask}},
 {{#first}}
 namespace Structs {
 {{/first}}
-namespace {{asUpperCamelCase name}} {
-    enum class Fields {
-    {{#zcl_struct_items}}
-    k{{asUpperCamelCase label}} = {{fieldIdentifier}},
-    {{/zcl_struct_items}}
-    };
-
-    struct Type {
-    public:
-        {{#zcl_struct_items}}
-        {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}};
-        {{/zcl_struct_items}}
-
-        CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
-        {{#unless struct_contains_array}}
-        CHIP_ERROR Decode(TLV::TLVReader &reader);
-        {{/unless}}
-        {{#if struct_is_fabric_scoped}}
-        bool MatchesFabricIndex(FabricIndex fabricIndex_) const {
-            return {{ asLowerCamelCase struct_fabric_idx_field }} == fabricIndex_;
-        }
-        {{/if}}
-    };
-
-    {{#if struct_contains_array}}
-    struct DecodableType {
-    public:
-        {{#zcl_struct_items}}
-        {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}};
-        {{/zcl_struct_items}}
-        CHIP_ERROR Decode(TLV::TLVReader &reader);
-    };
-    {{else}}
-    using DecodableType = Type;
-    {{/if}}
-
-} // namespace {{asUpperCamelCase name}}
+{{#if has_more_than_one_cluster}}
+namespace {{asUpperCamelCase name}} = Clusters::detail::Structs::{{asUpperCamelCase name}};
+{{else}}
+{{> cluster_objects_struct header=true}}
+{{/if}}
 {{#last}}
 } // namespace Structs
 {{/last}}
@@ -171,13 +150,13 @@ namespace {{asUpperCamelCase label}} {
     {{! forceNotOptional=true because the optionality is on the attribute
         itself, but we want just the type of the attribute. }}
     {{#if entryType}}
-        using Type = {{zapTypeToEncodableClusterObjectType entryType forceNotOptional=true}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType entryType forceNotOptional=true}};
-        using DecodableArgType = {{zapTypeToDecodableClusterObjectType entryType forceNotOptional=true isArgument=true}};
+        using Type = {{zapTypeToEncodableClusterObjectType entryType ns=parent.name forceNotOptional=true}};
+        using DecodableType = {{zapTypeToDecodableClusterObjectType entryType ns=parent.name forceNotOptional=true}};
+        using DecodableArgType = {{zapTypeToDecodableClusterObjectType entryType ns=parent.name forceNotOptional=true isArgument=true}};
     {{else}}
-        using Type = {{zapTypeToEncodableClusterObjectType type forceNotOptional=true}};
-        using DecodableType = {{zapTypeToDecodableClusterObjectType type forceNotOptional=true}};
-        using DecodableArgType = {{zapTypeToDecodableClusterObjectType type forceNotOptional=true isArgument=true}};
+        using Type = {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotOptional=true}};
+        using DecodableType = {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotOptional=true}};
+        using DecodableArgType = {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotOptional=true isArgument=true}};
     {{/if}}
 
         static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }

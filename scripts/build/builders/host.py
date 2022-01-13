@@ -27,7 +27,9 @@ class HostApp(Enum):
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
     TV_APP = auto()
+    LOCK = auto()
     TESTS = auto()
+    SHELL = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -42,8 +44,12 @@ class HostApp(Enum):
             return 'minimal-mdns'
         elif self == HostApp.TV_APP:
             return 'tv-app/linux'
+        elif self == HostApp.LOCK:
+            return 'door-lock-app/linux'
         elif self == HostApp.TESTS:
             return '../'
+        elif self == HostApp.SHELL:
+            return 'shell/standalone'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -69,8 +75,14 @@ class HostApp(Enum):
         elif self == HostApp.TV_APP:
             yield 'chip-tv-app'
             yield 'chip-tv-app.map'
+        elif self == HostApp.LOCK:
+            yield 'chip-door-lock-app'
+            yield 'chip-door-lock-app.map'
         elif self == HostApp.TESTS:
             pass
+        elif self == HostApp.SHELL:
+            yield 'chip-shell'
+            yield 'chip-shell.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 

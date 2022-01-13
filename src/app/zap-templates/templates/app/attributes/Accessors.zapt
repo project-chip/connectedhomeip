@@ -9,6 +9,7 @@
 
 #include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -26,10 +27,10 @@ namespace Attributes {
 {{else if (canHaveSimpleAccessors this)}}
 namespace {{asUpperCamelCase label}} {
 EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value); // {{type}} {{isArray}}
-EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} value);
+EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value);
 {{#if isNullable}}
 EmberAfStatus SetNull(chip::EndpointId endpoint);
-EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<{{asUnderlyingZclType type}}> & value);
+EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value);
 {{/if}}
 } // namespace {{asUpperCamelCase label}}
 

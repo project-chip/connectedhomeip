@@ -103,6 +103,7 @@ tests:
           value: 0
 
     #Issue #11142 Disabled all optional attribute checks
+    #disabled due to issue #13442
     - label: "Read optional non-global attribute: ActiveText"
       disabled: true
       command: "readAttribute"

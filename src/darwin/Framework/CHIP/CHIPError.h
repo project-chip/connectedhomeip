@@ -20,8 +20,8 @@
 NS_ASSUME_NONNULL_BEGIN
 FOUNDATION_EXPORT NSErrorDomain const CHIPErrorDomain;
 
+// clang-format off
 typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode){
-    CHIPSuccess                       = 0,
     CHIPErrorCodeUndefinedError       = 1,
     CHIPErrorCodeInvalidStringLength  = 2,
     CHIPErrorCodeInvalidIntegerValue  = 3,
@@ -39,5 +39,6 @@ typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode){
     CHIPErrorCodeUnsupportedWrite     = 0x88,
     CHIPErrorCodeUnsupportedCluster   = 0xC3,
 };
+// clang-format on
 
 NS_ASSUME_NONNULL_END

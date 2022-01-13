@@ -49,6 +49,9 @@ void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader,
 
 CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData)
 {
+    mState = State::kIdle;
+    mBdxTransfer.Reset();
+
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
 
     // Must call StartTransfer() here to store the the pointer data contained in bdxInitData in the TransferSession object.
@@ -65,7 +68,7 @@ CHIP_ERROR BDXDownloader::BeginPrepareDownload()
     VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mImageProcessor->PrepareDownload());
 
-    mState = State::kPreparing;
+    SetState(State::kPreparing);
 
     return CHIP_NO_ERROR;
 }
@@ -76,7 +79,7 @@ CHIP_ERROR BDXDownloader::OnPreparedForDownload(CHIP_ERROR status)
 
     if (status == CHIP_NO_ERROR)
     {
-        mState = State::kInProgress;
+        SetState(State::kInProgress);
 
         // Must call here because StartTransfer() should have prepared a ReceiveInit message, and now we should send it.
         PollTransferSession();
@@ -85,7 +88,7 @@ CHIP_ERROR BDXDownloader::OnPreparedForDownload(CHIP_ERROR status)
     {
         ChipLogError(BDX, "failed to prepare download: %" CHIP_ERROR_FORMAT, status.Format());
         mBdxTransfer.Reset();
-        mState = State::kIdle;
+        SetState(State::kIdle);
     }
 
     return CHIP_NO_ERROR;
@@ -110,7 +113,7 @@ void BDXDownloader::OnDownloadTimeout()
         {
             mImageProcessor->Abort();
         }
-        mState = State::kIdle;
+        SetState(State::kIdle);
     }
     else
     {
@@ -128,7 +131,7 @@ void BDXDownloader::EndDownload(CHIP_ERROR reason)
         {
             mImageProcessor->Abort();
         }
-        mState = State::kIdle;
+        SetState(State::kIdle);
 
         // Because AbortTransfer() will generate a StatusReport to send.
         PollTransferSession();
@@ -171,7 +174,7 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         if (outEvent.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF))
         {
             // BDX transfer is not complete until BlockAckEOF has been sent
-            mState = State::kComplete;
+            SetState(State::kComplete);
 
             // TODO: how/when to reset the BDXDownloader to be ready to handle another download
         }
@@ -215,6 +218,16 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     }
 
     return CHIP_NO_ERROR;
+}
+
+void BDXDownloader::SetState(State state)
+{
+    mState = state;
+
+    if (mStateDelegate)
+    {
+        mStateDelegate->OnDownloadStateChanged(state);
+    }
 }
 
 } // namespace chip

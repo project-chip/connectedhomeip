@@ -17,15 +17,13 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
+#include <app/clusters/target-navigator-server/target-navigator-server.h>
 
-#include <lib/core/CHIPError.h>
-#include <string>
-#include <vector>
-
-class TargetNavigatorManager
+class TargetNavigatorManager : public chip::app::Clusters::TargetNavigator::Delegate
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR proxyGetTargetInfoList(chip::app::AttributeValueEncoder & aEncoder);
+    std::list<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type> HandleGetTargetList() override;
+    uint8_t HandleGetCurrentTarget() override;
+    chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::Type
+    HandleNavigateTarget(const uint64_t & target, const chip::CharSpan & data) override;
 };

@@ -69,3 +69,6 @@ RUN chown -R $USERNAME:$USERNAME /opt/android/sdk
 
 # AmebaD requires access to change build_info.h
 RUN chown -R $USERNAME:$USERNAME /opt/ameba/ambd_sdk_with_chip_non_NDA/
+
+# NXP uses a patch_sdk script to change SDK files
+RUN chown -R $USERNAME:$USERNAME /opt/sdk/sdks/

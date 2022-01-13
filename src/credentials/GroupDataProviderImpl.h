@@ -29,6 +29,11 @@ public:
     static constexpr size_t kIteratorsMax = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
 
     GroupDataProviderImpl(chip::PersistentStorageDelegate & storage_delegate) : mStorage(storage_delegate) {}
+    GroupDataProviderImpl(chip::PersistentStorageDelegate & storage_delegate, uint16_t maxGroupsPerFabric,
+                          uint16_t maxGroupKeysPerFabric) :
+        GroupDataProvider(maxGroupsPerFabric, maxGroupKeysPerFabric),
+        mStorage(storage_delegate)
+    {}
     virtual ~GroupDataProviderImpl() {}
 
     CHIP_ERROR Init() override;
@@ -62,7 +67,8 @@ public:
     CHIP_ERROR SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & info) override;
     CHIP_ERROR GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & info) override;
     CHIP_ERROR RemoveGroupKeyAt(chip::FabricIndex fabric_index, size_t index) override;
-    GroupKeyIterator * IterateGroupKey(chip::FabricIndex fabric_index) override;
+    CHIP_ERROR RemoveGroupKeys(chip::FabricIndex fabric_index) override;
+    GroupKeyIterator * IterateGroupKeys(chip::FabricIndex fabric_index) override;
 
     //
     // Key Sets
@@ -147,6 +153,7 @@ private:
         size_t mCount             = 0;
         size_t mTotal             = 0;
     };
+    CHIP_ERROR RemoveEndpoints(chip::FabricIndex fabric_index, chip::GroupId group_id);
 
     chip::PersistentStorageDelegate & mStorage;
     bool mInitialized = false;

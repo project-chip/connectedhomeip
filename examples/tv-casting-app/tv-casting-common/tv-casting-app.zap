@@ -1357,6 +1357,57 @@
           ]
         },
         {
+          "name": "Localization Configuration",
+          "code": 43,
+          "mfgCode": null,
+          "define": "LOCALIZATION_CONFIGURATION_CLUSTER",
+          "side": "client",
+          "enabled": 0,
+          "commands": [],
+          "attributes": []
+        },
+        {
+          "name": "Localization Configuration",
+          "code": 43,
+          "mfgCode": null,
+          "define": "LOCALIZATION_CONFIGURATION_CLUSTER",
+          "side": "server",
+          "enabled": 1,
+          "commands": [],
+          "attributes": [
+            {
+              "name": "ActiveLocale",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "SupportedLocales",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            }
+          ]
+        },
+        {
           "name": "General Commissioning",
           "code": 48,
           "mfgCode": null,
@@ -4068,7 +4119,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "groups",
+              "name": "groupKeyMap",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -4083,7 +4134,7 @@
               "reportableChange": 0
             },
             {
-              "name": "group keys",
+              "name": "groupTable",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -8770,7 +8821,7 @@
           "commands": [],
           "attributes": [
             {
-              "name": "groups",
+              "name": "groupKeyMap",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -8785,7 +8836,7 @@
               "reportableChange": 0
             },
             {
-              "name": "group keys",
+              "name": "groupTable",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -11849,15 +11900,15 @@
           ]
         },
         {
-          "name": "TV Channel",
+          "name": "Channel",
           "code": 1284,
           "mfgCode": null,
-          "define": "TV_CHANNEL_CLUSTER",
+          "define": "CHANNEL_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
-              "name": "ChangeChannel",
+              "name": "ChangeChannelRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -11865,16 +11916,16 @@
               "outgoing": 1
             },
             {
-              "name": "ChangeChannelByNumber",
-              "code": 1,
+              "name": "ChangeChannelByNumberRequest",
+              "code": 2,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
               "outgoing": 1
             },
             {
-              "name": "SkipChannel",
-              "code": 2,
+              "name": "SkipChannelRequest",
+              "code": 3,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
@@ -11882,6 +11933,21 @@
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -11900,22 +11966,13 @@
           ]
         },
         {
-          "name": "TV Channel",
+          "name": "Channel",
           "code": 1284,
           "mfgCode": null,
-          "define": "TV_CHANNEL_CLUSTER",
+          "define": "CHANNEL_CLUSTER",
           "side": "server",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "ChangeChannelResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
+          "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "channel list",
@@ -11985,10 +12042,10 @@
           "mfgCode": null,
           "define": "TARGET_NAVIGATOR_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
-              "name": "NavigateTarget",
+              "name": "NavigateTargetRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -11997,6 +12054,21 @@
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -12020,17 +12092,8 @@
           "mfgCode": null,
           "define": "TARGET_NAVIGATOR_CLUSTER",
           "side": "server",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "NavigateTargetResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
+          "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "target navigator list",
@@ -12070,10 +12133,10 @@
           "mfgCode": null,
           "define": "MEDIA_PLAYBACK_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
-              "name": "MediaPlay",
+              "name": "PlayRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -12081,7 +12144,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaPause",
+              "name": "PauseRequest",
               "code": 1,
               "mfgCode": null,
               "source": "client",
@@ -12089,7 +12152,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaStop",
+              "name": "StopRequest",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -12097,7 +12160,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaStartOver",
+              "name": "StartOverRequest",
               "code": 3,
               "mfgCode": null,
               "source": "client",
@@ -12105,7 +12168,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaPrevious",
+              "name": "PreviousRequest",
               "code": 4,
               "mfgCode": null,
               "source": "client",
@@ -12113,7 +12176,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaNext",
+              "name": "NextRequest",
               "code": 5,
               "mfgCode": null,
               "source": "client",
@@ -12121,7 +12184,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaRewind",
+              "name": "RewindRequest",
               "code": 6,
               "mfgCode": null,
               "source": "client",
@@ -12129,7 +12192,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaFastForward",
+              "name": "FastForwardRequest",
               "code": 7,
               "mfgCode": null,
               "source": "client",
@@ -12137,7 +12200,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaSkipForward",
+              "name": "SkipForwardRequest",
               "code": 8,
               "mfgCode": null,
               "source": "client",
@@ -12145,7 +12208,7 @@
               "outgoing": 1
             },
             {
-              "name": "MediaSkipBackward",
+              "name": "SkipBackwardRequest",
               "code": 9,
               "mfgCode": null,
               "source": "client",
@@ -12153,8 +12216,8 @@
               "outgoing": 1
             },
             {
-              "name": "MediaSeek",
-              "code": 10,
+              "name": "SeekRequest",
+              "code": 11,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
@@ -12162,6 +12225,21 @@
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -12185,89 +12263,8 @@
           "mfgCode": null,
           "define": "MEDIA_PLAYBACK_CLUSTER",
           "side": "server",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "MediaPlayResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "MediaPauseResponse",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "MediaStopResponse",
-              "code": 2,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "MediaStartOverResponse",
-              "code": 3,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "MediaPreviousResponse",
-              "code": 4,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "MediaNextResponse",
-              "code": 5,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "MediaRewindResponse",
-              "code": 6,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "MediaFastForwardResponse",
-              "code": 7,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "MediaSkipForwardResponse",
-              "code": 8,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "MediaSkipBackwardResponse",
-              "code": 9,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
+          "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -12292,10 +12289,10 @@
           "mfgCode": null,
           "define": "MEDIA_INPUT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
-              "name": "SelectInput",
+              "name": "SelectInputRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -12303,7 +12300,7 @@
               "outgoing": 1
             },
             {
-              "name": "ShowInputStatus",
+              "name": "ShowInputStatusRequest",
               "code": 1,
               "mfgCode": null,
               "source": "client",
@@ -12311,7 +12308,7 @@
               "outgoing": 1
             },
             {
-              "name": "HideInputStatus",
+              "name": "HideInputStatusRequest",
               "code": 2,
               "mfgCode": null,
               "source": "client",
@@ -12319,7 +12316,7 @@
               "outgoing": 1
             },
             {
-              "name": "RenameInput",
+              "name": "RenameInputRequest",
               "code": 3,
               "mfgCode": null,
               "source": "client",
@@ -12328,6 +12325,21 @@
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -12351,7 +12363,7 @@
           "mfgCode": null,
           "define": "MEDIA_INPUT_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [],
           "attributes": [
             {
@@ -12392,10 +12404,10 @@
           "mfgCode": null,
           "define": "KEYPAD_INPUT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
-              "name": "SendKey",
+              "name": "SendKeyRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -12404,6 +12416,21 @@
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -12427,17 +12454,8 @@
           "mfgCode": null,
           "define": "KEYPAD_INPUT_CLUSTER",
           "side": "server",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "SendKeyResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
+          "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",
@@ -12462,10 +12480,10 @@
           "mfgCode": null,
           "define": "CONTENT_LAUNCH_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
-              "name": "LaunchContent",
+              "name": "LaunchContentRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -12473,7 +12491,7 @@
               "outgoing": 1
             },
             {
-              "name": "LaunchURL",
+              "name": "LaunchURLRequest",
               "code": 1,
               "mfgCode": null,
               "source": "client",
@@ -12482,6 +12500,21 @@
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -12505,28 +12538,11 @@
           "mfgCode": null,
           "define": "CONTENT_LAUNCH_CLUSTER",
           "side": "server",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "LaunchContentResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            },
-            {
-              "name": "LaunchURLResponse",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
+          "enabled": 0,
+          "commands": [],
           "attributes": [
             {
-              "name": "accepts header list",
+              "name": "accept header list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -12578,10 +12594,10 @@
           "mfgCode": null,
           "define": "AUDIO_OUTPUT_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
-              "name": "SelectOutput",
+              "name": "SelectOutputRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -12589,7 +12605,7 @@
               "outgoing": 1
             },
             {
-              "name": "RenameOutput",
+              "name": "RenameOutputRequest",
               "code": 1,
               "mfgCode": null,
               "source": "client",
@@ -12598,6 +12614,21 @@
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -12621,7 +12652,7 @@
           "mfgCode": null,
           "define": "AUDIO_OUTPUT_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [],
           "attributes": [
             {
@@ -12662,11 +12693,27 @@
           "mfgCode": null,
           "define": "APPLICATION_LAUNCHER_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
-              "name": "LaunchApp",
+              "name": "LaunchAppRequest",
               "code": 0,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "StopAppRequest",
+              "code": 1,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "HideAppRequest",
+              "code": 2,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
@@ -12674,6 +12721,21 @@
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -12697,17 +12759,8 @@
           "mfgCode": null,
           "define": "APPLICATION_LAUNCHER_CLUSTER",
           "side": "server",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "LaunchAppResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
+          "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "application launcher list",
@@ -12747,9 +12800,24 @@
           "mfgCode": null,
           "define": "APPLICATION_BASIC_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -12773,7 +12841,7 @@
           "mfgCode": null,
           "define": "APPLICATION_BASIC_CLUSTER",
           "side": "server",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [],
           "attributes": [
             {
@@ -12889,10 +12957,10 @@
           "mfgCode": null,
           "define": "ACCOUNT_LOGIN_CLUSTER",
           "side": "client",
-          "enabled": 0,
+          "enabled": 1,
           "commands": [
             {
-              "name": "GetSetupPIN",
+              "name": "GetSetupPINRequest",
               "code": 0,
               "mfgCode": null,
               "source": "client",
@@ -12900,8 +12968,16 @@
               "outgoing": 1
             },
             {
-              "name": "Login",
-              "code": 1,
+              "name": "LoginRequest",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "LogoutRequest",
+              "code": 3,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
@@ -12909,6 +12985,21 @@
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 0,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -12932,17 +13023,8 @@
           "mfgCode": null,
           "define": "ACCOUNT_LOGIN_CLUSTER",
           "side": "server",
-          "enabled": 1,
-          "commands": [
-            {
-              "name": "GetSetupPINResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 0
-            }
-          ],
+          "enabled": 0,
+          "commands": [],
           "attributes": [
             {
               "name": "ClusterRevision",

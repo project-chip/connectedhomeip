@@ -161,7 +161,6 @@ CHIP_ERROR CommissioningWindowManager::OpenCommissioningWindow()
     ReturnErrorOnFailure(mIDAllocator->Allocate(keyID));
 
     mPairingSession.Clear();
-    ReturnErrorOnFailure(mPairingSession.MessageDispatch().Init(&mServer->GetSecureSessionManager()));
 
     if (mCommissioningTimeoutSeconds != kNoCommissioningTimeout)
     {

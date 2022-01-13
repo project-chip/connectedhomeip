@@ -129,7 +129,6 @@ static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERRO
 static void HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error)
 {
     ResolverDelegateProxy * proxy = static_cast<ResolverDelegateProxy *>(context);
-    proxy->Release();
 
     for (size_t i = 0; i < servicesSize; ++i)
     {
@@ -144,7 +143,174 @@ static void HandleNodeBrowse(void * context, DnssdService * services, size_t ser
             HandleNodeResolve(context, &services[i], error);
         }
     }
+    proxy->Release();
 }
+
+CHIP_ERROR AddPtrRecord(DiscoveryFilter filter, const char ** entries, size_t & entriesCount, char * buffer, size_t bufferLen)
+{
+    ReturnErrorOnFailure(MakeServiceSubtype(buffer, bufferLen, filter));
+    entries[entriesCount++] = buffer;
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AddPtrRecord(DiscoveryFilterType type, const char ** entries, size_t & entriesCount, char * buffer, size_t bufferLen,
+                        CommissioningMode value)
+{
+    VerifyOrReturnError(value != CommissioningMode::kDisabled, CHIP_NO_ERROR);
+    return AddPtrRecord(DiscoveryFilter(type), entries, entriesCount, buffer, bufferLen);
+}
+
+CHIP_ERROR AddPtrRecord(DiscoveryFilterType type, const char ** entries, size_t & entriesCount, char * buffer, size_t bufferLen,
+                        uint64_t value)
+{
+    return AddPtrRecord(DiscoveryFilter(type, value), entries, entriesCount, buffer, bufferLen);
+}
+
+template <class T>
+CHIP_ERROR AddPtrRecord(DiscoveryFilterType type, const char ** entries, size_t & entriesCount, char * buffer, size_t bufferLen,
+                        chip::Optional<T> value)
+{
+    VerifyOrReturnError(value.HasValue(), CHIP_NO_ERROR);
+    return AddPtrRecord(type, entries, entriesCount, buffer, bufferLen, value.Value());
+}
+
+CHIP_ERROR ENFORCE_FORMAT(4, 5)
+    CopyTextRecordValue(char * buffer, size_t bufferLen, int minCharactersWritten, const char * format, ...)
+{
+    va_list args;
+    va_start(args, format);
+    int charactersWritten = vsnprintf(buffer, bufferLen, format, args);
+    va_end(args);
+
+    return charactersWritten >= minCharactersWritten ? CHIP_NO_ERROR : CHIP_ERROR_INVALID_STRING_LENGTH;
+}
+
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, bool value)
+{
+    return CopyTextRecordValue(buffer, bufferLen, 1, "%d", value);
+}
+
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, uint16_t value)
+{
+    return CopyTextRecordValue(buffer, bufferLen, 1, "%u", value);
+}
+
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, uint32_t value)
+{
+    return CopyTextRecordValue(buffer, bufferLen, 1, "%" PRIu32, value);
+}
+
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, uint16_t value1, uint16_t value2)
+{
+    return CopyTextRecordValue(buffer, bufferLen, 3, "%u+%u", value1, value2);
+}
+
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const char * value)
+{
+    return CopyTextRecordValue(buffer, bufferLen, 0, "%s", value);
+}
+
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, CommissioningMode value)
+{
+    return CopyTextRecordValue(buffer, bufferLen, static_cast<uint16_t>(value));
+}
+
+template <class T>
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, chip::Optional<T> value)
+{
+    VerifyOrReturnError(value.HasValue(), CHIP_ERROR_WELL_UNINITIALIZED);
+    return CopyTextRecordValue(buffer, bufferLen, value.Value());
+}
+
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, chip::Optional<uint16_t> value1, chip::Optional<uint16_t> value2)
+{
+    VerifyOrReturnError(value1.HasValue(), CHIP_ERROR_WELL_UNINITIALIZED);
+    return value2.HasValue() ? CopyTextRecordValue(buffer, bufferLen, value1.Value(), value2.Value())
+                             : CopyTextRecordValue(buffer, bufferLen, value1.Value());
+}
+
+CHIP_ERROR CopyTextRecordValue(char * buffer, size_t bufferLen, const chip::Optional<ReliableMessageProtocolConfig> optional,
+                               bool isIdle)
+{
+    VerifyOrReturnError(optional.HasValue(), CHIP_ERROR_WELL_UNINITIALIZED);
+
+    auto retryInterval = isIdle ? optional.Value().mIdleRetransTimeout : optional.Value().mActiveRetransTimeout;
+
+    // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value
+    // change or device type change.
+    // TODO: Is this really the best place to set these? Seems like it should be passed
+    // in with the correct values and set one level up from here.
+#if CHIP_DEVICE_CONFIG_ENABLE_SED
+    chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
+    ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
+    // Increment default MRP retry intervals by SED poll period to be on the safe side
+    // and avoid unnecessary retransmissions.
+    retryInterval += isIdle ? sedPollingConfig.SlowPollingIntervalMS : sedPollingConfig.FastPollingIntervalMS;
+#endif
+
+    if (retryInterval > kMaxRetryInterval)
+    {
+        ChipLogProgress(Discovery, "MRP retry interval %s value exceeds allowed range of 1 hour, using maximum available",
+                        isIdle ? "idle" : "active");
+        retryInterval = kMaxRetryInterval;
+    }
+
+    return CopyTextRecordValue(buffer, bufferLen, retryInterval.count());
+}
+
+template <class T>
+CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const T & params)
+{
+    switch (key)
+    {
+    case TxtFieldKey::kTcpSupported:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetTcpSupported());
+    case TxtFieldKey::kMrpRetryIntervalIdle:
+    case TxtFieldKey::kMrpRetryIntervalActive:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetMRPConfig(), key == TxtFieldKey::kMrpRetryIntervalIdle);
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+}
+
+CHIP_ERROR CopyTxtRecord(TxtFieldKey key, char * buffer, size_t bufferLen, const CommissionAdvertisingParameters & params)
+{
+    switch (key)
+    {
+    case TxtFieldKey::kVendorProduct:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetVendorId(), params.GetProductId());
+    case TxtFieldKey::kDeviceType:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetDeviceType());
+    case TxtFieldKey::kDeviceName:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetDeviceName());
+    case TxtFieldKey::kLongDiscriminator:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetLongDiscriminator());
+    case TxtFieldKey::kRotatingDeviceId:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetRotatingDeviceId());
+    case TxtFieldKey::kPairingInstruction:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetPairingInstruction());
+    case TxtFieldKey::kPairingHint:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetPairingHint());
+    case TxtFieldKey::kCommissioningMode:
+        return CopyTextRecordValue(buffer, bufferLen, params.GetCommissioningMode());
+    default:
+        return CopyTxtRecord(key, buffer, bufferLen, static_cast<BaseAdvertisingParams<CommissionAdvertisingParameters>>(params));
+    }
+}
+
+template <class T>
+CHIP_ERROR AddTxtRecord(TxtFieldKey key, TextEntry * entries, size_t & entriesCount, char * buffer, size_t bufferLen,
+                        const T & params)
+{
+    CHIP_ERROR error = CopyTxtRecord(key, buffer, bufferLen, params);
+    VerifyOrReturnError(CHIP_ERROR_WELL_UNINITIALIZED != error, CHIP_NO_ERROR);
+    VerifyOrReturnError(CHIP_NO_ERROR == error, error);
+
+    entries[entriesCount++] = { Internal::txtFieldInfo[static_cast<int>(key)].keyStr, reinterpret_cast<const uint8_t *>(buffer),
+                                strnlen(buffer, bufferLen) };
+    return CHIP_NO_ERROR;
+}
+
 } // namespace
 
 DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
@@ -200,18 +366,21 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
     DiscoveryImplPlatform * publisher = static_cast<DiscoveryImplPlatform *>(context);
     if (error == CHIP_ERROR_FORCED_RESET)
     {
-        if (publisher->mIsOperationalPublishing)
+        if (publisher->mIsOperationalNodePublishing)
         {
-            publisher->Advertise(publisher->mOperationalAdvertisingParams);
+            publisher->Advertise(publisher->mOperationalNodeAdvertisingParams);
         }
+
         if (publisher->mIsCommissionableNodePublishing)
         {
             publisher->Advertise(publisher->mCommissionableNodeAdvertisingParams);
         }
-        if (publisher->mIsCommissionerPublishing)
+
+        if (publisher->mIsCommissionerNodePublishing)
         {
-            publisher->Advertise(publisher->mCommissionerAdvertisingParams);
+            publisher->Advertise(publisher->mCommissionerNodeAdvertisingParams);
         }
+
         publisher->FinalizeServiceUpdate();
     }
     else
@@ -222,7 +391,7 @@ void DiscoveryImplPlatform::HandleDnssdError(void * context, CHIP_ERROR error)
 
 CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceName, size_t maxLength)
 {
-    if (maxLength < (chip::Dnssd::Commissionable::kInstanceNameMaxLength + 1))
+    if (maxLength < (chip::Dnssd::Commission::kInstanceNameMaxLength + 1))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
@@ -231,330 +400,137 @@ CHIP_ERROR DiscoveryImplPlatform::GetCommissionableInstanceName(char * instanceN
                                                      instanceName, maxLength);
 }
 
-template <class Derived, size_t N_idle, size_t N_active, size_t N_tcp>
-CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, char (&mrpRetryIdleStorage)[N_idle],
-                                char (&mrpRetryActiveStorage)[N_active], char (&tcpSupportedStorage)[N_tcp],
-                                TextEntry txtEntryStorage[], size_t & txtEntryIdx)
+CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize,
+                                                 const char ** subTypes, size_t subTypeSize,
+                                                 const OperationalAdvertisingParameters & params)
 {
-    auto optionalMrp = params.GetMRPConfig();
+    return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetMac(),
+                          DnssdServiceProtocol::kDnssdProtocolTcp, params.GetPeerId());
+}
 
-    // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value
-    // change or device type change.
-    // TODO: Is this really the best place to set these? Seems like it should be passed
-    // in with the correct values and set one level up from here.
-#if CHIP_DEVICE_CONFIG_ENABLE_SED
-    chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
-    ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
-    // Increment default MRP retry intervals by SED poll period to be on the safe side
-    // and avoid unnecessary retransmissions.
-    if (optionalMrp.HasValue())
+CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize,
+                                                 const char ** subTypes, size_t subTypeSize,
+                                                 const CommissionAdvertisingParameters & params)
+{
+    return PublishService(serviceType, textEntries, textEntrySize, subTypes, subTypeSize, params.GetPort(), params.GetMac(),
+                          DnssdServiceProtocol::kDnssdProtocolUdp, PeerId());
+}
+
+CHIP_ERROR DiscoveryImplPlatform::PublishService(const char * serviceType, TextEntry * textEntries, size_t textEntrySize,
+                                                 const char ** subTypes, size_t subTypeSize, uint16_t port,
+                                                 const chip::ByteSpan & mac, DnssdServiceProtocol protocol, PeerId peerId)
+{
+    ReturnErrorCodeIf(mDnssdInitialized == false, CHIP_ERROR_INCORRECT_STATE);
+
+    DnssdService service;
+    ReturnErrorOnFailure(MakeHostName(service.mHostName, sizeof(service.mHostName), mac));
+    ReturnErrorOnFailure(protocol == DnssdServiceProtocol::kDnssdProtocolTcp
+                             ? MakeInstanceName(service.mName, sizeof(service.mName), peerId)
+                             : GetCommissionableInstanceName(service.mName, sizeof(service.mName)));
+    strncpy(service.mType, serviceType, sizeof(service.mType));
+    service.mAddressType   = Inet::IPAddressType::kAny;
+    service.mInterface     = Inet::InterfaceId::Null();
+    service.mProtocol      = protocol;
+    service.mPort          = port;
+    service.mTextEntries   = textEntries;
+    service.mTextEntrySize = textEntrySize;
+    service.mSubTypes      = subTypes;
+    service.mSubTypeSize   = subTypeSize;
+
+    ReturnErrorOnFailure(ChipDnssdPublishService(&service));
+
+#ifdef DETAIL_LOGGING
+    printf("printEntries port=%u, mTextEntrySize=%zu, mSubTypeSize=%zu\n", port, textEntrySize, subTypeSize);
+
+    for (size_t i = 0; i < textEntrySize; i++)
     {
-        auto mrp = optionalMrp.Value();
-        optionalMrp.SetValue(ReliableMessageProtocolConfig(mrp.mIdleRetransTimeout + sedPollingConfig.SlowPollingIntervalMS,
-                                                           mrp.mActiveRetransTimeout + sedPollingConfig.FastPollingIntervalMS));
+        printf(" entry [%zu] : %s %s\n", i, textEntries[i].mKey, (char *) (textEntries[i].mData));
+    }
+
+    for (size_t i = 0; i < subTypeSize; i++)
+    {
+        printf(" type [%zu] : %s\n", i, subTypes[i]);
     }
 #endif
-    if (optionalMrp.HasValue())
-    {
-        auto mrp = optionalMrp.Value();
-        {
-            if (mrp.mIdleRetransTimeout > kMaxRetryInterval)
-            {
-                ChipLogProgress(Discovery,
-                                "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
-                mrp.mIdleRetransTimeout = kMaxRetryInterval;
-            }
-            size_t writtenCharactersNumber =
-                snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32, mrp.mIdleRetransTimeout.count());
-            VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalIdleMaxLength),
-                                CHIP_ERROR_INVALID_STRING_LENGTH);
-            txtEntryStorage[txtEntryIdx++] = { "CRI", Uint8::from_const_char(mrpRetryIdleStorage), strlen(mrpRetryIdleStorage) };
-        }
 
-        {
-            if (mrp.mActiveRetransTimeout > kMaxRetryInterval)
-            {
-                ChipLogProgress(Discovery,
-                                "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
-                mrp.mActiveRetransTimeout = kMaxRetryInterval;
-            }
-            size_t writtenCharactersNumber =
-                snprintf(mrpRetryActiveStorage, sizeof(mrpRetryActiveStorage), "%" PRIu32, mrp.mActiveRetransTimeout.count());
-            VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalActiveMaxLength),
-                                CHIP_ERROR_INVALID_STRING_LENGTH);
-            txtEntryStorage[txtEntryIdx++] = { "CRA", Uint8::from_const_char(mrpRetryActiveStorage),
-                                               strlen(mrpRetryActiveStorage) };
-        }
-    }
-    if (params.GetTcpSupported().HasValue())
-    {
-        size_t writtenCharactersNumber =
-            snprintf(tcpSupportedStorage, sizeof(tcpSupportedStorage), "%d", params.GetTcpSupported().Value());
-        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kKeyTcpSupportMaxLength),
-                            CHIP_ERROR_INVALID_STRING_LENGTH);
-        txtEntryStorage[txtEntryIdx++] = { "T", reinterpret_cast<const uint8_t *>(tcpSupportedStorage),
-                                           strlen(tcpSupportedStorage) };
-    }
     return CHIP_NO_ERROR;
+}
+
+#define PREPARE_RECORDS(Type)                                                                                                      \
+    TextEntry textEntries[Type##AdvertisingParameters::kTxtMaxNumber];                                                             \
+    size_t textEntrySize = 0;                                                                                                      \
+    const char * subTypes[Type::kSubTypeMaxNumber];                                                                                \
+    size_t subTypeSize = 0;
+
+#define ADD_TXT_RECORD(Name)                                                                                                       \
+    char Name##Buf[kKey##Name##MaxLength + 1];                                                                                     \
+    ReturnErrorOnFailure(AddTxtRecord(TxtFieldKey::k##Name, textEntries, textEntrySize, Name##Buf, sizeof(Name##Buf), params));
+
+#define ADD_PTR_RECORD(Name)                                                                                                       \
+    char Name##SubTypeBuf[kSubType##Name##MaxLength + 1];                                                                          \
+    ReturnErrorOnFailure(AddPtrRecord(DiscoveryFilterType::k##Name, subTypes, subTypeSize, Name##SubTypeBuf,                       \
+                                      sizeof(Name##SubTypeBuf), params.Get##Name()));
+
+#define PUBLISH_RECORDS(Type)                                                                                                      \
+    ReturnErrorOnFailure(PublishService(k##Type##ServiceName, textEntries, textEntrySize, subTypes, subTypeSize, params));         \
+    m##Type##NodeAdvertisingParams = params;                                                                                       \
+    mIs##Type##NodePublishing      = true;                                                                                         \
+    return CHIP_NO_ERROR;
+
+CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParameters & params)
+{
+    PREPARE_RECORDS(Operational);
+
+    ADD_TXT_RECORD(MrpRetryIntervalIdle);
+    ADD_TXT_RECORD(MrpRetryIntervalActive);
+    ADD_TXT_RECORD(TcpSupported);
+
+    ADD_PTR_RECORD(CompressedFabricId);
+
+    PUBLISH_RECORDS(Operational);
 }
 
 CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    DnssdService service;
-    // add newline to lengths for TXT entries
-    char discriminatorBuf[kKeyDiscriminatorMaxLength + 1];
-    char vendorProductBuf[kKeyVendorProductMaxLength + 1];
-    char commissioningModeBuf[kKeyCommissioningModeMaxLength + 1];
-    char deviceTypeBuf[kKeyDeviceTypeMaxLength + 1];
-    char deviceNameBuf[kKeyDeviceNameMaxLength + 1];
-    char rotatingIdBuf[kKeyRotatingIdMaxLength + 1];
-    char pairingHintBuf[kKeyPairingHintMaxLength + 1];
-    char pairingInstrBuf[kKeyPairingInstructionMaxLength + 1];
-    char mrpRetryIntervalIdleBuf[kTxtRetryIntervalIdleMaxLength + 1];
-    char mrpRetryIntervalActiveBuf[kTxtRetryIntervalActiveMaxLength + 1];
-    char tcpSupportedBuf[kKeyTcpSupportMaxLength + 1];
-    // size of textEntries array should be count of Bufs above
-    TextEntry textEntries[CommissionAdvertisingParameters::kTxtMaxNumber];
-    size_t textEntrySize = 0;
-    // add null-character to the subtypes
-    char shortDiscriminatorSubtype[kSubTypeShortDiscriminatorMaxLength + 1];
-    char longDiscriminatorSubtype[kSubTypeLongDiscriminatorMaxLength + 1];
-    char vendorSubType[kSubTypeVendorMaxLength + 1];
-    char commissioningModeSubType[kSubTypeCommissioningModeMaxLength + 1];
-    char deviceTypeSubType[kSubTypeDeviceTypeMaxLength + 1];
-    // size of subTypes array should be count of SubTypes above
-    const char * subTypes[Commissionable::kSubTypeMaxNumber];
-    size_t subTypeSize = 0;
+    PREPARE_RECORDS(Commission);
 
-    if (!mDnssdInitialized)
+    ADD_TXT_RECORD(VendorProduct);
+    ADD_TXT_RECORD(DeviceType);
+    ADD_TXT_RECORD(DeviceName);
+    ADD_TXT_RECORD(MrpRetryIntervalIdle);
+    ADD_TXT_RECORD(MrpRetryIntervalActive);
+    ADD_TXT_RECORD(TcpSupported);
+
+    ADD_PTR_RECORD(VendorId);
+    ADD_PTR_RECORD(DeviceType);
+
+    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioner)
     {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    error = MakeHostName(service.mHostName, sizeof(service.mHostName), params.GetMac());
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to create dnssd hostname: %s", ErrorStr(error));
-        return error;
-    }
-
-    ReturnErrorOnFailure(GetCommissionableInstanceName(service.mName, sizeof(service.mName)));
-
-    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
-    {
-        strncpy(service.mType, kCommissionableServiceName, sizeof(service.mType));
+        PUBLISH_RECORDS(Commissioner);
     }
     else
     {
-        strncpy(service.mType, kCommissionerServiceName, sizeof(service.mType));
+        ADD_TXT_RECORD(LongDiscriminator);
+        ADD_TXT_RECORD(CommissioningMode);
+        ADD_TXT_RECORD(RotatingDeviceId);
+        ADD_TXT_RECORD(PairingHint);
+        ADD_TXT_RECORD(PairingInstruction);
+
+        ADD_PTR_RECORD(ShortDiscriminator);
+        ADD_PTR_RECORD(LongDiscriminator);
+        ADD_PTR_RECORD(CommissioningMode);
+
+        PUBLISH_RECORDS(Commissionable);
     }
-    service.mProtocol = DnssdServiceProtocol::kDnssdProtocolUdp;
-
-    if (params.GetVendorId().HasValue())
-    {
-        if (params.GetProductId().HasValue())
-        {
-            snprintf(vendorProductBuf, sizeof(vendorProductBuf), "%u+%u", params.GetVendorId().Value(),
-                     params.GetProductId().Value());
-        }
-        else
-        {
-            snprintf(vendorProductBuf, sizeof(vendorProductBuf), "%u", params.GetVendorId().Value());
-        }
-        textEntries[textEntrySize++] = { "VP", reinterpret_cast<const uint8_t *>(vendorProductBuf),
-                                         strnlen(vendorProductBuf, sizeof(vendorProductBuf)) };
-    }
-
-    if (params.GetDeviceType().HasValue())
-    {
-        snprintf(deviceTypeBuf, sizeof(deviceTypeBuf), "%u", params.GetDeviceType().Value());
-        textEntries[textEntrySize++] = { "DT", reinterpret_cast<const uint8_t *>(deviceTypeBuf),
-                                         strnlen(deviceTypeBuf, sizeof(deviceTypeBuf)) };
-    }
-
-    if (params.GetDeviceName().HasValue())
-    {
-        snprintf(deviceNameBuf, sizeof(deviceNameBuf), "%s", params.GetDeviceName().Value());
-        textEntries[textEntrySize++] = { "DN", reinterpret_cast<const uint8_t *>(deviceNameBuf),
-                                         strnlen(deviceNameBuf, sizeof(deviceNameBuf)) };
-    }
-    AddCommonTxtElements<CommissionAdvertisingParameters>(params, mrpRetryIntervalIdleBuf, mrpRetryIntervalActiveBuf,
-                                                          tcpSupportedBuf, textEntries, textEntrySize);
-
-    // Following fields are for nodes and not for commissioners
-    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
-    {
-        snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%u", params.GetLongDiscriminator());
-        textEntries[textEntrySize++] = { "D", reinterpret_cast<const uint8_t *>(discriminatorBuf),
-                                         strnlen(discriminatorBuf, sizeof(discriminatorBuf)) };
-
-        snprintf(commissioningModeBuf, sizeof(commissioningModeBuf), "%u", static_cast<int>(params.GetCommissioningMode()));
-        textEntries[textEntrySize++] = { "CM", reinterpret_cast<const uint8_t *>(commissioningModeBuf),
-                                         strnlen(commissioningModeBuf, sizeof(commissioningModeBuf)) };
-
-        if (params.GetRotatingId().HasValue())
-        {
-            snprintf(rotatingIdBuf, sizeof(rotatingIdBuf), "%s", params.GetRotatingId().Value());
-            textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(rotatingIdBuf),
-                                             strnlen(rotatingIdBuf, sizeof(rotatingIdBuf)) };
-        }
-
-        if (params.GetPairingHint().HasValue())
-        {
-            snprintf(pairingHintBuf, sizeof(pairingHintBuf), "%u", params.GetPairingHint().Value());
-            textEntries[textEntrySize++] = { "PH", reinterpret_cast<const uint8_t *>(pairingHintBuf),
-                                             strnlen(pairingHintBuf, sizeof(pairingHintBuf)) };
-        }
-
-        if (params.GetPairingInstr().HasValue())
-        {
-            snprintf(pairingInstrBuf, sizeof(pairingInstrBuf), "%s", params.GetPairingInstr().Value());
-            textEntries[textEntrySize++] = { "PI", reinterpret_cast<const uint8_t *>(pairingInstrBuf),
-                                             strnlen(pairingInstrBuf, sizeof(pairingInstrBuf)) };
-        }
-
-        if (MakeServiceSubtype(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype),
-                               DiscoveryFilter(DiscoveryFilterType::kShort, params.GetShortDiscriminator())) == CHIP_NO_ERROR)
-        {
-            subTypes[subTypeSize++] = shortDiscriminatorSubtype;
-        }
-        if (MakeServiceSubtype(longDiscriminatorSubtype, sizeof(longDiscriminatorSubtype),
-                               DiscoveryFilter(DiscoveryFilterType::kLong, params.GetLongDiscriminator())) == CHIP_NO_ERROR)
-        {
-            subTypes[subTypeSize++] = longDiscriminatorSubtype;
-        }
-        if ((params.GetCommissioningMode() != CommissioningMode::kDisabled) &&
-            (MakeServiceSubtype(commissioningModeSubType, sizeof(commissioningModeSubType),
-                                DiscoveryFilter(DiscoveryFilterType::kCommissioningMode)) == CHIP_NO_ERROR))
-        {
-            subTypes[subTypeSize++] = commissioningModeSubType;
-        }
-    }
-
-    if (params.GetVendorId().HasValue())
-    {
-        if (MakeServiceSubtype(vendorSubType, sizeof(vendorSubType),
-                               DiscoveryFilter(DiscoveryFilterType::kVendor, params.GetVendorId().Value())) == CHIP_NO_ERROR)
-        {
-            subTypes[subTypeSize++] = vendorSubType;
-        }
-    }
-    if (params.GetDeviceType().HasValue())
-    {
-        if (MakeServiceSubtype(deviceTypeSubType, sizeof(deviceTypeSubType),
-                               DiscoveryFilter(DiscoveryFilterType::kDeviceType, params.GetDeviceType().Value())) == CHIP_NO_ERROR)
-        {
-            subTypes[subTypeSize++] = deviceTypeSubType;
-        }
-    }
-
-    service.mTextEntries   = textEntries;
-    service.mTextEntrySize = textEntrySize;
-    service.mPort          = params.GetPort();
-    service.mInterface     = Inet::InterfaceId::Null();
-    service.mSubTypes      = subTypes;
-    service.mSubTypeSize   = subTypeSize;
-    service.mAddressType   = Inet::IPAddressType::kAny;
-    error                  = ChipDnssdPublishService(&service);
-
-    if (error == CHIP_NO_ERROR)
-    {
-        if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissionableNode)
-        {
-            mCommissionableNodeAdvertisingParams = params;
-            mIsCommissionableNodePublishing      = true;
-        }
-        else
-        {
-            mCommissionerAdvertisingParams = params;
-            mIsCommissionerPublishing      = true;
-        }
-    }
-
-#ifdef DETAIL_LOGGING
-    PrintEntries(&service);
-#endif
-    return error;
-}
-
-#ifdef DETAIL_LOGGING
-void DiscoveryImplPlatform::PrintEntries(const DnssdService * service)
-{
-    printf("printEntries port=%d, mTextEntrySize=%d, mSubTypeSize=%d\n", (int) (service->mPort), (int) (service->mTextEntrySize),
-           (int) (service->mSubTypeSize));
-    for (int i = 0; i < (int) service->mTextEntrySize; i++)
-    {
-        printf(" entry [%d] : %s %s\n", i, service->mTextEntries[i].mKey, (char *) (service->mTextEntries[i].mData));
-    }
-
-    for (int i = 0; i < (int) service->mSubTypeSize; i++)
-    {
-        printf(" type [%d] : %s\n", i, service->mSubTypes[i]);
-    }
-}
-#endif
-
-CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParameters & params)
-{
-    DnssdService service;
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    char compressedFabricIdSub[kSubTypeCompressedFabricIdMaxLength + 1];
-    const char * subTypes[Operational::kSubTypeMaxNumber];
-    size_t subTypeSize = 0;
-
-    mOperationalAdvertisingParams = params;
-    // TODO: There may be multilple device/fabric ids after multi-admin.
-
-    char mrpRetryIntervalIdleBuf[kTxtRetryIntervalIdleMaxLength + 1];
-    char mrpRetryIntervalActiveBuf[kTxtRetryIntervalActiveMaxLength + 1];
-    char tcpSupportedBuf[kKeyTcpSupportMaxLength + 1];
-    TextEntry txtEntries[OperationalAdvertisingParameters::kTxtMaxNumber];
-    size_t textEntrySize = 0;
-
-    ReturnLogErrorOnFailure(AddCommonTxtElements(params, mrpRetryIntervalIdleBuf, mrpRetryIntervalActiveBuf, tcpSupportedBuf,
-                                                 txtEntries, textEntrySize));
-
-    if (MakeServiceSubtype(compressedFabricIdSub, sizeof(compressedFabricIdSub),
-                           DiscoveryFilter(DiscoveryFilterType::kCompressedFabricId, params.GetPeerId().GetCompressedFabricId())) ==
-        CHIP_NO_ERROR)
-    {
-        subTypes[subTypeSize++] = compressedFabricIdSub;
-    }
-    error = MakeHostName(service.mHostName, sizeof(service.mHostName), params.GetMac());
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Failed to create dnssd hostname: %s", ErrorStr(error));
-        return error;
-    }
-    ReturnErrorOnFailure(MakeInstanceName(service.mName, sizeof(service.mName), params.GetPeerId()));
-    strncpy(service.mType, kOperationalServiceName, sizeof(service.mType));
-    service.mProtocol      = DnssdServiceProtocol::kDnssdProtocolTcp;
-    service.mPort          = params.GetPort();
-    service.mTextEntries   = txtEntries;
-    service.mTextEntrySize = textEntrySize;
-    service.mInterface     = Inet::InterfaceId::Null();
-    service.mAddressType   = Inet::IPAddressType::kAny;
-    service.mSubTypes      = subTypes;
-    service.mSubTypeSize   = subTypeSize;
-    error                  = ChipDnssdPublishService(&service);
-
-    if (error == CHIP_NO_ERROR)
-    {
-        mIsOperationalPublishing = true;
-    }
-
-    return error;
 }
 
 CHIP_ERROR DiscoveryImplPlatform::RemoveServices()
 {
     ReturnErrorOnFailure(ChipDnssdRemoveServices());
 
-    mIsOperationalPublishing        = false;
+    mIsOperationalNodePublishing    = false;
     mIsCommissionableNodePublishing = false;
-    mIsCommissionerPublishing       = false;
+    mIsCommissionerNodePublishing   = false;
 
     return CHIP_NO_ERROR;
 }

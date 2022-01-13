@@ -35,13 +35,14 @@ enum CommissioningStage : uint8_t
     kSendPAICertificateRequest,
     kSendDACCertificateRequest,
     kSendAttestationRequest,
+    kAttestationVerification,
     kSendOpCertSigningRequest,
     kGenerateNOCChain,
     kSendTrustedRootCert,
     kSendNOC,
-    kWifiNetworkSetup,
+    kWiFiNetworkSetup,
     kThreadNetworkSetup,
-    kWifiNetworkEnable,
+    kWiFiNetworkEnable,
     kThreadNetworkEnable,
     kFindOperational,
     kSendComplete,
@@ -49,12 +50,12 @@ enum CommissioningStage : uint8_t
     kConfigACL,
 };
 
-struct WifiCredentials
+struct WiFiCredentials
 {
     ByteSpan ssid;
     // TODO(cecille): We should add a PII bytespan concept.
     ByteSpan credentials;
-    WifiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
+    WiFiCredentials(ByteSpan newSsid, ByteSpan newCreds) : ssid(newSsid), credentials(newCreds) {}
 };
 
 struct NOCChainGenerationParameters
@@ -75,18 +76,26 @@ public:
     static constexpr size_t kMaxCredentialsLen   = 64;
     bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
     bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
-    bool HasWifiCredentials() const { return mWifiCreds.HasValue(); }
+    bool HasWiFiCredentials() const { return mWiFiCreds.HasValue(); }
     bool HasThreadOperationalDataset() const { return mThreadOperationalDataset.HasValue(); }
     bool HasNOCChainGenerationaParameters() const { return mNOCChainGenerationParameters.HasValue(); }
     bool HasRootCert() const { return mRootCert.HasValue(); }
     bool HasNOCerts() const { return mNOCerts.HasValue(); }
+    bool HasAttestationElements() const { return mAttestationElements.HasValue(); }
+    bool HasAttestationSignature() const { return mAttestationSignature.HasValue(); }
+    bool HasPAI() const { return mPAI.HasValue(); }
+    bool HasDAC() const { return mDAC.HasValue(); }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
-    const Optional<WifiCredentials> GetWifiCredentials() const { return mWifiCreds; }
+    const Optional<WiFiCredentials> GetWiFiCredentials() const { return mWiFiCreds; }
     const Optional<ByteSpan> GetThreadOperationalDataset() const { return mThreadOperationalDataset; }
     const Optional<NOCChainGenerationParameters> GetNOCChainGenerationParameters() const { return mNOCChainGenerationParameters; }
     const Optional<ByteSpan> GetRootCert() const { return mRootCert; }
     const Optional<NOCerts> GetNOCerts() const { return mNOCerts; }
+    const Optional<ByteSpan> GetAttestationElements() const { return mAttestationElements; }
+    const Optional<ByteSpan> GetAttestationSignature() const { return mAttestationSignature; }
+    const Optional<ByteSpan> GetPAI() const { return mPAI; }
+    const Optional<ByteSpan> GetDAC() const { return mDAC; }
 
     // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
     CommissioningParameters & SetCSRNonce(ByteSpan csrNonce)
@@ -101,9 +110,9 @@ public:
         mAttestationNonce.SetValue(attestationNonce);
         return *this;
     }
-    CommissioningParameters & SetWifiCredentials(WifiCredentials wifiCreds)
+    CommissioningParameters & SetWiFiCredentials(WiFiCredentials wifiCreds)
     {
-        mWifiCreds.SetValue(wifiCreds);
+        mWiFiCreds.SetValue(wifiCreds);
         return *this;
     }
 
@@ -132,15 +141,39 @@ public:
         mNOCerts.SetValue(certs);
         return *this;
     }
+    CommissioningParameters & SetAttestationElements(const ByteSpan & attestationElements)
+    {
+        mAttestationElements = MakeOptional(attestationElements);
+        return *this;
+    }
+    CommissioningParameters & SetAttestationSignature(const ByteSpan & attestationSignature)
+    {
+        mAttestationSignature = MakeOptional(attestationSignature);
+        return *this;
+    }
+    CommissioningParameters & SetPAI(const ByteSpan & pai)
+    {
+        mPAI = MakeOptional(pai);
+        return *this;
+    }
+    CommissioningParameters & SetDAC(const ByteSpan & dac)
+    {
+        mDAC = MakeOptional(dac);
+        return *this;
+    }
 
 private:
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
     Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
-    Optional<WifiCredentials> mWifiCreds;
+    Optional<WiFiCredentials> mWiFiCreds;
     Optional<ByteSpan> mThreadOperationalDataset;
     Optional<NOCChainGenerationParameters> mNOCChainGenerationParameters;
     Optional<ByteSpan> mRootCert;
     Optional<NOCerts> mNOCerts;
+    Optional<ByteSpan> mAttestationElements;
+    Optional<ByteSpan> mAttestationSignature;
+    Optional<ByteSpan> mPAI;
+    Optional<ByteSpan> mDAC;
 };
 
 class CommissioningDelegate

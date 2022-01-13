@@ -1,0 +1,55 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 45.1.4. [TC-SWDIAG-3.1] Command received functionality with server as DUT
+
+config:
+    cluster: "Software Diagnostics"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    #issue #11578 ResetWatermarks command is Failing
+    #disabled due to issue  #13441
+    - label: "Sends ResetWatermarks to DUT"
+      disabled: true
+      command: "ResetWatermarks"
+      PICS: CR_RESETWATERMARKS
+
+    - label: "Reads a list of ThreadMetrics struct attribute from DUT."
+      disabled: true
+      command: "readAttribute"
+      attribute: "ThreadMetrics"
+      PICS: A_THREADMETRICS
+      response:
+          value: 0
+
+    - label: "Reads CurrentHeapUsed attribute value from DUT"
+      optional: true
+      command: "readAttribute"
+      attribute: "CurrentHeapUsed"
+      PICS: A_CURRENTHEAPUSED
+      response:
+          value: 0
+
+    - label: "Reads CurrentHeapHighWaterMark attribute value from DUT"
+      optional: true
+      command: "readAttribute"
+      attribute: "CurrentHeapHighWatermark"
+      PICS: A_CURRENTHEAPHIGHWATERMARK
+      response:
+          value: 0

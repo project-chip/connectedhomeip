@@ -65,7 +65,7 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, List<X> list)
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
     for (auto & item : list)
     {
-        ReturnErrorOnFailure(Encode(writer, TLV::AnonymousTag, item));
+        ReturnErrorOnFailure(Encode(writer, TLV::AnonymousTag(), item));
     }
     ReturnErrorOnFailure(writer.EndContainer(type));
 

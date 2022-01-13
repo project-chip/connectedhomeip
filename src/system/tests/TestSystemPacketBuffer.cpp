@@ -531,7 +531,7 @@ void PacketBufferTest::CheckDataLength(nlTestSuite * inSuite, void * inContext)
  *               without specifying the head of the buffer chain. Otherwise,
  *               test SetDataLength with one buffer being down the chain and the
  *               other one being passed as the head of the chain. After calling
- *               the method verify that data lenghts were correctly adjusted.
+ *               the method verify that data lengths were correctly adjusted.
  */
 void PacketBufferTest::CheckSetDataLength(nlTestSuite * inSuite, void * inContext)
 {

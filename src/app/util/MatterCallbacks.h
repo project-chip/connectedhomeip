@@ -34,6 +34,6 @@ CHIP_ERROR MatterPreCommandReceivedCallback(const chip::app::ConcreteCommandPath
 /** @brief Matter Post Command Received
  *
  * This callback is called once the message has been determined to be a command, but
- * after it beeing dispatched to the receiver.
+ * after it being dispatched to the receiver.
  */
 void MatterPostCommandReceivedCallback(const chip::app::ConcreteCommandPath & commandPath);

@@ -51,18 +51,12 @@ public:
 
     virtual bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const { return false; }
 
-    virtual CHIP_ERROR SendSubscribeAttributeRequest(app::AttributePathParams aPath, uint16_t mMinIntervalFloorSeconds,
-                                                     uint16_t mMaxIntervalCeilingSeconds, Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback);
     virtual CHIP_ERROR ShutdownSubscriptions() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     virtual CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
                                                  Callback::Cancelable * onFailureCallback);
 
     virtual CHIP_ERROR SendCommands(app::CommandSender * commandObj);
-
-    virtual void AddReportHandler(EndpointId endpoint, ClusterId cluster, AttributeId attribute,
-                                  Callback::Cancelable * onReportCallback, app::TLVDataFilter tlvDataFilter);
 
     // Interaction model uses the object and callback interface instead of sequence number to mark different transactions.
     virtual void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,

@@ -65,11 +65,10 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
  */
 void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
-    GetAppTask().UpdateClusterState();
+    GetAppTask().InitOnOffClusterState();
 }
 
 void emberAfPumpConfigurationAndControlClusterInitCallback(chip::EndpointId endpoint)
 {
-    // TODO: Setup the default values in the cluster for this specific application
-    GetAppTask().UpdateClusterState();
+    GetAppTask().InitPCCClusterState();
 }

@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <lib/core/GroupId.h>
+
 #include <cstdint>
 
 namespace chip {
@@ -69,6 +71,16 @@ constexpr bool IsCASEAuthTag(NodeId aNodeId)
 constexpr bool IsPAKEKeyId(NodeId aNodeId)
 {
     return (aNodeId >= kMinPAKEKeyId) && (aNodeId <= kMaxPAKEKeyId);
+}
+
+constexpr NodeId NodeIdFromGroupId(GroupId aGroupId)
+{
+    return kMinGroupNodeId | aGroupId;
+}
+
+constexpr NodeId NodeIdFromPAKEKeyId(uint16_t aPAKEKeyId)
+{
+    return kMinPAKEKeyId | aPAKEKeyId;
 }
 
 } // namespace chip
