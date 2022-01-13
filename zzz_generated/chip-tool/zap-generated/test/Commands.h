@@ -75,9 +75,11 @@ public:
         printf("Test_TC_ILL_1_1\n");
         printf("Test_TC_LVL_1_1\n");
         printf("Test_TC_LVL_2_1\n");
+        printf("Test_TC_LVL_2_2\n");
         printf("Test_TC_LVL_3_1\n");
         printf("Test_TC_LVL_4_1\n");
         printf("Test_TC_LVL_5_1\n");
+        printf("Test_TC_LVL_6_1\n");
         printf("Test_TC_MC_1_1\n");
         printf("Test_TC_MC_2_1\n");
         printf("Test_TC_MC_3_1\n");
@@ -91,6 +93,17 @@ public:
         printf("Test_TC_MC_3_9\n");
         printf("Test_TC_MC_3_10\n");
         printf("Test_TC_MC_3_11\n");
+        printf("Test_TC_MC_5_1\n");
+        printf("Test_TC_MC_5_2\n");
+        printf("Test_TC_MC_5_3\n");
+        printf("Test_TC_MC_6_1\n");
+        printf("Test_TC_MC_6_2\n");
+        printf("Test_TC_MC_6_3\n");
+        printf("Test_TC_MC_6_4\n");
+        printf("Test_TC_MC_7_1\n");
+        printf("Test_TC_MC_7_2\n");
+        printf("Test_TC_MC_8_1\n");
+        printf("Test_TC_MC_9_1\n");
         printf("Test_TC_OCC_1_1\n");
         printf("Test_TC_OCC_2_1\n");
         printf("Test_TC_OCC_2_2\n");
@@ -17396,56 +17409,64 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : reads current Level attribute from DUT\n");
-            err = TestReadsCurrentLevelAttributeFromDut_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads the CurrentLevel attribute\n");
+            err = TestReadsTheCurrentLevelAttribute_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : sends a Move to level command\n");
-            err = TestSendsAMoveToLevelCommand_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the CurrentLevel attribute\n");
+            err = TestReadsTheCurrentLevelAttribute_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 100ms\n");
-            err = TestWait100ms_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads the RemainingTime attribute\n");
+            err = TestReadsTheRemainingTimeAttribute_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : reads current Level attribute from DUT\n");
-            err = TestReadsCurrentLevelAttributeFromDut_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads the MinLevel attribute\n");
+            err = TestReadsTheMinLevelAttribute_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : sends a Move to level command\n");
-            err = TestSendsAMoveToLevelCommand_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Reads the MaxLevel attribute\n");
+            err = TestReadsTheMaxLevelAttribute_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 200ms\n");
-            err = TestWait200ms_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads the CurrentFrequency attribute\n");
+            err = TestReadsTheCurrentFrequencyAttribute_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : reads current Level attribute from DUT\n");
-            err = TestReadsCurrentLevelAttributeFromDut_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Reads the MinFrequency attribute\n");
+            err = TestReadsTheMinFrequencyAttribute_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : reads On Off Transition Time attribute from DUT\n");
-            err = TestReadsOnOffTransitionTimeAttributeFromDut_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Reads the MaxFrequency attribute\n");
+            err = TestReadsTheMaxFrequencyAttribute_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : sends a Move to level command\n");
-            err = TestSendsAMoveToLevelCommand_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Reads the OnOffTransitionTime attribute\n");
+            err = TestReadsTheOnOffTransitionTimeAttribute_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : Wait 10ms\n");
-            err = TestWait10ms_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Reads the OnLevel attribute \n");
+            err = TestReadsTheOnLevelAttribute_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : reads current Level attribute from DUT\n");
-            err = TestReadsCurrentLevelAttributeFromDut_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Reads the OnTransitionTime attribute \n");
+            err = TestReadsTheOnTransitionTimeAttribute_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Reset level to 254\n");
-            err = TestResetLevelTo254_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Reads the OffTransitionTime attribute \n");
+            err = TestReadsTheOffTransitionTimeAttribute_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : Wait 100ms\n");
-            err = TestWait100ms_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Reads the DefaultMoveRate attribute \n");
+            err = TestReadsTheDefaultMoveRateAttribute_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Reads the Options attribute \n");
+            err = TestReadsTheOptionsAttribute_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Reads the StartUpCurrentLevel attribute \n");
+            err = TestReadsTheStartUpCurrentLevelAttribute_15();
             break;
         }
 
@@ -17458,7 +17479,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 14;
+    const uint16_t mTestCount = 16;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -17473,14 +17494,54 @@ private:
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_1(currentLevel);
     }
 
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_2(currentLevel);
+    }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint16_t remainingTime)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_3(remainingTime);
+    }
+
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_4(status);
     }
 
-    static void OnSuccessCallback_4(void * context, uint8_t currentLevel)
+    static void OnSuccessCallback_4(void * context, uint8_t minLevel)
     {
-        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_4(currentLevel);
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_4(minLevel);
+    }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context, uint8_t maxLevel)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_5(maxLevel);
+    }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, uint16_t currentFrequency)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_6(currentFrequency);
     }
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
@@ -17488,9 +17549,9 @@ private:
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_7(status);
     }
 
-    static void OnSuccessCallback_7(void * context, uint8_t currentLevel)
+    static void OnSuccessCallback_7(void * context, uint16_t minFrequency)
     {
-        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_7(currentLevel);
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_7(minFrequency);
     }
 
     static void OnFailureCallback_8(void * context, EmberAfStatus status)
@@ -17498,9 +17559,29 @@ private:
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_8(status);
     }
 
-    static void OnSuccessCallback_8(void * context, uint16_t onOffTransitionTime)
+    static void OnSuccessCallback_8(void * context, uint16_t maxFrequency)
     {
-        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_8(onOffTransitionTime);
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_8(maxFrequency);
+    }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_9(status);
+    }
+
+    static void OnSuccessCallback_9(void * context, uint16_t onOffTransitionTime)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_9(onOffTransitionTime);
+    }
+
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, const chip::app::DataModel::Nullable<uint8_t> & onLevel)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_10(onLevel);
     }
 
     static void OnFailureCallback_11(void * context, EmberAfStatus status)
@@ -17508,9 +17589,49 @@ private:
         (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_11(status);
     }
 
-    static void OnSuccessCallback_11(void * context, uint8_t currentLevel)
+    static void OnSuccessCallback_11(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTransitionTime)
     {
-        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_11(currentLevel);
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_11(onTransitionTime);
+    }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_12(status);
+    }
+
+    static void OnSuccessCallback_12(void * context, const chip::app::DataModel::Nullable<uint16_t> & offTransitionTime)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_12(offTransitionTime);
+    }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context, const chip::app::DataModel::Nullable<uint8_t> & defaultMoveRate)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_13(defaultMoveRate);
+    }
+
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_14(status);
+    }
+
+    static void OnSuccessCallback_14(void * context, uint8_t options)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_14(options);
+    }
+
+    static void OnFailureCallback_15(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_15(status);
+    }
+
+    static void OnSuccessCallback_15(void * context, uint8_t startUpCurrentLevel)
+    {
+        (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_15(startUpCurrentLevel);
     }
 
     //
@@ -17523,7 +17644,7 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_1()
+    CHIP_ERROR TestReadsTheCurrentLevelAttribute_1()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
@@ -17543,26 +17664,579 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendsAMoveToLevelCommand_2()
+    CHIP_ERROR TestReadsTheCurrentLevelAttribute_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        RequestType request;
-        request.level          = 64;
-        request.transitionTime = 0U;
-        request.optionMask     = 1;
-        request.optionOverride = 1;
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_2();
-        };
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
 
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_2(status);
-        };
+    void OnSuccessResponse_2(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckConstraintType("currentLevel", "", "uint8"));
+        NextTest();
+    }
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+    CHIP_ERROR TestReadsTheRemainingTimeAttribute_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::RemainingTime::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint16_t remainingTime)
+    {
+        VerifyOrReturn(CheckValue("remainingTime", remainingTime, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheMinLevelAttribute_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint8_t minLevel)
+    {
+        VerifyOrReturn(CheckValue("minLevel", minLevel, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheMaxLevelAttribute_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(uint8_t maxLevel)
+    {
+        VerifyOrReturn(CheckConstraintType("maxLevel", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheCurrentFrequencyAttribute_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentFrequency::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(uint16_t currentFrequency)
+    {
+        VerifyOrReturn(CheckValue("currentFrequency", currentFrequency, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheMinFrequencyAttribute_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MinFrequency::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(uint16_t minFrequency)
+    {
+        VerifyOrReturn(CheckValue("minFrequency", minFrequency, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheMaxFrequencyAttribute_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MaxFrequency::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(uint16_t maxFrequency)
+    {
+        VerifyOrReturn(CheckValue("maxFrequency", maxFrequency, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheOnOffTransitionTimeAttribute_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
+            this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(uint16_t onOffTransitionTime)
+    {
+        VerifyOrReturn(CheckValue("onOffTransitionTime", onOffTransitionTime, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheOnLevelAttribute_10()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo>(
+            this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(const chip::app::DataModel::Nullable<uint8_t> & onLevel)
+    {
+        VerifyOrReturn(CheckConstraintType("onLevel", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheOnTransitionTimeAttribute_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo>(
+            this, OnSuccessCallback_11, OnFailureCallback_11));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11(const chip::app::DataModel::Nullable<uint16_t> & onTransitionTime)
+    {
+        VerifyOrReturn(CheckConstraintType("onTransitionTime", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheOffTransitionTimeAttribute_12()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo>(
+            this, OnSuccessCallback_12, OnFailureCallback_12));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12(const chip::app::DataModel::Nullable<uint16_t> & offTransitionTime)
+    {
+        VerifyOrReturn(CheckConstraintType("offTransitionTime", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheDefaultMoveRateAttribute_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
+            this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13(const chip::app::DataModel::Nullable<uint8_t> & defaultMoveRate)
+    {
+        VerifyOrReturn(CheckConstraintType("defaultMoveRate", "", "uint8"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheOptionsAttribute_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo>(
+            this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14(uint8_t options)
+    {
+        VerifyOrReturn(CheckValue("options", options, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheStartUpCurrentLevelAttribute_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
+            this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15(uint8_t startUpCurrentLevel)
+    {
+        VerifyOrReturn(CheckValue("startUpCurrentLevel", startUpCurrentLevel, 0));
+
+        NextTest();
+    }
+};
+
+class Test_TC_LVL_2_2 : public TestCommand
+{
+public:
+    Test_TC_LVL_2_2() : TestCommand("Test_TC_LVL_2_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_LVL_2_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_LVL_2_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads the OnOffTransitionTime attribute from the DUT\n");
+            err = TestReadsTheOnOffTransitionTimeAttributeFromTheDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : writes the OnOffTransitionTime attribute on the DUT\n");
+            err = TestWritesTheOnOffTransitionTimeAttributeOnTheDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads the OnOffTransitionTime attribute from the DUT\n");
+            err = TestReadsTheOnOffTransitionTimeAttributeFromTheDut_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : writes default value of OnOffTransitionTime attribute\n");
+            err = TestWritesDefaultValueOfOnOffTransitionTimeAttribute_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : writes the OnLevel attribute on the DUT\n");
+            err = TestWritesTheOnLevelAttributeOnTheDut_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads the OnLevel attribute from the DUT\n");
+            err = TestReadsTheOnLevelAttributeFromTheDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Writes the OnTransitionTime attribute on the DUT\n");
+            err = TestWritesTheOnTransitionTimeAttributeOnTheDut_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Reads the OnTransitionTime attribute from the DUT\n");
+            err = TestReadsTheOnTransitionTimeAttributeFromTheDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Writes the OffTransitionTime attribute on the DUT\n");
+            err = TestWritesTheOffTransitionTimeAttributeOnTheDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Reads the OffTransitionTime attribute from the DUT\n");
+            err = TestReadsTheOffTransitionTimeAttributeFromTheDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Reads the DefaultMoveRate attribute from the DUT\n");
+            err = TestReadsTheDefaultMoveRateAttributeFromTheDut_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Writes the DefaultMoveRate attribute on the DUT\n");
+            err = TestWritesTheDefaultMoveRateAttributeOnTheDut_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Reads the DefaultMoveRate attribute from the DUT\n");
+            err = TestReadsTheDefaultMoveRateAttributeFromTheDut_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Reads the StartUpCurrentLevel attribute from the DUT\n");
+            err = TestReadsTheStartUpCurrentLevelAttributeFromTheDut_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : writes the StartUpCurrentLevel attribute on the DUT\n");
+            err = TestWritesTheStartUpCurrentLevelAttributeOnTheDut_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : reads the StartUpCurrentLevel attribute from the DUT\n");
+            err = TestReadsTheStartUpCurrentLevelAttributeFromTheDut_16();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 17;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint16_t onOffTransitionTime)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_1(onOffTransitionTime);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_2(); }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint16_t onOffTransitionTime)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_3(onOffTransitionTime);
+    }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_4(); }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_5(); }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, const chip::app::DataModel::Nullable<uint8_t> & onLevel)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_6(onLevel);
+    }
+
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_7(status);
+    }
+
+    static void OnSuccessCallback_7(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_7(); }
+
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context, const chip::app::DataModel::Nullable<uint16_t> & onTransitionTime)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_8(onTransitionTime);
+    }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_9(status);
+    }
+
+    static void OnSuccessCallback_9(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_9(); }
+
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, const chip::app::DataModel::Nullable<uint16_t> & offTransitionTime)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_10(offTransitionTime);
+    }
+
+    static void OnFailureCallback_11(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_11(status);
+    }
+
+    static void OnSuccessCallback_11(void * context, const chip::app::DataModel::Nullable<uint8_t> & defaultMoveRate)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_11(defaultMoveRate);
+    }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_12(status);
+    }
+
+    static void OnSuccessCallback_12(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_12(); }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context, const chip::app::DataModel::Nullable<uint8_t> & defaultMoveRate)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_13(defaultMoveRate);
+    }
+
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_14(status);
+    }
+
+    static void OnSuccessCallback_14(void * context, uint8_t startUpCurrentLevel)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_14(startUpCurrentLevel);
+    }
+
+    static void OnFailureCallback_15(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_15(status);
+    }
+
+    static void OnSuccessCallback_15(void * context) { (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_15(); }
+
+    static void OnFailureCallback_16(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnFailureResponse_16(status);
+    }
+
+    static void OnSuccessCallback_16(void * context, uint8_t startUpCurrentLevel)
+    {
+        (static_cast<Test_TC_LVL_2_2 *>(context))->OnSuccessResponse_16(startUpCurrentLevel);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadsTheOnOffTransitionTimeAttributeFromTheDut_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t onOffTransitionTime)
+    {
+        VerifyOrReturn(CheckValue("onOffTransitionTime", onOffTransitionTime, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheOnOffTransitionTimeAttributeOnTheDut_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint16_t onOffTransitionTimeArgument;
+        onOffTransitionTimeArgument = 10U;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
+            onOffTransitionTimeArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
         return CHIP_NO_ERROR;
     }
 
@@ -17570,52 +18244,56 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait100ms_3()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(100);
-    }
-
-    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
+    CHIP_ERROR TestReadsTheOnOffTransitionTimeAttributeFromTheDut_3()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint16_t onOffTransitionTime)
+    {
+        VerifyOrReturn(CheckValue("onOffTransitionTime", onOffTransitionTime, 10U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesDefaultValueOfOnOffTransitionTimeAttribute_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint16_t onOffTransitionTimeArgument;
+        onOffTransitionTimeArgument = 0U;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
+            onOffTransitionTimeArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(uint8_t currentLevel)
-    {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 64));
+    void OnSuccessResponse_4() { NextTest(); }
 
-        NextTest();
-    }
-
-    CHIP_ERROR TestSendsAMoveToLevelCommand_5()
+    CHIP_ERROR TestWritesTheOnLevelAttributeOnTheDut_5()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        RequestType request;
-        request.level          = 128;
-        request.transitionTime = 1U;
-        request.optionMask     = 1;
-        request.optionOverride = 1;
+        chip::app::DataModel::Nullable<uint8_t> onLevelArgument;
+        onLevelArgument.SetNonNull();
+        onLevelArgument.Value() = 1;
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_5();
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_5(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo>(
+            onLevelArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
         return CHIP_NO_ERROR;
     }
 
@@ -17623,72 +18301,79 @@ private:
 
     void OnSuccessResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestWait200ms_6()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(200);
-    }
-
-    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_7()
+    CHIP_ERROR TestReadsTheOnLevelAttributeFromTheDut_6()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
-            this, OnSuccessCallback_7, OnFailureCallback_7));
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(const chip::app::DataModel::Nullable<uint8_t> & onLevel)
+    {
+        VerifyOrReturn(CheckValueNonNull("onLevel", onLevel));
+        VerifyOrReturn(CheckValue("onLevel.Value()", onLevel.Value(), 1));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheOnTransitionTimeAttributeOnTheDut_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<uint16_t> onTransitionTimeArgument;
+        onTransitionTimeArgument.SetNonNull();
+        onTransitionTimeArgument.Value() = 100U;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo>(
+            onTransitionTimeArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(uint8_t currentLevel)
-    {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 128));
+    void OnSuccessResponse_7() { NextTest(); }
 
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadsOnOffTransitionTimeAttributeFromDut_8()
+    CHIP_ERROR TestReadsTheOnTransitionTimeAttributeFromTheDut_8()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(uint16_t onOffTransitionTime)
+    void OnSuccessResponse_8(const chip::app::DataModel::Nullable<uint16_t> & onTransitionTime)
     {
-        VerifyOrReturn(CheckValue("onOffTransitionTime", onOffTransitionTime, 0U));
+        VerifyOrReturn(CheckValueNonNull("onTransitionTime", onTransitionTime));
+        VerifyOrReturn(CheckValue("onTransitionTime.Value()", onTransitionTime.Value(), 100U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendsAMoveToLevelCommand_9()
+    CHIP_ERROR TestWritesTheOffTransitionTimeAttributeOnTheDut_9()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        RequestType request;
-        request.level          = 254;
-        request.transitionTime = 65535U;
-        request.optionMask     = 1;
-        request.optionOverride = 1;
+        chip::app::DataModel::Nullable<uint16_t> offTransitionTimeArgument;
+        offTransitionTimeArgument.SetNonNull();
+        offTransitionTimeArgument.Value() = 100U;
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_9();
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_9(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo>(
+            offTransitionTimeArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
         return CHIP_NO_ERROR;
     }
 
@@ -17696,52 +18381,60 @@ private:
 
     void OnSuccessResponse_9() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_10()
-    {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(10);
-    }
-
-    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_11()
+    CHIP_ERROR TestReadsTheOffTransitionTimeAttributeFromTheDut_10()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo>(
+            this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(const chip::app::DataModel::Nullable<uint16_t> & offTransitionTime)
+    {
+        VerifyOrReturn(CheckValueNonNull("offTransitionTime", offTransitionTime));
+        VerifyOrReturn(CheckValue("offTransitionTime.Value()", offTransitionTime.Value(), 100U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheDefaultMoveRateAttributeFromTheDut_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
             this, OnSuccessCallback_11, OnFailureCallback_11));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_11(uint8_t currentLevel)
+    void OnSuccessResponse_11(const chip::app::DataModel::Nullable<uint8_t> & defaultMoveRate)
     {
-        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 254));
+        VerifyOrReturn(CheckValueNonNull("defaultMoveRate", defaultMoveRate));
+        VerifyOrReturn(CheckValue("defaultMoveRate.Value()", defaultMoveRate.Value(), 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestResetLevelTo254_12()
+    CHIP_ERROR TestWritesTheDefaultMoveRateAttributeOnTheDut_12()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        RequestType request;
-        request.level          = 254;
-        request.transitionTime = 0U;
-        request.optionMask     = 1;
-        request.optionOverride = 1;
+        chip::app::DataModel::Nullable<uint8_t> defaultMoveRateArgument;
+        defaultMoveRateArgument.SetNonNull();
+        defaultMoveRateArgument.Value() = 100;
 
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_2_1 *>(context))->OnSuccessResponse_12();
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_12(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
+            defaultMoveRateArgument, this, OnSuccessCallback_12, OnFailureCallback_12));
         return CHIP_NO_ERROR;
     }
 
@@ -17749,10 +18442,83 @@ private:
 
     void OnSuccessResponse_12() { NextTest(); }
 
-    CHIP_ERROR TestWait100ms_13()
+    CHIP_ERROR TestReadsTheDefaultMoveRateAttributeFromTheDut_13()
     {
-        SetIdentity(kIdentityAlpha);
-        return WaitForMs(100);
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
+            this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13(const chip::app::DataModel::Nullable<uint8_t> & defaultMoveRate)
+    {
+        VerifyOrReturn(CheckValueNonNull("defaultMoveRate", defaultMoveRate));
+        VerifyOrReturn(CheckValue("defaultMoveRate.Value()", defaultMoveRate.Value(), 100));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheStartUpCurrentLevelAttributeFromTheDut_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
+            this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14(uint8_t startUpCurrentLevel)
+    {
+        VerifyOrReturn(CheckValue("startUpCurrentLevel", startUpCurrentLevel, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWritesTheStartUpCurrentLevelAttributeOnTheDut_15()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint8_t startUpCurrentLevelArgument;
+        startUpCurrentLevelArgument = 1;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
+            startUpCurrentLevelArgument, this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_15(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15() { NextTest(); }
+
+    CHIP_ERROR TestReadsTheStartUpCurrentLevelAttributeFromTheDut_16()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
+            this, OnSuccessCallback_16, OnFailureCallback_16));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_16(uint8_t startUpCurrentLevel)
+    {
+        VerifyOrReturn(CheckValue("startUpCurrentLevel", startUpCurrentLevel, 1));
+
+        NextTest();
     }
 };
 
@@ -17795,7 +18561,474 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : reads current level attribute from DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 1 : reads CurrentLevel attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the MinLevel attribute\n");
+            err = TestReadsTheMinLevelAttribute_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads the MaxLevel attribute\n");
+            err = TestReadsTheMaxLevelAttribute_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : sends a Move to level command\n");
+            err = TestSendsAMoveToLevelCommand_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 100ms\n");
+            err = TestWait100ms_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : reads CurrentLevel attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : sends a Move to level command\n");
+            err = TestSendsAMoveToLevelCommand_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Wait 200ms\n");
+            err = TestWait200ms_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : reads CurrentLevel attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : reads On Off Transition Time attribute from DUT\n");
+            err = TestReadsOnOffTransitionTimeAttributeFromDut_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : sends a Move to level command\n");
+            err = TestSendsAMoveToLevelCommand_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 10ms\n");
+            err = TestWait10ms_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : reads CurrentLevel attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Reset level to 254\n");
+            err = TestResetLevelTo254_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Wait 100ms\n");
+            err = TestWait100ms_15();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 16;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_1(currentLevel);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, uint8_t minLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_2(minLevel);
+    }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint8_t maxLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_3(maxLevel);
+    }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_6(currentLevel);
+    }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_9(status);
+    }
+
+    static void OnSuccessCallback_9(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_9(currentLevel);
+    }
+
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_10(status);
+    }
+
+    static void OnSuccessCallback_10(void * context, uint16_t onOffTransitionTime)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_10(onOffTransitionTime);
+    }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_13(status);
+    }
+
+    static void OnSuccessCallback_13(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_13(currentLevel);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 254));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheMinLevelAttribute_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint8_t minLevel)
+    {
+        VerifyOrReturn(CheckValue("minLevel", minLevel, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheMaxLevelAttribute_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint8_t maxLevel)
+    {
+        VerifyOrReturn(CheckValue("maxLevel", maxLevel, 255));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsAMoveToLevelCommand_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
+
+        RequestType request;
+        request.level          = 64;
+        request.transitionTime = 0U;
+        request.optionMask     = 1;
+        request.optionOverride = 1;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_4();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_4(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_5()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 64));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsAMoveToLevelCommand_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
+
+        RequestType request;
+        request.level          = 128;
+        request.transitionTime = 1U;
+        request.optionMask     = 1;
+        request.optionOverride = 1;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_7(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7() { NextTest(); }
+
+    CHIP_ERROR TestWait200ms_8()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(200);
+    }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
+            this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 128));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsOnOffTransitionTimeAttributeFromDut_10()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
+            this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10(uint16_t onOffTransitionTime)
+    {
+        VerifyOrReturn(CheckValue("onOffTransitionTime", onOffTransitionTime, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsAMoveToLevelCommand_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
+
+        RequestType request;
+        request.level          = 254;
+        request.transitionTime = 65535U;
+        request.optionMask     = 1;
+        request.optionOverride = 1;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_11();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_11(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestWait10ms_12()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(10);
+    }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
+            this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 254));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestResetLevelTo254_14()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
+
+        RequestType request;
+        request.level          = 254;
+        request.transitionTime = 0U;
+        request.optionMask     = 1;
+        request.optionOverride = 1;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_14();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_14(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_15()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
+};
+
+class Test_TC_LVL_4_1 : public TestCommand
+{
+public:
+    Test_TC_LVL_4_1() : TestCommand("Test_TC_LVL_4_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_LVL_4_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_LVL_4_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : reads CurrentLevel attribute from DUT\n");
             err = TestReadsCurrentLevelAttributeFromDut_1();
             break;
         case 2:
@@ -17811,7 +19044,7 @@ public:
             err = TestWait3000ms_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : reads current level attribute from DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 5 : reads CurrentLevel attribute from DUT\n");
             err = TestReadsCurrentLevelAttributeFromDut_5();
             break;
         case 6:
@@ -17827,7 +19060,7 @@ public:
             err = TestWait3000ms_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : reads current level attribute from DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 9 : reads CurrentLevel attribute from DUT\n");
             err = TestReadsCurrentLevelAttributeFromDut_9();
             break;
         case 10:
@@ -17847,7 +19080,7 @@ public:
             err = TestWait100ms_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : reads current level attribute from DUT\n");
+            ChipLogProgress(chipTool, " ***** Test Step 14 : reads CurrentLevel attribute from DUT\n");
             err = TestReadsCurrentLevelAttributeFromDut_14();
             break;
         case 15:
@@ -17876,79 +19109,79 @@ private:
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_1(status);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_1(status);
     }
 
     static void OnSuccessCallback_1(void * context, uint8_t currentLevel)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_1(currentLevel);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_1(currentLevel);
     }
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_2(status);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_2(status);
     }
 
     static void OnSuccessCallback_2(void * context, uint8_t maxLevel)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_2(maxLevel);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_2(maxLevel);
     }
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_5(status);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_5(status);
     }
 
     static void OnSuccessCallback_5(void * context, uint8_t currentLevel)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_5(currentLevel);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_5(currentLevel);
     }
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_6(status);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_6(status);
     }
 
     static void OnSuccessCallback_6(void * context, uint8_t minLevel)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_6(minLevel);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_6(minLevel);
     }
 
     static void OnFailureCallback_9(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_9(status);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_9(status);
     }
 
     static void OnSuccessCallback_9(void * context, uint8_t currentLevel)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_9(currentLevel);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_9(currentLevel);
     }
 
     static void OnFailureCallback_10(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_10(status);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_10(status);
     }
 
-    static void OnSuccessCallback_10(void * context) { (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_10(); }
+    static void OnSuccessCallback_10(void * context) { (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_10(); }
 
     static void OnFailureCallback_11(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_11(status);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_11(status);
     }
 
     static void OnSuccessCallback_11(void * context, const chip::app::DataModel::Nullable<uint8_t> & defaultMoveRate)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_11(defaultMoveRate);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_11(defaultMoveRate);
     }
 
     static void OnFailureCallback_14(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_14(status);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_14(status);
     }
 
     static void OnSuccessCallback_14(void * context, uint8_t currentLevel)
     {
-        (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_14(currentLevel);
+        (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_14(currentLevel);
     }
 
     //
@@ -18013,11 +19246,11 @@ private:
         request.optionOverride = 1;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_3();
+            (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_3();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_3(status);
+            (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_3(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18086,11 +19319,11 @@ private:
         request.optionOverride = 1;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_7();
+            (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_7(status);
+            (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_7(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18179,11 +19412,11 @@ private:
         request.optionOverride = 1;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_12();
+            (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_12();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_12(status);
+            (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_12(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18232,11 +19465,11 @@ private:
         request.optionOverride = 1;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_15();
+            (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_15();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_15(status);
+            (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_15(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18254,10 +19487,10 @@ private:
     }
 };
 
-class Test_TC_LVL_4_1 : public TestCommand
+class Test_TC_LVL_5_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_4_1() : TestCommand("Test_TC_LVL_4_1"), mTestIndex(0)
+    Test_TC_LVL_5_1() : TestCommand("Test_TC_LVL_5_1"), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18270,12 +19503,12 @@ public:
 
         if (0 == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_LVL_4_1\n");
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_LVL_5_1\n");
         }
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_LVL_4_1\n");
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_LVL_5_1\n");
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -18333,8 +19566,16 @@ public:
             err = TestReadsCurrentLevelAttributeFromDut_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : Sending off command\n");
-            err = TestSendingOffCommand_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Reset level to 254\n");
+            err = TestResetLevelTo254_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Wait 100ms\n");
+            err = TestWait100ms_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Sending off command\n");
+            err = TestSendingOffCommand_13();
             break;
         }
 
@@ -18347,39 +19588,39 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 12;
+    const uint16_t mTestCount = 14;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
 
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_4(status);
+        (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_4(status);
     }
 
     static void OnSuccessCallback_4(void * context, uint8_t currentLevel)
     {
-        (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_4(currentLevel);
+        (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_4(currentLevel);
     }
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_7(status);
+        (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_7(status);
     }
 
     static void OnSuccessCallback_7(void * context, uint8_t currentLevel)
     {
-        (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_7(currentLevel);
+        (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_7(currentLevel);
     }
 
     static void OnFailureCallback_10(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_10(status);
+        (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_10(status);
     }
 
     static void OnSuccessCallback_10(void * context, uint8_t currentLevel)
     {
-        (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_10(currentLevel);
+        (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_10(currentLevel);
     }
 
     //
@@ -18400,11 +19641,11 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_1();
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_1(status);
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_1(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18428,11 +19669,11 @@ private:
         request.optionOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_2();
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_2(status);
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_2(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18482,11 +19723,11 @@ private:
         request.optionOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_5();
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_5(status);
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_5(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18536,11 +19777,11 @@ private:
         request.optionOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_8();
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_8();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_8(status);
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_8(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18577,19 +19818,23 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendingOffCommand_11()
+    CHIP_ERROR TestResetLevelTo254_11()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
         RequestType request;
+        request.level          = 254;
+        request.transitionTime = 0U;
+        request.optionMask     = 1;
+        request.optionOverride = 1;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_4_1 *>(context))->OnSuccessResponse_11();
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_11();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_11(status);
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_11(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18599,12 +19844,41 @@ private:
     void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_11() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_12()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
+
+    CHIP_ERROR TestSendingOffCommand_13()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_13();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_13(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_13(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13() { NextTest(); }
 };
 
-class Test_TC_LVL_5_1 : public TestCommand
+class Test_TC_LVL_6_1 : public TestCommand
 {
 public:
-    Test_TC_LVL_5_1() : TestCommand("Test_TC_LVL_5_1"), mTestIndex(0)
+    Test_TC_LVL_6_1() : TestCommand("Test_TC_LVL_6_1"), mTestIndex(0)
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
@@ -18617,12 +19891,12 @@ public:
 
         if (0 == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Start: Test_TC_LVL_5_1\n");
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_LVL_6_1\n");
         }
 
         if (mTestCount == mTestIndex)
         {
-            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_LVL_5_1\n");
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_LVL_6_1\n");
             SetCommandExitStatus(CHIP_NO_ERROR);
             return;
         }
@@ -18644,28 +19918,44 @@ public:
             err = TestSendingOnCommand_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Precondition: DUT level is set to 0x80\n");
-            err = TestPreconditionDutLevelIsSetTo0x80_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Precondition: set DUT to lowest point\n");
+            err = TestPreconditionSetDutToLowestPoint_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 3000ms\n");
-            err = TestWait3000ms_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Wait 100ms\n");
+            err = TestWait100ms_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Sends a move up command to DUT\n");
-            err = TestSendsAMoveUpCommandToDut_4();
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads CurrentLevel attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Wait 3000ms\n");
-            err = TestWait3000ms_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Sends a move up command to DUT\n");
+            err = TestSendsAMoveUpCommandToDut_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Sends stop command to DUT\n");
-            err = TestSendsStopCommandToDut_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 2000ms\n");
+            err = TestWait2000ms_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : Sending off command\n");
-            err = TestSendingOffCommand_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Sends stop command to DUT\n");
+            err = TestSendsStopCommandToDut_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Reads CurrentLevel attribute from DUT\n");
+            err = TestReadsCurrentLevelAttributeFromDut_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Reset level to 254\n");
+            err = TestResetLevelTo254_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Wait 100ms\n");
+            err = TestWait100ms_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Sending off command\n");
+            err = TestSendingOffCommand_11();
             break;
         }
 
@@ -18678,10 +19968,30 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 8;
+    const uint16_t mTestCount = 12;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_6_1 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_6_1 *>(context))->OnSuccessResponse_4(currentLevel);
+    }
+
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_6_1 *>(context))->OnFailureResponse_8(status);
+    }
+
+    static void OnSuccessCallback_8(void * context, uint8_t currentLevel)
+    {
+        (static_cast<Test_TC_LVL_6_1 *>(context))->OnSuccessResponse_8(currentLevel);
+    }
 
     //
     // Tests methods
@@ -18701,11 +20011,11 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_1();
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnSuccessResponse_1();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_1(status);
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnFailureResponse_1(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18716,24 +20026,23 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR TestPreconditionDutLevelIsSetTo0x80_2()
+    CHIP_ERROR TestPreconditionSetDutToLowestPoint_2()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::LevelControl::Commands::Step::Type;
+        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
 
         RequestType request;
-        request.stepMode       = static_cast<chip::app::Clusters::LevelControl::StepMode>(0);
-        request.stepSize       = 128;
-        request.transitionTime = 20U;
-        request.optionMask     = 0;
-        request.optionOverride = 0;
+        request.level          = 0;
+        request.transitionTime = 0U;
+        request.optionMask     = 1;
+        request.optionOverride = 1;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_2();
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnSuccessResponse_2();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_2(status);
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnFailureResponse_2(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18744,13 +20053,33 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_3()
+    CHIP_ERROR TestWait100ms_3()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(3000);
+        return WaitForMs(100);
     }
 
-    CHIP_ERROR TestSendsAMoveUpCommandToDut_4()
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestSendsAMoveUpCommandToDut_5()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Move::Type;
@@ -18762,28 +20091,28 @@ private:
         request.optionOverride = 1;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_4();
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnSuccessResponse_5();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_4(status);
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnFailureResponse_5(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4() { NextTest(); }
+    void OnSuccessResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_5()
+    CHIP_ERROR TestWait2000ms_6()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(3000);
+        return WaitForMs(2000);
     }
 
-    CHIP_ERROR TestSendsStopCommandToDut_6()
+    CHIP_ERROR TestSendsStopCommandToDut_7()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::LevelControl::Commands::Stop::Type;
@@ -18793,34 +20122,11 @@ private:
         request.optionOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_6();
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnSuccessResponse_7();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_6(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_6() { NextTest(); }
-
-    CHIP_ERROR TestSendingOffCommand_7()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
-
-        RequestType request;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_LVL_5_1 *>(context))->OnSuccessResponse_7();
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_7(status);
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnFailureResponse_7(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
@@ -18830,6 +20136,82 @@ private:
     void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_7() { NextTest(); }
+
+    CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_8()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(uint8_t currentLevel)
+    {
+        VerifyOrReturn(CheckValue("currentLevel", currentLevel, 2));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestResetLevelTo254_9()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type;
+
+        RequestType request;
+        request.level          = 254;
+        request.transitionTime = 0U;
+        request.optionMask     = 1;
+        request.optionOverride = 1;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnFailureResponse_9(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    CHIP_ERROR TestWait100ms_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
+
+    CHIP_ERROR TestSendingOffCommand_11()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnSuccessResponse_11();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_LVL_6_1 *>(context))->OnFailureResponse_11(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_11(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11() { NextTest(); }
 };
 
 class Test_TC_MC_1_1 : public TestCommand
@@ -19768,6 +21150,1434 @@ private:
     {
         SetIdentity(kIdentityAlpha);
         return WaitForCommissionee();
+    }
+};
+
+class Test_TC_MC_5_1 : public TestCommand
+{
+public:
+    Test_TC_MC_5_1() : TestCommand("Test_TC_MC_5_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_5_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_5_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads the ChannelList attribute from the DUT\n");
+            err = TestReadsTheChannelListAttributeFromTheDut_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_5_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & channelList)
+    {
+        (static_cast<Test_TC_MC_5_1 *>(context))->OnSuccessResponse_1(channelList);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadsTheChannelListAttributeFromTheDut_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ChannelClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::Channel::Attributes::ChannelList::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & channelList)
+    {
+        VerifyOrReturn(CheckConstraintType("channelList", "", "list"));
+        NextTest();
+    }
+};
+
+class Test_TC_MC_5_2 : public TestCommand
+{
+public:
+    Test_TC_MC_5_2() : TestCommand("Test_TC_MC_5_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_5_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_5_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : log a command\n");
+            err = TestLogACommand_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestLogACommand_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("verify that the channel has changed on the device.");
+    }
+};
+
+class Test_TC_MC_5_3 : public TestCommand
+{
+public:
+    Test_TC_MC_5_3() : TestCommand("Test_TC_MC_5_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_5_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_5_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : log a command\n");
+            err = TestLogACommand_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestLogACommand_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("verify that the channel has changed on the device");
+    }
+};
+
+class Test_TC_MC_6_1 : public TestCommand
+{
+public:
+    Test_TC_MC_6_1() : TestCommand("Test_TC_MC_6_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_6_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_6_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : log a command\n");
+            err = TestLogACommand_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : log a command\n");
+            err = TestLogACommand_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads the playback state attribute\n");
+            err = TestReadsThePlaybackStateAttribute_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : log a command\n");
+            err = TestLogACommand_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : log a command\n");
+            err = TestLogACommand_5();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 6;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_6_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    {
+        (static_cast<Test_TC_MC_6_1 *>(context))->OnSuccessResponse_3(playbackState);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestLogACommand_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that media is paused");
+    }
+
+    CHIP_ERROR TestLogACommand_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Physically verify that the media is playing");
+    }
+
+    CHIP_ERROR TestReadsThePlaybackStateAttribute_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    {
+        VerifyOrReturn(CheckValue("playbackState", playbackState, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestLogACommand_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Physically verify that the media is paused");
+    }
+
+    CHIP_ERROR TestLogACommand_5()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Physically verify that the media is stoped");
+    }
+};
+
+class Test_TC_MC_6_2 : public TestCommand
+{
+public:
+    Test_TC_MC_6_2() : TestCommand("Test_TC_MC_6_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_6_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_6_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : log a command\n");
+            err = TestLogACommand_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : log a command\n");
+            err = TestLogACommand_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads the CurrentState attribute\n");
+            err = TestReadsTheCurrentStateAttribute_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : log a command\n");
+            err = TestLogACommand_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : log a command\n");
+            err = TestLogACommand_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : log a command\n");
+            err = TestLogACommand_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : log a command\n");
+            err = TestLogACommand_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : log a command\n");
+            err = TestLogACommand_8();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 9;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_6_2 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    {
+        (static_cast<Test_TC_MC_6_2 *>(context))->OnSuccessResponse_3(playbackState);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestLogACommand_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that media is paused");
+    }
+
+    CHIP_ERROR TestLogACommand_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Physically verify that the media is playing");
+    }
+
+    CHIP_ERROR TestReadsTheCurrentStateAttribute_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    {
+        VerifyOrReturn(CheckValue("playbackState", playbackState, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestLogACommand_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Physically verify that the media is started over");
+    }
+
+    CHIP_ERROR TestLogACommand_5()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that the next media item in the queue has been loaded");
+    }
+
+    CHIP_ERROR TestLogACommand_6()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that the previous media item in the queue has been loaded");
+    }
+
+    CHIP_ERROR TestLogACommand_7()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that the media has skipped forward 10 seconds");
+    }
+
+    CHIP_ERROR TestLogACommand_8()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that the media has skipped backward 10 seconds");
+    }
+};
+
+class Test_TC_MC_6_3 : public TestCommand
+{
+public:
+    Test_TC_MC_6_3() : TestCommand("Test_TC_MC_6_3"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_6_3\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_6_3\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : log a command\n");
+            err = TestLogACommand_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : log a command\n");
+            err = TestLogACommand_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : log a command\n");
+            err = TestLogACommand_3();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 4;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestLogACommand_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that media is paused");
+    }
+
+    CHIP_ERROR TestLogACommand_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that the media has moved to 10 seconds from the starting point.");
+    }
+
+    CHIP_ERROR TestLogACommand_3()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("User prompt needed to enter the value beyond the furthest valid position");
+    }
+};
+
+class Test_TC_MC_6_4 : public TestCommand
+{
+public:
+    Test_TC_MC_6_4() : TestCommand("Test_TC_MC_6_4"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_6_4\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_6_4\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : log a command\n");
+            err = TestLogACommand_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the PlaybackSpeed attribute from the DUT\n");
+            err = TestReadsThePlaybackSpeedAttributeFromTheDut_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : log a command\n");
+            err = TestLogACommand_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads the CurrentState attribute\n");
+            err = TestReadsTheCurrentStateAttribute_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : log a command\n");
+            err = TestLogACommand_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : log a command\n");
+            err = TestLogACommand_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Reads the CurrentState attribute\n");
+            err = TestReadsTheCurrentStateAttribute_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : log a command\n");
+            err = TestLogACommand_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : log a command\n");
+            err = TestLogACommand_9();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 10;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_6_4 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, float playbackSpeed)
+    {
+        (static_cast<Test_TC_MC_6_4 *>(context))->OnSuccessResponse_2(playbackSpeed);
+    }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_6_4 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    {
+        (static_cast<Test_TC_MC_6_4 *>(context))->OnSuccessResponse_4(playbackState);
+    }
+
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_6_4 *>(context))->OnFailureResponse_7(status);
+    }
+
+    static void OnSuccessCallback_7(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    {
+        (static_cast<Test_TC_MC_6_4 *>(context))->OnSuccessResponse_7(playbackState);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestLogACommand_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that media is paused");
+    }
+
+    CHIP_ERROR TestReadsThePlaybackSpeedAttributeFromTheDut_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(float playbackSpeed)
+    {
+        VerifyOrReturn(CheckValue("playbackSpeed", playbackSpeed, 0.0f));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestLogACommand_3()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that the media is playing");
+    }
+
+    CHIP_ERROR TestReadsTheCurrentStateAttribute_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    {
+        VerifyOrReturn(CheckValue("playbackState", playbackState, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestLogACommand_5()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that the media play speed has increased");
+    }
+
+    CHIP_ERROR TestLogACommand_6()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that the media play has reversed direction");
+    }
+
+    CHIP_ERROR TestReadsTheCurrentStateAttribute_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::MediaPlaybackClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(chip::app::Clusters::MediaPlayback::PlaybackStateEnum playbackState)
+    {
+        VerifyOrReturn(CheckValue("playbackState", playbackState, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestLogACommand_8()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that the media play has reversed direction");
+    }
+
+    CHIP_ERROR TestLogACommand_9()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("Verify that the media is has resumed playing forward at the default speed");
+    }
+};
+
+class Test_TC_MC_7_1 : public TestCommand
+{
+public:
+    Test_TC_MC_7_1() : TestCommand("Test_TC_MC_7_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_7_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_7_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+};
+
+class Test_TC_MC_7_2 : public TestCommand
+{
+public:
+    Test_TC_MC_7_2() : TestCommand("Test_TC_MC_7_2"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_7_2\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_7_2\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 1;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+};
+
+class Test_TC_MC_8_1 : public TestCommand
+{
+public:
+    Test_TC_MC_8_1() : TestCommand("Test_TC_MC_8_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_8_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_8_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads the CurrentTarget attribute\n");
+            err = TestReadsTheCurrentTargetAttribute_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the TargetList attribute\n");
+            err = TestReadsTheTargetListAttribute_2();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 3;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    uint8_t currentTarget;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_8_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t currentNavigatorTarget)
+    {
+        (static_cast<Test_TC_MC_8_1 *>(context))->OnSuccessResponse_1(currentNavigatorTarget);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_8_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &
+            targetNavigatorList)
+    {
+        (static_cast<Test_TC_MC_8_1 *>(context))->OnSuccessResponse_2(targetNavigatorList);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestReadsTheCurrentTargetAttribute_1()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TargetNavigatorClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(
+            cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo>(
+                this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint8_t currentNavigatorTarget)
+    {
+        VerifyOrReturn(CheckConstraintType("currentNavigatorTarget", "", "uint8"));
+        currentTarget = currentNavigatorTarget;
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheTargetListAttribute_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TargetNavigatorClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::TargetNavigatorList::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &
+            targetNavigatorList)
+    {
+        VerifyOrReturn(CheckConstraintType("targetNavigatorList", "", "list"));
+        NextTest();
+    }
+};
+
+class Test_TC_MC_9_1 : public TestCommand
+{
+public:
+    Test_TC_MC_9_1() : TestCommand("Test_TC_MC_9_1"), mTestIndex(0)
+    {
+        AddArgument("cluster", &mCluster);
+        AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_MC_9_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_MC_9_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
+            err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Precondition\n");
+            err = TestPrecondition_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the VendorName attribute\n");
+            err = TestReadsTheVendorNameAttribute_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Reads the VendorID attribute\n");
+            err = TestReadsTheVendorIDAttribute_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads the ApplicationName attribute\n");
+            err = TestReadsTheApplicationNameAttribute_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Reads the ProductID attribute\n");
+            err = TestReadsTheProductIDAttribute_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Reads the Status attribute\n");
+            err = TestReadsTheStatusAttribute_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Reads the ApplicationVersion attribute\n");
+            err = TestReadsTheApplicationVersionAttribute_7();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 8;
+
+    chip::Optional<chip::CharSpan> mCluster;
+    chip::Optional<chip::EndpointId> mEndpoint;
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(void * context, chip::CharSpan vendorName)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_2(vendorName);
+    }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnFailureResponse_3(status);
+    }
+
+    static void OnSuccessCallback_3(void * context, uint16_t vendorId)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_3(vendorId);
+    }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnFailureResponse_4(status);
+    }
+
+    static void OnSuccessCallback_4(void * context, chip::CharSpan applicationName)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_4(applicationName);
+    }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnFailureResponse_5(status);
+    }
+
+    static void OnSuccessCallback_5(void * context, uint16_t productId)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_5(productId);
+    }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnFailureResponse_6(status);
+    }
+
+    static void OnSuccessCallback_6(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_6(applicationStatus);
+    }
+
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnFailureResponse_7(status);
+    }
+
+    static void OnSuccessCallback_7(void * context, chip::CharSpan applicationVersion)
+    {
+        (static_cast<Test_TC_MC_9_1 *>(context))->OnSuccessResponse_7(applicationVersion);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
+
+    CHIP_ERROR TestPrecondition_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("DUT has one or more Content Apps available");
+    }
+
+    CHIP_ERROR TestReadsTheVendorNameAttribute_2()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ApplicationBasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(chip::CharSpan vendorName)
+    {
+        VerifyOrReturn(CheckConstraintType("vendorName", "", "string"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheVendorIDAttribute_3()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ApplicationBasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorId::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint16_t vendorId)
+    {
+        VerifyOrReturn(CheckValue("vendorId", vendorId, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheApplicationNameAttribute_4()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ApplicationBasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_4(chip::CharSpan applicationName)
+    {
+        VerifyOrReturn(CheckConstraintType("applicationName", "", "string"));
+        VerifyOrReturn(CheckConstraintMaxLength("applicationName", applicationName.size(), 256));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheProductIDAttribute_5()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ApplicationBasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5(uint16_t productId)
+    {
+        VerifyOrReturn(CheckConstraintType("productId", "", "uint16"));
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheStatusAttribute_6()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ApplicationBasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus)
+    {
+        VerifyOrReturn(CheckValue("applicationStatus", applicationStatus, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadsTheApplicationVersionAttribute_7()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ApplicationBasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(chip::CharSpan applicationVersion)
+    {
+        VerifyOrReturn(CheckConstraintType("applicationVersion", "", "string"));
+        VerifyOrReturn(CheckConstraintMaxLength("applicationVersion", applicationVersion.size(), 32));
+        NextTest();
     }
 };
 
@@ -62874,9 +65684,11 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_ILL_1_1>(),
         make_unique<Test_TC_LVL_1_1>(),
         make_unique<Test_TC_LVL_2_1>(),
+        make_unique<Test_TC_LVL_2_2>(),
         make_unique<Test_TC_LVL_3_1>(),
         make_unique<Test_TC_LVL_4_1>(),
         make_unique<Test_TC_LVL_5_1>(),
+        make_unique<Test_TC_LVL_6_1>(),
         make_unique<Test_TC_MC_1_1>(),
         make_unique<Test_TC_MC_2_1>(),
         make_unique<Test_TC_MC_3_1>(),
@@ -62890,6 +65702,17 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_MC_3_9>(),
         make_unique<Test_TC_MC_3_10>(),
         make_unique<Test_TC_MC_3_11>(),
+        make_unique<Test_TC_MC_5_1>(),
+        make_unique<Test_TC_MC_5_2>(),
+        make_unique<Test_TC_MC_5_3>(),
+        make_unique<Test_TC_MC_6_1>(),
+        make_unique<Test_TC_MC_6_2>(),
+        make_unique<Test_TC_MC_6_3>(),
+        make_unique<Test_TC_MC_6_4>(),
+        make_unique<Test_TC_MC_7_1>(),
+        make_unique<Test_TC_MC_7_2>(),
+        make_unique<Test_TC_MC_8_1>(),
+        make_unique<Test_TC_MC_9_1>(),
         make_unique<Test_TC_OCC_1_1>(),
         make_unique<Test_TC_OCC_2_1>(),
         make_unique<Test_TC_OCC_2_2>(),
