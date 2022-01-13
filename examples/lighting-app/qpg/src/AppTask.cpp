@@ -289,7 +289,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
     if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
     {
         ChipLogProgress(NotSpecified, "[BTN] Factory Reset selected. Release within %us to cancel.",
-                        FACTORY_RESET_CANCEL_WINDOW_TIMEOUT/1000);
+                        FACTORY_RESET_CANCEL_WINDOW_TIMEOUT / 1000);
 
         // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
         // cancel, if required.
