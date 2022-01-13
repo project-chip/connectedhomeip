@@ -131,6 +131,13 @@ jobs:
               timeout-minutes: 20
               run: |
                   scripts/examples/ota_test.sh
+            - name: Uploading OTA logs
+              uses: actions/upload-artifact@v2
+              if: ${{ !env.ACT }}
+              with:
+                  name: OTA,Linux-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
+                  path: |
+                      /tmp/ota/
             - name: Build example Standalone Door Lock App
               timeout-minutes: 5
               run: |
