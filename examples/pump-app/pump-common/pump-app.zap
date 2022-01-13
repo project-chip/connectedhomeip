@@ -1091,38 +1091,7 @@
           "side": "server",
           "enabled": 1,
           "commands": [],
-          "attributes": [
-            {
-              "name": "ActiveLocale",
-              "code": 1,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 0,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
-              "name": "SupportedLocales",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "External",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 0,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            }
-          ]
+          "attributes": []
         },
         {
           "name": "General Commissioning",
@@ -6256,13 +6225,13 @@
   ],
   "endpoints": [
     {
-      "endpointTypeName": "MA-pump",
+      "endpointTypeName": "MA-rootdevice",
       "endpointTypeIndex": 0,
-      "profileId": 2457,
+      "profileId": 259,
       "endpointId": 0,
       "networkId": 0,
       "endpointVersion": 1,
-      "deviceIdentifier": 771
+      "deviceIdentifier": 22
     },
     {
       "endpointTypeName": "MA-pump",
