@@ -136,6 +136,7 @@ private:
         uint16_t mEndpoint        = 0;
         size_t mEndpointIndex     = 0;
         size_t mEndpointCount     = 0;
+        bool mFirstEndpoint       = true;
     };
 
     class KeySetIteratorImpl : public KeySetIterator

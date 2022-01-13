@@ -118,14 +118,15 @@ public:
     // A operational group key set, usable by many GroupState mappings
     struct KeySet
     {
-        using SecurityPolicy = chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy;
+        static constexpr size_t kEpochKeysMax = 3;
+        using SecurityPolicy                  = chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy;
 
         KeySet() = default;
         KeySet(uint16_t id, SecurityPolicy policy_id, uint8_t num_keys) : keyset_id(id), policy(policy_id), num_keys_used(num_keys)
         {}
 
         // The actual keys for the group key set
-        EpochKey epoch_keys[3];
+        EpochKey epoch_keys[kEpochKeysMax];
         // Logical id provided by the Administrator that configured the entry
         uint16_t keyset_id = 0;
         // Security policy to use for groups that use this keyset
@@ -137,6 +138,31 @@ public:
         {
             VerifyOrReturnError(this->policy == other.policy && this->num_keys_used == other.num_keys_used, false);
             return !memcmp(this->epoch_keys, other.epoch_keys, this->num_keys_used * sizeof(EpochKey));
+        }
+
+        chip::ByteSpan GetCurrentKey()
+        {
+            chip::System::Clock::Timestamp now      = chip::System::SystemClock().GetMonotonicTimestamp();
+            GroupDataProvider::EpochKey * epoch_key = nullptr;
+            GroupDataProvider::EpochKey * found     = nullptr;
+
+            for (size_t i = 0; i < this->num_keys_used && i < kEpochKeysMax; i++)
+            {
+                epoch_key                                      = &epoch_keys[i];
+                chip::System::Clock::Microseconds64 epoch_time = chip::System::Clock::Microseconds64(epoch_key->start_time);
+                if ((now > epoch_time) && ((nullptr == found) || (epoch_key->start_time > found->start_time)))
+                {
+                    found = epoch_key;
+                }
+            }
+            if (found)
+            {
+                return chip::ByteSpan(found->key, EpochKey::kLengthBytes);
+            }
+            else
+            {
+                return chip::ByteSpan(nullptr, 0);
+            }
         }
     };
 
@@ -304,6 +330,13 @@ protected:
         if (mListener)
         {
             mListener->OnGroupAdded(fabric_index, new_group);
+        }
+    }
+    void GroupRemoved(chip::FabricIndex fabric_index, const GroupInfo & old_group)
+    {
+        if (mListener)
+        {
+            mListener->OnGroupRemoved(fabric_index, old_group);
         }
     }
     const uint16_t mMaxGroupsPerFabric;
