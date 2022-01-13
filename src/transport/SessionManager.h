@@ -210,8 +210,8 @@ public:
     }
 
     // TODO: implements group sessions
-    Optional<SessionHandle> CreateGroupSession(GroupId group) { return mGroupSessions.AllocEntry(group, kUndefinedFabricIndex); }
-    Optional<SessionHandle> FindGroupSession(GroupId group) { return mGroupSessions.FindEntry(group, kUndefinedFabricIndex); }
+    Optional<SessionHandle> CreateGroupSession(GroupId group) { return mGroupSessions.AllocEntry(group, 1); }
+    Optional<SessionHandle> FindGroupSession(GroupId group) { return mGroupSessions.FindEntry(group, 1); }
     void RemoveGroupSession(Transport::GroupSession * session) { mGroupSessions.DeleteEntry(session); }
 
     // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
