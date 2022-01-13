@@ -12862,205 +12862,214 @@ public:
             err = TestReadEnhancedCurrentHueAttributeFromDut_31();
             break;
         case 32:
-            ChipLogProgress(chipTool, " ***** Test Step 32 : Sends ColorLoopSet Command - Set all Attributes\n");
-            if (ShouldSkip("CR_COLORLOOPSET"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestSendsColorLoopSetCommandSetAllAttributes_32();
-            break;
-        case 33:
-            ChipLogProgress(chipTool, " ***** Test Step 33 : Read ColorLoopDirection attribute from DUT\n");
-            if (ShouldSkip("A_COLORLOOPDIRECTION"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopDirectionAttributeFromDut_33();
-            break;
-        case 34:
-            ChipLogProgress(chipTool, " ***** Test Step 34 : Sends ColorLoopSet Command - Set all Attributes\n");
-            if (ShouldSkip("CR_COLORLOOPSET"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestSendsColorLoopSetCommandSetAllAttributes_34();
-            break;
-        case 35:
-            ChipLogProgress(chipTool, " ***** Test Step 35 : Read ColorLoopActive attribute from DUT\n");
-            if (ShouldSkip("A_COLORLOOPACTIVE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopActiveAttributeFromDut_35();
-            break;
-        case 36:
-            ChipLogProgress(chipTool, " ***** Test Step 36 : Read EnhancedCurrentHue attribute from DUT\n");
-            if (ShouldSkip("A_ENHANCEDCURRENTHUE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadEnhancedCurrentHueAttributeFromDut_36();
-            break;
-        case 37:
-            ChipLogProgress(chipTool, " ***** Test Step 37 : Read ColorLoopStoredEnhancedHue attribute from DUT\n");
-            if (ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopStoredEnhancedHueAttributeFromDut_37();
-            break;
-        case 38:
-            ChipLogProgress(chipTool, " ***** Test Step 38 : Sends ColorLoopSet Command - Set all Attributes\n");
-            if (ShouldSkip("CR_COLORLOOPSET"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestSendsColorLoopSetCommandSetAllAttributes_38();
-            break;
-        case 39:
-            ChipLogProgress(chipTool, " ***** Test Step 39 : Read ColorLoopActive attribute from DUT\n");
-            if (ShouldSkip("A_COLORLOOPACTIVE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopActiveAttributeFromDut_39();
-            break;
-        case 40:
-            ChipLogProgress(chipTool, " ***** Test Step 40 : Read ColorLoopStoredEnhancedHue attribute from DUT\n");
-            if (ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopStoredEnhancedHueAttributeFromDut_40();
-            break;
-        case 41:
-            ChipLogProgress(chipTool, " ***** Test Step 41 : Read EnhancedCurrentHue attribute from DUT\n");
-            if (ShouldSkip("A_ENHANCEDCURRENTHUE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadEnhancedCurrentHueAttributeFromDut_41();
-            break;
-        case 42:
-            ChipLogProgress(chipTool, " ***** Test Step 42 : Sends ColorLoopSet Command - Set all Attributes\n");
-            if (ShouldSkip("CR_COLORLOOPSET"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestSendsColorLoopSetCommandSetAllAttributes_42();
-            break;
-        case 43:
-            ChipLogProgress(chipTool, " ***** Test Step 43 : Read ColorLoopDirection attribute from DUT\n");
-            if (ShouldSkip("A_COLORLOOPDIRECTION"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopDirectionAttributeFromDut_43();
-            break;
-        case 44:
-            ChipLogProgress(chipTool, " ***** Test Step 44 : Sends ColorLoopSet Command - Set all Attributes\n");
-            if (ShouldSkip("CR_COLORLOOPSET"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestSendsColorLoopSetCommandSetAllAttributes_44();
-            break;
-        case 45:
-            ChipLogProgress(chipTool, " ***** Test Step 45 : Read ColorLoopActive attribute from DUT\n");
-            if (ShouldSkip("A_COLORLOOPACTIVE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopActiveAttributeFromDut_45();
-            break;
-        case 46:
-            ChipLogProgress(chipTool, " ***** Test Step 46 : Read EnhancedCurrentHue attribute from DUT\n");
-            if (ShouldSkip("A_ENHANCEDCURRENTHUE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadEnhancedCurrentHueAttributeFromDut_46();
-            break;
-        case 47:
-            ChipLogProgress(chipTool, " ***** Test Step 47 : Read ColorLoopStoredEnhancedHue attribute from DUT\n");
-            if (ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopStoredEnhancedHueAttributeFromDut_47();
-            break;
-        case 48:
-            ChipLogProgress(chipTool, " ***** Test Step 48 : Sends ColorLoopSet Command - Set all Attributes\n");
-            if (ShouldSkip("CR_COLORLOOPSET"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestSendsColorLoopSetCommandSetAllAttributes_48();
-            break;
-        case 49:
-            ChipLogProgress(chipTool, " ***** Test Step 49 : Read ColorLoopActive attribute from DUT\n");
-            if (ShouldSkip("A_COLORLOOPACTIVE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopActiveAttributeFromDut_49();
-            break;
-        case 50:
-            ChipLogProgress(chipTool, " ***** Test Step 50 : Read ColorLoopStoredEnhancedHue attribute from DUT\n");
-            if (ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadColorLoopStoredEnhancedHueAttributeFromDut_50();
-            break;
-        case 51:
-            ChipLogProgress(chipTool, " ***** Test Step 51 : Read EnhancedCurrentHue attribute from DUT\n");
-            if (ShouldSkip("A_ENHANCEDCURRENTHUE"))
-            {
-                NextTest();
-                return;
-            }
-            err = TestReadEnhancedCurrentHueAttributeFromDut_51();
-            break;
-        case 52:
-            ChipLogProgress(chipTool, " ***** Test Step 52 : Reset Enhanced Move To Hue command\n");
+            ChipLogProgress(chipTool, " ***** Test Step 32 : Reset Enhanced Move To Hue command\n");
             if (ShouldSkip("CR_ENHANCEDMOVETOHUE"))
             {
                 NextTest();
                 return;
             }
-            err = TestResetEnhancedMoveToHueCommand_52();
+            err = TestResetEnhancedMoveToHueCommand_32();
+            break;
+        case 33:
+            ChipLogProgress(chipTool, " ***** Test Step 33 : Sends ColorLoopSet Command - Set all Attributes\n");
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_33();
+            break;
+        case 34:
+            ChipLogProgress(chipTool, " ***** Test Step 34 : Read ColorLoopDirection attribute from DUT\n");
+            if (ShouldSkip("A_COLORLOOPDIRECTION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopDirectionAttributeFromDut_34();
+            break;
+        case 35:
+            ChipLogProgress(chipTool, " ***** Test Step 35 : Sends ColorLoopSet Command - Set all Attributes\n");
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_35();
+            break;
+        case 36:
+            ChipLogProgress(chipTool, " ***** Test Step 36 : Read ColorLoopActive attribute from DUT\n");
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_36();
+            break;
+        case 37:
+            ChipLogProgress(chipTool, " ***** Test Step 37 : Read EnhancedCurrentHue attribute from DUT\n");
+            if (ShouldSkip("A_ENHANCEDCURRENTHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadEnhancedCurrentHueAttributeFromDut_37();
+            break;
+        case 38:
+            ChipLogProgress(chipTool, " ***** Test Step 38 : Read ColorLoopStoredEnhancedHue attribute from DUT\n");
+            if (ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopStoredEnhancedHueAttributeFromDut_38();
+            break;
+        case 39:
+            ChipLogProgress(chipTool, " ***** Test Step 39 : Sends ColorLoopSet Command - Set all Attributes\n");
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_39();
+            break;
+        case 40:
+            ChipLogProgress(chipTool, " ***** Test Step 40 : Read ColorLoopActive attribute from DUT\n");
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_40();
+            break;
+        case 41:
+            ChipLogProgress(chipTool, " ***** Test Step 41 : Read ColorLoopStoredEnhancedHue attribute from DUT\n");
+            if (ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopStoredEnhancedHueAttributeFromDut_41();
+            break;
+        case 42:
+            ChipLogProgress(chipTool, " ***** Test Step 42 : Read EnhancedCurrentHue attribute from DUT\n");
+            if (ShouldSkip("A_ENHANCEDCURRENTHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadEnhancedCurrentHueAttributeFromDut_42();
+            break;
+        case 43:
+            ChipLogProgress(chipTool, " ***** Test Step 43 : Sends ColorLoopSet Command - Set all Attributes\n");
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_43();
+            break;
+        case 44:
+            ChipLogProgress(chipTool, " ***** Test Step 44 : Read ColorLoopDirection attribute from DUT\n");
+            if (ShouldSkip("A_COLORLOOPDIRECTION"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopDirectionAttributeFromDut_44();
+            break;
+        case 45:
+            ChipLogProgress(chipTool, " ***** Test Step 45 : Sends ColorLoopSet Command - Set all Attributes\n");
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_45();
+            break;
+        case 46:
+            ChipLogProgress(chipTool, " ***** Test Step 46 : Read ColorLoopActive attribute from DUT\n");
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_46();
+            break;
+        case 47:
+            ChipLogProgress(chipTool, " ***** Test Step 47 : Read EnhancedCurrentHue attribute from DUT\n");
+            if (ShouldSkip("A_ENHANCEDCURRENTHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadEnhancedCurrentHueAttributeFromDut_47();
+            break;
+        case 48:
+            ChipLogProgress(chipTool, " ***** Test Step 48 : Read ColorLoopStoredEnhancedHue attribute from DUT\n");
+            if (ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopStoredEnhancedHueAttributeFromDut_48();
+            break;
+        case 49:
+            ChipLogProgress(chipTool, " ***** Test Step 49 : Sends ColorLoopSet Command - Set all Attributes\n");
+            if (ShouldSkip("CR_COLORLOOPSET"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestSendsColorLoopSetCommandSetAllAttributes_49();
+            break;
+        case 50:
+            ChipLogProgress(chipTool, " ***** Test Step 50 : Read ColorLoopActive attribute from DUT\n");
+            if (ShouldSkip("A_COLORLOOPACTIVE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopActiveAttributeFromDut_50();
+            break;
+        case 51:
+            ChipLogProgress(chipTool, " ***** Test Step 51 : Read ColorLoopStoredEnhancedHue attribute from DUT\n");
+            if (ShouldSkip("A_COLORLOOPSTOREDENHANCEDHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadColorLoopStoredEnhancedHueAttributeFromDut_51();
+            break;
+        case 52:
+            ChipLogProgress(chipTool, " ***** Test Step 52 : Read EnhancedCurrentHue attribute from DUT\n");
+            if (ShouldSkip("A_ENHANCEDCURRENTHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestReadEnhancedCurrentHueAttributeFromDut_52();
             break;
         case 53:
-            ChipLogProgress(chipTool, " ***** Test Step 53 : Reset Color Loop Set Command\n");
-            err = TestResetColorLoopSetCommand_53();
+            ChipLogProgress(chipTool, " ***** Test Step 53 : Reset Enhanced Move To Hue command\n");
+            if (ShouldSkip("CR_ENHANCEDMOVETOHUE"))
+            {
+                NextTest();
+                return;
+            }
+            err = TestResetEnhancedMoveToHueCommand_53();
             break;
         case 54:
-            ChipLogProgress(chipTool, " ***** Test Step 54 : Turn Off light for color control tests\n");
-            err = TestTurnOffLightForColorControlTests_54();
+            ChipLogProgress(chipTool, " ***** Test Step 54 : Reset Color Loop Set Command\n");
+            err = TestResetColorLoopSetCommand_54();
             break;
         case 55:
-            ChipLogProgress(chipTool, " ***** Test Step 55 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_55();
+            ChipLogProgress(chipTool, " ***** Test Step 55 : Turn Off light for color control tests\n");
+            err = TestTurnOffLightForColorControlTests_55();
+            break;
+        case 56:
+            ChipLogProgress(chipTool, " ***** Test Step 56 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_56();
             break;
         }
 
@@ -13073,7 +13082,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 56;
+    const uint16_t mTestCount = 57;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -13277,24 +13286,14 @@ private:
         (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_31(enhancedCurrentHue);
     }
 
-    static void OnFailureCallback_33(void * context, EmberAfStatus status)
+    static void OnFailureCallback_34(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_33(status);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_34(status);
     }
 
-    static void OnSuccessCallback_33(void * context, uint8_t colorLoopDirection)
+    static void OnSuccessCallback_34(void * context, uint8_t colorLoopDirection)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_33(colorLoopDirection);
-    }
-
-    static void OnFailureCallback_35(void * context, EmberAfStatus status)
-    {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_35(status);
-    }
-
-    static void OnSuccessCallback_35(void * context, uint8_t colorLoopActive)
-    {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_35(colorLoopActive);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_34(colorLoopDirection);
     }
 
     static void OnFailureCallback_36(void * context, EmberAfStatus status)
@@ -13302,9 +13301,9 @@ private:
         (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_36(status);
     }
 
-    static void OnSuccessCallback_36(void * context, uint16_t enhancedCurrentHue)
+    static void OnSuccessCallback_36(void * context, uint8_t colorLoopActive)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_36(enhancedCurrentHue);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_36(colorLoopActive);
     }
 
     static void OnFailureCallback_37(void * context, EmberAfStatus status)
@@ -13312,19 +13311,19 @@ private:
         (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_37(status);
     }
 
-    static void OnSuccessCallback_37(void * context, uint16_t colorLoopStoredEnhancedHue)
+    static void OnSuccessCallback_37(void * context, uint16_t enhancedCurrentHue)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_37(colorLoopStoredEnhancedHue);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_37(enhancedCurrentHue);
     }
 
-    static void OnFailureCallback_39(void * context, EmberAfStatus status)
+    static void OnFailureCallback_38(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_39(status);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_38(status);
     }
 
-    static void OnSuccessCallback_39(void * context, uint8_t colorLoopActive)
+    static void OnSuccessCallback_38(void * context, uint16_t colorLoopStoredEnhancedHue)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_39(colorLoopActive);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_38(colorLoopStoredEnhancedHue);
     }
 
     static void OnFailureCallback_40(void * context, EmberAfStatus status)
@@ -13332,9 +13331,9 @@ private:
         (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_40(status);
     }
 
-    static void OnSuccessCallback_40(void * context, uint16_t colorLoopStoredEnhancedHue)
+    static void OnSuccessCallback_40(void * context, uint8_t colorLoopActive)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_40(colorLoopStoredEnhancedHue);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_40(colorLoopActive);
     }
 
     static void OnFailureCallback_41(void * context, EmberAfStatus status)
@@ -13342,29 +13341,29 @@ private:
         (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_41(status);
     }
 
-    static void OnSuccessCallback_41(void * context, uint16_t enhancedCurrentHue)
+    static void OnSuccessCallback_41(void * context, uint16_t colorLoopStoredEnhancedHue)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_41(enhancedCurrentHue);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_41(colorLoopStoredEnhancedHue);
     }
 
-    static void OnFailureCallback_43(void * context, EmberAfStatus status)
+    static void OnFailureCallback_42(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_43(status);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_42(status);
     }
 
-    static void OnSuccessCallback_43(void * context, uint8_t colorLoopDirection)
+    static void OnSuccessCallback_42(void * context, uint16_t enhancedCurrentHue)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_43(colorLoopDirection);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_42(enhancedCurrentHue);
     }
 
-    static void OnFailureCallback_45(void * context, EmberAfStatus status)
+    static void OnFailureCallback_44(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_45(status);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_44(status);
     }
 
-    static void OnSuccessCallback_45(void * context, uint8_t colorLoopActive)
+    static void OnSuccessCallback_44(void * context, uint8_t colorLoopDirection)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_45(colorLoopActive);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_44(colorLoopDirection);
     }
 
     static void OnFailureCallback_46(void * context, EmberAfStatus status)
@@ -13372,9 +13371,9 @@ private:
         (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_46(status);
     }
 
-    static void OnSuccessCallback_46(void * context, uint16_t enhancedCurrentHue)
+    static void OnSuccessCallback_46(void * context, uint8_t colorLoopActive)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_46(enhancedCurrentHue);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_46(colorLoopActive);
     }
 
     static void OnFailureCallback_47(void * context, EmberAfStatus status)
@@ -13382,19 +13381,19 @@ private:
         (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_47(status);
     }
 
-    static void OnSuccessCallback_47(void * context, uint16_t colorLoopStoredEnhancedHue)
+    static void OnSuccessCallback_47(void * context, uint16_t enhancedCurrentHue)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_47(colorLoopStoredEnhancedHue);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_47(enhancedCurrentHue);
     }
 
-    static void OnFailureCallback_49(void * context, EmberAfStatus status)
+    static void OnFailureCallback_48(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_49(status);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_48(status);
     }
 
-    static void OnSuccessCallback_49(void * context, uint8_t colorLoopActive)
+    static void OnSuccessCallback_48(void * context, uint16_t colorLoopStoredEnhancedHue)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_49(colorLoopActive);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_48(colorLoopStoredEnhancedHue);
     }
 
     static void OnFailureCallback_50(void * context, EmberAfStatus status)
@@ -13402,9 +13401,9 @@ private:
         (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_50(status);
     }
 
-    static void OnSuccessCallback_50(void * context, uint16_t colorLoopStoredEnhancedHue)
+    static void OnSuccessCallback_50(void * context, uint8_t colorLoopActive)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_50(colorLoopStoredEnhancedHue);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_50(colorLoopActive);
     }
 
     static void OnFailureCallback_51(void * context, EmberAfStatus status)
@@ -13412,19 +13411,29 @@ private:
         (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_51(status);
     }
 
-    static void OnSuccessCallback_51(void * context, uint16_t enhancedCurrentHue)
+    static void OnSuccessCallback_51(void * context, uint16_t colorLoopStoredEnhancedHue)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_51(enhancedCurrentHue);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_51(colorLoopStoredEnhancedHue);
     }
 
-    static void OnFailureCallback_55(void * context, EmberAfStatus status)
+    static void OnFailureCallback_52(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_55(status);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_52(status);
     }
 
-    static void OnSuccessCallback_55(void * context, bool onOff)
+    static void OnSuccessCallback_52(void * context, uint16_t enhancedCurrentHue)
     {
-        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_55(onOff);
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_52(enhancedCurrentHue);
+    }
+
+    static void OnFailureCallback_56(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_56(status);
+    }
+
+    static void OnSuccessCallback_56(void * context, bool onOff)
+    {
+        (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_56(onOff);
     }
 
     //
@@ -14148,17 +14157,15 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_32()
+    CHIP_ERROR TestResetEnhancedMoveToHueCommand_32()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
 
         RequestType request;
-        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
-        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
-        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
-        request.time            = 0U;
-        request.startHue        = 0U;
+        request.enhancedHue     = 0U;
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
+        request.transitionTime  = 0U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
@@ -14178,27 +14185,57 @@ private:
 
     void OnSuccessResponse_32() { NextTest(); }
 
-    CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_33()
+    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_33()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
+
+        RequestType request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(2);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 0U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_33();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_33(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_33(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_33() { NextTest(); }
+
+    CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_34()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_33, OnFailureCallback_33));
+            this, OnSuccessCallback_34, OnFailureCallback_34));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_33(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_34(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_33(uint8_t colorLoopDirection)
+    void OnSuccessResponse_34(uint8_t colorLoopDirection)
     {
         VerifyOrReturn(CheckValue("colorLoopDirection", colorLoopDirection, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_34()
+    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_35()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
@@ -14213,62 +14250,62 @@ private:
         request.optionsOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_34();
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_35();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_34(status);
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_35(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_34(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_35(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_34() { NextTest(); }
+    void OnSuccessResponse_35() { NextTest(); }
 
-    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_35()
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_36()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_35, OnFailureCallback_35));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_35(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_35(uint8_t colorLoopActive)
-    {
-        VerifyOrReturn(CheckValue("colorLoopActive", colorLoopActive, 1));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_36()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
             this, OnSuccessCallback_36, OnFailureCallback_36));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_36(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_36(uint16_t enhancedCurrentHue)
+    void OnSuccessResponse_36(uint8_t colorLoopActive)
+    {
+        VerifyOrReturn(CheckValue("colorLoopActive", colorLoopActive, 1));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_37()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
+            this, OnSuccessCallback_37, OnFailureCallback_37));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_37(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_37(uint16_t enhancedCurrentHue)
     {
         VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
         EnhancedCurrentHueValue4 = enhancedCurrentHue;
         NextTest();
     }
 
-    CHIP_ERROR TestReadColorLoopStoredEnhancedHueAttributeFromDut_37()
+    CHIP_ERROR TestReadColorLoopStoredEnhancedHueAttributeFromDut_38()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
@@ -14276,20 +14313,20 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_37, OnFailureCallback_37));
+                this, OnSuccessCallback_38, OnFailureCallback_38));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_37(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_38(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_37(uint16_t colorLoopStoredEnhancedHue)
+    void OnSuccessResponse_38(uint16_t colorLoopStoredEnhancedHue)
     {
         VerifyOrReturn(CheckValue("colorLoopStoredEnhancedHue", colorLoopStoredEnhancedHue, EnhancedCurrentHueValue4));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_38()
+    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_39()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
@@ -14304,42 +14341,42 @@ private:
         request.optionsOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_38();
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_39();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_38(status);
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_39(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_38(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_39(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_38() { NextTest(); }
+    void OnSuccessResponse_39() { NextTest(); }
 
-    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_39()
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_40()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_39, OnFailureCallback_39));
+            this, OnSuccessCallback_40, OnFailureCallback_40));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_39(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_40(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_39(uint8_t colorLoopActive)
+    void OnSuccessResponse_40(uint8_t colorLoopActive)
     {
         VerifyOrReturn(CheckValue("colorLoopActive", colorLoopActive, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadColorLoopStoredEnhancedHueAttributeFromDut_40()
+    CHIP_ERROR TestReadColorLoopStoredEnhancedHueAttributeFromDut_41()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
@@ -14347,40 +14384,40 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_40, OnFailureCallback_40));
+                this, OnSuccessCallback_41, OnFailureCallback_41));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_40(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_41(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_40(uint16_t colorLoopStoredEnhancedHue)
+    void OnSuccessResponse_41(uint16_t colorLoopStoredEnhancedHue)
     {
         VerifyOrReturn(CheckConstraintType("colorLoopStoredEnhancedHue", "", "uint16"));
         ColorLoopStoredEnhancedHueValue2 = colorLoopStoredEnhancedHue;
         NextTest();
     }
 
-    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_41()
+    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_42()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_41, OnFailureCallback_41));
+            this, OnSuccessCallback_42, OnFailureCallback_42));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_41(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_42(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_41(uint16_t enhancedCurrentHue)
+    void OnSuccessResponse_42(uint16_t enhancedCurrentHue)
     {
         VerifyOrReturn(CheckValue("enhancedCurrentHue", enhancedCurrentHue, ColorLoopStoredEnhancedHueValue2));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_42()
+    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_43()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
@@ -14395,42 +14432,42 @@ private:
         request.optionsOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_42();
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_43();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_42(status);
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_43(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_42(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_43(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_42() { NextTest(); }
+    void OnSuccessResponse_43() { NextTest(); }
 
-    CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_43()
+    CHIP_ERROR TestReadColorLoopDirectionAttributeFromDut_44()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            this, OnSuccessCallback_43, OnFailureCallback_43));
+            this, OnSuccessCallback_44, OnFailureCallback_44));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_43(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_44(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_43(uint8_t colorLoopDirection)
+    void OnSuccessResponse_44(uint8_t colorLoopDirection)
     {
         VerifyOrReturn(CheckValue("colorLoopDirection", colorLoopDirection, 1));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_44()
+    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_45()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
@@ -14445,62 +14482,62 @@ private:
         request.optionsOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_44();
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_45();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_44(status);
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_45(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_44(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_45(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_44() { NextTest(); }
+    void OnSuccessResponse_45() { NextTest(); }
 
-    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_45()
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_46()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_45, OnFailureCallback_45));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_45(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_45(uint8_t colorLoopActive)
-    {
-        VerifyOrReturn(CheckValue("colorLoopActive", colorLoopActive, 1));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_46()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
             this, OnSuccessCallback_46, OnFailureCallback_46));
         return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_46(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_46(uint16_t enhancedCurrentHue)
+    void OnSuccessResponse_46(uint8_t colorLoopActive)
+    {
+        VerifyOrReturn(CheckValue("colorLoopActive", colorLoopActive, 1));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_47()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
+            this, OnSuccessCallback_47, OnFailureCallback_47));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_47(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_47(uint16_t enhancedCurrentHue)
     {
         VerifyOrReturn(CheckConstraintType("enhancedCurrentHue", "", "uint16"));
         EnhancedCurrentHueValue5 = enhancedCurrentHue;
         NextTest();
     }
 
-    CHIP_ERROR TestReadColorLoopStoredEnhancedHueAttributeFromDut_47()
+    CHIP_ERROR TestReadColorLoopStoredEnhancedHueAttributeFromDut_48()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
@@ -14508,20 +14545,20 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_47, OnFailureCallback_47));
+                this, OnSuccessCallback_48, OnFailureCallback_48));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_47(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_48(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_47(uint16_t colorLoopStoredEnhancedHue)
+    void OnSuccessResponse_48(uint16_t colorLoopStoredEnhancedHue)
     {
         VerifyOrReturn(CheckValue("colorLoopStoredEnhancedHue", colorLoopStoredEnhancedHue, EnhancedCurrentHueValue5));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_48()
+    CHIP_ERROR TestSendsColorLoopSetCommandSetAllAttributes_49()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
@@ -14536,42 +14573,42 @@ private:
         request.optionsOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_48();
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_49();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_48(status);
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_49(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_48(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_49(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_48() { NextTest(); }
+    void OnSuccessResponse_49() { NextTest(); }
 
-    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_49()
+    CHIP_ERROR TestReadColorLoopActiveAttributeFromDut_50()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            this, OnSuccessCallback_49, OnFailureCallback_49));
+            this, OnSuccessCallback_50, OnFailureCallback_50));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_49(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_50(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_49(uint8_t colorLoopActive)
+    void OnSuccessResponse_50(uint8_t colorLoopActive)
     {
         VerifyOrReturn(CheckValue("colorLoopActive", colorLoopActive, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadColorLoopStoredEnhancedHueAttributeFromDut_50()
+    CHIP_ERROR TestReadColorLoopStoredEnhancedHueAttributeFromDut_51()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
@@ -14579,40 +14616,40 @@ private:
 
         ReturnErrorOnFailure(
             cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-                this, OnSuccessCallback_50, OnFailureCallback_50));
+                this, OnSuccessCallback_51, OnFailureCallback_51));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_50(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_51(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_50(uint16_t colorLoopStoredEnhancedHue)
+    void OnSuccessResponse_51(uint16_t colorLoopStoredEnhancedHue)
     {
         VerifyOrReturn(CheckConstraintType("colorLoopStoredEnhancedHue", "", "uint16"));
         ColorLoopStoredEnhancedHuevalue3 = colorLoopStoredEnhancedHue;
         NextTest();
     }
 
-    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_51()
+    CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_52()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            this, OnSuccessCallback_51, OnFailureCallback_51));
+            this, OnSuccessCallback_52, OnFailureCallback_52));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_51(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_52(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_51(uint16_t enhancedCurrentHue)
+    void OnSuccessResponse_52(uint16_t enhancedCurrentHue)
     {
         VerifyOrReturn(CheckValue("enhancedCurrentHue", enhancedCurrentHue, ColorLoopStoredEnhancedHuevalue3));
 
         NextTest();
     }
 
-    CHIP_ERROR TestResetEnhancedMoveToHueCommand_52()
+    CHIP_ERROR TestResetEnhancedMoveToHueCommand_53()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         using RequestType               = chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type;
@@ -14621,36 +14658,6 @@ private:
         request.enhancedHue     = 0U;
         request.direction       = static_cast<chip::app::Clusters::ColorControl::HueDirection>(0);
         request.transitionTime  = 0U;
-        request.optionsMask     = 0;
-        request.optionsOverride = 0;
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_52();
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_52(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_52(EmberAfStatus status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_52() { NextTest(); }
-
-    CHIP_ERROR TestResetColorLoopSetCommand_53()
-    {
-        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
-
-        RequestType request;
-        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(0);
-        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
-        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
-        request.time            = 0U;
-        request.startHue        = 0U;
         request.optionsMask     = 0;
         request.optionsOverride = 0;
 
@@ -14670,12 +14677,19 @@ private:
 
     void OnSuccessResponse_53() { NextTest(); }
 
-    CHIP_ERROR TestTurnOffLightForColorControlTests_54()
+    CHIP_ERROR TestResetColorLoopSetCommand_54()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
-        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type;
 
         RequestType request;
+        request.updateFlags     = static_cast<chip::BitFlags<chip::app::Clusters::ColorControl::ColorLoopUpdateFlags>>(0);
+        request.action          = static_cast<chip::app::Clusters::ColorControl::ColorLoopAction>(0);
+        request.direction       = static_cast<chip::app::Clusters::ColorControl::ColorLoopDirection>(0);
+        request.time            = 0U;
+        request.startHue        = 0U;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_54();
@@ -14693,20 +14707,43 @@ private:
 
     void OnSuccessResponse_54() { NextTest(); }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_55()
+    CHIP_ERROR TestTurnOffLightForColorControlTests_55()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnSuccessResponse_55();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_55(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_55(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_55() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_56()
     {
         const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(
-            this, OnSuccessCallback_55, OnFailureCallback_55));
+            this, OnSuccessCallback_56, OnFailureCallback_56));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_55(EmberAfStatus status) { ThrowFailureResponse(); }
+    void OnFailureResponse_56(EmberAfStatus status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_55(bool onOff)
+    void OnSuccessResponse_56(bool onOff)
     {
         VerifyOrReturn(CheckValue("onOff", onOff, 0));
 

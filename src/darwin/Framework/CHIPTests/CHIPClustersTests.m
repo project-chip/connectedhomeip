@@ -9252,7 +9252,33 @@ uint16_t ColorLoopStoredEnhancedHueValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000032_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_9_1_000032_EnhancedMoveToHue
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Reset Enhanced Move To Hue command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterEnhancedMoveToHueParams alloc] init];
+    params.enhancedHue = [NSNumber numberWithUnsignedShort:0U];
+    params.direction = [NSNumber numberWithUnsignedChar:0];
+    params.transitionTime = [NSNumber numberWithUnsignedShort:0U];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster enhancedMoveToHueWithParams:params
+                       completionHandler:^(NSError * _Nullable err) {
+                           NSLog(@"Reset Enhanced Move To Hue command Error: %@", err);
+
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                           [expectation fulfill];
+                       }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_9_1_000033_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
 
@@ -9280,7 +9306,7 @@ uint16_t ColorLoopStoredEnhancedHueValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000033_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000034_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopDirection attribute from DUT"];
 
@@ -9304,7 +9330,7 @@ uint16_t ColorLoopStoredEnhancedHueValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000034_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_9_1_000035_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
 
@@ -9332,7 +9358,7 @@ uint16_t ColorLoopStoredEnhancedHueValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000035_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000036_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
 
@@ -9357,7 +9383,7 @@ uint16_t ColorLoopStoredEnhancedHueValue;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 uint16_t EnhancedCurrentHueValue4;
-- (void)testSendClusterTest_TC_CC_9_1_000036_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000037_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
 
@@ -9376,7 +9402,7 @@ uint16_t EnhancedCurrentHueValue4;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000037_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000038_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT"];
 
@@ -9400,7 +9426,7 @@ uint16_t EnhancedCurrentHueValue4;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000038_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_9_1_000039_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
 
@@ -9428,7 +9454,7 @@ uint16_t EnhancedCurrentHueValue4;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000039_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000040_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
 
@@ -9453,7 +9479,7 @@ uint16_t EnhancedCurrentHueValue4;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 uint16_t ColorLoopStoredEnhancedHueValue2;
-- (void)testSendClusterTest_TC_CC_9_1_000040_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000041_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT"];
 
@@ -9472,7 +9498,7 @@ uint16_t ColorLoopStoredEnhancedHueValue2;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000041_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000042_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
 
@@ -9496,7 +9522,7 @@ uint16_t ColorLoopStoredEnhancedHueValue2;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000042_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_9_1_000043_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
 
@@ -9524,7 +9550,7 @@ uint16_t ColorLoopStoredEnhancedHueValue2;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000043_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000044_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopDirection attribute from DUT"];
 
@@ -9548,7 +9574,7 @@ uint16_t ColorLoopStoredEnhancedHueValue2;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000044_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_9_1_000045_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
 
@@ -9576,7 +9602,7 @@ uint16_t ColorLoopStoredEnhancedHueValue2;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000045_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000046_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
 
@@ -9601,7 +9627,7 @@ uint16_t ColorLoopStoredEnhancedHueValue2;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 uint16_t EnhancedCurrentHueValue5;
-- (void)testSendClusterTest_TC_CC_9_1_000046_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000047_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
 
@@ -9620,7 +9646,7 @@ uint16_t EnhancedCurrentHueValue5;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000047_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000048_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT"];
 
@@ -9644,7 +9670,7 @@ uint16_t EnhancedCurrentHueValue5;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000048_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_9_1_000049_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Sends ColorLoopSet Command - Set all Attributes"];
 
@@ -9672,7 +9698,7 @@ uint16_t EnhancedCurrentHueValue5;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000049_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000050_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopActive attribute from DUT"];
 
@@ -9697,7 +9723,7 @@ uint16_t EnhancedCurrentHueValue5;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 uint16_t ColorLoopStoredEnhancedHuevalue3;
-- (void)testSendClusterTest_TC_CC_9_1_000050_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000051_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read ColorLoopStoredEnhancedHue attribute from DUT"];
 
@@ -9716,7 +9742,7 @@ uint16_t ColorLoopStoredEnhancedHuevalue3;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000051_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000052_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read EnhancedCurrentHue attribute from DUT"];
 
@@ -9740,7 +9766,7 @@ uint16_t ColorLoopStoredEnhancedHuevalue3;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000052_EnhancedMoveToHue
+- (void)testSendClusterTest_TC_CC_9_1_000053_EnhancedMoveToHue
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reset Enhanced Move To Hue command"];
 
@@ -9766,7 +9792,7 @@ uint16_t ColorLoopStoredEnhancedHuevalue3;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000053_ColorLoopSet
+- (void)testSendClusterTest_TC_CC_9_1_000054_ColorLoopSet
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Reset Color Loop Set Command"];
 
@@ -9794,7 +9820,7 @@ uint16_t ColorLoopStoredEnhancedHuevalue3;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000054_Off
+- (void)testSendClusterTest_TC_CC_9_1_000055_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn Off light for color control tests"];
 
@@ -9813,7 +9839,7 @@ uint16_t ColorLoopStoredEnhancedHuevalue3;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_9_1_000055_ReadAttribute
+- (void)testSendClusterTest_TC_CC_9_1_000056_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
 
