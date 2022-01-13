@@ -472,7 +472,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     if (!session.HasValue())
     {
-        ChipLogError(Inet, "Data received on an unknown session (LS:%d). Dropping it!", packetHeader.GetSessionId());
+        ChipLogError(Inet, "Data received on an unknown session (LSID=%d). Dropping it!", packetHeader.GetSessionId());
         return;
     }
 
