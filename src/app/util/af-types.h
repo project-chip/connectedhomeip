@@ -132,10 +132,7 @@ typedef struct
     chip::EndpointId endpoint;
 
     /**
-     * Cluster that the attribute is located on. If the cluster
-     * id is inside the manufacturer specific range, 0xfc00 - 0xffff,
-     * The manufacturer code should also be set to the code associated
-     * with the manufacturer specific cluster.
+     * Cluster that the attribute is located on.
      */
     chip::ClusterId clusterId;
 
@@ -147,33 +144,10 @@ typedef struct
     EmberAfClusterMask clusterMask;
 
     /**
-     * The two byte identifier for the attribute. If the cluster id is
-     * inside the manufacturer specific range 0xfc00 - 0xffff, or the manufacturer
-     * code is NOT 0, the attribute is assumed to be manufacturer specific.
+     * The identifier for the attribute.
      */
     chip::AttributeId attributeId;
-
-    /**
-     * Manufacturer Code associated with the cluster and or attribute.
-     * If the cluster id is inside the manufacturer specific
-     * range, this value should indicate the manufacturer code for the
-     * manufacturer specific cluster. Otherwise if this value is non zero,
-     * and the cluster id is a standard ZCL cluster,
-     * it is assumed that the attribute being sought is a manufacturer specific
-     * extension to the standard ZCL cluster indicated by the cluster id.
-     */
-    uint16_t manufacturerCode;
 } EmberAfAttributeSearchRecord;
-
-/**
- * A struct used to construct a table of manufacturer codes for
- * manufacturer specific attributes and clusters.
- */
-typedef struct
-{
-    uint16_t index;
-    uint16_t manufacturerCode;
-} EmberAfManufacturerCodeEntry;
 
 /**
  * This type is used to compare two ZCL attribute values. The size of this data
