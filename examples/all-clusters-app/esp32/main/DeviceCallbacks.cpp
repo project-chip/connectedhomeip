@@ -34,6 +34,7 @@
 #include "esp_log.h"
 #include "route_hook/esp_route_hook.h"
 #include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
@@ -156,6 +157,9 @@ void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, Cluster
         OnColorControlAttributeChangeCallback(endpointId, attributeId, value);
         break;
 #endif
+    case ZCL_IDENTIFY_CLUSTER_ID:
+        OnIdentifyPostAttributeChangeCallback(endpointId, attributeId, value);
+        break;
     default:
         ESP_LOGI(TAG, "Unhandled cluster ID: %d", clusterId);
         break;
@@ -253,6 +257,26 @@ exit:
     return;
 }
 #endif
+
+void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
+{
+    if (attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID)
+    {
+        uint8_t identifyTime = *value;
+        bool onOffState;
+        if (identifyTime)
+        {
+            // Currently we have no separate indicator LEDs on each endpoints.
+            // We are using LED1 for endpoint 0,1 and LED2 for endpoint 2
+            endpointId == 2 ? statusLED2.Blink(500) : statusLED1.Blink(500);
+        }
+        else
+        {
+            endpointId == 0 ? onOffState = mEndpointOnOffState[0] : onOffState = mEndpointOnOffState[endpointId - 1];
+            endpointId == 2 ? statusLED2.Set(onOffState) : statusLED1.Set(onOffState);
+        }
+    }
+}
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {
