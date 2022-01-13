@@ -36,6 +36,8 @@ namespace Controller {
 
 // FlowMeasurement Cluster Commands
 
+// OccupancySensing Cluster Commands
+
 // PressureMeasurement Cluster Commands
 
 // TemperatureMeasurement Cluster Commands
