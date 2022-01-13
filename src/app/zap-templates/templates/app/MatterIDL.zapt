@@ -46,9 +46,9 @@ struct {{name}} {
   {{#chip_cluster_attributes}}
   attribute(
     {{~#if isWritableAttribute~}}
-      readonly
-    {{~else~}}
       writable
+    {{~else~}}
+      readonly
     {{~/if~}}
     {{~#if isReportableAttribute~}}
       , reportable

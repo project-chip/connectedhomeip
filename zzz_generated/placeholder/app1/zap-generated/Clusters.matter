@@ -16,26 +16,26 @@ server cluster Basic = 40 {
     kReachableNewValue = 0,
   }
 
-  attribute(writable, reportable) int16u interactionModelVersion = 0;
-  attribute(writable, reportable) char_string vendorName = 1;
-  attribute(writable, reportable) vendor_id vendorID = 2;
-  attribute(writable, reportable) char_string productName = 3;
-  attribute(writable, reportable) int16u productID = 4;
-  attribute(readonly, reportable) char_string nodeLabel = 5;
-  attribute(readonly, reportable) char_string location = 6;
-  attribute(writable, reportable) int16u hardwareVersion = 7;
-  attribute(writable, reportable) char_string hardwareVersionString = 8;
-  attribute(writable, reportable) int32u softwareVersion = 9;
-  attribute(writable, reportable) char_string softwareVersionString = 10;
-  attribute(writable, reportable) char_string manufacturingDate = 11;
-  attribute(writable, reportable) char_string partNumber = 12;
-  attribute(writable, reportable) long_char_string productURL = 13;
-  attribute(writable, reportable) char_string productLabel = 14;
-  attribute(writable, reportable) char_string serialNumber = 15;
-  attribute(readonly, reportable) boolean localConfigDisabled = 16;
-  attribute(writable, reportable) boolean reachable = 17;
-  attribute(writable) char_string uniqueID = 18;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) int16u interactionModelVersion = 0;
+  attribute(readonly, reportable) char_string vendorName = 1;
+  attribute(readonly, reportable) vendor_id vendorID = 2;
+  attribute(readonly, reportable) char_string productName = 3;
+  attribute(readonly, reportable) int16u productID = 4;
+  attribute(writable, reportable) char_string nodeLabel = 5;
+  attribute(writable, reportable) char_string location = 6;
+  attribute(readonly, reportable) int16u hardwareVersion = 7;
+  attribute(readonly, reportable) char_string hardwareVersionString = 8;
+  attribute(readonly, reportable) int32u softwareVersion = 9;
+  attribute(readonly, reportable) char_string softwareVersionString = 10;
+  attribute(readonly, reportable) char_string manufacturingDate = 11;
+  attribute(readonly, reportable) char_string partNumber = 12;
+  attribute(readonly, reportable) long_char_string productURL = 13;
+  attribute(readonly, reportable) char_string productLabel = 14;
+  attribute(readonly, reportable) char_string serialNumber = 15;
+  attribute(writable, reportable) boolean localConfigDisabled = 16;
+  attribute(readonly, reportable) boolean reachable = 17;
+  attribute(readonly) char_string uniqueID = 18;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 server cluster ColorControl = 768 {
@@ -85,12 +85,12 @@ server cluster ColorControl = 768 {
     kDown = 3;
   }
 
-  attribute(writable, reportable) int16u currentX = 3;
-  attribute(writable, reportable) int16u currentY = 4;
-  attribute(readonly, reportable) bitmap8 colorControlOptions = 15;
-  attribute(writable, reportable) int16u coupleColorTempToLevelMinMireds = 16397;
-  attribute(readonly, reportable) int16u startUpColorTemperatureMireds = 16400;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) int16u currentX = 3;
+  attribute(readonly, reportable) int16u currentY = 4;
+  attribute(writable, reportable) bitmap8 colorControlOptions = 15;
+  attribute(readonly, reportable) int16u coupleColorTempToLevelMinMireds = 16397;
+  attribute(writable, reportable) int16u startUpColorTemperatureMireds = 16400;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct MoveColorRequest {
     INT16S rateX;  
@@ -126,11 +126,11 @@ server cluster Descriptor = 29 {
     INT16U kRevision = 2;
   }
 
-  attribute(writable, reportable) DeviceType deviceList = 0;
-  attribute(writable, reportable) CLUSTER_ID serverList = 1;
-  attribute(writable, reportable) CLUSTER_ID clientList = 2;
-  attribute(writable, reportable) ENDPOINT_NO partsList = 3;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) DeviceType deviceList = 0;
+  attribute(readonly, reportable) CLUSTER_ID serverList = 1;
+  attribute(readonly, reportable) CLUSTER_ID clientList = 2;
+  attribute(readonly, reportable) ENDPOINT_NO partsList = 3;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 server cluster GeneralCommissioning = 48 {
@@ -151,9 +151,9 @@ server cluster GeneralCommissioning = 48 {
     INT32U kFailSafeExpiryLengthMs = 1;
   }
 
-  attribute(readonly, reportable) int64u breadcrumb = 0;
-  attribute(writable, reportable) BasicCommissioningInfoType basicCommissioningInfoList = 1;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(writable, reportable) int64u breadcrumb = 0;
+  attribute(readonly, reportable) BasicCommissioningInfoType basicCommissioningInfoList = 1;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds;  
@@ -192,8 +192,8 @@ server cluster GeneralCommissioning = 48 {
 }
 
 server cluster Groups = 4 {
-  attribute(writable, reportable) bitmap8 nameSupport = 0;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) bitmap8 nameSupport = 0;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
     INT16U groupId;  
@@ -272,9 +272,9 @@ server cluster Identify = 3 {
     kActuator = 5;
   }
 
-  attribute(readonly, reportable) int16u identifyTime = 0;
-  attribute(writable, reportable) enum8 identifyType = 1;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(writable, reportable) int16u identifyTime = 0;
+  attribute(readonly, reportable) enum8 identifyType = 1;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
     INT16U identifyTime;  
@@ -302,8 +302,8 @@ server cluster LevelControl = 8 {
     kDown = 1;
   }
 
-  attribute(writable, reportable) int8u currentLevel = 0;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) int8u currentLevel = 0;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct MoveRequest {
     MoveMode moveMode;  
@@ -411,16 +411,16 @@ server cluster NetworkCommissioning = 49 {
     INT8U kLqi = 8;
   }
 
-  attribute(writable) int8u maxNetworks = 0;
-  attribute(writable) NetworkInfo networks = 1;
-  attribute(writable) int8u scanMaxTimeSeconds = 2;
-  attribute(writable) int8u connectMaxTimeSeconds = 3;
-  attribute(readonly) boolean interfaceEnabled = 4;
-  attribute(writable) NetworkCommissioningStatus lastNetworkingStatus = 5;
-  attribute(writable) octet_string lastNetworkID = 6;
-  attribute(writable) int32u lastConnectErrorValue = 7;
-  attribute(writable, reportable) bitmap32 featureMap = 65532;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(readonly) int8u maxNetworks = 0;
+  attribute(readonly) NetworkInfo networks = 1;
+  attribute(readonly) int8u scanMaxTimeSeconds = 2;
+  attribute(readonly) int8u connectMaxTimeSeconds = 3;
+  attribute(writable) boolean interfaceEnabled = 4;
+  attribute(readonly) NetworkCommissioningStatus lastNetworkingStatus = 5;
+  attribute(readonly) octet_string lastNetworkID = 6;
+  attribute(readonly) int32u lastConnectErrorValue = 7;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
     OCTET_STRING OperationalDataset;  
@@ -496,8 +496,8 @@ server cluster OnOff = 6 {
     kDyingLight = 1;
   }
 
-  attribute(writable, reportable) boolean onOff = 0;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) boolean onOff = 0;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct OffRequest {
   }
@@ -536,12 +536,12 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING kLabel = 6;
   }
 
-  attribute(writable, reportable) FabricDescriptor fabricsList = 1;
-  attribute(writable, reportable) int8u supportedFabrics = 2;
-  attribute(writable, reportable) int8u commissionedFabrics = 3;
-  attribute(writable, reportable) OCTET_STRING trustedRootCertificates = 4;
-  attribute(writable, reportable) fabric_idx currentFabricIndex = 5;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) FabricDescriptor fabricsList = 1;
+  attribute(readonly, reportable) int8u supportedFabrics = 2;
+  attribute(readonly, reportable) int8u commissionedFabrics = 3;
+  attribute(readonly, reportable) OCTET_STRING trustedRootCertificates = 4;
+  attribute(readonly, reportable) fabric_idx currentFabricIndex = 5;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
     OCTET_STRING NOCValue;  
@@ -622,12 +622,12 @@ server cluster Scenes = 5 {
     INT8U kValue = 3;
   }
 
-  attribute(writable, reportable) int8u sceneCount = 0;
-  attribute(writable, reportable) int8u currentScene = 1;
-  attribute(writable, reportable) int16u currentGroup = 2;
-  attribute(writable, reportable) boolean sceneValid = 3;
-  attribute(writable, reportable) bitmap8 nameSupport = 4;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) int8u sceneCount = 0;
+  attribute(readonly, reportable) int8u currentScene = 1;
+  attribute(readonly, reportable) int16u currentGroup = 2;
+  attribute(readonly, reportable) boolean sceneValid = 3;
+  attribute(readonly, reportable) bitmap8 nameSupport = 4;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
     INT16U groupId;  
@@ -716,17 +716,17 @@ server cluster Scenes = 5 {
 }
 
 client cluster TemperatureMeasurement = 1026 {
-  attribute(writable, reportable) int16s measuredValue = 0;
-  attribute(writable, reportable) int16s minMeasuredValue = 1;
-  attribute(writable, reportable) int16s maxMeasuredValue = 2;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) int16s measuredValue = 0;
+  attribute(readonly, reportable) int16s minMeasuredValue = 1;
+  attribute(readonly, reportable) int16s maxMeasuredValue = 2;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 server cluster TemperatureMeasurement = 1026 {
-  attribute(writable, reportable) int16s measuredValue = 0;
-  attribute(writable, reportable) int16s minMeasuredValue = 1;
-  attribute(writable, reportable) int16s maxMeasuredValue = 2;
-  attribute(writable, reportable) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) int16s measuredValue = 0;
+  attribute(readonly, reportable) int16s minMeasuredValue = 1;
+  attribute(readonly, reportable) int16s maxMeasuredValue = 2;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 
