@@ -1,448 +1,10 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct Dimension {
-  double kWidth = 1;
-  double kHeight = 2;
-  MetricTypeEnum kMetric = 3;
-}
-
-struct AdditionalInfo {
-  CHAR_STRING kName = 1;
-  CHAR_STRING kValue = 2;
-}
-
-struct SimpleStruct {
-  INT8U kA = 1;
-  BOOLEAN kB = 2;
-  SimpleEnum kC = 3;
-  OCTET_STRING kD = 4;
-  CHAR_STRING kE = 5;
-  SimpleBitmap kF = 6;
-  single kG = 7;
-  double kH = 8;
-}
-
-struct NullablesAndOptionalsStruct {
-  INT16U kNullableInt = 1;
-  INT16U kOptionalInt = 2;
-  INT16U kNullableOptionalInt = 3;
-  CHAR_STRING kNullableString = 4;
-  CHAR_STRING kOptionalString = 5;
-  CHAR_STRING kNullableOptionalString = 6;
-  SimpleStruct kNullableStruct = 7;
-  SimpleStruct kOptionalStruct = 8;
-  SimpleStruct kNullableOptionalStruct = 9;
-  SimpleEnum kNullableList = 10;
-  SimpleEnum kOptionalList = 11;
-  SimpleEnum kNullableOptionalList = 12;
-}
-
-struct NestedStruct {
-  INT8U kA = 1;
-  BOOLEAN kB = 2;
-  SimpleStruct kC = 3;
-}
-
-struct NestedStructList {
-  INT8U kA = 1;
-  BOOLEAN kB = 2;
-  SimpleStruct kC = 3;
-  SimpleStruct kD = 4;
-  INT32U kE = 5;
-  OCTET_STRING kF = 6;
-  INT8U kG = 7;
-}
-
-struct DoubleNestedStructList {
-  NestedStructList kA = 1;
-}
-
-struct Parameter {
-  ParameterEnum kType = 1;
-  CHAR_STRING kValue = 2;
-  AdditionalInfo kExternalIDList = 3;
-}
-
-struct ContentSearch {
-  Parameter kParameterList = 1;
-}
-
-struct StyleInformation {
-  CHAR_STRING kImageUrl = 1;
-  CHAR_STRING kColor = 2;
-  Dimension kSize = 3;
-}
-
-struct BrandingInformation {
-  CHAR_STRING kProviderName = 1;
-  StyleInformation kBackground = 2;
-  StyleInformation kLogo = 3;
-  StyleInformation kProgressBar = 4;
-  StyleInformation kSplash = 5;
-  StyleInformation kWaterMark = 6;
-}
-
-struct Application {
-  INT16U kCatalogVendorId = 1;
-  CHAR_STRING kApplicationId = 2;
-}
-
-struct ApplicationEP {
-  Application kApplication = 1;
-  CHAR_STRING kEndpoint = 2;
-}
-
-struct Target {
-  cluster_id kCluster = 0;
-  endpoint_no kEndpoint = 1;
-  devtype_id kDeviceType = 2;
-}
-
-[fabric_scoped_by=kFabricIndex]
-struct AccessControlEntry {
-  fabric_idx kFabricIndex = 0;
-  Privilege kPrivilege = 1;
-  AuthMode kAuthMode = 2;
-  INT64U kSubjects = 3;
-  Target kTargets = 4;
-}
-
-struct ActionStruct {
-  INT16U kActionID = 1;
-  CHAR_STRING kName = 2;
-  ActionTypeEnum kType = 3;
-  INT16U kEndpointListID = 4;
-  INT16U kSupportedCommands = 5;
-  ActionStateEnum kStatus = 6;
-}
-
-struct BasicCommissioningInfoType {
-  INT32U kFailSafeExpiryLengthMs = 1;
-}
-
-struct BatChargeFaultChangeType {
-  BatChargeFaultType kCurrent = 1;
-  BatChargeFaultType kPrevious = 2;
-}
-
-struct BatFaultChangeType {
-  BatFaultType kCurrent = 1;
-  BatFaultType kPrevious = 2;
-}
-
-struct ChannelInfo {
-  INT16U kMajorNumber = 1;
-  INT16U kMinorNumber = 2;
-  CHAR_STRING kName = 3;
-  CHAR_STRING kCallSign = 4;
-  CHAR_STRING kAffiliateCallSign = 5;
-}
-
-struct DeviceType {
-  DEVTYPE_ID kType = 1;
-  INT16U kRevision = 2;
-}
-
-struct DlCredential {
-  DlCredentialType kCredentialType = 1;
-  INT16U kCredentialIndex = 2;
-}
-
-struct EndpointListStruct {
-  INT16U kEndpointListID = 1;
-  CHAR_STRING kName = 2;
-  EndpointListTypeEnum kType = 3;
-  ENDPOINT_NO kEndpoints = 4;
-}
-
-[fabric_scoped_by=kFabricIndex]
-struct ExtensionEntry {
-  fabric_idx kFabricIndex = 0;
-  OCTET_STRING kData = 1;
-}
-
-struct FabricDescriptor {
-  INT8U kFabricIndex = 1;
-  OCTET_STRING kRootPublicKey = 2;
-  INT16U kVendorId = 3;
-  FABRIC_ID kFabricId = 4;
-  NODE_ID kNodeId = 5;
-  CHAR_STRING kLabel = 6;
-}
-
-struct GroupInfo {
-  INT16U kFabricIndex = 0;
-  INT16U kGroupId = 1;
-  INT16U kEndpoints = 2;
-  CHAR_STRING kGroupName = 3;
-}
-
-[fabric_scoped_by=kFabricIndex]
-struct GroupKey {
-  fabric_idx kFabricIndex = 0;
-  INT16U kGroupId = 1;
-  INT16U kGroupKeySetID = 2;
-}
-
-struct GroupKeySet {
-  INT16U kGroupKeySetID = 0;
-  GroupKeySecurityPolicy kSecurityPolicy = 1;
-  OCTET_STRING kEpochKey0 = 2;
-  INT64U kEpochStartTime0 = 3;
-  OCTET_STRING kEpochKey1 = 4;
-  INT64U kEpochStartTime1 = 5;
-  OCTET_STRING kEpochKey2 = 6;
-  INT64U kEpochStartTime2 = 7;
-}
-
-struct IasAceZoneStatusResult {
-  INT8U kZoneId = 1;
-  IasZoneStatus kZoneStatus = 2;
-}
-
-struct InputInfo {
-  INT8U kIndex = 1;
-  InputTypeEnum kInputType = 2;
-  CHAR_STRING kName = 3;
-  CHAR_STRING kDescription = 4;
-}
-
 struct LabelStruct {
   CHAR_STRING kLabel = 1;
   CHAR_STRING kValue = 2;
 }
-
-struct LineupInfo {
-  CHAR_STRING kOperatorName = 1;
-  CHAR_STRING kLineupName = 2;
-  CHAR_STRING kPostalCode = 3;
-  LineupInfoTypeEnum kLineupInfoType = 4;
-}
-
-struct ModeOptionStruct {
-  CHAR_STRING kLabel = 1;
-  INT8U kMode = 2;
-  INT32U kSemanticTag = 3;
-}
-
-struct NOCStruct {
-  INT8U kFabricIndex = 1;
-  OCTET_STRING kNoc = 2;
-}
-
-struct NeighborTable {
-  INT64U kExtAddress = 1;
-  INT32U kAge = 2;
-  INT16U kRloc16 = 3;
-  INT32U kLinkFrameCounter = 4;
-  INT32U kMleFrameCounter = 5;
-  INT8U kLqi = 6;
-  INT8S kAverageRssi = 7;
-  INT8S kLastRssi = 8;
-  INT8U kFrameErrorRate = 9;
-  INT8U kMessageErrorRate = 10;
-  BOOLEAN kRxOnWhenIdle = 11;
-  BOOLEAN kFullThreadDevice = 12;
-  BOOLEAN kFullNetworkData = 13;
-  BOOLEAN kIsChild = 14;
-}
-
-struct NetworkInfo {
-  OCTET_STRING kNetworkID = 1;
-  BOOLEAN kConnected = 2;
-}
-
-struct NetworkInterfaceType {
-  CHAR_STRING kName = 1;
-  BOOLEAN kFabricConnected = 2;
-  BOOLEAN kOffPremiseServicesReachableIPv4 = 3;
-  BOOLEAN kOffPremiseServicesReachableIPv6 = 4;
-  OCTET_STRING kHardwareAddress = 5;
-  InterfaceType kType = 6;
-}
-
-struct Notification {
-  INT16U kContentId = 1;
-  ENUM8 kStatusFeedback = 2;
-}
-
-struct OperationalDatasetComponents {
-  BOOLEAN kActiveTimestampPresent = 1;
-  BOOLEAN kPendingTimestampPresent = 2;
-  BOOLEAN kMasterKeyPresent = 3;
-  BOOLEAN kNetworkNamePresent = 4;
-  BOOLEAN kExtendedPanIdPresent = 5;
-  BOOLEAN kMeshLocalPrefixPresent = 6;
-  BOOLEAN kDelayPresent = 7;
-  BOOLEAN kPanIdPresent = 8;
-  BOOLEAN kChannelPresent = 9;
-  BOOLEAN kPskcPresent = 10;
-  BOOLEAN kSecurityPolicyPresent = 11;
-  BOOLEAN kChannelMaskPresent = 12;
-}
-
-struct OutputInfo {
-  INT8U kIndex = 1;
-  OutputTypeEnum kOutputType = 2;
-  CHAR_STRING kName = 3;
-}
-
-struct PlaybackPosition {
-  INT64U kUpdatedAt = 1;
-  INT64U kPosition = 2;
-}
-
-struct PowerProfileRecord {
-  INT8U kPowerProfileId = 1;
-  INT8U kEnergyPhaseId = 2;
-  BOOLEAN kPowerProfileRemoteControl = 3;
-  ENUM8 kPowerProfileState = 4;
-}
-
-[fabric_scoped_by=kFabricIndex]
-struct ProviderLocation {
-  fabric_idx kFabricIndex = 0;
-  node_id kProviderNodeID = 1;
-  endpoint_no kEndpoint = 2;
-}
-
-struct ReadAttributeStatusRecord {
-  ATTRIB_ID kAttributeId = 1;
-  Status kStatus = 2;
-  INT8U kAttributeType = 3;
-  NO_DATA kAttributeLocation = 4;
-}
-
-struct ReadStructuredAttributeRecord {
-  ATTRIB_ID kAttributeId = 1;
-  INT8U kIndicator = 2;
-  INT16U kIndicies = 3;
-}
-
-struct RouteTable {
-  INT64U kExtAddress = 1;
-  INT16U kRloc16 = 2;
-  INT8U kRouterId = 3;
-  INT8U kNextHop = 4;
-  INT8U kPathCost = 5;
-  INT8U kLQIIn = 6;
-  INT8U kLQIOut = 7;
-  INT8U kAge = 8;
-  BOOLEAN kAllocated = 9;
-  BOOLEAN kLinkEstablished = 10;
-}
-
-struct SceneExtensionAttributeInfo {
-  INT8U kAttributeType = 1;
-  NO_DATA kAttributeLocation = 2;
-}
-
-struct SceneExtensionFieldSet {
-  CLUSTER_ID kClusterId = 1;
-  INT8U kLength = 2;
-  INT8U kValue = 3;
-}
-
-struct ScheduledPhase {
-  INT8U kEnergyPhaseId = 1;
-  INT16U kScheduledTime = 2;
-}
-
-struct SecurityPolicy {
-  INT16U kRotationTime = 1;
-  BITMAP16 kFlags = 2;
-}
-
-struct SemanticTag {
-  ENUM16 kMfgCode = 1;
-  ENUM16 kValue = 2;
-}
-
-struct SoftwareFault {
-  INT64U kId = 1;
-  CHAR_STRING kName = 2;
-  OCTET_STRING kFaultRecording = 3;
-}
-
-struct TargetInfo {
-  INT8U kIdentifier = 1;
-  CHAR_STRING kName = 2;
-}
-
-struct TestListStructOctet {
-  INT64U kFabricIndex = 1;
-  OCTET_STRING kOperationalCert = 2;
-}
-
-struct ThreadInterfaceScanResult {
-  INT64U kPanId = 1;
-  INT64U kExtendedPanId = 2;
-  CHAR_STRING kNetworkName = 3;
-  INT16U kChannel = 4;
-  INT8U kVersion = 5;
-  INT64U kExtendedAddress = 6;
-  INT8S kRssi = 7;
-  INT8U kLqi = 8;
-}
-
-struct ThreadMetrics {
-  INT64U kId = 1;
-  CHAR_STRING kName = 2;
-  INT32U kStackFreeCurrent = 3;
-  INT32U kStackFreeMinimum = 4;
-  INT32U kStackSize = 5;
-}
-
-struct TransferredPhase {
-  INT8U kEnergyPhaseId = 1;
-  INT8U kMacroPhaseId = 2;
-  INT16U kExpectedDuration = 3;
-  INT16U kPeakPower = 4;
-  INT16U kEnergy = 5;
-  INT16U kMaxActivationDelay = 6;
-}
-
-struct WiFiInterfaceScanResult {
-  BITMAP8 kSecurity = 1;
-  OCTET_STRING kSsid = 2;
-  OCTET_STRING kBssid = 3;
-  INT16U kChannel = 4;
-  WiFiBand kWiFiBand = 5;
-  INT8S kRssi = 6;
-}
-
-struct WiredFaultChangeType {
-  WiredFaultType kCurrent = 1;
-  WiredFaultType kPrevious = 2;
-}
-
-struct WriteAttributeRecord {
-  ATTRIB_ID kAttributeId = 1;
-  INT8U kAttributeType = 2;
-  NO_DATA kAttributeLocation = 3;
-}
-
-struct WriteAttributeStatusRecord {
-  Status kStatus = 1;
-  ATTRIB_ID kAttributeId = 2;
-}
-
-struct WriteStructuredAttributeRecord {
-  ATTRIB_ID kAttributeId = 1;
-  INT8U kIndicator = 2;
-  INT16U kIndicies = 3;
-  INT8U kAttributeType = 4;
-  NO_DATA kAttributeLocation = 5;
-}
-
-struct WriteStructuredAttributeStatusRecord {
-  Status kStatus = 1;
-  ATTRIB_ID kAttributeId = 2;
-  INT8U kIndicator = 3;
-  INT16U kIndicies = 4;
-}
-
 
 server cluster AdministratorCommissioning = 60 {
   enum CommissioningWindowStatus : ENUM8 {
@@ -518,6 +80,11 @@ server cluster Basic = 40 {
 }
 
 server cluster Descriptor = 29 {
+  struct DeviceType {
+    DEVTYPE_ID kType = 1;
+    INT16U kRevision = 2;
+  }
+
   attribute(writable, reportable) DeviceType deviceList = 0;
   attribute(writable, reportable) CLUSTER_ID serverList = 1;
   attribute(writable, reportable) CLUSTER_ID clientList = 2;
@@ -606,6 +173,10 @@ server cluster GeneralCommissioning = 48 {
     kIndoor = 0;
     kOutdoor = 1;
     kIndoorOutdoor = 2;
+  }
+
+  struct BasicCommissioningInfoType {
+    INT32U kFailSafeExpiryLengthMs = 1;
   }
 
   attribute(readonly, reportable) int64u breadcrumb = 0;
@@ -699,6 +270,15 @@ server cluster GeneralDiagnostics = 51 {
     kNFCFault = 4;
     kBLEFault = 5;
     kEthernetFault = 6;
+  }
+
+  struct NetworkInterfaceType {
+    CHAR_STRING kName = 1;
+    BOOLEAN kFabricConnected = 2;
+    BOOLEAN kOffPremiseServicesReachableIPv4 = 3;
+    BOOLEAN kOffPremiseServicesReachableIPv6 = 4;
+    OCTET_STRING kHardwareAddress = 5;
+    InterfaceType kType = 6;
   }
 
   event HardwareFaultChange(critical) = 0 {
@@ -831,6 +411,31 @@ server cluster NetworkCommissioning = 49 {
     k60g = 4;
   }
 
+  struct NetworkInfo {
+    OCTET_STRING kNetworkID = 1;
+    BOOLEAN kConnected = 2;
+  }
+
+  struct WiFiInterfaceScanResult {
+    BITMAP8 kSecurity = 1;
+    OCTET_STRING kSsid = 2;
+    OCTET_STRING kBssid = 3;
+    INT16U kChannel = 4;
+    WiFiBand kWiFiBand = 5;
+    INT8S kRssi = 6;
+  }
+
+  struct ThreadInterfaceScanResult {
+    INT64U kPanId = 1;
+    INT64U kExtendedPanId = 2;
+    CHAR_STRING kNetworkName = 3;
+    INT16U kChannel = 4;
+    INT8U kVersion = 5;
+    INT64U kExtendedAddress = 6;
+    INT8S kRssi = 7;
+    INT8U kLqi = 8;
+  }
+
   attribute(writable) int8u maxNetworks = 0;
   attribute(writable) NetworkInfo networks = 1;
   attribute(writable) int8u scanMaxTimeSeconds = 2;
@@ -945,6 +550,15 @@ server cluster OperationalCredentials = 62 {
     kFabricConflict = 9;
     kLabelConflict = 10;
     kInvalidFabricIndex = 11;
+  }
+
+  struct FabricDescriptor {
+    INT8U kFabricIndex = 1;
+    OCTET_STRING kRootPublicKey = 2;
+    INT16U kVendorId = 3;
+    FABRIC_ID kFabricId = 4;
+    NODE_ID kNodeId = 5;
+    CHAR_STRING kLabel = 6;
   }
 
   attribute(writable, reportable) FabricDescriptor fabricsList = 1;
@@ -1112,6 +726,14 @@ client cluster PumpConfigurationAndControl = 512 {
 }
 
 server cluster SoftwareDiagnostics = 52 {
+  struct ThreadMetrics {
+    INT64U kId = 1;
+    CHAR_STRING kName = 2;
+    INT32U kStackFreeCurrent = 3;
+    INT32U kStackFreeMinimum = 4;
+    INT32U kStackSize = 5;
+  }
+
   event SoftwareFault(info) = 0 {
     kSoftwareFault = 0,
   }
@@ -1152,6 +774,56 @@ server cluster ThreadNetworkDiagnostics = 53 {
   enum ThreadConnectionStatus : ENUM8 {
     kConnected = 0;
     kNotConnected = 1;
+  }
+
+  struct NeighborTable {
+    INT64U kExtAddress = 1;
+    INT32U kAge = 2;
+    INT16U kRloc16 = 3;
+    INT32U kLinkFrameCounter = 4;
+    INT32U kMleFrameCounter = 5;
+    INT8U kLqi = 6;
+    INT8S kAverageRssi = 7;
+    INT8S kLastRssi = 8;
+    INT8U kFrameErrorRate = 9;
+    INT8U kMessageErrorRate = 10;
+    BOOLEAN kRxOnWhenIdle = 11;
+    BOOLEAN kFullThreadDevice = 12;
+    BOOLEAN kFullNetworkData = 13;
+    BOOLEAN kIsChild = 14;
+  }
+
+  struct RouteTable {
+    INT64U kExtAddress = 1;
+    INT16U kRloc16 = 2;
+    INT8U kRouterId = 3;
+    INT8U kNextHop = 4;
+    INT8U kPathCost = 5;
+    INT8U kLQIIn = 6;
+    INT8U kLQIOut = 7;
+    INT8U kAge = 8;
+    BOOLEAN kAllocated = 9;
+    BOOLEAN kLinkEstablished = 10;
+  }
+
+  struct SecurityPolicy {
+    INT16U kRotationTime = 1;
+    BITMAP16 kFlags = 2;
+  }
+
+  struct OperationalDatasetComponents {
+    BOOLEAN kActiveTimestampPresent = 1;
+    BOOLEAN kPendingTimestampPresent = 2;
+    BOOLEAN kMasterKeyPresent = 3;
+    BOOLEAN kNetworkNamePresent = 4;
+    BOOLEAN kExtendedPanIdPresent = 5;
+    BOOLEAN kMeshLocalPrefixPresent = 6;
+    BOOLEAN kDelayPresent = 7;
+    BOOLEAN kPanIdPresent = 8;
+    BOOLEAN kChannelPresent = 9;
+    BOOLEAN kPskcPresent = 10;
+    BOOLEAN kSecurityPolicyPresent = 11;
+    BOOLEAN kChannelMaskPresent = 12;
   }
 
   event ConnectionStatus(info) = 0 {
@@ -1294,5 +966,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 endpoint 0 {
 }
+
 endpoint 1 {
 }
+
