@@ -176,6 +176,17 @@ extern void ChipEpochToCalendarTime(uint32_t chipEpochTime, uint16_t & year, uin
  */
 extern bool UnixEpochToChipEpochTime(uint32_t unixEpochTime, uint32_t & chipEpochTime);
 
+inline bool ChipEpochToUnixEpochTime(uint32_t chipEpochTime, uint32_t & unixEpochTime)
+{
+    if (kChipEpochSecondsSinceUnixEpoch <= UINT32_MAX - chipEpochTime)
+    {
+        unixEpochTime = chipEpochTime + kChipEpochSecondsSinceUnixEpoch;
+        return true;
+    }
+
+    return false;
+}
+
 /**
  *  @def secondsToMilliseconds
  *

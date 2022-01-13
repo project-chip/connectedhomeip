@@ -279,6 +279,66 @@ public:
      *                                      current time.
      */
     virtual CHIP_ERROR SetClock_RealTime(Microseconds64 aNewCurTime) = 0;
+
+    /**
+     * This function returns the last known good time (set via the call to SetClock_LastKnownGoodTime()) API.
+     *
+     * @param[out] aTime                 The last known good time, expressed as Unix time scaled to microseconds.
+     *
+     * @retval #CHIP_NO_ERROR            If the method succeeded.
+     * @retval #CHIP_ERROR_INVALID_TIME  If the "last known good time" was not set.
+     */
+    virtual CHIP_ERROR GetClock_LastKnownGoodTime(Microseconds64 & aTime)
+    {
+        if (mLastKnownGoodTime == Microseconds64(0))
+        {
+            return CHIP_ERROR_INVALID_TIME;
+        }
+        aTime = mLastKnownGoodTime;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * This function returns the last known good time (set via the call to SetClock_LastKnownGoodTime()) API.
+     *
+     * @note
+     *   This function is reserved for internal use by the System Clock.  Users of the System
+     *   Clock should call System::Clock::GetClock_RealTimeMS().
+     *
+     * @param[out] aTime                 The last known good time, expressed as Unix time scaled to milliseconds.
+     *
+     * @retval #CHIP_NO_ERROR            If the method succeeded.
+     * @retval #CHIP_ERROR_INVALID_TIME  If the "last known good time" was not set.
+     */
+    virtual CHIP_ERROR GetClock_LastKnownGoodTimeMS(Milliseconds64 & aTime)
+    {
+        if (mLastKnownGoodTime == Microseconds64(0))
+        {
+            return CHIP_ERROR_INVALID_TIME;
+        }
+        aTime = std::chrono::duration_cast<System::Clock::Milliseconds64>(mLastKnownGoodTime);
+        ;
+        return CHIP_NO_ERROR;
+    }
+
+    /**
+     * This function updates the value of last known good time.
+     *
+     * @param[in] aNewTime                The new time, expressed as Unix time scaled to microseconds.
+     * @param[in] aForceUpdaate           If true, update the time even if the new time is older than current time.
+     *                                    (by default, aForceUpdate is false)
+     *
+     */
+    virtual void SetClock_LastKnownGoodTime(Microseconds64 aNewTime, bool aForceUpdate = false)
+    {
+        if (aForceUpdate || aNewTime > mLastKnownGoodTime)
+        {
+            mLastKnownGoodTime = aNewTime;
+        }
+    }
+
+private:
+    Microseconds64 mLastKnownGoodTime = Microseconds64(0);
 };
 
 // Currently we have a single implementation class, ClockImpl, whose members are implemented in build-specific files.

@@ -269,6 +269,15 @@ CHIP_ERROR FabricInfo::SetCert(MutableByteSpan & dstCert, const ByteSpan & srcCe
     VerifyOrReturnError(srcCert.size() <= kMaxCHIPCertLength, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(CanCastTo<uint16_t>(srcCert.size()), CHIP_ERROR_INVALID_ARGUMENT);
 
+    uint32_t notValidBefore = 0;
+    ReturnErrorOnFailure(ExtractNotValidBeforeFromChipCert(srcCert, notValidBefore));
+
+    uint32_t notValidBeforeUTC;
+    VerifyOrReturnError(ChipEpochToUnixEpochTime(notValidBefore, notValidBeforeUTC), CHIP_ERROR_INVALID_TIME);
+
+    System::Clock::Seconds32 lkgt = System::Clock::Seconds32(notValidBeforeUTC);
+    System::SystemClock().SetClock_LastKnownGoodTime(std::chrono::duration_cast<System::Clock::Microseconds64>(lkgt));
+
     dstCert = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(srcCert.size())), srcCert.size());
     VerifyOrReturnError(dstCert.data() != nullptr, CHIP_ERROR_NO_MEMORY);
 

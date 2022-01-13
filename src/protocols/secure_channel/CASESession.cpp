@@ -1315,20 +1315,25 @@ CHIP_ERROR CASESession::GetHardcodedTime()
 
 CHIP_ERROR CASESession::SetEffectiveTime()
 {
-    System::Clock::Milliseconds64 currentTimeMS;
-    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentTimeMS);
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    System::Clock::Milliseconds64 timeMS;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(timeMS);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(
-            SecureChannel,
-            "The device does not support GetClock_RealTimeMS() API. This will eventually result in CASE session setup failures.");
-        // TODO: Remove use of hardcoded time during CASE setup
-        return GetHardcodedTime();
-    }
-    ReturnErrorOnFailure(err);
+        ChipLogDetail(SecureChannel, "The device does not support GetClock_RealTimeMS() API. Trying to use last known good time.");
 
-    System::Clock::Seconds32 currentTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentTimeMS);
-    VerifyOrReturnError(UnixEpochToChipEpochTime(currentTime.count(), mValidContext.mEffectiveTime), CHIP_ERROR_INVALID_TIME);
+        err = System::SystemClock().GetClock_LastKnownGoodTimeMS(timeMS);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(SecureChannel,
+                         "The device does not support GetClock_RealTimeMS() API and the last known good time is not set. This will "
+                         "eventually result in CASE session setup failures.");
+            // TODO: Remove use of hardcoded time during CASE setup
+            return GetHardcodedTime();
+        }
+    }
+
+    System::Clock::Seconds32 timeS = std::chrono::duration_cast<System::Clock::Seconds32>(timeMS);
+    VerifyOrReturnError(UnixEpochToChipEpochTime(timeS.count(), mValidContext.mEffectiveTime), CHIP_ERROR_INVALID_TIME);
 
     return CHIP_NO_ERROR;
 }

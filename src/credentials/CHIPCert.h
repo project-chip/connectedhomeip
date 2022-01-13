@@ -847,5 +847,14 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
  */
 CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId & skid);
 
+/**
+ * Extract validity start timestamp from a chip certificate.
+ * This does not perform any sort of validation on the certificate structure
+ * structure than parsing it.
+ *
+ * Can return any error that can be returned from parsing the cert.
+ */
+CHIP_ERROR ExtractNotValidBeforeFromChipCert(const ByteSpan & chipCert, uint32_t & notValidBefore);
+
 } // namespace Credentials
 } // namespace chip

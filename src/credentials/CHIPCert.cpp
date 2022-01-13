@@ -965,5 +965,19 @@ CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId &
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ExtractNotValidBeforeFromChipCert(const ByteSpan & chipCert, uint32_t & notValidBefore)
+{
+    ChipCertificateSet certSet;
+    ChipCertificateData certData;
+
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
+
+    ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
+
+    notValidBefore = certData.mNotBeforeTime;
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace Credentials
 } // namespace chip
