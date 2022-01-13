@@ -28,9 +28,7 @@ qpg_project_dir = "${chip_root}/examples/lock-app/qpg"
 examples_plat_dir = "${chip_root}/examples/platform/qpg"
 
 qpg_sdk("sdk") {
-  sources = [
-    "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
-  ]
+  sources = [ "${examples_plat_dir}/project_include/CHIPProjectConfig.h" ]
 
   include_dirs = [
     "${chip_root}/src/platform/qpg",
