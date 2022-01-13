@@ -331,6 +331,54 @@ public:
         OnGeneralAttributeEventResponse(context, "{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response", value);
     }
 };
+
+class Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
+{
+public:
+    Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("report-event")
+    {
+        AddArgument("event-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
+    {
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 4}}) ReportEvent on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::{{asUpperCamelCase parent.name}}Cluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeEvent<chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType>(this,
+          OnValueReport,
+          OnDefaultFailure,
+          mMinInterval,
+          mMaxInterval,
+          subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType value)
+    {
+       LogValue("{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
 {{/chip_server_cluster_events}}
 
 {{#chip_server_cluster_attributes}}
@@ -491,6 +539,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{/chip_server_cluster_attributes}}
         {{#chip_server_cluster_events}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        make_unique<Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/chip_server_cluster_events}}
     };
 

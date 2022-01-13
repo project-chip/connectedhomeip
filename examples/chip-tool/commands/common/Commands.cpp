@@ -182,7 +182,7 @@ bool Commands::IsAttributeCommand(std::string commandName) const
 
 bool Commands::IsEventCommand(std::string commandName) const
 {
-    return commandName.compare("read-event") == 0;
+    return commandName.compare("read-event") == 0 || commandName.compare("report-event") == 0;
 }
 
 bool Commands::IsGlobalCommand(std::string commandName) const
@@ -216,10 +216,11 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Commands:                                                                           |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    bool readCommand      = false;
-    bool writeCommand     = false;
-    bool reportCommand    = false;
-    bool readEventCommand = false;
+    bool readCommand        = false;
+    bool writeCommand       = false;
+    bool reportCommand      = false;
+    bool readEventCommand   = false;
+    bool reportEventCommand = false;
     for (auto & command : commands)
     {
         bool shouldPrint = true;
@@ -241,6 +242,10 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
             else if (strcmp(command->GetName(), "read-event") == 0 && readEventCommand == false)
             {
                 readEventCommand = true;
+            }
+            else if (strcmp(command->GetName(), "report-event") == 0 && reportEventCommand == false)
+            {
+                reportEventCommand = true;
             }
             else
             {
