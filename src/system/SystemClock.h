@@ -288,7 +288,7 @@ public:
      * @retval #CHIP_NO_ERROR            If the method succeeded.
      * @retval #CHIP_ERROR_INVALID_TIME  If the "last known good time" was not set.
      */
-    virtual CHIP_ERROR GetClock_LastKnownGoodTime(Microseconds64 & aTime)
+    CHIP_ERROR GetClock_LastKnownGoodTime(Microseconds64 & aTime)
     {
         if (mLastKnownGoodTime == Microseconds64(0))
         {
@@ -310,14 +310,13 @@ public:
      * @retval #CHIP_NO_ERROR            If the method succeeded.
      * @retval #CHIP_ERROR_INVALID_TIME  If the "last known good time" was not set.
      */
-    virtual CHIP_ERROR GetClock_LastKnownGoodTimeMS(Milliseconds64 & aTime)
+    CHIP_ERROR GetClock_LastKnownGoodTimeMS(Milliseconds64 & aTime)
     {
         if (mLastKnownGoodTime == Microseconds64(0))
         {
             return CHIP_ERROR_INVALID_TIME;
         }
         aTime = std::chrono::duration_cast<System::Clock::Milliseconds64>(mLastKnownGoodTime);
-        ;
         return CHIP_NO_ERROR;
     }
 
@@ -329,7 +328,7 @@ public:
      *                                    (by default, aForceUpdate is false)
      *
      */
-    virtual void SetClock_LastKnownGoodTime(Microseconds64 aNewTime, bool aForceUpdate = false)
+    void SetClock_LastKnownGoodTime(Microseconds64 aNewTime, bool aForceUpdate = false)
     {
         if (aForceUpdate || aNewTime > mLastKnownGoodTime)
         {

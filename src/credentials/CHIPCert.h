@@ -832,7 +832,7 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nod
 /**
  * Extract Public Key from a chip certificate in ByteSpan TLV-encoded form.
  * This does not perform any sort of validation on the certificate structure
- * structure than parsing it.
+ * other than parsing it.
  *
  * Can return any error that can be returned from parsing the cert.
  */
@@ -841,7 +841,7 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
 /**
  * Extract Subject Key Identifier from a chip certificate in ByteSpan TLV-encoded form.
  * This does not perform any sort of validation on the certificate structure
- * structure than parsing it.
+ * other than parsing it.
  *
  * Can return any error that can be returned from parsing the cert.
  */
@@ -850,7 +850,7 @@ CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId &
 /**
  * Extract validity start timestamp from a chip certificate.
  * This does not perform any sort of validation on the certificate structure
- * structure than parsing it.
+ * other than parsing it.
  *
  * Can return any error that can be returned from parsing the cert.
  */
