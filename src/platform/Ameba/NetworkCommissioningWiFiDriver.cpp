@@ -205,7 +205,7 @@ void AmebaWiFiDriver::OnScanWiFiNetworkDone()
         return;
     }
 
-    rtw_scan_result_t *ScanResult = (rtw_scan_result*) calloc(NumAP, sizeof(rtw_scan_result));
+    rtw_scan_result_t *ScanResult = (rtw_scan_result*) pvPortMalloc(NumAP * sizeof(rtw_scan_result));
     matter_get_scan_results(ScanResult, NumAP);
 
     if (ScanResult)
@@ -223,7 +223,7 @@ void AmebaWiFiDriver::OnScanWiFiNetworkDone()
                 }
             }))
         {
-            free(ScanResult);
+            ChipLogProgress(DeviceLayer, "ScheduleLambda OK");
         }
     }
     else
@@ -235,7 +235,7 @@ void AmebaWiFiDriver::OnScanWiFiNetworkDone()
             mpScanCallback = nullptr;
         }
     }
-    free(ScanResult);
+    vPortFree(ScanResult);
 }
 
 void AmebaWiFiDriver::ScanNetworks(ByteSpan ssid, WiFiDriver::ScanCallback * callback)
