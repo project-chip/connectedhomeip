@@ -1,0 +1,192 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 21.8.4. [TC-MC-6.4] Variable Speed Media Playback Verification
+
+config:
+    cluster: "Media Playback"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    #issue #12884 Media cluster commands and precondition not supported
+    - labe: "Precondition: Connect media content available for playback"
+      disabled: true
+
+    - label:
+          "Precondition: Media content in a paused state at the beginning of the
+          content"
+      disabled: true
+      command: "MediaPause"
+
+    - label: "log a command"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Verify that media is paused"
+
+    - label: "Reads the CurrentState attribute from the DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "playback state"
+      response:
+          value: 1
+
+    - label: "Reads the PlaybackSpeed attribute from the DUT"
+      command: "readAttribute"
+      attribute: "playback speed"
+      response:
+          value: 0
+
+    - label: "Sends a FastForward command"
+      disabled: true
+      command: "MediaFastForward"
+      response:
+          values:
+              - name: "returnValue"
+              - value: 0
+
+    - label: "log a command"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Verify that the media is playing"
+
+    - label: "Reads the CurrentState attribute"
+      command: "readAttribute"
+      attribute: "playback state"
+      response:
+          value: 0
+
+    - label: "Reads the PlaybackSpeed attribute from the DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "playback speed"
+      response:
+          value: 1
+
+    - label: "Sends a FastForward command"
+      disabled: true
+      command: "MediaFastForward"
+      response:
+          values:
+              - name: "returnValue"
+              - value: 0
+
+    - label: "log a command"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Verify that the media play speed has increased"
+
+    - label: "Reads the PlaybackSpeed attribute from the DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "playback speed"
+      response:
+          value: 2
+
+    - label: "Sends a Rewind command to the DUT"
+      disabled: true
+      command: "MediaRewind"
+
+    - label: "log a command"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Verify that the media play has reversed direction"
+
+    - label: "Reads the CurrentState attribute"
+      command: "readAttribute"
+      attribute: "playback state"
+      response:
+          value: 0
+
+    - label: "Reads the PlaybackSpeed attribute from the DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "playback speed"
+      response:
+          value: -1
+
+    - label: "Sends a Rewind command to the DUT"
+      disabled: true
+      command: "MediaRewind"
+      response:
+          values:
+              - name: "returnValue"
+              - value: 0
+
+    - label: "log a command"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value: "Verify that the media play has reversed direction"
+
+    - label: "Reads the PlaybackSpeed attribute from the DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "playback speed"
+      response:
+          value: -2
+
+    - label: "Sends a Play command"
+      disabled: true
+      command: "MediaPlay"
+      response:
+          values:
+              - name: "returnValue"
+              - value: 0
+
+    - label: "log a command"
+      cluster: "LogCommands"
+      command: "UserPrompt"
+      arguments:
+          values:
+              - name: "message"
+                value:
+                    "Verify that the media is has resumed playing forward at the
+                    default speed"
+
+    - label: "Reads the PlaybackSpeed attribute from the DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "playback speed"
+      response:
+          value: 1
+
+    - label: "Sends consecutive FastForward commands"
+      disabled: true
+      command: "MediaFastForward"
+      response:
+          error: 4
+
+    - label: "Sends consecutive Rewind commands"
+      disabled: true
+      command: "MediaRewind"
+      response:
+          error: 4
