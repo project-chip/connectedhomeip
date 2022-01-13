@@ -462,7 +462,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
     record.clusterId          = aPath.mClusterId;
     record.clusterMask        = CLUSTER_MASK_SERVER;
     record.attributeId        = aPath.mAttributeId;
-    record.manufacturerCode   = EMBER_AF_NULL_MANUFACTURER_CODE;
     EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &attributeMetadata, attributeData, sizeof(attributeData),
                                                          /* write = */ false);
 
