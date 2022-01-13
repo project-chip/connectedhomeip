@@ -262,8 +262,6 @@ void Instance::HandleRemoveNetwork(HandlerContext & ctx, const Commands::RemoveN
 
 void Instance::HandleConnectNetwork(HandlerContext & ctx, const Commands::ConnectNetwork::DecodableType & req)
 {
-    Commands::ConnectNetworkResponse::Type response;
-
     mAsyncCommandHandle = app::CommandHandler::Handle(&ctx.mCommandHandler);
     mpWirelessDriver->ConnectNetwork(req.networkID, this);
 }
