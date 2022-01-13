@@ -348,7 +348,7 @@ server cluster GroupKeyManagement = 63 {
   struct GroupInfo {
     INT16U kFabricIndex = 0;
     INT16U kGroupId = 1;
-    INT16U kEndpoints = 2;
+    INT16U kEndpoints[] = 2;
     CHAR_STRING kGroupName = 3;
   }
 

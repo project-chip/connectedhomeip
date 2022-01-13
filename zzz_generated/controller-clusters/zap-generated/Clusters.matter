@@ -25,14 +25,14 @@ client cluster AccessControl = 31 {
     fabric_idx kFabricIndex = 0;
     Privilege kPrivilege = 1;
     AuthMode kAuthMode = 2;
-    INT64U kSubjects = 3;
-    Target kTargets = 4;
+    nullable INT64U kSubjects[] = 3;
+    nullable Target kTargets[] = 4;
   }
 
   struct Target {
-    cluster_id kCluster = 0;
-    endpoint_no kEndpoint = 1;
-    devtype_id kDeviceType = 2;
+    nullable cluster_id kCluster = 0;
+    nullable endpoint_no kEndpoint = 1;
+    nullable devtype_id kDeviceType = 2;
   }
 
   struct ExtensionEntry {
@@ -353,7 +353,7 @@ client cluster BridgedActions = 37 {
     INT16U kEndpointListID = 1;
     CHAR_STRING kName = 2;
     EndpointListTypeEnum kType = 3;
-    ENDPOINT_NO kEndpoints = 4;
+    ENDPOINT_NO kEndpoints[] = 4;
   }
 
   event StateChanged(info) = 0 {
@@ -804,13 +804,13 @@ client cluster ContentLauncher = 1290 {
   }
 
   struct ContentSearch {
-    Parameter kParameterList = 1;
+    Parameter kParameterList[] = 1;
   }
 
   struct Parameter {
     ParameterEnum kType = 1;
     CHAR_STRING kValue = 2;
-    AdditionalInfo kExternalIDList = 3;
+    AdditionalInfo kExternalIDList[] = 3;
   }
 
   struct AdditionalInfo {
@@ -1479,7 +1479,7 @@ client cluster GroupKeyManagement = 63 {
   struct GroupInfo {
     INT16U kFabricIndex = 0;
     INT16U kGroupId = 1;
-    INT16U kEndpoints = 2;
+    INT16U kEndpoints[] = 2;
     CHAR_STRING kGroupName = 3;
   }
 
@@ -2797,18 +2797,18 @@ client cluster TestCluster = 1295 {
   }
 
   struct NullablesAndOptionalsStruct {
-    INT16U kNullableInt = 1;
-    INT16U kOptionalInt = 2;
-    INT16U kNullableOptionalInt = 3;
-    CHAR_STRING kNullableString = 4;
-    CHAR_STRING kOptionalString = 5;
-    CHAR_STRING kNullableOptionalString = 6;
-    SimpleStruct kNullableStruct = 7;
-    SimpleStruct kOptionalStruct = 8;
-    SimpleStruct kNullableOptionalStruct = 9;
-    SimpleEnum kNullableList = 10;
-    SimpleEnum kOptionalList = 11;
-    SimpleEnum kNullableOptionalList = 12;
+    nullable INT16U kNullableInt = 1;
+    optional INT16U kOptionalInt = 2;
+    optional nullable INT16U kNullableOptionalInt = 3;
+    nullable CHAR_STRING kNullableString = 4;
+    optional CHAR_STRING kOptionalString = 5;
+    optional nullable CHAR_STRING kNullableOptionalString = 6;
+    nullable SimpleStruct kNullableStruct = 7;
+    optional SimpleStruct kOptionalStruct = 8;
+    optional nullable SimpleStruct kNullableOptionalStruct = 9;
+    nullable SimpleEnum kNullableList[] = 10;
+    optional SimpleEnum kOptionalList[] = 11;
+    optional nullable SimpleEnum kNullableOptionalList[] = 12;
   }
 
   struct SimpleStruct {
@@ -2826,10 +2826,10 @@ client cluster TestCluster = 1295 {
     INT8U kA = 1;
     BOOLEAN kB = 2;
     SimpleStruct kC = 3;
-    SimpleStruct kD = 4;
-    INT32U kE = 5;
-    OCTET_STRING kF = 6;
-    INT8U kG = 7;
+    SimpleStruct kD[] = 4;
+    INT32U kE[] = 5;
+    OCTET_STRING kF[] = 6;
+    INT8U kG[] = 7;
   }
 
   struct NestedStruct {

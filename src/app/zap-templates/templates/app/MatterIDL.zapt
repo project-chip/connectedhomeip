@@ -7,7 +7,11 @@
 {{/if}}
 struct {{name}} {
   {{#zcl_struct_items}}
-  {{type}} k{{asUpperCamelCase label}} = {{fieldIdentifier}};
+  {{#if isOptional~}} optional {{/if~}}
+  {{~#if isNullable~}} nullable {{/if~}} {{type}} k{{asUpperCamelCase label}}
+  {{~#if isArray~}}
+    []
+  {{~/if}} = {{fieldIdentifier}};
   {{/zcl_struct_items}}
 }
 
@@ -30,7 +34,11 @@ struct {{name}} {
   {{/if}}
   struct {{name}} {
     {{#zcl_struct_items}}
-    {{type}} k{{asUpperCamelCase label}} = {{fieldIdentifier}};
+    {{#if isOptional~}} optional {{/if~}}
+    {{~#if isNullable~}} nullable {{/if~}} {{type}} k{{asUpperCamelCase label}}
+    {{~#if isArray~}}
+      []
+    {{~/if}} = {{fieldIdentifier}};
     {{/zcl_struct_items}}
   }
 

@@ -335,13 +335,13 @@ server cluster ContentLauncher = 1290 {
   }
 
   struct ContentSearch {
-    Parameter kParameterList = 1;
+    Parameter kParameterList[] = 1;
   }
 
   struct Parameter {
     ParameterEnum kType = 1;
     CHAR_STRING kValue = 2;
-    AdditionalInfo kExternalIDList = 3;
+    AdditionalInfo kExternalIDList[] = 3;
   }
 
   struct AdditionalInfo {
@@ -696,7 +696,7 @@ server cluster GroupKeyManagement = 63 {
   struct GroupInfo {
     INT16U kFabricIndex = 0;
     INT16U kGroupId = 1;
-    INT16U kEndpoints = 2;
+    INT16U kEndpoints[] = 2;
     CHAR_STRING kGroupName = 3;
   }
 
