@@ -900,24 +900,6 @@ client cluster OnOff = 6 {
   attribute(readonly, reportable) enum8 startUpOnOff = 16387;
   attribute(writable, reportable) bitmap32 featureMap = 65532;
   attribute(writable, reportable) int16u clusterRevision = 65533;
-
-  request struct OffWithEffectRequest {
-    OnOffEffectIdentifier EffectId;  
-    OnOffDelayedAllOffEffectVariant EffectVariant;  
-  }
-
-  request struct OnWithRecallGlobalSceneRequest {
-  }
-
-  request struct OnWithTimedOffRequest {
-    OnOffControl OnOffControl;  
-    int16u OnTime;  
-    int16u OffWaitTime;  
-  }
-
-  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  command OnWithRecallGlobalScene(OnWithRecallGlobalSceneRequest): DefaultSuccess = 65;
-  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
 }
 
 server cluster OnOff = 6 {
@@ -947,14 +929,31 @@ server cluster OnOff = 6 {
   request struct OffRequest {
   }
 
+  request struct OffWithEffectRequest {
+    OnOffEffectIdentifier EffectId;  
+    OnOffDelayedAllOffEffectVariant EffectVariant;  
+  }
+
   request struct OnRequest {
+  }
+
+  request struct OnWithRecallGlobalSceneRequest {
+  }
+
+  request struct OnWithTimedOffRequest {
+    OnOffControl OnOffControl;  
+    int16u OnTime;  
+    int16u OffWaitTime;  
   }
 
   request struct ToggleRequest {
   }
 
   command Off(OffRequest): DefaultSuccess = 0;
+  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
   command On(OnRequest): DefaultSuccess = 1;
+  command OnWithRecallGlobalScene(OnWithRecallGlobalSceneRequest): DefaultSuccess = 65;
+  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
   command Toggle(ToggleRequest): DefaultSuccess = 2;
 }
 

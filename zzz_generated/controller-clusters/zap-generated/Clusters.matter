@@ -1,11 +1,6 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-struct Application {
-  INT16U kCatalogVendorId = 1;
-  CHAR_STRING kApplicationId = 2;
-}
-
 struct LabelStruct {
   CHAR_STRING kLabel = 1;
   CHAR_STRING kValue = 2;
@@ -124,11 +119,16 @@ client cluster ApplicationBasic = 1293 {
     kActiveVisibleNotFocus = 3;
   }
 
+  struct ApplicationBasicApplication {
+    INT16U kCatalogVendorId = 1;
+    CHAR_STRING kApplicationId = 2;
+  }
+
   attribute(writable, reportable) char_string vendorName = 0;
   attribute(writable, reportable) int16u vendorId = 1;
   attribute(writable, reportable) char_string applicationName = 2;
   attribute(writable, reportable) int16u productId = 3;
-  attribute(readonly) Application applicationApp = 4;
+  attribute(readonly) ApplicationBasicApplication applicationApp = 4;
   attribute(writable, reportable) ApplicationStatusEnum applicationStatus = 5;
   attribute(writable, reportable) char_string applicationVersion = 6;
   attribute(writable) vendor_id allowedVendorList = 7;
@@ -143,21 +143,26 @@ client cluster ApplicationLauncher = 1292 {
     kSystemBusy = 2;
   }
 
+  struct ApplicationLauncherApplication {
+    INT16U kCatalogVendorId = 1;
+    CHAR_STRING kApplicationId = 2;
+  }
+
   attribute(writable, reportable) INT16U applicationLauncherList = 0;
   attribute(writable) attrib_id attributeList = 65531;
   attribute(writable, reportable) int16u clusterRevision = 65533;
 
   request struct HideAppRequestRequest {
-    Application application;  
+    ApplicationLauncherApplication application;  
   }
 
   request struct LaunchAppRequestRequest {
     CHAR_STRING data;  
-    Application application;  
+    ApplicationLauncherApplication application;  
   }
 
   request struct StopAppRequestRequest {
-    Application application;  
+    ApplicationLauncherApplication application;  
   }
 
   response struct LauncherResponse {
