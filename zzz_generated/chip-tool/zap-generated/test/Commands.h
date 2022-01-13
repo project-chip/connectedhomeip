@@ -22137,14 +22137,6 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
-        case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads the CurrentTarget attribute\n");
-            err = TestReadsTheCurrentTargetAttribute_1();
-            break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the TargetList attribute\n");
-            err = TestReadsTheTargetListAttribute_2();
-            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -22156,35 +22148,10 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 1;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
-
-    uint8_t currentTarget;
-
-    static void OnFailureCallback_1(void * context, EmberAfStatus status)
-    {
-        (static_cast<Test_TC_MC_8_1 *>(context))->OnFailureResponse_1(status);
-    }
-
-    static void OnSuccessCallback_1(void * context, uint8_t currentNavigatorTarget)
-    {
-        (static_cast<Test_TC_MC_8_1 *>(context))->OnSuccessResponse_1(currentNavigatorTarget);
-    }
-
-    static void OnFailureCallback_2(void * context, EmberAfStatus status)
-    {
-        (static_cast<Test_TC_MC_8_1 *>(context))->OnFailureResponse_2(status);
-    }
-
-    static void OnSuccessCallback_2(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &
-            targetNavigatorList)
-    {
-        (static_cast<Test_TC_MC_8_1 *>(context))->OnSuccessResponse_2(targetNavigatorList);
-    }
 
     //
     // Tests methods
@@ -22235,6 +22202,14 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 0 : Wait for the commissioned device to be retrieved\n");
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Reads the CurrentTarget attribute\n");
+            err = TestReadsTheCurrentTargetAttribute_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the TargetList attribute\n");
+            err = TestReadsTheTargetListAttribute_2();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -22246,10 +22221,35 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 1;
+    const uint16_t mTestCount = 3;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
+
+    uint8_t currentTarget;
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_8_1 *>(context))->OnFailureResponse_1(status);
+    }
+
+    static void OnSuccessCallback_1(void * context, uint8_t currentNavigatorTarget)
+    {
+        (static_cast<Test_TC_MC_8_1 *>(context))->OnSuccessResponse_1(currentNavigatorTarget);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_8_1 *>(context))->OnFailureResponse_2(status);
+    }
+
+    static void OnSuccessCallback_2(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> &
+            targetNavigatorList)
+    {
+        (static_cast<Test_TC_MC_8_1 *>(context))->OnSuccessResponse_2(targetNavigatorList);
+    }
 
     //
     // Tests methods
