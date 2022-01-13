@@ -36736,8 +36736,6 @@ private:
         request.data = chip::Span<const char>("datagarbage: not in length on purpose", 4);
 
         request.application.catalogVendorId = 123U;
-        request.application.catalogVendorId = 123U;
-        request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
         request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -36771,8 +36769,6 @@ private:
         RequestType request;
 
         request.application.catalogVendorId = 123U;
-        request.application.catalogVendorId = 123U;
-        request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
         request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
@@ -36806,8 +36802,6 @@ private:
         RequestType request;
 
         request.application.catalogVendorId = 123U;
-        request.application.catalogVendorId = 123U;
-        request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
         request.application.applicationId   = chip::Span<const char>("applicationIdgarbage: not in length on purpose", 13);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {

@@ -775,8 +775,6 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     ApplicationLauncher::Commands::HideAppRequest::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.applicationId = [self asCharSpan:params.application.applicationId];
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
@@ -795,8 +793,6 @@ using namespace chip::app::Clusters;
     ApplicationLauncher::Commands::LaunchAppRequest::Type request;
     request.data = [self asCharSpan:params.data];
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.applicationId = [self asCharSpan:params.application.applicationId];
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
@@ -814,8 +810,6 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     ApplicationLauncher::Commands::StopAppRequest::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.applicationId = [self asCharSpan:params.application.applicationId];
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
