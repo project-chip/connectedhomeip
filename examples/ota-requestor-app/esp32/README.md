@@ -45,7 +45,8 @@ chip-tool. On receiving this command OTA requestor will query for OTA image.
 
 ## Apply update
 
-Once transfer is complete, reboot the device manually to boot from upgraded OTA image.
+Once transfer is complete, reboot the device manually to boot from upgraded OTA
+image.
 
 ## ESP32 OTA Requestor with Linux OTA Provider
 
