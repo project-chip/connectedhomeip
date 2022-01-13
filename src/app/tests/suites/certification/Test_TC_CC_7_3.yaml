@@ -91,6 +91,21 @@ tests:
       response:
           value: 1000
 
+    - label: "Reset Enhanced Step Hue Up command"
+      command: "EnhancedStepHue"
+      arguments:
+          values:
+              - name: "stepMode"
+                value: 0
+              - name: "stepSize"
+                value: 0
+              - name: "transitionTime"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
       command: "off"

@@ -69,6 +69,21 @@ tests:
       response:
           value: 1200
 
+    - label: "Reset Enhanced move to hue and saturation command"
+      command: "EnhancedMoveToHueAndSaturation"
+      arguments:
+          values:
+              - name: "enhancedHue"
+                value: 0
+              - name: "saturation"
+                value: 0
+              - name: "transitionTime"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
       command: "off"
