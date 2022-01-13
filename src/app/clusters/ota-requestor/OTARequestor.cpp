@@ -20,7 +20,6 @@
  * OTA Requestor logic is contained in this class.
  */
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <lib/core/CHIPEncoding.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/OTAImageProcessor.h>
@@ -90,12 +89,12 @@ static void LogApplyUpdateResponse(const ApplyUpdateResponse::DecodableType & re
 
 static void SetUpdateStateAttribute(OTAUpdateStateEnum state)
 {
-    OtaRequestorServer::GetInstance().SetUpdateState(state);
+    OtaRequestorServerSetUpdateState(state);
 
     // The UpdateStateProgress attribute only applies to the querying state
     if (state != OTAUpdateStateEnum::kQuerying)
     {
-        OtaRequestorServer::GetInstance().SetUpdateStateProgress(0);
+        OtaRequestorServerSetUpdateStateProgress(0);
     }
 }
 
@@ -302,6 +301,7 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
         {
             ChipLogError(SoftwareUpdate, "Failed to start download: %" CHIP_ERROR_FORMAT, err.Format());
             requestorCore->mOtaRequestorDriver->HandleError(OTAUpdateStateEnum::kDownloading, err);
+            SetUpdateStateAttribute(OTAUpdateStateEnum::kIdle);
             return;
         }
 
@@ -315,6 +315,7 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
         {
             ChipLogError(SoftwareUpdate, "Failed to send ApplyUpdate command: %" CHIP_ERROR_FORMAT, err.Format());
             requestorCore->mOtaRequestorDriver->HandleError(OTAUpdateStateEnum::kApplying, err);
+            SetUpdateStateAttribute(OTAUpdateStateEnum::kIdle);
             return;
         }
 
@@ -394,7 +395,7 @@ void OTARequestor::OnDownloadStateChanged(OTADownloader::State state)
 
 void OTARequestor::OnUpdateProgressChanged(uint8_t percent)
 {
-    OtaRequestorServer::GetInstance().SetUpdateStateProgress(percent);
+    OtaRequestorServerSetUpdateStateProgress(percent);
 }
 
 CHIP_ERROR OTARequestor::SendQueryImageRequest(OperationalDeviceProxy & deviceProxy)

@@ -80,8 +80,8 @@ public:
         mOtaRequestorDriver = driver;
         mBdxDownloader      = downloader;
 
-        OtaRequestorServer::GetInstance().SetUpdateState(app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle);
-        OtaRequestorServer::GetInstance().SetUpdateStateProgress(0);
+        OtaRequestorServerSetUpdateState(app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle);
+        OtaRequestorServerSetUpdateStateProgress(0);
     }
 
     /**

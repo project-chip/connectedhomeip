@@ -20,10 +20,8 @@
  * to the OTA Requestor object that handles them
  */
 
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/AttributeAccessInterface.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
-#include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <platform/OTARequestorInterface.h>
 
@@ -81,19 +79,9 @@ CHIP_ERROR OtaSoftwareUpdateRequestorAttrAccess::Write(const ConcreteDataAttribu
 
 } // namespace
 
-namespace chip {
-
 // -----------------------------------------------------------------------------
-// OtaRequestorServer implementation
-
-static OtaRequestorServer sInstance;
-
-OtaRequestorServer & OtaRequestorServer::GetInstance(void)
-{
-    return sInstance;
-}
-
-EmberAfStatus OtaRequestorServer::SetUpdateState(OTAUpdateStateEnum value)
+// Global functions
+EmberAfStatus OtaRequestorServerSetUpdateState(OTAUpdateStateEnum value)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -114,7 +102,7 @@ EmberAfStatus OtaRequestorServer::SetUpdateState(OTAUpdateStateEnum value)
     return status;
 }
 
-EmberAfStatus OtaRequestorServer::SetUpdateStateProgress(uint8_t value)
+EmberAfStatus OtaRequestorServerSetUpdateStateProgress(uint8_t value)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
@@ -124,20 +112,15 @@ EmberAfStatus OtaRequestorServer::SetUpdateStateProgress(uint8_t value)
         app::DataModel::Nullable<uint8_t> currentValue;
         status = Attributes::UpdateStateProgress::Get(endpoint, currentValue);
         VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
-        if (!currentValue.IsNull())
+        if (currentValue.IsNull() || currentValue.Value() != value)
         {
-            if (currentValue.Value() != value)
-            {
-                status = Attributes::UpdateStateProgress::Set(endpoint, value);
-                VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
-            }
+            status = Attributes::UpdateStateProgress::Set(endpoint, value);
+            VerifyOrDie(EMBER_ZCL_STATUS_SUCCESS == status);
         }
     }
 
     return status;
 }
-
-} // namespace chip
 
 // -----------------------------------------------------------------------------
 // Callbacks implementation

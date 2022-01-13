@@ -16,15 +16,9 @@
  *    limitations under the License.
  */
 
-namespace chip {
+#pragma once
 
-class OtaRequestorServer
-{
-public:
-    static OtaRequestorServer & GetInstance(void);
+#include <app-common/zap-generated/attributes/Accessors.h>
 
-    EmberAfStatus SetUpdateState(chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value);
-    EmberAfStatus SetUpdateStateProgress(uint8_t value);
-};
-
-} // namespace chip
+EmberAfStatus OtaRequestorServerSetUpdateState(chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value);
+EmberAfStatus OtaRequestorServerSetUpdateStateProgress(uint8_t value);
