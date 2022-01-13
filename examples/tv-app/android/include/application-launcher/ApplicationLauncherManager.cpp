@@ -36,7 +36,8 @@ std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList()
 }
 
 Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(
-    const chip::CharSpan & data, const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
+    const chip::CharSpan & data,
+    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
@@ -45,8 +46,8 @@ Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(
     return response;
 }
 
-Commands::LauncherResponse::Type
-ApplicationLauncherManager::HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
+Commands::LauncherResponse::Type ApplicationLauncherManager::HandleStopApp(
+    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;
@@ -55,8 +56,8 @@ ApplicationLauncherManager::HandleStopApp(const chip::app::Clusters::Application
     return response;
 }
 
-Commands::LauncherResponse::Type
-ApplicationLauncherManager::HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
+Commands::LauncherResponse::Type ApplicationLauncherManager::HandleHideApp(
+    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
 {
     // TODO: Insert code here
     Commands::LauncherResponse::Type response;

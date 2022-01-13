@@ -21019,7 +21019,7 @@ namespace Events {
 } // namespace AudioOutput
 namespace ApplicationLauncher {
 namespace Structs {
-namespace Application {
+namespace ApplicationLauncherApplication {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21058,7 +21058,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace Application
+} // namespace ApplicationLauncherApplication
 namespace ApplicationEP {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -21282,7 +21282,7 @@ namespace Events {
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
 namespace Structs {
-namespace Application {
+namespace ApplicationBasicApplication {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21321,7 +21321,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace Application
+} // namespace ApplicationBasicApplication
 } // namespace Structs
 
 namespace Commands {

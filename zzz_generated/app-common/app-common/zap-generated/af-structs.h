@@ -132,17 +132,17 @@ typedef struct _BrandingInformation
     StyleInformation waterMark;
 } BrandingInformation;
 
-// Struct for Application
-typedef struct _Application
+// Struct for ApplicationLauncherApplication
+typedef struct _ApplicationLauncherApplication
 {
     uint16_t catalogVendorId;
     chip::CharSpan applicationId;
-} Application;
+} ApplicationLauncherApplication;
 
 // Struct for ApplicationEP
 typedef struct _ApplicationEP
 {
-    Application application;
+    ApplicationLauncherApplication application;
     chip::CharSpan endpoint;
 } ApplicationEP;
 
@@ -174,6 +174,13 @@ typedef struct _ActionStruct
     uint16_t SupportedCommands;
     uint8_t Status;
 } ActionStruct;
+
+// Struct for ApplicationBasicApplication
+typedef struct _ApplicationBasicApplication
+{
+    uint16_t catalogVendorId;
+    chip::CharSpan applicationId;
+} ApplicationBasicApplication;
 
 // Struct for BasicCommissioningInfoType
 typedef struct _BasicCommissioningInfoType
