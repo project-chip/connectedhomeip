@@ -536,6 +536,7 @@ function getTests()
     'TestClusterComplexTypes',
     'TestConstraints',
     'TestDelayCommands',
+    'TestEvents',
     'TestDiscovery',
     'TestLogCommands',
     'TestSaveAs',
