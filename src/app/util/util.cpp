@@ -325,20 +325,13 @@ void emberAfStackDown(void)
 // Print out information about each cluster
 // ****************************************
 
-uint16_t emberAfFindClusterNameIndexWithMfgCode(ClusterId cluster, uint16_t mfgCode)
+uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
 {
     static_assert(sizeof(ClusterId) == 4, "May need to adjust our index type or somehow define it in terms of cluster id type");
     uint16_t index = 0;
     while (zclClusterNames[index].id != ZCL_NULL_CLUSTER_ID)
     {
-        if (zclClusterNames[index].id == cluster
-            // This check sees if its a standard cluster, in which mfgCode is ignored
-            // due to the name being well defined.
-            // If it is manufacturer specific, then we try to check to see if we
-            // know the name of the cluster within the list.
-            // If the mfgCode we are given is null, then we just ignore it for backward
-            // compatibility reasons
-            && (cluster < 0xFC00 || zclClusterNames[index].mfgCode == mfgCode || mfgCode == EMBER_AF_NULL_MANUFACTURER_CODE))
+        if (zclClusterNames[index].id == cluster)
         {
             return index;
         }
@@ -347,16 +340,11 @@ uint16_t emberAfFindClusterNameIndexWithMfgCode(ClusterId cluster, uint16_t mfgC
     return 0xFFFF;
 }
 
-uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
-{
-    return emberAfFindClusterNameIndexWithMfgCode(cluster, EMBER_AF_NULL_MANUFACTURER_CODE);
-}
-
 // This function parses into the cluster name table, and tries to find
-// the index in the table that has the two keys: cluster + mfgcode.
-void emberAfDecodeAndPrintClusterWithMfgCode(ClusterId cluster, uint16_t mfgCode)
+// the index in the table that has the right cluster id.
+void emberAfDecodeAndPrintCluster(ClusterId cluster)
 {
-    uint16_t index = emberAfFindClusterNameIndexWithMfgCode(cluster, mfgCode);
+    uint16_t index = emberAfFindClusterNameIndex(cluster);
     if (index == 0xFFFF)
     {
         static_assert(sizeof(ClusterId) == 4, "Adjust the print formatting");
@@ -366,11 +354,6 @@ void emberAfDecodeAndPrintClusterWithMfgCode(ClusterId cluster, uint16_t mfgCode
     {
         emberAfPrint(emberAfPrintActiveArea, "(%p)", zclClusterNames[index].name);
     }
-}
-
-void emberAfDecodeAndPrintCluster(ClusterId cluster)
-{
-    emberAfDecodeAndPrintClusterWithMfgCode(cluster, EMBER_AF_NULL_MANUFACTURER_CODE);
 }
 
 // This function makes the assumption that

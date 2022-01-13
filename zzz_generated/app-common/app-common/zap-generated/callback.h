@@ -15285,7 +15285,7 @@ void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks);
  */
 EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                           chip::AttributeId attributeId, uint8_t mask,
-                                                                          uint16_t manufacturerCode, uint8_t * value, uint8_t type);
+                                                                          uint8_t * value, uint8_t type);
 
 /** @brief Attribute Read Access
  *

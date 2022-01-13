@@ -145,11 +145,9 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void);
 void emberAfInit(chip::Messaging::ExchangeManager * exchangeContext);
 void emberAfTick(void);
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
-uint16_t emberAfFindClusterNameIndexWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 void emberAfStackDown(void);
 
 void emberAfDecodeAndPrintCluster(chip::ClusterId cluster);
-void emberAfDecodeAndPrintClusterWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 
 /**
  * Retrieves the difference between the two passed values.
