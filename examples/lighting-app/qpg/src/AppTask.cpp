@@ -349,7 +349,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             sAppTask.mFunction = kFunction_NoneSelected;
 
             ChipLogProgress(NotSpecified, "[BTN] Triggering OTA Query");
-            
+
             TriggerOTAQuery();
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
