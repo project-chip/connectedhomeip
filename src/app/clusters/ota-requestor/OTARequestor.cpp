@@ -200,7 +200,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(app::CommandHandler * comm
     }
 
     mProviderNodeId      = providerNodeId;
-    mProviderFabricIndex = commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
+    mProviderFabricIndex = commandObj->GetAccessingFabricIndex();
     mProviderEndpointId  = providerEndpoint;
 
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
@@ -323,8 +323,8 @@ void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
-    ChipLogError(SoftwareUpdate, "Failed to connect to node 0x%" PRIX64 ": %" CHIP_ERROR_FORMAT, peerId.GetNodeId(),
-                 error.Format());
+    ChipLogError(SoftwareUpdate, "Failed to connect to node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                 ChipLogValueX64(peerId.GetNodeId()), error.Format());
 
     switch (requestorCore->mOnConnectedAction)
     {

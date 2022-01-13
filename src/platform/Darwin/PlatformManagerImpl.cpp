@@ -133,5 +133,21 @@ PlatformManagerImpl::_SetUserLabelList(
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR
+PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
+{
+    // In Darwin simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
+    supportedLocales.add(CharSpan("en-US", strlen("en-US")));
+    supportedLocales.add(CharSpan("de-DE", strlen("de-DE")));
+    supportedLocales.add(CharSpan("fr-FR", strlen("fr-FR")));
+    supportedLocales.add(CharSpan("en-GB", strlen("en-GB")));
+    supportedLocales.add(CharSpan("es-ES", strlen("es-ES")));
+    supportedLocales.add(CharSpan("zh-CN", strlen("zh-CN")));
+    supportedLocales.add(CharSpan("it-IT", strlen("it-IT")));
+    supportedLocales.add(CharSpan("ja-JP", strlen("ja-JP")));
+
+    return CHIP_NO_ERROR;
+}
+
 } // namespace DeviceLayer
 } // namespace chip

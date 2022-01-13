@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,11 +16,25 @@
  *    limitations under the License.
  */
 
-#ifndef _SERVICE_PROVISIONING_H
-#define _SERVICE_PROVISIONING_H
+#pragma once
 
-#include <lib/core/CHIPError.h>
+#include <jni.h>
 
-CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key);
+class TvAppJNI
+{
+public:
+    void InitializeWithObjects(jobject app);
+    void PostClusterInit(int clusterId, int endpoint);
 
-#endif // _SERVICE_PROVISIONING_H
+private:
+    friend TvAppJNI & TvAppJNIMgr();
+
+    static TvAppJNI sInstance;
+    jobject mTvAppObject             = nullptr;
+    jmethodID mPostClusterInitMethod = nullptr;
+};
+
+inline class TvAppJNI & TvAppJNIMgr()
+{
+    return TvAppJNI::sInstance;
+}

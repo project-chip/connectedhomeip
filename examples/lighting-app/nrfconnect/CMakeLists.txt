@@ -26,7 +26,7 @@ include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 # Load NCS/Zephyr build system
 set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 
-if (EXISTS boards/${BOARD}.conf)
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf)
   list(APPEND CONF_FILE boards/${BOARD}.conf)
 endif()
 

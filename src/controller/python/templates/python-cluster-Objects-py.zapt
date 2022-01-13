@@ -99,6 +99,12 @@ class {{asUpperCamelCase name}}(Cluster):
                         {{/zcl_command_arguments}}
                     ])
 
+            {{#if mustUseTimedInvoke}}
+            @ChipUtility.classproperty
+            def must_use_timed_invoke(cls) -> bool:
+                return True
+
+            {{/if}}
             {{#zcl_command_arguments}}
             {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
             {{/zcl_command_arguments}}
@@ -119,6 +125,12 @@ class {{asUpperCamelCase name}}(Cluster):
             def attribute_id(cls) -> int:
                 return {{ asMEI manufacturerCode code }}
 
+            {{#if mustUseTimedWrite}}
+            @ChipUtility.classproperty
+            def must_use_timed_write(cls) -> bool:
+                return True
+
+            {{/if}}
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
             {{#if entryType}}

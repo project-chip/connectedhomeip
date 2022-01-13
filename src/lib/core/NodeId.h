@@ -78,7 +78,7 @@ constexpr NodeId NodeIdFromGroupId(GroupId aGroupId)
     return kMinGroupNodeId | aGroupId;
 }
 
-constexpr NodeId NodeIdFromPAKEKeyId(GroupId aPAKEKeyId)
+constexpr NodeId NodeIdFromPAKEKeyId(uint16_t aPAKEKeyId)
 {
     return kMinPAKEKeyId | aPAKEKeyId;
 }

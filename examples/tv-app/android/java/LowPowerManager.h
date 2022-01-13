@@ -26,18 +26,12 @@
 class LowPowerManager : public chip::app::Clusters::LowPower::Delegate
 {
 public:
+    static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
+
     bool HandleSleep() override;
 
 private:
-    friend LowPowerManager & LowPowerMgr();
-
-    static LowPowerManager sInstance;
     jobject mLowPowerManagerObject = nullptr;
     jmethodID mSleepMethod         = nullptr;
 };
-
-inline LowPowerManager & LowPowerMgr()
-{
-    return LowPowerManager::sInstance;
-}

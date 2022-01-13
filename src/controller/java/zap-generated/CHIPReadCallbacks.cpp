@@ -6623,6 +6623,93 @@ void CHIPLevelControlAttributeListAttributeCallback::CallbackFn(void * context,
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
 
+CHIPLocalizationConfigurationSupportedLocalesAttributeCallback::CHIPLocalizationConfigurationSupportedLocalesAttributeCallback(
+    jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIPLocalizationConfigurationClusterSupportedLocalesAttributeCallbackType>(CallbackFn, this),
+    keepAlive(keepAlive)
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPLocalizationConfigurationSupportedLocalesAttributeCallback::~CHIPLocalizationConfigurationSupportedLocalesAttributeCallback()
+{
+    JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+}
+
+void CHIPLocalizationConfigurationSupportedLocalesAttributeCallback::CallbackFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & list)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+
+    std::unique_ptr<CHIPLocalizationConfigurationSupportedLocalesAttributeCallback, decltype(&maybeDestroy)> cppCallback(
+        reinterpret_cast<CHIPLocalizationConfigurationSupportedLocalesAttributeCallback *>(context), maybeDestroy);
+
+    // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+    javaCallbackRef = cppCallback.get()->javaCallbackRef;
+    VerifyOrReturn(javaCallbackRef != nullptr,
+                   ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+    jclass arrayListClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(env, "java/util/ArrayList", arrayListClass);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error using Java ArrayList"));
+    chip::JniClass arrayListJniClass(arrayListClass);
+    jmethodID arrayListCtor      = env->GetMethodID(arrayListClass, "<init>", "()V");
+    jmethodID arrayListAddMethod = env->GetMethodID(arrayListClass, "add", "(Ljava/lang/Object;)Z");
+    VerifyOrReturn(arrayListCtor != nullptr && arrayListAddMethod != nullptr,
+                   ChipLogError(Zcl, "Error finding Java ArrayList methods"));
+    jobject arrayListObj = env->NewObject(arrayListClass, arrayListCtor);
+    VerifyOrReturn(arrayListObj != nullptr, ChipLogError(Zcl, "Error creating Java ArrayList"));
+
+    jmethodID javaMethod;
+    err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+    auto iter = list.begin();
+    while (iter.Next())
+    {
+        auto & entry              = iter.GetValue();
+        bool entryNull            = false;
+        chip::CharSpan entryValue = entry;
+
+        jstring entryObject = nullptr;
+        chip::UtfString entryStr(env, entryValue);
+        if (!entryNull)
+        {
+            entryObject = jstring(entryStr.jniValue());
+        }
+
+        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, entryObject);
+    }
+    VerifyOrReturn(
+        iter.GetStatus() == CHIP_NO_ERROR,
+        ChipLogError(Zcl, "Error decoding SupportedLocalesAttribute value: %" CHIP_ERROR_FORMAT, iter.GetStatus().Format()));
+
+    env->ExceptionClear();
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
+}
+
 CHIPLowPowerAttributeListAttributeCallback::CHIPLowPowerAttributeListAttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<CHIPLowPowerClusterAttributeListAttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {

@@ -35,6 +35,8 @@
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 
+using namespace chip::System::Clock::Literals;
+
 namespace chip {
 namespace Messaging {
 
@@ -308,7 +310,10 @@ void ReliableMessageMgr::StartTimer()
 #endif
 
         StopTimer();
-        VerifyOrDie(mSystemLayer->StartTimer(nextWakeTime, Timeout, this) == CHIP_NO_ERROR);
+
+        const System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+        const auto nextWakeDelay           = (nextWakeTime > now) ? nextWakeTime - now : 0_ms;
+        VerifyOrDie(mSystemLayer->StartTimer(nextWakeDelay, Timeout, this) == CHIP_NO_ERROR);
     }
     else
     {

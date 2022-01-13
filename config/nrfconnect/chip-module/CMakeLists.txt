@@ -195,6 +195,11 @@ chip_gn_arg_bool  ("chip_monolithic_tests"                  CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
 
+if (CONFIG_CHIP_ROTATING_DEVICE_ID)
+    chip_gn_arg_bool  ("chip_enable_rotating_device_id"          "true")
+    chip_gn_arg_bool  ("chip_enable_additional_data_advertising" "true")
+endif()
+
 if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
     chip_gn_arg_string("chip_mdns" "platform")
 endif()

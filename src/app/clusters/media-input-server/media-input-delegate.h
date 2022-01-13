@@ -19,7 +19,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
-
+#include <app/AttributeAccessInterface.h>
 #include <app/util/af.h>
 #include <list>
 
@@ -34,12 +34,13 @@ namespace MediaInput {
 class Delegate
 {
 public:
-    virtual std::list<chip::app::Clusters::MediaInput::Structs::InputInfo::Type> HandleGetInputList() = 0;
-    virtual uint8_t HandleGetCurrentInput()                                                           = 0;
-    virtual bool HandleSelectInput(const uint8_t index)                                               = 0;
-    virtual bool HandleShowInputStatus()                                                              = 0;
-    virtual bool HandleHideInputStatus()                                                              = 0;
-    virtual bool HandleRenameInput(const uint8_t index, const chip::CharSpan & name)                  = 0;
+    // no easy way to handle the return memory of app::Clusters::MediaInput::Structs::InputInfo::Type list, so encoder is used
+    virtual CHIP_ERROR HandleGetInputList(app::AttributeValueEncoder & aEncoder)     = 0;
+    virtual uint8_t HandleGetCurrentInput()                                          = 0;
+    virtual bool HandleSelectInput(const uint8_t index)                              = 0;
+    virtual bool HandleShowInputStatus()                                             = 0;
+    virtual bool HandleHideInputStatus()                                             = 0;
+    virtual bool HandleRenameInput(const uint8_t index, const chip::CharSpan & name) = 0;
 
     virtual ~Delegate() = default;
 };
