@@ -25,8 +25,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/ESP32/SystemTimeSupport.h>
 
 #include <esp_timer.h>
 
@@ -110,6 +110,15 @@ CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
     }
 #endif // CHIP_PROGRESS_LOGGING
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InitClock_RealTime()
+{
+    Clock::Microseconds64 curTime =
+        Clock::Microseconds64((static_cast<uint64_t>(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD) * UINT64_C(1000000)));
+    // Use CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD as the initial value of RealTime.
+    // Then the RealTime obtained from GetClock_RealTime will be always valid.
+    return System::SystemClock().SetClock_RealTime(curTime);
 }
 
 } // namespace Clock

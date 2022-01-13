@@ -38,12 +38,11 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/clusters/channel-server/channel-delegate.h>
-#include <app/clusters/channel-server/channel-server.h>
-
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/clusters/channel-server/channel-delegate.h>
+#include <app/clusters/channel-server/channel-server.h>
 #include <app/data-model/Encode.h>
 #include <app/util/attribute-storage.h>
 
@@ -149,26 +148,17 @@ CHIP_ERROR ChannelAttrAccess::Read(const app::ConcreteReadAttributePath & aPath,
 
 CHIP_ERROR ChannelAttrAccess::ReadChannelListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    std::list<Structs::ChannelInfo::Type> channelList = delegate->HandleGetChannelList();
-    return aEncoder.EncodeList([channelList](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & channel : channelList)
-        {
-            ReturnErrorOnFailure(encoder.Encode(channel));
-        }
-        return CHIP_NO_ERROR;
-    });
+    return delegate->HandleGetChannelList(aEncoder);
 }
 
 CHIP_ERROR ChannelAttrAccess::ReadLineupAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    Structs::LineupInfo::Type lineup = delegate->HandleGetLineup();
-    return aEncoder.Encode(lineup);
+    return delegate->HandleGetLineup(aEncoder);
 }
 
 CHIP_ERROR ChannelAttrAccess::ReadCurrentChannelAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    Structs::ChannelInfo::Type currentChannel = delegate->HandleGetCurrentChannel();
-    return aEncoder.Encode(currentChannel);
+    return delegate->HandleGetCurrentChannel(aEncoder);
 }
 
 } // anonymous namespace
@@ -184,20 +174,26 @@ bool emberAfChannelClusterChangeChannelRequestCallback(app::CommandHandler * com
 
     auto & match = commandData.match;
 
+    app::CommandResponseHelper<Commands::ChangeChannelResponse::Type> responser(command, commandPath);
+
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
     {
-        Commands::ChangeChannelResponse::Type response = delegate->HandleChangeChannel(match);
-        err                                            = command->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleChangeChannel(match, responser);
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfChannelClusterChangeChannelRequestCallback error: %s", err.AsString());
+    }
+
+    // If isDelegateNull, no one will call responser, so IsResponsed will be false
+    if (!responser.IsResponsed())
+    {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
+
     return true;
 }
 

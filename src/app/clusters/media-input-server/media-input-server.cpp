@@ -129,14 +129,7 @@ CHIP_ERROR MediaInputAttrAccess::Read(const app::ConcreteReadAttributePath & aPa
 
 CHIP_ERROR MediaInputAttrAccess::ReadInputListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    std::list<Structs::InputInfo::Type> inputList = delegate->HandleGetInputList();
-    return aEncoder.EncodeList([inputList](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & input : inputList)
-        {
-            ReturnErrorOnFailure(encoder.Encode(input));
-        }
-        return CHIP_NO_ERROR;
-    });
+    return delegate->HandleGetInputList(aEncoder);
 }
 
 CHIP_ERROR MediaInputAttrAccess::ReadCurrentInputAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)

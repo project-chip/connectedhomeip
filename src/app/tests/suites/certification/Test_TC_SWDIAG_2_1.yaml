@@ -22,7 +22,6 @@ tests:
     #issue #11725 Reading the List is not implemented in YAML framework
     - label: "Reads a list of SoftwareFault struct from DUT"
       disabled: true
-      optional: true
       command: "readAttribute"
       attribute: "SoftwareFault"
       PICS: E_SOFTWAREFAULT

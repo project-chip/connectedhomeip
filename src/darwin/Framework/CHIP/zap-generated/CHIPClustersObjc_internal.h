@@ -145,6 +145,10 @@
 @property (readonly) chip::Controller::LevelControlCluster cppCluster;
 @end
 
+@interface CHIPLocalizationConfiguration ()
+@property (readonly) chip::Controller::LocalizationConfigurationCluster cppCluster;
+@end
+
 @interface CHIPLowPower ()
 @property (readonly) chip::Controller::LowPowerCluster cppCluster;
 @end

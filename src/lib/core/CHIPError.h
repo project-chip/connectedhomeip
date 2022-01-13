@@ -2358,6 +2358,15 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_MISSING_URI_SEPARATOR             CHIP_CORE_ERROR(0xd7)
 
 /**
+ * @def CHIP_ERROR_IM_CONSTRAINT_ERROR
+ *
+ * @brief
+ *   The equivalent of a CONSTRAINT_ERROR status: a value was out of the valid
+ *   range.
+ */
+#define CHIP_ERROR_IM_CONSTRAINT_ERROR               CHIP_CORE_ERROR(0xd8)
+
+/**
  *  @}
  */
 

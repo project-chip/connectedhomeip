@@ -642,7 +642,6 @@ tests:
               maxLength: 254
 
     - label: "Write the default values to optional attribute: CompensationText"
-      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "compensation text"
@@ -652,7 +651,6 @@ tests:
           error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional attribute: CompensationText"
-      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "compensation text"
@@ -1205,7 +1203,6 @@ tests:
               type: uint8
 
     - label: "Write the default optional attribute: ColorPointRIntensity"
-      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "color point r intensity"
@@ -1213,7 +1210,6 @@ tests:
           value: 0
 
     - label: "Read back the optional attribute: ColorPointRIntensity"
-      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "color point r intensity"
@@ -1277,7 +1273,6 @@ tests:
               type: uint8
 
     - label: "Write the default optional attribute: ColorPointGIntensity"
-      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "color point g intensity"
@@ -1285,7 +1280,6 @@ tests:
           value: 0
 
     - label: "Read back the optional attribute: ColorPointGIntensity"
-      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "color point g intensity"
@@ -1349,7 +1343,6 @@ tests:
               type: uint8
 
     - label: "Write the default optional attribute: ColorPointBIntensity"
-      disabled: true
       optional: true
       command: "writeAttribute"
       attribute: "color point b intensity"
@@ -1357,7 +1350,6 @@ tests:
           value: 0
 
     - label: "Read back the optional attribute: ColorPointBIntensity"
-      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "color point b intensity"

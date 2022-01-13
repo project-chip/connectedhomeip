@@ -595,6 +595,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPTestClusterClusterTestEmitTestEventResponseCallback
+    : public Callback::Callback<CHIPTestClusterClusterTestEmitTestEventResponseCallbackType>
+{
+public:
+    CHIPTestClusterClusterTestEmitTestEventResponseCallback(jobject javaCallback);
+
+    ~CHIPTestClusterClusterTestEmitTestEventResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPTestClusterClusterTestEnumsResponseCallback
     : public Callback::Callback<CHIPTestClusterClusterTestEnumsResponseCallbackType>
 {

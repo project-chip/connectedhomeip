@@ -108,6 +108,12 @@ config CHIP_OTA_REQUESTOR
 	  Device Firmware Upgrade by quering and downloading a new firmware image
 	  from an external OTA Provider node.
 
+config CHIP_ROTATING_DEVICE_ID
+	bool "Enable rotating device ID support"
+	help
+	  Enables rotating device identifier that provides a non-trackable identifier
+	  which is unique per device and rotates at pre-defined moments.
+
 config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	int "Interval of saving node operation time to flash in hours unit"
 	default 10

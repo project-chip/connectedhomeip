@@ -34,7 +34,12 @@
 #include <openthread/netdata.h>
 #include <openthread/thread.h>
 
+#include <credentials/GroupDataProvider.h>
+
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+
+#include <app/server/Server.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -225,6 +230,41 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                     addrAssigned[addrIdx] = true;
                 }
             }
+
+// Multicast won't work with LWIP on top of OT
+// Duplication of listeners, unecessary timers, buffer duplication, hardfault etc...
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+            // Refresh Multicast listening
+            if (GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock())
+            {
+                ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
+
+                Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+                TransportMgrBase * transportMgr           = &(chip::Server::GetInstance().GetTransportManager());
+                Credentials::GroupDataProvider::GroupInfo group;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
+                {
+                    auto it = provider->IterateGroupInfo(fabricInfo.GetFabricIndex());
+                    if (it)
+                    {
+                        while (it->Next(group))
+                        {
+                            err = transportMgr->MulticastGroupJoinLeave(
+                                Transport::PeerAddress::Multicast(fabricInfo.GetFabricIndex(), group.group_id), true);
+                            if (err != CHIP_NO_ERROR)
+                            {
+                                ChipLogError(DeviceLayer, "Failed to Join Multicast Group: %s", err.AsString());
+                                break;
+                            }
+                        }
+                        it->Release();
+                    }
+                }
+
+                err = transportMgr->MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(0, 1234), true);
+            }
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
         }
 
         ChipLogDetail(DeviceLayer, "LwIP Thread interface addresses %s", isInterfaceUp ? "updated" : "cleared");

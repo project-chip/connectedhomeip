@@ -20,8 +20,8 @@ package com.tcl.chip.tvapp;
 
 public interface ContentLaunchManager {
 
-  int STREAMING_TYPE_DASH = 0;
-  int STREAMING_TYPE_HLS = 1;
+  int STREAMING_TYPE_DASH = 1;
+  int STREAMING_TYPE_HLS = 2;
 
   /**
    * @return The list of content types supported by the Video Player or Content App in the form of
@@ -30,7 +30,7 @@ public interface ContentLaunchManager {
   String[] getAcceptHeader();
 
   /** @return The list information about supported streaming protocols in STREAMING_TYPE_XXX. */
-  int[] getSupportedStreamingProtocols();
+  long getSupportedStreamingProtocols();
 
   /**
    * Launch the specified content with optional search criteria.

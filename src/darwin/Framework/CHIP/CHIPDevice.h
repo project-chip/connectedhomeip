@@ -22,8 +22,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^SubscriptionEstablishedHandler)(void);
-
 @interface CHIPDevice : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -40,7 +38,7 @@ typedef void (^SubscriptionEstablishedHandler)(void);
  *
  * The array passed to reportHandler will contain CHIPAttributeReport instances.
  *
- * subscriptionEstablishedHandler, if not nil, will be called once the
+ * subscriptionEstablished block, if not nil, will be called once the
  * subscription is established.  This will be _after_ the first (priming) call
  * to reportHandler.
  *
@@ -50,7 +48,7 @@ typedef void (^SubscriptionEstablishedHandler)(void);
                 minInterval:(uint16_t)minInterval
                 maxInterval:(uint16_t)maxInterval
               reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-    subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler;
+    subscriptionEstablished:(nullable void (^)(void))subscriptionEstablishedHandler;
 @end
 
 @interface CHIPAttributePath : NSObject

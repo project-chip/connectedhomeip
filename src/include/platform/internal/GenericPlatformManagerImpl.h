@@ -65,6 +65,7 @@ protected:
                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
     CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
 
     // ===== Support methods that can be overridden by the implementation subclass.
 
@@ -98,6 +99,13 @@ inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_SetUserLabelList(
 template <class ImplClass>
 inline CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_GetUserLabelList(
     EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+template <class ImplClass>
+inline CHIP_ERROR
+GenericPlatformManagerImpl<ImplClass>::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

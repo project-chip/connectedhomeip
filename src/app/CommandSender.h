@@ -170,6 +170,8 @@ public:
         return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
     }
 
+    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
+
 #if CONFIG_IM_BUILD_FOR_UNIT_TEST
     /**
      * Version of AddRequestData that allows sending a message that is
@@ -277,8 +279,6 @@ private:
     // Send our queued-up Invoke Request message.  Assumes the exchange is ready
     // and mPendingInvokeData is populated.
     CHIP_ERROR SendInvokeRequest();
-
-    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
 
     CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
 

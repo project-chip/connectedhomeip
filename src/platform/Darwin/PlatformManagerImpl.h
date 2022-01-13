@@ -64,6 +64,7 @@ private:
 
     CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
 
     void _RunEventLoop();
     void _LockChipStack(){};
