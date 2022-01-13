@@ -48,8 +48,11 @@ public:
     class StateDelegate
     {
     public:
+        // Handle download state change
         virtual void OnDownloadStateChanged(State state) = 0;
-        virtual ~StateDelegate()                         = default;
+        // Handle update progress change
+        virtual void OnUpdateProgressChanged(uint8_t percent) = 0;
+        virtual ~StateDelegate()                              = default;
     };
 
     // To be called when there is an incoming message to handle (of any protocol type)
