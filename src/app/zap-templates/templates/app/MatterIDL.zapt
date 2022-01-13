@@ -44,7 +44,16 @@ struct {{name}} {
 
   {{/zcl_events}}
   {{#chip_cluster_attributes}}
-  attribute({{#if isWritableAttribute}}readonly{{else}}writable{{/if}}{{#if isReportableAttribute}}, reportable{{/if}}) {{type}} {{asLowerCamelCase name}} = {{code}};
+  attribute(
+    {{~#if isWritableAttribute~}}
+      readonly
+    {{~else~}}
+      writable
+    {{~/if~}}
+    {{~#if isReportableAttribute~}}
+      , reportable
+    {{~/if~}}
+    ) {{type}} {{asLowerCamelCase name}} = {{code}};
   {{/chip_cluster_attributes}}
   {{#chip_cluster_commands}}
 
