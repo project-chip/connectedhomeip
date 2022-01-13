@@ -395,6 +395,27 @@ function chip_available_cluster_commands(options)
 }
 
 /**
+ * Creates block iterator over structures belonging to the current cluster
+ */
+async function chip_cluster_specific_structs(options)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_cluster_specific_structs');
+
+  const structs = await ensureClusters(this).getStructuresByClusterName(clusterName);
+
+  return templateUtil.collectBlocks(structs, options, this);
+}
+
+/**
+ * Creates block iterator over structures that are shared between clusters
+ */
+async function chip_shared_structs(options)
+{
+  const structs = await ensureClusters(this).getSharedStructs();
+  return templateUtil.collectBlocks(structs, options, this);
+}
+
+/**
  * Checks whether a type is an enum for purposes of its chipType.  That includes
  * both spec-defined enum types and types that we map to enum types in our code.
  */
@@ -437,3 +458,5 @@ exports.chip_server_has_list_attributes                      = chip_server_has_l
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
 exports.if_chip_enum                                         = if_chip_enum;
 exports.if_in_global_responses                               = if_in_global_responses;
+exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
+exports.chip_shared_structs                                  = chip_shared_structs;

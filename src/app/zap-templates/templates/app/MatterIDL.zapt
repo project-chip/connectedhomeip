@@ -1,7 +1,7 @@
 // This IDL was generated automatically by ZAP.
 // It is for view/code review purposes only.
 
-{{#zcl_structs}}
+{{#chip_shared_structs}}
 {{#if struct_is_fabric_scoped}}
 [fabric_scoped_by=k{{asUpperCamelCase struct_fabric_idx_field}}]
 {{/if}}
@@ -11,8 +11,7 @@ struct {{name}} {
   {{/zcl_struct_items}}
 }
 
-{{/zcl_structs}}
-
+{{/chip_shared_structs}}
 {{!TODO: consider #chip_clusters as iteration point as well. 
 {{!      Unsure about the differences}}
 {{#all_user_clusters}}
@@ -25,6 +24,17 @@ struct {{name}} {
   }
 
   {{/zcl_enums}}
+  {{#chip_cluster_specific_structs}}
+  {{#if struct_is_fabric_scoped}}
+  [fabric_scoped_by=k{{asUpperCamelCase struct_fabric_idx_field}}]
+  {{/if}}
+  struct {{name}} {
+    {{#zcl_struct_items}}
+    {{type}} k{{asUpperCamelCase label}} = {{fieldIdentifier}};
+    {{/zcl_struct_items}}
+  }
+
+  {{/chip_cluster_specific_structs}}
   {{#zcl_events}}
   event {{asUpperCamelCase name}}({{priority}}) = {{code}} {
     {{#zcl_event_fields}}
@@ -66,4 +76,5 @@ struct {{name}} {
 endpoint {{endpointId}} {
     {{!TODO: report device types and cluster instantionation. }}
 }
+
 {{/user_endpoints}}
