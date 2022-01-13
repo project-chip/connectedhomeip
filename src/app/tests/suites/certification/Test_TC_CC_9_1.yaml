@@ -412,6 +412,22 @@ tests:
       response:
           value: 40960
 
+    - label: "Reset Enhanced Move To Hue command"
+      command: "EnhancedMoveToHue"
+      PICS: CR_ENHANCEDMOVETOHUE
+      arguments:
+          values:
+              - name: "enhancedHue"
+                value: 0
+              - name: "direction"
+                value: 0
+              - name: "transitionTime"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
       PICS: CR_COLORLOOPSET
