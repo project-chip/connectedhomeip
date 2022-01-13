@@ -250,7 +250,7 @@ template <class ConfigClass>
 void GenericConfigurationManagerImpl<ConfigClass>::InitiateFactoryReset()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
-    _IncrementLifetimeCounter();
+    IncrementLifetimeCounter();
 #endif
     // Inheriting classes should call this method so the lifetime counter is updated if necessary.
 }
@@ -499,7 +499,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetLifetimeCounter(uint
 }
 
 template <class ConfigClass>
-CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::_IncrementLifetimeCounter()
+CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::IncrementLifetimeCounter()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
     return mLifetimePersistedCounter.Advance();
@@ -541,6 +541,10 @@ GenericConfigurationManagerImpl<ConfigClass>::GetBLEDeviceIdentificationInfo(Ble
     err = GetSetupDiscriminator(discriminator);
     SuccessOrExit(err);
     deviceIdInfo.SetDeviceDiscriminator(discriminator);
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    deviceIdInfo.SetAdditionalDataFlag(true);
+#endif
 
 exit:
     return err;

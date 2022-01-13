@@ -1317,7 +1317,8 @@ CHIP_ERROR CASESession::SetEffectiveTime()
 {
     System::Clock::Milliseconds64 currentTimeMS;
     CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentTimeMS);
-    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+
+    if (err != CHIP_NO_ERROR)
     {
         ChipLogError(
             SecureChannel,
@@ -1325,7 +1326,6 @@ CHIP_ERROR CASESession::SetEffectiveTime()
         // TODO: Remove use of hardcoded time during CASE setup
         return GetHardcodedTime();
     }
-    ReturnErrorOnFailure(err);
 
     System::Clock::Seconds32 currentTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentTimeMS);
     VerifyOrReturnError(UnixEpochToChipEpochTime(currentTime.count(), mValidContext.mEffectiveTime), CHIP_ERROR_INVALID_TIME);

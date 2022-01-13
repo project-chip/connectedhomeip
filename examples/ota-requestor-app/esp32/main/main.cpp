@@ -142,14 +142,8 @@ extern "C" void app_main()
 
     ESPInitConsole();
     SetRequestorInstance(&gRequestorCore);
-
-    Server * server = &(Server::GetInstance());
-    gRequestorCore.SetServerInstance(server);
-    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
-
+    gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
     gImageProcessor.SetOTADownloader(&gDownloader);
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-
-    gRequestorCore.SetBDXDownloader(&gDownloader);
 }

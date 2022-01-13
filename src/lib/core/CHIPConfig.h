@@ -2434,6 +2434,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *      * #CHIP_IM_MAX_NUM_READ_CLIENT
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ *      * #CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
  *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
  *      * #CHIP_IM_MAX_NUM_WRITE_CLIENT
  *      * #CHIP_IM_MAX_NUM_TIMED_HANDLER
@@ -2484,6 +2485,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
 #define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 8
+#endif
+
+/**
+ * @def CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
+ *
+ * @brief Defines the maximum number of dirty set, limits the number of attributes being read or subscribed at the same time.
+ */
+#ifndef CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
+#define CHIP_IM_SERVER_MAX_NUM_DIRTY_SET 8
 #endif
 
 /**

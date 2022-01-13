@@ -81,8 +81,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_UTIL}/ember-print.cpp
                ${APP_UTIL}/ember-compatibility-functions.cpp
                ${APP_UTIL}/message.cpp
-               ${APP_UTIL}/process-cluster-message.cpp
-               ${APP_UTIL}/process-global-message.cpp
                ${APP_UTIL}/util.cpp
                ${APP_UTIL}/error-mapping.cpp
 

@@ -8911,7 +8911,7 @@ struct TypeInfo
 };
 } // namespace Attributes
 } // namespace LocalizationConfiguration
-namespace LocalizationTimeFormat {
+namespace TimeFormatLocalization {
 // Enum for CalendarType
 enum class CalendarType : uint8_t
 {
@@ -8944,7 +8944,7 @@ struct TypeInfo
     using DecodableType    = uint8_t;
     using DecodableArgType = uint8_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HourFormat::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -8956,7 +8956,7 @@ struct TypeInfo
     using DecodableType    = uint8_t;
     using DecodableArgType = uint8_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CalendarType::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -8964,11 +8964,11 @@ struct TypeInfo
 namespace SupportedCalendarTypes {
 struct TypeInfo
 {
-    using Type             = chip::app::DataModel::List<const chip::app::Clusters::LocalizationTimeFormat::CalendarType>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::LocalizationTimeFormat::CalendarType>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::LocalizationTimeFormat::CalendarType> &;
+    using Type             = chip::app::DataModel::List<const chip::app::Clusters::TimeFormatLocalization::CalendarType>;
+    using DecodableType    = chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::app::Clusters::TimeFormatLocalization::CalendarType> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedCalendarTypes::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -8980,7 +8980,7 @@ struct TypeInfo
     using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
     using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -8992,7 +8992,7 @@ struct TypeInfo
     using DecodableType    = uint32_t;
     using DecodableArgType = uint32_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -9004,7 +9004,7 @@ struct TypeInfo
     using DecodableType    = uint16_t;
     using DecodableArgType = uint16_t;
 
-    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
@@ -9014,7 +9014,7 @@ struct TypeInfo
 {
     struct DecodableType
     {
-        static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
+        static constexpr ClusterId GetClusterId() { return Clusters::TimeFormatLocalization::Id; }
 
         CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
 
@@ -9027,83 +9027,7 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
-} // namespace LocalizationTimeFormat
-namespace LocalizationUnit {
-// Enum for TempUnit
-enum class TempUnit : uint8_t
-{
-    kFahrenheit = 0x00,
-    kCelsius    = 0x01,
-    kKelvin     = 0x02,
-};
-
-namespace Attributes {
-
-namespace TemperatureUnit {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureUnit::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace TemperatureUnit
-namespace AttributeList {
-struct TypeInfo
-{
-    using Type             = chip::app::DataModel::List<const chip::AttributeId>;
-    using DecodableType    = chip::app::DataModel::DecodableList<chip::AttributeId>;
-    using DecodableArgType = const chip::app::DataModel::DecodableList<chip::AttributeId> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::AttributeList::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace AttributeList
-namespace FeatureMap {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ClusterRevision
-
-struct TypeInfo
-{
-    struct DecodableType
-    {
-        static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
-
-        CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path);
-
-        Attributes::TemperatureUnit::TypeInfo::DecodableType temperatureUnit;
-        Attributes::AttributeList::TypeInfo::DecodableType attributeList;
-        Attributes::FeatureMap::TypeInfo::DecodableType featureMap;
-        Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision;
-    };
-};
-} // namespace Attributes
-} // namespace LocalizationUnit
+} // namespace TimeFormatLocalization
 namespace PowerSourceConfiguration {
 
 namespace Attributes {
@@ -32718,7 +32642,7 @@ enum class ChannelFeature : uint32_t
 };
 
 namespace Structs {
-namespace Application {
+namespace ApplicationLauncherApplication {
 enum class Fields
 {
     kCatalogVendorId = 1,
@@ -32737,7 +32661,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace Application
+} // namespace ApplicationLauncherApplication
 namespace ApplicationEP {
 enum class Fields
 {
@@ -32748,7 +32672,7 @@ enum class Fields
 struct Type
 {
 public:
-    Structs::Application::Type application;
+    Structs::ApplicationLauncherApplication::Type application;
     chip::CharSpan endpoint;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32801,7 +32725,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
-    Structs::Application::Type application;
+    Structs::ApplicationLauncherApplication::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32817,7 +32741,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
-    Structs::Application::DecodableType application;
+    Structs::ApplicationLauncherApplication::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchAppRequest
@@ -32834,7 +32758,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::Type application;
+    Structs::ApplicationLauncherApplication::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32849,7 +32773,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::StopAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::DecodableType application;
+    Structs::ApplicationLauncherApplication::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace StopAppRequest
@@ -32866,7 +32790,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::Type application;
+    Structs::ApplicationLauncherApplication::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -32881,7 +32805,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::HideAppRequest::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
-    Structs::Application::DecodableType application;
+    Structs::ApplicationLauncherApplication::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace HideAppRequest
@@ -33013,7 +32937,7 @@ enum class ApplicationStatusEnum : uint8_t
 };
 
 namespace Structs {
-namespace Application {
+namespace ApplicationBasicApplication {
 enum class Fields
 {
     kCatalogVendorId = 1,
@@ -33032,7 +32956,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace Application
+} // namespace ApplicationBasicApplication
 } // namespace Structs
 
 namespace Attributes {
@@ -33088,9 +33012,9 @@ struct TypeInfo
 namespace ApplicationApp {
 struct TypeInfo
 {
-    using Type             = chip::app::Clusters::ApplicationBasic::Structs::Application::Type;
-    using DecodableType    = chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType;
-    using DecodableArgType = const chip::app::Clusters::ApplicationBasic::Structs::Application::DecodableType &;
+    using Type             = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type;
+    using DecodableType    = chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType;
+    using DecodableArgType = const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationApp::Id; }

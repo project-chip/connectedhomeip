@@ -261,6 +261,8 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                         it->Release();
                     }
                 }
+
+                err = transportMgr->MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(0, 1234), true);
             }
 #endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
         }
