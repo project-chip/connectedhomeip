@@ -48,6 +48,8 @@ extern "C" {
 using namespace ::chip;
 using namespace ::chip::Ble;
 
+#define BLE_SERVICE_DATA_SIZE 10
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -787,7 +789,7 @@ void BLEManagerImpl::SetAdvertisingData(void)
     ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
     uint16_t deviceDiscriminator = 0;
     uint8_t localDeviceNameLen;
-    uint8_t service_data[9];
+    uint8_t service_data[BLE_SERVICE_DATA_SIZE];
     uint8_t * p = service_data;
 
     // Initialize the CHIP BLE Device Identification Information block that will be sent as payload
@@ -838,6 +840,7 @@ void BLEManagerImpl::SetAdvertisingData(void)
     UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceVendorId[1]);
     UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceProductId[0]);
     UINT8_TO_STREAM(p, mDeviceIdInfo.DeviceProductId[1]);
+    UINT8_TO_STREAM(p, 0); // Additional Data Flag
 
     adv_elem[num_elem].advert_type = BTM_BLE_ADVERT_TYPE_NAME_COMPLETE;
     adv_elem[num_elem].len         = localDeviceNameLen;
