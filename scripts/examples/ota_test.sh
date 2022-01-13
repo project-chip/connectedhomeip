@@ -7,7 +7,9 @@ ARG3=${3:-5560}
 pkill chip-ota-provider-app
 pkill chip-ota-requestor-app 
 
-./out/debug/chip-ota-provider-app -f tmp/ota.txt > /tmp/ota/provider-log.txt  &
+scripts/examples/gn_build_example.sh examples/chip-tool out/
+
+./out/ota_provider_debug/chip-ota-provider-app -f tmp/ota.txt > /tmp/ota/provider-log.txt  &
 provider_pid=$!
 
 echo  "Commissioning Provider "
@@ -19,7 +21,7 @@ then echo Provider Commissioned;
 else echo Provider not commissioned properly exit 1;
 fi
 
-stdbuf -o0 ./out/debug/chip-ota-requestor-app -u "$ARG3" -d "$ARG2" > /tmp/ota/requestor-log.txt & 
+stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app -u "$ARG3" -d "$ARG2" > /tmp/ota/requestor-log.txt & 
 requestor_pid=$!
 
 echo  "Commissioning Requestor "
