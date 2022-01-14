@@ -23,14 +23,14 @@ set -e
 CHIP_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"/../..
 
 INPUT_DIR="$CHIP_ROOT/examples/placeholder/linux"
-OUTPUT_DIR="$CHIP_ROOT/out/debug/placeholder"
+OUTPUT_DIR="$CHIP_ROOT/zzz_generated/placeholder"
 
 source "$CHIP_ROOT/scripts/activate.sh"
 
 APP_DIR=$1
 
 function runZAP() {
-    ZAP_INPUT_FILE=$INPUT_DIR/apps/$APP_DIR/zap.config
+    ZAP_INPUT_FILE=$INPUT_DIR/apps/$APP_DIR/config.zap
     ZAP_OUTPUT_DIR=$OUTPUT_DIR/$APP_DIR/zap-generated
 
     # Create the folder to host the generated content if needed
@@ -42,7 +42,11 @@ function runZAP() {
         touch "$ZAP_OUTPUT_DIR"/af-gen-event.h
     fi
 
+    # Generates the generic files for the given zap configuration
     "$CHIP_ROOT"/scripts/tools/zap/generate.py "$ZAP_INPUT_FILE" -o "$ZAP_OUTPUT_DIR"
+
+    # Generates the specific files for the given zap configuration
+    TARGET_APP=$APP_DIR "$CHIP_ROOT"/scripts/tools/zap/generate.py "$ZAP_INPUT_FILE" -t "$INPUT_DIR"/../templates/templates.json -o "$ZAP_OUTPUT_DIR"
 }
 
 function runGN() {
@@ -50,11 +54,11 @@ function runGN() {
     GN_ARGS+="chip_project_config_include_dirs=[\"$INPUT_DIR/apps/$APP_DIR/include\", \"$CHIP_ROOT/config/standalone\"]"
     GN_ARGS+="chip_config_network_layer_ble=false"
 
-    gn gen --check --fail-on-unused-args --root=examples/placeholder/linux "$OUTPUT_DIR" --args="$GN_ARGS"
+    gn gen --check --fail-on-unused-args --root=examples/placeholder/linux "$CHIP_ROOT/out/$APP_DIR" --args="$GN_ARGS"
 }
 
 function runNinja() {
-    ninja -C "$OUTPUT_DIR"
+    ninja -C "$CHIP_ROOT/out/$APP_DIR"
 }
 
 function runAll() {

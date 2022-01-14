@@ -26,7 +26,7 @@ namespace {
 class NoneAdvertiser : public ServiceAdvertiser
 {
 public:
-    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayet) override
+    CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * inetLayet) override
     {
         ChipLogError(Discovery, "DNS-SD advertising not available. DNS-SD init disabled.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -48,7 +48,7 @@ public:
 
     CHIP_ERROR Advertise(const CommissionAdvertisingParameters & params) override
     {
-        ChipLogError(Discovery, "DNS-SD advertising not available. Commisioning Advertisement failed.");
+        ChipLogError(Discovery, "DNS-SD advertising not available. Commissioning Advertisement failed.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 

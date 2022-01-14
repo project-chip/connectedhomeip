@@ -24,7 +24,7 @@
 #import "QRCodeViewController.h"
 #import "TemperatureSensorViewController.h"
 #import "UnpairDevicesViewController.h"
-#import "WifiViewController.h"
+#import "WiFiViewController.h"
 
 @implementation RootViewController
 
@@ -42,7 +42,7 @@
     self.tableView.dataSource = self;
     [self.view addSubview:self.tableView];
     self.options = @[
-        @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"Wifi Configuration",
+        @"QRCode scanner", @"Echo client", @"Light on / off cluster", @"Temperature Sensor", @"Bindings", @"WiFi Configuration",
         @"Enable Pairing", @"Unpair Devices", @"Fabric Management"
     ];
 }
@@ -121,7 +121,7 @@
 
 - (void)pushNetworkConfiguration
 {
-    WifiViewController * controller = [WifiViewController new];
+    WiFiViewController * controller = [WiFiViewController new];
     [self.navigationController pushViewController:controller animated:YES];
 }
 

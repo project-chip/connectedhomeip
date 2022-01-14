@@ -1,0 +1,388 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Groups Cluster Tests
+
+config:
+    cluster: "Groups"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "View Group 0 (invalid)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0
+      response:
+          values:
+              - name: "status"
+                value: 0x87
+              - name: "groupId"
+                value: 0
+
+    - label: "View Group 1 (not found)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0001
+      response:
+          values:
+              - name: "status"
+                value: 0x8B
+              - name: "groupId"
+                value: 0x0001
+
+    - label: "Add Group 1 (new)"
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0001
+              - name: "groupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0001
+
+    - label: "View Group 1 (new)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0001
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0001
+              - name: "groupName"
+                value: "Group #1"
+
+    - label: "View Group 2 (not found)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x1111
+      response:
+          values:
+              - name: "status"
+                value: 0x8B
+              - name: "groupId"
+                value: 0x1111
+
+    - label: "Get Group Membership 1 (all)"
+      command: "GetGroupMembership"
+      arguments:
+          values:
+              - name: "groupList"
+                value: []
+      response:
+          values:
+              - name: "capacity"
+                value: 0xff
+              - name: "groupList"
+                value: [0x01]
+
+    - label: "Add Group 2 (new)"
+      # https://github.com/project-chip/connectedhomeip/issues/11312
+      disabled: true
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x1111
+              - name: "groupName"
+                value: "Group #2"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x1111
+
+    - label: "View Group 2 (new)"
+      # https://github.com/project-chip/connectedhomeip/issues/11312
+      disabled: true
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x1111
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x1111
+              - name: "groupName"
+                value: "Group #2"
+
+    - label: "View Group 3 (not found)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x7fff
+      response:
+          values:
+              - name: "status"
+                value: 0x8B
+              - name: "groupId"
+                value: 0x7fff
+
+    - label: "Add Group 3 (new)"
+      # https://github.com/project-chip/connectedhomeip/issues/11312
+      disabled: true
+      command: "AddGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x7fff
+              - name: "groupName"
+                value: "Group #3"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x7fff
+
+    - label: "View Group 1 (existing)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x01
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x01
+              - name: "groupName"
+                value: "Group #1"
+
+    - label: "View Group 2 (existing)"
+      # https://github.com/project-chip/connectedhomeip/issues/11312
+      disabled: true
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x1111
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x1111
+              - name: "groupName"
+                value: "Group #2"
+
+    - label: "Get Group Membership 2"
+      # https://github.com/project-chip/connectedhomeip/issues/11312
+      disabled: true
+      command: "GetGroupMembership"
+      arguments:
+          values:
+              - name: "groupList"
+                value: [0x02, 0x03, 0x7fff]
+      response:
+          values:
+              - name: "capacity"
+                value: 0xff
+              - name: "groupList"
+                value: [0x7fff]
+
+    - label: "View Group 3 (new)"
+      # https://github.com/project-chip/connectedhomeip/issues/11312
+      disabled: true
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x7fff
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x7fff
+              - name: "groupName"
+                value: "Group #3"
+
+    - label: "Remove Group 0 (invalid)"
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0
+      response:
+          values:
+              - name: "status"
+                value: 0x87
+              - name: "groupId"
+                value: 0
+
+    - label: "Remove Group 4 (not found)"
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x04
+      response:
+          values:
+              - name: "status"
+                value: 0x8B
+              - name: "groupId"
+                value: 0x04
+
+    - label: "Remove Group 2 (existing)"
+      # https://github.com/project-chip/connectedhomeip/issues/11312
+      disabled: true
+      command: "RemoveGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x1111
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x1111
+
+    - label: "View Group 1 (not removed)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0001
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x0001
+              - name: "groupName"
+                value: "Group #1"
+
+    - label: "View Group 2 (removed)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x1111
+      response:
+          values:
+              - name: "status"
+                value: 0x8B
+              - name: "groupId"
+                value: 0x1111
+
+    - label: "View Group 3 (not removed)"
+      # https://github.com/project-chip/connectedhomeip/issues/11312
+      disabled: true
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x7fff
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x7fff
+              - name: "groupName"
+                value: "Group #3"
+
+    - label: "Get Group Membership 3"
+      command: "GetGroupMembership"
+      arguments:
+          values:
+              - name: "groupList"
+                value: [0x01, 0x02, 0x1111, 0x03]
+      response:
+          values:
+              - name: "capacity"
+                value: 0xff
+              - name: "groupList"
+                value: [0x01]
+
+    - label: "Remove All"
+      command: "RemoveAllGroups"
+
+    - label: "View Group 1 (removed)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x0001
+      response:
+          values:
+              - name: "status"
+                value: 0x8B
+              - name: "groupId"
+                value: 0x0001
+
+    - label: "View Group 2 (still removed)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x1111
+      response:
+          values:
+              - name: "status"
+                value: 0x8B
+              - name: "groupId"
+                value: 0x1111
+
+    - label: "View Group 3 (removed)"
+      command: "ViewGroup"
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x7fff
+      response:
+          values:
+              - name: "status"
+                value: 0x8B
+              - name: "groupId"
+                value: 0x7fff
+
+    - label: "Get Group Membership 4"
+      command: "GetGroupMembership"
+      arguments:
+          values:
+              - name: "groupList"
+                value: [0x01, 0x02, 0x1111, 0x03, 0x7fff]
+      response:
+          values:
+              - name: "capacity"
+                value: 0xff
+              - name: "groupList"
+                value: []

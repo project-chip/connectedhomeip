@@ -38,8 +38,7 @@ int gNIDChipFirmwareSigningId;
 int gNIDChipICAId;
 int gNIDChipRootId;
 int gNIDChipFabricId;
-int gNIDChipAuthTag1;
-int gNIDChipAuthTag2;
+int gNIDChipCASEAuthenticatedTag;
 int gNIDChipAttAttrVID;
 int gNIDChipAttAttrPID;
 int gNIDChipCurveP256 = EC_curve_nist2nid("P-256");
@@ -83,14 +82,8 @@ bool InitOpenSSL()
         ReportOpenSSLErrorAndExit("OBJ_create", res = false);
     }
 
-    gNIDChipAuthTag1 = OBJ_create("1.3.6.1.4.1.37244.1.6", "ChipAuthTag1", "ChipAuthTag1");
-    if (gNIDChipAuthTag1 == 0)
-    {
-        ReportOpenSSLErrorAndExit("OBJ_create", res = false);
-    }
-
-    gNIDChipAuthTag2 = OBJ_create("1.3.6.1.4.1.37244.1.7", "ChipAuthTag2", "ChipAuthTag2");
-    if (gNIDChipAuthTag2 == 0)
+    gNIDChipCASEAuthenticatedTag = OBJ_create("1.3.6.1.4.1.37244.1.6", "ChipCASEAuthenticatedTag", "ChipCASEAuthenticatedTag");
+    if (gNIDChipCASEAuthenticatedTag == 0)
     {
         ReportOpenSSLErrorAndExit("OBJ_create", res = false);
     }
@@ -112,8 +105,7 @@ bool InitOpenSSL()
     ASN1_STRING_TABLE_add(gNIDChipICAId, 16, 16, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipRootId, 16, 16, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipFabricId, 16, 16, B_ASN1_UTF8STRING, 0);
-    ASN1_STRING_TABLE_add(gNIDChipAuthTag1, 8, 8, B_ASN1_UTF8STRING, 0);
-    ASN1_STRING_TABLE_add(gNIDChipAuthTag2, 8, 8, B_ASN1_UTF8STRING, 0);
+    ASN1_STRING_TABLE_add(gNIDChipCASEAuthenticatedTag, 8, 8, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipAttAttrVID, 4, 4, B_ASN1_UTF8STRING, 0);
     ASN1_STRING_TABLE_add(gNIDChipAttAttrPID, 4, 4, B_ASN1_UTF8STRING, 0);
 
@@ -175,15 +167,6 @@ bool ContainsPEMMarker(const char * marker, const uint8_t * data, uint32_t dataL
         }
     }
     return false;
-}
-
-bool ParseChip64bitAttr(const char * str, uint64_t & val)
-{
-    char * parseEnd;
-
-    errno = 0;
-    val   = strtoull(str, &parseEnd, 16);
-    return parseEnd > str && *parseEnd == 0 && (val != ULLONG_MAX || errno == 0);
 }
 
 bool ParseDateTime(const char * str, struct tm & date)

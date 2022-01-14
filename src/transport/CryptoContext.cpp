@@ -37,7 +37,7 @@ namespace chip {
 
 namespace {
 
-constexpr size_t kAESCCMIVLen = 12;
+constexpr size_t kAESCCMIVLen = 13;
 constexpr size_t kMaxAADLen   = 128;
 
 /* Session Establish Key Info */
@@ -96,7 +96,7 @@ CHIP_ERROR CryptoContext::InitFromSecret(const ByteSpan & secret, const ByteSpan
     (void) info;
     (void) infoLen;
 
-#pragma message                                                                                                                    \
+#warning                                                                                                                           \
     "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  Node can only communicate with other nodes built with this flag set."
     ChipLogError(SecureChannel,
                  "Warning: CONFIG_SECURITY_TEST_MODE=1 bypassing key negotiation... All sessions will use known, fixed test key.  "
@@ -137,8 +137,9 @@ CHIP_ERROR CryptoContext::GetIV(const PacketHeader & header, uint8_t * iv, size_
 
     Encoding::LittleEndian::BufferWriter bbuf(iv, len);
 
-    bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
+    bbuf.Put8(header.GetSecurityFlags());
     bbuf.Put32(header.GetMessageCounter());
+    bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
 
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
@@ -183,7 +184,7 @@ CHIP_ERROR CryptoContext::Encrypt(const uint8_t * input, size_t input_length, ui
     KeyUsage usage = kR2IKey;
 
     // Message is encrypted before sending. If the secure session was created by session
-    // initiator, we'll use I2R key to encrypt the message that's being transmittted.
+    // initiator, we'll use I2R key to encrypt the message that's being transmitted.
     // Otherwise, we'll use R2I key, as the responder is sending the message.
     if (mSessionRole == SessionRole::kInitiator)
     {

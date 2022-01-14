@@ -37,6 +37,7 @@
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -47,11 +48,11 @@
 #include <nlunit-test.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
-#define PBUF_TYPE(pbuf) (pbuf)->type_internal
-#else
+#if (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 #define PBUF_TYPE(pbuf) (pbuf)->type
-#endif // (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
+#else // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#define PBUF_TYPE(pbuf) (pbuf)->type_internal
+#endif // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 using ::chip::Encoding::PacketBufferWriter;
@@ -214,6 +215,10 @@ PacketBufferTest::PacketBufferTest(TestContext * context) : mContext(context)
 int PacketBufferTest::TestSetup(void * inContext)
 {
     chip::Platform::MemoryInit();
+
+    if (chip::DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
+        return FAILURE;
+
     TestContext * const theContext = reinterpret_cast<TestContext *>(inContext);
     theContext->test               = new PacketBufferTest(theContext);
     if (theContext->test == nullptr)
@@ -225,6 +230,11 @@ int PacketBufferTest::TestSetup(void * inContext)
 
 int PacketBufferTest::TestTeardown(void * inContext)
 {
+    CHIP_ERROR err = chip::DeviceLayer::PlatformMgr().Shutdown();
+    // RTOS shutdown is not implemented, ignore CHIP_ERROR_NOT_IMPLEMENTED
+    if (err != CHIP_NO_ERROR && err != CHIP_ERROR_NOT_IMPLEMENTED)
+        return FAILURE;
+
     return SUCCESS;
 }
 
@@ -521,7 +531,7 @@ void PacketBufferTest::CheckDataLength(nlTestSuite * inSuite, void * inContext)
  *               without specifying the head of the buffer chain. Otherwise,
  *               test SetDataLength with one buffer being down the chain and the
  *               other one being passed as the head of the chain. After calling
- *               the method verify that data lenghts were correctly adjusted.
+ *               the method verify that data lengths were correctly adjusted.
  */
 void PacketBufferTest::CheckSetDataLength(nlTestSuite * inSuite, void * inContext)
 {

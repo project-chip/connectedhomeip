@@ -18,6 +18,7 @@ There are following Apps on Android
 -   [Source files](#source)
 -   [Requirements for building](#requirements)
     -   [ABIs and TARGET_CPU](#abi)
+    -   [Gradle & JDK Version](#jdk)
 -   [Preparing for build](#preparing)
 -   [Building Android CHIPTool from scripts](#building-scripts)
 -   [Building Android CHIPTool from Android Studio](#building-studio)
@@ -56,6 +57,20 @@ architecture:
 | arm64-v8a   | arm64      |
 | x86         | x86        |
 | x86_64      | x64        |
+
+<a name="jdk"></a>
+
+### Gradle & JDK Version
+
+We are using Gradle 7.1.1 for all android project which does not support Java 17
+(https://docs.gradle.org/current/userguide/compatibility.html) while the default
+JDK version on MacOS for Apple Silicon is 'openjdk 17.0.1' or above.
+
+Using JDK bundled with Android Studio will help with that.
+
+```shell
+export JAVA_HOME=/Applications/Android\ Studio.app/Contents/jre/Contents/Home/
+```
 
 <hr>
 
@@ -116,9 +131,9 @@ which allows us to directly edit core Matter code in-IDE.
 
     See the table above for other values of `TARGET_CPU`.
 
-2. Modify the `matterSdkSourceBuild` variable to true and `matterBuildSrcDir`
-   point to the appropriate output directory (e.g.
-   `../../../../out/android_arm64`) in
+2. Modify the `matterSdkSourceBuild` variable to true, `matterBuildSrcDir` point
+   to the appropriate output directory (e.g. `../../../../out/android_arm64`),
+   and `matterSourceBuildAbiFilters` to the desired ABIs in
    [src/android/CHIPTool/gradle.properties](https://github.com/project-chip/connectedhomeip/blob/master/src/android/CHIPTool/gradle.properties)
 
 3) Open the project in Android Studio and run **Sync Project with Gradle

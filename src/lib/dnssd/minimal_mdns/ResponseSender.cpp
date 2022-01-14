@@ -89,7 +89,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
 
     // send all 'Answer' replies
     {
-        const uint64_t kTimeNowMs = chip::System::SystemClock().GetMonotonicMilliseconds();
+        const chip::System::Clock::Timestamp kTimeNow = chip::System::SystemClock().GetMonotonicTimestamp();
 
         QueryReplyFilter queryReplyFilter(query);
         QueryResponderRecordFilter responseFilter;
@@ -102,8 +102,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
             //
             // TODO: the 'last sent' value does NOT track the interface we used to send, so this may cause
             //       broadcasts on one interface to throttle broadcasts on another interface.
-            constexpr uint64_t kOneSecondMs = 1000;
-            responseFilter.SetIncludeOnlyMulticastBeforeMS(kTimeNowMs - kOneSecondMs);
+            responseFilter.SetIncludeOnlyMulticastBeforeMS(kTimeNow - chip::System::Clock::Seconds32(1));
         }
         for (size_t i = 0; i < kMaxQueryResponders; ++i)
         {
@@ -120,7 +119,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
 
                 if (!mSendState.SendUnicast())
                 {
-                    it->lastMulticastTime = kTimeNowMs;
+                    it->lastMulticastTime = kTimeNow;
                 }
             }
         }
@@ -229,7 +228,7 @@ void ResponseSender::AddResponse(const ResourceRecord & record)
         mResponseBuilder.AddRecord(mSendState.GetResourceType(), record);
         if (!mResponseBuilder.Ok())
         {
-            // Very much unexpected: single record addtion should fit (our records should not be that big).
+            // Very much unexpected: single record addition should fit (our records should not be that big).
             ChipLogError(Discovery, "Failed to add single record to mDNS response.");
             mSendState.SetError(CHIP_ERROR_INTERNAL);
         }

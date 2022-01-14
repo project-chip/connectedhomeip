@@ -45,7 +45,9 @@ enum
     kDeviceOption_Passcode                  = 0x1009,
     kDeviceOption_SecuredDevicePort         = 0x100a,
     kDeviceOption_SecuredCommissionerPort   = 0x100b,
-    kDeviceOption_UnsecuredCommissionerPort = 0x100c
+    kDeviceOption_UnsecuredCommissionerPort = 0x100c,
+    kDeviceOption_Command                   = 0x100d,
+    kDeviceOption_PICS                      = 0x100e
 };
 
 constexpr unsigned kAppUsageLength = 64;
@@ -70,6 +72,8 @@ OptionDef sDeviceOptionDefs[] = {
     { "secured-device-port", kArgumentRequired, kDeviceOption_SecuredDevicePort },
     { "secured-commissioner-port", kArgumentRequired, kDeviceOption_SecuredCommissionerPort },
     { "unsecured-commissioner-port", kArgumentRequired, kDeviceOption_UnsecuredCommissionerPort },
+    { "command", kArgumentRequired, kDeviceOption_Command },
+    { "PICS", kArgumentRequired, kDeviceOption_PICS },
     {}
 };
 
@@ -119,6 +123,12 @@ const char * sDeviceOptionHelp =
     "\n"
     "  --unsecured-commissioner-port <port>\n"
     "       A 16-bit unsigned integer specifying the port to use for unsecured commissioner messages (default is 5550).\n"
+    "\n"
+    "  --command <command-name>\n"
+    "       A name for a command to execute during startup.\n"
+    "\n"
+    "  --PICS <filepath>\n"
+    "       A file containing PICS items.\n"
     "\n";
 
 bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
@@ -164,9 +174,20 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.SetRaw(static_cast<uint8_t>(atoi(aValue)));
         break;
 
-    case kDeviceOption_Discriminator:
-        LinuxDeviceOptions::GetInstance().payload.discriminator = static_cast<uint16_t>(atoi(aValue));
+    case kDeviceOption_Discriminator: {
+        uint16_t value = static_cast<uint16_t>(atoi(aValue));
+        if (value >= 4096)
+        {
+            PrintArgError("%s: invalid value specified for discriminator: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            LinuxDeviceOptions::GetInstance().payload.discriminator = value;
+            DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(value);
+        }
         break;
+    }
 
     case kDeviceOption_Passcode:
         LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(atoi(aValue));
@@ -182,6 +203,14 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
 
     case kDeviceOption_UnsecuredCommissionerPort:
         LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort = static_cast<uint16_t>(atoi(aValue));
+        break;
+
+    case kDeviceOption_Command:
+        LinuxDeviceOptions::GetInstance().command = aValue;
+        break;
+
+    case kDeviceOption_PICS:
+        LinuxDeviceOptions::GetInstance().PICS = aValue;
         break;
 
     default:

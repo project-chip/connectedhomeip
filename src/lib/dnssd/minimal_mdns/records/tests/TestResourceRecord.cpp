@@ -35,11 +35,7 @@ public:
     FakeResourceRecord(const char * data) : ResourceRecord(QType::ANY, kNames), mData(data) {}
 
 protected:
-    bool WriteData(BufferWriter & out) const override
-    {
-        out.Put(mData);
-        return out.Fit();
-    }
+    bool WriteData(RecordWriter & out) const override { return out.PutString(mData).Fit(); }
 
 private:
     const char * mData;
@@ -54,6 +50,8 @@ void CanWriteSimpleRecord(nlTestSuite * inSuite, void * inContext)
     header.Clear();
 
     BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
     FakeResourceRecord record("somedata");
 
     record.SetTtl(0x11223344);
@@ -70,7 +68,7 @@ void CanWriteSimpleRecord(nlTestSuite * inSuite, void * inContext)
         's',  'o',  'm',  'e',  'd', 'a', 't', 'a',
     };
 
-    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output));
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, writer));
     NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
     NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
     NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
@@ -87,6 +85,8 @@ void CanWriteMultipleRecords(nlTestSuite * inSuite, void * inContext)
     header.Clear();
 
     BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
     FakeResourceRecord record1("somedata");
     FakeResourceRecord record2("moredata");
     FakeResourceRecord record3("xyz");
@@ -104,17 +104,13 @@ void CanWriteMultipleRecords(nlTestSuite * inSuite, void * inContext)
         0x11, 0x22, 0x33, 0x44,                     // TTL
         0,    8,                                    // data size
         's',  'o',  'm',  'e',  'd', 'a', 't', 'a', //
-        3,    'f',  'o',  'o',                      // QNAME part: foo
-        3,    'b',  'a',  'r',                      // QNAME part: bar
-        0,                                          // QNAME ends
+        0xC0, 0x00,                                 // PTR: foo.bar
         0,    255,                                  // QType ANY (totally fake)
         0,    1,                                    // QClass IN
         0,    0,    0,    0,                        // TTL
         0,    8,                                    // data size
         'm',  'o',  'r',  'e',  'd', 'a', 't', 'a', //
-        3,    'f',  'o',  'o',                      // QNAME part: foo
-        3,    'b',  'a',  'r',                      // QNAME part: bar
-        0,                                          // QNAME ends
+        0xC0, 0x00,                                 // PTR: foo.bar
         0,    255,                                  // QType ANY (totally fake)
         0,    1,                                    // QClass IN
         0,    0,    0,    0xFF,                     // TTL
@@ -122,17 +118,17 @@ void CanWriteMultipleRecords(nlTestSuite * inSuite, void * inContext)
         'x',  'y',  'z',
     };
 
-    NL_TEST_ASSERT(inSuite, record1.Append(header, ResourceType::kAnswer, output));
+    NL_TEST_ASSERT(inSuite, record1.Append(header, ResourceType::kAnswer, writer));
     NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
     NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
     NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
 
-    NL_TEST_ASSERT(inSuite, record2.Append(header, ResourceType::kAuthority, output));
+    NL_TEST_ASSERT(inSuite, record2.Append(header, ResourceType::kAuthority, writer));
     NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
     NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 1);
     NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
 
-    NL_TEST_ASSERT(inSuite, record3.Append(header, ResourceType::kAdditional, output));
+    NL_TEST_ASSERT(inSuite, record3.Append(header, ResourceType::kAdditional, writer));
     NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
     NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 1);
     NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 1);
@@ -149,16 +145,18 @@ void RecordOrderIsEnforced(nlTestSuite * inSuite, void * inContext)
     HeaderRef header(headerBuffer);
 
     BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
     FakeResourceRecord record("somedata");
 
     header.Clear();
     header.SetAuthorityCount(1);
-    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output) == false);
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, writer) == false);
 
     header.Clear();
     header.SetAdditionalCount(1);
-    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output) == false);
-    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAuthority, output) == false);
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, writer) == false);
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAuthority, writer) == false);
 }
 
 void ErrorsOutOnSmallBuffers(nlTestSuite * inSuite, void * inContext)
@@ -191,8 +189,9 @@ void ErrorsOutOnSmallBuffers(nlTestSuite * inSuite, void * inContext)
     {
         memset(dataBuffer, 0, sizeof(dataBuffer));
         BufferWriter output(dataBuffer, i);
+        RecordWriter writer(&output);
 
-        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output) == false);
+        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, writer) == false);
 
         // header untouched
         NL_TEST_ASSERT(inSuite, memcmp(headerBuffer, clearHeader, HeaderRef::kSizeBytes) == 0);
@@ -200,8 +199,9 @@ void ErrorsOutOnSmallBuffers(nlTestSuite * inSuite, void * inContext)
 
     memset(dataBuffer, 0, sizeof(dataBuffer));
     BufferWriter output(dataBuffer, sizeof(expectedOutput));
+    RecordWriter writer(&output);
 
-    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output));
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, writer));
     NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
     NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
     NL_TEST_ASSERT(inSuite, memcmp(headerBuffer, clearHeader, HeaderRef::kSizeBytes) != 0);
@@ -221,7 +221,9 @@ void RecordCount(nlTestSuite * inSuite, void * inContext)
     for (int i = 0; i < kAppendCount; i++)
     {
         BufferWriter output(dataBuffer, sizeof(dataBuffer));
-        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output));
+        RecordWriter writer(&output);
+
+        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, writer));
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == i + 1);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
         NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
@@ -230,7 +232,9 @@ void RecordCount(nlTestSuite * inSuite, void * inContext)
     for (int i = 0; i < kAppendCount; i++)
     {
         BufferWriter output(dataBuffer, sizeof(dataBuffer));
-        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAuthority, output));
+        RecordWriter writer(&output);
+
+        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAuthority, writer));
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == kAppendCount);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == i + 1);
         NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
@@ -239,7 +243,9 @@ void RecordCount(nlTestSuite * inSuite, void * inContext)
     for (int i = 0; i < kAppendCount; i++)
     {
         BufferWriter output(dataBuffer, sizeof(dataBuffer));
-        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAdditional, output));
+        RecordWriter writer(&output);
+
+        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAdditional, writer));
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == kAppendCount);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == kAppendCount);
         NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == i + 1);

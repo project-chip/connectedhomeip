@@ -19,82 +19,85 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       response:
           constraints:
               type: uint16
 
     - label: "read the mandatory attribute: MinMeasuredValue"
       command: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       response:
           constraints:
               type: uint16
 
     - label: "read the mandatory attribute: MaxMeasuredValue"
       command: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       response:
           constraints:
               type: uint16
 
     - label: "write the default value to optional attribute: MeasuredValue"
-      disabled: true
       command: "writeAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write the default value to optional attribute: MinMeasuredValue"
       command: "writeAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write the default value to optional attribute: MaxMeasuredValue"
       command: "writeAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
-      attribute: "measured value"
+      attribute: "MeasuredValue"
       response:
           constraints:
               type: uint16
 
     - label: "read the mandatory attribute: MinMeasuredValue"
       command: "readAttribute"
-      attribute: "min measured value"
+      attribute: "MinMeasuredValue"
       response:
           constraints:
               type: uint16
 
     - label: "read the mandatory attribute: MaxMeasuredValue"
       command: "readAttribute"
-      attribute: "max measured value"
+      attribute: "MaxMeasuredValue"
       response:
           constraints:
               type: uint16
 
     - label: "read the optional attribute: Tolerance"
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:
           value: 0
 
     - label: "read the optional attribute: Tolerance"
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:
@@ -104,27 +107,17 @@ tests:
               maxValue: 2048
 
     - label: "write the default value to optional attribute: Tolerance"
-      disabled: true
+      optional: true
       command: "writeAttribute"
       attribute: "Tolerance"
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "read the optional attribute: Tolerance"
-      disabled: true
+      optional: true
       command: "readAttribute"
       attribute: "Tolerance"
       response:
           value: 0
-
-    - label: "read the optional attribute: Tolerance"
-      disabled: true
-      command: "readAttribute"
-      attribute: "Tolerance"
-      response:
-          constraints:
-              type: uint16
-              minValue: 0
-              maxValue: 2048

@@ -63,22 +63,13 @@ public:
     CHIPDeviceCallbacksMgr(const CHIPDeviceCallbacksMgr &&) = delete;
     CHIPDeviceCallbacksMgr & operator=(const CHIPDeviceCallbacksMgr &) = delete;
 
-    static CHIPDeviceCallbacksMgr & GetInstance()
-    {
-        static CHIPDeviceCallbacksMgr instance;
-        return instance;
-    }
+    static CHIPDeviceCallbacksMgr & GetInstance();
 
     CHIP_ERROR AddResponseCallback(NodeId nodeId, uint8_t sequenceNumber, Callback::Cancelable * onSuccessCallback,
                                    Callback::Cancelable * onFailureCallback, TLVDataFilter callbackFilter = nullptr);
     CHIP_ERROR CancelResponseCallback(NodeId nodeId, uint8_t sequenceNumber);
     CHIP_ERROR GetResponseCallback(NodeId nodeId, uint8_t sequenceNumber, Callback::Cancelable ** onSuccessCallback,
                                    Callback::Cancelable ** onFailureCallback, TLVDataFilter * callbackFilter = nullptr);
-
-    CHIP_ERROR AddReportCallback(NodeId nodeId, EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                 Callback::Cancelable * onReportCallback, TLVDataFilter callbackFilter);
-    CHIP_ERROR GetReportCallback(NodeId nodeId, EndpointId endpointId, ClusterId clusterId, AttributeId attributeId,
-                                 Callback::Cancelable ** onReportCallback, TLVDataFilter * callbackFilter);
 
 private:
     CHIPDeviceCallbacksMgr() {}
@@ -154,14 +145,9 @@ private:
     CHIP_ERROR AddResponseFilter(const ResponseCallbackInfo & info, TLVDataFilter callbackFilter);
     CHIP_ERROR PopResponseFilter(const ResponseCallbackInfo & info, TLVDataFilter * callbackFilter);
 
-    CHIP_ERROR SetSubscribeFilter(const ReportCallbackInfo & info, TLVDataFilter callbackFilter);
-    CHIP_ERROR GetSubscribeFilter(const ReportCallbackInfo & info, TLVDataFilter * callbackFilter);
-
     Callback::CallbackDeque mResponsesSuccess;
     Callback::CallbackDeque mResponsesFailure;
     TLVFilterItem<ResponseCallbackInfo> mTLVFilterPool[kTLVFilterPoolSize];
-    Callback::CallbackDeque mReports;
-    TLVFilterItem<ReportCallbackInfo> mReportFilterPool[kTLVFilterPoolSize];
 };
 
 } // namespace app

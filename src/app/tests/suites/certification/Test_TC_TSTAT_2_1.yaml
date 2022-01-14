@@ -1,0 +1,1816 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 42.2.1. [TC-TSTAT-2.1] Attributes with server as DUT
+
+config:
+    cluster: "Thermostat"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    #issue  #11524 disabled steps are for attributes not supported in YAML framework
+    - label: "Reads mandatory attributes from DUT: LocalTemperature"
+      disabled: true
+      command: "readAttribute"
+      attribute: "local temperature"
+      response:
+          value: null
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT: LocalTemperature"
+      command: "readAttribute"
+      attribute: "local temperature"
+      response:
+          constraints:
+              type: int16
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          LocalTemperature"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "local temperature"
+      arguments:
+          value: null
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back mandatory attributes from DUT: LocalTemperature"
+      disabled: true
+      command: "readAttribute"
+      attribute: "local temperature"
+      response:
+          value: null
+
+    - label: "Reads mandatory attributes from DUT: AbsMinHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs min heat setpoint limit"
+      response:
+          value: 700
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          AbsMinHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs min heat setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          AbsMinHeatSetpointLimit"
+      command: "writeAttribute"
+      attribute: "abs min heat setpoint limit"
+      arguments:
+          value: 700
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back mandatory attributes from DUT: AbsMinHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs min heat setpoint limit"
+      response:
+          value: 700
+
+    - label: "Reads mandatory attributes from DUT: AbsMaxHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs max heat setpoint limit"
+      response:
+          value: 3000
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          AbsMaxHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs max heat setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          AbsMaxHeatSetpointLimit"
+      command: "writeAttribute"
+      attribute: "abs max heat setpoint limit"
+      arguments:
+          value: 3000
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back mandatory attributes from DUT: AbsMaxHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs max heat setpoint limit"
+      response:
+          value: 3000
+
+    - label: "Reads mandatory attributes from DUT: AbsMinCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs min cool setpoint limit"
+      response:
+          value: 1600
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          AbsMinCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs min cool setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          AbsMinCoolSetpointLimit"
+      command: "writeAttribute"
+      attribute: "abs min cool setpoint limit"
+      arguments:
+          value: 1600
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back mandatory attributes from DUT: AbsMinCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs min cool setpoint limit"
+      response:
+          value: 1600
+
+    - label: "Reads mandatory attributes from DUT: AbsMaxCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs max cool setpoint limit"
+      response:
+          value: 3200
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          AbsMaxCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs max cool setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          AbsMaxCoolSetpointLimit"
+      command: "writeAttribute"
+      attribute: "abs max cool setpoint limit"
+      arguments:
+          value: 3200
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back mandatory attributes from DUT: AbsMaxCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "abs max cool setpoint limit"
+      response:
+          value: 3200
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT: PICoolingDemand"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PICoolingDemand"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 100
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          PICoolingDemand"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "PICoolingDemand"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back mandatory attributes from DUT: PICoolingDemand"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PICoolingDemand"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT: PIHeatingDemand"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIHeatingDemand"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 100
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          PIHeatingDemand"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "PIHeatingDemand"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back mandatory attributes from DUT: PIHeatingDemand"
+      disabled: true
+      command: "readAttribute"
+      attribute: "PIHeatingDemand"
+      response:
+          value: 0
+
+    - label: "Reads mandatory attributes from DUT: OccupiedCoolingSetpoint"
+      command: "readAttribute"
+      attribute: "occupied cooling setpoint"
+      response:
+          value: 2600
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          OccupiedCoolingSetpoint"
+      command: "readAttribute"
+      attribute: "occupied cooling setpoint"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 2600
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          OccupiedCoolingSetpoint"
+      command: "writeAttribute"
+      attribute: "occupied cooling setpoint"
+      arguments:
+          value: 2600
+
+    - label: "Read back mandatory attributes from DUT: OccupiedCoolingSetpoint"
+      command: "readAttribute"
+      attribute: "occupied cooling setpoint"
+      response:
+          value: 2600
+
+    - label: "Reads mandatory attributes from DUT: OccupiedHeatingSetpoint"
+      command: "readAttribute"
+      attribute: "occupied heating setpoint"
+      response:
+          value: 2000
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          OccupiedHeatingSetpoint"
+      command: "readAttribute"
+      attribute: "occupied heating setpoint"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 2600
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          OccupiedHeatingSetpoint"
+      command: "writeAttribute"
+      attribute: "occupied heating setpoint"
+      arguments:
+          value: 2000
+
+    - label: "Read back mandatory attributes from DUT: OccupiedHeatingSetpoint"
+      command: "readAttribute"
+      attribute: "occupied heating setpoint"
+      response:
+          value: 2000
+
+    - label: "Reads mandatory attributes from DUT: UnoccupiedCoolingSetpoint"
+      disabled: true
+      command: "readAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      response:
+          value: 2600
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          UnoccupiedCoolingSetpoint"
+      disabled: true
+      command: "readAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 2600
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          UnoccupiedCoolingSetpoint"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      arguments:
+          value: 2600
+
+    - label:
+          "Read back mandatory attributes from DUT: UnoccupiedCoolingSetpoint"
+      disabled: true
+      command: "readAttribute"
+      attribute: "UnoccupiedCoolingSetpoint"
+      response:
+          value: 2600
+
+    - label: "Reads mandatory attributes from DUT: UnoccupiedHeatingSetpoint"
+      disabled: true
+      command: "readAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      response:
+          value: 2000
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          UnoccupiedHeatingSetpoint"
+      disabled: true
+      command: "readAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 2000
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          UnoccupiedHeatingSetpoint"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      arguments:
+          value: 2000
+
+    - label:
+          "Read back mandatory attributes from DUT: UnoccupiedHeatingSetpoint"
+      disabled: true
+      command: "readAttribute"
+      attribute: "UnoccupiedHeatingSetpoint"
+      response:
+          value: 2000
+
+    - label: "Reads mandatory attributes from DUT: MinHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "min heat setpoint limit"
+      response:
+          value: 700
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          MinHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "min heat setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          MinHeatSetpointLimit"
+      command: "writeAttribute"
+      attribute: "min heat setpoint limit"
+      arguments:
+          value: 700
+
+    - label: "Read back mandatory attributes from DUT: MinHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "min heat setpoint limit"
+      response:
+          value: 700
+
+    - label: "Reads mandatory attributes from DUT: MaxHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "max heat setpoint limit"
+      response:
+          value: 3000
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          MaxHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "max heat setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 700
+              maxValue: 3000
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          MaxHeatSetpointLimit"
+      command: "writeAttribute"
+      attribute: "max heat setpoint limit"
+      arguments:
+          value: 3000
+
+    - label: "Read back mandatory attributes from DUT: MaxHeatSetpointLimit"
+      command: "readAttribute"
+      attribute: "max heat setpoint limit"
+      response:
+          value: 3000
+
+    - label: "Reads mandatory attributes from DUT: MinCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "min cool setpoint limit"
+      response:
+          value: 1600
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          MinCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "min cool setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          MinCoolSetpointLimit"
+      command: "writeAttribute"
+      attribute: "min cool setpoint limit"
+      arguments:
+          value: 1600
+
+    - label: "Read back mandatory attributes from DUT: MinCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "min cool setpoint limit"
+      response:
+          value: 1600
+
+    - label: "Reads mandatory attributes from DUT: MaxCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "max cool setpoint limit"
+      response:
+          value: 3200
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          MaxCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "max cool setpoint limit"
+      response:
+          constraints:
+              type: int16
+              minValue: 1600
+              maxValue: 3200
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          MaxCoolSetpointLimit"
+      command: "writeAttribute"
+      attribute: "max cool setpoint limit"
+      arguments:
+          value: 3200
+
+    - label: "Read back mandatory attributes from DUT: MaxCoolSetpointLimit"
+      command: "readAttribute"
+      attribute: "max cool setpoint limit"
+      response:
+          value: 3200
+
+    - label: "Reads mandatory attributes from DUT: ControlSequenceOfOperation"
+      command: "readAttribute"
+      attribute: "control sequence of operation"
+      response:
+          value: 4
+
+    - label:
+          "Reads constraints of mandatory attributes from DUT:
+          ControlSequenceOfOperation"
+      command: "readAttribute"
+      attribute: "control sequence of operation"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 5
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          ControlSequenceOfOperation"
+      command: "writeAttribute"
+      attribute: "control sequence of operation"
+      arguments:
+          value: 4
+
+    - label:
+          "Read back mandatory attributes from DUT: ControlSequenceOfOperation"
+      command: "readAttribute"
+      attribute: "control sequence of operation"
+      response:
+          value: 4
+
+    - label: "Reads mandatory attributes from DUT: SystemMode"
+      command: "readAttribute"
+      attribute: "system mode"
+      response:
+          value: 1
+
+    - label: "Reads constraints of mandatory attributes from DUT: SystemMode"
+      command: "readAttribute"
+      attribute: "system mode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label:
+          "Writes the respective default value to mandatory attributes to DUT:
+          SystemMode"
+      command: "writeAttribute"
+      attribute: "system mode"
+      arguments:
+          value: 1
+
+    - label: "Read back mandatory attributes from DUT: SystemMode"
+      command: "readAttribute"
+      attribute: "system mode"
+      response:
+          value: 1
+
+    - label: "Reads optional attributes from DUT: OutdoorTemperature"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OutdoorTemperature"
+      response:
+          value: null
+
+    - label:
+          "Reads constraints of optional attributes from DUT: OutdoorTemperature"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OutdoorTemperature"
+      response:
+          constraints:
+              type: int16
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          OutdoorTemperature"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "OutdoorTemperature"
+      arguments:
+          value: null
+
+    - label: "Read back optional attributes from DUT: OutdoorTemperature"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OutdoorTemperature"
+      response:
+          value: null
+
+    - label: "Reads optional attributes from DUT: Occupancy"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "Occupancy"
+      response:
+          value: 1
+
+    - label: "Reads constraints of optional attributes from DUT: Occupancy"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "Occupancy"
+      response:
+          constraints:
+              type: map8
+              minValue: 0
+              maxValue: 1
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          Occupancy"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "Occupancy"
+      arguments:
+          value: 1
+
+    - label: "Read back optional attributes from DUT: Occupancy"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "Occupancy"
+      response:
+          value: 1
+
+    - label: "Reads optionl attributes from DUT: HVACSystemTypeConfiguration"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "HVACSystemTypeConfiguration"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          HVACSystemTypeConfiguration"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "HVACSystemTypeConfiguration"
+      response:
+          constraints:
+              type: map8
+              minValue: 0
+              maxValue: 5
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          HVACSystemTypeConfiguration"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "HVACSystemTypeConfiguration"
+      arguments:
+          value: 0
+
+    - label:
+          "Read back optional attributes from DUT: HVACSystemTypeConfiguration"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "HVACSystemTypeConfiguration"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: LocalTemperatureCalibration"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "LocalTemperatureCalibration"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          LocalTemperatureCalibration"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "LocalTemperatureCalibration"
+      response:
+          constraints:
+              type: int8
+              minValue: -25
+              maxValue: 25
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          LocalTemperatureCalibration"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "LocalTemperatureCalibration"
+      arguments:
+          value: 0
+
+    - label:
+          "Read back optional attributes from DUT: LocalTemperatureCalibration"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "LocalTemperatureCalibration"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: MinSetpointDeadBand"
+      optional: true
+      command: "readAttribute"
+      attribute: "min setpoint dead band"
+      response:
+          value: 25
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          MinSetpointDeadBand"
+      optional: true
+      command: "readAttribute"
+      attribute: "min setpoint dead band"
+      response:
+          constraints:
+              type: int8
+              minValue: 0
+              maxValue: 25
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          MinSetpointDeadBand"
+      optional: true
+      command: "writeAttribute"
+      attribute: "min setpoint dead band"
+      arguments:
+          value: 25
+
+    - label: "Read back optional attributes from DUT: MinSetpointDeadBand"
+      optional: true
+      command: "readAttribute"
+      attribute: "min setpoint dead band"
+      response:
+          value: 25
+
+    - label: "Reads optional attributes from DUT: RemoteSensing"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "RemoteSensing"
+      response:
+          value: 0
+
+    - label: "Reads constraints of optional attributes from DUT: RemoteSensing"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "RemoteSensing"
+      response:
+          constraints:
+              type: map8
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          RemoteSensing"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "RemoteSensing"
+      arguments:
+          value: 0
+
+    - label: "Read back optional attributes from DUT: RemoteSensing"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "RemoteSensing"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: AlarmMask"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "AlarmMask"
+      response:
+          value: 0
+
+    - label: "Reads constraints of optional attributes from DUT: AlarmMask"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "AlarmMask"
+      response:
+          constraints:
+              type: map8
+              minValue: 0
+              maxValue: 2
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          AlarmMask"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "AlarmMask"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back optional attributes from DUT: AlarmMask"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "AlarmMask"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: ThermostatRunningMode"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ThermostatRunningMode"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          ThermostatRunningMode"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ThermostatRunningMode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 9
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          ThermostatRunningMode"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "ThermostatRunningMode"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back optional attributes from DUT: ThermostatRunningMode"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ThermostatRunningMode"
+      response:
+          value: 0
+
+    - label: "Reads constraints of optional attributes from DUT: StartOfWeek"
+      optional: true
+      command: "readAttribute"
+      attribute: "start of week"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 6
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          StartOfWeek"
+      optional: true
+      command: "writeAttribute"
+      attribute: "start of week"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back optional attributes from DUT: StartOfWeek"
+      optional: true
+      command: "readAttribute"
+      attribute: "start of week"
+      response:
+          value: 0
+
+    #issue #11625 default value is 0 as per spec but expecting 7
+    - label: "Reads optional attributes from DUT: NumberOfWeeklyTransitions"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "number of weekly transitions"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          NumberOfWeeklyTransitions"
+      optional: true
+      command: "readAttribute"
+      attribute: "number of weekly transitions"
+      response:
+          constraints:
+              type: uint8
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          NumberOfWeeklyTransitions"
+      optional: true
+      command: "writeAttribute"
+      attribute: "number of weekly transitions"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back optional attributes from DUT: NumberOfWeeklyTransitions"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "number of weekly transitions"
+      response:
+          value: 0
+
+    #issue #11625 default value is 0 as per spec but expecting 4
+    - label: "Reads optional attributes from DUT: NumberOfDailyTransitions"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "number of daily transitions"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          NumberOfDailyTransitions"
+      optional: true
+      command: "readAttribute"
+      attribute: "number of daily transitions"
+      response:
+          constraints:
+              type: uint8
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          NumberOfDailyTransitions"
+      optional: true
+      command: "writeAttribute"
+      attribute: "number of daily transitions"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back optional attributes from DUT: NumberOfDailyTransitions"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "number of daily transitions"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: TemperatureSetpointHold"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "TemperatureSetpointHold"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          TemperatureSetpointHold"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "TemperatureSetpointHold"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 1
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          TemperatureSetpointHold"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "TemperatureSetpointHold"
+      arguments:
+          value: 0
+
+    - label: "Read back optional attributes from DUT: TemperatureSetpointHold"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "TemperatureSetpointHold"
+      response:
+          value: 0
+
+    - label:
+          "Reads optional attributes from DUT: TemperatureSetpointHoldDuration"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "TemperatureSetpointHoldDuration"
+      response:
+          value: null
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          TemperatureSetpointHoldDuration"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "TemperatureSetpointHoldDuration"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 1440
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          TemperatureSetpointHoldDuration"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "TemperatureSetpointHoldDuration"
+      arguments:
+          value: null
+
+    - label:
+          "Read back optional attributes from DUT:
+          TemperatureSetpointHoldDuration"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "TemperatureSetpointHoldDuration"
+      response:
+          value: null
+
+    - label:
+          "Reads optional attributes from DUT:
+          ThermostatProgrammingOperationMode"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ThermostatProgrammingOperationMode"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          ThermostatProgrammingOperationMode"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ThermostatProgrammingOperationMode"
+      response:
+          constraints:
+              type: map8
+              minValue: 0
+              maxValue: 2
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          ThermostatProgrammingOperationMode"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "ThermostatProgrammingOperationMode"
+      arguments:
+          value: 0
+
+    - label:
+          "Read back optional attributes from DUT:
+          ThermostatProgrammingOperationMode"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ThermostatProgrammingOperationMode"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          ThermostatRunningState"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ThermostatRunningState"
+      response:
+          constraints:
+              type: map16
+              minValue: 0
+              maxValue: 6
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          ThermostatRunningState"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "ThermostatRunningState"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back optional attributes from DUT: ThermostatRunningState"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ThermostatRunningState"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: SetpointChangeSource"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "SetpointChangeSource"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          SetpointChangeSource"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "SetpointChangeSource"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          SetpointChangeSource"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "SetpointChangeSource"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back optional attributes from DUT: SetpointChangeSource"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "SetpointChangeSource"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: SetpointChangeAmount"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "SetpointChangeAmount"
+      response:
+          value: null
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          SetpointChangeAmount"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "SetpointChangeAmount"
+      response:
+          constraints:
+              type: int16
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          SetpointChangeAmount"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "SetpointChangeAmount"
+      arguments:
+          value: null
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back optional attributes from DUT: SetpointChangeAmount"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "SetpointChangeAmount"
+      response:
+          value: null
+
+    - label: "Reads optional attributes from DUT: SetpointChangeSourceTimestamp"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "SetpointChangeSourceTimestamp"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          SetpointChangeSourceTimestamp"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "SetpointChangeSourceTimestamp"
+      response:
+          constraints:
+              type: utc
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          SetpointChangeSourceTimestamp"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "SetpointChangeSourceTimestamp"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label:
+          "Read back optional attributes from DUT: SetpointChangeSourceTimestamp"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "SetpointChangeSourceTimestamp"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: OccupiedSetback"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedSetback"
+      response:
+          value: null
+
+    - label:
+          "Reads constraints of optional attributes from DUT: OccupiedSetback"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedSetback"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          OccupiedSetback"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedSetback"
+      arguments:
+          value: null
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back optional attributes from DUT: OccupiedSetback"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedSetback"
+      response:
+          value: null
+
+    - label: "Reads optional attributes from DUT: OccupiedSetbackMin"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedSetbackMin"
+      response:
+          value: null
+
+    - label:
+          "Reads constraints of optional attributes from DUT: OccupiedSetbackMin"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedSetbackMin"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          OccupiedSetbackMin"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedSetbackMin"
+      arguments:
+          value: null
+
+    - label: "Read back optional attributes from DUT: OccupiedSetbackMin"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedSetbackMin"
+      response:
+          value: null
+
+    - label: "Reads optional attributes from DUT: OccupiedSetbackMax"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedSetbackMax"
+      response:
+          value: null
+
+    - label:
+          "Reads constraints of optional attributes from DUT: OccupiedSetbackMax"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedSetbackMax"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          OccupiedSetbackMax"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "OccupiedSetbackMax"
+      arguments:
+          value: null
+
+    - label: "Read back optional attributes from DUT: OccupiedSetbackMax"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "OccupiedSetbackMax"
+      response:
+          value: null
+
+    - label: "Reads optional attributes from DUT: UnoccupiedSetback"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetback"
+      response:
+          value: null
+
+    - label:
+          "Reads constraints of optional attributes from DUT: UnoccupiedSetback"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetback"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          UnoccupiedSetback"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedSetback"
+      arguments:
+          value: null
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back optional attributes from DUT: UnoccupiedSetback"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetback"
+      response:
+          value: null
+
+    - label: "Reads optional attributes from DUT: UnoccupiedSetbackMin"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetbackMin"
+      response:
+          value: null
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          UnoccupiedSetbackMin"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetbackMin"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          UnoccupiedSetbackMin"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedSetbackMin"
+      arguments:
+          value: null
+
+    - label: "Read back optional attributes from DUT: UnoccupiedSetbackMin"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetbackMin"
+      response:
+          value: null
+
+    - label: "Reads optional attributes from DUT: UnoccupiedSetbackMax"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetbackMax"
+      response:
+          value: null
+
+    - label:
+          "Reads constraints of optional attributes from DUT:
+          UnoccupiedSetbackMax"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetbackMax"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          UnoccupiedSetbackMax"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "UnoccupiedSetbackMax"
+      arguments:
+          value: null
+
+    - label: "Read back optional attributes from DUT: UnoccupiedSetbackMax"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "UnoccupiedSetbackMax"
+      response:
+          value: null
+
+    - label: "Reads optional attributes from DUT: EmergencyHeatDelta"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "EmergencyHeatDelta"
+      response:
+          value: 255OccupiedSetbackMin
+
+    - label:
+          "Reads constraints of optional attributes from DUT: EmergencyHeatDelta"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "EmergencyHeatDelta"
+      response:
+          constraints:
+              type: uint8
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          EmergencyHeatDelta"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "EmergencyHeatDelta"
+      arguments:
+          value: 255
+
+    - label: "Read back optional attributes from DUT: EmergencyHeatDelta"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "EmergencyHeatDelta"
+      response:
+          value: 255
+
+    - label: "Reads optional attributes from DUT: ACType"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACType"
+      response:
+          value: 0
+
+    - label: "Reads constraints of optional attributes from DUT: ACType"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACType"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 4
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          ACType"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "ACType"
+      arguments:
+          value: 0
+
+    - label: "Read back optional attributes from DUT: ACType"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACType"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: ACCapacity"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCapacity"
+      response:
+          value: 0
+
+    - label: "Reads constraints of optional attributes from DUT: ACCapacity"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCapacity"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          ACCapacity"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "ACCapacity"
+      arguments:
+          value: 0
+
+    - label: "Read back optional attributes from DUT: ACCapacity"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCapacity"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: ACRefrigerantType"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACRefrigerantType"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT: ACRefrigerantType"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACRefrigerantType"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          ACRefrigerantType"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "ACRefrigerantType"
+      arguments:
+          value: 0
+
+    - label: "Read back optional attributes from DUT: ACRefrigerantType"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACRefrigerantType"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: ACCompressorType"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCompressorType"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT: ACCompressorType"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCompressorType"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 3
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          ACCompressorType"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "ACCompressorType"
+      arguments:
+          value: 0
+
+    - label: "Read back optional attributes from DUT: ACCompressorType"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCompressorType"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: ACErrorCode"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACErrorCode"
+      response:
+          value: 0
+
+    - label: "Reads constraints of optional attributes from DUT: ACErrorCode"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACErrorCode"
+      response:
+          constraints:
+              type: map32
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          ACErrorCode"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "ACErrorCode"
+      arguments:
+          value: 0
+
+    - label: "Read back optional attributes from DUT: ACErrorCode"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACErrorCode"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: ACLouverPosition"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACLouverPosition"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT: ACLouverPosition"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACLouverPosition"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 5
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          ACLouverPosition"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "ACLouverPosition"
+      arguments:
+          value: 0
+
+    - label: "Read back optional attributes from DUT: ACLouverPosition"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACLouverPosition"
+      response:
+          value: 0
+
+    - label: "Reads optional attributes from DUT: ACCoilTemperature"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCoilTemperature"
+      response:
+          value: null
+
+    - label:
+          "Reads constraints of optional attributes from DUT: ACCoilTemperature"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCoilTemperature"
+      response:
+          constraints:
+              type: int16
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          ACCoilTemperature"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "ACCoilTemperature"
+      arguments:
+          value: null
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back optional attributes from DUT: ACCoilTemperature"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCoilTemperature"
+      response:
+          value: null
+
+    - label: "Reads optional attributes from DUT: ACCapacityFormat"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCapacityFormat"
+      response:
+          value: 0
+
+    - label:
+          "Reads constraints of optional attributes from DUT: ACCapacityFormat"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCapacityFormat"
+      response:
+          constraints:
+              type: enum8
+
+    - label:
+          "Writes the respective default value to optional attributes to DUT:
+          ACCapacityFormat"
+      disabled: true
+      optional: true
+      command: "writeAttribute"
+      attribute: "ACCapacityFormat"
+      arguments:
+          value: 0
+
+    - label: "Read back optional attributes from DUT: ACCapacityFormat"
+      disabled: true
+      optional: true
+      command: "readAttribute"
+      attribute: "ACCapacityFormat"
+      response:
+          value: 0

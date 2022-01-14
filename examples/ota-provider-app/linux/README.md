@@ -10,12 +10,12 @@ Suggest doing the following:
 
 ## Usage
 
-`./ota-provider-app [--filepath \<filepath\>]`
+`./ota-provider-app [-f/--filepath \<file\>]`
 
-If `-filepath` is provided, `ota-provider-app` will automatically serve that
-file to the Requestor (SoftwareVersion will be Requester version + 1).
+If `--filepath` is supplied, `ota-provider-app` will automatically serve that
+file to the OTA Requestor (SoftwareVersion will be Requester version + 1).
 
-If no `-filepath` is provided, `ota-provider-app` will respond to `QueryImage`
+If no `--filepath` is supplied, `ota-provider-app` will respond to `QueryImage`
 with `NotAvailable` status.
 
 ## Current Features/Limitations
@@ -31,6 +31,5 @@ with `NotAvailable` status.
 -   Synchronous BDX transfer only
 -   using hardcoded test values for local and peer Node IDs
 -   does not check VID/PID
--   no configuration for `Busy`/`DelayedActionTime`
 -   no configuration for `AwaitNextAction`
 -   only one transfer at a time (does not check incoming `UpdateTokens`)

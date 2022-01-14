@@ -29,7 +29,7 @@ namespace chip {
 
 void GlobalUnencryptedMessageCounter::Init()
 {
-    value = Crypto::GetRandU32();
+    mValue = Crypto::GetRandU32();
 }
 
 CHIP_ERROR GlobalEncryptedMessageCounter::Init()

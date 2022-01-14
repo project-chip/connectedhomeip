@@ -45,14 +45,17 @@ public class ChipDeviceController {
     completionListener = listener;
   }
 
-  public void pairDevice(BluetoothGatt bleServer, int connId, long deviceId, long setupPincode) {
-    pairDevice(bleServer, connId, deviceId, setupPincode, null);
+  public void pairDevice(
+      BluetoothGatt bleServer,
+      int connId,
+      long deviceId,
+      long setupPincode,
+      NetworkCredentials networkCredentials) {
+    pairDevice(bleServer, connId, deviceId, setupPincode, null, networkCredentials);
   }
 
   /**
    * Pair a device connected through BLE.
-   *
-   * <p>TODO(#7985): Annotate csrNonce as Nullable.
    *
    * @param bleServer the BluetoothGatt representing the BLE connection to the device
    * @param connId the BluetoothGatt Id representing the BLE connection to the device
@@ -66,7 +69,8 @@ public class ChipDeviceController {
       int connId,
       long deviceId,
       long setupPincode,
-      @Nullable byte[] csrNonce) {
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials) {
     if (connectionId == 0) {
       connectionId = connId;
 
@@ -78,7 +82,8 @@ public class ChipDeviceController {
 
       Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
       Log.d(TAG, "Pairing device with ID: " + deviceId);
-      pairDevice(deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce);
+      pairDevice(
+          deviceControllerPtr, deviceId, connectionId, setupPincode, csrNonce, networkCredentials);
     } else {
       Log.e(TAG, "Bluetooth connection already in use.");
       completionListener.onError(new Exception("Bluetooth connection already in use."));
@@ -96,12 +101,74 @@ public class ChipDeviceController {
         deviceControllerPtr, deviceId, address, port, discriminator, pinCode, csrNonce);
   }
 
+  public void establishPaseConnection(long deviceId, int connId, long setupPincode) {
+    if (connectionId == 0) {
+      connectionId = connId;
+
+      if (connectionId == 0) {
+        Log.e(TAG, "Failed to add Bluetooth connection.");
+        completionListener.onError(new Exception("Failed to add Bluetooth connection."));
+        return;
+      }
+
+      Log.d(TAG, "Bluetooth connection added with ID: " + connectionId);
+      Log.d(TAG, "Establishing PASE connection with ID: " + deviceId);
+      establishPaseConnection(deviceControllerPtr, deviceId, connId, setupPincode);
+    } else {
+      Log.e(TAG, "Bluetooth connection already in use.");
+      completionListener.onError(new Exception("Bluetooth connection already in use."));
+    }
+  }
+
+  /**
+   * Establish a secure PASE connection to the given device via IP address.
+   *
+   * @param deviceId the ID of the node to connect to
+   * @param address the IP address at which the node is located
+   * @param port the port at which the node is located
+   * @param setupPincode the pincode for this node
+   */
+  public void establishPaseConnection(long deviceId, String address, int port, long setupPincode) {
+    Log.d(TAG, "Establishing PASE connection with ID: " + deviceId);
+    establishPaseConnectionByAddress(deviceControllerPtr, deviceId, address, port, setupPincode);
+  }
+
+  /**
+   * Initiates the automatic commissioning flow using the specified network credentials. It is
+   * expected that a secure session has already been established via {@link
+   * #establishPaseConnection(long, int, long)}.
+   *
+   * @param deviceId the ID of the node to be commissioned
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   */
+  public void commissionDevice(long deviceId, NetworkCredentials networkCredentials) {
+    commissionDevice(deviceControllerPtr, deviceId, /* csrNonce= */ null, networkCredentials);
+  }
+
+  /**
+   * Initiates the automatic commissioning flow using the specified network credentials. It is
+   * expected that a secure session has already been established via {@link
+   * #establishPaseConnection(long, int, long)}.
+   *
+   * @param deviceId the ID of the node to be commissioned
+   * @param csrNonce a nonce to be used for the CSR request
+   * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
+   */
+  public void commissionDevice(
+      long deviceId, @Nullable byte[] csrNonce, NetworkCredentials networkCredentials) {
+    commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
+  }
+
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
   }
 
-  public void pairTestDeviceWithoutSecurity(String ipAddress) {
-    pairTestDeviceWithoutSecurity(deviceControllerPtr, ipAddress);
+  /**
+   * Returns a pointer to a device currently being commissioned. This should be used before the
+   * device is operationally available.
+   */
+  public long getDeviceBeingCommissionedPointer(long nodeId) {
+    return getDeviceBeingCommissionedPointer(deviceControllerPtr, nodeId);
   }
 
   /**
@@ -214,6 +281,11 @@ public class ChipDeviceController {
     return isActive(deviceControllerPtr, deviceId);
   }
 
+  /* Shutdown all cluster attribute subscriptions for a given device */
+  public void shutdownSubscriptions(long devicePtr) {
+    shutdownSubscriptions(deviceControllerPtr, devicePtr);
+  }
+
   /**
    * Generates a new PASE verifier and passcode ID for the given setup PIN code.
    *
@@ -237,7 +309,8 @@ public class ChipDeviceController {
       long deviceId,
       int connectionId,
       long pinCode,
-      @Nullable byte[] csrNonce);
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials);
 
   private native void pairDeviceWithAddress(
       long deviceControllerPtr,
@@ -248,12 +321,24 @@ public class ChipDeviceController {
       long pinCode,
       @Nullable byte[] csrNonce);
 
+  private native void establishPaseConnection(
+      long deviceControllerPtr, long deviceId, int connId, long setupPincode);
+
+  private native void establishPaseConnectionByAddress(
+      long deviceControllerPtr, long deviceId, String address, int port, long setupPincode);
+
+  private native void commissionDevice(
+      long deviceControllerPtr,
+      long deviceId,
+      @Nullable byte[] csrNonce,
+      NetworkCredentials networkCredentials);
+
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
+
+  private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 
   private native void getConnectedDevicePointer(
       long deviceControllerPtr, long deviceId, long callbackHandle);
-
-  private native void pairTestDeviceWithoutSecurity(long deviceControllerPtr, String ipAddress);
 
   private native boolean disconnectDevice(long deviceControllerPtr, long deviceId);
 
@@ -276,6 +361,8 @@ public class ChipDeviceController {
       long setupPinCode);
 
   private native boolean isActive(long deviceControllerPtr, long deviceId);
+
+  private native void shutdownSubscriptions(long deviceControllerPtr, long devicePtr);
 
   static {
     System.loadLibrary("CHIPController");

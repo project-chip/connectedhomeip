@@ -91,6 +91,7 @@ private:
     void SysProcess();
     void ProcessDeviceEvents();
 
+    volatile bool mShouldRunEventLoop;
     static void EventLoopTaskMain(void * thisPtr, void *, void *);
 };
 

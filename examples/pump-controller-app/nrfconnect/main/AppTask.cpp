@@ -26,6 +26,7 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
@@ -503,15 +504,4 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     }
 }
 
-void AppTask::UpdateClusterState()
-{
-    uint8_t newValue = !PumpMgr().IsStopped();
-
-    // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
-                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        LOG_ERR("Updating on/off %x", status);
-    }
-}
+void AppTask::UpdateClusterState() {}

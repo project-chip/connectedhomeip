@@ -27,10 +27,13 @@
     MatterDescriptorPluginServerInitCallback();                                                                                    \
     MatterDiagnosticLogsPluginServerInitCallback();                                                                                \
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
+    MatterFixedLabelPluginServerInitCallback();                                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
+    MatterLocalizationConfigurationPluginServerInitCallback();                                                                     \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterTemperatureMeasurementPluginServerInitCallback();                                                                        \
+    MatterUserLabelPluginServerInitCallback();                                                                                     \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();

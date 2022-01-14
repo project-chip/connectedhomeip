@@ -22,7 +22,7 @@
  */
 
 #include <lib/support/CodeUtils.h>
-#include <system/LwIPEventSupport.h>
+#include <system/PlatformEventSupport.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemLayer.h>
 #include <system/SystemLayerImplLwIP.h>
@@ -30,7 +30,7 @@
 namespace chip {
 namespace System {
 
-LayerImplLwIP::LayerImplLwIP() : mHandlingTimerComplete(false), mEventDelegateList(nullptr) {}
+LayerImplLwIP::LayerImplLwIP() : mHandlingTimerComplete(false) {}
 
 CHIP_ERROR LayerImplLwIP::Init()
 {
@@ -38,17 +38,13 @@ CHIP_ERROR LayerImplLwIP::Init()
 
     RegisterLwIPErrorFormatter();
 
-    ReturnErrorOnFailure(mTimerList.Init());
-
     VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR LayerImplLwIP::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
-    mLayerState.SetShutdown();
-    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
+    VerifyOrReturnError(mLayerState.ResetFromInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 
@@ -56,11 +52,11 @@ CHIP_ERROR LayerImplLwIP::StartTimer(Clock::Timeout delay, TimerCompleteCallback
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = Clock::Zero);
+    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_TimeoutImmediate, delay = Clock::kZero);
 
     CancelTimer(onComplete, appState);
 
-    Timer * timer = Timer::New(*this, delay, onComplete, appState);
+    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp() + delay, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (mTimerList.Add(timer) == timer)
@@ -80,124 +76,25 @@ void LayerImplLwIP::CancelTimer(TimerCompleteCallback onComplete, void * appStat
 {
     VerifyOrReturn(mLayerState.IsInitialized());
 
-    Timer * timer = mTimerList.Remove(onComplete, appState);
-    VerifyOrReturn(timer != nullptr);
-
-    timer->Clear();
-    timer->Release();
+    TimerList::Node * timer = mTimerList.Remove(onComplete, appState);
+    if (timer != nullptr)
+    {
+        mTimerPool.Release(timer);
+    }
 }
 
 CHIP_ERROR LayerImplLwIP::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    Timer * timer = Timer::New(*this, System::Clock::Zero, onComplete, appState);
+    TimerList::Node * timer = mTimerPool.Create(*this, SystemClock().GetMonotonicTimestamp(), onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    return ScheduleLambda([timer] { timer->HandleComplete(); });
-}
-
-bool LayerLwIP::EventHandlerDelegate::IsInitialized() const
-{
-    return mFunction != nullptr;
-}
-
-void LayerLwIP::EventHandlerDelegate::Init(EventHandlerFunction aFunction)
-{
-    mFunction     = aFunction;
-    mNextDelegate = nullptr;
-}
-
-void LayerLwIP::EventHandlerDelegate::Prepend(const LayerLwIP::EventHandlerDelegate *& aDelegateList)
-{
-    mNextDelegate = aDelegateList;
-    aDelegateList = this;
-}
-
-CHIP_ERROR LayerImplLwIP::AddEventHandlerDelegate(EventHandlerDelegate & aDelegate)
-{
-    LwIPEventHandlerDelegate & lDelegate = static_cast<LwIPEventHandlerDelegate &>(aDelegate);
-    VerifyOrReturnError(lDelegate.GetFunction() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    lDelegate.Prepend(mEventDelegateList);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR LayerImplLwIP::ScheduleLambdaBridge(const LambdaBridge & bridge)
-{
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-
-    CHIP_ERROR lReturn = PlatformEventing::ScheduleLambdaBridge(*this, bridge);
-    if (lReturn != CHIP_NO_ERROR)
-    {
-        ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer lambda event: %s", ErrorStr(lReturn));
-    }
-    return lReturn;
-}
-
-CHIP_ERROR LayerImplLwIP::PostEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
-{
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-
-    CHIP_ERROR lReturn = PlatformEventing::PostEvent(*this, aTarget, aEventType, aArgument);
-    if (lReturn != CHIP_NO_ERROR)
-    {
-        ChipLogError(chipSystemLayer, "Failed to queue CHIP System Layer event (type %d): %s", aEventType, ErrorStr(lReturn));
-    }
-    return lReturn;
-}
-
-/**
- * This implements the actual dispatch and handling of a CHIP System Layer event.
- *
- *  @param[in,out]  aTarget     A reference to the layer object to which the event is targeted.
- *  @param[in]      aEventType  The event / message type to handle.
- *  @param[in]      aArgument   The argument associated with the event / message.
- *
- *  @retval   CHIP_NO_ERROR                 On success.
- *  @retval   CHIP_ERROR_INCORRECT_STATE    If the state of the InetLayer object is incorrect.
- *  @retval   CHIP_ERROR_UNEXPECTED_EVENT   If the event type is unrecognized.
- */
-CHIP_ERROR LayerImplLwIP::HandleEvent(Object & aTarget, EventType aEventType, uintptr_t aArgument)
-{
-    VerifyOrReturnError(IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
-
-    // Prevent the target object from being freed while dispatching the event.
-    aTarget.Retain();
-
-    CHIP_ERROR lReturn                              = CHIP_ERROR_UNEXPECTED_EVENT;
-    const LwIPEventHandlerDelegate * lEventDelegate = static_cast<const LwIPEventHandlerDelegate *>(mEventDelegateList);
-
-    while (lReturn == CHIP_ERROR_UNEXPECTED_EVENT && lEventDelegate != nullptr)
-    {
-        lReturn        = lEventDelegate->GetFunction()(aTarget, aEventType, aArgument);
-        lEventDelegate = lEventDelegate->GetNextDelegate();
-    }
-
-    if (lReturn == CHIP_ERROR_UNEXPECTED_EVENT)
-    {
-        ChipLogError(chipSystemLayer, "Unexpected event type %d", aEventType);
-    }
-
-    /*
-      Release the reference to the target object. When the object's lifetime finally comes to an end, in most cases this will be
-      the release call that decrements the ref count to zero.
-      */
-    aTarget.Release();
-
-    return lReturn;
+    return ScheduleLambda([this, timer] { this->mTimerPool.Invoke(timer); });
 }
 
 /**
  * Start the platform timer with specified millsecond duration.
- *
- *  @brief
- *      Calls the Platform specific API to start a platform timer. This API is called by the chip::System::Timer class when
- *      one or more timers are active and require deferred execution.
- *
- *  @param[in]  aDelay  The timer duration in milliseconds.
- *
- *  @return CHIP_NO_ERROR on success, error code otherwise.
- *
  */
 CHIP_ERROR LayerImplLwIP::StartPlatformTimer(System::Clock::Timeout aDelay)
 {
@@ -234,28 +131,27 @@ CHIP_ERROR LayerImplLwIP::HandlePlatformTimer()
     // limit the number of timers handled before the control is returned to the event queue.  The bound is similar to
     // (though not exactly same) as that on the sockets-based systems.
 
-    size_t timersHandled = 0;
-    Timer * timer        = nullptr;
+    size_t timersHandled    = 0;
+    TimerList::Node * timer = nullptr;
     while ((timersHandled < CHIP_SYSTEM_CONFIG_NUM_TIMERS) && ((timer = mTimerList.PopIfEarlier(expirationTime)) != nullptr))
     {
         mHandlingTimerComplete = true;
-        timer->HandleComplete();
+        mTimerPool.Invoke(timer);
         mHandlingTimerComplete = false;
-
         timersHandled++;
     }
 
     if (!mTimerList.Empty())
     {
         // timers still exist so restart the platform timer.
-        Clock::Timeout delay{ 0 };
+        Clock::Timeout delay = System::Clock::kZero;
 
         Clock::Timestamp currentTime = SystemClock().GetMonotonicTimestamp();
 
-        if (currentTime < mTimerList.Earliest()->mAwakenTime)
+        if (currentTime < mTimerList.Earliest()->AwakenTime())
         {
             // the next timer expires in the future, so set the delay to a non-zero value
-            delay = mTimerList.Earliest()->mAwakenTime - currentTime;
+            delay = mTimerList.Earliest()->AwakenTime() - currentTime;
         }
 
         StartPlatformTimer(delay);

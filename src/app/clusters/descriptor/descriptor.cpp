@@ -42,13 +42,18 @@ public:
     // Register for the Descriptor cluster on all endpoints.
     DescriptorAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), Descriptor::Id) {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
+    static constexpr uint16_t ClusterRevision = 1;
+
     CHIP_ERROR ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server);
+    CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
+
+constexpr uint16_t DescriptorAttrAccess::ClusterRevision;
 
 CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
@@ -56,7 +61,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
     if (endpoint == 0x00)
     {
-        err = aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
             for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
             {
                 if (emberAfEndpointIndexIsEnabled(index))
@@ -74,7 +79,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
     }
     else
     {
-        err = aEncoder.Encode(DataModel::List<EndpointId>());
+        err = aEncoder.EncodeEmptyList();
     }
 
     return err;
@@ -82,7 +87,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
 CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    CHIP_ERROR err = aEncoder.EncodeList([&endpoint](const auto & encoder) -> CHIP_ERROR {
         Descriptor::Structs::DeviceType::Type deviceStruct;
         uint16_t index = emberAfIndexFromEndpoint(endpoint);
 
@@ -96,7 +101,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadDeviceAttribute(EndpointId endpoint, Attrib
 
 CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder, bool server)
 {
-    CHIP_ERROR err = aEncoder.EncodeList([&endpoint, server](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    CHIP_ERROR err = aEncoder.EncodeList([&endpoint, server](const auto & encoder) -> CHIP_ERROR {
         uint16_t clusterCount = emberAfClusterCount(endpoint, server);
 
         for (uint8_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++)
@@ -111,9 +116,14 @@ CHIP_ERROR DescriptorAttrAccess::ReadClientServerAttribute(EndpointId endpoint, 
     return err;
 }
 
+CHIP_ERROR DescriptorAttrAccess::ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(ClusterRevision);
+}
+
 DescriptorAttrAccess gAttrAccess;
 
-CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == Descriptor::Id);
 
@@ -131,6 +141,9 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
     case PartsList::Id: {
         return ReadPartsAttribute(aPath.mEndpointId, aEncoder);
     }
+    case ClusterRevision::Id: {
+        return ReadClusterRevision(aPath.mEndpointId, aEncoder);
+    }
     default: {
         break;
     }
@@ -141,13 +154,5 @@ CHIP_ERROR DescriptorAttrAccess::Read(const ConcreteAttributePath & aPath, Attri
 
 void MatterDescriptorPluginServerInitCallback(void)
 {
-#if CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
-    static bool attrAccessRegistered = false;
-
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gAttrAccess);
-        attrAccessRegistered = true;
-    }
-#endif
+    registerAttributeAccessOverride(&gAttrAccess);
 }

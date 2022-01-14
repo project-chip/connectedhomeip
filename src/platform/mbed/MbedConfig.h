@@ -56,7 +56,7 @@ public:
     static const Key kConfigKey_MfrDeviceCert;
     static const Key kConfigKey_MfrDeviceICACerts;
     static const Key kConfigKey_MfrDevicePrivateKey;
-    static const Key kConfigKey_ProductRevision;
+    static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
     static const Key kConfigKey_FabricId;
@@ -71,7 +71,10 @@ public:
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
+    static const Key kConfigKey_ActiveLocale;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_HourFormat;
+    static const Key kConfigKey_CalendarType;
 
     // Config value accessors.
     static CHIP_ERROR ReadConfigValue(Key key, bool & val);

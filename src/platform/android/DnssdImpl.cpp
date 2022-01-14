@@ -17,17 +17,18 @@
 
 #include "DnssdImpl.h"
 
-#include <jni.h>
-#include <lib/support/CHIPJNIError.h>
-#include <lib/support/JniReferences.h>
-#include <lib/support/JniTypeWrappers.h>
-
 #include <lib/dnssd/platform/Dnssd.h>
+#include <lib/support/CHIPJNIError.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <cstddef>
+#include <jni.h>
 #include <string>
 
 namespace chip {
@@ -36,9 +37,11 @@ namespace Dnssd {
 using namespace chip::Platform;
 
 namespace {
-jobject sResolverObject     = nullptr;
-jobject sMdnsCallbackObject = nullptr;
-jmethodID sResolveMethod    = nullptr;
+jobject sResolverObject         = nullptr;
+jobject sMdnsCallbackObject     = nullptr;
+jmethodID sResolveMethod        = nullptr;
+jmethodID sPublishMethod        = nullptr;
+jmethodID sRemoveServicesMethod = nullptr;
 } // namespace
 
 // Implemention of functions declared in lib/dnssd/platform/Dnssd.h
@@ -59,17 +62,81 @@ CHIP_ERROR ChipDnssdShutdown()
 
 CHIP_ERROR ChipDnssdRemoveServices()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(sResolverObject != nullptr && sRemoveServicesMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+
+    {
+        DeviceLayer::StackUnlock unlock;
+        env->CallVoidMethod(sResolverObject, sRemoveServicesMethod);
+    }
+
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(Discovery, "Java exception in ChipDnssdRemoveServices");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_JNI_ERROR_EXCEPTION_THROWN;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    VerifyOrReturnError(service != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(sResolverObject != nullptr && sPublishMethod != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    UtfString jniName(env, service->mName);
+    UtfString jniHostName(env, service->mHostName);
+
+    std::string serviceType = service->mType;
+    serviceType += '.';
+    serviceType += (service->mProtocol == DnssdServiceProtocol::kDnssdProtocolUdp ? "_udp" : "_tcp");
+    UtfString jniServiceType(env, serviceType.c_str());
+
+    jclass stringClass = env->FindClass("java/lang/String");
+    jobjectArray keys  = env->NewObjectArray(service->mTextEntrySize, stringClass, nullptr);
+
+    jclass arrayElemType = env->FindClass("[B");
+    jobjectArray datas   = env->NewObjectArray(service->mTextEntrySize, arrayElemType, nullptr);
+
+    for (size_t i = 0; i < service->mTextEntrySize; i++)
+    {
+        UtfString jniKey(env, service->mTextEntries[i].mKey);
+        env->SetObjectArrayElement(keys, i, jniKey.jniValue());
+
+        ByteArray jniData(env, (const jbyte *) service->mTextEntries[i].mData, service->mTextEntries[i].mDataSize);
+        env->SetObjectArrayElement(datas, i, jniData.jniValue());
+    }
+
+    jobjectArray subTypes = env->NewObjectArray(service->mSubTypeSize, stringClass, nullptr);
+    for (size_t i = 0; i < service->mSubTypeSize; i++)
+    {
+        UtfString jniSubType(env, service->mSubTypes[i]);
+        env->SetObjectArrayElement(subTypes, i, jniSubType.jniValue());
+    }
+
+    {
+        DeviceLayer::StackUnlock unlock;
+        env->CallVoidMethod(sResolverObject, sPublishMethod, jniName.jniValue(), jniHostName.jniValue(), jniServiceType.jniValue(),
+                            service->mPort, keys, datas, subTypes);
+    }
+
+    if (env->ExceptionCheck())
+    {
+        ChipLogError(Discovery, "Java exception in ChipDnssdPublishService");
+        env->ExceptionDescribe();
+        env->ExceptionClear();
+        return CHIP_JNI_ERROR_EXCEPTION_THROWN;
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdFinalizeServiceUpdate()
 {
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ChipDnssdBrowse(const char * type, DnssdServiceProtocol protocol, Inet::IPAddressType addressType,
@@ -93,8 +160,11 @@ CHIP_ERROR ChipDnssdResolve(DnssdService * service, Inet::InterfaceId interface,
     UtfString jniInstanceName(env, service->mName);
     UtfString jniServiceType(env, serviceType.c_str());
 
-    env->CallVoidMethod(sResolverObject, sResolveMethod, jniInstanceName.jniValue(), jniServiceType.jniValue(),
-                        reinterpret_cast<jlong>(callback), reinterpret_cast<jlong>(context), sMdnsCallbackObject);
+    {
+        DeviceLayer::StackUnlock unlock;
+        env->CallVoidMethod(sResolverObject, sResolveMethod, jniInstanceName.jniValue(), jniServiceType.jniValue(),
+                            reinterpret_cast<jlong>(callback), reinterpret_cast<jlong>(context), sMdnsCallbackObject);
+    }
 
     if (env->ExceptionCheck())
     {
@@ -120,10 +190,25 @@ void InitializeWithObjects(jobject resolverObject, jobject mdnsCallbackObject)
 
     sResolveMethod =
         env->GetMethodID(resolverClass, "resolve", "(Ljava/lang/String;Ljava/lang/String;JJLchip/platform/ChipMdnsCallback;)V");
-
     if (sResolveMethod == nullptr)
     {
         ChipLogError(Discovery, "Failed to access Resolver 'resolve' method");
+        env->ExceptionClear();
+    }
+
+    sPublishMethod =
+        env->GetMethodID(resolverClass, "publish",
+                         "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I[Ljava/lang/String;[[B[Ljava/lang/String;)V");
+    if (sPublishMethod == nullptr)
+    {
+        ChipLogError(Discovery, "Failed to access Resolver 'publish' method");
+        env->ExceptionClear();
+    }
+
+    sRemoveServicesMethod = env->GetMethodID(resolverClass, "removeServices", "()V");
+    if (sRemoveServicesMethod == nullptr)
+    {
+        ChipLogError(Discovery, "Failed to access Resolver 'removeServices' method");
         env->ExceptionClear();
     }
 }
@@ -133,6 +218,7 @@ void HandleResolve(jstring instanceName, jstring serviceType, jstring address, j
     VerifyOrReturn(callbackHandle != 0, ChipLogError(Discovery, "HandleResolve called with callback equal to nullptr"));
 
     const auto dispatch = [callbackHandle, contextHandle](CHIP_ERROR error, DnssdService * service = nullptr) {
+        DeviceLayer::StackLock lock;
         DnssdResolveCallback callback = reinterpret_cast<DnssdResolveCallback>(callbackHandle);
         callback(reinterpret_cast<void *>(contextHandle), service, error);
     };

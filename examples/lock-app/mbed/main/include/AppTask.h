@@ -30,6 +30,8 @@ public:
     void PostEvent(AppEvent * aEvent);
     void UpdateClusterState(void);
 
+    void ButtonEventHandler(uint32_t id, bool pushed);
+
 private:
     friend AppTask & GetAppTask(void);
 

@@ -19,22 +19,7 @@
 
 #include "CHIPClusters.h"
 
-#include <cstdint>
-
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <app/CommandSender.h>
-#include <app/InteractionModelEngine.h>
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/util/basic-types.h>
-#include <controller/CommandSenderAllocator.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/BufferWriter.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
 namespace chip {
@@ -49,9 +34,11 @@ namespace Controller {
 // TODO(#4503): length should be passed to commands when byte string is in argument list.
 // TODO(#4503): Commands should take group id as an argument.
 
+// AccessControl Cluster Commands
+
 // AccountLogin Cluster Commands
-CHIP_ERROR AccountLoginCluster::GetSetupPIN(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            chip::ByteSpan tempAccountIdentifier)
+CHIP_ERROR AccountLoginCluster::GetSetupPINRequest(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback, chip::CharSpan tempAccountIdentifier)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -63,7 +50,7 @@ CHIP_ERROR AccountLoginCluster::GetSetupPIN(Callback::Cancelable * onSuccessCall
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AccountLogin::Commands::GetSetupPIN::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AccountLogin::Commands::GetSetupPINRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -75,9 +62,7 @@ CHIP_ERROR AccountLoginCluster::GetSetupPIN(Callback::Cancelable * onSuccessCall
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // tempAccountIdentifier: charString
-    SuccessOrExit(err = writer->PutString(
-                      TLV::ContextTag(argSeqNumber++),
-                      Span<const char>(Uint8::to_const_char(tempAccountIdentifier.data()), tempAccountIdentifier.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), tempAccountIdentifier));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -93,8 +78,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR AccountLoginCluster::Login(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      chip::ByteSpan tempAccountIdentifier, chip::ByteSpan setupPIN)
+CHIP_ERROR AccountLoginCluster::LoginRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             chip::CharSpan tempAccountIdentifier, chip::CharSpan setupPIN)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -106,7 +91,7 @@ CHIP_ERROR AccountLoginCluster::Login(Callback::Cancelable * onSuccessCallback, 
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AccountLogin::Commands::Login::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AccountLogin::Commands::LoginRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -118,12 +103,9 @@ CHIP_ERROR AccountLoginCluster::Login(Callback::Cancelable * onSuccessCallback, 
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // tempAccountIdentifier: charString
-    SuccessOrExit(err = writer->PutString(
-                      TLV::ContextTag(argSeqNumber++),
-                      Span<const char>(Uint8::to_const_char(tempAccountIdentifier.data()), tempAccountIdentifier.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), tempAccountIdentifier));
     // setupPIN: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(setupPIN.data()), setupPIN.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), setupPIN));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -139,29 +121,43 @@ exit:
     return err;
 }
 
-// AccountLogin Cluster Attributes
-CHIP_ERROR AccountLoginCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
+CHIP_ERROR AccountLoginCluster::LogoutRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AccountLogin::Commands::LogoutRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    // Command takes no arguments.
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type,
-                                               chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType>(
-    const chip::app::Clusters::AccountLogin::Commands::GetSetupPIN::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AccountLogin::Commands::Login::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AccountLogin::Commands::Login::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // AdministratorCommissioning Cluster Commands
 CHIP_ERROR AdministratorCommissioningCluster::OpenBasicCommissioningWindow(Callback::Cancelable * onSuccessCallback,
@@ -302,39 +298,12 @@ exit:
     return err;
 }
 
-// AdministratorCommissioning Cluster Attributes
-CHIP_ERROR AdministratorCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // ApplicationBasic Cluster Commands
-CHIP_ERROR ApplicationBasicCluster::ChangeStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t status)
+
+// ApplicationLauncher Cluster Commands
+CHIP_ERROR ApplicationLauncherCluster::HideAppRequest(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                                                      chip::CharSpan applicationId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -346,7 +315,7 @@ CHIP_ERROR ApplicationBasicCluster::ChangeStatus(Callback::Cancelable * onSucces
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationBasic::Commands::ChangeStatus::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationLauncher::Commands::HideAppRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -357,8 +326,10 @@ CHIP_ERROR ApplicationBasicCluster::ChangeStatus(Callback::Cancelable * onSucces
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // status: applicationBasicStatus
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), status));
+    // catalogVendorId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
+    // applicationId: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), applicationId));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -374,111 +345,9 @@ exit:
     return err;
 }
 
-// ApplicationBasic Cluster Attributes
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeVendorId(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationName(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeProductId(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationId(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeApplicationStatus(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000007;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationBasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ApplicationBasic::Commands::ChangeStatus::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-// ApplicationLauncher Cluster Commands
-CHIP_ERROR ApplicationLauncherCluster::LaunchApp(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 chip::ByteSpan data, uint16_t catalogVendorId, chip::ByteSpan applicationId)
+CHIP_ERROR ApplicationLauncherCluster::LaunchAppRequest(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, chip::CharSpan data,
+                                                        uint16_t catalogVendorId, chip::CharSpan applicationId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -490,7 +359,8 @@ CHIP_ERROR ApplicationLauncherCluster::LaunchApp(Callback::Cancelable * onSucces
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationLauncher::Commands::LaunchApp::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         ApplicationLauncher::Commands::LaunchAppRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -502,13 +372,11 @@ CHIP_ERROR ApplicationLauncherCluster::LaunchApp(Callback::Cancelable * onSucces
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // data: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(data.data()), data.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data));
     // catalogVendorId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
     // applicationId: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(applicationId.data()), applicationId.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), applicationId));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -524,65 +392,9 @@ exit:
     return err;
 }
 
-// ApplicationLauncher Cluster Attributes
-CHIP_ERROR ApplicationLauncherCluster::ReadAttributeApplicationLauncherList(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             ApplicationLauncherClusterApplicationLauncherListListAttributeFilter);
-}
-
-CHIP_ERROR ApplicationLauncherCluster::ReadAttributeCatalogVendorId(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationLauncherCluster::ReadAttributeApplicationId(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ApplicationLauncherCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type,
-                           chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType>(
-    const chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-// AudioOutput Cluster Commands
-CHIP_ERROR AudioOutputCluster::RenameOutput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint8_t index, chip::ByteSpan name)
+CHIP_ERROR ApplicationLauncherCluster::StopAppRequest(Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback, uint16_t catalogVendorId,
+                                                      chip::CharSpan applicationId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -594,7 +406,51 @@ CHIP_ERROR AudioOutputCluster::RenameOutput(Callback::Cancelable * onSuccessCall
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AudioOutput::Commands::RenameOutput::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ApplicationLauncher::Commands::StopAppRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // catalogVendorId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), catalogVendorId));
+    // applicationId: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), applicationId));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+// AudioOutput Cluster Commands
+CHIP_ERROR AudioOutputCluster::RenameOutputRequest(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback, uint8_t index, chip::CharSpan name)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AudioOutput::Commands::RenameOutputRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -608,8 +464,7 @@ CHIP_ERROR AudioOutputCluster::RenameOutput(Callback::Cancelable * onSuccessCall
     // index: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), index));
     // name: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(name.data()), name.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), name));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -625,8 +480,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR AudioOutputCluster::SelectOutput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint8_t index)
+CHIP_ERROR AudioOutputCluster::SelectOutputRequest(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback, uint8_t index)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -638,7 +493,7 @@ CHIP_ERROR AudioOutputCluster::SelectOutput(Callback::Cancelable * onSuccessCall
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AudioOutput::Commands::SelectOutput::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, AudioOutput::Commands::SelectOutputRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -665,53 +520,6 @@ CHIP_ERROR AudioOutputCluster::SelectOutput(Callback::Cancelable * onSuccessCall
 exit:
     return err;
 }
-
-// AudioOutput Cluster Attributes
-CHIP_ERROR AudioOutputCluster::ReadAttributeAudioOutputList(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             AudioOutputClusterAudioOutputListListAttributeFilter);
-}
-
-CHIP_ERROR AudioOutputCluster::ReadAttributeCurrentAudioOutput(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR AudioOutputCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AudioOutput::Commands::RenameOutput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::AudioOutput::Commands::SelectOutput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // BarrierControl Cluster Commands
 CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Cancelable * onSuccessCallback,
@@ -795,77 +603,6 @@ exit:
     return err;
 }
 
-// BarrierControl Cluster Attributes
-CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierMovingState(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierSafetyStatus(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierCapabilities(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR BarrierControlCluster::ReadAttributeBarrierPosition(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR BarrierControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // Basic Cluster Commands
 CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
@@ -905,402 +642,7 @@ exit:
     return err;
 }
 
-// Basic Cluster Attributes
-CHIP_ERROR BasicCluster::ReadAttributeInteractionModelVersion(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeVendorID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeProductName(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeProductID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 chip::ByteSpan value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::WriteAttributeLocation(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                chip::ByteSpan value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000007;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000008;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000009;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributePartNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeProductURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeProductLabel(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000E;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeSerialNumber(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000F;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::WriteAttributeLocalConfigDisabled(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, bool value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeReachable(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000011;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // BinaryInputBasic Cluster Commands
-// BinaryInputBasic Cluster Attributes
-CHIP_ERROR BinaryInputBasicCluster::ReadAttributeOutOfService(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000051;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::WriteAttributeOutOfService(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, bool value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000051;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::ReadAttributePresentValue(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000055;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::WriteAttributePresentValue(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, bool value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000055;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::SubscribeAttributePresentValue(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BinaryInputBasic::Attributes::PresentValue::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::ReportAttributePresentValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(BinaryInputBasic::Attributes::PresentValue::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::ReadAttributeStatusFlags(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000006F;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::SubscribeAttributeStatusFlags(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                  uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = BinaryInputBasic::Attributes::StatusFlags::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::ReportAttributeStatusFlags(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(BinaryInputBasic::Attributes::StatusFlags::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR BinaryInputBasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // Binding Cluster Commands
 CHIP_ERROR BindingCluster::Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1398,226 +740,673 @@ exit:
     return err;
 }
 
-// Binding Cluster Attributes
-CHIP_ERROR BindingCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
+// BooleanState Cluster Commands
+
+// BridgedActions Cluster Commands
+CHIP_ERROR BridgedActionsCluster::DisableAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint16_t actionID, uint32_t invokeID)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, BridgedActions::Commands::DisableAction::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Binding::Commands::Bind::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Binding::Commands::Bind::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+CHIP_ERROR BridgedActionsCluster::DisableActionWithDuration(Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                                                            uint32_t invokeID, uint32_t duration)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
 
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Binding::Commands::Unbind::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Binding::Commands::Unbind::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         BridgedActions::Commands::DisableActionWithDuration::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+    // duration: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), duration));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR BridgedActionsCluster::EnableAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint16_t actionID, uint32_t invokeID)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, BridgedActions::Commands::EnableAction::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR BridgedActionsCluster::EnableActionWithDuration(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                                                           uint32_t invokeID, uint32_t duration)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         BridgedActions::Commands::EnableActionWithDuration::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+    // duration: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), duration));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR BridgedActionsCluster::InstantAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint16_t actionID, uint32_t invokeID)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, BridgedActions::Commands::InstantAction::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR BridgedActionsCluster::InstantActionWithTransition(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                                                              uint32_t invokeID, uint16_t transitionTime)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         BridgedActions::Commands::InstantActionWithTransition::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+    // transitionTime: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR BridgedActionsCluster::PauseAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t actionID, uint32_t invokeID)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, BridgedActions::Commands::PauseAction::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR BridgedActionsCluster::PauseActionWithDuration(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                                                          uint32_t invokeID, uint32_t duration)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         BridgedActions::Commands::PauseActionWithDuration::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+    // duration: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), duration));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR BridgedActionsCluster::ResumeAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint16_t actionID, uint32_t invokeID)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, BridgedActions::Commands::ResumeAction::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR BridgedActionsCluster::StartAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t actionID, uint32_t invokeID)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, BridgedActions::Commands::StartAction::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR BridgedActionsCluster::StartActionWithDuration(Callback::Cancelable * onSuccessCallback,
+                                                          Callback::Cancelable * onFailureCallback, uint16_t actionID,
+                                                          uint32_t invokeID, uint32_t duration)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         BridgedActions::Commands::StartActionWithDuration::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+    // duration: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), duration));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR BridgedActionsCluster::StopAction(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t actionID, uint32_t invokeID)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, BridgedActions::Commands::StopAction::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // actionID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), actionID));
+    // invokeID: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), invokeID));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
 
 // BridgedDeviceBasic Cluster Commands
-// BridgedDeviceBasic Cluster Attributes
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
+
+// Channel Cluster Commands
+CHIP_ERROR ChannelCluster::ChangeChannelByNumberRequest(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, uint16_t majorNumber,
+                                                        uint16_t minorNumber)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         Channel::Commands::ChangeChannelByNumberRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // majorNumber: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), majorNumber));
+    // minorNumber: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), minorNumber));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
 
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeVendorID(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ChannelCluster::ChangeChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                chip::CharSpan match)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Channel::Commands::ChangeChannelRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // match: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), match));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
 
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeProductName(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
+CHIP_ERROR ChannelCluster::SkipChannelRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint16_t count)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
 
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeUserLabel(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
 
-CHIP_ERROR BridgedDeviceBasicCluster::WriteAttributeUserLabel(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, Channel::Commands::SkipChannelRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
 
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
 
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000007;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000008;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000009;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // count: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), count));
 
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
+    SuccessOrExit(err = sender->FinishCommand());
 
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributePartNumber(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
 
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeProductURL(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeProductLabel(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000E;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeSerialNumber(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000F;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeReachable(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000011;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
 
 // ColorControl Cluster Commands
@@ -2564,1053 +2353,10 @@ exit:
     return err;
 }
 
-// ColorControl Cluster Attributes
-CHIP_ERROR ColorControlCluster::ReadAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeCurrentHue(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                             uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::CurrentHue::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentHue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::CurrentHue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeCurrentSaturation(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                    uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::CurrentSaturation::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentSaturation(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::CurrentSaturation::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeRemainingTime(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeCurrentX(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeCurrentX(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::CurrentX::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentX(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::CurrentX::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeCurrentY(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                           uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::CurrentY::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeCurrentY(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::CurrentY::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeDriftCompensation(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeCompensationText(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000007;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::SubscribeAttributeColorTemperature(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                   uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = ColorControl::Attributes::ColorTemperature::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReportAttributeColorTemperature(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(ColorControl::Attributes::ColorTemperature::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorMode(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000008;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorControlOptions(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000F;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeColorControlOptions(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000F;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeNumberOfPrimaries(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary1X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000011;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary1Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000012;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary1Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000013;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary2X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000015;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary2Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000016;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary2Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000017;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary3X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000019;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary3Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary3Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary4X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000020;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary4Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000021;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary4Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000022;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary5X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000024;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary5Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000025;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary5Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000026;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary6X(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000028;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary6Y(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000029;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributePrimary6Intensity(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000002A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeWhitePointX(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000030;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointX(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000030;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeWhitePointY(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000031;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeWhitePointY(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000031;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRX(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000032;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRX(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000032;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRY(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000033;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRY(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000033;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000034;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointRIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000034;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGX(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000036;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGX(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000036;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGY(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000037;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGY(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000037;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000038;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointGIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000038;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBX(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000003A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBX(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000003A;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBY(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000003B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBY(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000003B;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000003C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeColorPointBIntensity(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000003C;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeEnhancedCurrentHue(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeEnhancedColorMode(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopActive(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopDirection(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopTime(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopStartEnhancedHue(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorLoopStoredEnhancedHue(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorCapabilities(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000400A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorTempPhysicalMin(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000400B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeColorTempPhysicalMax(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000400C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeCoupleColorTempToLevelMinMireds(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000400D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004010;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ColorControlCluster::WriteAttributeStartUpColorTemperatureMireds(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004010;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveColor::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveColor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveHue::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToColor::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveToColor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToHue::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveToHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepColor::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::StepColor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepHue::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::StepHue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StepSaturation::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::StepSaturation::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // ContentLauncher Cluster Commands
-CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 bool autoPlay, chip::ByteSpan data)
+CHIP_ERROR ContentLauncherCluster::LaunchContentRequest(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, bool autoPlay,
+                                                        chip::CharSpan data)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3622,7 +2368,8 @@ CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSucces
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ContentLauncher::Commands::LaunchContent::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         ContentLauncher::Commands::LaunchContentRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -3636,8 +2383,7 @@ CHIP_ERROR ContentLauncherCluster::LaunchContent(Callback::Cancelable * onSucces
     // autoPlay: boolean
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), autoPlay));
     // data: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(data.data()), data.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3653,8 +2399,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR ContentLauncherCluster::LaunchURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             chip::ByteSpan contentURL, chip::ByteSpan displayString)
+CHIP_ERROR ContentLauncherCluster::LaunchURLRequest(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, chip::CharSpan contentURL,
+                                                    chip::CharSpan displayString, chip::CharSpan providerName)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3666,7 +2413,7 @@ CHIP_ERROR ContentLauncherCluster::LaunchURL(Callback::Cancelable * onSuccessCal
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ContentLauncher::Commands::LaunchURL::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ContentLauncher::Commands::LaunchURLRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -3678,11 +2425,11 @@ CHIP_ERROR ContentLauncherCluster::LaunchURL(Callback::Cancelable * onSuccessCal
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // contentURL: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(contentURL.data()), contentURL.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), contentURL));
     // displayString: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(displayString.data()), displayString.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), displayString));
+    // providerName: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), providerName));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3698,117 +2445,7 @@ exit:
     return err;
 }
 
-// ContentLauncher Cluster Attributes
-CHIP_ERROR ContentLauncherCluster::ReadAttributeAcceptsHeaderList(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             ContentLauncherClusterAcceptsHeaderListListAttributeFilter);
-}
-
-CHIP_ERROR ContentLauncherCluster::ReadAttributeSupportedStreamingTypes(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             ContentLauncherClusterSupportedStreamingTypesListAttributeFilter);
-}
-
-CHIP_ERROR ContentLauncherCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type,
-                           chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType>(
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type,
-                                               chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType>(
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // Descriptor Cluster Commands
-// Descriptor Cluster Attributes
-CHIP_ERROR DescriptorCluster::ReadAttributeDeviceList(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             DescriptorClusterDeviceListListAttributeFilter);
-}
-
-CHIP_ERROR DescriptorCluster::ReadAttributeServerList(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             DescriptorClusterServerListListAttributeFilter);
-}
-
-CHIP_ERROR DescriptorCluster::ReadAttributeClientList(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             DescriptorClusterClientListListAttributeFilter);
-}
-
-CHIP_ERROR DescriptorCluster::ReadAttributePartsList(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             DescriptorClusterPartsListListAttributeFilter);
-}
-
-CHIP_ERROR DescriptorCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // DiagnosticLogs Cluster Commands
 CHIP_ERROR DiagnosticLogsCluster::RetrieveLogsRequest(Callback::Cancelable * onSuccessCallback,
@@ -3857,15 +2494,9 @@ exit:
     return err;
 }
 
-// DiagnosticLogs Cluster Attributes
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // DoorLock Cluster Commands
-CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DoorLockCluster::ClearCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                            uint8_t credentialType, uint16_t credentialIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3877,84 +2508,7 @@ CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallbac
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearAllPins::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    // Command takes no arguments.
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::ClearAllRfids(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearAllRfids::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    // Command takes no arguments.
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t scheduleId)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearHolidaySchedule::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearCredential::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -3965,8 +2519,10 @@ CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Cancelable * onSucces
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    // credentialType: dlCredentialType
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialType));
+    // credentialIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -3982,8 +2538,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint16_t userId)
+CHIP_ERROR DoorLockCluster::ClearUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      uint16_t userIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -3995,7 +2551,7 @@ CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, C
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearPin::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearUser::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -4006,8 +2562,8 @@ CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, C
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
+    // userIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -4023,8 +2579,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint16_t userId)
+CHIP_ERROR DoorLockCluster::GetCredentialStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint8_t credentialType, uint16_t credentialIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -4036,7 +2592,7 @@ CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, 
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearRfid::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetCredentialStatus::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -4047,8 +2603,10 @@ CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
+    // credentialType: dlCredentialType
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialType));
+    // credentialIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -4064,8 +2622,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t scheduleId, uint16_t userId)
+CHIP_ERROR DoorLockCluster::GetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint16_t userIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -4077,7 +2635,7 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSucces
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearWeekdaySchedule::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetUser::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -4088,344 +2646,8 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSucces
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t scheduleId, uint16_t userId)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearYeardaySchedule::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetHolidaySchedule::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::GetLogRecord(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         uint16_t logIndex)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetLogRecord::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // logIndex: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), logIndex));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::GetPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t userId)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetPin::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::GetRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint16_t userId)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetRfid::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::GetUserType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint16_t userId)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetUserType::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetWeekdaySchedule::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetYeardaySchedule::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
+    // userIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -4442,7 +2664,7 @@ exit:
 }
 
 CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     chip::ByteSpan pin)
+                                     chip::ByteSpan pinCode)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -4465,8 +2687,8 @@ CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, C
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // pin: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
+    // pinCode: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pinCode));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -4482,9 +2704,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime,
-                                               uint8_t operatingModeDuringHoliday)
+CHIP_ERROR DoorLockCluster::SetCredential(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint8_t operationType, uint8_t credentialType, uint16_t credentialIndex,
+                                          chip::ByteSpan credentialData, uint16_t userIndex, uint8_t userStatus)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -4496,7 +2718,7 @@ CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessC
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetHolidaySchedule::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetCredential::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -4507,61 +2729,18 @@ CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessC
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // localStartTime: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), localStartTime));
-    // localEndTime: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), localEndTime));
-    // operatingModeDuringHoliday: enum8
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), operatingModeDuringHoliday));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetPin::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-    // userStatus: doorLockUserStatus
+    // operationType: dlDataOperationType
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), operationType));
+    // credentialType: dlCredentialType
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialType));
+    // credentialIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialIndex));
+    // credentialData: longOctetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialData));
+    // userIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userIndex));
+    // userStatus: dlUserStatus
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userStatus));
-    // userType: doorLockUserType
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userType));
-    // pin: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -4577,8 +2756,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan id)
+CHIP_ERROR DoorLockCluster::SetUser(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint8_t operationType, uint16_t userIndex, chip::CharSpan userName, uint32_t userUniqueId,
+                                    uint8_t userStatus, uint8_t userType, uint8_t credentialRule)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -4590,7 +2770,7 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Ca
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetRfid::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetUser::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -4601,158 +2781,20 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Ca
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-    // userStatus: doorLockUserStatus
+    // operationType: dlDataOperationType
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), operationType));
+    // userIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userIndex));
+    // userName: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), userName));
+    // userUniqueId: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userUniqueId));
+    // userStatus: dlUserStatus
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userStatus));
-    // userType: doorLockUserType
+    // userType: dlUserType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userType));
-    // id: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), id));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::SetUserType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint16_t userId, uint8_t userType)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetUserType::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-    // userType: doorLockUserType
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userType));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour,
-                                               uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetWeekdaySchedule::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-    // daysMask: doorLockDayOfWeek
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), daysMask));
-    // startHour: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), startHour));
-    // startMinute: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), startMinute));
-    // endHour: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), endHour));
-    // endMinute: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), endMinute));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetYeardaySchedule::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-    // localStartTime: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), localStartTime));
-    // localEndTime: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), localEndTime));
+    // credentialRule: dlCredentialRule
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentialRule));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -4769,7 +2811,7 @@ exit:
 }
 
 CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       chip::ByteSpan pin)
+                                       chip::ByteSpan pinCode)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -4792,8 +2834,8 @@ CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback,
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // pin: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
+    // pinCode: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pinCode));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -4808,403 +2850,8 @@ CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback,
 exit:
     return err;
 }
-
-CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t timeoutInSeconds, chip::ByteSpan pin)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::UnlockWithTimeout::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // timeoutInSeconds: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutInSeconds));
-    // pin: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-// DoorLock Cluster Attributes
-CHIP_ERROR DoorLockCluster::ReadAttributeLockState(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeLockState(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = DoorLock::Attributes::LockState::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeLockState(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::LockState::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::ReadAttributeLockType(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::ReadAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearAllPins::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearAllPins::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearAllRfids::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearAllRfids::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type,
-                           chip::app::Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearPin::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearPinResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearPin::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearPinResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearRfid::Type,
-                                               chip::app::Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearRfid::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearWeekdaySchedule::Type,
-                           chip::app::Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearWeekdaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::ClearYeardaySchedule::Type,
-                           chip::app::Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::ClearYeardaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetPin::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetPinResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetPin::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetPinResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetRfid::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetRfidResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetRfid::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetRfidResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetUserType::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetUserType::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetWeekdaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetWeekdaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::GetYeardaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::GetYeardaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::LockDoor::Type,
-                                               chip::app::Clusters::DoorLock::Commands::LockDoorResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::LockDoor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::LockDoorResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetPin::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetPinResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetPin::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetPinResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetRfid::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetRfidResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetRfid::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetRfidResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetUserType::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetUserType::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetWeekdaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetWeekdaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::SetYeardaySchedule::Type,
-                                               chip::app::Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::SetYeardaySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type,
-                                               chip::app::Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type,
-                                               chip::app::Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType>(
-    const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // ElectricalMeasurement Cluster Commands
-// ElectricalMeasurement Cluster Attributes
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeMeasurementType(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeTotalActivePower(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000304;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32sAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeRmsVoltage(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000505;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeRmsVoltageMin(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000506;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeRmsVoltageMax(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000507;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeRmsCurrent(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000508;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeRmsCurrentMin(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000509;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeRmsCurrentMax(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000050A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeActivePower(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000050B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeActivePowerMin(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000050C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeActivePowerMax(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000050D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ElectricalMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // EthernetNetworkDiagnostics Cluster Commands
 CHIP_ERROR EthernetNetworkDiagnosticsCluster::ResetCounts(Callback::Cancelable * onSuccessCallback,
@@ -5247,207 +2894,9 @@ exit:
     return err;
 }
 
-// EthernetNetworkDiagnostics Cluster Attributes
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributePHYRate(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeFullDuplex(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributePacketRxCount(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributePacketTxCount(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeTxErrCount(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeCollisionCount(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeOverrunCount(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeCarrierDetect(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000007;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeTimeSinceReset(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000008;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR EthernetNetworkDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // FixedLabel Cluster Commands
-// FixedLabel Cluster Attributes
-CHIP_ERROR FixedLabelCluster::ReadAttributeLabelList(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             FixedLabelClusterLabelListListAttributeFilter);
-}
-
-CHIP_ERROR FixedLabelCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // FlowMeasurement Cluster Commands
-// FlowMeasurement Cluster Attributes
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // GeneralCommissioning Cluster Commands
 CHIP_ERROR GeneralCommissioningCluster::ArmFailSafe(Callback::Cancelable * onSuccessCallback,
@@ -5538,7 +2987,7 @@ exit:
 
 CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback,
                                                             Callback::Cancelable * onFailureCallback, uint8_t location,
-                                                            chip::ByteSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs)
+                                                            chip::CharSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -5565,8 +3014,7 @@ CHIP_ERROR GeneralCommissioningCluster::SetRegulatoryConfig(Callback::Cancelable
     // location: regulatoryLocationType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), location));
     // countryCode: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(countryCode.data()), countryCode.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), countryCode));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
     // timeoutMs: int32u
@@ -5586,197 +3034,194 @@ exit:
     return err;
 }
 
-// GeneralCommissioning Cluster Attributes
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint64_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBasicCommissioningInfoList(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType>(
-    const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType>(
-    const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type &, void *,
-    CommandResponseSuccessCallback<
-        chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type,
-                           chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType>(
-    const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // GeneralDiagnostics Cluster Commands
-// GeneralDiagnostics Cluster Attributes
-CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeNetworkInterfaces(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             GeneralDiagnosticsClusterNetworkInterfacesListAttributeFilter);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeRebootCount(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeUpTime(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeTotalOperationalHours(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeBootReasons(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // GroupKeyManagement Cluster Commands
-// GroupKeyManagement Cluster Attributes
-CHIP_ERROR GroupKeyManagementCluster::ReadAttributeGroups(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GroupKeyManagementCluster::KeySetRead(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint16_t groupKeySetID)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             GroupKeyManagementClusterGroupsListAttributeFilter);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, GroupKeyManagement::Commands::KeySetRead::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // groupKeySetID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySetID));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
 
-CHIP_ERROR GroupKeyManagementCluster::ReadAttributeGroupKeys(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GroupKeyManagementCluster::KeySetReadAllIndices(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback, uint16_t groupKeySetIDs)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             GroupKeyManagementClusterGroupKeysListAttributeFilter);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         GroupKeyManagement::Commands::KeySetReadAllIndices::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // groupKeySetIDs: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySetIDs));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
 
-CHIP_ERROR GroupKeyManagementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
+CHIP_ERROR GroupKeyManagementCluster::KeySetRemove(Callback::Cancelable * onSuccessCallback,
+                                                   Callback::Cancelable * onFailureCallback, uint16_t groupKeySetID)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, GroupKeyManagement::Commands::KeySetRemove::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // groupKeySetID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySetID));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR GroupKeyManagementCluster::KeySetWrite(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback, uint16_t groupKeySetID,
+                                                  uint8_t securityPolicy, chip::ByteSpan epochKey0, uint64_t epochStartTime0,
+                                                  chip::ByteSpan epochKey1, uint64_t epochStartTime1, chip::ByteSpan epochKey2,
+                                                  uint64_t epochStartTime2)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, GroupKeyManagement::Commands::KeySetWrite::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // groupKeySetID: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupKeySetID));
+    // securityPolicy: groupKeySecurityPolicy
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), securityPolicy));
+    // epochKey0: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey0));
+    // epochStartTime0: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime0));
+    // epochKey1: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey1));
+    // epochStartTime1: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime1));
+    // epochKey2: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochKey2));
+    // epochStartTime2: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), epochStartTime2));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
 
 // Groups Cluster Commands
 CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t groupId, chip::ByteSpan groupName)
+                                   uint16_t groupId, chip::CharSpan groupName)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -5802,8 +3247,7 @@ CHIP_ERROR GroupsCluster::AddGroup(Callback::Cancelable * onSuccessCallback, Cal
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // groupName: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(groupName.data()), groupName.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), groupName));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -5820,7 +3264,7 @@ exit:
 }
 
 CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                uint16_t groupId, chip::ByteSpan groupName)
+                                                uint16_t groupId, chip::CharSpan groupName)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -5846,8 +3290,7 @@ CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Cancelable * onSuccess
     // groupId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupId));
     // groupName: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(groupName.data()), groupName.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), groupName));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -5864,7 +3307,7 @@ exit:
 }
 
 CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint8_t groupCount, uint16_t groupList)
+                                             uint16_t groupList)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -5887,8 +3330,6 @@ CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Cancelable * onSuccessCal
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // groupCount: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupCount));
     // groupList: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), groupList));
 
@@ -6026,65 +3467,6 @@ exit:
     return err;
 }
 
-// Groups Cluster Attributes
-CHIP_ERROR GroupsCluster::ReadAttributeNameSupport(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR GroupsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::AddGroup::Type,
-                                               chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType>(
-    const chip::app::Clusters::Groups::Commands::AddGroup::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::GetGroupMembership::Type,
-                                               chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType>(
-    const chip::app::Clusters::Groups::Commands::GetGroupMembership::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::RemoveGroup::Type,
-                                               chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType>(
-    const chip::app::Clusters::Groups::Commands::RemoveGroup::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Groups::Commands::ViewGroup::Type,
-                                               chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType>(
-    const chip::app::Clusters::Groups::Commands::ViewGroup::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // Identify Cluster Commands
 CHIP_ERROR IdentifyCluster::Identify(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                      uint16_t identifyTime)
@@ -6208,79 +3590,11 @@ exit:
     return err;
 }
 
-// Identify Cluster Attributes
-CHIP_ERROR IdentifyCluster::ReadAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR IdentifyCluster::WriteAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR IdentifyCluster::ReadAttributeIdentifyType(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR IdentifyCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::Identify::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Identify::Commands::Identify::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::IdentifyQuery::Type,
-                                               chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType>(
-    const chip::app::Clusters::Identify::Commands::IdentifyQuery::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Identify::Commands::TriggerEffect::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Identify::Commands::TriggerEffect::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+// IlluminanceMeasurement Cluster Commands
 
 // KeypadInput Cluster Commands
-CHIP_ERROR KeypadInputCluster::SendKey(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       uint8_t keyCode)
+CHIP_ERROR KeypadInputCluster::SendKeyRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint8_t keyCode)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6292,7 +3606,7 @@ CHIP_ERROR KeypadInputCluster::SendKey(Callback::Cancelable * onSuccessCallback,
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, KeypadInput::Commands::SendKey::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, KeypadInput::Commands::SendKeyRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6303,7 +3617,7 @@ CHIP_ERROR KeypadInputCluster::SendKey(Callback::Cancelable * onSuccessCallback,
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // keyCode: keypadInputCecKeyCode
+    // keyCode: cecKeyCode
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), keyCode));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -6319,25 +3633,6 @@ CHIP_ERROR KeypadInputCluster::SendKey(Callback::Cancelable * onSuccessCallback,
 exit:
     return err;
 }
-
-// KeypadInput Cluster Attributes
-CHIP_ERROR KeypadInputCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::KeypadInput::Commands::SendKey::Type,
-                                               chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType>(
-    const chip::app::Clusters::KeypadInput::Commands::SendKey::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // LevelControl Cluster Commands
 CHIP_ERROR LevelControlCluster::Move(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -6697,363 +3992,7 @@ exit:
     return err;
 }
 
-// LevelControl Cluster Attributes
-CHIP_ERROR LevelControlCluster::ReadAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::SubscribeAttributeCurrentLevel(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                               uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = LevelControl::Attributes::CurrentLevel::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReportAttributeCurrentLevel(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(LevelControl::Attributes::CurrentLevel::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeRemainingTime(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeMinLevel(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeMaxLevel(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeCurrentFrequency(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeMinFrequency(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeMaxFrequency(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeOptions(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000F;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::WriteAttributeOptions(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000F;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeOnOffTransitionTime(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::WriteAttributeOnOffTransitionTime(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeOnLevel(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000011;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::WriteAttributeOnLevel(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000011;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeOnTransitionTime(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000012;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::WriteAttributeOnTransitionTime(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000012;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeOffTransitionTime(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000013;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::WriteAttributeOffTransitionTime(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000013;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeDefaultMoveRate(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000014;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::WriteAttributeDefaultMoveRate(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000014;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeStartUpCurrentLevel(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR LevelControlCluster::WriteAttributeStartUpCurrentLevel(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004000;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Move::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::Move::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Step::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::Step::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::Stop::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::Stop::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+// LocalizationConfiguration Cluster Commands
 
 // LowPower Cluster Commands
 CHIP_ERROR LowPowerCluster::Sleep(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -7094,26 +4033,9 @@ exit:
     return err;
 }
 
-// LowPower Cluster Attributes
-CHIP_ERROR LowPowerCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::LowPower::Commands::Sleep::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::LowPower::Commands::Sleep::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // MediaInput Cluster Commands
-CHIP_ERROR MediaInputCluster::HideInputStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaInputCluster::HideInputStatusRequest(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7125,7 +4047,7 @@ CHIP_ERROR MediaInputCluster::HideInputStatus(Callback::Cancelable * onSuccessCa
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::HideInputStatus::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::HideInputStatusRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7151,8 +4073,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaInputCluster::RenameInput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint8_t index, chip::ByteSpan name)
+CHIP_ERROR MediaInputCluster::RenameInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint8_t index, chip::CharSpan name)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7164,7 +4086,7 @@ CHIP_ERROR MediaInputCluster::RenameInput(Callback::Cancelable * onSuccessCallba
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::RenameInput::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::RenameInputRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7178,8 +4100,7 @@ CHIP_ERROR MediaInputCluster::RenameInput(Callback::Cancelable * onSuccessCallba
     // index: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), index));
     // name: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(name.data()), name.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), name));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -7195,8 +4116,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaInputCluster::SelectInput(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint8_t index)
+CHIP_ERROR MediaInputCluster::SelectInputRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint8_t index)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7208,7 +4129,7 @@ CHIP_ERROR MediaInputCluster::SelectInput(Callback::Cancelable * onSuccessCallba
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::SelectInput::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::SelectInputRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7236,7 +4157,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaInputCluster::ShowInputStatus(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaInputCluster::ShowInputStatusRequest(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7248,7 +4170,7 @@ CHIP_ERROR MediaInputCluster::ShowInputStatus(Callback::Cancelable * onSuccessCa
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::ShowInputStatus::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaInput::Commands::ShowInputStatusRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7273,67 +4195,10 @@ CHIP_ERROR MediaInputCluster::ShowInputStatus(Callback::Cancelable * onSuccessCa
 exit:
     return err;
 }
-
-// MediaInput Cluster Attributes
-CHIP_ERROR MediaInputCluster::ReadAttributeMediaInputList(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             MediaInputClusterMediaInputListListAttributeFilter);
-}
-
-CHIP_ERROR MediaInputCluster::ReadAttributeCurrentMediaInput(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR MediaInputCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::MediaInput::Commands::HideInputStatus::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::RenameInput::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::MediaInput::Commands::RenameInput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::SelectInput::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::MediaInput::Commands::SelectInput::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::MediaInput::Commands::ShowInputStatus::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // MediaPlayback Cluster Commands
-CHIP_ERROR MediaPlaybackCluster::MediaFastForward(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::FastForwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7345,7 +4210,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaFastForward(Callback::Cancelable * onSucce
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaFastForward::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::FastForwardRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7371,7 +4236,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaNext(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::NextRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7383,7 +4248,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaNext(Callback::Cancelable * onSuccessCallb
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaNext::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::NextRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7409,7 +4274,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaPause(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::PauseRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7421,7 +4286,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaPause(Callback::Cancelable * onSuccessCall
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaPause::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::PauseRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7447,7 +4312,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaPlay(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::PlayRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7459,7 +4324,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaPlay(Callback::Cancelable * onSuccessCallb
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaPlay::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::PlayRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7485,7 +4350,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaPrevious(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::PreviousRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7497,7 +4362,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaPrevious(Callback::Cancelable * onSuccessC
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaPrevious::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::PreviousRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7523,7 +4388,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaRewind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::RewindRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7535,7 +4400,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaRewind(Callback::Cancelable * onSuccessCal
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaRewind::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::RewindRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7561,8 +4426,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaSeek(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint64_t position)
+CHIP_ERROR MediaPlaybackCluster::SeekRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint64_t position)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7574,7 +4439,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaSeek(Callback::Cancelable * onSuccessCallb
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaSeek::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SeekRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7602,8 +4467,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaSkipBackward(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
+CHIP_ERROR MediaPlaybackCluster::SkipBackwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7615,7 +4480,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaSkipBackward(Callback::Cancelable * onSucc
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaSkipBackward::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SkipBackwardRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7643,8 +4508,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaSkipForward(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
+CHIP_ERROR MediaPlaybackCluster::SkipForwardRequest(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, uint64_t deltaPositionMilliseconds)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7656,7 +4521,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaSkipForward(Callback::Cancelable * onSucce
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaSkipForward::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::SkipForwardRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7684,7 +4549,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaStartOver(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::StartOverRequest(Callback::Cancelable * onSuccessCallback,
+                                                  Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7696,7 +4562,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaStartOver(Callback::Cancelable * onSuccess
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaStartOver::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::StartOverRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7722,7 +4588,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MediaPlaybackCluster::MediaStop(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR MediaPlaybackCluster::StopRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7734,7 +4600,7 @@ CHIP_ERROR MediaPlaybackCluster::MediaStop(Callback::Cancelable * onSuccessCallb
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::MediaStop::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, MediaPlayback::Commands::StopRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7760,188 +4626,52 @@ exit:
     return err;
 }
 
-// MediaPlayback Cluster Attributes
-CHIP_ERROR MediaPlaybackCluster::ReadAttributePlaybackState(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
+// ModeSelect Cluster Commands
+CHIP_ERROR ModeSelectCluster::ChangeToMode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                           uint8_t newMode)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, ModeSelect::Commands::ChangeToMode::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // newMode: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), newMode));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
-
-CHIP_ERROR MediaPlaybackCluster::ReadAttributeStartTime(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReadAttributeDuration(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReadAttributePositionUpdatedAt(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReadAttributePosition(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReadAttributePlaybackSpeed(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReadAttributeSeekRangeEnd(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReadAttributeSeekRangeStart(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000007;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR MediaPlaybackCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type,
-                           chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaFastForward::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaNext::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaPause::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaPlay::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaPrevious::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaRewind::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaSeek::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type,
-                           chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackward::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type,
-                           chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForward::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaStartOver::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type,
-                                               chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType>(
-    const chip::app::Clusters::MediaPlayback::Commands::MediaStop::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // NetworkCommissioning Cluster Commands
-CHIP_ERROR NetworkCommissioningCluster::AddThreadNetwork(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback,
-                                                         chip::ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR NetworkCommissioningCluster::AddOrUpdateThreadNetwork(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback,
+                                                                 chip::ByteSpan operationalDataset, uint64_t breadcrumb)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -7954,7 +4684,7 @@ CHIP_ERROR NetworkCommissioningCluster::AddThreadNetwork(Callback::Cancelable * 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::AddThreadNetwork::Id,
+                                         NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -7969,8 +4699,6 @@ CHIP_ERROR NetworkCommissioningCluster::AddThreadNetwork(Callback::Cancelable * 
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), operationalDataset));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -7986,9 +4714,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR NetworkCommissioningCluster::AddWiFiNetwork(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
-                                                       chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
+CHIP_ERROR NetworkCommissioningCluster::AddOrUpdateWiFiNetwork(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
+                                                               chip::ByteSpan credentials, uint64_t breadcrumb)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -8001,7 +4729,7 @@ CHIP_ERROR NetworkCommissioningCluster::AddWiFiNetwork(Callback::Cancelable * on
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::AddWiFiNetwork::Id,
+                                         NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -8018,8 +4746,6 @@ CHIP_ERROR NetworkCommissioningCluster::AddWiFiNetwork(Callback::Cancelable * on
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentials));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -8035,9 +4761,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * onSuccessCallback,
+CHIP_ERROR NetworkCommissioningCluster::ConnectNetwork(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID,
-                                                       uint64_t breadcrumb, uint32_t timeoutMs)
+                                                       uint64_t breadcrumb)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -8050,7 +4776,7 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::DisableNetwork::Id,
+                                         NetworkCommissioning::Commands::ConnectNetwork::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -8065,97 +4791,6 @@ CHIP_ERROR NetworkCommissioningCluster::DisableNetwork(Callback::Cancelable * on
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkID));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR NetworkCommissioningCluster::EnableNetwork(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID,
-                                                      uint64_t breadcrumb, uint32_t timeoutMs)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, NetworkCommissioning::Commands::EnableNetwork::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // networkID: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkID));
-    // breadcrumb: int64u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR NetworkCommissioningCluster::GetLastNetworkCommissioningResult(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint32_t timeoutMs)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -8173,7 +4808,7 @@ exit:
 
 CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID,
-                                                      uint64_t breadcrumb, uint32_t timeoutMs)
+                                                      uint64_t breadcrumb)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -8200,8 +4835,53 @@ CHIP_ERROR NetworkCommissioningCluster::RemoveNetwork(Callback::Cancelable * onS
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkID));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR NetworkCommissioningCluster::ReorderNetwork(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan networkID,
+                                                       uint8_t networkIndex, uint64_t breadcrumb)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         NetworkCommissioning::Commands::ReorderNetwork::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // networkID: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkID));
+    // networkIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), networkIndex));
+    // breadcrumb: int64u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -8219,7 +4899,7 @@ exit:
 
 CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
-                                                     uint64_t breadcrumb, uint32_t timeoutMs)
+                                                     uint64_t breadcrumb)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -8246,8 +4926,6 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), ssid));
     // breadcrumb: int64u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -8262,190 +4940,6 @@ CHIP_ERROR NetworkCommissioningCluster::ScanNetworks(Callback::Cancelable * onSu
 exit:
     return err;
 }
-
-CHIP_ERROR NetworkCommissioningCluster::UpdateThreadNetwork(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback,
-                                                            chip::ByteSpan operationalDataset, uint64_t breadcrumb,
-                                                            uint32_t timeoutMs)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::UpdateThreadNetwork::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // operationalDataset: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), operationalDataset));
-    // breadcrumb: int64u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR NetworkCommissioningCluster::UpdateWiFiNetwork(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
-                                                          chip::ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
-                                         NetworkCommissioning::Commands::UpdateWiFiNetwork::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // ssid: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), ssid));
-    // credentials: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), credentials));
-    // breadcrumb: int64u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), breadcrumb));
-    // timeoutMs: int32u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutMs));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-// NetworkCommissioning Cluster Attributes
-CHIP_ERROR NetworkCommissioningCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFC;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::GetLastNetworkCommissioningResult::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Type,
-                           chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType>(
-    const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetwork::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType>,
-    CommandResponseFailureCallback);
 
 // OtaSoftwareUpdateProvider Cluster Commands
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::ApplyUpdateRequest(Callback::Cancelable * onSuccessCallback,
@@ -8539,10 +5033,10 @@ exit:
 }
 
 CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t vendorId,
-                                                        uint16_t productId, uint16_t hardwareVersion, uint32_t softwareVersion,
-                                                        uint8_t protocolsSupported, chip::ByteSpan location,
-                                                        bool requestorCanConsent, chip::ByteSpan metadataForProvider)
+                                                        Callback::Cancelable * onFailureCallback, chip::VendorId vendorId,
+                                                        uint16_t productId, uint32_t softwareVersion, uint8_t protocolsSupported,
+                                                        uint16_t hardwareVersion, chip::CharSpan location, bool requestorCanConsent,
+                                                        chip::ByteSpan metadataForProvider)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -8566,19 +5060,18 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // vendorId: int16u
+    // vendorId: vendorId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
     // productId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), productId));
-    // hardwareVersion: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
     // softwareVersion: int32u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), softwareVersion));
     // protocolsSupported: OTADownloadProtocol
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), protocolsSupported));
+    // hardwareVersion: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
     // location: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(location.data()), location.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), location));
     // requestorCanConsent: boolean
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), requestorCanConsent));
     // metadataForProvider: octetString
@@ -8598,44 +5091,12 @@ exit:
     return err;
 }
 
-// OtaSoftwareUpdateProvider Cluster Attributes
-CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type,
-                           chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::DecodableType>(
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type &, void *,
-    CommandResponseSuccessCallback<
-        chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequestResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type,
-                           chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType>(
-    const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // OtaSoftwareUpdateRequestor Cluster Commands
 CHIP_ERROR OtaSoftwareUpdateRequestorCluster::AnnounceOtaProvider(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback,
-                                                                  chip::ByteSpan providerLocation, uint16_t vendorId,
-                                                                  uint8_t announcementReason, chip::ByteSpan metadataForNode)
+                                                                  chip::NodeId providerNodeId, chip::VendorId vendorId,
+                                                                  uint8_t announcementReason, chip::ByteSpan metadataForNode,
+                                                                  chip::EndpointId endpoint)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -8659,14 +5120,16 @@ CHIP_ERROR OtaSoftwareUpdateRequestorCluster::AnnounceOtaProvider(Callback::Canc
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // providerLocation: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), providerLocation));
-    // vendorId: int16u
+    // providerNodeId: nodeId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), providerNodeId));
+    // vendorId: vendorId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), vendorId));
     // announcementReason: OTAAnnouncementReason
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), announcementReason));
     // metadataForNode: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), metadataForNode));
+    // endpoint: endpointNo
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), endpoint));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -8682,133 +5145,7 @@ exit:
     return err;
 }
 
-// OtaSoftwareUpdateRequestor Cluster Attributes
-CHIP_ERROR OtaSoftwareUpdateRequestorCluster::ReadAttributeDefaultOtaProvider(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR OtaSoftwareUpdateRequestorCluster::WriteAttributeDefaultOtaProvider(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               chip::ByteSpan value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OtaSoftwareUpdateRequestorCluster::ReadAttributeUpdatePossible(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR OtaSoftwareUpdateRequestorCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // OccupancySensing Cluster Commands
-// OccupancySensing Cluster Attributes
-CHIP_ERROR OccupancySensingCluster::ReadAttributeOccupancy(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OccupancySensingCluster::SubscribeAttributeOccupancy(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OccupancySensing::Attributes::Occupancy::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OccupancySensingCluster::ReportAttributeOccupancy(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OccupancySensing::Attributes::Occupancy::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OccupancySensingCluster::ReadAttributeOccupancySensorType(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OccupancySensingCluster::ReadAttributeOccupancySensorTypeBitmap(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OccupancySensingCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // OnOff Cluster Commands
 CHIP_ERROR OnOffCluster::Off(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
@@ -9051,240 +5388,7 @@ exit:
     return err;
 }
 
-// OnOff Cluster Attributes
-CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::SubscribeAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = OnOff::Attributes::OnOff::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(OnOff::Attributes::OnOff::Id, onReportCallback,
-                                     BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::ReadAttributeGlobalSceneControl(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::ReadAttributeOnTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::WriteAttributeOnTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004001;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReadAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::WriteAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004002;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReadAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::WriteAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00004003;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFC;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Off::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::Off::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OffWithEffect::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::OffWithEffect::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::On::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::On::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OnOff::Commands::Toggle::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OnOff::Commands::Toggle::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // OnOffSwitchConfiguration Cluster Commands
-// OnOffSwitchConfiguration Cluster Attributes
-CHIP_ERROR OnOffSwitchConfigurationCluster::ReadAttributeSwitchType(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::ReadAttributeSwitchActions(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::WriteAttributeSwitchActions(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR OnOffSwitchConfigurationCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // OperationalCredentials Cluster Commands
 CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -9593,7 +5697,7 @@ exit:
 }
 
 CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, chip::ByteSpan label)
+                                                            Callback::Cancelable * onFailureCallback, chip::CharSpan label)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -9618,8 +5722,7 @@ CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // label: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(label.data()), label.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), label));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -9679,744 +5782,19 @@ exit:
     return err;
 }
 
-// OperationalCredentials Cluster Attributes
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             OperationalCredentialsClusterFabricsListListAttributeFilter);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type,
-                           chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type,
-                           chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type,
-                           chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type,
-                                               chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>(
-    const chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // PowerSource Cluster Commands
-// PowerSource Cluster Attributes
-CHIP_ERROR PowerSourceCluster::ReadAttributeStatus(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
 
-CHIP_ERROR PowerSourceCluster::ReadAttributeOrder(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::ReadAttributeDescription(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::ReadAttributeBatteryVoltage(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::ReadAttributeBatteryPercentRemaining(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::ReadAttributeBatteryTimeRemaining(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::ReadAttributeBatteryChargeLevel(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000E;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::ReadAttributeActiveBatteryFaults(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000012;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             PowerSourceClusterActiveBatteryFaultsListAttributeFilter);
-}
-
-CHIP_ERROR PowerSourceCluster::ReadAttributeBatteryChargeState(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFC;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PowerSourceCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
+// PowerSourceConfiguration Cluster Commands
 
 // PressureMeasurement Cluster Commands
-// PressureMeasurement Cluster Attributes
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PressureMeasurementCluster::SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback,
-                                                                       uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PressureMeasurement::Attributes::MeasuredValue::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PressureMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PressureMeasurement::Attributes::MeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // PumpConfigurationAndControl Cluster Commands
-// PumpConfigurationAndControl Cluster Attributes
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxPressure(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxSpeed(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxFlow(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMinConstPressure(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxConstPressure(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMinCompPressure(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxCompPressure(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMinConstSpeed(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000007;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxConstSpeed(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000008;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMinConstFlow(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000009;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxConstFlow(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMinConstTemp(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeMaxConstTemp(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributePumpStatus(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributePumpStatus(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback,
-                                                                            uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::PumpStatus::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributePumpStatus(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::PumpStatus::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveOperationMode(Callback::Cancelable * onSuccessCallback,
-                                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000011;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeEffectiveControlMode(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000012;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeCapacity(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000013;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::SubscribeAttributeCapacity(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = PumpConfigurationAndControl::Attributes::Capacity::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReportAttributeCapacity(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(PumpConfigurationAndControl::Attributes::Capacity::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeSpeed(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000014;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeLifetimeEnergyConsumed(Callback::Cancelable * onSuccessCallback,
-                                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000017;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000020;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeOperationMode(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000020;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeControlMode(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000021;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::WriteAttributeControlMode(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000021;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeAlarmMask(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000022;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFC;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR PumpConfigurationAndControlCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // RelativeHumidityMeasurement Cluster Commands
-// RelativeHumidityMeasurement Cluster Attributes
-CHIP_ERROR RelativeHumidityMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback,
-                                                                               uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = RelativeHumidityMeasurement::Attributes::MeasuredValue::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(RelativeHumidityMeasurement::Attributes::MeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR RelativeHumidityMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // Scenes Cluster Commands
 CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::ByteSpan sceneName,
+                                   uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, chip::CharSpan sceneName,
                                    chip::ClusterId clusterId, uint8_t length, uint8_t value)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
@@ -10447,8 +5825,7 @@ CHIP_ERROR ScenesCluster::AddScene(Callback::Cancelable * onSuccessCallback, Cal
     // transitionTime: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), transitionTime));
     // sceneName: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(sceneName.data()), sceneName.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), sceneName));
     // clusterId: clusterId
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), clusterId));
     // length: int8u
@@ -10726,120 +6103,6 @@ exit:
     return err;
 }
 
-// Scenes Cluster Attributes
-CHIP_ERROR ScenesCluster::ReadAttributeSceneCount(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ScenesCluster::ReadAttributeCurrentScene(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ScenesCluster::ReadAttributeCurrentGroup(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ScenesCluster::ReadAttributeSceneValid(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR ScenesCluster::ReadAttributeNameSupport(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ScenesCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::AddScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::AddScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type,
-                                               chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RecallScene::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Scenes::Commands::RecallScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type,
-                                               chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::RemoveScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::RemoveScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::StoreScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::StoreScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Scenes::Commands::ViewScene::Type,
-                                               chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType>(
-    const chip::app::Clusters::Scenes::Commands::ViewScene::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // SoftwareDiagnostics Cluster Commands
 CHIP_ERROR SoftwareDiagnosticsCluster::ResetWatermarks(Callback::Cancelable * onSuccessCallback,
                                                        Callback::Cancelable * onFailureCallback)
@@ -10881,312 +6144,12 @@ exit:
     return err;
 }
 
-// SoftwareDiagnostics Cluster Attributes
-CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeCurrentHeapFree(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeCurrentHeapUsed(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeCurrentHeapHighWatermark(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR SoftwareDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // Switch Cluster Commands
-// Switch Cluster Attributes
-CHIP_ERROR SwitchCluster::ReadAttributeNumberOfPositions(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR SwitchCluster::ReadAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR SwitchCluster::SubscribeAttributeCurrentPosition(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                            uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Switch::Attributes::CurrentPosition::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR SwitchCluster::ReportAttributeCurrentPosition(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Switch::Attributes::CurrentPosition::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR SwitchCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-// TvChannel Cluster Commands
-CHIP_ERROR TvChannelCluster::ChangeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           chip::ByteSpan match)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TvChannel::Commands::ChangeChannel::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // match: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++),
-                                          Span<const char>(Uint8::to_const_char(match.data()), match.size())));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR TvChannelCluster::ChangeChannelByNumber(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint16_t majorNumber,
-                                                   uint16_t minorNumber)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TvChannel::Commands::ChangeChannelByNumber::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // majorNumber: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), majorNumber));
-    // minorNumber: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), minorNumber));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-CHIP_ERROR TvChannelCluster::SkipChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                         uint16_t count)
-{
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    TLV::TLVWriter * writer = nullptr;
-    uint8_t argSeqNumber    = 0;
-
-    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
-    (void) writer;
-    (void) argSeqNumber;
-
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TvChannel::Commands::SkipChannel::Id,
-                                         (app::CommandPathFlags::kEndpointIdValid) };
-
-    CommandSenderHandle sender(
-        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
-
-    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
-
-    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
-
-    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // count: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), count));
-
-    SuccessOrExit(err = sender->FinishCommand());
-
-    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
-    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
-
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
-
-    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
-    // now.
-    sender.release();
-exit:
-    return err;
-}
-
-// TvChannel Cluster Attributes
-CHIP_ERROR TvChannelCluster::ReadAttributeTvChannelList(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             TvChannelClusterTvChannelListListAttributeFilter);
-}
-
-CHIP_ERROR TvChannelCluster::ReadAttributeTvChannelLineup(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR TvChannelCluster::ReadAttributeCurrentTvChannel(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR TvChannelCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::ChangeChannel::Type,
-                                               chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType>(
-    const chip::app::Clusters::TvChannel::Commands::ChangeChannel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TvChannel::Commands::ChangeChannelByNumber::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TvChannel::Commands::SkipChannel::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TvChannel::Commands::SkipChannel::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // TargetNavigator Cluster Commands
-CHIP_ERROR TargetNavigatorCluster::NavigateTarget(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback, uint8_t target, chip::ByteSpan data)
+CHIP_ERROR TargetNavigatorCluster::NavigateTargetRequest(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback, uint8_t target,
+                                                         chip::CharSpan data)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -11198,7 +6161,8 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTarget(Callback::Cancelable * onSucce
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TargetNavigator::Commands::NavigateTarget::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         TargetNavigator::Commands::NavigateTargetRequest::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -11212,8 +6176,7 @@ CHIP_ERROR TargetNavigatorCluster::NavigateTarget(Callback::Cancelable * onSucce
     // target: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), target));
     // data: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(data.data()), data.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), data));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -11229,107 +6192,66 @@ exit:
     return err;
 }
 
-// TargetNavigator Cluster Attributes
-CHIP_ERROR TargetNavigatorCluster::ReadAttributeTargetNavigatorList(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             TargetNavigatorClusterTargetNavigatorListListAttributeFilter);
-}
-
-CHIP_ERROR TargetNavigatorCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type,
-                           chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType>(
-    const chip::app::Clusters::TargetNavigator::Commands::NavigateTarget::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
 // TemperatureMeasurement Cluster Commands
-// TemperatureMeasurement Cluster Attributes
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback,
-                                                                          uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = TemperatureMeasurement::Attributes::MeasuredValue::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(TemperatureMeasurement::Attributes::MeasuredValue::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // TestCluster Cluster Commands
+CHIP_ERROR TestClusterCluster::SimpleStructEchoRequest(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint8_t c,
+                                                       chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g, double h)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         TestCluster::Commands::SimpleStructEchoRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // a: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), a));
+    // b: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), b));
+    // c: simpleEnum
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), c));
+    // d: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), d));
+    // e: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), e));
+    // f: simpleBitmap
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
+    // g: single
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), g));
+    // h: double
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), h));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
 CHIP_ERROR TestClusterCluster::Test(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
@@ -11395,6 +6317,96 @@ CHIP_ERROR TestClusterCluster::TestAddArguments(Callback::Cancelable * onSuccess
     // arg1: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg1));
     // arg2: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg2));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR TestClusterCluster::TestEmitTestEventRequest(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback, uint8_t arg1, uint8_t arg2,
+                                                        bool arg3)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         TestCluster::Commands::TestEmitTestEventRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // arg1: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg1));
+    // arg2: simpleEnum
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg2));
+    // arg3: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg3));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR TestClusterCluster::TestEnumsRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                chip::VendorId arg1, uint8_t arg2)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TestCluster::Commands::TestEnumsRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // arg1: vendorId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg1));
+    // arg2: simpleEnum
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg2));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -11495,9 +6507,60 @@ exit:
     return err;
 }
 
+CHIP_ERROR TestClusterCluster::TestListNestedStructListArgumentRequest(Callback::Cancelable * onSuccessCallback,
+                                                                       Callback::Cancelable * onFailureCallback, uint8_t a, bool b,
+                                                                       uint32_t e, chip::ByteSpan f, uint8_t g)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         TestCluster::Commands::TestListNestedStructListArgumentRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // a: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), a));
+    // b: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), b));
+    // e: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), e));
+    // f: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
+    // g: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), g));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
 CHIP_ERROR TestClusterCluster::TestListStructArgumentRequest(Callback::Cancelable * onSuccessCallback,
                                                              Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint8_t c,
-                                                             chip::ByteSpan d, chip::ByteSpan e, uint8_t f)
+                                                             chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g, double h)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -11530,10 +6593,108 @@ CHIP_ERROR TestClusterCluster::TestListStructArgumentRequest(Callback::Cancelabl
     // d: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), d));
     // e: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(e.data()), e.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), e));
     // f: simpleBitmap
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
+    // g: single
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), g));
+    // h: double
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), h));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR TestClusterCluster::TestNestedStructArgumentRequest(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback, uint8_t a, bool b)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         TestCluster::Commands::TestNestedStructArgumentRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // a: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), a));
+    // b: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), b));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR TestClusterCluster::TestNestedStructListArgumentRequest(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, uint8_t a, bool b,
+                                                                   uint32_t e, chip::ByteSpan f, uint8_t g)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         TestCluster::Commands::TestNestedStructListArgumentRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // a: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), a));
+    // b: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), b));
+    // e: int32u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), e));
+    // f: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
+    // g: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), g));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -11572,6 +6733,90 @@ CHIP_ERROR TestClusterCluster::TestNotHandled(Callback::Cancelable * onSuccessCa
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     // Command takes no arguments.
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR TestClusterCluster::TestNullableOptionalRequest(Callback::Cancelable * onSuccessCallback,
+                                                           Callback::Cancelable * onFailureCallback, uint8_t arg1)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         TestCluster::Commands::TestNullableOptionalRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // arg1: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg1));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR TestClusterCluster::TestSimpleOptionalArgumentRequest(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback, bool arg1)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         TestCluster::Commands::TestSimpleOptionalArgumentRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // arg1: boolean
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), arg1));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -11627,7 +6872,7 @@ exit:
 
 CHIP_ERROR TestClusterCluster::TestStructArgumentRequest(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback, uint8_t a, bool b, uint8_t c,
-                                                         chip::ByteSpan d, chip::ByteSpan e, uint8_t f)
+                                                         chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g, double h)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -11660,10 +6905,13 @@ CHIP_ERROR TestClusterCluster::TestStructArgumentRequest(Callback::Cancelable * 
     // d: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), d));
     // e: charString
-    SuccessOrExit(
-        err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char(e.data()), e.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), e));
     // f: simpleBitmap
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), f));
+    // g: single
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), g));
+    // h: double
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), h));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -11718,741 +6966,44 @@ exit:
     return err;
 }
 
-// TestCluster Cluster Attributes
-CHIP_ERROR TestClusterCluster::ReadAttributeBoolean(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeBoolean(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, bool value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeBitmap8(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeBitmap8(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeBitmap16(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeBitmap16(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeBitmap32(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeBitmap32(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint32_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeBitmap64(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeBitmap64(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback, uint64_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeInt8u(Callback::Cancelable * onSuccessCallback,
+CHIP_ERROR TestClusterCluster::TimedInvokeRequest(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, TestCluster::Commands::TimedInvokeRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    // Command takes no arguments.
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
 }
-
-CHIP_ERROR TestClusterCluster::WriteAttributeInt8u(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeInt16u(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeInt16u(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeInt32u(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000008;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeInt32u(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint32_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000008;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeInt64u(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeInt64u(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint64_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000C;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeInt8s(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeInt8s(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, int8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000D;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeInt16s(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000E;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeInt16s(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, int16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000E;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeInt32s(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeInt32s(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, int32_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeInt64s(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000014;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64sAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeInt64s(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, int64_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000014;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeEnum8(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000015;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeEnum8(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000015;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeEnum16(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000016;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeEnum16(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000016;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeOctetString(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000019;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeOctetString(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000019;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeListInt8u(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             TestClusterClusterListInt8uListAttributeFilter);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeListOctetString(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             TestClusterClusterListOctetStringListAttributeFilter);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeListStructOctetString(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             TestClusterClusterListStructOctetStringListAttributeFilter);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeLongOctetString(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeLongOctetString(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001D;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeCharString(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001E;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeCharString(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001E;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeLongCharString(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001F;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeLongCharString(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback, chip::ByteSpan value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001F;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeEpochUs(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000020;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeEpochUs(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint64_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000020;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeEpochS(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000021;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeEpochS(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint32_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000021;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x000000FF;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR TestClusterCluster::WriteAttributeUnsupported(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback, bool value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x000000FF;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR TestClusterCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::Test::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::Test::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type,
-                                               chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType>(
-    const chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type,
-                           chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType>(
-    const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestSpecific::Type,
-                                               chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType>(
-    const chip::app::Clusters::TestCluster::Commands::TestSpecific::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType>,
-    CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
 
 // Thermostat Cluster Commands
 CHIP_ERROR ThermostatCluster::ClearWeeklySchedule(Callback::Cancelable * onSuccessCallback,
@@ -12666,505 +7217,7 @@ exit:
     return err;
 }
 
-// Thermostat Cluster Attributes
-CHIP_ERROR ThermostatCluster::ReadAttributeLocalTemperature(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::SubscribeAttributeLocalTemperature(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = Thermostat::Attributes::LocalTemperature::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReportAttributeLocalTemperature(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(Thermostat::Attributes::LocalTemperature::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeAbsMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeAbsMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeAbsMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeAbsMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000011;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::WriteAttributeOccupiedCoolingSetpoint(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, int16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000011;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000012;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::WriteAttributeOccupiedHeatingSetpoint(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback, int16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000012;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000015;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::WriteAttributeMinHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, int16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000015;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000016;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::WriteAttributeMaxHeatSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, int16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000016;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000017;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::WriteAttributeMinCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, int16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000017;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000018;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::WriteAttributeMaxCoolSetpointLimit(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, int16_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000018;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::WriteAttributeControlSequenceOfOperation(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001B;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeSystemMode(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::WriteAttributeSystemMode(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001C;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeStartOfWeek(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000020;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeNumberOfWeeklyTransitions(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000021;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeNumberOfDailyTransitions(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000022;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFC;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // ThermostatUserInterfaceConfiguration Cluster Commands
-// ThermostatUserInterfaceConfiguration Cluster Attributes
-CHIP_ERROR
-ThermostatUserInterfaceConfigurationCluster::ReadAttributeTemperatureDisplayMode(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeTemperatureDisplayMode(
-    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::ReadAttributeKeypadLockout(Callback::Cancelable * onSuccessCallback,
-                                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeKeypadLockout(Callback::Cancelable * onSuccessCallback,
-                                                                                    Callback::Cancelable * onFailureCallback,
-                                                                                    uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR
-ThermostatUserInterfaceConfigurationCluster::ReadAttributeScheduleProgrammingVisibility(Callback::Cancelable * onSuccessCallback,
-                                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::WriteAttributeScheduleProgrammingVisibility(
-    Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR ThermostatUserInterfaceConfigurationCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // ThreadNetworkDiagnostics Cluster Commands
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::ResetCounts(Callback::Cancelable * onSuccessCallback,
@@ -13207,805 +7260,9 @@ exit:
     return err;
 }
 
-// ThreadNetworkDiagnostics Cluster Attributes
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeChannel(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRoutingRole(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeNetworkName(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributePanId(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeExtendedPanId(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeMeshLocalPrefix(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeOverrunCount(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeNeighborTableList(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000007;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRouteTableList(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000008;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             ThreadNetworkDiagnosticsClusterRouteTableListListAttributeFilter);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributePartitionId(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000009;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeWeighting(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeDataVersion(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeStableDataVersion(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeLeaderRouterId(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeDetachedRoleCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000E;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeChildRoleCount(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000F;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRouterRoleCount(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeLeaderRoleCount(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000011;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeAttachAttemptCount(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000012;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributePartitionIdChangeCount(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000013;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeBetterPartitionAttachAttemptCount(Callback::Cancelable * onSuccessCallback,
-                                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000014;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeParentChangeCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000015;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxTotalCount(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000016;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxUnicastCount(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000017;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxBroadcastCount(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000018;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxAckRequestedCount(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000019;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxAckedCount(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxNoAckRequestedCount(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxDataCount(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxDataPollCount(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxBeaconCount(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001E;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxBeaconRequestCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001F;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxOtherCount(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000020;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxRetryCount(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000021;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxDirectMaxRetryExpiryCount(Callback::Cancelable * onSuccessCallback,
-                                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000022;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxIndirectMaxRetryExpiryCount(Callback::Cancelable * onSuccessCallback,
-                                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000023;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxErrCcaCount(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000024;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxErrAbortCount(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000025;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeTxErrBusyChannelCount(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000026;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxTotalCount(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000027;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxUnicastCount(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000028;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxBroadcastCount(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000029;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxDataCount(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000002A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxDataPollCount(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000002B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxBeaconCount(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000002C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxBeaconRequestCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000002D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxOtherCount(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000002E;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxAddressFilteredCount(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000002F;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxDestAddrFilteredCount(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000030;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxDuplicatedCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000031;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxErrNoFrameCount(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000032;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxErrUnknownNeighborCount(Callback::Cancelable * onSuccessCallback,
-                                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000033;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxErrInvalidSrcAddrCount(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000034;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxErrSecCount(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000035;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxErrFcsCount(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000036;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRxErrOtherCount(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000037;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeActiveTimestamp(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000038;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributePendingTimestamp(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000039;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeDelay(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000003A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeSecurityPolicy(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000003B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             ThreadNetworkDiagnosticsClusterSecurityPolicyListAttributeFilter);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeChannelMask(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000003C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeOperationalDatasetComponents(Callback::Cancelable * onSuccessCallback,
-                                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000003D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             ThreadNetworkDiagnosticsClusterOperationalDatasetComponentsListAttributeFilter);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeActiveNetworkFaultsList(Callback::Cancelable * onSuccessCallback,
-                                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000003E;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter);
-}
-
-CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
+// UserLabel Cluster Commands
 
 // WakeOnLan Cluster Commands
-// WakeOnLan Cluster Attributes
-CHIP_ERROR WakeOnLanCluster::ReadAttributeWakeOnLanMacAddress(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<CharStringAttributeCallback>);
-}
-
-CHIP_ERROR WakeOnLanCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
 
 // WiFiNetworkDiagnostics Cluster Commands
 CHIP_ERROR WiFiNetworkDiagnosticsCluster::ResetCounts(Callback::Cancelable * onSuccessCallback,
@@ -14047,180 +7304,6 @@ exit:
     return err;
 }
 
-// WiFiNetworkDiagnostics Cluster Attributes
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeBssid(Callback::Cancelable * onSuccessCallback,
-                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<OctetStringAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeSecurityType(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000001;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeWiFiVersion(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000002;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeChannelNumber(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeRssi(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8sAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeBeaconLostCount(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000005;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeBeaconRxCount(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000006;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributePacketMulticastRxCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000007;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributePacketMulticastTxCount(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000008;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributePacketUnicastRxCount(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000009;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributePacketUnicastTxCount(Callback::Cancelable * onSuccessCallback,
-                                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeCurrentMaxRate(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeOverrunCount(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR WiFiNetworkDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
 // WindowCovering Cluster Commands
 CHIP_ERROR WindowCoveringCluster::DownOrClose(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
@@ -14261,8 +7344,8 @@ exit:
 }
 
 CHIP_ERROR WindowCoveringCluster::GoToLiftPercentage(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t liftPercentageValue,
-                                                     uint16_t liftPercent100thsValue)
+                                                     Callback::Cancelable * onFailureCallback, chip::Percent liftPercentageValue,
+                                                     chip::Percent100ths liftPercent100thsValue)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -14285,9 +7368,9 @@ CHIP_ERROR WindowCoveringCluster::GoToLiftPercentage(Callback::Cancelable * onSu
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // liftPercentageValue: int8u
+    // liftPercentageValue: percent
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), liftPercentageValue));
-    // liftPercent100thsValue: int16u
+    // liftPercent100thsValue: percent100ths
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), liftPercent100thsValue));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -14346,8 +7429,8 @@ exit:
 }
 
 CHIP_ERROR WindowCoveringCluster::GoToTiltPercentage(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t tiltPercentageValue,
-                                                     uint16_t tiltPercent100thsValue)
+                                                     Callback::Cancelable * onFailureCallback, chip::Percent tiltPercentageValue,
+                                                     chip::Percent100ths tiltPercent100thsValue)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -14370,9 +7453,9 @@ CHIP_ERROR WindowCoveringCluster::GoToTiltPercentage(Callback::Cancelable * onSu
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // tiltPercentageValue: int8u
+    // tiltPercentageValue: percent
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), tiltPercentageValue));
-    // tiltPercent100thsValue: int16u
+    // tiltPercent100thsValue: percent100ths
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), tiltPercent100thsValue));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -14505,451 +7588,6 @@ CHIP_ERROR WindowCoveringCluster::UpOrOpen(Callback::Cancelable * onSuccessCallb
 exit:
     return err;
 }
-
-// WindowCovering Cluster Attributes
-CHIP_ERROR WindowCoveringCluster::ReadAttributeType(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000000;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionLift(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000003;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionTilt(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000004;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeConfigStatus(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000007;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000008;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::CurrentPositionLiftPercentage::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionLiftPercentage(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::CurrentPositionLiftPercentage::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                             Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000009;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onSuccessCallback,
-                                                                                  Callback::Cancelable * onFailureCallback,
-                                                                                  uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::CurrentPositionTiltPercentage::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionTiltPercentage(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::CurrentPositionTiltPercentage::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeOperationalStatus(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeOperationalStatus(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback,
-                                                                      uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::OperationalStatus::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeOperationalStatus(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::OperationalStatus::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000B;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                    Callback::Cancelable * onFailureCallback,
-                                                                                    uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeTargetPositionLiftPercent100ths(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::TargetPositionLiftPercent100ths::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000C;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                    Callback::Cancelable * onFailureCallback,
-                                                                                    uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeTargetPositionTiltPercent100ths(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::TargetPositionTiltPercent100ths::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeEndProductType(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000D;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000E;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                     Callback::Cancelable * onFailureCallback,
-                                                                                     uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionLiftPercent100ths(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::CurrentPositionLiftPercent100ths::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000000F;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onSuccessCallback,
-                                                                                     Callback::Cancelable * onFailureCallback,
-                                                                                     uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeCurrentPositionTiltPercent100ths(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::CurrentPositionTiltPercent100ths::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledOpenLimitLift(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000010;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledClosedLimitLift(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000011;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledOpenLimitTilt(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000012;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeInstalledClosedLimitTilt(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000013;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeMode(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000017;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::WriteAttributeMode(Callback::Cancelable * onSuccessCallback,
-                                                     Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId     = mDevice->GetDeviceId();
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x00000017;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback,
-                                                            Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000001A;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::SubscribeAttributeSafetyStatus(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                                 uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = WindowCovering::Attributes::SafetyStatus::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReportAttributeSafetyStatus(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(WindowCovering::Attributes::SafetyStatus::Id, onReportCallback,
-                                     BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR WindowCoveringCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = 0x0000FFFD;
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Type,
-                                               chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::StopMotion::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::StopMotion::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template CHIP_ERROR
-ClusterBase::InvokeCommand<chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type, chip::app::DataModel::NullObjectType>(
-    const chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type &, void *,
-    CommandResponseSuccessCallback<chip::app::DataModel::NullObjectType>, CommandResponseFailureCallback);
-
-template <typename RequestDataT, typename ResponseDataT>
-CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
-                                      CommandResponseSuccessCallback<ResponseDataT> successCb,
-                                      CommandResponseFailureCallback failureCb)
-{
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
-
-    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
-        successCb(context, responseData);
-    };
-
-    auto onFailureCb = [context, failureCb](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
-        failureCb(context, app::ToEmberAfStatus(aIMStatus));
-    };
-
-    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                               requestData, onSuccessCb, onFailureCb);
-};
 
 } // namespace Controller
 } // namespace chip

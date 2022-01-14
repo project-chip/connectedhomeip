@@ -31,36 +31,29 @@ namespace app {
 namespace TestEventPathParams {
 void TestSamePath(nlTestSuite * apSuite, void * apContext)
 {
-    EventPathParams eventPathParams1(1, 2, 3, 4, false);
-    EventPathParams eventPathParams2(1, 2, 3, 4, false);
+    EventPathParams eventPathParams1(2, 3, 4);
+    EventPathParams eventPathParams2(2, 3, 4);
     NL_TEST_ASSERT(apSuite, eventPathParams1.IsSamePath(eventPathParams2));
-}
-
-void TestDifferentNodeId(nlTestSuite * apSuite, void * apContext)
-{
-    EventPathParams eventPathParams1(1, 2, 3, 4, false);
-    EventPathParams eventPathParams2(6, 2, 3, 4, false);
-    NL_TEST_ASSERT(apSuite, !eventPathParams1.IsSamePath(eventPathParams2));
 }
 
 void TestDifferentEndpointId(nlTestSuite * apSuite, void * apContext)
 {
-    EventPathParams eventPathParams1(1, 2, 3, 4, false);
-    EventPathParams eventPathParams2(1, 6, 3, 4, false);
+    EventPathParams eventPathParams1(2, 3, 4);
+    EventPathParams eventPathParams2(6, 3, 4);
     NL_TEST_ASSERT(apSuite, !eventPathParams1.IsSamePath(eventPathParams2));
 }
 
 void TestDifferentClusterId(nlTestSuite * apSuite, void * apContext)
 {
-    EventPathParams eventPathParams1(1, 2, 3, 4, false);
-    EventPathParams eventPathParams2(1, 2, 6, 4, false);
+    EventPathParams eventPathParams1(2, 3, 4);
+    EventPathParams eventPathParams2(2, 6, 4);
     NL_TEST_ASSERT(apSuite, !eventPathParams1.IsSamePath(eventPathParams2));
 }
 
 void TestDifferentEventId(nlTestSuite * apSuite, void * apContext)
 {
-    EventPathParams eventPathParams1(1, 2, 3, 4, false);
-    EventPathParams eventPathParams2(1, 2, 3, 6, false);
+    EventPathParams eventPathParams1(2, 3, 4);
+    EventPathParams eventPathParams2(2, 3, 6);
     NL_TEST_ASSERT(apSuite, !eventPathParams1.IsSamePath(eventPathParams2));
 }
 } // namespace TestEventPathParams
@@ -69,7 +62,6 @@ void TestDifferentEventId(nlTestSuite * apSuite, void * apContext)
 
 namespace {
 const nlTest sTests[] = { NL_TEST_DEF("TestSamePath", chip::app::TestEventPathParams::TestSamePath),
-                          NL_TEST_DEF("TestDifferentNodeId", chip::app::TestEventPathParams::TestDifferentNodeId),
                           NL_TEST_DEF("TestDifferentEndpointId", chip::app::TestEventPathParams::TestDifferentEndpointId),
                           NL_TEST_DEF("TestDifferentClusterId", chip::app::TestEventPathParams::TestDifferentClusterId),
                           NL_TEST_DEF("TestDifferentEventId", chip::app::TestEventPathParams::TestDifferentEventId),

@@ -19,16 +19,12 @@ config:
     endpoint: 3
 
 tests:
-    - label: "Change Status Command"
-      command: "ChangeStatus"
-      arguments:
-          values:
-              - name: "status"
-                value: 1
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
 
     # TODO: Support chars validation
     - label: "Read attribute vendor name"
-      disabled: true
       command: "readAttribute"
       attribute: "vendor name"
       response:
@@ -41,8 +37,7 @@ tests:
           value: 1
 
     # TODO: Support chars validation
-    - label: "Read attribute name"
-      disabled: true
+    - label: "Read attribute application name"
       command: "readAttribute"
       attribute: "application name"
       response:
@@ -54,16 +49,29 @@ tests:
       response:
           value: 1
 
-    # TODO: Support chars validation
-    - label: "Read attribute id"
+    - label: "Read attribute application status"
+      command: "readAttribute"
+      attribute: "application status"
+      response:
+          value: 0
+    # TODO: Enable once attribute struct is supported
+    - label: "Read attribute application status"
       disabled: true
       command: "readAttribute"
-      attribute: "application id"
+      attribute: "application app"
       response:
-          value: "appId"
+          value: { catalogVendorId: 123, applicationId: "applicationId" }
 
-    - label: "Read attribute catalog vendor id"
+    # TODO: Support chars validation
+    - label: "Read attribute application version"
       command: "readAttribute"
-      attribute: "catalog vendor id"
+      attribute: "application version"
       response:
-          value: 1
+          value: "exampleVersion"
+
+    - label: "Read attribute application allowed vendor list"
+      disabled: true
+      command: "readAttribute"
+      attribute: "allowed vendor list"
+      response:
+          value: [123, 456]

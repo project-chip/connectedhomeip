@@ -29,6 +29,8 @@ class GnBuilder(Builder):
         """
         super(GnBuilder, self).__init__(root, runner)
 
+        self.build_command = None
+
     def GnBuildArgs(self):
         """Extra gn build `--args`
 
@@ -47,6 +49,7 @@ class GnBuilder(Builder):
         if not os.path.exists(self.output_dir):
             cmd = [
                 'gn', 'gen', '--check', '--fail-on-unused-args',
+                '--export-compile-commands',
                 '--root=%s' % self.root
             ]
 
@@ -72,5 +75,8 @@ class GnBuilder(Builder):
             self._Execute(cmd, title=title)
 
     def _build(self):
-        self._Execute(['ninja', '-C', self.output_dir],
-                      title='Building ' + self.identifier)
+        cmd = ['ninja', '-C', self.output_dir]
+        if self.build_command:
+            cmd.append(self.build_command)
+
+        self._Execute(cmd, title='Building ' + self.identifier)

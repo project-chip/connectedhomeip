@@ -182,10 +182,10 @@ CHIP_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
     {
         mTxOldestUnackedSeqNum = ack_num;
 
-        // All oustanding fragments have been acknowledged.
+        // All outstanding fragments have been acknowledged.
         mExpectingAck = false;
     }
-    else // If ack is valid, but not for newest oustanding unacknowledged fragment...
+    else // If ack is valid, but not for newest outstanding unacknowledged fragment...
     {
         // Update newest unacknowledged fragment to one past that which was just acknowledged.
         mTxOldestUnackedSeqNum = ack_num;
@@ -196,7 +196,7 @@ CHIP_ERROR BtpEngine::HandleAckReceived(SequenceNumber_t ack_num)
 }
 
 // Calling convention:
-//   EncodeStandAloneAck may only be called if data arg is commited for immediate, synchronous subsequent transmission.
+//   EncodeStandAloneAck may only be called if data arg is committed for immediate, synchronous subsequent transmission.
 CHIP_ERROR BtpEngine::EncodeStandAloneAck(const PacketBufferHandle & data)
 {
     // Ensure enough headroom exists for the lower BLE layers.
@@ -412,7 +412,7 @@ PacketBufferHandle BtpEngine::TakeRxPacket()
 }
 
 // Calling convention:
-//   May only be called if data arg is commited for immediate, synchronous subsequent transmission.
+//   May only be called if data arg is committed for immediate, synchronous subsequent transmission.
 //   Returns false on error. Caller must free data arg on error.
 bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool send_ack)
 {
@@ -437,7 +437,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         mTxLength = mTxBuf->DataLength();
 
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send whole message:");
-        PrintBufDebug(data);
+        PrintBufDebug(mTxBuf);
 
         // Determine fragment header size.
         uint8_t header_size =
@@ -493,7 +493,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
 
         characteristic[0] = headerFlags.Raw();
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send first fragment:");
-        PrintBufDebug(data);
+        PrintBufDebug(mTxBuf);
     }
     else if (mTxState == kState_InProgress)
     {

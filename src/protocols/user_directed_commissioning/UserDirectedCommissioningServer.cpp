@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements an object for a Matter User Directed Commissioning unsolicitied
+ *      This file implements an object for a Matter User Directed Commissioning unsolicited
  *      recipient (server).
  *
  */
@@ -47,8 +47,8 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
-    char instanceName[Dnssd::Commissionable::kInstanceNameMaxLength + 1];
-    size_t instanceNameLength = std::min<size_t>(msg->DataLength(), Dnssd::Commissionable::kInstanceNameMaxLength);
+    char instanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    size_t instanceNameLength = std::min<size_t>(msg->DataLength(), Dnssd::Commission::kInstanceNameMaxLength);
     msg->Read(Uint8::from_char(instanceName), instanceNameLength);
 
     instanceName[instanceNameLength] = '\0';
@@ -109,6 +109,17 @@ void UserDirectedCommissioningServer::SetUDCClientProcessingState(char * instanc
 
 void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::DiscoveredNodeData & nodeData)
 {
+    if (nodeData.numIPs == 0)
+    {
+        ChipLogError(AppServer, "SetUDCClientProcessingState no IP addresses returned for instance name=%s", nodeData.instanceName);
+        return;
+    }
+    if (nodeData.port == 0)
+    {
+        ChipLogError(AppServer, "SetUDCClientProcessingState no port returned for instance name=%s", nodeData.instanceName);
+        return;
+    }
+
     UDCClientState * client = mUdcClients.FindUDCClientState(nodeData.instanceName);
     if (client != nullptr && client->GetUDCClientProcessingState() == UDCClientProcessingState::kDiscoveringNode)
     {
@@ -116,10 +127,59 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
                       (int) client->GetUDCClientProcessingState(), (int) UDCClientProcessingState::kPromptingUser);
         client->SetUDCClientProcessingState(UDCClientProcessingState::kPromptingUser);
 
+        // currently IPv6 addresses do not work for some reason
+        bool foundV4 = false;
+        for (int i = 0; i < nodeData.numIPs; ++i)
+        {
+            if (nodeData.ipAddress[i].IsIPv4())
+            {
+                foundV4 = true;
+                client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[i], nodeData.port));
+                break;
+            }
+        }
+        // use IPv6 as last resort
+        if (!foundV4)
+        {
+            client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
+        }
+
+        client->SetDeviceName(nodeData.deviceName);
+        client->SetLongDiscriminator(nodeData.longDiscriminator);
+        client->SetVendorId(nodeData.vendorId);
+        client->SetProductId(nodeData.productId);
+        client->SetDeviceName(nodeData.deviceName);
+        client->SetRotatingId(nodeData.rotatingId);
+
         // Call the registered mUserConfirmationProvider, if any.
         if (mUserConfirmationProvider != nullptr)
         {
-            mUserConfirmationProvider->OnUserDirectedCommissioningRequest(nodeData);
+            mUserConfirmationProvider->OnUserDirectedCommissioningRequest(*client);
+        }
+    }
+}
+
+void UserDirectedCommissioningServer::PrintUDCClients()
+{
+    for (uint8_t i = 0; i < kMaxUDCClients; i++)
+    {
+        UDCClientState * state = GetUDCClients().GetUDCClientState(i);
+        if (state == nullptr)
+        {
+            ChipLogProgress(AppServer, "UDC Client[%d] null", i);
+        }
+        else
+        {
+            char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
+            state->GetPeerAddress().ToString(addrBuffer);
+
+            char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+            Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
+                                                sizeof(rotatingIdString));
+
+            ChipLogProgress(AppServer, "UDC Client[%d] instance=%s deviceName=%s address=%s, vid/pid=%d/%d disc=%d rid=%s", i,
+                            state->GetInstanceName(), state->GetDeviceName(), addrBuffer, state->GetVendorId(),
+                            state->GetProductId(), state->GetLongDiscriminator(), rotatingIdString);
         }
     }
 }

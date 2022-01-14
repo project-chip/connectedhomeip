@@ -23,8 +23,6 @@
 
 #pragma once
 
-#include <memory>
-
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.h>
 
@@ -56,19 +54,25 @@ public:
     GDBusConnection * GetGDBusConnection();
 #endif
 
+    System::Clock::Timestamp GetStartTime() { return mStartTime; }
+
+    void HandleGeneralFault(uint32_t EventId);
+    void HandleSoftwareFault(uint32_t EventId);
+    void HandleSwitchEvent(uint32_t EventId);
+
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack();
     CHIP_ERROR _Shutdown();
-    CHIP_ERROR _GetCurrentHeapFree(uint64_t & currentHeapFree);
-    CHIP_ERROR _GetCurrentHeapUsed(uint64_t & currentHeapUsed);
-    CHIP_ERROR _GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
-
-    CHIP_ERROR _GetRebootCount(uint16_t & rebootCount);
-    CHIP_ERROR _GetUpTime(uint64_t & upTime);
-    CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);
+    CHIP_ERROR
+    _GetFixedLabelList(EndpointId endpoint,
+                       AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+    CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
+                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
+                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
 
     // ===== Members for internal use by the following friends.
 
@@ -76,13 +80,14 @@ private:
     friend PlatformManagerImpl & PlatformMgrImpl();
     friend class Internal::BLEManagerImpl;
 
-    uint64_t mStartTimeMilliseconds = 0;
+    System::Clock::Timestamp mStartTime = System::Clock::kZero;
 
     static PlatformManagerImpl sInstance;
 
     // The temporary hack for getting IP address change on linux for network provisioning in the rendezvous session.
     // This should be removed or find a better place once we depercate the rendezvous session.
     static void WiFIIPChangeListener();
+    static void HandleDeviceRebooted(intptr_t arg);
 
 #if CHIP_WITH_GIO
     struct GDBusConnectionDeleter
@@ -109,7 +114,7 @@ inline PlatformManager & PlatformMgr()
  * Returns the platform-specific implementation of the PlatformManager singleton object.
  *
  * chip applications can use this to gain access to features of the PlatformManager
- * that are specific to the ESP32 platform.
+ * that are specific to the platform.
  */
 inline PlatformManagerImpl & PlatformMgrImpl()
 {

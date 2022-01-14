@@ -26,7 +26,8 @@ list(
     -DCONFIG_FUNCION_O0_OPTIMIZE
     -DDM_ODM_SUPPORT_TYPE=32
     -DCHIP_DEVICE_LAYER_TARGET=Ameba
-    -DMBEDTLS_CONFIG_FILE=\\\"mbedtls_config.h\\\"
+    -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
+    -D_POSIX_REALTIME_SIGNALS
 )
 
 list(
@@ -40,6 +41,10 @@ list(
     -Wno-deprecated-declarations
     -Wno-unused-parameter
     -Wno-format
+    -Wno-stringop-truncation
+    -Wno-format-nonliteral
+    -Wno-format-security
+    -std=c++17
 )
 
 list(
@@ -96,7 +101,15 @@ string(APPEND CHIP_GN_ARGS "ameba_ar = \"arm-none-eabi-ar\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cc = \"arm-none-eabi-gcc\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cxx = \"arm-none-eabi-c++\"\n")
 string(APPEND CHIP_GN_ARGS "ameba_cpu = \"ameba\"\n")
-string(APPEND CHIP_GN_ARGS "chip_build_tests = false\n")
+
+# Build RPC
+#string(APPEND CHIP_GN_ARGS "remove_default_configs = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]\n")
+string(APPEND CHIP_GN_ARGS "chip_build_pw_rpc_lib = true\n")
+string(APPEND CHIP_GN_ARGS "pw_log_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"\n")
+string(APPEND CHIP_GN_ARGS "pw_assert_BACKEND = \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"\n")
+string(APPEND CHIP_GN_ARGS "pw_sys_io_BACKEND = \"//third_party/connectedhomeip/examples/platform/ameba/pw_sys_io:pw_sys_io_ameba\"\n")
+string(APPEND CHIP_GN_ARGS "dir_pw_third_party_nanopb = \"//third_party/connectedhomeip/third_party/nanopb/repo\"\n")
+string(APPEND CHIP_GN_ARGS "pw_build_LINK_DEPS = [\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert:impl\", \"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log:impl\"]\n")
 
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 
@@ -106,9 +119,9 @@ ExternalProject_Add(
     SOURCE_DIR              ${CHIP_ROOT}
     BINARY_DIR              ${CMAKE_CURRENT_BINARY_DIR}
     CONFIGURE_COMMAND       gn --root=${CHIP_ROOT}/config/ameba gen --check --fail-on-unused-args ${CHIP_OUTPUT}
-    BUILD_COMMAND           ninja -C ${CHIP_OUTPUT}
+    BUILD_COMMAND           ninja -C ${CHIP_OUTPUT} :ameba
     INSTALL_COMMAND         ""
-    BUILD_BYPRODUCTS        -lCHIP
+    BUILD_BYPRODUCTS        -lCHIP -lPwRpc
     CONFIGURE_ALWAYS        TRUE
     BUILD_ALWAYS            TRUE
     USES_TERMINAL_CONFIGURE TRUE

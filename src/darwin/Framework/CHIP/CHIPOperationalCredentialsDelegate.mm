@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <algorithm>
+
 #import "CHIPOperationalCredentialsDelegate.h"
 
 #import <Security/Security.h>
@@ -251,7 +253,7 @@ CHIP_ERROR CHIPOperationalCredentialsDelegate::GenerateNOCChain(const chip::Byte
     }
 
     VerifyOrReturnError(reader.GetType() == kTLVType_Structure, CHIP_ERROR_WRONG_TLV_TYPE);
-    VerifyOrReturnError(reader.GetTag() == AnonymousTag, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+    VerifyOrReturnError(reader.GetTag() == AnonymousTag(), CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     TLVType containerType;
     ReturnErrorOnFailure(reader.EnterContainer(containerType));

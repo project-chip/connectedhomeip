@@ -66,7 +66,7 @@ public:
 private:
     bool AcceptableQueryType(QType qType)
     {
-        if (mSendingAdditionalItems && mQueryData.IsBootAdvertising())
+        if (mSendingAdditionalItems)
         {
             return true;
         }

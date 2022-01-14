@@ -64,7 +64,7 @@ const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceId         = { FACTORY_KEY
 const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceCert       = { FACTORY_KEY("device-cert") };
 const MbedConfig::Key MbedConfig::kConfigKey_MfrDeviceICACerts   = { FACTORY_KEY("device-ca-certs") };
 const MbedConfig::Key MbedConfig::kConfigKey_MfrDevicePrivateKey = { FACTORY_KEY("device-key") };
-const MbedConfig::Key MbedConfig::kConfigKey_ProductRevision     = { FACTORY_KEY("product-rev") };
+const MbedConfig::Key MbedConfig::kConfigKey_HardwareVersion     = { FACTORY_KEY("hardware-ver") };
 const MbedConfig::Key MbedConfig::kConfigKey_ManufacturingDate   = { FACTORY_KEY("mfg-date") };
 const MbedConfig::Key MbedConfig::kConfigKey_SetupPinCode        = { FACTORY_KEY("pin-code") };
 const MbedConfig::Key MbedConfig::kConfigKey_SetupDiscriminator  = { FACTORY_KEY("discriminator") };
@@ -80,7 +80,10 @@ const MbedConfig::Key MbedConfig::kConfigKey_FailSafeArmed      = { CONFIG_KEY("
 const MbedConfig::Key MbedConfig::kConfigKey_WiFiStationSecType = { CONFIG_KEY("sta-sec-type") };
 const MbedConfig::Key MbedConfig::kConfigKey_RegulatoryLocation = { CONFIG_KEY("regulatory-location") };
 const MbedConfig::Key MbedConfig::kConfigKey_CountryCode        = { CONFIG_KEY("country-code") };
+const MbedConfig::Key MbedConfig::kConfigKey_ActiveLocale       = { CONFIG_KEY("active-locale") };
 const MbedConfig::Key MbedConfig::kConfigKey_Breadcrumb         = { CONFIG_KEY("breadcrumb") };
+const MbedConfig::Key MbedConfig::kConfigKey_HourFormat         = { CONFIG_KEY("hour-format") };
+const MbedConfig::Key MbedConfig::kConfigKey_CalendarType       = { CONFIG_KEY("calendar-type") };
 
 CHIP_ERROR MbedConfig::ReadConfigValue(Key key, bool & val)
 {
@@ -174,11 +177,23 @@ CHIP_ERROR MbedConfig::ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize
         return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
     }
 
-    int err = kv_get(key, reinterpret_cast<void *>(buf), bufSize, &outLen);
+    kv_info_t info;
 
+    int err = kv_get_info(key, &info);
     if (err != MBED_SUCCESS)
     {
         return CHIP_ERROR_INTERNAL;
+    }
+
+    err = kv_get(key, reinterpret_cast<void *>(buf), bufSize, &outLen);
+    if (err != MBED_SUCCESS)
+    {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    if (bufSize < info.size)
+    {
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
     }
 
     return CHIP_NO_ERROR;

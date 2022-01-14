@@ -30,6 +30,19 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT BindingCluster : public ClusterBase
+{
+public:
+    BindingCluster() : ClusterBase(app::Clusters::Binding::Id) {}
+    ~BindingCluster() {}
+
+    // Cluster Commands
+    CHIP_ERROR Bind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId,
+                    chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
+    CHIP_ERROR Unbind(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::NodeId nodeId,
+                      chip::GroupId groupId, chip::EndpointId endpointId, chip::ClusterId clusterId);
+};
+
 class DLL_EXPORT GeneralCommissioningCluster : public ClusterBase
 {
 public:
@@ -41,17 +54,7 @@ public:
                            uint16_t expiryLengthSeconds, uint64_t breadcrumb, uint32_t timeoutMs);
     CHIP_ERROR CommissioningComplete(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SetRegulatoryConfig(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint8_t location, chip::ByteSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
-
-    // Cluster Attributes
-    CHIP_ERROR ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeBasicCommissioningInfoList(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint64_t value);
-
-private:
+                                   uint8_t location, chip::CharSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 };
 
 class DLL_EXPORT NetworkCommissioningCluster : public ClusterBase
@@ -61,21 +64,18 @@ public:
     ~NetworkCommissioningCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR DisableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR EnableNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
-    CHIP_ERROR GetLastNetworkCommissioningResult(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint32_t timeoutMs);
+    CHIP_ERROR AddOrUpdateThreadNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        chip::ByteSpan operationalDataset, uint64_t breadcrumb);
+    CHIP_ERROR AddOrUpdateWiFiNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      chip::ByteSpan ssid, chip::ByteSpan credentials, uint64_t breadcrumb);
+    CHIP_ERROR ConnectNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              chip::ByteSpan networkID, uint64_t breadcrumb);
     CHIP_ERROR RemoveNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                             chip::ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs);
+                             chip::ByteSpan networkID, uint64_t breadcrumb);
+    CHIP_ERROR ReorderNetwork(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                              chip::ByteSpan networkID, uint8_t networkIndex, uint64_t breadcrumb);
     CHIP_ERROR ScanNetworks(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan ssid,
-                            uint64_t breadcrumb, uint32_t timeoutMs);
-
-    // Cluster Attributes
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-
-private:
+                            uint64_t breadcrumb);
 };
 
 class DLL_EXPORT OperationalCredentialsCluster : public ClusterBase
@@ -98,17 +98,7 @@ public:
     CHIP_ERROR RemoveFabric(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                             uint8_t fabricIndex);
     CHIP_ERROR UpdateFabricLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 chip::ByteSpan label);
-
-    // Cluster Attributes
-    CHIP_ERROR ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeTrustedRootCertificates(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-
-private:
+                                 chip::CharSpan label);
 };
 
 } // namespace Controller

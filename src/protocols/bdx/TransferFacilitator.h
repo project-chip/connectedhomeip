@@ -44,7 +44,7 @@ namespace bdx {
 class TransferFacilitator : public Messaging::ExchangeDelegate
 {
 public:
-    TransferFacilitator() : mExchangeCtx(nullptr), mSystemLayer(nullptr), mPollFreqMs(kDefaultPollFreqMs) {}
+    TransferFacilitator() : mExchangeCtx(nullptr), mSystemLayer(nullptr), mPollFreq(kDefaultPollFreq) {}
     ~TransferFacilitator() = default;
 
 private:
@@ -82,9 +82,9 @@ protected:
     TransferSession mTransfer;
     Messaging::ExchangeContext * mExchangeCtx;
     System::Layer * mSystemLayer;
-    uint32_t mPollFreqMs;
-    static constexpr uint32_t kDefaultPollFreqMs    = 500;
-    static constexpr uint32_t kImmediatePollDelayMs = 1;
+    System::Clock::Timeout mPollFreq;
+    static constexpr System::Clock::Timeout kDefaultPollFreq    = System::Clock::Milliseconds32(500);
+    static constexpr System::Clock::Timeout kImmediatePollDelay = System::Clock::Milliseconds32(1);
 };
 
 /**
@@ -103,12 +103,12 @@ public:
      * @param[in] role            The role of the Responder: Sender or Receiver of BDX data
      * @param[in] xferControlOpts Supported transfer modes (see TransferControlFlags)
      * @param[in] maxBlockSize    The supported maximum size of BDX Block data
-     * @param[in] timeoutMs       The chosen timeout delay for the BDX transfer in milliseconds
-     * @param[in] pollFreqMs      The period for the TransferSession poll timer in milliseconds
+     * @param[in] timeout         The chosen timeout delay for the BDX transfer
+     * @param[in] pollFreq        The period for the TransferSession poll timer
      */
     CHIP_ERROR PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
-                                  uint16_t maxBlockSize, uint32_t timeoutMs,
-                                  uint32_t pollFreqMs = TransferFacilitator::kDefaultPollFreqMs);
+                                  uint16_t maxBlockSize, System::Clock::Timeout timeout,
+                                  System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
 };
 
 /**
@@ -131,7 +131,8 @@ public:
      * @param[in] pollFreqMs The period for the TransferSession poll timer in milliseconds
      */
     CHIP_ERROR InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
-                                uint32_t timeoutMs, uint32_t pollFreqMs = TransferFacilitator::kDefaultPollFreqMs);
+                                System::Clock::Timeout timeout,
+                                System::Clock::Timeout pollFreq = TransferFacilitator::kDefaultPollFreq);
 };
 
 } // namespace bdx

@@ -26,10 +26,11 @@
 namespace chip {
 namespace app {
 
-#define TIMEOUT_CLEARED 0
 class DLL_EXPORT DnssdServer
 {
 public:
+    static constexpr System::Clock::Timestamp kTimeoutCleared = System::Clock::kZero;
+
     /// Provides the system-wide implementation of the service advertiser
     static DnssdServer & Instance()
     {
@@ -104,9 +105,9 @@ private:
 
     void ClearTimeouts()
     {
-        mDiscoveryExpirationMs = TIMEOUT_CLEARED;
+        mDiscoveryExpiration = kTimeoutCleared;
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-        mExtendedDiscoveryExpirationMs = TIMEOUT_CLEARED;
+        mExtendedDiscoveryExpiration = kTimeoutCleared;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     }
 
@@ -115,11 +116,11 @@ private:
 
     /// schedule next discovery expiration
     CHIP_ERROR ScheduleDiscoveryExpiration();
-    int16_t mDiscoveryTimeoutSecs   = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
-    uint64_t mDiscoveryExpirationMs = TIMEOUT_CLEARED;
+    int16_t mDiscoveryTimeoutSecs                 = CHIP_DEVICE_CONFIG_DISCOVERY_TIMEOUT_SECS;
+    System::Clock::Timestamp mDiscoveryExpiration = kTimeoutCleared;
 
     /// return true if expirationMs is valid (not cleared and not in the future)
-    bool OnExpiration(uint64_t expirationMs);
+    bool OnExpiration(System::Clock::Timestamp expiration);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
     /// get the current extended discovery timeout (from persistent storage)
@@ -128,7 +129,7 @@ private:
     /// schedule next extended discovery expiration
     CHIP_ERROR ScheduleExtendedDiscoveryExpiration();
 
-    uint64_t mExtendedDiscoveryExpirationMs = TIMEOUT_CLEARED;
+    System::Clock::Timestamp mExtendedDiscoveryExpiration = kTimeoutCleared;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
 };
 

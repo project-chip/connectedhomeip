@@ -28,16 +28,6 @@
 
 #pragma once
 
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
- *
- * Enables the use of a hard-coded default Chip device id and credentials if no device id
- * is found in Chip NV storage.
- *
- * This option is for testing only and should be disabled in production releases.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
-
 // Use a default setup PIN code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
@@ -51,7 +41,7 @@
 //    WARNING: These options make it possible to circumvent basic Chip security functionality,
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
-#define CHIP_CONFIG_SECURITY_TEST_MODE 1
+#define CHIP_CONFIG_SECURITY_TEST_MODE 0
 #define CHIP_CONFIG_REQUIRE_AUTH 0
 
 /**
@@ -69,24 +59,24 @@
 #define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID 0x514C
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION
+ * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
  *
- * The product revision number assigned to device or product by the device vendor.  This
+ * The hardware version number assigned to device or product by the device vendor.  This
  * number is scoped to the device product id, and typically corresponds to a revision of the
  * physical device, a change to its packaging, and/or a change to its marketing presentation.
- * This value is generally *not* incremented for device software revisions.
+ * This value is generally *not* incremented for device software versions.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 1
+#define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
  *
- * A string identifying the firmware revision running on the device.
- * CHIP service currently expects the firmware version to be in the format
+ * A string identifying the software version running on the device.
+ * CHIP service currently expects the software version to be in the format
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "0.1ALPHA"
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
 #endif
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -112,25 +102,11 @@
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
 
 /**
- * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
- *
- * Enable recording UTC timestamps.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
-
-/**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
-
-/**
- * CHIP_DEVICE_CONFIG_THREAD_FTD
- *
- * Disable Full Thread Device features
- */
-#define CHIP_DEVICE_CONFIG_THREAD_FTD 0
 
 /**
  * CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI
@@ -148,3 +124,69 @@
  *    their access control lists.
  */
 #define CHIP_CONFIG_MAX_DEVICE_ADMINS 4 // 3 fabrics + 1 for rotation slack
+
+/**
+ *  @name Interaction Model object pool configuration.
+ *
+ *  @brief
+ *    The following definitions sets the maximum number of corresponding interaction model object pool size.
+ *
+ *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *      * #CHIP_IM_MAX_NUM_READ_HANDLER
+ *      * #CHIP_IM_MAX_NUM_READ_CLIENT
+ *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
+ *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *      * #CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *
+ *  @{
+ */
+
+/**
+ * @def CHIP_IM_MAX_NUM_COMMAND_HANDLER
+ *
+ * @brief Defines the maximum number of CommandHandler, limits the number of active commands transactions on server.
+ */
+#define CHIP_IM_MAX_NUM_COMMAND_HANDLER 2
+
+/**
+ * @def CHIP_IM_MAX_NUM_READ_HANDLER
+ *
+ * @brief Defines the maximum number of ReadHandler, limits the number of active read transactions on server.
+ */
+#define CHIP_IM_MAX_NUM_READ_HANDLER 3
+
+/**
+ * @def CHIP_IM_MAX_NUM_READ_CLIENT
+ *
+ * @brief Defines the maximum number of ReadClient, limits the number of active read transactions on client.
+ */
+#define CHIP_IM_MAX_NUM_READ_CLIENT 2
+
+/**
+ * @def CHIP_IM_MAX_REPORTS_IN_FLIGHT
+ *
+ * @brief Defines the maximum number of Reports, limits the traffic of read and subscription transactions.
+ */
+#define CHIP_IM_MAX_REPORTS_IN_FLIGHT 2
+
+/**
+ * @def CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ *
+ * @brief Defines the maximum number of path objects, limits the number of attributes being read or subscribed at the same time.
+ */
+#define CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS 9
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
+ *
+ * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
+ */
+#define CHIP_IM_MAX_NUM_WRITE_HANDLER 2
+
+/**
+ * @def CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *
+ * @brief Defines the maximum number of WriteClient, limits the number of active write transactions on client.
+ */
+#define CHIP_IM_MAX_NUM_WRITE_CLIENT 2

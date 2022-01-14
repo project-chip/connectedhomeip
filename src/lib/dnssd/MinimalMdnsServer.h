@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 #pragma once
+
+#include <inet/IPPacketInfo.h>
 #include <lib/dnssd/minimal_mdns/Server.h>
 
 namespace chip {
@@ -30,7 +32,7 @@ bool IsCurrentInterfaceUsable(T & iterator)
     {
         return false; // not a usable interface
     }
-    char name[chip::Inet::InterfaceIterator::kMaxIfNameLength];
+    char name[chip::Inet::InterfaceId::kMaxIfNameLength];
     if (iterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to get interface name.");
@@ -89,7 +91,7 @@ public:
     }
 
     /// Calls Server().Listen() on all available interfaces
-    CHIP_ERROR StartServer(chip::Inet::InetLayer * inetLayer, uint16_t port);
+    CHIP_ERROR StartServer(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager, uint16_t port);
     void ShutdownServer();
 
     void SetQueryDelegate(MdnsPacketDelegate * delegate) { mQueryDelegate = delegate; }

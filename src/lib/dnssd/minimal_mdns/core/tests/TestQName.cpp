@@ -25,11 +25,26 @@ namespace {
 
 using namespace mdns::Minimal;
 
+/// Convenience method to have a  serialized QName:
+///
+/// static const uint8_t kData[] = "datahere\00";
+///  AsSerializedQName(kData);
+///
+/// NOTE: this MUST be using the string "" format to add an extra NULL
+/// terminator that this method discards.
+template <size_t N>
+static SerializedQNameIterator AsSerializedQName(const uint8_t (&v)[N])
+{
+    // NOTE: the -1 is because we format these items as STRINGS and that
+    // appends an extra NULL terminator
+    return SerializedQNameIterator(BytesRange(v, v + N - 1), v);
+}
+
 void IteratorTest(nlTestSuite * inSuite, void * inContext)
 {
     {
         static const uint8_t kOneItem[] = "\04test\00";
-        SerializedQNameIterator it(BytesRange(kOneItem, kOneItem + sizeof(kOneItem)), kOneItem);
+        SerializedQNameIterator it      = AsSerializedQName(kOneItem);
 
         NL_TEST_ASSERT(inSuite, it.Next());
         NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "test") == 0);
@@ -39,7 +54,7 @@ void IteratorTest(nlTestSuite * inSuite, void * inContext)
 
     {
         static const uint8_t kManyItems[] = "\04this\02is\01a\04test\00";
-        SerializedQNameIterator it(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems);
+        SerializedQNameIterator it        = AsSerializedQName(kManyItems);
 
         NL_TEST_ASSERT(inSuite, it.Next());
         NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "this") == 0);
@@ -82,7 +97,7 @@ void ErrorTest(nlTestSuite * inSuite, void * inContext)
     {
         // Truncated before the end
         static const uint8_t kData[] = "\04test";
-        SerializedQNameIterator it(BytesRange(kData, kData + 5), kData);
+        SerializedQNameIterator it   = AsSerializedQName(kData);
 
         NL_TEST_ASSERT(inSuite, !it.Next());
         NL_TEST_ASSERT(inSuite, !it.IsValid());
@@ -91,7 +106,7 @@ void ErrorTest(nlTestSuite * inSuite, void * inContext)
     {
         // Truncated before the end
         static const uint8_t kData[] = "\02";
-        SerializedQNameIterator it(BytesRange(kData, kData + 1), kData);
+        SerializedQNameIterator it   = AsSerializedQName(kData);
 
         NL_TEST_ASSERT(inSuite, !it.Next());
         NL_TEST_ASSERT(inSuite, !it.IsValid());
@@ -100,7 +115,7 @@ void ErrorTest(nlTestSuite * inSuite, void * inContext)
     {
         // Truncated before the end
         static const uint8_t kData[] = "\xc0";
-        SerializedQNameIterator it(BytesRange(kData, kData + 1), kData);
+        SerializedQNameIterator it   = AsSerializedQName(kData);
 
         NL_TEST_ASSERT(inSuite, !it.Next());
         NL_TEST_ASSERT(inSuite, !it.IsValid());
@@ -108,6 +123,7 @@ void ErrorTest(nlTestSuite * inSuite, void * inContext)
 
     {
         // Truncated before the end (but seemingly valid in case of error)
+        // does NOT use AsSerializedQName (because out of range)
         static const uint8_t kData[] = "\00\xc0\x00";
         SerializedQNameIterator it(BytesRange(kData, kData + 2), kData + 1);
 
@@ -117,7 +133,7 @@ void ErrorTest(nlTestSuite * inSuite, void * inContext)
     {
         // Infinite recursion
         static const uint8_t kData[] = "\03test\xc0\x00";
-        SerializedQNameIterator it(BytesRange(kData, kData + 7), kData);
+        SerializedQNameIterator it   = AsSerializedQName(kData);
 
         NL_TEST_ASSERT(inSuite, it.Next());
         NL_TEST_ASSERT(inSuite, !it.Next());
@@ -131,44 +147,32 @@ void Comparison(nlTestSuite * inSuite, void * inContext)
 
     {
         const QNamePart kTestName[] = { "this" };
-        NL_TEST_ASSERT(inSuite,
-                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) !=
-                           FullQName(kTestName));
+        NL_TEST_ASSERT(inSuite, AsSerializedQName(kManyItems) != FullQName(kTestName));
     }
 
     {
         const QNamePart kTestName[] = { "this", "is" };
-        NL_TEST_ASSERT(inSuite,
-                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) !=
-                           FullQName(kTestName));
+        NL_TEST_ASSERT(inSuite, AsSerializedQName(kManyItems) != FullQName(kTestName));
     }
 
     {
         const QNamePart kTestName[] = { "is", "a", "test" };
-        NL_TEST_ASSERT(inSuite,
-                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) !=
-                           FullQName(kTestName));
+        NL_TEST_ASSERT(inSuite, AsSerializedQName(kManyItems) != FullQName(kTestName));
     }
 
     {
         const QNamePart kTestName[] = { "this", "is", "a", "test" };
-        NL_TEST_ASSERT(inSuite,
-                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) ==
-                           FullQName(kTestName));
+        NL_TEST_ASSERT(inSuite, AsSerializedQName(kManyItems) == FullQName(kTestName));
     }
 
     {
         const QNamePart kTestName[] = { "this", "is", "a", "test", "suffix" };
-        NL_TEST_ASSERT(inSuite,
-                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) !=
-                           FullQName(kTestName));
+        NL_TEST_ASSERT(inSuite, AsSerializedQName(kManyItems) != FullQName(kTestName));
     }
 
     {
         const QNamePart kTestName[] = { "prefix", "this", "is", "a", "test" };
-        NL_TEST_ASSERT(inSuite,
-                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) !=
-                           FullQName(kTestName));
+        NL_TEST_ASSERT(inSuite, AsSerializedQName(kManyItems) != FullQName(kTestName));
     }
 }
 
@@ -237,6 +241,33 @@ void CaseInsensitiveFullQNameCompare(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void SerializedCompare(nlTestSuite * inSuite, void * inContext)
+{
+    static const uint8_t kThisIsATest1[]    = "\04this\02is\01a\04test\00";
+    static const uint8_t kThisIsATest2[]    = "\04ThIs\02is\01A\04tESt\00";
+    static const uint8_t kThisIsDifferent[] = "\04this\02is\09different\00";
+    static const uint8_t kThisIs[]          = "\04this\02is";
+
+    NL_TEST_ASSERT(inSuite, AsSerializedQName(kThisIsATest1) == AsSerializedQName(kThisIsATest1));
+    NL_TEST_ASSERT(inSuite, AsSerializedQName(kThisIsATest2) == AsSerializedQName(kThisIsATest2));
+    NL_TEST_ASSERT(inSuite, AsSerializedQName(kThisIsATest1) == AsSerializedQName(kThisIsATest2));
+    NL_TEST_ASSERT(inSuite, AsSerializedQName(kThisIsATest1) != AsSerializedQName(kThisIsDifferent));
+    NL_TEST_ASSERT(inSuite, AsSerializedQName(kThisIsDifferent) != AsSerializedQName(kThisIsATest1));
+    NL_TEST_ASSERT(inSuite, AsSerializedQName(kThisIsDifferent) != AsSerializedQName(kThisIs));
+    NL_TEST_ASSERT(inSuite, AsSerializedQName(kThisIs) != AsSerializedQName(kThisIsDifferent));
+
+    // These items have back references and are "this.is.a.test"
+    static const uint8_t kPtrItems[] = "\03abc\02is\01a\04test\00\04this\xc0\04";
+    SerializedQNameIterator thisIsATestPtr(BytesRange(kPtrItems, kPtrItems + sizeof(kPtrItems)), kPtrItems + 15);
+
+    NL_TEST_ASSERT(inSuite, thisIsATestPtr == AsSerializedQName(kThisIsATest1));
+    NL_TEST_ASSERT(inSuite, thisIsATestPtr == AsSerializedQName(kThisIsATest2));
+    NL_TEST_ASSERT(inSuite, AsSerializedQName(kThisIsATest1) == thisIsATestPtr);
+    NL_TEST_ASSERT(inSuite, AsSerializedQName(kThisIsATest2) == thisIsATestPtr);
+    NL_TEST_ASSERT(inSuite, thisIsATestPtr != AsSerializedQName(kThisIs));
+    NL_TEST_ASSERT(inSuite, AsSerializedQName(kThisIs) != thisIsATestPtr);
+}
+
 } // namespace
 
 // clang-format off
@@ -247,6 +278,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Comparison", Comparison),
     NL_TEST_DEF("CaseInsensitiveSerializedCompare", CaseInsensitiveSerializedCompare),
     NL_TEST_DEF("CaseInsensitiveFullQNameCompare", CaseInsensitiveFullQNameCompare),
+    NL_TEST_DEF("SerializedCompare", SerializedCompare),
 
     NL_TEST_SENTINEL()
 };

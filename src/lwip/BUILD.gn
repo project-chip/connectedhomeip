@@ -47,6 +47,7 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/efr32_sdk.gni")
 } else if (lwip_platform == "qpg") {
   import("//build_overrides/qpg_sdk.gni")
+  import("${qpg_sdk_build_root}/qpg_sdk.gni")
 } else if (lwip_platform == "k32w0") {
   import("//build_overrides/k32w0_sdk.gni")
 } else if (lwip_platform == "p6") {
@@ -80,6 +81,39 @@ if (current_os == "zephyr" || current_os == "mbed") {
 
   group("all") {
     deps = [ ":lwip" ]
+  }
+} else if (lwip_platform == "p6") {
+  group("lwip") {
+    public_deps = [ ":lwip_buildconfig" ]
+    public_configs = [ "${chip_root}/src:includes" ]
+    public_configs += [ "${p6_sdk_build_root}:p6_sdk_config" ]
+  }
+
+  group("all") {
+    deps = [ ":lwip" ]
+  }
+} else if (lwip_platform == "qpg") {
+  config("lwip_config") {
+    include_dirs = [ "freertos" ]
+  }
+
+  lwip_target("lwip") {
+    public = [
+      "${qpg_sdk_build_root}/repo/${qpg_target_ic}/comps/lwip/arch/cc.h",
+      "${qpg_sdk_build_root}/repo/${qpg_target_ic}/comps/lwip/arch/perf.h",
+      "${qpg_sdk_build_root}/repo/${qpg_target_ic}/comps/lwip/lwipopts.h",
+      "${qpg_sdk_build_root}/repo/${qpg_target_ic}/comps/lwip/lwippools.h",
+      "freertos/arch/sys_arch.h",
+    ]
+    sources =
+        [ "${qpg_sdk_build_root}/repo/${qpg_target_ic}/comps/lwip/sys_arch.c" ]
+
+    public_deps = [ ":lwip_buildconfig" ]
+    public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]
+    public_configs = [
+      ":lwip_config",
+      "${chip_root}/src:includes",
+    ]
   }
 } else {
   config("lwip_config") {
@@ -115,8 +149,6 @@ if (current_os == "zephyr" || current_os == "mbed") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
     } else if (lwip_platform == "efr32") {
       public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
-    } else if (lwip_platform == "qpg") {
-      public_deps += [ "${qpg_sdk_build_root}:qpg_sdk" ]
     } else if (lwip_platform == "standalone") {
       public_deps += [ "${chip_root}/src/lib/support" ]
     } else if (lwip_platform == "k32w0") {
@@ -127,9 +159,5 @@ if (current_os == "zephyr" || current_os == "mbed") {
       ":lwip_config",
       "${chip_root}/src:includes",
     ]
-
-    if (lwip_platform == "p6") {
-      public_configs += [ "${p6_sdk_build_root}:p6_sdk_config" ]
-    }
   }
 }

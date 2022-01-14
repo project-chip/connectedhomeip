@@ -24,6 +24,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 
+#include <app/util/DataModelHandler.h>
 #include <lib/support/ErrorStr.h>
 
 #if CONFIG_DEVICE_LAYER
@@ -49,8 +50,8 @@ CHIP_ERROR DeviceControllerFactory::Init(FactoryInitParams params)
         return CHIP_NO_ERROR;
     }
 
-    mListenPort      = params.listenPort;
-    mStorageDelegate = params.storageDelegate;
+    mListenPort    = params.listenPort;
+    mFabricStorage = params.fabricStorage;
 
     CHIP_ERROR err = InitSystemState(params);
 
@@ -62,8 +63,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
     FactoryInitParams params;
     if (mSystemState != nullptr)
     {
-        params.systemLayer = mSystemState->SystemLayer();
-        params.inetLayer   = mSystemState->InetLayer();
+        params.systemLayer        = mSystemState->SystemLayer();
+        params.tcpEndPointManager = mSystemState->TCPEndPointManager();
+        params.udpEndPointManager = mSystemState->UDPEndPointManager();
 #if CONFIG_NETWORK_LAYER_BLE
         params.bleLayer = mSystemState->BleLayer();
 #endif
@@ -90,16 +92,18 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if CONFIG_DEVICE_LAYER
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
-    stateParams.systemLayer = &DeviceLayer::SystemLayer();
-    stateParams.inetLayer   = &DeviceLayer::InetLayer;
+    stateParams.systemLayer        = &DeviceLayer::SystemLayer();
+    stateParams.tcpEndPointManager = DeviceLayer::TCPEndPointManager();
+    stateParams.udpEndPointManager = DeviceLayer::UDPEndPointManager();
 #else
-    stateParams.systemLayer = params.systemLayer;
-    stateParams.inetLayer   = params.inetLayer;
+    stateParams.systemLayer        = params.systemLayer;
+    stateParams.tcpEndPointManager = params.tcpEndPointManager;
+    stateParams.udpEndPointManager = params.udpEndPointManager;
     ChipLogError(Controller, "Warning: Device Controller Factory should be with a CHIP Device Layer...");
 #endif // CONFIG_DEVICE_LAYER
 
     VerifyOrReturnError(stateParams.systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(stateParams.inetLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(stateParams.udpEndPointManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
 #if CONFIG_DEVICE_LAYER
@@ -112,17 +116,20 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     stateParams.transportMgr = chip::Platform::New<DeviceTransportMgr>();
 
-    ReturnErrorOnFailure(stateParams.transportMgr->Init(
-        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::IPAddressType::kIPv6).SetListenPort(mListenPort)
+    ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
+                                                            .SetAddressType(Inet::IPAddressType::kIPv6)
+                                                            .SetListenPort(mListenPort)
 #if INET_CONFIG_ENABLE_IPV4
-            ,
-        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(mListenPort)
+                                                            ,
+                                                        Transport::UdpListenParameters(stateParams.udpEndPointManager)
+                                                            .SetAddressType(Inet::IPAddressType::kIPv4)
+                                                            .SetListenPort(mListenPort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-            ,
-        Transport::BleListenParameters(stateParams.bleLayer)
+                                                            ,
+                                                        Transport::BleListenParameters(stateParams.bleLayer)
 #endif
-            ));
+                                                            ));
 
     if (params.imDelegate == nullptr)
     {
@@ -134,14 +141,20 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
     stateParams.exchangeMgr           = chip::Platform::New<Messaging::ExchangeManager>();
     stateParams.messageCounterManager = chip::Platform::New<secure_channel::MessageCounterManager>();
 
-    ReturnErrorOnFailure(stateParams.fabricTable->Init(mStorageDelegate));
+    ReturnErrorOnFailure(stateParams.fabricTable->Init(mFabricStorage));
     ReturnErrorOnFailure(
         stateParams.sessionMgr->Init(stateParams.systemLayer, stateParams.transportMgr, stateParams.messageCounterManager));
     ReturnErrorOnFailure(stateParams.exchangeMgr->Init(stateParams.sessionMgr));
     ReturnErrorOnFailure(stateParams.messageCounterManager->Init(stateParams.exchangeMgr));
 
+    InitDataModelHandler(stateParams.exchangeMgr);
+
     stateParams.imDelegate = params.imDelegate;
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(stateParams.exchangeMgr, stateParams.imDelegate));
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    ReturnErrorOnFailure(Dnssd::Resolver::Instance().Init(stateParams.udpEndPointManager));
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
     // store the system state
     mSystemState = chip::Platform::New<DeviceControllerSystemState>(stateParams);
@@ -159,10 +172,11 @@ void DeviceControllerFactory::PopulateInitParams(ControllerInitParams & controll
     controllerParams.controllerNOC                  = params.controllerNOC;
     controllerParams.controllerICAC                 = params.controllerICAC;
     controllerParams.controllerRCAC                 = params.controllerRCAC;
+    controllerParams.fabricIndex                    = params.fabricIndex;
     controllerParams.fabricId                       = params.fabricId;
+    controllerParams.storageDelegate                = params.storageDelegate;
 
     controllerParams.systemState        = mSystemState;
-    controllerParams.storageDelegate    = mStorageDelegate;
     controllerParams.controllerVendorId = params.controllerVendorId;
 }
 
@@ -210,7 +224,7 @@ DeviceControllerFactory::~DeviceControllerFactory()
         chip::Platform::Delete(mSystemState);
         mSystemState = nullptr;
     }
-    mStorageDelegate = nullptr;
+    mFabricStorage = nullptr;
 }
 
 CHIP_ERROR DeviceControllerSystemState::Shutdown()
@@ -219,8 +233,21 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
 
     ChipLogDetail(Controller, "Shutting down the System State, this will teardown the CHIP Stack");
 
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    Dnssd::Resolver::Instance().Shutdown();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+
     // Shut down the interaction model
     app::InteractionModelEngine::GetInstance()->Shutdown();
+
+    // Shut down the TransportMgr. This holds Inet::UDPEndPoints so it must be shut down
+    // before PlatformMgr().Shutdown() shuts down Inet.
+    if (mTransportMgr != nullptr)
+    {
+        mTransportMgr->Close();
+        chip::Platform::Delete(mTransportMgr);
+        mTransportMgr = nullptr;
+    }
 
 #if CONFIG_DEVICE_LAYER
     //
@@ -244,13 +271,8 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mSessionMgr->Shutdown();
     }
 
-    mSystemLayer = nullptr;
-    mInetLayer   = nullptr;
-    if (mTransportMgr != nullptr)
-    {
-        chip::Platform::Delete(mTransportMgr);
-        mTransportMgr = nullptr;
-    }
+    mSystemLayer        = nullptr;
+    mUDPEndPointManager = nullptr;
 
     if (mMessageCounterManager != nullptr)
     {

@@ -19,6 +19,10 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Query Interaction Model Version"
       command: "readAttribute"
       attribute: "InteractionModelVersion"
@@ -56,9 +60,9 @@ tests:
           constraints:
               type: uint16
 
-    - label: "Query User Label"
+    - label: "Query Node Label"
       command: "readAttribute"
-      attribute: "UserLabel"
+      attribute: "NodeLabel"
       response:
           constraints:
               type: string
@@ -109,6 +113,7 @@ tests:
     - label: "Query ManufacturingDate"
       command: "readAttribute"
       attribute: "ManufacturingDate"
+      PICS: MANF_DATE
       optional: true
       response:
           constraints:
@@ -120,6 +125,7 @@ tests:
     - label: "Query PartNumber"
       command: "readAttribute"
       attribute: "PartNumber"
+      PICS: PART_NUM
       optional: true
       response:
           constraints:
@@ -169,3 +175,12 @@ tests:
       response:
           constraints:
               type: boolean
+
+    - label: "Query UniqueID"
+      command: "readAttribute"
+      attribute: "UniqueID"
+      optional: true
+      response:
+          constraints:
+              type: string
+              maxLength: 32

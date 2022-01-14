@@ -31,6 +31,18 @@
         {
             "name": "commandValue",
             "path": "partials/test_cluster_command_value.zapt"
+        },
+        {
+            "name": "valueEquals",
+            "path": "partials/test_cluster_value_equals.zapt"
+        },
+        {
+            "name": "log_struct_value",
+            "path": "partials/log_struct_value.zapt"
+        },
+        {
+            "name": "log_event_value",
+            "path": "partials/log_event_value.zapt"
         }
     ],
     "templates": [
@@ -38,11 +50,6 @@
             "path": "commands.zapt",
             "name": "Cluster Commands header",
             "output": "cluster/Commands.h"
-        },
-        {
-            "path": "reporting-commands.zapt",
-            "name": "Reporting Commands header",
-            "output": "reporting/Commands.h"
         },
         {
             "path": "tests-commands.zapt",

@@ -28,6 +28,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -94,6 +95,7 @@ static const char ModuleNames[] = "-\0\0" // None
                                   "IM\0"  // InteractionModel
                                   "TST"   // Test
                                   "ODP"   // OperationalDeviceProxy
+                                  "ATM"   // Automation
     ;
 
 #define ModuleNamesCount ((sizeof(ModuleNames) - 1) / chip::Logging::kMaxModuleNameLen)
@@ -140,6 +142,37 @@ DLL_EXPORT void Log(uint8_t module, uint8_t category, const char * msg, ...)
     va_start(v, msg);
     LogV(module, category, msg, v);
     va_end(v);
+}
+
+DLL_EXPORT void LogByteSpan(uint8_t module, uint8_t category, const chip::ByteSpan & span)
+{
+    // Maximum number of characters needed to print 8 byte buffer including formatting (0x)
+    // 8 bytes * (2 nibbles per byte + 4 character for ", 0x") + null termination.
+    // Rounding up to 50 bytes.
+    char output[50];
+    size_t offset = 0;
+    for (unsigned int i = 0; i < span.size(); i++)
+    {
+        if (i % 8 == 0 && offset != 0)
+        {
+            Log(module, category, "%s", output);
+            offset = 0;
+        }
+        int result = snprintf(&output[offset], sizeof(output) - offset, "0x%02x, ", (unsigned char) span.data()[i]);
+        if (result > 0)
+        {
+            offset += static_cast<size_t>(result);
+        }
+        else
+        {
+            Log(module, chip::Logging::kLogCategory_Error, "Failed to print ByteSpan buffer");
+            return;
+        }
+    }
+    if (offset != 0)
+    {
+        Log(module, category, "%s", output);
+    }
 }
 
 void LogV(uint8_t module, uint8_t category, const char * msg, va_list args)

@@ -51,7 +51,7 @@ OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingPara
                                                           .SetMac(ByteSpan(kMac))
                                                           .SetPort(CHIP_PORT)
                                                           .EnableIpV4(true)
-                                                          .SetMRPRetryIntervals(Optional<uint32_t>(32), Optional<uint32_t>(33))
+                                                          .SetMRPConfig({ 32_ms32, 33_ms32 })
                                                           .SetTcpSupported(Optional<bool>(true));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
@@ -90,13 +90,12 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetCommissioningMode(CommissioningMode::kEnabledBasic)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
-        .SetPairingInstr(chip::Optional<const char *>("Pair me"))
+        .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingId(chip::Optional<const char *>("id_that_spins"))
+        .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
-        .SetMRPRetryIntervals(
-            chip::Optional<uint32_t>(3600000),
-            chip::Optional<uint32_t>(3600005)); // 3600005 is over the max, so this should be adjusted by the platform
+        // 3600005 is over the max, so this should be adjusted by the platform
+        .SetMRPConfig({ 3600000_ms32, 3600005_ms32 });
 
 test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)
@@ -129,9 +128,9 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetCommissioningMode(CommissioningMode::kEnabledEnhanced)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
-        .SetPairingInstr(chip::Optional<const char *>("Pair me"))
+        .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingId(chip::Optional<const char *>("id_that_spins"));
+        .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"));
 
 test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
                                                      .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)
@@ -157,7 +156,7 @@ void TestStub(nlTestSuite * inSuite, void * inContext)
     // without an expected event.
     ChipLogError(Discovery, "Test platform returns error correctly");
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
     OperationalAdvertisingParameters params;
     NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(params) == CHIP_ERROR_UNEXPECTED_EVENT);
@@ -168,7 +167,7 @@ void TestOperational(nlTestSuite * inSuite, void * inContext)
     ChipLogError(Discovery, "Test operational");
     test::Reset();
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
 
     operationalCall1.callType = test::CallType::kStart;
@@ -189,7 +188,7 @@ void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
     ChipLogError(Discovery, "Test commissionable");
     test::Reset();
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
 
     commissionableSmall.callType = test::CallType::kStart;

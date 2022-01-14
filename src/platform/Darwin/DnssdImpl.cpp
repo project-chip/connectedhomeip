@@ -45,7 +45,7 @@ bool IsSupportedProtocol(DnssdServiceProtocol protocol)
 
 uint32_t GetInterfaceId(chip::Inet::InterfaceId interfaceId)
 {
-    return (interfaceId == INET_NULL_INTERFACEID) ? kDNSServiceInterfaceIndexAny : interfaceId;
+    return interfaceId.IsPresent() ? interfaceId.GetPlatformInterface() : kDNSServiceInterfaceIndexAny;
 }
 
 std::string GetFullType(const char * type, DnssdServiceProtocol protocol)
@@ -89,7 +89,10 @@ void MdnsContexts::Delete(GenericContext * context)
         }
     }
 
-    DNSServiceRefDeallocate(context->serviceRef);
+    if (context->serviceRef != nullptr)
+    {
+        DNSServiceRefDeallocate(context->serviceRef);
+    }
     chip::Platform::Delete(context);
 }
 
@@ -304,34 +307,39 @@ CHIP_ERROR Register(uint32_t interfaceId, const char * type, const char * name, 
     return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
 }
 
-void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, const char * domain, uint32_t interfaceId)
+void OnBrowseAdd(BrowseContext * context, const char * name, const char * type, const char * domain,
+                 chip::Inet::InterfaceId interfaceId)
 {
     ChipLogDetail(DeviceLayer, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %d", __func__, name, type, domain,
-                  interfaceId);
+                  interfaceId.GetPlatformInterface());
 
     VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
-
-    char * tokens  = strdup(type);
-    char * regtype = strtok(tokens, ".");
-    free(tokens);
 
     DnssdService service = {};
     service.mInterface   = interfaceId;
     service.mProtocol    = context->protocol;
 
-    strncpy(service.mName, name, sizeof(service.mName));
-    service.mName[Common::kInstanceNameMaxLength] = 0;
+    Platform::CopyString(service.mName, name);
+    Platform::CopyString(service.mType, type);
 
-    strncpy(service.mType, regtype, sizeof(service.mType));
-    service.mType[kDnssdTypeMaxSize] = 0;
+    // only the first token after '.' should be included in the type
+    for (char * p = service.mType; *p != '\0'; p++)
+    {
+        if (*p == '.')
+        {
+            *p = '\0';
+            break;
+        }
+    }
 
     context->services.push_back(service);
 }
 
-void OnBrowseRemove(BrowseContext * context, const char * name, const char * type, const char * domain, uint32_t interfaceId)
+void OnBrowseRemove(BrowseContext * context, const char * name, const char * type, const char * domain,
+                    chip::Inet::InterfaceId interfaceId)
 {
     ChipLogDetail(DeviceLayer, "Mdns: %s  name: %s, type: %s, domain: %s, interface: %d", __func__, name, type, domain,
-                  interfaceId);
+                  interfaceId.GetPlatformInterface());
 
     VerifyOrReturn(strcmp(kLocalDot, domain) == 0);
 
@@ -347,8 +355,8 @@ static void OnBrowse(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interf
     BrowseContext * sdCtx = reinterpret_cast<BrowseContext *>(context);
     VerifyOrReturn(CheckForSuccess(sdCtx, __func__, err, true));
 
-    (flags & kDNSServiceFlagsAdd) ? OnBrowseAdd(sdCtx, name, type, domain, interfaceId)
-                                  : OnBrowseRemove(sdCtx, name, type, domain, interfaceId);
+    (flags & kDNSServiceFlagsAdd) ? OnBrowseAdd(sdCtx, name, type, domain, Inet::InterfaceId(interfaceId))
+                                  : OnBrowseRemove(sdCtx, name, type, domain, Inet::InterfaceId(interfaceId));
 
     if (!(flags & kDNSServiceFlagsMoreComing))
     {
@@ -394,12 +402,14 @@ static void OnGetAddrInfo(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t i
     service.mPort          = sdCtx->port;
     service.mTextEntries   = sdCtx->textEntries.empty() ? nullptr : sdCtx->textEntries.data();
     service.mTextEntrySize = sdCtx->textEntries.empty() ? 0 : sdCtx->textEntries.size();
-    service.mAddress.SetValue(chip::Inet::IPAddress::FromSockAddr(*address));
+    chip::Inet::IPAddress ip;
+    CHIP_ERROR status = chip::Inet::IPAddress::GetIPAddressFromSockAddr(*address, ip);
+    service.mAddress.SetValue(ip);
     Platform::CopyString(service.mName, sdCtx->name);
     Platform::CopyString(service.mHostName, hostname);
-    service.mInterface = sdCtx->interfaceId;
+    service.mInterface = Inet::InterfaceId(sdCtx->interfaceId);
 
-    sdCtx->callback(sdCtx->context, &service, CHIP_NO_ERROR);
+    sdCtx->callback(sdCtx->context, &service, status);
     MdnsContexts::GetInstance().Remove(sdCtx);
 }
 
@@ -424,7 +434,12 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
         err = TXTRecordGetItemAtIndex(txtLen, txtRecord, i, kDnssdKeyMaxSize, key, &valueLen, &valuePtr);
         VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
-        strncpy(value, reinterpret_cast<const char *>(valuePtr), valueLen);
+        if (valueLen >= sizeof(value))
+        {
+            // Truncation, but nothing better we can do
+            valueLen = sizeof(value) - 1;
+        }
+        memcpy(value, valuePtr, valueLen);
         value[valueLen] = 0;
 
         sdCtx->textEntries.push_back(TextEntry{ strdup(key), reinterpret_cast<const uint8_t *>(strdup(value)), valueLen });
@@ -450,13 +465,35 @@ static CHIP_ERROR GetAddrInfo(void * context, DnssdResolveCallback callback, uin
     protocol = kDNSServiceProtocol_IPv6;
 #endif
 
-    err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, protocol, hostname, OnGetAddrInfo, sdCtx);
-    VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
+    if (interfaceId != kDNSServiceInterfaceIndexLocalOnly)
+    {
+        // -1 is the local only interface. If we're not on that interface, we need to get the address for the given hostname.
+        err = DNSServiceGetAddrInfo(&sdRef, 0 /* flags */, interfaceId, protocol, hostname, OnGetAddrInfo, sdCtx);
+        VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
-    err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
-    VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
+        err = DNSServiceSetDispatchQueue(sdRef, chip::DeviceLayer::PlatformMgrImpl().GetWorkQueue());
+        VerifyOrReturnError(CheckForSuccess(sdCtx, __func__, err, true), CHIP_ERROR_INTERNAL);
 
-    return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
+        return MdnsContexts::GetInstance().Add(sdCtx, sdRef);
+    }
+    else
+    {
+        sockaddr_in6 sockaddr;
+        memset(&sockaddr, 0, sizeof(sockaddr));
+        sockaddr.sin6_len    = sizeof(sockaddr);
+        sockaddr.sin6_family = AF_INET6;
+        sockaddr.sin6_addr   = in6addr_loopback;
+        sockaddr.sin6_port   = htons((unsigned short) port);
+        uint32_t ttl         = 120; // default TTL for records with hostnames is 120 seconds
+        uint32_t interface   = 0;   // Set interface to ANY (0) - network stack can decide how to route this.
+        OnGetAddrInfo(nullptr, 0 /* flags */, interface, kDNSServiceErr_NoError, hostname,
+                      reinterpret_cast<struct sockaddr *>(&sockaddr), ttl, sdCtx);
+
+        // Don't leak memory.
+        sdCtx->serviceRef = nullptr;
+        MdnsContexts::GetInstance().Delete(sdCtx);
+        return CHIP_NO_ERROR;
+    }
 }
 
 static void OnResolve(DNSServiceRef sdRef, DNSServiceFlags flags, uint32_t interfaceId, DNSServiceErrorType err,
@@ -520,7 +557,7 @@ CHIP_ERROR ChipDnssdPublishService(const DnssdService * service)
     char buffer[kDnssdTextMaxSize];
     ReturnErrorOnFailure(PopulateTextRecord(&record, buffer, sizeof(buffer), service->mTextEntries, service->mTextEntrySize));
 
-    ChipLogProgress(chipTool, "Publising service %s on port %u with type: %s on interface id: %" PRIu32, service->mName,
+    ChipLogProgress(DeviceLayer, "Publishing service %s on port %u with type: %s on interface id: %" PRIu32, service->mName,
                     service->mPort, regtype.c_str(), interfaceId);
     return Register(interfaceId, regtype.c_str(), service->mName, service->mPort, &record);
 }

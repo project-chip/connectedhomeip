@@ -4,12 +4,28 @@ package chip.rpc;
 
 import 'pw_protobuf_protos/common.proto';
 
+message PairingInfo {
+  uint32 code = 1;
+  uint32 discriminator = 2;
+}
+
 // type lengths defined in chip spec 8.2.3.1
 message DeviceInfo {
   uint32 vendor_id = 1;
   uint32 product_id = 2;
   uint32 software_version = 3;
   string serial_number = 4;
+  PairingInfo pairing_info = 5;
+}
+
+message FabricInfo {
+  uint32 fabric_id = 1;
+  uint64 node_id = 2;
+}
+
+message DeviceState {
+  uint64 time_since_boot_millis = 1;
+  repeated FabricInfo fabric_info = 2;
 }
 
 service Device {
@@ -17,4 +33,6 @@ service Device {
   rpc Reboot(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
   rpc TriggerOta(pw.protobuf.Empty) returns (pw.protobuf.Empty){}
   rpc GetDeviceInfo(pw.protobuf.Empty) returns (DeviceInfo){}
+  rpc GetDeviceState(pw.protobuf.Empty) returns (DeviceState){}
+  rpc SetPairingInfo(PairingInfo) returns (pw.protobuf.Empty){}
 }

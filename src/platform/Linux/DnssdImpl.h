@@ -24,6 +24,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <string>
 #include <vector>
 
 #include <avahi-client/client.h>
@@ -111,7 +112,8 @@ public:
     CHIP_ERROR Browse(const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
                       chip::Inet::InterfaceId interface, DnssdBrowseCallback callback, void * context);
     CHIP_ERROR Resolve(const char * name, const char * type, DnssdServiceProtocol protocol, chip::Inet::IPAddressType addressType,
-                       chip::Inet::InterfaceId interface, DnssdResolveCallback callback, void * context);
+                       chip::Inet::IPAddressType transportType, chip::Inet::InterfaceId interface, DnssdResolveCallback callback,
+                       void * context);
 
     Poller & GetPoller() { return mPoller; }
 
@@ -123,6 +125,7 @@ private:
         MdnsAvahi * mInstance;
         DnssdBrowseCallback mCallback;
         void * mContext;
+        Inet::IPAddressType mAddressType;
         std::vector<DnssdService> mServices;
     };
 
@@ -131,6 +134,12 @@ private:
         MdnsAvahi * mInstance;
         DnssdResolveCallback mCallback;
         void * mContext;
+        char mName[Common::kInstanceNameMaxLength + 1];
+        AvahiIfIndex mInterface;
+        AvahiProtocol mTransport;
+        AvahiProtocol mAddressType;
+        std::string mFullType;
+        uint8_t mAttempts = 0;
     };
 
     MdnsAvahi() : mClient(nullptr), mGroup(nullptr) {}

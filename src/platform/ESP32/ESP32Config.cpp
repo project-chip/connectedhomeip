@@ -55,7 +55,7 @@ const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceId         = { kConfigNa
 const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
 const ESP32Config::Key ESP32Config::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
 const ESP32Config::Key ESP32Config::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
-const ESP32Config::Key ESP32Config::kConfigKey_ProductRevision     = { kConfigNamespace_ChipFactory, "product-rev" };
+const ESP32Config::Key ESP32Config::kConfigKey_HardwareVersion     = { kConfigNamespace_ChipFactory, "hardware-ver" };
 const ESP32Config::Key ESP32Config::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
 const ESP32Config::Key ESP32Config::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
 const ESP32Config::Key ESP32Config::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
@@ -71,7 +71,10 @@ const ESP32Config::Key ESP32Config::kConfigKey_FailSafeArmed      = { kConfigNam
 const ESP32Config::Key ESP32Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 const ESP32Config::Key ESP32Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const ESP32Config::Key ESP32Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const ESP32Config::Key ESP32Config::kConfigKey_ActiveLocale       = { kConfigNamespace_ChipConfig, "active-locale" };
 const ESP32Config::Key ESP32Config::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const ESP32Config::Key ESP32Config::kConfigKey_HourFormat         = { kConfigNamespace_ChipConfig, "hour-format" };
+const ESP32Config::Key ESP32Config::kConfigKey_CalendarType       = { kConfigNamespace_ChipConfig, "calendar-type" };
 
 // Keys stored in the Chip-counters namespace
 const ESP32Config::Key ESP32Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };

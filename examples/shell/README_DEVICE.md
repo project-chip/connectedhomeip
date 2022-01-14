@@ -32,7 +32,7 @@ Dump the configuration of the device.
 > device config
 VendorId:        235a
 ProductId:       feff
-ProductRevision: 0001
+HardwareVersion: 0001
 SerialNumber:    <None>
 ServiceId:       <None>
 FabricId:        <None>
@@ -54,7 +54,7 @@ Where valid parameter names include:
 
 -   vendorid: Vendor Identifier
 -   productid: Product Identifier
--   productrev: Product Revision
+-   hardwarever: Hardware Version
 -   serial: Serial Number
 -   deviceid: Device Identification Number
 -   cert: Device Certificate

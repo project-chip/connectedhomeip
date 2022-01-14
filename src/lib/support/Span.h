@@ -73,7 +73,6 @@ public:
     constexpr pointer begin() { return data(); }
     constexpr pointer end() { return data() + size(); }
 
-    // Allow data_equal for spans that are over the same type up to const-ness.
     template <class U, typename = std::enable_if_t<std::is_same<std::remove_const_t<T>, std::remove_const_t<U>>::value>>
     bool data_equal(const Span<U> & other) const
     {
@@ -87,6 +86,12 @@ public:
         VerifyOrDie(offset <= mDataLen);
         VerifyOrDie(length <= mDataLen - offset);
         return Span(mDataBuf + offset, length);
+    }
+
+    Span SubSpan(size_t offset) const
+    {
+        VerifyOrDie(offset <= mDataLen);
+        return Span(mDataBuf + offset, mDataLen - offset);
     }
 
     // Allow reducing the size of a span.
@@ -110,6 +115,12 @@ public:
         }
         return Span(&bytes[1], length);
     }
+
+    // operator== explicitly not implemented on Span, because its meaning
+    // (equality of data, or pointing to the same buffer and same length) is
+    // ambiguous.  Use data_equal if testing for equality of data.
+    template <typename U>
+    bool operator==(const Span<U> & other) const = delete;
 
 private:
     pointer mDataBuf;
@@ -179,6 +190,14 @@ public:
     {
         return (size() == other.size() && (empty() || (memcmp(data(), other.data(), size() * sizeof(T)) == 0)));
     }
+
+    // operator== explicitly not implemented on FixedSpan, because its meaning
+    // (equality of data, or pointing to the same buffer and same length) is
+    // ambiguous.  Use data_equal if testing for equality of data.
+    template <typename U>
+    bool operator==(const Span<U> & other) const = delete;
+    template <typename U, size_t M>
+    bool operator==(const FixedSpan<U, M> & other) const = delete;
 
 private:
     pointer mDataBuf;

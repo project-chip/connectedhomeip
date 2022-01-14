@@ -28,16 +28,6 @@
 
 #pragma once
 
-/**
- * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
- *
- * Enables the use of a hard-coded default Chip device id and credentials if no device id
- * is found in Chip NV storage.
- *
- * This option is for testing only and should be disabled in production releases.
- */
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 34
-
 // Use a default pairing code if one hasn't been provisioned in flash.
 #ifndef CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -54,24 +44,24 @@
 #define CHIP_CONFIG_REQUIRE_AUTH 1
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION
+ * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION
  *
- * The product revision number assigned to device or product by the device vendor.  This
+ * The hardware version number assigned to device or product by the device vendor.  This
  * number is scoped to the device product id, and typically corresponds to a revision of the
  * physical device, a change to its packaging, and/or a change to its marketing presentation.
- * This value is generally *not* incremented for device software revisions.
+ * This value is generally *not* incremented for device software versions.
  */
-#define CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION 1
+#define CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION 1
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
  *
- * A string identifying the firmware revision running on the device.
- * CHIP service currently expects the firmware version to be in the format
+ * A string identifying the software version running on the device.
+ * CHIP service currently expects the software version to be in the format
  * {MAJOR_VERSION}.0d{MINOR_VERSION}
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "0.1ALPHA"
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "0.1ALPHA"
 #endif
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
@@ -95,13 +85,6 @@
  * is found in Chip NV storage.
  */
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
-
-/**
- * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
- *
- * Enable recording UTC timestamps.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
 
 /**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE

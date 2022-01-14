@@ -79,9 +79,15 @@ int main(void)
 
     // Init Chip memory management before the stack
     chip::Platform::MemoryInit();
-    // chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
 
-    CHIP_ERROR ret = PlatformMgr().InitChipStack();
+    CHIP_ERROR ret = chip::DeviceLayer::PersistedStorage::KeyValueStoreMgrImpl().Init();
+    if (ret != CHIP_NO_ERROR)
+    {
+        P6_LOG("PersistedStorage::KeyValueStoreMgrImpl().Init() failed");
+        appError(ret);
+    }
+
+    ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
         P6_LOG("PlatformMgr().InitChipStack() failed");

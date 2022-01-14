@@ -27,3 +27,5 @@ chip_custom_build_cflags = []
 
 custom_toolchain = "//toolchain:mbed"
 mbedtls_target = "//mbedtls:mbedtls"
+
+pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/constraints.txt" ]

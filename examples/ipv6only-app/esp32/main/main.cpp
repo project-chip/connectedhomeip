@@ -50,13 +50,13 @@ void UdpReceiver(void * pvParameters)
     int optval;                     // flag value for setsockopt
     int n;                          // message byte size
     int sockfd = 0;
-    unsigned int clientlen;         // byte size of client's address
+    socklen_t clientlen;            // byte size of client's address
     struct sockaddr_in6 clientaddr; // client addr
 
     while (1)
     {
         // Start the udp server after the wifi is connectd.
-        chip::rpc::Wifi::Instance().BlockUntilWifiConnected();
+        chip::rpc::WiFi::Instance().BlockUntilWiFiConnected();
         ESP_LOGI(TAG, "UDP server starting");
 
         portno = 8765;
@@ -121,7 +121,7 @@ void UdpReceiver(void * pvParameters)
 
 void RegisterServices(pw::rpc::Server & server)
 {
-    server.RegisterService(chip::rpc::Wifi::Instance());
+    server.RegisterService(chip::rpc::WiFi::Instance());
 }
 
 void RunRpcService(void *)
@@ -144,7 +144,7 @@ extern "C" void app_main()
     }
     ESP_ERROR_CHECK(ret);
 
-    ESP_LOGI(TAG, "Wifi Init: %s", pw_StatusString(chip::rpc::Wifi::Instance().Init()));
+    ESP_LOGI(TAG, "WiFi Init: %s", pw_StatusString(chip::rpc::WiFi::Instance().Init()));
     ESP_LOGI(TAG, "----------- chip-esp32-ipv6-example starting -----------");
 
     xTaskCreate(RunRpcService, "RPC", kRpcStackSizeBytes / sizeof(StackType_t), nullptr, kRpcTaskPriority, &rpcTaskHandle);

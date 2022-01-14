@@ -116,7 +116,7 @@ extern "C" void otPlatFree(void * aPtr)
 #include "uart.h"
 #endif
 
-extern "C" __WEAK otError otPlatUartEnable(void)
+extern "C" otError otPlatUartEnable(void)
 {
 #ifdef PW_RPC_ENABLED
     return OT_ERROR_NOT_IMPLEMENTED;
@@ -126,7 +126,7 @@ extern "C" __WEAK otError otPlatUartEnable(void)
 #endif
 }
 
-extern "C" __WEAK otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
+extern "C" otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
 {
 #ifdef PW_RPC_ENABLED
     return OT_ERROR_NOT_IMPLEMENTED;
@@ -140,7 +140,7 @@ extern "C" __WEAK otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLeng
 #endif
 }
 
-extern "C" __WEAK void efr32UartProcess(void)
+extern "C" void efr32UartProcess(void)
 {
 #if !defined(PW_RPC_ENABLED) && !defined(ENABLE_CHIP_SHELL)
     uint8_t tempBuf[128] = { 0 };

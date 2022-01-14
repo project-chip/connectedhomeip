@@ -211,6 +211,7 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
 
                     NSString * output;
                     NSError * error;
+                    CHIPDeviceController * controller = InitializeCHIP();
                     if ([self.useOnboardingTokenSwitch isOn]) {
                         NSString * discriminatorStr = [self.discriminatorField text];
                         if (discriminatorStr.length == 0) {
@@ -218,7 +219,8 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
                         }
                         NSInteger discriminator = [discriminatorStr intValue];
 
-                        output = [chipDevice openPairingWindowWithPIN:timeout
+                        output = [controller openPairingWindowWithPIN:deviceId
+                                                             duration:timeout
                                                         discriminator:discriminator
                                                              setupPIN:setupPIN
                                                                 error:&error];
@@ -230,7 +232,7 @@ static NSString * const DEFAULT_DISCRIMINATOR = @"3840";
                             [self updateResult:@"Failed in opening the pairing window"];
                         }
                     } else {
-                        BOOL didSend = [chipDevice openPairingWindow:timeout error:&error];
+                        BOOL didSend = [controller openPairingWindow:deviceId duration:timeout error:&error];
                         if (didSend) {
                             [self updateResult:@"Scan the QR code on the device"];
                         } else {

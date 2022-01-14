@@ -15,6 +15,10 @@
  */
 
 / {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
+
 	/*
 	* By default, PWM module is only configured for led0 (LED1 on the board).
 	* The lighting-app, however, uses LED2 to show the state of the lighting,

@@ -41,3 +41,8 @@ jobs:
       - name: Check for incorrect error use in VerifyOrExit
         run: |
           git grep -n "VerifyOrExit(.*, [A-Za-z]*_ERROR" -- './*' ':(exclude).github/workflows/lint.yml' && exit 1 || exit 0
+
+      # Comments like '{{! ... }}' should be used in zap files
+      - name: Do not allow TODO in generated files
+        run: |
+          git grep -n 'TODO:' -- ./zzz_generated './*/zap-generated/*' && exit 1 || exit 0

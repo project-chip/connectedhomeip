@@ -32,7 +32,7 @@ public:
     {}
 
 protected:
-    bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const override;
+    bool WriteData(RecordWriter & out) const override;
 
 private:
     const chip::Inet::IPAddress mIPAddress;

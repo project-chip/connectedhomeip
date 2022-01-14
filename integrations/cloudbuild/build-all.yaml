@@ -1,5 +1,5 @@
 steps:
-    - name: "connectedhomeip/chip-build-vscode:0.5.18"
+    - name: "connectedhomeip/chip-build-vscode:0.5.48"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
@@ -12,12 +12,13 @@ steps:
             path: /pwenv
       timeout: 900s
 
-    - name: "connectedhomeip/chip-build-vscode:0.5.18"
+    - name: "connectedhomeip/chip-build-vscode:0.5.48"
       env:
           - PW_ENVIRONMENT_ROOT=/pwenv
       args:
           - >-
-              ./scripts/build/build_examples.py --enable-flashbundle build
+              ./scripts/build/build_examples.py --enable-flashbundle
+              --target-glob '*' --skip-target-glob '*-tests' build
               --create-archives /workspace/artifacts/
       id: CompileAll
       waitFor:
@@ -30,7 +31,7 @@ steps:
 logsBucket: matter-build-automation-build-logs
 
 # Global timeout for all steps
-timeout: 7200s
+timeout: 14400s
 
 artifacts:
     objects:

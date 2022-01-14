@@ -152,6 +152,40 @@ bool SerializedQNameIterator::operator==(const FullQName & other) const
     return ((idx == other.nameCount) && !self.Next());
 }
 
+bool SerializedQNameIterator::operator==(const SerializedQNameIterator & other) const
+{
+    SerializedQNameIterator a = *this; // allow iteration
+    SerializedQNameIterator b = other;
+
+    while (true)
+    {
+        bool hasA = a.Next();
+        bool hasB = b.Next();
+
+        if (hasA ^ hasB)
+        {
+            return false; /// one is longer than the other
+        }
+
+        if (!a.IsValid() || !b.IsValid())
+        {
+            return false; // invalid data
+        }
+
+        if (!hasA || !hasB)
+        {
+            break;
+        }
+
+        if (strcasecmp(a.Value(), b.Value()) != 0)
+        {
+            return false;
+        }
+    }
+
+    return a.IsValid() && b.IsValid();
+}
+
 bool FullQName::operator==(const FullQName & other) const
 {
     if (nameCount != other.nameCount)

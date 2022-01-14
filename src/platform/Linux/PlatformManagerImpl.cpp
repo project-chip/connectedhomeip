@@ -27,18 +27,23 @@
 #include <app-common/zap-generated/enums.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/DeviceControlServer.h>
+#include <platform/Linux/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 
 #include <thread>
 
 #include <arpa/inet.h>
+#include <dirent.h>
 #include <linux/netlink.h>
 #include <linux/rtnetlink.h>
-#include <malloc.h>
 #include <net/if.h>
 #include <netinet/in.h>
+#include <signal.h>
 #include <unistd.h>
+
+using namespace ::chip::app::Clusters;
 
 namespace chip {
 namespace DeviceLayer {
@@ -59,41 +64,52 @@ void SignalHandler(int signum)
     switch (signum)
     {
     case SIGINT:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGHUP:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::BrownOutReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTERM:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::PowerOnReboot);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGUSR1:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::HardwareWatchdogReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGUSR2:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
     case SIGTSTP:
-        ConfigurationMgrImpl().StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED);
+        ConfigurationMgr().StoreBootReason(DiagnosticDataProvider::BootReasonType::SoftwareUpdateCompleted);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
+        break;
+    case SIGTRAP:
+        PlatformMgrImpl().HandleSoftwareFault(SoftwareDiagnostics::Events::SoftwareFault::kEventId);
+        break;
+    case SIGILL:
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::HardwareFaultChange::kEventId);
+        break;
+    case SIGALRM:
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::kEventId);
+        break;
+    case SIGVTALRM:
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::kEventId);
+        break;
+    case SIGIO:
+        PlatformMgrImpl().HandleSwitchEvent(Switch::Events::SwitchLatched::kEventId);
         break;
     default:
         break;
     }
 
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_ERROR_REBOOT_SIGNAL_RECEIVED)
     {
         PlatformMgr().Shutdown();
         exit(EXIT_FAILURE);
-    }
-    else
-    {
-        ChipLogDetail(DeviceLayer, "Ignore signal %d", signum);
     }
 }
 
@@ -208,12 +224,17 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_InitChipStack();
     SuccessOrExit(err);
 
-    mStartTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
+    ScheduleWork(HandleDeviceRebooted, 0);
 
 exit:
     return err;
@@ -221,15 +242,22 @@ exit:
 
 CHIP_ERROR PlatformManagerImpl::_Shutdown()
 {
-    uint64_t upTime = 0;
+    PlatformManagerDelegate * platformManagerDelegate = PlatformMgr().GetDelegate();
+    uint64_t upTime                                   = 0;
 
-    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    // The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence.
+    if (platformManagerDelegate != nullptr)
+    {
+        platformManagerDelegate->OnShutDown();
+    }
+
+    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
     {
         uint32_t totalOperationalHours = 0;
 
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
         {
-            ConfigurationMgrImpl().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
         }
         else
         {
@@ -244,102 +272,275 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
     return Internal::GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>::_Shutdown();
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
+CHIP_ERROR PlatformManagerImpl::_GetFixedLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
 {
-    struct mallinfo mallocInfo = mallinfo();
+    // In Linux simulation, return following hardcoded labelList on all endpoints.
+    FixedLabel::Structs::LabelStruct::Type room;
+    FixedLabel::Structs::LabelStruct::Type orientation;
+    FixedLabel::Structs::LabelStruct::Type floor;
+    FixedLabel::Structs::LabelStruct::Type direction;
 
-    // Get the current amount of heap memory, in bytes, that are not being utilized
-    // by the current running program.
-    currentHeapFree = mallocInfo.fordblks;
+    room.label = CharSpan("room", strlen("room"));
+    room.value = CharSpan("bedroom 2", strlen("bedroom 2"));
+
+    orientation.label = CharSpan("orientation", strlen("orientation"));
+    orientation.value = CharSpan("North", strlen("North"));
+
+    floor.label = CharSpan("floor", strlen("floor"));
+    floor.value = CharSpan("2", strlen("2"));
+
+    direction.label = CharSpan("direction", strlen("direction"));
+    direction.value = CharSpan("up", strlen("up"));
+
+    labelList.add(room);
+    labelList.add(orientation);
+    labelList.add(floor);
+    labelList.add(direction);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+CHIP_ERROR
+PlatformManagerImpl::_SetUserLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
-    struct mallinfo mallocInfo = mallinfo();
+    // TODO:: store the user labelList, and read back stored user labelList if it has been set. Add yaml test to verify this.
+    return CHIP_NO_ERROR;
+}
 
-    // Get the current amount of heap memory, in bytes, that are being used by
-    // the current running program.
-    currentHeapUsed = mallocInfo.uordblks;
+CHIP_ERROR
+PlatformManagerImpl::_GetUserLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    // In Linux simulation, return following hardcoded labelList on all endpoints.
+    UserLabel::Structs::LabelStruct::Type room;
+    UserLabel::Structs::LabelStruct::Type orientation;
+    UserLabel::Structs::LabelStruct::Type floor;
+    UserLabel::Structs::LabelStruct::Type direction;
+
+    room.label = CharSpan("room", strlen("room"));
+    room.value = CharSpan("bedroom 2", strlen("bedroom 2"));
+
+    orientation.label = CharSpan("orientation", strlen("orientation"));
+    orientation.value = CharSpan("North", strlen("North"));
+
+    floor.label = CharSpan("floor", strlen("floor"));
+    floor.value = CharSpan("2", strlen("2"));
+
+    direction.label = CharSpan("direction", strlen("direction"));
+    direction.value = CharSpan("up", strlen("up"));
+
+    labelList.add(room);
+    labelList.add(orientation);
+    labelList.add(floor);
+    labelList.add(direction);
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+CHIP_ERROR
+PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
 {
-    struct mallinfo mallocInfo = mallinfo();
-
-    // The usecase of this function is embedded devices,on which we would need to intercept
-    // malloc/calloc/free and then record the maximum amount of heap memory,in bytes, that
-    // has been used by the Node.
-    // On Linux, since it uses virtual memory, whereby a page of memory could be copied to
-    // the hard disk, called swap space, and free up that page of memory. So it is impossible
-    // to know accurately peak physical memory it use. We just return the current heap memory
-    // being used by the current running program.
-    currentHeapHighWatermark = mallocInfo.uordblks;
+    // In Linux simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
+    supportedLocales.add(CharSpan("en-US", strlen("en-US")));
+    supportedLocales.add(CharSpan("de-DE", strlen("de-DE")));
+    supportedLocales.add(CharSpan("fr-FR", strlen("fr-FR")));
+    supportedLocales.add(CharSpan("en-GB", strlen("en-GB")));
+    supportedLocales.add(CharSpan("es-ES", strlen("es-ES")));
+    supportedLocales.add(CharSpan("zh-CN", strlen("zh-CN")));
+    supportedLocales.add(CharSpan("it-IT", strlen("it-IT")));
+    supportedLocales.add(CharSpan("ja-JP", strlen("ja-JP")));
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetRebootCount(uint16_t & rebootCount)
+void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
 {
-    uint32_t count = 0;
+    PlatformManagerDelegate * platformManagerDelegate       = PlatformMgr().GetDelegate();
+    GeneralDiagnosticsDelegate * generalDiagnosticsDelegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
 
-    CHIP_ERROR err = ConfigurationMgrImpl().GetRebootCount(count);
-
-    if (err == CHIP_NO_ERROR)
+    if (generalDiagnosticsDelegate != nullptr)
     {
-        VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        rebootCount = static_cast<uint16_t>(count);
+        generalDiagnosticsDelegate->OnDeviceRebooted();
     }
 
-    return err;
+    // The StartUp event SHALL be emitted by a Node after completing a boot or reboot process
+    if (platformManagerDelegate != nullptr)
+    {
+        uint16_t softwareVersion;
+
+        ReturnOnFailure(ConfigurationMgr().GetSoftwareVersion(softwareVersion));
+        platformManagerDelegate->OnStartUp(softwareVersion);
+    }
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetUpTime(uint64_t & upTime)
+void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
 {
-    uint64_t currentTimeMilliseconds = System::SystemClock().GetMonotonicMilliseconds();
+    GeneralDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
 
-    if (currentTimeMilliseconds >= mStartTimeMilliseconds)
+    if (delegate == nullptr)
     {
-        upTime = (currentTimeMilliseconds - mStartTimeMilliseconds) / 1000;
-        return CHIP_NO_ERROR;
+        ChipLogError(DeviceLayer, "No delegate registered to handle General Diagnostics event");
+        return;
     }
 
-    return CHIP_ERROR_INVALID_TIME;
+    if (EventId == GeneralDiagnostics::Events::HardwareFaultChange::kEventId)
+    {
+        GeneralFaults<kMaxHardwareFaults> previous;
+        GeneralFaults<kMaxHardwareFaults> current;
+
+#if CHIP_CONFIG_TEST
+        // On Linux Simulation, set following hardware faults statically.
+        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
+#endif
+        delegate->OnHardwareFaultsDetected(previous, current);
+    }
+    else if (EventId == GeneralDiagnostics::Events::RadioFaultChange::kEventId)
+    {
+        GeneralFaults<kMaxRadioFaults> previous;
+        GeneralFaults<kMaxRadioFaults> current;
+
+#if CHIP_CONFIG_TEST
+        // On Linux Simulation, set following radio faults statically.
+        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
+        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
+#endif
+        delegate->OnRadioFaultsDetected(previous, current);
+    }
+    else if (EventId == GeneralDiagnostics::Events::NetworkFaultChange::kEventId)
+    {
+        GeneralFaults<kMaxNetworkFaults> previous;
+        GeneralFaults<kMaxNetworkFaults> current;
+
+#if CHIP_CONFIG_TEST
+        // On Linux Simulation, set following radio faults statically.
+        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+
+        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
+#endif
+        delegate->OnNetworkFaultsDetected(previous, current);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
+    }
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetTotalOperationalHours(uint32_t & totalOperationalHours)
+void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
 {
-    uint64_t upTime = 0;
+    SoftwareDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetSoftwareDiagnosticsDelegate();
 
-    if (_GetUpTime(upTime) == CHIP_NO_ERROR)
+    if (delegate != nullptr)
     {
-        uint32_t totalHours = 0;
-        if (ConfigurationMgrImpl().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
-        {
-            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
-        }
-    }
+        SoftwareDiagnostics::Structs::SoftwareFault::Type softwareFault;
+        char threadName[kMaxThreadNameLength + 1];
 
-    return CHIP_ERROR_INVALID_TIME;
+        softwareFault.id = gettid();
+        strncpy(threadName, std::to_string(softwareFault.id).c_str(), kMaxThreadNameLength);
+        threadName[kMaxThreadNameLength] = '\0';
+        softwareFault.name               = CharSpan(threadName, strlen(threadName));
+        softwareFault.faultRecording     = ByteSpan(Uint8::from_const_char("FaultRecording"), strlen("FaultRecording"));
+
+        delegate->OnSoftwareFaultDetected(softwareFault);
+    }
 }
 
-CHIP_ERROR PlatformManagerImpl::_GetBootReasons(uint8_t & bootReasons)
+void PlatformManagerImpl::HandleSwitchEvent(uint32_t EventId)
 {
-    uint32_t reason = 0;
+    SwitchDeviceControlDelegate * delegate = DeviceControlServer::DeviceControlSvr().GetSwitchDelegate();
 
-    CHIP_ERROR err = ConfigurationMgrImpl().GetBootReasons(reason);
-
-    if (err == CHIP_NO_ERROR)
+    if (delegate == nullptr)
     {
-        VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-        bootReasons = static_cast<uint8_t>(reason);
+        ChipLogError(DeviceLayer, "No delegate registered to handle Switch event");
+        return;
     }
 
-    return err;
+    if (EventId == Switch::Events::SwitchLatched::kEventId)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnSwitchLatched(newPosition);
+    }
+    else if (EventId == Switch::Events::InitialPress::kEventId)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnInitialPressed(newPosition);
+    }
+    else if (EventId == Switch::Events::LongPress::kEventId)
+    {
+        uint8_t newPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition = 100;
+#endif
+        delegate->OnLongPressed(newPosition);
+    }
+    else if (EventId == Switch::Events::ShortRelease::kEventId)
+    {
+        uint8_t previousPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        previousPosition = 50;
+#endif
+        delegate->OnShortReleased(previousPosition);
+    }
+    else if (EventId == Switch::Events::LongRelease::kEventId)
+    {
+        uint8_t previousPosition = 0;
+
+#if CHIP_CONFIG_TEST
+        previousPosition = 50;
+#endif
+        delegate->OnLongReleased(previousPosition);
+    }
+    else if (EventId == Switch::Events::MultiPressOngoing::kEventId)
+    {
+        uint8_t newPosition                   = 0;
+        uint8_t currentNumberOfPressesCounted = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition                   = 10;
+        currentNumberOfPressesCounted = 5;
+#endif
+        delegate->OnMultiPressOngoing(newPosition, currentNumberOfPressesCounted);
+    }
+    else if (EventId == Switch::Events::MultiPressComplete::kEventId)
+    {
+        uint8_t newPosition                 = 0;
+        uint8_t totalNumberOfPressesCounted = 0;
+
+#if CHIP_CONFIG_TEST
+        newPosition                 = 10;
+        totalNumberOfPressesCounted = 5;
+#endif
+        delegate->OnMultiPressComplete(newPosition, totalNumberOfPressesCounted);
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
+    }
 }
 
 #if CHIP_WITH_GIO

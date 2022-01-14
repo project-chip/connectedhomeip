@@ -53,11 +53,12 @@ public:
             uint8_t buffer[128];
 
             BigEndian::BufferWriter out(buffer, sizeof(buffer));
+            RecordWriter writer(&out);
 
             HeaderRef hdr(headerBuffer);
             hdr.Clear();
 
-            NL_TEST_ASSERT(mSuite, record.Append(hdr, ResourceType::kAnswer, out));
+            NL_TEST_ASSERT(mSuite, record.Append(hdr, ResourceType::kAnswer, writer));
 
             ResourceData data;
             SerializedQNameIterator target;
@@ -99,7 +100,7 @@ void TestPtrResponse(nlTestSuite * inSuite, void * inContext)
     packetInfo.DestAddress = ipAddress;
     packetInfo.SrcPort     = kMdnsPort;
     packetInfo.DestPort    = kMdnsPort;
-    packetInfo.Interface   = INET_NULL_INTERFACEID;
+    packetInfo.Interface   = InterfaceId::Null();
 
     responder.AddAllResponses(&packetInfo, &acc);
 }

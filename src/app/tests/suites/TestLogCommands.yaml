@@ -19,9 +19,21 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Log a simple message"
       cluster: "LogCommands"
       command: "Log"
+      arguments:
+          values:
+              - name: "message"
+                value: "This is a simple message"
+
+    - label: "Do a simple user prompt message"
+      cluster: "LogCommands"
+      command: "UserPrompt"
       arguments:
           values:
               - name: "message"

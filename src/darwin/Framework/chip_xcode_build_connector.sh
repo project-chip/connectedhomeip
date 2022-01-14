@@ -52,19 +52,7 @@ for define in "${defines[@]}"; do
 
     # skip over those that GN does for us
     case "$define" in
-        CHIP_DEVICE_LAYER*)
-            continue
-            ;;
-        CHIP_*_CONFIG_INCLUDE)
-            continue
-            ;;
-        CHIP_SYSTEM_CONFIG_*)
-            continue
-            ;;
-        CONFIG_NETWORK_LAYER*)
-            continue
-            ;;
-        CHIP_CRYPTO_*)
+        CHIP_HAVE_CONFIG_H)
             continue
             ;;
     esac
@@ -108,10 +96,6 @@ declare -a args=(
     'chip_crypto="mbedtls"'
     'chip_build_tools=false'
     'chip_build_tests=false'
-    'chip_ble_project_config_include=""'
-    'chip_device_project_config_include=""'
-    'chip_inet_project_config_include=""'
-    'chip_system_project_config_include=""'
     'target_cpu="'"$target_cpu"'"'
     'target_defines='"$target_defines"
     'target_cflags=['"$target_cflags"']'
@@ -129,8 +113,6 @@ declare -a args=(
 [[ $PLATFORM_FAMILY_NAME == macOS ]] && {
     args+=(
         'target_os="mac"'
-        'import("//config/standalone/args.gni")'
-        'chip_project_config_include_dirs=["'"$CHIP_ROOT"'/config/standalone"]'
     )
 }
 

@@ -26,6 +26,14 @@
         {
             "name": "im_command_handler_cluster_commands",
             "path": "partials/im_command_handler_cluster_commands.zapt"
+        },
+        {
+            "name": "idl_structure_definition",
+            "path": "partials/idl/structure_definition.zapt"
+        },
+        {
+            "name": "idl_structure_member",
+            "path": "partials/idl/structure_member.zapt"
         }
     ],
     "templates": [
@@ -33,11 +41,6 @@
             "path": "templates/app/callbacks/PluginApplicationCallbacks.zapt",
             "name": "Matter Application Callbacks header",
             "output": "PluginApplicationCallbacks.h"
-        },
-        {
-            "path": "templates/app/attribute-size-src.zapt",
-            "name": "ZCL attribute-size",
-            "output": "attribute-size.cpp"
         },
         {
             "path": "templates/app/callback-stub-src.zapt",
@@ -83,6 +86,11 @@
             "path": "templates/app/CHIPClusters-src.zapt",
             "name": "C++ ZCL API",
             "output": "CHIPClusters.cpp"
+        },
+        {
+            "path": "templates/app/MatterIDL.zapt",
+            "name": "Human-readable Matter IDL",
+            "output": "Clusters.matter"
         }
     ]
 }

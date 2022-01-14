@@ -18,6 +18,12 @@ import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/src/platform/device.gni")
 
+declare_args() {
+  # Platform DNSsd should always be running on darwin. On Linux
+  # this depends on avahi being available and running.
+  chip_enable_dnssd_tests = chip_device_platform == "darwin"
+}
+
 if (chip_device_platform != "none" && chip_device_platform != "fake") {
   import("${chip_root}/build/chip/chip_test_suite.gni")
 
@@ -39,7 +45,7 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
       "${nlunit_test_root}:nlunit-test",
     ]
 
-    if (chip_mdns != "none" && chip_enable_happy_tests &&
+    if (chip_mdns != "none" && chip_enable_dnssd_tests &&
         (chip_device_platform == "linux" || chip_device_platform == "darwin")) {
       test_sources += [ "TestDnssd.cpp" ]
       public_deps += [ "${chip_root}/src/lib/dnssd" ]
@@ -75,8 +81,13 @@ if (chip_device_platform != "none" && chip_device_platform != "fake") {
       tests = [ "TestCHIPoBLEStackMgr" ]
     }
 
-    if (current_os == "zephyr" || current_os == "android") {
+    if (current_os == "zephyr" || current_os == "android" ||
+        current_os == "mbed") {
       test_sources += [ "TestKeyValueStoreMgr.cpp" ]
+    }
+
+    if (chip_device_platform == "linux") {
+      test_sources += [ "TestConnectivityMgr.cpp" ]
     }
   }
 } else {

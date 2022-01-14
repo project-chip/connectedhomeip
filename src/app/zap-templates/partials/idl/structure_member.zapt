@@ -1,0 +1,8 @@
+{{~#if isOptional~}} optional {{/if~}}
+{{~#if isNullable~}} nullable {{/if~}}
+
+{{type}} {{asLowerCamelCase label~}}
+
+{{~#if isArray~}}
+  []
+{{~/if}} = {{fieldIdentifier}};

@@ -29,6 +29,28 @@ scripts/examples/gn_build_example.sh examples/chip-tool SOME-PATH/
 
 which puts the binary at `SOME-PATH/chip-tool`.
 
+### Building with message tracing
+
+Message tracing allows capture of the secure messages which can be used for test
+automation.
+
+```
+gn gen out/with_trace/ --args='import("//with_pw_trace.gni")'
+ninja -C out/with_trace chip-tool
+```
+
+This enables tracing and adds additional flags to chip-tool to control where the
+traces should go:
+
+-   --trace_file <file> Outputs trace data to the specified file.
+-   --trace_log Outputs trace data to the chip log stream.
+
+For example:
+
+```
+out/with_trace/chip-tool pairing <pairing_args> --trace_file trace.log
+```
+
 ## Using the Client to commission a device
 
 In order to send commands to a device, it must be commissioned with the client.
@@ -41,13 +63,6 @@ configuration.
 
 To initiate a client commissioning request to a device, run the built executable
 and choose the pairing mode.
-
-##### Commission a device configured to bypass Rendezvous
-
-The command below commissions a device with the provided IP address and port of
-the server to talk to.
-
-    $ chip-tool pairing bypass ${NODE_ID_TO_ASSIGN} 192.168.0.30 5540
 
 #### Commission a device over BLE
 
@@ -433,7 +448,6 @@ Usage:
   | Commands:                                                                           |
   +-------------------------------------------------------------------------------------+
   | * unpair                                                                            |
-  | * bypass                                                                            |
   | * ble                                                                               |
   | * softap                                                                            |
   +-------------------------------------------------------------------------------------+

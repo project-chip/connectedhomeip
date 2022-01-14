@@ -26,6 +26,7 @@
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app/util/attribute-storage.h>
 
@@ -44,6 +45,9 @@
 #define BUTTON_PUSH_EVENT 1
 #define BUTTON_RELEASE_EVENT 0
 
+#define PCC_CLUSTER_ENDPOINT 1
+#define ONOFF_CLUSTER_ENDPOINT 1
+
 LOG_MODULE_DECLARE(app);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
 
@@ -60,6 +64,7 @@ static k_timer sFunctionTimer;
 
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::app::Clusters;
 
 AppTask AppTask::sAppTask;
 
@@ -505,13 +510,108 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState()
 {
-    uint8_t newValue = !PumpMgr().IsStopped();
+    EmberStatus status;
 
-    // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
-                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    ChipLogProgress(NotSpecified, "UpdateClusterState");
+
+    // Write the new values
+
+    bool onOffState = !PumpMgr().IsStopped();
+
+    status = OnOff::Attributes::OnOff::Set(ONOFF_CLUSTER_ENDPOINT, onOffState);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        LOG_ERR("Updating on/off %x", status);
+        ChipLogError(NotSpecified, "ERR: Updating On/Off state  %" PRIx8, status);
+    }
+
+    int16_t maxPressure = PumpMgr().GetMaxPressure();
+    status              = PumpConfigurationAndControl::Attributes::MaxPressure::Set(PCC_CLUSTER_ENDPOINT, maxPressure);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxPressure  %" PRIx8, status);
+    }
+
+    uint16_t maxSpeed = PumpMgr().GetMaxSpeed();
+    status            = PumpConfigurationAndControl::Attributes::MaxSpeed::Set(PCC_CLUSTER_ENDPOINT, maxSpeed);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxSpeed  %" PRIx8, status);
+    }
+
+    uint16_t maxFlow = PumpMgr().GetMaxFlow();
+    status           = PumpConfigurationAndControl::Attributes::MaxFlow::Set(PCC_CLUSTER_ENDPOINT, maxFlow);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxFlow  %" PRIx8, status);
+    }
+
+    int16_t minConstPress = PumpMgr().GetMinConstPressure();
+    status                = PumpConfigurationAndControl::Attributes::MinConstPressure::Set(PCC_CLUSTER_ENDPOINT, minConstPress);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MinConstPressure  %" PRIx8, status);
+    }
+
+    int16_t maxConstPress = PumpMgr().GetMaxConstPressure();
+    status                = PumpConfigurationAndControl::Attributes::MaxConstPressure::Set(PCC_CLUSTER_ENDPOINT, maxConstPress);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstPressure  %" PRIx8, status);
+    }
+
+    int16_t minCompPress = PumpMgr().GetMinCompPressure();
+    status               = PumpConfigurationAndControl::Attributes::MinCompPressure::Set(PCC_CLUSTER_ENDPOINT, minCompPress);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MinCompPressure  %" PRIx8, status);
+    }
+
+    int16_t maxCompPress = PumpMgr().GetMaxCompPressure();
+    status               = PumpConfigurationAndControl::Attributes::MaxCompPressure::Set(PCC_CLUSTER_ENDPOINT, maxCompPress);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxCompPressure  %" PRIx8, status);
+    }
+
+    uint16_t minConstSpeed = PumpMgr().GetMinConstSpeed();
+    status                 = PumpConfigurationAndControl::Attributes::MinConstSpeed::Set(PCC_CLUSTER_ENDPOINT, minConstSpeed);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MinConstSpeed  %" PRIx8, status);
+    }
+
+    uint16_t maxConstSpeed = PumpMgr().GetMaxConstSpeed();
+    status                 = PumpConfigurationAndControl::Attributes::MaxConstSpeed::Set(PCC_CLUSTER_ENDPOINT, maxConstSpeed);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstSpeed  %" PRIx8, status);
+    }
+
+    uint16_t minConstFlow = PumpMgr().GetMinConstFlow();
+    status                = PumpConfigurationAndControl::Attributes::MinConstFlow::Set(PCC_CLUSTER_ENDPOINT, minConstFlow);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MinConstFlow  %" PRIx8, status);
+    }
+
+    uint16_t maxConstFlow = PumpMgr().GetMaxConstFlow();
+    status                = PumpConfigurationAndControl::Attributes::MaxConstFlow::Set(PCC_CLUSTER_ENDPOINT, maxConstFlow);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstFlow  %" PRIx8, status);
+    }
+
+    int16_t minConstTemp = PumpMgr().GetMinConstTemp();
+    status               = PumpConfigurationAndControl::Attributes::MinConstTemp::Set(PCC_CLUSTER_ENDPOINT, minConstTemp);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MinConstTemp  %" PRIx8, status);
+    }
+
+    int16_t maxConstTemp = PumpMgr().GetMaxConstTemp();
+    status               = PumpConfigurationAndControl::Attributes::MaxConstTemp::Set(PCC_CLUSTER_ENDPOINT, maxConstTemp);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: Updating MaxConstTemp  %" PRIx8, status);
     }
 }

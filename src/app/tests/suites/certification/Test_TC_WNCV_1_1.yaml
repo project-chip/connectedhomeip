@@ -19,47 +19,105 @@ config:
     endpoint: 1
 
 tests:
-    - label: "read the global attribute: ClusterRevision"
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    ### MANDATORY GLOBAL Attributes
+    ### Attribute[0xFFFD]: ClusterRevision =======================================
+    - label: "2: read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 5
+          constraints:
+              type: uint16
+              minValue: 5
+              maxValue: 200
 
     - label:
-          "write the default value to mandatory global attribute:
+          "3a: write a value into the RO mandatory global attribute:
           ClusterRevision"
       command: "writeAttribute"
       attribute: "ClusterRevision"
       arguments:
-          value: 5
+          value: 201
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
-    - label: "reads back global attribute: ClusterRevision"
+    - label: "3b: reads back global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
-          value: 5
+          constraints:
+              type: uint16
+              notValue: 201
 
-    - label: "read the optional global attribute: FeatureMap"
-      disabled: 1
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
+    - label: "Read the global attribute: AttributeList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: CommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "CommandList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: EventList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: ClientGeneratedCommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ClientGeneratedCommandList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: ServerGeneratedCommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ServerGeneratedCommandList"
+      response:
+          constraints:
+              type: list
+
+    ### Attribute[0xFFFC]: FeatureMap =======================================
+    - label: "2: read the global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
+          constraints:
+              type: uint32
+              minValue: 0
+              maxValue: 32768
 
-    - label: "write the default value to optional global attribute: FeatureMap"
-      disabled: true
+    - label:
+          "3a: write the default value to optional global attribute: FeatureMap"
       command: "writeAttribute"
       attribute: "FeatureMap"
       arguments:
-          value: 0
+          value: 32769
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
-    - label: "reads back optional global attribute: FeatureMap"
-      disabled: true
+    - label: "3b: reads back global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
-          value: 0
+          constraints:
+              type: uint32
+              notValue: 32769
+    ### OPTIONAL GLOBAL Attributes
+    ### None =======================================

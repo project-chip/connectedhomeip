@@ -100,7 +100,8 @@ bool emberAfPluginScenesServerParseViewScene(chip::app::CommandHandler * command
  * @param groupId The group identifier.  Ver.: always
  * @param sceneId The scene identifier.  Ver.: always
  */
-EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t sceneId);
+EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::FabricIndex fabricIndex, chip::EndpointId endpoint,
+                                                           chip::GroupId groupId, uint8_t sceneId);
 
 /** @brief Scenes Cluster Store Current Scene
  *
@@ -114,7 +115,8 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::EndpointId endp
  * @param groupId The group identifier.  Ver.: always
  * @param sceneId The scene identifier.  Ver.: always
  */
-EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t sceneId);
+EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::FabricIndex fabricIndex, chip::EndpointId endpoint,
+                                                            chip::GroupId groupId, uint8_t sceneId);
 
 /** @brief Scenes Cluster Remove Scenes In Group
  *

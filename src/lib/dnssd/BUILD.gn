@@ -26,6 +26,7 @@ static_library("dnssd") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging:messaging_mrp_config",
   ]
 
   sources = [

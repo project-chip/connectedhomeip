@@ -51,7 +51,7 @@ extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
 
 /* needed for FreeRtos Heap 4 */
-uint8_t __attribute__((section(".heap"))) ucHeap[0xF000];
+uint8_t __attribute__((section(".heap"))) ucHeap[HEAP_SIZE];
 
 extern "C" void main_task(void const * argument)
 {
@@ -61,6 +61,8 @@ extern "C" void main_task(void const * argument)
     {
         (*pFunc)();
     }
+
+    SHA_ClkInit(SHA_INSTANCE);
 
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 

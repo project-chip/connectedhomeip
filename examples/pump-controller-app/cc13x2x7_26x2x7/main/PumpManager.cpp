@@ -25,7 +25,7 @@
 
 #define ACTUATOR_MOVEMENT_PERIOS_MS 500
 
-PumpManager PumpManager::sLock;
+PumpManager PumpManager::sPump;
 
 int PumpManager::Init()
 {
@@ -34,15 +34,15 @@ int PumpManager::Init()
     mTimerHandle = xTimerCreate("BLT_TIMER", pdMS_TO_TICKS(ACTUATOR_MOVEMENT_PERIOS_MS), pdFALSE, this, TimerEventHandler);
     if (NULL == mTimerHandle)
     {
-        PLAT_LOG("failed to create bolt lock timer");
+        PLAT_LOG("failed to create pump timer");
         while (1)
             ;
     }
 
-    mState              = kState_LockingCompleted;
-    mAutoLockTimerArmed = false;
-    mAutoRelock         = false;
-    mAutoLockDuration   = 0;
+    mState               = kState_StopCompleted;
+    mAutoStartTimerArmed = false;
+    mAutoRestart         = false;
+    mAutoStartDuration   = 0;
 
     return ret;
 }
@@ -55,22 +55,22 @@ void PumpManager::SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callba
 
 bool PumpManager::IsActionInProgress()
 {
-    return (mState == kState_LockingInitiated || mState == kState_UnlockingInitiated);
+    return (mState == kState_StartInitiated || mState == kState_StopInitiated);
 }
 
-bool PumpManager::IsUnlocked()
+bool PumpManager::IsStopped()
 {
-    return (mState == kState_UnlockingCompleted);
+    return (mState == kState_StopCompleted);
 }
 
-void PumpManager::EnableAutoRelock(bool aOn)
+void PumpManager::EnableAutoRestart(bool aOn)
 {
-    mAutoRelock = aOn;
+    mAutoRestart = aOn;
 }
 
-void PumpManager::SetAutoLockDuration(uint32_t aDurationInSecs)
+void PumpManager::SetAutoStartDuration(uint32_t aDurationInSecs)
 {
-    mAutoLockDuration = aDurationInSecs;
+    mAutoStartDuration = aDurationInSecs;
 }
 
 bool PumpManager::InitiateAction(int32_t aActor, Action_t aAction)
@@ -78,32 +78,32 @@ bool PumpManager::InitiateAction(int32_t aActor, Action_t aAction)
     bool action_initiated = false;
     State_t new_state;
 
-    // Initiate Lock/Unlock Action only when the previous one is complete.
-    if (mState == kState_LockingCompleted && aAction == UNLOCK_ACTION)
+    // Initiate Start/Stop Action only when the previous one is complete.
+    if (mState == kState_StartCompleted && aAction == STOP_ACTION)
     {
         action_initiated = true;
 
-        new_state = kState_UnlockingInitiated;
+        new_state = kState_StopInitiated;
     }
-    else if (mState == kState_UnlockingCompleted && aAction == LOCK_ACTION)
+    else if (mState == kState_StopCompleted && aAction == START_ACTION)
     {
         action_initiated = true;
-
-        new_state = kState_LockingInitiated;
+        mCurrentActor    = aActor;
+        new_state        = kState_StartInitiated;
     }
 
     if (action_initiated)
     {
-        if (mAutoLockTimerArmed && new_state == kState_LockingInitiated)
+        if (mAutoStartTimerArmed && new_state == kState_StartInitiated)
         {
-            // If auto lock timer has been armed and someone initiates locking,
+            // If auto start timer has been armed and someone initiates start,
             // cancel the timer and continue as normal.
-            mAutoLockTimerArmed = false;
+            mAutoStartTimerArmed = false;
 
             CancelTimer();
         }
 
-        StartTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
+        PumpTimer(ACTUATOR_MOVEMENT_PERIOS_MS);
 
         // Since the timer started successfully, update the state and trigger callback
         mState = new_state;
@@ -117,7 +117,7 @@ bool PumpManager::InitiateAction(int32_t aActor, Action_t aAction)
     return action_initiated;
 }
 
-void PumpManager::StartTimer(uint32_t aTimeoutMs)
+void PumpManager::PumpTimer(uint32_t aTimeoutMs)
 {
     xTimerChangePeriod(mTimerHandle, pdMS_TO_TICKS(aTimeoutMs), 100);
     xTimerStart(mTimerHandle, 100);
@@ -130,17 +130,17 @@ void PumpManager::CancelTimer(void)
 
 void PumpManager::TimerEventHandler(TimerHandle_t aTimer)
 {
-    PumpManager * lock = static_cast<PumpManager *>(pvTimerGetTimerID(aTimer));
+    PumpManager * pump = static_cast<PumpManager *>(pvTimerGetTimerID(aTimer));
 
     // The timer event handler will be called in the context of the timer task
-    // once sLockTimer expires. Post an event to apptask queue with the actual handler
+    // once sPumpTimer expires. Post an event to apptask queue with the actual handler
     // so that the event can be handled in the context of the apptask.
     AppEvent event;
-    event.Type                  = AppEvent::kEventType_AppEvent;
-    event.BoltLockEvent.Context = static_cast<PumpManager *>(lock);
-    if (lock->mAutoLockTimerArmed)
+    event.Type                   = AppEvent::kEventType_AppEvent;
+    event.PumpStateEvent.Context = static_cast<PumpManager *>(pump);
+    if (pump->mAutoStartTimerArmed)
     {
-        event.Handler = AutoReLockTimerEventHandler;
+        event.Handler = AutoRestartTimerEventHandler;
     }
     else
     {
@@ -149,56 +149,56 @@ void PumpManager::TimerEventHandler(TimerHandle_t aTimer)
     GetAppTask().PostEvent(&event);
 }
 
-void PumpManager::AutoReLockTimerEventHandler(AppEvent * aEvent)
+void PumpManager::AutoRestartTimerEventHandler(AppEvent * aEvent)
 {
-    PumpManager * lock = static_cast<PumpManager *>(aEvent->BoltLockEvent.Context);
+    PumpManager * pump = static_cast<PumpManager *>(aEvent->PumpStateEvent.Context);
     int32_t actor      = 0;
 
-    // Make sure auto lock timer is still armed.
-    if (!lock->mAutoLockTimerArmed)
+    // Make sure auto start timer is still armed.
+    if (!pump->mAutoStartTimerArmed)
     {
         return;
     }
 
-    lock->mAutoLockTimerArmed = false;
+    pump->mAutoStartTimerArmed = false;
 
-    PLAT_LOG("Auto Re-Lock has been triggered!");
+    PLAT_LOG("Auto Re-Start has been triggered!");
 
-    lock->InitiateAction(actor, LOCK_ACTION);
+    pump->InitiateAction(actor, START_ACTION);
 }
 
 void PumpManager::ActuatorMovementTimerEventHandler(AppEvent * aEvent)
 {
     Action_t actionCompleted = INVALID_ACTION;
 
-    PumpManager * lock = static_cast<PumpManager *>(aEvent->BoltLockEvent.Context);
+    PumpManager * pump = static_cast<PumpManager *>(aEvent->PumpStateEvent.Context);
 
-    if (lock->mState == kState_LockingInitiated)
+    if (pump->mState == kState_StartInitiated)
     {
-        lock->mState    = kState_LockingCompleted;
-        actionCompleted = LOCK_ACTION;
+        pump->mState    = kState_StartCompleted;
+        actionCompleted = START_ACTION;
     }
-    else if (lock->mState == kState_UnlockingInitiated)
+    else if (pump->mState == kState_StopInitiated)
     {
-        lock->mState    = kState_UnlockingCompleted;
-        actionCompleted = UNLOCK_ACTION;
+        pump->mState    = kState_StopCompleted;
+        actionCompleted = STOP_ACTION;
     }
 
     if (actionCompleted != INVALID_ACTION)
     {
-        if (lock->mActionCompleted_CB)
+        if (pump->mActionCompleted_CB)
         {
-            lock->mActionCompleted_CB(actionCompleted);
+            pump->mActionCompleted_CB(actionCompleted, pump->mCurrentActor);
         }
 
-        if (lock->mAutoRelock && actionCompleted == UNLOCK_ACTION)
+        if (pump->mAutoRestart && actionCompleted == STOP_ACTION)
         {
-            // Start the timer for auto relock
-            lock->StartTimer(lock->mAutoLockDuration * 1000);
+            // Start the timer for auto restart
+            pump->PumpTimer(pump->mAutoStartDuration * 1000);
 
-            lock->mAutoLockTimerArmed = true;
+            pump->mAutoStartTimerArmed = true;
 
-            PLAT_LOG("Auto Re-lock enabled. Will be triggered in %u seconds", lock->mAutoLockDuration);
+            PLAT_LOG("Auto Re-start enabled. Will be triggered in %u seconds", pump->mAutoStartDuration);
         }
     }
 }

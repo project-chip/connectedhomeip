@@ -28,10 +28,13 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/nxp/k32w/k32w0/DiagnosticDataProviderImpl.h>
 
 #include <lwip/tcpip.h>
 
 #include <openthread/platform/entropy.h>
+
+#include "K32W061.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -59,6 +62,19 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     err = Internal::K32WConfig::Init();
     SuccessOrExit(err);
 
+    if (Chip_GetType() != CHIP_K32W061)
+    {
+        err = CHIP_ERROR_INTERNAL;
+        ChipLogError(DeviceLayer, "Invalid chip type, expected K32W061");
+
+        goto exit;
+    }
+
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
+
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
 
@@ -72,6 +88,31 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
+}
+
+CHIP_ERROR PlatformManagerImpl::_Shutdown()
+{
+    uint64_t upTime = 0;
+
+    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalOperationalHours = 0;
+
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        {
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
+    }
+
+    return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
 } // namespace DeviceLayer

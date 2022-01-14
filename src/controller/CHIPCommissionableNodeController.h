@@ -19,7 +19,6 @@
 #pragma once
 
 #include <controller/AbstractDnssdDiscoveryController.h>
-#include <lib/dnssd/Resolver.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -37,8 +36,7 @@ namespace Controller {
 class DLL_EXPORT CommissionableNodeController : public AbstractDnssdDiscoveryController
 {
 public:
-    CommissionableNodeController(chip::Dnssd::Resolver * resolver = &chip::Dnssd::Resolver::Instance()) :
-        AbstractDnssdDiscoveryController(resolver){};
+    CommissionableNodeController(chip::Dnssd::Resolver * resolver = nullptr) : mResolver(resolver) {}
     virtual ~CommissionableNodeController() {}
 
     CHIP_ERROR DiscoverCommissioners(Dnssd::DiscoveryFilter discoveryFilter = Dnssd::DiscoveryFilter());
@@ -66,6 +64,7 @@ protected:
     DiscoveredNodeList GetDiscoveredNodes() override { return DiscoveredNodeList(mDiscoveredCommissioners); }
 
 private:
+    Dnssd::Resolver * mResolver = nullptr;
     Dnssd::DiscoveredNodeData mDiscoveredCommissioners[CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES];
 };
 

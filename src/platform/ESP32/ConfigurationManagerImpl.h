@@ -41,27 +41,21 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the ESP32 platform.
  */
-class ConfigurationManagerImpl final : public Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>,
+class ConfigurationManagerImpl : public Internal::GenericConfigurationManagerImpl<Internal::ESP32Config>,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
+                                 public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>
 #else
-                                       public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>,
+                                 public Internal::GenericConnectivityManagerImpl_NoBLE<ConnectivityManagerImpl>
 #endif
-                                       private Internal::ESP32Config
 {
 public:
-    CHIP_ERROR GetRebootCount(uint32_t & rebootCount);
-    CHIP_ERROR StoreRebootCount(uint32_t rebootCount);
-    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours);
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override;
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
+    static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
-    // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
-    // defined on this class.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
-#endif
-
     // ===== Members that implement the ConfigurationManager public interface.
 
     CHIP_ERROR Init(void) override;
@@ -74,39 +68,24 @@ private:
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
 
-    // ===== Members for internal use by the following friends.
-
-    friend ConfigurationManager & ConfigurationMgr(void);
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
-
-    static ConfigurationManagerImpl sInstance;
+    // ===== Members that implement the GenericConfigurationManagerImpl protected interface.
+    CHIP_ERROR ReadConfigValue(Key key, bool & val) override;
+    CHIP_ERROR ReadConfigValue(Key key, uint32_t & val) override;
+    CHIP_ERROR ReadConfigValue(Key key, uint64_t & val) override;
+    CHIP_ERROR ReadConfigValueStr(Key key, char * buf, size_t bufSize, size_t & outLen) override;
+    CHIP_ERROR ReadConfigValueBin(Key key, uint8_t * buf, size_t bufSize, size_t & outLen) override;
+    CHIP_ERROR WriteConfigValue(Key key, bool val) override;
+    CHIP_ERROR WriteConfigValue(Key key, uint32_t val) override;
+    CHIP_ERROR WriteConfigValue(Key key, uint64_t val) override;
+    CHIP_ERROR WriteConfigValueStr(Key key, const char * str) override;
+    CHIP_ERROR WriteConfigValueStr(Key key, const char * str, size_t strLen) override;
+    CHIP_ERROR WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen) override;
+    void RunConfigUnitTest(void) override;
 
     // ===== Private members reserved for use by this class only.
 
     static void DoFactoryReset(intptr_t arg);
 };
-
-/**
- * Returns the public interface of the ConfigurationManager singleton object.
- *
- * Chip applications should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
- */
-inline ConfigurationManager & ConfigurationMgr(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
- *
- * Chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the ESP32 platform.
- */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

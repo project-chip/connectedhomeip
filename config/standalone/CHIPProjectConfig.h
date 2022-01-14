@@ -26,8 +26,6 @@
 
 #define CHIP_CONFIG_ENABLE_EPHEMERAL_UDP_PORT 1
 
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
-
 #define CHIP_CONFIG_EVENT_LOGGING_NUM_EXTERNAL_CALLBACKS 2
 
 #define CHIP_CONFIG_EVENT_LOGGING_EXTERNAL_EVENT_SUPPORT 1
@@ -53,6 +51,8 @@
 //    WARNING: These options make it possible to circumvent basic Chip security functionality,
 //    including message encryption. Because of this they MUST NEVER BE ENABLED IN PRODUCTION BUILDS.
 //
+//    To build with this flag, pass 'treat_warnings_as_errors=false' to gn/ninja.
+//
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
 #define CHIP_CONFIG_REQUIRE_AUTH 1
 
@@ -69,6 +69,10 @@
 
 #define CHIP_CONFIG_DATA_MANAGEMENT_CLIENT_EXPERIMENTAL 1
 
-#define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 1
+#ifndef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 4
+#endif
+
+#define CONFIG_IM_BUILD_FOR_UNIT_TEST 1
 
 #endif /* CHIPPROJECTCONFIG_H */

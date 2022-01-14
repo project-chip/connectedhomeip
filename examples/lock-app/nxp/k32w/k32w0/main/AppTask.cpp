@@ -141,8 +141,8 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Print the current software version
-    char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength + 1] = { 0 };
-    err = ConfigurationMgr().GetFirmwareRevisionString(currentFirmwareRev, sizeof(currentFirmwareRev));
+    char currentSoftwareVer[ConfigurationManager::kMaxSoftwareVersionLength + 1] = { 0 };
+    err = ConfigurationMgr().GetSoftwareVersionString(currentSoftwareVer, sizeof(currentSoftwareVer));
     if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Get version error");
@@ -153,7 +153,7 @@ CHIP_ERROR AppTask::Init()
     PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);
 #endif
 
-    K32W_LOG("Current Firmware Version: %s", currentFirmwareRev);
+    K32W_LOG("Current Software Version: %s", currentSoftwareVer);
     return err;
 }
 

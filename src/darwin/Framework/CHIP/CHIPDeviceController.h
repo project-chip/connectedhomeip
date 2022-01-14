@@ -39,7 +39,6 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
 - (BOOL)pairDevice:(uint64_t)deviceID
      discriminator:(uint16_t)discriminator
       setupPINCode:(uint32_t)setupPINCode
-          csrNonce:(nullable NSData *)csrNonce
              error:(NSError * __autoreleasing *)error;
 
 - (BOOL)pairDevice:(uint64_t)deviceID
@@ -49,15 +48,7 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
       setupPINCode:(uint32_t)setupPINCode
              error:(NSError * __autoreleasing *)error;
 
-- (BOOL)pairDeviceWithoutSecurity:(uint64_t)deviceID
-                          address:(NSString *)address
-                             port:(uint16_t)port
-                            error:(NSError * __autoreleasing *)error;
-
-- (BOOL)pairDevice:(uint64_t)deviceID
-        onboardingPayload:(NSString *)onboardingPayload
-    onboardingPayloadType:(CHIPOnboardingPayloadType)onboardingPayloadType
-                    error:(NSError * __autoreleasing *)error;
+- (BOOL)pairDevice:(uint64_t)deviceID onboardingPayload:(NSString *)onboardingPayload error:(NSError * __autoreleasing *)error;
 
 - (void)setListenPort:(uint16_t)port;
 - (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
@@ -65,9 +56,17 @@ typedef void (^CHIPDeviceConnectionCallback)(CHIPDevice * _Nullable device, NSEr
 - (void)updateDevice:(uint64_t)deviceID fabricId:(uint64_t)fabricId;
 
 - (BOOL)isDevicePaired:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+- (nullable CHIPDevice *)getDeviceBeingCommissioned:(uint64_t)deviceId error:(NSError * __autoreleasing *)error;
 - (BOOL)getConnectedDevice:(uint64_t)deviceID
                      queue:(dispatch_queue_t)queue
          completionHandler:(CHIPDeviceConnectionCallback)completionHandler;
+
+- (BOOL)openPairingWindow:(uint64_t)deviceID duration:(NSUInteger)duration error:(NSError * __autoreleasing *)error;
+- (nullable NSString *)openPairingWindowWithPIN:(uint64_t)deviceID
+                                       duration:(NSUInteger)duration
+                                  discriminator:(NSUInteger)discriminator
+                                       setupPIN:(NSUInteger)setupPIN
+                                          error:(NSError * __autoreleasing *)error;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

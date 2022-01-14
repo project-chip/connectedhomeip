@@ -14,6 +14,25 @@
 
 import("//build_overrides/chip.gni")
 
+declare_args() {
+  # Allows to change time between retries during the case session
+  chip_case_retry_delta = ""
+}
+
+defines = []
+
+if (chip_case_retry_delta != "") {
+  defines += [
+    "CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL=${chip_case_retry_delta}",
+  ]
+}
+
+source_set("messaging_mrp_config") {
+  sources = [ "ReliableMessageProtocolConfig.h" ]
+
+  public_deps = [ "${chip_root}/src/system" ]
+}
+
 static_library("messaging") {
   output_name = "libMessagingLayer"
 
@@ -29,18 +48,18 @@ static_library("messaging") {
     "ExchangeMessageDispatch.h",
     "ExchangeMgr.cpp",
     "ExchangeMgr.h",
-    "ExchangeMgrDelegate.h",
     "Flags.h",
     "ReliableMessageContext.cpp",
     "ReliableMessageContext.h",
     "ReliableMessageMgr.cpp",
     "ReliableMessageMgr.h",
-    "ReliableMessageProtocolConfig.h",
+    "ReliableMessageProtocolConfig.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":messaging_mrp_config",
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",

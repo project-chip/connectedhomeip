@@ -33,18 +33,10 @@
 
 using namespace chip;
 using namespace chip::TLV;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
-CHIP_ERROR StatusIB::Parser::Init(const TLV::TLVReader & aReader)
-{
-    // make a copy of the reader here
-    mReader.Init(aReader);
-    VerifyOrReturnError(TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR StatusIB::Parser::DecodeStatusIB(StatusIB & aStatusIB) const
 {
     TLV::TLVReader reader;
@@ -135,18 +127,6 @@ CHIP_ERROR StatusIB::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR StatusIB::Builder::Init(TLV::TLVWriter * const apWriter)
-{
-    return InitAnonymousStructure(apWriter);
-}
-
-CHIP_ERROR StatusIB::Builder::Init(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
-{
-    mpWriter = apWriter;
-    mError   = mpWriter->StartContainer(TLV::ContextTag(aContextTagToUse), TLV::kTLVType_Structure, mOuterContainerType);
-    return mError;
-}
-
 StatusIB::Builder & StatusIB::Builder::EncodeStatusIB(const StatusIB & aStatusIB)
 {
     mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kStatus)), aStatusIB.mStatus);
@@ -161,6 +141,46 @@ StatusIB::Builder & StatusIB::Builder::EncodeStatusIB(const StatusIB & aStatusIB
     EndOfContainer();
 exit:
     return *this;
+}
+
+CHIP_ERROR StatusIB::ToChipError() const
+{
+    if (mStatus == Status::Success)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (mClusterStatus.HasValue())
+    {
+        return ChipError(ChipError::SdkPart::kIMClusterStatus, mClusterStatus.Value());
+    }
+
+    return ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(mStatus));
+}
+
+void StatusIB::InitFromChipError(CHIP_ERROR aError)
+{
+    if (aError.IsPart(ChipError::SdkPart::kIMClusterStatus))
+    {
+        mStatus        = Status::Failure;
+        mClusterStatus = MakeOptional(aError.GetSdkCode());
+        return;
+    }
+
+    mClusterStatus = NullOptional;
+    if (aError == CHIP_NO_ERROR)
+    {
+        mStatus = Status::Success;
+        return;
+    }
+
+    if (aError.IsPart(ChipError::SdkPart::kIMGlobalStatus))
+    {
+        mStatus = static_cast<Status>(aError.GetSdkCode());
+        return;
+    }
+
+    mStatus = Status::Failure;
 }
 
 }; // namespace app

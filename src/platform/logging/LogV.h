@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <lib/support/EnforceFormat.h>
 #include <stdarg.h>
 #include <stdint.h>
 
@@ -27,7 +28,7 @@ namespace Platform {
  *                      correspond to the format specifiers in @a msg.
  *
  */
-void LogV(const char * module, uint8_t category, const char * msg, va_list v);
+void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v);
 
 } // namespace Platform
 } // namespace Logging

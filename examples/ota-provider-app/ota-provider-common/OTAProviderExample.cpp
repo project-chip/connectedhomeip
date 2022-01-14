@@ -18,29 +18,41 @@
 
 #include <ota-provider-common/OTAProviderExample.h>
 
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app/CommandPathParams.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
+#include <app/server/Server.h>
 #include <app/util/af.h>
+#include <credentials/FabricTable.h>
 #include <crypto/RandUtils.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMemString.h>
-#include <protocols/secure_channel/PASESession.h> // For chip::kTestDeviceNodeId
+#include <protocols/bdx/BdxUri.h>
 
 #include <string.h>
 
+using chip::BitFlags;
 using chip::ByteSpan;
+using chip::CharSpan;
+using chip::FabricIndex;
+using chip::FabricInfo;
+using chip::MutableCharSpan;
+using chip::NodeId;
+using chip::Optional;
+using chip::Server;
 using chip::Span;
-using chip::app::CommandPathFlags;
-using chip::app::CommandPathParams;
 using chip::app::Clusters::OTAProviderDelegate;
-using chip::TLV::ContextTag;
-using chip::TLV::TLVWriter;
+using chip::bdx::TransferControlFlags;
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider;
+using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 constexpr uint8_t kUpdateTokenLen    = 32;                      // must be between 8 and 32
 constexpr uint8_t kUpdateTokenStrLen = kUpdateTokenLen * 2 + 1; // Hex string needs 2 hex chars for every byte
 constexpr size_t kUriMaxLen          = 256;
+
+// Arbitrary BDX Transfer Params
+constexpr uint32_t kMaxBdxBlockSize                 = 1024;
+constexpr chip::System::Clock::Timeout kBdxTimeout  = chip::System::Clock::Seconds16(5 * 60); // OTA Spec mandates >= 5 minutes
+constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
 
 void GetUpdateTokenString(const chip::ByteSpan & token, char * buf, size_t bufSize)
 {
@@ -58,24 +70,6 @@ void GenerateUpdateToken(uint8_t * buf, size_t bufSize)
     {
         buf[i] = chip::Crypto::GetRandU8();
     }
-}
-
-bool GenerateBdxUri(const Span<char> & fileDesignator, Span<char> outUri, size_t availableSize)
-{
-    static constexpr char bdxPrefix[] = "bdx://";
-    chip::NodeId nodeId               = chip::kTestDeviceNodeId; // TODO: read this dynamically
-    size_t nodeIdHexStrLen            = sizeof(nodeId) * 2;
-    size_t expectedLength             = strlen(bdxPrefix) + nodeIdHexStrLen + fileDesignator.size();
-
-    if (expectedLength >= availableSize)
-    {
-        return false;
-    }
-
-    size_t written = static_cast<size_t>(snprintf(outUri.data(), availableSize, "%s" ChipLogFormatX64 "%s", bdxPrefix,
-                                                  ChipLogValueX64(nodeId), fileDesignator.data()));
-
-    return expectedLength == written;
 }
 
 OTAProviderExample::OTAProviderExample()
@@ -97,16 +91,15 @@ void OTAProviderExample::SetOTAFilePath(const char * path)
     }
 }
 
-EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj, uint16_t vendorId, uint16_t productId,
-                                                   uint16_t hardwareVersion, uint32_t softwareVersion, uint8_t protocolsSupported,
-                                                   const chip::Span<const char> & location, bool requestorCanConsent,
-                                                   const chip::ByteSpan & metadataForProvider)
+EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * commandObj,
+                                                   const chip::app::ConcreteCommandPath & commandPath,
+                                                   const QueryImage::DecodableType & commandData)
 {
     // TODO: add confiuration for returning BUSY status
 
-    EmberAfOTAQueryStatus queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
-    uint32_t newSoftwareVersion       = softwareVersion + 1; // This implementation will always indicate that an update is available
-                                                             // (if the user provides a file).
+    OTAQueryStatus queryStatus  = OTAQueryStatus::kNotAvailable;
+    uint32_t newSoftwareVersion = commandData.softwareVersion + 1; // This implementation will always indicate that an update is
+                                                                   // available (if the user provides a file).
     constexpr char kExampleSoftwareString[] = "Example-Image-V0.1";
     bool userConsentNeeded                  = false;
     uint8_t updateToken[kUpdateTokenLen]    = { 0 };
@@ -119,9 +112,16 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     if (strlen(mOTAFilePath))
     {
+        // TODO: This uses the current node as the provider to supply the OTA image. This can be configurable such that the provider
+        // supplying the response is not the provider supplying the OTA image.
+        FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
+        FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+        NodeId nodeId           = fabricInfo->GetPeerId().GetNodeId();
+
         // Only doing BDX transport for now
-        GenerateBdxUri(Span<char>(mOTAFilePath, strlen(mOTAFilePath)), Span<char>(uriBuf, 0), kUriMaxLen);
-        ChipLogDetail(SoftwareUpdate, "generated URI: %s", uriBuf);
+        MutableCharSpan uri(uriBuf, kUriMaxLen);
+        chip::bdx::MakeURI(nodeId, CharSpan(mOTAFilePath, strlen(mOTAFilePath)), uri);
+        ChipLogDetail(SoftwareUpdate, "Generated URI: %.*s", static_cast<int>(uri.size()), uri.data());
     }
 
     // Set Status for the Query Image Response
@@ -130,80 +130,84 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
     case kRespondWithUpdateAvailable: {
         if (strlen(mOTAFilePath) != 0)
         {
-            queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE;
+            queryStatus = OTAQueryStatus::kUpdateAvailable;
+
+            // Initialize the transfer session in prepartion for a BDX transfer
+            mBdxOtaSender.SetFilepath(mOTAFilePath);
+            BitFlags<TransferControlFlags> bdxFlags;
+            bdxFlags.Set(TransferControlFlags::kReceiverDrive);
+            CHIP_ERROR err = mBdxOtaSender.PrepareForTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kSender,
+                                                              bdxFlags, kMaxBdxBlockSize, kBdxTimeout, kBdxPollFreq);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(BDX, "Failed to initialize BDX transfer session: %s", chip::ErrorStr(err));
+                return EMBER_ZCL_STATUS_FAILURE;
+            }
         }
         else
         {
-            queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
+            queryStatus = OTAQueryStatus::kNotAvailable;
             ChipLogError(SoftwareUpdate, "No OTA file configured on the Provider");
         }
         break;
     }
     case kRespondWithBusy: {
-        queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_BUSY;
+        queryStatus = OTAQueryStatus::kBusy;
         break;
     }
     case kRespondWithNotAvailable: {
-        queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
+        queryStatus = OTAQueryStatus::kNotAvailable;
         break;
     }
     default:
-        queryStatus = EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE;
+        queryStatus = OTAQueryStatus::kNotAvailable;
     }
 
-    CommandPathParams cmdParams = { emberAfCurrentEndpoint(), 0 /* mGroupId */, ZCL_OTA_PROVIDER_CLUSTER_ID,
-                                    ZCL_QUERY_IMAGE_RESPONSE_COMMAND_ID, (CommandPathFlags::kEndpointIdValid) };
-    TLVWriter * writer          = nullptr;
-    uint8_t tagNum              = 0;
-    VerifyOrReturnError((commandObj->PrepareCommand(cmdParams) == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(tagNum++), queryStatus) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(tagNum++), mDelayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->PutString(ContextTag(tagNum++), uriBuf) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(tagNum++), newSoftwareVersion) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->PutString(ContextTag(tagNum++), kExampleSoftwareString) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->PutBytes(ContextTag(tagNum++), updateToken, kUpdateTokenLen) == CHIP_NO_ERROR,
-                        EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(tagNum++), userConsentNeeded) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->PutBytes(ContextTag(tagNum++), updateToken, kUpdateTokenLen) == CHIP_NO_ERROR,
-                        EMBER_ZCL_STATUS_FAILURE); // metadata
-    VerifyOrReturnError((commandObj->FinishCommand() == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
+    QueryImageResponse::Type response;
+    response.status = queryStatus;
+    response.delayedActionTime.Emplace(mDelayedActionTimeSec);
+    response.imageURI.Emplace(chip::CharSpan(uriBuf, strlen(uriBuf)));
+    response.softwareVersion.Emplace(newSoftwareVersion);
+    response.softwareVersionString.Emplace(chip::CharSpan(kExampleSoftwareString, strlen(kExampleSoftwareString)));
+    response.updateToken.Emplace(chip::ByteSpan(updateToken));
+    response.userConsentNeeded.Emplace(userConsentNeeded);
+    // Could also just not send metadataForRequestor at all.
+    response.metadataForRequestor.Emplace(chip::ByteSpan());
 
+    VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
 EmberAfStatus OTAProviderExample::HandleApplyUpdateRequest(chip::app::CommandHandler * commandObj,
-                                                           const chip::ByteSpan & updateToken, uint32_t newVersion)
+                                                           const chip::app::ConcreteCommandPath & commandPath,
+                                                           const ApplyUpdateRequest::DecodableType & commandData)
 {
     // TODO: handle multiple transfers by tracking updateTokens
 
-    EmberAfOTAApplyUpdateAction updateAction = EMBER_ZCL_OTA_APPLY_UPDATE_ACTION_PROCEED; // For now, just allow any update request
-    char tokenBuf[kUpdateTokenStrLen]        = { 0 };
+    OTAApplyUpdateAction updateAction = OTAApplyUpdateAction::kProceed; // For now, just allow any update request
+    char tokenBuf[kUpdateTokenStrLen] = { 0 };
 
-    GetUpdateTokenString(updateToken, tokenBuf, kUpdateTokenStrLen);
-    ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, newVersion);
+    GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
+    ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.newVersion);
 
     VerifyOrReturnError(commandObj != nullptr, EMBER_ZCL_STATUS_INVALID_VALUE);
 
-    CommandPathParams cmdParams = { emberAfCurrentEndpoint(), 0 /* mGroupId */, ZCL_OTA_PROVIDER_CLUSTER_ID,
-                                    ZCL_APPLY_UPDATE_REQUEST_RESPONSE_COMMAND_ID, (CommandPathFlags::kEndpointIdValid) };
-    TLVWriter * writer          = nullptr;
-
-    VerifyOrReturnError((commandObj->PrepareCommand(cmdParams) == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(0), updateAction) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError(writer->Put(ContextTag(1), mDelayedActionTimeSec) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrReturnError((commandObj->FinishCommand() == CHIP_NO_ERROR), EMBER_ZCL_STATUS_FAILURE);
+    ApplyUpdateResponse::Type response;
+    response.action            = updateAction;
+    response.delayedActionTime = mDelayedActionTimeSec;
+    VerifyOrReturnError(commandObj->AddResponseData(commandPath, response) == CHIP_NO_ERROR, EMBER_ZCL_STATUS_FAILURE);
 
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus OTAProviderExample::HandleNotifyUpdateApplied(const chip::ByteSpan & updateToken, uint32_t softwareVersion)
+EmberAfStatus OTAProviderExample::HandleNotifyUpdateApplied(chip::app::CommandHandler * commandObj,
+                                                            const chip::app::ConcreteCommandPath & commandPath,
+                                                            const NotifyUpdateApplied::DecodableType & commandData)
 {
     char tokenBuf[kUpdateTokenStrLen] = { 0 };
 
-    GetUpdateTokenString(updateToken, tokenBuf, kUpdateTokenStrLen);
-    ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, softwareVersion);
+    GetUpdateTokenString(commandData.updateToken, tokenBuf, kUpdateTokenStrLen);
+    ChipLogDetail(SoftwareUpdate, "%s: token: %s, version: %" PRIu32, __FUNCTION__, tokenBuf, commandData.softwareVersion);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
 

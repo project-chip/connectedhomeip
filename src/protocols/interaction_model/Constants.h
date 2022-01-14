@@ -66,7 +66,7 @@ enum class MsgType : uint8_t
 };
 
 // This table comes from the IM's "Status Code Table" section from the Interaction Model spec.
-enum class Status : uint16_t
+enum class Status : uint8_t
 {
     Success                = 0x0,
     Failure                = 0x01,
@@ -108,7 +108,7 @@ enum class Status : uint16_t
     UnsupportedCluster     = 0xc3,
     Deprecatedc4           = 0xc4,
     NoUpstreamSubscription = 0xc5,
-    InvalidArgument        = 0xc6,
+    NeedsTimedInteraction  = 0xc6,
 };
 } // namespace InteractionModel
 
