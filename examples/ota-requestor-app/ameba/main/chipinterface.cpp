@@ -120,7 +120,6 @@ static void InitOTARequestor(void)
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // Initialize and interconnect the Requestor and Image Processor objects -- END
-
 }
 
 extern "C" void ChipTest(void)
