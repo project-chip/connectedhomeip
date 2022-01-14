@@ -20,12 +20,21 @@
 
 #include <string>
 
+#include <app/data-model/DecodableList.h>
+#include <app/ConcreteAttributePath.h>
+#include <app/ConcreteCommandPath.h>
+#include <app/EventHeader.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/BytesToHex.h>
 
 class DataModelLogger
 {
 public:
+    static CHIP_ERROR LogAttribute(const chip::app::ConcreteDataAttributePath & path, chip::TLV::TLVReader * data);
+    static CHIP_ERROR LogCommand(const chip::app::ConcreteCommandPath & path, chip::TLV::TLVReader * data);
+    static CHIP_ERROR LogEvent(const chip::app::EventHeader & header, chip::TLV::TLVReader * data);
+
+private:
     static CHIP_ERROR LogValue(const char * label, size_t indent, bool value)
     {
         DataModelLogger::LogString(label, indent, value ? "TRUE" : "FALSE");
@@ -139,7 +148,6 @@ public:
 
 #include <zap-generated/cluster/logging/DataModelLogger.h>
 
-private:
     static void LogString(size_t indent, const std::string string) { LogString("", indent, string); }
 
     static void LogString(const std::string label, size_t indent, const std::string string)
