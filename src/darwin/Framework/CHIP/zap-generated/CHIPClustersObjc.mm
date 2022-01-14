@@ -25,9 +25,9 @@
 #import "CHIPCommandPayloadsObjc.h"
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
-#import "CHIPListUtils_internal.h"
 #import "CHIPStructsObjc.h"
 
+#include <lib/support/CHIPListUtils.h>
 #include <type_traits>
 
 using chip::Callback::Callback;

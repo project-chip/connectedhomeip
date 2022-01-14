@@ -28,10 +28,12 @@
 #include <controller/java/AndroidClusterExceptions.h>
 #include <controller/java/CHIPDefaultCallbacks.h>
 #include <jni.h>
+#include <lib/support/CHIPListUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <lib/support/Span.h>
+#include <list>
 #include <platform/PlatformManager.h>
 
 #define JNI_METHOD(RETURN, CLASS_NAME, METHOD_NAME)                                                                                \
@@ -59,6 +61,120 @@ JNI_METHOD(jlong, AccessControlCluster, initWithDevice)(JNIEnv * env, jobject se
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, AccessControlCluster, subscribeAclAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPAccessControlAclAttributeCallback, void (*)(CHIPAccessControlAclAttributeCallback *)> onSuccess(
+        Platform::New<CHIPAccessControlAclAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPAccessControlAclAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    AccessControlCluster * cppCluster = reinterpret_cast<AccessControlCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPAccessControlClusterAclAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPAccessControlAclAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, AccessControlCluster, subscribeExtensionAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPAccessControlExtensionAttributeCallback, void (*)(CHIPAccessControlExtensionAttributeCallback *)> onSuccess(
+        Platform::New<CHIPAccessControlExtensionAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPAccessControlExtensionAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    AccessControlCluster * cppCluster = reinterpret_cast<AccessControlCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::AccessControl::Attributes::Extension::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPAccessControlClusterExtensionAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPAccessControlExtensionAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, AccessControlCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPAccessControlAttributeListAttributeCallback, void (*)(CHIPAccessControlAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPAccessControlAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPAccessControlAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    AccessControlCluster * cppCluster = reinterpret_cast<AccessControlCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::AccessControl::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPAccessControlClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPAccessControlAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, AccessControlCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -112,9 +228,14 @@ JNI_METHOD(void, AccountLoginCluster, getSetupPINRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::AccountLogin::Commands::GetSetupPINRequest::Type request;
 
-    request.tempAccountIdentifier = chip::JniUtfString(env, static_cast<jstring>(tempAccountIdentifier)).charSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto tempAccountIdentifierJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(tempAccountIdentifier));
+    cleanupStrings.push_back(tempAccountIdentifierJni);
+    request.tempAccountIdentifier = tempAccountIdentifierJni->charSpan();
 
     std::unique_ptr<CHIPAccountLoginClusterGetSetupPINResponseCallback,
                     void (*)(CHIPAccountLoginClusterGetSetupPINResponseCallback *)>
@@ -144,6 +265,11 @@ JNI_METHOD(void, AccountLoginCluster, getSetupPINRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -155,10 +281,17 @@ JNI_METHOD(void, AccountLoginCluster, loginRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::AccountLogin::Commands::LoginRequest::Type request;
 
-    request.tempAccountIdentifier = chip::JniUtfString(env, static_cast<jstring>(tempAccountIdentifier)).charSpan();
-    request.setupPIN              = chip::JniUtfString(env, static_cast<jstring>(setupPIN)).charSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto tempAccountIdentifierJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(tempAccountIdentifier));
+    cleanupStrings.push_back(tempAccountIdentifierJni);
+    request.tempAccountIdentifier = tempAccountIdentifierJni->charSpan();
+    auto setupPINJni              = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(setupPIN));
+    cleanupStrings.push_back(setupPINJni);
+    request.setupPIN = setupPINJni->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -192,6 +325,11 @@ JNI_METHOD(void, AccountLoginCluster, loginRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -202,7 +340,11 @@ JNI_METHOD(void, AccountLoginCluster, logoutRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     AccountLoginCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::AccountLogin::Commands::LogoutRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -228,6 +370,49 @@ JNI_METHOD(void, AccountLoginCluster, logoutRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, AccountLoginCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPAccountLoginAttributeListAttributeCallback, void (*)(CHIPAccountLoginAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPAccountLoginAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPAccountLoginAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    AccountLoginCluster * cppCluster = reinterpret_cast<AccountLoginCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::AccountLogin::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPAccountLoginClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPAccountLoginAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -285,9 +470,12 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openBasicCommissioningWindow
     CHIP_ERROR err = CHIP_NO_ERROR;
     AdministratorCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::AdministratorCommissioning::Commands::OpenBasicCommissioningWindow::Type request;
 
-    request.commissioningTimeout = static_cast<decltype(request.commissioningTimeout)>(
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.commissioningTimeout = static_cast<std::remove_reference_t<decltype(request.commissioningTimeout)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(commissioningTimeout));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
@@ -321,6 +509,11 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openBasicCommissioningWindow
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -333,17 +526,25 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openCommissioningWindow)
     CHIP_ERROR err = CHIP_NO_ERROR;
     AdministratorCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::AdministratorCommissioning::Commands::OpenCommissioningWindow::Type request;
 
-    request.commissioningTimeout = static_cast<decltype(request.commissioningTimeout)>(
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.commissioningTimeout = static_cast<std::remove_reference_t<decltype(request.commissioningTimeout)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(commissioningTimeout));
-    request.PAKEVerifier = chip::JniByteArray(env, static_cast<jbyteArray>(PAKEVerifier)).byteSpan();
-    request.discriminator =
-        static_cast<decltype(request.discriminator)>(chip::JniReferences::GetInstance().IntegerToPrimitive(discriminator));
-    request.iterations = static_cast<decltype(request.iterations)>(chip::JniReferences::GetInstance().LongToPrimitive(iterations));
-    request.salt       = chip::JniByteArray(env, static_cast<jbyteArray>(salt)).byteSpan();
-    request.passcodeID =
-        static_cast<decltype(request.passcodeID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(passcodeID));
+    auto PAKEVerifierJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(PAKEVerifier));
+    cleanupByteArrays.push_back(PAKEVerifierJni);
+    request.PAKEVerifier  = PAKEVerifierJni->byteSpan();
+    request.discriminator = static_cast<std::remove_reference_t<decltype(request.discriminator)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(discriminator));
+    request.iterations = static_cast<std::remove_reference_t<decltype(request.iterations)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(iterations));
+    auto saltJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(salt));
+    cleanupByteArrays.push_back(saltJni);
+    request.salt       = saltJni->byteSpan();
+    request.passcodeID = static_cast<std::remove_reference_t<decltype(request.passcodeID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(passcodeID));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -376,6 +577,11 @@ JNI_METHOD(void, AdministratorCommissioningCluster, openCommissioningWindow)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -387,7 +593,11 @@ JNI_METHOD(void, AdministratorCommissioningCluster, revokeCommissioning)
     CHIP_ERROR err = CHIP_NO_ERROR;
     AdministratorCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -420,6 +630,11 @@ JNI_METHOD(void, AdministratorCommissioningCluster, revokeCommissioning)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -534,6 +749,47 @@ JNI_METHOD(void, AdministratorCommissioningCluster, subscribeAdminVendorIdAttrib
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, AdministratorCommissioningCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPAdministratorCommissioningAttributeListAttributeCallback,
+                    void (*)(CHIPAdministratorCommissioningAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPAdministratorCommissioningAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPAdministratorCommissioningAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    AdministratorCommissioningCluster * cppCluster = reinterpret_cast<AdministratorCommissioningCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::AdministratorCommissioning::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPAdministratorCommissioningClusterAttributeListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPAdministratorCommissioningAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -810,6 +1066,84 @@ JNI_METHOD(void, ApplicationBasicCluster, subscribeApplicationVersionAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, ApplicationBasicCluster, subscribeAllowedVendorListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPApplicationBasicAllowedVendorListAttributeCallback,
+                    void (*)(CHIPApplicationBasicAllowedVendorListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPApplicationBasicAllowedVendorListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPApplicationBasicAllowedVendorListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    ApplicationBasicCluster * cppCluster = reinterpret_cast<ApplicationBasicCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPApplicationBasicClusterAllowedVendorListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPApplicationBasicAllowedVendorListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ApplicationBasicCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPApplicationBasicAttributeListAttributeCallback,
+                    void (*)(CHIPApplicationBasicAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPApplicationBasicAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPApplicationBasicAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    ApplicationBasicCluster * cppCluster = reinterpret_cast<ApplicationBasicCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPApplicationBasicClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPApplicationBasicAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, ApplicationBasicCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -857,16 +1191,29 @@ JNI_METHOD(jlong, ApplicationLauncherCluster, initWithDevice)(JNIEnv * env, jobj
 }
 
 JNI_METHOD(void, ApplicationLauncherCluster, hideAppRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject catalogVendorId, jstring applicationId,
- jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject application, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationLauncherCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ApplicationLauncher::Commands::HideAppRequest::Type request;
 
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    jobject application_catalogVendorIdItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(application, "catalogVendorId", "Ljava/lang/Integer;",
+                                                      application_catalogVendorIdItem_0);
+    request.application.catalogVendorId = static_cast<std::remove_reference_t<decltype(request.application.catalogVendorId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(application_catalogVendorIdItem_0));
+    jobject application_applicationIdItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(application, "applicationId", "Ljava/lang/String;",
+                                                      application_applicationIdItem_0);
+    auto application_applicationIdItem_0Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(application_applicationIdItem_0));
+    cleanupStrings.push_back(application_applicationIdItem_0Jni);
+    request.application.applicationId = application_applicationIdItem_0Jni->charSpan();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
@@ -902,22 +1249,42 @@ JNI_METHOD(void, ApplicationLauncherCluster, hideAppRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
 }
 JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring data, jobject catalogVendorId, jstring applicationId,
- jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring data, jobject application, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationLauncherCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppRequest::Type request;
 
-    request.data        = chip::JniUtfString(env, static_cast<jstring>(data)).charSpan();
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto dataJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(data));
+    cleanupStrings.push_back(dataJni);
+    request.data = dataJni->charSpan();
+    jobject application_catalogVendorIdItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(application, "catalogVendorId", "Ljava/lang/Integer;",
+                                                      application_catalogVendorIdItem_0);
+    request.application.catalogVendorId = static_cast<std::remove_reference_t<decltype(request.application.catalogVendorId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(application_catalogVendorIdItem_0));
+    jobject application_applicationIdItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(application, "applicationId", "Ljava/lang/String;",
+                                                      application_applicationIdItem_0);
+    auto application_applicationIdItem_0Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(application_applicationIdItem_0));
+    cleanupStrings.push_back(application_applicationIdItem_0Jni);
+    request.application.applicationId = application_applicationIdItem_0Jni->charSpan();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
@@ -953,21 +1320,39 @@ JNI_METHOD(void, ApplicationLauncherCluster, launchAppRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
 }
 JNI_METHOD(void, ApplicationLauncherCluster, stopAppRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject catalogVendorId, jstring applicationId,
- jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject application, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ApplicationLauncherCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ApplicationLauncher::Commands::StopAppRequest::Type request;
 
-    request.application = chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    jobject application_catalogVendorIdItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(application, "catalogVendorId", "Ljava/lang/Integer;",
+                                                      application_catalogVendorIdItem_0);
+    request.application.catalogVendorId = static_cast<std::remove_reference_t<decltype(request.application.catalogVendorId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(application_catalogVendorIdItem_0));
+    jobject application_applicationIdItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(application, "applicationId", "Ljava/lang/String;",
+                                                      application_applicationIdItem_0);
+    auto application_applicationIdItem_0Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(application_applicationIdItem_0));
+    cleanupStrings.push_back(application_applicationIdItem_0Jni);
+    request.application.applicationId = application_applicationIdItem_0Jni->charSpan();
 
     std::unique_ptr<CHIPApplicationLauncherClusterLauncherResponseCallback,
                     void (*)(CHIPApplicationLauncherClusterLauncherResponseCallback *)>
@@ -1003,6 +1388,91 @@ JNI_METHOD(void, ApplicationLauncherCluster, stopAppRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ApplicationLauncherCluster, subscribeApplicationLauncherListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPApplicationLauncherApplicationLauncherListAttributeCallback,
+                    void (*)(CHIPApplicationLauncherApplicationLauncherListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPApplicationLauncherApplicationLauncherListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPApplicationLauncherApplicationLauncherListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    ApplicationLauncherCluster * cppCluster = reinterpret_cast<ApplicationLauncherCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPApplicationLauncherClusterApplicationLauncherListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPApplicationLauncherApplicationLauncherListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ApplicationLauncherCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPApplicationLauncherAttributeListAttributeCallback,
+                    void (*)(CHIPApplicationLauncherAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPApplicationLauncherAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPApplicationLauncherAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    ApplicationLauncherCluster * cppCluster = reinterpret_cast<ApplicationLauncherCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ApplicationLauncher::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPApplicationLauncherClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPApplicationLauncherAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -1060,10 +1530,16 @@ JNI_METHOD(void, AudioOutputCluster, renameOutputRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     AudioOutputCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::AudioOutput::Commands::RenameOutputRequest::Type request;
 
-    request.index = static_cast<decltype(request.index)>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
-    request.name  = chip::JniUtfString(env, static_cast<jstring>(name)).charSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.index =
+        static_cast<std::remove_reference_t<decltype(request.index)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
+    auto nameJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(name));
+    cleanupStrings.push_back(nameJni);
+    request.name = nameJni->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1096,6 +1572,11 @@ JNI_METHOD(void, AudioOutputCluster, renameOutputRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1107,9 +1588,13 @@ JNI_METHOD(void, AudioOutputCluster, selectOutputRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     AudioOutputCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::AudioOutput::Commands::SelectOutputRequest::Type request;
 
-    request.index = static_cast<decltype(request.index)>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.index =
+        static_cast<std::remove_reference_t<decltype(request.index)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1142,6 +1627,49 @@ JNI_METHOD(void, AudioOutputCluster, selectOutputRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, AudioOutputCluster, subscribeAudioOutputListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPAudioOutputAudioOutputListAttributeCallback, void (*)(CHIPAudioOutputAudioOutputListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPAudioOutputAudioOutputListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPAudioOutputAudioOutputListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    AudioOutputCluster * cppCluster = reinterpret_cast<AudioOutputCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::AudioOutput::Attributes::AudioOutputList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPAudioOutputClusterAudioOutputListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPAudioOutputAudioOutputListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -1176,6 +1704,44 @@ JNI_METHOD(void, AudioOutputCluster, subscribeCurrentAudioOutputAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, AudioOutputCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPAudioOutputAttributeListAttributeCallback, void (*)(CHIPAudioOutputAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPAudioOutputAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPAudioOutputAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    AudioOutputCluster * cppCluster = reinterpret_cast<AudioOutputCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::AudioOutput::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPAudioOutputClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPAudioOutputAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -1236,10 +1802,13 @@ JNI_METHOD(void, BarrierControlCluster, barrierControlGoToPercent)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BarrierControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BarrierControl::Commands::BarrierControlGoToPercent::Type request;
 
-    request.percentOpen =
-        static_cast<decltype(request.percentOpen)>(chip::JniReferences::GetInstance().IntegerToPrimitive(percentOpen));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.percentOpen = static_cast<std::remove_reference_t<decltype(request.percentOpen)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(percentOpen));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1272,6 +1841,11 @@ JNI_METHOD(void, BarrierControlCluster, barrierControlGoToPercent)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1283,7 +1857,11 @@ JNI_METHOD(void, BarrierControlCluster, barrierControlStop)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BarrierControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BarrierControl::Commands::BarrierControlStop::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1316,6 +1894,11 @@ JNI_METHOD(void, BarrierControlCluster, barrierControlStop)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -1468,6 +2051,44 @@ JNI_METHOD(void, BarrierControlCluster, subscribeBarrierPositionAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, BarrierControlCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBarrierControlAttributeListAttributeCallback, void (*)(CHIPBarrierControlAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPBarrierControlAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPBarrierControlAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    BarrierControlCluster * cppCluster = reinterpret_cast<BarrierControlCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::BarrierControl::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPBarrierControlClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPBarrierControlAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, BarrierControlCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -1521,7 +2142,11 @@ JNI_METHOD(void, BasicCluster, mfgSpecificPing)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BasicCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Basic::Commands::MfgSpecificPing::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -1554,6 +2179,11 @@ JNI_METHOD(void, BasicCluster, mfgSpecificPing)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2253,6 +2883,44 @@ JNI_METHOD(void, BasicCluster, subscribeUniqueIDAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, BasicCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBasicAttributeListAttributeCallback, void (*)(CHIPBasicAttributeListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPBasicAttributeListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPBasicAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    BasicCluster * cppCluster = reinterpret_cast<BasicCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Basic::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPBasicClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPBasicAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, BasicCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -2410,6 +3078,45 @@ JNI_METHOD(void, BinaryInputBasicCluster, subscribeStatusFlagsAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, BinaryInputBasicCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBinaryInputBasicAttributeListAttributeCallback,
+                    void (*)(CHIPBinaryInputBasicAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPBinaryInputBasicAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPBinaryInputBasicAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    BinaryInputBasicCluster * cppCluster = reinterpret_cast<BinaryInputBasicCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::BinaryInputBasic::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPBinaryInputBasicClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPBinaryInputBasicAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, BinaryInputBasicCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -2464,13 +3171,19 @@ JNI_METHOD(void, BindingCluster, bind)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BindingCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Binding::Commands::Bind::Type request;
 
-    request.nodeId  = static_cast<decltype(request.nodeId)>(chip::JniReferences::GetInstance().LongToPrimitive(nodeId));
-    request.groupId = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
-    request.endpointId =
-        static_cast<decltype(request.endpointId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(endpointId));
-    request.clusterId = static_cast<decltype(request.clusterId)>(chip::JniReferences::GetInstance().LongToPrimitive(clusterId));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.nodeId =
+        static_cast<std::remove_reference_t<decltype(request.nodeId)>>(chip::JniReferences::GetInstance().LongToPrimitive(nodeId));
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    request.endpointId = static_cast<std::remove_reference_t<decltype(request.endpointId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(endpointId));
+    request.clusterId = static_cast<std::remove_reference_t<decltype(request.clusterId)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(clusterId));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2503,6 +3216,11 @@ JNI_METHOD(void, BindingCluster, bind)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2515,13 +3233,19 @@ JNI_METHOD(void, BindingCluster, unbind)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BindingCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Binding::Commands::Unbind::Type request;
 
-    request.nodeId  = static_cast<decltype(request.nodeId)>(chip::JniReferences::GetInstance().LongToPrimitive(nodeId));
-    request.groupId = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
-    request.endpointId =
-        static_cast<decltype(request.endpointId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(endpointId));
-    request.clusterId = static_cast<decltype(request.clusterId)>(chip::JniReferences::GetInstance().LongToPrimitive(clusterId));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.nodeId =
+        static_cast<std::remove_reference_t<decltype(request.nodeId)>>(chip::JniReferences::GetInstance().LongToPrimitive(nodeId));
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    request.endpointId = static_cast<std::remove_reference_t<decltype(request.endpointId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(endpointId));
+    request.clusterId = static_cast<std::remove_reference_t<decltype(request.clusterId)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(clusterId));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2554,6 +3278,49 @@ JNI_METHOD(void, BindingCluster, unbind)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, BindingCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBindingAttributeListAttributeCallback, void (*)(CHIPBindingAttributeListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPBindingAttributeListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPBindingAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    BindingCluster * cppCluster = reinterpret_cast<BindingCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Binding::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPBindingClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPBindingAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -2641,6 +3408,44 @@ JNI_METHOD(void, BooleanStateCluster, subscribeStateValueAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, BooleanStateCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBooleanStateAttributeListAttributeCallback, void (*)(CHIPBooleanStateAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPBooleanStateAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPBooleanStateAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    BooleanStateCluster * cppCluster = reinterpret_cast<BooleanStateCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::BooleanState::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPBooleanStateClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPBooleanStateAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, BooleanStateCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -2694,12 +3499,21 @@ JNI_METHOD(void, BridgedActionsCluster, disableAction)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::DisableAction::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2732,6 +3546,11 @@ JNI_METHOD(void, BridgedActionsCluster, disableAction)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2744,13 +3563,23 @@ JNI_METHOD(void, BridgedActionsCluster, disableActionWithDuration)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::DisableActionWithDuration::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
-    request.duration = static_cast<decltype(request.duration)>(chip::JniReferences::GetInstance().LongToPrimitive(duration));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
+    request.duration = static_cast<std::remove_reference_t<decltype(request.duration)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(duration));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2783,6 +3612,11 @@ JNI_METHOD(void, BridgedActionsCluster, disableActionWithDuration)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2794,12 +3628,21 @@ JNI_METHOD(void, BridgedActionsCluster, enableAction)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::EnableAction::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2832,6 +3675,11 @@ JNI_METHOD(void, BridgedActionsCluster, enableAction)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2844,13 +3692,23 @@ JNI_METHOD(void, BridgedActionsCluster, enableActionWithDuration)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::EnableActionWithDuration::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
-    request.duration = static_cast<decltype(request.duration)>(chip::JniReferences::GetInstance().LongToPrimitive(duration));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
+    request.duration = static_cast<std::remove_reference_t<decltype(request.duration)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(duration));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2883,6 +3741,11 @@ JNI_METHOD(void, BridgedActionsCluster, enableActionWithDuration)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2894,12 +3757,21 @@ JNI_METHOD(void, BridgedActionsCluster, instantAction)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::InstantAction::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2932,6 +3804,11 @@ JNI_METHOD(void, BridgedActionsCluster, instantAction)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2944,14 +3821,23 @@ JNI_METHOD(void, BridgedActionsCluster, instantActionWithTransition)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::InstantActionWithTransition::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -2984,6 +3870,11 @@ JNI_METHOD(void, BridgedActionsCluster, instantActionWithTransition)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -2995,12 +3886,21 @@ JNI_METHOD(void, BridgedActionsCluster, pauseAction)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::PauseAction::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3033,6 +3933,11 @@ JNI_METHOD(void, BridgedActionsCluster, pauseAction)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3045,13 +3950,23 @@ JNI_METHOD(void, BridgedActionsCluster, pauseActionWithDuration)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::PauseActionWithDuration::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
-    request.duration = static_cast<decltype(request.duration)>(chip::JniReferences::GetInstance().LongToPrimitive(duration));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
+    request.duration = static_cast<std::remove_reference_t<decltype(request.duration)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(duration));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3084,6 +3999,11 @@ JNI_METHOD(void, BridgedActionsCluster, pauseActionWithDuration)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3095,12 +4015,21 @@ JNI_METHOD(void, BridgedActionsCluster, resumeAction)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::ResumeAction::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3133,6 +4062,11 @@ JNI_METHOD(void, BridgedActionsCluster, resumeAction)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3144,12 +4078,21 @@ JNI_METHOD(void, BridgedActionsCluster, startAction)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::StartAction::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3182,6 +4125,11 @@ JNI_METHOD(void, BridgedActionsCluster, startAction)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3194,13 +4142,23 @@ JNI_METHOD(void, BridgedActionsCluster, startActionWithDuration)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::StartActionWithDuration::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
-    request.duration = static_cast<decltype(request.duration)>(chip::JniReferences::GetInstance().LongToPrimitive(duration));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
+    request.duration = static_cast<std::remove_reference_t<decltype(request.duration)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(duration));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3233,6 +4191,11 @@ JNI_METHOD(void, BridgedActionsCluster, startActionWithDuration)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3244,12 +4207,21 @@ JNI_METHOD(void, BridgedActionsCluster, stopAction)
     CHIP_ERROR err = CHIP_NO_ERROR;
     BridgedActionsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::BridgedActions::Commands::StopAction::Type request;
 
-    request.actionID = static_cast<decltype(request.actionID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
-    chip::JniReferences::GetInstance().GetOptionalValue(invokeID, invokeID);
-    request.invokeID = chip::Optional<uint32_t>(
-        static_cast<decltype(request.invokeID)>(chip::JniReferences::GetInstance().LongToPrimitive(invokeID)));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.actionID = static_cast<std::remove_reference_t<decltype(request.actionID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(actionID));
+    if (invokeID != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(invokeID, optionalValue_0);
+        auto & definedValue_0 = request.invokeID.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(optionalValue_0));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3282,6 +4254,87 @@ JNI_METHOD(void, BridgedActionsCluster, stopAction)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, BridgedActionsCluster, subscribeActionListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBridgedActionsActionListAttributeCallback, void (*)(CHIPBridgedActionsActionListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPBridgedActionsActionListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPBridgedActionsActionListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::BridgedActions::Attributes::ActionList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPBridgedActionsClusterActionListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPBridgedActionsActionListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, BridgedActionsCluster, subscribeEndpointListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBridgedActionsEndpointListAttributeCallback, void (*)(CHIPBridgedActionsEndpointListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPBridgedActionsEndpointListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPBridgedActionsEndpointListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::BridgedActions::Attributes::EndpointList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPBridgedActionsClusterEndpointListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPBridgedActionsEndpointListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -3316,6 +4369,44 @@ JNI_METHOD(void, BridgedActionsCluster, subscribeSetupUrlAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPCharStringAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, BridgedActionsCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBridgedActionsAttributeListAttributeCallback, void (*)(CHIPBridgedActionsAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPBridgedActionsAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPBridgedActionsAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    BridgedActionsCluster * cppCluster = reinterpret_cast<BridgedActionsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::BridgedActions::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPBridgedActionsClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPBridgedActionsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -3369,6 +4460,45 @@ JNI_METHOD(jlong, BridgedDeviceBasicCluster, initWithDevice)(JNIEnv * env, jobje
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPBridgedDeviceBasicAttributeListAttributeCallback,
+                    void (*)(CHIPBridgedDeviceBasicAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPBridgedDeviceBasicAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPBridgedDeviceBasicAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    BridgedDeviceBasicCluster * cppCluster = reinterpret_cast<BridgedDeviceBasicCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::BridgedDeviceBasic::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPBridgedDeviceBasicClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPBridgedDeviceBasicAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, BridgedDeviceBasicCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -3423,12 +4553,15 @@ JNI_METHOD(void, ChannelCluster, changeChannelByNumberRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChannelCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Channel::Commands::ChangeChannelByNumberRequest::Type request;
 
-    request.majorNumber =
-        static_cast<decltype(request.majorNumber)>(chip::JniReferences::GetInstance().IntegerToPrimitive(majorNumber));
-    request.minorNumber =
-        static_cast<decltype(request.minorNumber)>(chip::JniReferences::GetInstance().IntegerToPrimitive(minorNumber));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.majorNumber = static_cast<std::remove_reference_t<decltype(request.majorNumber)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(majorNumber));
+    request.minorNumber = static_cast<std::remove_reference_t<decltype(request.minorNumber)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(minorNumber));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3462,6 +4595,11 @@ JNI_METHOD(void, ChannelCluster, changeChannelByNumberRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -3472,9 +4610,14 @@ JNI_METHOD(void, ChannelCluster, changeChannelRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChannelCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Channel::Commands::ChangeChannelRequest::Type request;
 
-    request.match = chip::JniUtfString(env, static_cast<jstring>(match)).charSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto matchJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(match));
+    cleanupStrings.push_back(matchJni);
+    request.match = matchJni->charSpan();
 
     std::unique_ptr<CHIPChannelClusterChangeChannelResponseCallback, void (*)(CHIPChannelClusterChangeChannelResponseCallback *)>
         onSuccess(Platform::New<CHIPChannelClusterChangeChannelResponseCallback>(callback),
@@ -3510,6 +4653,11 @@ JNI_METHOD(void, ChannelCluster, changeChannelRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -3520,9 +4668,13 @@ JNI_METHOD(void, ChannelCluster, skipChannelRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChannelCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Channel::Commands::SkipChannelRequest::Type request;
 
-    request.count = static_cast<decltype(request.count)>(chip::JniReferences::GetInstance().IntegerToPrimitive(count));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.count =
+        static_cast<std::remove_reference_t<decltype(request.count)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(count));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3555,6 +4707,87 @@ JNI_METHOD(void, ChannelCluster, skipChannelRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ChannelCluster, subscribeChannelListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPChannelChannelListAttributeCallback, void (*)(CHIPChannelChannelListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPChannelChannelListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPChannelChannelListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    ChannelCluster * cppCluster = reinterpret_cast<ChannelCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Channel::Attributes::ChannelList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPChannelClusterChannelListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPChannelChannelListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ChannelCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPChannelAttributeListAttributeCallback, void (*)(CHIPChannelAttributeListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPChannelAttributeListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPChannelAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    ChannelCluster * cppCluster = reinterpret_cast<ChannelCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Channel::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPChannelClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPChannelAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -3613,18 +4846,25 @@ JNI_METHOD(void, ColorControlCluster, colorLoopSet)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::ColorLoopSet::Type request;
 
-    request.updateFlags =
-        static_cast<decltype(request.updateFlags)>(chip::JniReferences::GetInstance().IntegerToPrimitive(updateFlags));
-    request.action    = static_cast<decltype(request.action)>(chip::JniReferences::GetInstance().IntegerToPrimitive(action));
-    request.direction = static_cast<decltype(request.direction)>(chip::JniReferences::GetInstance().IntegerToPrimitive(direction));
-    request.time      = static_cast<decltype(request.time)>(chip::JniReferences::GetInstance().IntegerToPrimitive(time));
-    request.startHue  = static_cast<decltype(request.startHue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(startHue));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.updateFlags = static_cast<std::remove_reference_t<decltype(request.updateFlags)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(updateFlags));
+    request.action = static_cast<std::remove_reference_t<decltype(request.action)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(action));
+    request.direction = static_cast<std::remove_reference_t<decltype(request.direction)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(direction));
+    request.time =
+        static_cast<std::remove_reference_t<decltype(request.time)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(time));
+    request.startHue = static_cast<std::remove_reference_t<decltype(request.startHue)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(startHue));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3657,6 +4897,11 @@ JNI_METHOD(void, ColorControlCluster, colorLoopSet)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3669,14 +4914,19 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveHue)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::EnhancedMoveHue::Type request;
 
-    request.moveMode = static_cast<decltype(request.moveMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
-    request.rate     = static_cast<decltype(request.rate)>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
+    request.rate =
+        static_cast<std::remove_reference_t<decltype(request.rate)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3709,6 +4959,11 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveHue)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3721,17 +4976,21 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHue)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHue::Type request;
 
-    request.enhancedHue =
-        static_cast<decltype(request.enhancedHue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(enhancedHue));
-    request.direction = static_cast<decltype(request.direction)>(chip::JniReferences::GetInstance().IntegerToPrimitive(direction));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.enhancedHue = static_cast<std::remove_reference_t<decltype(request.enhancedHue)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(enhancedHue));
+    request.direction = static_cast<std::remove_reference_t<decltype(request.direction)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(direction));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3764,6 +5023,11 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHue)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3776,18 +5040,21 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHueAndSaturation)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::EnhancedMoveToHueAndSaturation::Type request;
 
-    request.enhancedHue =
-        static_cast<decltype(request.enhancedHue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(enhancedHue));
-    request.saturation =
-        static_cast<decltype(request.saturation)>(chip::JniReferences::GetInstance().IntegerToPrimitive(saturation));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.enhancedHue = static_cast<std::remove_reference_t<decltype(request.enhancedHue)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(enhancedHue));
+    request.saturation = static_cast<std::remove_reference_t<decltype(request.saturation)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(saturation));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3820,6 +5087,11 @@ JNI_METHOD(void, ColorControlCluster, enhancedMoveToHueAndSaturation)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3832,16 +5104,21 @@ JNI_METHOD(void, ColorControlCluster, enhancedStepHue)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::EnhancedStepHue::Type request;
 
-    request.stepMode = static_cast<decltype(request.stepMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
-    request.stepSize = static_cast<decltype(request.stepSize)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
+    request.stepSize = static_cast<std::remove_reference_t<decltype(request.stepSize)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3874,6 +5151,11 @@ JNI_METHOD(void, ColorControlCluster, enhancedStepHue)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3886,14 +5168,19 @@ JNI_METHOD(void, ColorControlCluster, moveColor)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::MoveColor::Type request;
 
-    request.rateX = static_cast<decltype(request.rateX)>(chip::JniReferences::GetInstance().IntegerToPrimitive(rateX));
-    request.rateY = static_cast<decltype(request.rateY)>(chip::JniReferences::GetInstance().IntegerToPrimitive(rateY));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.rateX =
+        static_cast<std::remove_reference_t<decltype(request.rateX)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(rateX));
+    request.rateY =
+        static_cast<std::remove_reference_t<decltype(request.rateY)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(rateY));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3926,6 +5213,11 @@ JNI_METHOD(void, ColorControlCluster, moveColor)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3938,18 +5230,23 @@ JNI_METHOD(void, ColorControlCluster, moveColorTemperature)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::MoveColorTemperature::Type request;
 
-    request.moveMode = static_cast<decltype(request.moveMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
-    request.rate     = static_cast<decltype(request.rate)>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
-    request.colorTemperatureMinimum = static_cast<decltype(request.colorTemperatureMinimum)>(
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
+    request.rate =
+        static_cast<std::remove_reference_t<decltype(request.rate)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
+    request.colorTemperatureMinimum = static_cast<std::remove_reference_t<decltype(request.colorTemperatureMinimum)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(colorTemperatureMinimum));
-    request.colorTemperatureMaximum = static_cast<decltype(request.colorTemperatureMaximum)>(
+    request.colorTemperatureMaximum = static_cast<std::remove_reference_t<decltype(request.colorTemperatureMaximum)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(colorTemperatureMaximum));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -3982,6 +5279,11 @@ JNI_METHOD(void, ColorControlCluster, moveColorTemperature)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -3994,14 +5296,19 @@ JNI_METHOD(void, ColorControlCluster, moveHue)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::MoveHue::Type request;
 
-    request.moveMode = static_cast<decltype(request.moveMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
-    request.rate     = static_cast<decltype(request.rate)>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
+    request.rate =
+        static_cast<std::remove_reference_t<decltype(request.rate)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4034,6 +5341,11 @@ JNI_METHOD(void, ColorControlCluster, moveHue)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4046,14 +5358,19 @@ JNI_METHOD(void, ColorControlCluster, moveSaturation)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type request;
 
-    request.moveMode = static_cast<decltype(request.moveMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
-    request.rate     = static_cast<decltype(request.rate)>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
+    request.rate =
+        static_cast<std::remove_reference_t<decltype(request.rate)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4086,6 +5403,11 @@ JNI_METHOD(void, ColorControlCluster, moveSaturation)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4098,16 +5420,21 @@ JNI_METHOD(void, ColorControlCluster, moveToColor)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::MoveToColor::Type request;
 
-    request.colorX = static_cast<decltype(request.colorX)>(chip::JniReferences::GetInstance().IntegerToPrimitive(colorX));
-    request.colorY = static_cast<decltype(request.colorY)>(chip::JniReferences::GetInstance().IntegerToPrimitive(colorY));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.colorX = static_cast<std::remove_reference_t<decltype(request.colorX)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(colorX));
+    request.colorY = static_cast<std::remove_reference_t<decltype(request.colorY)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(colorY));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4140,6 +5467,11 @@ JNI_METHOD(void, ColorControlCluster, moveToColor)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4152,16 +5484,19 @@ JNI_METHOD(void, ColorControlCluster, moveToColorTemperature)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::MoveToColorTemperature::Type request;
 
-    request.colorTemperature =
-        static_cast<decltype(request.colorTemperature)>(chip::JniReferences::GetInstance().IntegerToPrimitive(colorTemperature));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.colorTemperature = static_cast<std::remove_reference_t<decltype(request.colorTemperature)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(colorTemperature));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4194,6 +5529,11 @@ JNI_METHOD(void, ColorControlCluster, moveToColorTemperature)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4206,16 +5546,21 @@ JNI_METHOD(void, ColorControlCluster, moveToHue)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::MoveToHue::Type request;
 
-    request.hue       = static_cast<decltype(request.hue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(hue));
-    request.direction = static_cast<decltype(request.direction)>(chip::JniReferences::GetInstance().IntegerToPrimitive(direction));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.hue =
+        static_cast<std::remove_reference_t<decltype(request.hue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(hue));
+    request.direction = static_cast<std::remove_reference_t<decltype(request.direction)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(direction));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4248,6 +5593,11 @@ JNI_METHOD(void, ColorControlCluster, moveToHue)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4260,17 +5610,21 @@ JNI_METHOD(void, ColorControlCluster, moveToHueAndSaturation)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::MoveToHueAndSaturation::Type request;
 
-    request.hue = static_cast<decltype(request.hue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(hue));
-    request.saturation =
-        static_cast<decltype(request.saturation)>(chip::JniReferences::GetInstance().IntegerToPrimitive(saturation));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.hue =
+        static_cast<std::remove_reference_t<decltype(request.hue)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(hue));
+    request.saturation = static_cast<std::remove_reference_t<decltype(request.saturation)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(saturation));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4303,6 +5657,11 @@ JNI_METHOD(void, ColorControlCluster, moveToHueAndSaturation)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4315,16 +5674,19 @@ JNI_METHOD(void, ColorControlCluster, moveToSaturation)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::MoveToSaturation::Type request;
 
-    request.saturation =
-        static_cast<decltype(request.saturation)>(chip::JniReferences::GetInstance().IntegerToPrimitive(saturation));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.saturation = static_cast<std::remove_reference_t<decltype(request.saturation)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(saturation));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4357,6 +5719,11 @@ JNI_METHOD(void, ColorControlCluster, moveToSaturation)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4369,16 +5736,21 @@ JNI_METHOD(void, ColorControlCluster, stepColor)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::StepColor::Type request;
 
-    request.stepX = static_cast<decltype(request.stepX)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepX));
-    request.stepY = static_cast<decltype(request.stepY)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepY));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.stepX =
+        static_cast<std::remove_reference_t<decltype(request.stepX)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepX));
+    request.stepY =
+        static_cast<std::remove_reference_t<decltype(request.stepY)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepY));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4411,6 +5783,11 @@ JNI_METHOD(void, ColorControlCluster, stepColor)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4424,20 +5801,25 @@ JNI_METHOD(void, ColorControlCluster, stepColorTemperature)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::StepColorTemperature::Type request;
 
-    request.stepMode = static_cast<decltype(request.stepMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
-    request.stepSize = static_cast<decltype(request.stepSize)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.colorTemperatureMinimum = static_cast<decltype(request.colorTemperatureMinimum)>(
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
+    request.stepSize = static_cast<std::remove_reference_t<decltype(request.stepSize)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.colorTemperatureMinimum = static_cast<std::remove_reference_t<decltype(request.colorTemperatureMinimum)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(colorTemperatureMinimum));
-    request.colorTemperatureMaximum = static_cast<decltype(request.colorTemperatureMaximum)>(
+    request.colorTemperatureMaximum = static_cast<std::remove_reference_t<decltype(request.colorTemperatureMaximum)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(colorTemperatureMaximum));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4470,6 +5852,11 @@ JNI_METHOD(void, ColorControlCluster, stepColorTemperature)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4482,16 +5869,21 @@ JNI_METHOD(void, ColorControlCluster, stepHue)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::StepHue::Type request;
 
-    request.stepMode = static_cast<decltype(request.stepMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
-    request.stepSize = static_cast<decltype(request.stepSize)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
+    request.stepSize = static_cast<std::remove_reference_t<decltype(request.stepSize)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4524,6 +5916,11 @@ JNI_METHOD(void, ColorControlCluster, stepHue)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4536,16 +5933,21 @@ JNI_METHOD(void, ColorControlCluster, stepSaturation)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::StepSaturation::Type request;
 
-    request.stepMode = static_cast<decltype(request.stepMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
-    request.stepSize = static_cast<decltype(request.stepSize)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
+    request.stepSize = static_cast<std::remove_reference_t<decltype(request.stepSize)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4578,6 +5980,11 @@ JNI_METHOD(void, ColorControlCluster, stepSaturation)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -4590,12 +5997,15 @@ JNI_METHOD(void, ColorControlCluster, stopMoveStep)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ColorControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ColorControl::Commands::StopMoveStep::Type request;
 
-    request.optionsMask =
-        static_cast<decltype(request.optionsMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
-    request.optionsOverride =
-        static_cast<decltype(request.optionsOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.optionsMask = static_cast<std::remove_reference_t<decltype(request.optionsMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsMask));
+    request.optionsOverride = static_cast<std::remove_reference_t<decltype(request.optionsOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionsOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -4628,6 +6038,11 @@ JNI_METHOD(void, ColorControlCluster, stopMoveStep)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6560,6 +7975,44 @@ JNI_METHOD(void, ColorControlCluster, subscribeStartUpColorTemperatureMiredsAttr
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, ColorControlCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPColorControlAttributeListAttributeCallback, void (*)(CHIPColorControlAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPColorControlAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPColorControlAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    ColorControlCluster * cppCluster = reinterpret_cast<ColorControlCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ColorControl::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPColorControlClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPColorControlAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, ColorControlCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -6607,18 +8060,126 @@ JNI_METHOD(jlong, ContentLauncherCluster, initWithDevice)(JNIEnv * env, jobject 
 }
 
 JNI_METHOD(void, ContentLauncherCluster, launchContentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject autoPlay, jstring data, jobject parameterList,
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject autoPlay, jstring data, jobject search,
  jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ContentLauncherCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ContentLauncher::Commands::LaunchContentRequest::Type request;
 
-    request.autoPlay = static_cast<decltype(request.autoPlay)>(chip::JniReferences::GetInstance().BooleanToPrimitive(autoPlay));
-    request.data     = chip::JniUtfString(env, static_cast<jstring>(data)).charSpan();
-    request.search   = chip::app::DataModel::List<const chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type>();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.autoPlay = static_cast<std::remove_reference_t<decltype(request.autoPlay)>>(
+        chip::JniReferences::GetInstance().BooleanToPrimitive(autoPlay));
+    auto dataJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(data));
+    cleanupStrings.push_back(dataJni);
+    request.data = dataJni->charSpan();
+    {
+        using ListType_0       = std::remove_reference_t<decltype(request.search)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint searchSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(search, searchSize);
+        if (searchSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(searchSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(searchSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(search, i_0, element_0);
+                jobject element_0_parameterListItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "parameterList", "Ljava/util/ArrayList;",
+                                                                  element_0_parameterListItem_1);
+                {
+                    using ListType_2       = std::remove_reference_t<decltype(listHolder_0->mList[i_0].parameterList)>;
+                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                    jint element_0_parameterListItem_1Size;
+                    chip::JniReferences::GetInstance().GetArrayListSize(element_0_parameterListItem_1,
+                                                                        element_0_parameterListItem_1Size);
+                    if (element_0_parameterListItem_1Size != 0)
+                    {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0_parameterListItem_1Size);
+                        listFreer.add(listHolder_2);
+
+                        for (size_t i_2 = 0; i_2 < static_cast<size_t>(element_0_parameterListItem_1Size); ++i_2)
+                        {
+                            jobject element_2;
+                            chip::JniReferences::GetInstance().GetArrayListItem(element_0_parameterListItem_1, i_2, element_2);
+                            jobject element_2_typeItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "type", "Ljava/lang/Integer;",
+                                                                              element_2_typeItem_3);
+                            listHolder_2->mList[i_2].type =
+                                static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].type)>>(
+                                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_2_typeItem_3));
+                            jobject element_2_valueItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "value", "Ljava/lang/String;",
+                                                                              element_2_valueItem_3);
+                            auto element_2_valueItem_3Jni =
+                                chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(element_2_valueItem_3));
+                            cleanupStrings.push_back(element_2_valueItem_3Jni);
+                            listHolder_2->mList[i_2].value = element_2_valueItem_3Jni->charSpan();
+                            jobject element_2_externalIDListItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "externalIDList", "Ljava/util/ArrayList;",
+                                                                              element_2_externalIDListItem_3);
+                            {
+                                using ListType_4       = std::remove_reference_t<decltype(listHolder_2->mList[i_2].externalIDList)>;
+                                using ListMemberType_4 = ListMemberTypeGetter<ListType_4>::Type;
+                                jint element_2_externalIDListItem_3Size;
+                                chip::JniReferences::GetInstance().GetArrayListSize(element_2_externalIDListItem_3,
+                                                                                    element_2_externalIDListItem_3Size);
+                                if (element_2_externalIDListItem_3Size != 0)
+                                {
+                                    auto * listHolder_4 = new ListHolder<ListMemberType_4>(element_2_externalIDListItem_3Size);
+                                    listFreer.add(listHolder_4);
+
+                                    for (size_t i_4 = 0; i_4 < static_cast<size_t>(element_2_externalIDListItem_3Size); ++i_4)
+                                    {
+                                        jobject element_4;
+                                        chip::JniReferences::GetInstance().GetArrayListItem(element_2_externalIDListItem_3, i_4,
+                                                                                            element_4);
+                                        jobject element_4_nameItem_5;
+                                        chip::JniReferences::GetInstance().GetObjectField(element_4, "name", "Ljava/lang/String;",
+                                                                                          element_4_nameItem_5);
+                                        auto element_4_nameItem_5Jni = chip::Platform::New<chip::JniUtfString>(
+                                            env, static_cast<jstring>(element_4_nameItem_5));
+                                        cleanupStrings.push_back(element_4_nameItem_5Jni);
+                                        listHolder_4->mList[i_4].name = element_4_nameItem_5Jni->charSpan();
+                                        jobject element_4_valueItem_5;
+                                        chip::JniReferences::GetInstance().GetObjectField(element_4, "value", "Ljava/lang/String;",
+                                                                                          element_4_valueItem_5);
+                                        auto element_4_valueItem_5Jni = chip::Platform::New<chip::JniUtfString>(
+                                            env, static_cast<jstring>(element_4_valueItem_5));
+                                        cleanupStrings.push_back(element_4_valueItem_5Jni);
+                                        listHolder_4->mList[i_4].value = element_4_valueItem_5Jni->charSpan();
+                                    }
+                                    listHolder_2->mList[i_2].externalIDList =
+                                        ListType_4(listHolder_4->mList, element_2_externalIDListItem_3Size);
+                                }
+                                else
+                                {
+                                    listHolder_2->mList[i_2].externalIDList = ListType_4();
+                                }
+                            }
+                        }
+                        listHolder_0->mList[i_0].parameterList = ListType_2(listHolder_2->mList, element_0_parameterListItem_1Size);
+                    }
+                    else
+                    {
+                        listHolder_0->mList[i_0].parameterList = ListType_2();
+                    }
+                }
+            }
+            request.search = ListType_0(listHolder_0->mList, searchSize);
+        }
+        else
+        {
+            request.search = ListType_0();
+        }
+    }
 
     std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
         onSuccess(Platform::New<CHIPContentLauncherClusterLaunchResponseCallback>(callback),
@@ -6653,23 +8214,249 @@ JNI_METHOD(void, ContentLauncherCluster, launchContentRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
 }
 JNI_METHOD(void, ContentLauncherCluster, launchURLRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring contentURL, jstring displayString, jstring providerName,
- jobject background, jobject logo, jobject progressBar, jobject splash, jobject waterMark, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jstring contentURL, jstring displayString,
+ jobject brandingInformation, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ContentLauncherCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ContentLauncher::Commands::LaunchURLRequest::Type request;
 
-    request.contentURL          = chip::JniUtfString(env, static_cast<jstring>(contentURL)).charSpan();
-    request.displayString       = chip::JniUtfString(env, static_cast<jstring>(displayString)).charSpan();
-    request.brandingInformation = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto contentURLJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(contentURL));
+    cleanupStrings.push_back(contentURLJni);
+    request.contentURL    = contentURLJni->charSpan();
+    auto displayStringJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(displayString));
+    cleanupStrings.push_back(displayStringJni);
+    request.displayString = displayStringJni->charSpan();
+    jobject brandingInformation_providerNameItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "providerName", "Ljava/lang/String;",
+                                                      brandingInformation_providerNameItem_0);
+    auto brandingInformation_providerNameItem_0Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_providerNameItem_0));
+    cleanupStrings.push_back(brandingInformation_providerNameItem_0Jni);
+    request.brandingInformation.providerName = brandingInformation_providerNameItem_0Jni->charSpan();
+    jobject brandingInformation_backgroundItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "background",
+                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterStyleInformation;",
+                                                      brandingInformation_backgroundItem_0);
+    jobject brandingInformation_backgroundItem_0_imageUrlItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0, "imageUrl", "Ljava/lang/String;",
+                                                      brandingInformation_backgroundItem_0_imageUrlItem_1);
+    auto brandingInformation_backgroundItem_0_imageUrlItem_1Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_backgroundItem_0_imageUrlItem_1));
+    cleanupStrings.push_back(brandingInformation_backgroundItem_0_imageUrlItem_1Jni);
+    request.brandingInformation.background.imageUrl = brandingInformation_backgroundItem_0_imageUrlItem_1Jni->charSpan();
+    jobject brandingInformation_backgroundItem_0_colorItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0, "color", "Ljava/lang/String;",
+                                                      brandingInformation_backgroundItem_0_colorItem_1);
+    auto brandingInformation_backgroundItem_0_colorItem_1Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_backgroundItem_0_colorItem_1));
+    cleanupStrings.push_back(brandingInformation_backgroundItem_0_colorItem_1Jni);
+    request.brandingInformation.background.color = brandingInformation_backgroundItem_0_colorItem_1Jni->charSpan();
+    jobject brandingInformation_backgroundItem_0_sizeItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0, "size",
+                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterDimension;",
+                                                      brandingInformation_backgroundItem_0_sizeItem_1);
+    jobject brandingInformation_backgroundItem_0_sizeItem_1_widthItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0_sizeItem_1, "width",
+                                                      "Ljava/lang/Double;",
+                                                      brandingInformation_backgroundItem_0_sizeItem_1_widthItem_2);
+    request.brandingInformation.background.size.width =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.background.size.width)>>(
+            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_backgroundItem_0_sizeItem_1_widthItem_2));
+    jobject brandingInformation_backgroundItem_0_sizeItem_1_heightItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0_sizeItem_1, "height",
+                                                      "Ljava/lang/Double;",
+                                                      brandingInformation_backgroundItem_0_sizeItem_1_heightItem_2);
+    request.brandingInformation.background.size.height =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.background.size.height)>>(
+            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_backgroundItem_0_sizeItem_1_heightItem_2));
+    jobject brandingInformation_backgroundItem_0_sizeItem_1_metricItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_backgroundItem_0_sizeItem_1, "metric",
+                                                      "Ljava/lang/Integer;",
+                                                      brandingInformation_backgroundItem_0_sizeItem_1_metricItem_2);
+    request.brandingInformation.background.size.metric =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.background.size.metric)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(brandingInformation_backgroundItem_0_sizeItem_1_metricItem_2));
+    jobject brandingInformation_logoItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "logo",
+                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterStyleInformation;",
+                                                      brandingInformation_logoItem_0);
+    jobject brandingInformation_logoItem_0_imageUrlItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0, "imageUrl", "Ljava/lang/String;",
+                                                      brandingInformation_logoItem_0_imageUrlItem_1);
+    auto brandingInformation_logoItem_0_imageUrlItem_1Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_logoItem_0_imageUrlItem_1));
+    cleanupStrings.push_back(brandingInformation_logoItem_0_imageUrlItem_1Jni);
+    request.brandingInformation.logo.imageUrl = brandingInformation_logoItem_0_imageUrlItem_1Jni->charSpan();
+    jobject brandingInformation_logoItem_0_colorItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0, "color", "Ljava/lang/String;",
+                                                      brandingInformation_logoItem_0_colorItem_1);
+    auto brandingInformation_logoItem_0_colorItem_1Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_logoItem_0_colorItem_1));
+    cleanupStrings.push_back(brandingInformation_logoItem_0_colorItem_1Jni);
+    request.brandingInformation.logo.color = brandingInformation_logoItem_0_colorItem_1Jni->charSpan();
+    jobject brandingInformation_logoItem_0_sizeItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0, "size",
+                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterDimension;",
+                                                      brandingInformation_logoItem_0_sizeItem_1);
+    jobject brandingInformation_logoItem_0_sizeItem_1_widthItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0_sizeItem_1, "width", "Ljava/lang/Double;",
+                                                      brandingInformation_logoItem_0_sizeItem_1_widthItem_2);
+    request.brandingInformation.logo.size.width =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.logo.size.width)>>(
+            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_logoItem_0_sizeItem_1_widthItem_2));
+    jobject brandingInformation_logoItem_0_sizeItem_1_heightItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0_sizeItem_1, "height", "Ljava/lang/Double;",
+                                                      brandingInformation_logoItem_0_sizeItem_1_heightItem_2);
+    request.brandingInformation.logo.size.height =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.logo.size.height)>>(
+            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_logoItem_0_sizeItem_1_heightItem_2));
+    jobject brandingInformation_logoItem_0_sizeItem_1_metricItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_logoItem_0_sizeItem_1, "metric", "Ljava/lang/Integer;",
+                                                      brandingInformation_logoItem_0_sizeItem_1_metricItem_2);
+    request.brandingInformation.logo.size.metric =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.logo.size.metric)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(brandingInformation_logoItem_0_sizeItem_1_metricItem_2));
+    jobject brandingInformation_progressBarItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "progressBar",
+                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterStyleInformation;",
+                                                      brandingInformation_progressBarItem_0);
+    jobject brandingInformation_progressBarItem_0_imageUrlItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0, "imageUrl", "Ljava/lang/String;",
+                                                      brandingInformation_progressBarItem_0_imageUrlItem_1);
+    auto brandingInformation_progressBarItem_0_imageUrlItem_1Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_progressBarItem_0_imageUrlItem_1));
+    cleanupStrings.push_back(brandingInformation_progressBarItem_0_imageUrlItem_1Jni);
+    request.brandingInformation.progressBar.imageUrl = brandingInformation_progressBarItem_0_imageUrlItem_1Jni->charSpan();
+    jobject brandingInformation_progressBarItem_0_colorItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0, "color", "Ljava/lang/String;",
+                                                      brandingInformation_progressBarItem_0_colorItem_1);
+    auto brandingInformation_progressBarItem_0_colorItem_1Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_progressBarItem_0_colorItem_1));
+    cleanupStrings.push_back(brandingInformation_progressBarItem_0_colorItem_1Jni);
+    request.brandingInformation.progressBar.color = brandingInformation_progressBarItem_0_colorItem_1Jni->charSpan();
+    jobject brandingInformation_progressBarItem_0_sizeItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0, "size",
+                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterDimension;",
+                                                      brandingInformation_progressBarItem_0_sizeItem_1);
+    jobject brandingInformation_progressBarItem_0_sizeItem_1_widthItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0_sizeItem_1, "width",
+                                                      "Ljava/lang/Double;",
+                                                      brandingInformation_progressBarItem_0_sizeItem_1_widthItem_2);
+    request.brandingInformation.progressBar.size.width =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.progressBar.size.width)>>(
+            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_progressBarItem_0_sizeItem_1_widthItem_2));
+    jobject brandingInformation_progressBarItem_0_sizeItem_1_heightItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0_sizeItem_1, "height",
+                                                      "Ljava/lang/Double;",
+                                                      brandingInformation_progressBarItem_0_sizeItem_1_heightItem_2);
+    request.brandingInformation.progressBar.size.height =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.progressBar.size.height)>>(
+            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_progressBarItem_0_sizeItem_1_heightItem_2));
+    jobject brandingInformation_progressBarItem_0_sizeItem_1_metricItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_progressBarItem_0_sizeItem_1, "metric",
+                                                      "Ljava/lang/Integer;",
+                                                      brandingInformation_progressBarItem_0_sizeItem_1_metricItem_2);
+    request.brandingInformation.progressBar.size.metric =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.progressBar.size.metric)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(brandingInformation_progressBarItem_0_sizeItem_1_metricItem_2));
+    jobject brandingInformation_splashItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "splash",
+                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterStyleInformation;",
+                                                      brandingInformation_splashItem_0);
+    jobject brandingInformation_splashItem_0_imageUrlItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0, "imageUrl", "Ljava/lang/String;",
+                                                      brandingInformation_splashItem_0_imageUrlItem_1);
+    auto brandingInformation_splashItem_0_imageUrlItem_1Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_splashItem_0_imageUrlItem_1));
+    cleanupStrings.push_back(brandingInformation_splashItem_0_imageUrlItem_1Jni);
+    request.brandingInformation.splash.imageUrl = brandingInformation_splashItem_0_imageUrlItem_1Jni->charSpan();
+    jobject brandingInformation_splashItem_0_colorItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0, "color", "Ljava/lang/String;",
+                                                      brandingInformation_splashItem_0_colorItem_1);
+    auto brandingInformation_splashItem_0_colorItem_1Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_splashItem_0_colorItem_1));
+    cleanupStrings.push_back(brandingInformation_splashItem_0_colorItem_1Jni);
+    request.brandingInformation.splash.color = brandingInformation_splashItem_0_colorItem_1Jni->charSpan();
+    jobject brandingInformation_splashItem_0_sizeItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0, "size",
+                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterDimension;",
+                                                      brandingInformation_splashItem_0_sizeItem_1);
+    jobject brandingInformation_splashItem_0_sizeItem_1_widthItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0_sizeItem_1, "width", "Ljava/lang/Double;",
+                                                      brandingInformation_splashItem_0_sizeItem_1_widthItem_2);
+    request.brandingInformation.splash.size.width =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.splash.size.width)>>(
+            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_splashItem_0_sizeItem_1_widthItem_2));
+    jobject brandingInformation_splashItem_0_sizeItem_1_heightItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0_sizeItem_1, "height", "Ljava/lang/Double;",
+                                                      brandingInformation_splashItem_0_sizeItem_1_heightItem_2);
+    request.brandingInformation.splash.size.height =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.splash.size.height)>>(
+            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_splashItem_0_sizeItem_1_heightItem_2));
+    jobject brandingInformation_splashItem_0_sizeItem_1_metricItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_splashItem_0_sizeItem_1, "metric", "Ljava/lang/Integer;",
+                                                      brandingInformation_splashItem_0_sizeItem_1_metricItem_2);
+    request.brandingInformation.splash.size.metric =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.splash.size.metric)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(brandingInformation_splashItem_0_sizeItem_1_metricItem_2));
+    jobject brandingInformation_waterMarkItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation, "waterMark",
+                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterStyleInformation;",
+                                                      brandingInformation_waterMarkItem_0);
+    jobject brandingInformation_waterMarkItem_0_imageUrlItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0, "imageUrl", "Ljava/lang/String;",
+                                                      brandingInformation_waterMarkItem_0_imageUrlItem_1);
+    auto brandingInformation_waterMarkItem_0_imageUrlItem_1Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_waterMarkItem_0_imageUrlItem_1));
+    cleanupStrings.push_back(brandingInformation_waterMarkItem_0_imageUrlItem_1Jni);
+    request.brandingInformation.waterMark.imageUrl = brandingInformation_waterMarkItem_0_imageUrlItem_1Jni->charSpan();
+    jobject brandingInformation_waterMarkItem_0_colorItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0, "color", "Ljava/lang/String;",
+                                                      brandingInformation_waterMarkItem_0_colorItem_1);
+    auto brandingInformation_waterMarkItem_0_colorItem_1Jni =
+        chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(brandingInformation_waterMarkItem_0_colorItem_1));
+    cleanupStrings.push_back(brandingInformation_waterMarkItem_0_colorItem_1Jni);
+    request.brandingInformation.waterMark.color = brandingInformation_waterMarkItem_0_colorItem_1Jni->charSpan();
+    jobject brandingInformation_waterMarkItem_0_sizeItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0, "size",
+                                                      "Lchip/devicecontroller/ChipStructs$ContentLauncherClusterDimension;",
+                                                      brandingInformation_waterMarkItem_0_sizeItem_1);
+    jobject brandingInformation_waterMarkItem_0_sizeItem_1_widthItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0_sizeItem_1, "width", "Ljava/lang/Double;",
+                                                      brandingInformation_waterMarkItem_0_sizeItem_1_widthItem_2);
+    request.brandingInformation.waterMark.size.width =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.waterMark.size.width)>>(
+            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_waterMarkItem_0_sizeItem_1_widthItem_2));
+    jobject brandingInformation_waterMarkItem_0_sizeItem_1_heightItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0_sizeItem_1, "height",
+                                                      "Ljava/lang/Double;",
+                                                      brandingInformation_waterMarkItem_0_sizeItem_1_heightItem_2);
+    request.brandingInformation.waterMark.size.height =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.waterMark.size.height)>>(
+            chip::JniReferences::GetInstance().DoubleToPrimitive(brandingInformation_waterMarkItem_0_sizeItem_1_heightItem_2));
+    jobject brandingInformation_waterMarkItem_0_sizeItem_1_metricItem_2;
+    chip::JniReferences::GetInstance().GetObjectField(brandingInformation_waterMarkItem_0_sizeItem_1, "metric",
+                                                      "Ljava/lang/Integer;",
+                                                      brandingInformation_waterMarkItem_0_sizeItem_1_metricItem_2);
+    request.brandingInformation.waterMark.size.metric =
+        static_cast<std::remove_reference_t<decltype(request.brandingInformation.waterMark.size.metric)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(brandingInformation_waterMarkItem_0_sizeItem_1_metricItem_2));
 
     std::unique_ptr<CHIPContentLauncherClusterLaunchResponseCallback, void (*)(CHIPContentLauncherClusterLaunchResponseCallback *)>
         onSuccess(Platform::New<CHIPContentLauncherClusterLaunchResponseCallback>(callback),
@@ -6704,6 +8491,50 @@ JNI_METHOD(void, ContentLauncherCluster, launchURLRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ContentLauncherCluster, subscribeAcceptHeaderListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPContentLauncherAcceptHeaderListAttributeCallback,
+                    void (*)(CHIPContentLauncherAcceptHeaderListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPContentLauncherAcceptHeaderListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPContentLauncherAcceptHeaderListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    ContentLauncherCluster * cppCluster = reinterpret_cast<ContentLauncherCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ContentLauncher::Attributes::AcceptHeaderList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPContentLauncherClusterAcceptHeaderListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPContentLauncherAcceptHeaderListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -6739,6 +8570,45 @@ JNI_METHOD(void, ContentLauncherCluster, subscribeSupportedStreamingProtocolsAtt
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt32uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ContentLauncherCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPContentLauncherAttributeListAttributeCallback,
+                    void (*)(CHIPContentLauncherAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPContentLauncherAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPContentLauncherAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    ContentLauncherCluster * cppCluster = reinterpret_cast<ContentLauncherCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ContentLauncher::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPContentLauncherClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPContentLauncherAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -6792,6 +8662,196 @@ JNI_METHOD(jlong, DescriptorCluster, initWithDevice)(JNIEnv * env, jobject self,
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, DescriptorCluster, subscribeDeviceListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDescriptorDeviceListAttributeCallback, void (*)(CHIPDescriptorDeviceListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPDescriptorDeviceListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPDescriptorDeviceListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    DescriptorCluster * cppCluster = reinterpret_cast<DescriptorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Descriptor::Attributes::DeviceList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPDescriptorClusterDeviceListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPDescriptorDeviceListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DescriptorCluster, subscribeServerListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDescriptorServerListAttributeCallback, void (*)(CHIPDescriptorServerListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPDescriptorServerListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPDescriptorServerListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    DescriptorCluster * cppCluster = reinterpret_cast<DescriptorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPDescriptorClusterServerListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPDescriptorServerListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DescriptorCluster, subscribeClientListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDescriptorClientListAttributeCallback, void (*)(CHIPDescriptorClientListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPDescriptorClientListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPDescriptorClientListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    DescriptorCluster * cppCluster = reinterpret_cast<DescriptorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Descriptor::Attributes::ClientList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPDescriptorClusterClientListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPDescriptorClientListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DescriptorCluster, subscribePartsListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDescriptorPartsListAttributeCallback, void (*)(CHIPDescriptorPartsListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPDescriptorPartsListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPDescriptorPartsListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    DescriptorCluster * cppCluster = reinterpret_cast<DescriptorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Descriptor::Attributes::PartsList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPDescriptorClusterPartsListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPDescriptorPartsListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DescriptorCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDescriptorAttributeListAttributeCallback, void (*)(CHIPDescriptorAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPDescriptorAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPDescriptorAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    DescriptorCluster * cppCluster = reinterpret_cast<DescriptorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Descriptor::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPDescriptorClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPDescriptorAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, DescriptorCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -6846,12 +8906,18 @@ JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     DiagnosticLogsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsRequest::Type request;
 
-    request.intent = static_cast<decltype(request.intent)>(chip::JniReferences::GetInstance().IntegerToPrimitive(intent));
-    request.requestedProtocol =
-        static_cast<decltype(request.requestedProtocol)>(chip::JniReferences::GetInstance().IntegerToPrimitive(requestedProtocol));
-    request.transferFileDesignator = chip::JniByteArray(env, static_cast<jbyteArray>(transferFileDesignator)).byteSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.intent = static_cast<std::remove_reference_t<decltype(request.intent)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(intent));
+    request.requestedProtocol = static_cast<std::remove_reference_t<decltype(request.requestedProtocol)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(requestedProtocol));
+    auto transferFileDesignatorJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(transferFileDesignator));
+    cleanupByteArrays.push_back(transferFileDesignatorJni);
+    request.transferFileDesignator = transferFileDesignatorJni->byteSpan();
 
     std::unique_ptr<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback,
                     void (*)(CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback *)>
@@ -6888,6 +8954,49 @@ JNI_METHOD(void, DiagnosticLogsCluster, retrieveLogsRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, DiagnosticLogsCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDiagnosticLogsAttributeListAttributeCallback, void (*)(CHIPDiagnosticLogsAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPDiagnosticLogsAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPDiagnosticLogsAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    DiagnosticLogsCluster * cppCluster = reinterpret_cast<DiagnosticLogsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::DiagnosticLogs::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPDiagnosticLogsClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPDiagnosticLogsAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
     onSuccess.release();
     onFailure.release();
 }
@@ -6901,16 +9010,27 @@ JNI_METHOD(jlong, DoorLockCluster, initWithDevice)(JNIEnv * env, jobject self, j
 }
 
 JNI_METHOD(void, DoorLockCluster, clearCredential)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject credentialType, jobject credentialIndex,
- jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject credential, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::DoorLock::Commands::ClearCredential::Type request;
 
-    request.credential = chip::app::Clusters::DoorLock::Structs::DlCredential::Type();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    jobject credential_credentialTypeItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(credential, "credentialType", "Ljava/lang/Integer;",
+                                                      credential_credentialTypeItem_0);
+    request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(credential_credentialTypeItem_0));
+    jobject credential_credentialIndexItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(credential, "credentialIndex", "Ljava/lang/Integer;",
+                                                      credential_credentialIndexItem_0);
+    request.credential.credentialIndex = static_cast<std::remove_reference_t<decltype(request.credential.credentialIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(credential_credentialIndexItem_0));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6943,6 +9063,11 @@ JNI_METHOD(void, DoorLockCluster, clearCredential)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -6954,9 +9079,13 @@ JNI_METHOD(void, DoorLockCluster, clearUser)
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::DoorLock::Commands::ClearUser::Type request;
 
-    request.userIndex = static_cast<decltype(request.userIndex)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.userIndex = static_cast<std::remove_reference_t<decltype(request.userIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -6990,20 +9119,36 @@ JNI_METHOD(void, DoorLockCluster, clearUser)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
 JNI_METHOD(void, DoorLockCluster, getCredentialStatus)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject credentialType, jobject credentialIndex,
- jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject credential, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type request;
 
-    request.credential = chip::app::Clusters::DoorLock::Structs::DlCredential::Type();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    jobject credential_credentialTypeItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(credential, "credentialType", "Ljava/lang/Integer;",
+                                                      credential_credentialTypeItem_0);
+    request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(credential_credentialTypeItem_0));
+    jobject credential_credentialIndexItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(credential, "credentialIndex", "Ljava/lang/Integer;",
+                                                      credential_credentialIndexItem_0);
+    request.credential.credentialIndex = static_cast<std::remove_reference_t<decltype(request.credential.credentialIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(credential_credentialIndexItem_0));
 
     std::unique_ptr<CHIPDoorLockClusterGetCredentialStatusResponseCallback,
                     void (*)(CHIPDoorLockClusterGetCredentialStatusResponseCallback *)>
@@ -7040,6 +9185,11 @@ JNI_METHOD(void, DoorLockCluster, getCredentialStatus)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -7050,9 +9200,13 @@ JNI_METHOD(void, DoorLockCluster, getUser)
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::DoorLock::Commands::GetUser::Type request;
 
-    request.userIndex = static_cast<decltype(request.userIndex)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.userIndex = static_cast<std::remove_reference_t<decltype(request.userIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
 
     std::unique_ptr<CHIPDoorLockClusterGetUserResponseCallback, void (*)(CHIPDoorLockClusterGetUserResponseCallback *)> onSuccess(
         Platform::New<CHIPDoorLockClusterGetUserResponseCallback>(callback),
@@ -7087,6 +9241,11 @@ JNI_METHOD(void, DoorLockCluster, getUser)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -7097,10 +9256,20 @@ JNI_METHOD(void, DoorLockCluster, lockDoor)
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::DoorLock::Commands::LockDoor::Type request;
 
-    chip::JniReferences::GetInstance().GetOptionalValue(pinCode, pinCode);
-    request.pinCode = chip::Optional<chip::ByteSpan>(chip::JniByteArray(env, static_cast<jbyteArray>(pinCode)).byteSpan());
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    if (pinCode != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(pinCode, optionalValue_0);
+        auto & definedValue_0   = request.pinCode.Emplace();
+        auto optionalValue_0Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_0));
+        cleanupByteArrays.push_back(optionalValue_0Jni);
+        definedValue_0 = optionalValue_0Jni->byteSpan();
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -7134,26 +9303,46 @@ JNI_METHOD(void, DoorLockCluster, lockDoor)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
 JNI_METHOD(void, DoorLockCluster, setCredential)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject operationType, jobject credentialType,
- jobject credentialIndex, jbyteArray credentialData, jobject userIndex, jobject userStatus, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject operationType, jobject credential,
+ jbyteArray credentialData, jobject userIndex, jobject userStatus, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::DoorLock::Commands::SetCredential::Type request;
 
-    request.operationType =
-        static_cast<decltype(request.operationType)>(chip::JniReferences::GetInstance().IntegerToPrimitive(operationType));
-    request.credential     = chip::app::Clusters::DoorLock::Structs::DlCredential::Type();
-    request.credentialData = chip::JniByteArray(env, static_cast<jbyteArray>(credentialData)).byteSpan();
-    request.userIndex = static_cast<decltype(request.userIndex)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
-    request.userStatus =
-        static_cast<decltype(request.userStatus)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.operationType = static_cast<std::remove_reference_t<decltype(request.operationType)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(operationType));
+    jobject credential_credentialTypeItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(credential, "credentialType", "Ljava/lang/Integer;",
+                                                      credential_credentialTypeItem_0);
+    request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(credential_credentialTypeItem_0));
+    jobject credential_credentialIndexItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(credential, "credentialIndex", "Ljava/lang/Integer;",
+                                                      credential_credentialIndexItem_0);
+    request.credential.credentialIndex = static_cast<std::remove_reference_t<decltype(request.credential.credentialIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(credential_credentialIndexItem_0));
+    auto credentialDataJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(credentialData));
+    cleanupByteArrays.push_back(credentialDataJni);
+    request.credentialData = credentialDataJni->byteSpan();
+    request.userIndex      = static_cast<std::remove_reference_t<decltype(request.userIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
+    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
 
     std::unique_ptr<CHIPDoorLockClusterSetCredentialResponseCallback, void (*)(CHIPDoorLockClusterSetCredentialResponseCallback *)>
         onSuccess(Platform::New<CHIPDoorLockClusterSetCredentialResponseCallback>(callback),
@@ -7189,6 +9378,11 @@ JNI_METHOD(void, DoorLockCluster, setCredential)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -7200,30 +9394,42 @@ JNI_METHOD(void, DoorLockCluster, setUser)
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::DoorLock::Commands::SetUser::Type request;
 
-    request.operationType =
-        static_cast<decltype(request.operationType)>(chip::JniReferences::GetInstance().IntegerToPrimitive(operationType));
-    request.userIndex = static_cast<decltype(request.userIndex)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
-    chip::CharSpan userNameValue;
-    if (userName != nullptr)
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.operationType = static_cast<std::remove_reference_t<decltype(request.operationType)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(operationType));
+    request.userIndex = static_cast<std::remove_reference_t<decltype(request.userIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userIndex));
+    if (userName == nullptr)
     {
-        userNameValue = chip::JniUtfString(env, static_cast<jstring>(userName)).charSpan();
+        request.userName.SetNull();
     }
-    request.userName = userName == nullptr ? chip::app::DataModel::Nullable<chip::CharSpan>()
-                                           : chip::app::DataModel::Nullable<chip::CharSpan>(userNameValue);
-    uint32_t userUniqueIdValue;
-    if (userUniqueId != nullptr)
+    else
     {
-        userUniqueIdValue = chip::JniReferences::GetInstance().LongToPrimitive(userUniqueId);
+        auto & nonNullValue_0 = request.userName.SetNonNull();
+        auto userNameJni      = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(userName));
+        cleanupStrings.push_back(userNameJni);
+        nonNullValue_0 = userNameJni->charSpan();
     }
-    request.userUniqueId = userUniqueId == nullptr ? chip::app::DataModel::Nullable<uint32_t>()
-                                                   : chip::app::DataModel::Nullable<uint32_t>(userUniqueIdValue);
-    request.userStatus =
-        static_cast<decltype(request.userStatus)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
-    request.userType = static_cast<decltype(request.userType)>(chip::JniReferences::GetInstance().IntegerToPrimitive(userType));
-    request.credentialRule =
-        static_cast<decltype(request.credentialRule)>(chip::JniReferences::GetInstance().IntegerToPrimitive(credentialRule));
+    if (userUniqueId == nullptr)
+    {
+        request.userUniqueId.SetNull();
+    }
+    else
+    {
+        auto & nonNullValue_0 = request.userUniqueId.SetNonNull();
+        nonNullValue_0        = static_cast<std::remove_reference_t<decltype(nonNullValue_0)>>(
+            chip::JniReferences::GetInstance().LongToPrimitive(userUniqueId));
+    }
+    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userStatus));
+    request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(userType));
+    request.credentialRule = static_cast<std::remove_reference_t<decltype(request.credentialRule)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(credentialRule));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -7256,6 +9462,11 @@ JNI_METHOD(void, DoorLockCluster, setUser)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7267,10 +9478,20 @@ JNI_METHOD(void, DoorLockCluster, unlockDoor)
     CHIP_ERROR err = CHIP_NO_ERROR;
     DoorLockCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type request;
 
-    chip::JniReferences::GetInstance().GetOptionalValue(pinCode, pinCode);
-    request.pinCode = chip::Optional<chip::ByteSpan>(chip::JniByteArray(env, static_cast<jbyteArray>(pinCode)).byteSpan());
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    if (pinCode != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(pinCode, optionalValue_0);
+        auto & definedValue_0   = request.pinCode.Emplace();
+        auto optionalValue_0Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_0));
+        cleanupByteArrays.push_back(optionalValue_0Jni);
+        definedValue_0 = optionalValue_0Jni->byteSpan();
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -7303,6 +9524,11 @@ JNI_METHOD(void, DoorLockCluster, unlockDoor)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -7901,6 +10127,44 @@ JNI_METHOD(void, DoorLockCluster, subscribeWrongCodeEntryLimitAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, DoorLockCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPDoorLockAttributeListAttributeCallback, void (*)(CHIPDoorLockAttributeListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPDoorLockAttributeListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPDoorLockAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    DoorLockCluster * cppCluster = reinterpret_cast<DoorLockCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::DoorLock::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPDoorLockClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPDoorLockAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, DoorLockCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -8355,6 +10619,45 @@ JNI_METHOD(void, ElectricalMeasurementCluster, subscribeActivePowerMaxAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, ElectricalMeasurementCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPElectricalMeasurementAttributeListAttributeCallback,
+                    void (*)(CHIPElectricalMeasurementAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPElectricalMeasurementAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPElectricalMeasurementAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                            = CHIP_NO_ERROR;
+    ElectricalMeasurementCluster * cppCluster = reinterpret_cast<ElectricalMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ElectricalMeasurement::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPElectricalMeasurementClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPElectricalMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, ElectricalMeasurementCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -8408,7 +10711,11 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, resetCounts)
     CHIP_ERROR err = CHIP_NO_ERROR;
     EthernetNetworkDiagnosticsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::EthernetNetworkDiagnostics::Commands::ResetCounts::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -8441,6 +10748,11 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, resetCounts)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -8784,6 +11096,47 @@ JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeTimeSinceResetAttri
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback,
+                    void (*)(CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    EthernetNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<EthernetNetworkDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPEthernetNetworkDiagnosticsClusterAttributeListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPEthernetNetworkDiagnosticsAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, EthernetNetworkDiagnosticsCluster, subscribeFeatureMapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -8868,6 +11221,82 @@ JNI_METHOD(jlong, FixedLabelCluster, initWithDevice)(JNIEnv * env, jobject self,
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, FixedLabelCluster, subscribeLabelListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPFixedLabelLabelListAttributeCallback, void (*)(CHIPFixedLabelLabelListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPFixedLabelLabelListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPFixedLabelLabelListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    FixedLabelCluster * cppCluster = reinterpret_cast<FixedLabelCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::FixedLabel::Attributes::LabelList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPFixedLabelClusterLabelListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPFixedLabelLabelListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, FixedLabelCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPFixedLabelAttributeListAttributeCallback, void (*)(CHIPFixedLabelAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPFixedLabelAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPFixedLabelAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    FixedLabelCluster * cppCluster = reinterpret_cast<FixedLabelCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::FixedLabel::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPFixedLabelClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPFixedLabelAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, FixedLabelCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -9062,6 +11491,45 @@ JNI_METHOD(void, FlowMeasurementCluster, subscribeToleranceAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, FlowMeasurementCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPFlowMeasurementAttributeListAttributeCallback,
+                    void (*)(CHIPFlowMeasurementAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPFlowMeasurementAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPFlowMeasurementAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    FlowMeasurementCluster * cppCluster = reinterpret_cast<FlowMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::FlowMeasurement::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPFlowMeasurementClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPFlowMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, FlowMeasurementCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -9116,12 +11584,17 @@ JNI_METHOD(void, GeneralCommissioningCluster, armFailSafe)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type request;
 
-    request.expiryLengthSeconds = static_cast<decltype(request.expiryLengthSeconds)>(
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.expiryLengthSeconds = static_cast<std::remove_reference_t<decltype(request.expiryLengthSeconds)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(expiryLengthSeconds));
-    request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
-    request.timeoutMs  = static_cast<decltype(request.timeoutMs)>(chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
+    request.breadcrumb = static_cast<std::remove_reference_t<decltype(request.breadcrumb)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
+    request.timeoutMs = static_cast<std::remove_reference_t<decltype(request.timeoutMs)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
 
     std::unique_ptr<CHIPGeneralCommissioningClusterArmFailSafeResponseCallback,
                     void (*)(CHIPGeneralCommissioningClusterArmFailSafeResponseCallback *)>
@@ -9158,6 +11631,11 @@ JNI_METHOD(void, GeneralCommissioningCluster, armFailSafe)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -9168,7 +11646,11 @@ JNI_METHOD(void, GeneralCommissioningCluster, commissioningComplete)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::GeneralCommissioning::Commands::CommissioningComplete::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback,
                     void (*)(CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback *)>
@@ -9206,6 +11688,11 @@ JNI_METHOD(void, GeneralCommissioningCluster, commissioningComplete)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -9217,12 +11704,20 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GeneralCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfig::Type request;
 
-    request.location    = static_cast<decltype(request.location)>(chip::JniReferences::GetInstance().IntegerToPrimitive(location));
-    request.countryCode = chip::JniUtfString(env, static_cast<jstring>(countryCode)).charSpan();
-    request.breadcrumb  = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
-    request.timeoutMs   = static_cast<decltype(request.timeoutMs)>(chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.location = static_cast<std::remove_reference_t<decltype(request.location)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(location));
+    auto countryCodeJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(countryCode));
+    cleanupStrings.push_back(countryCodeJni);
+    request.countryCode = countryCodeJni->charSpan();
+    request.breadcrumb  = static_cast<std::remove_reference_t<decltype(request.breadcrumb)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
+    request.timeoutMs = static_cast<std::remove_reference_t<decltype(request.timeoutMs)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(timeoutMs));
 
     std::unique_ptr<CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback,
                     void (*)(CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback *)>
@@ -9260,6 +11755,11 @@ JNI_METHOD(void, GeneralCommissioningCluster, setRegulatoryConfig)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -9293,6 +11793,47 @@ JNI_METHOD(void, GeneralCommissioningCluster, subscribeBreadcrumbAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GeneralCommissioningCluster, subscribeBasicCommissioningInfoListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback,
+                    void (*)(CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    GeneralCommissioningCluster * cppCluster = reinterpret_cast<GeneralCommissioningCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfoList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPGeneralCommissioningClusterBasicCommissioningInfoListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPGeneralCommissioningBasicCommissioningInfoListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -9375,6 +11916,45 @@ JNI_METHOD(void, GeneralCommissioningCluster, subscribeLocationCapabilityAttribu
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, GeneralCommissioningCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPGeneralCommissioningAttributeListAttributeCallback,
+                    void (*)(CHIPGeneralCommissioningAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPGeneralCommissioningAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPGeneralCommissioningAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    GeneralCommissioningCluster * cppCluster = reinterpret_cast<GeneralCommissioningCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::GeneralCommissioning::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPGeneralCommissioningClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPGeneralCommissioningAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, GeneralCommissioningCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -9421,6 +12001,45 @@ JNI_METHOD(jlong, GeneralDiagnosticsCluster, initWithDevice)(JNIEnv * env, jobje
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeNetworkInterfacesAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback,
+                    void (*)(CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback *)>
+        onSuccess(Platform::New<CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    GeneralDiagnosticsCluster * cppCluster = reinterpret_cast<GeneralDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::GeneralDiagnostics::Attributes::NetworkInterfaces::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPGeneralDiagnosticsClusterNetworkInterfacesAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPGeneralDiagnosticsNetworkInterfacesAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeRebootCountAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -9570,6 +12189,164 @@ JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeBootReasonsAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeActiveHardwareFaultsAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback,
+                    void (*)(CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback *)>
+        onSuccess(Platform::New<CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    GeneralDiagnosticsCluster * cppCluster = reinterpret_cast<GeneralDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveHardwareFaults::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPGeneralDiagnosticsClusterActiveHardwareFaultsAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPGeneralDiagnosticsActiveHardwareFaultsAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeActiveRadioFaultsAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback,
+                    void (*)(CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback *)>
+        onSuccess(Platform::New<CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    GeneralDiagnosticsCluster * cppCluster = reinterpret_cast<GeneralDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveRadioFaults::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPGeneralDiagnosticsClusterActiveRadioFaultsAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPGeneralDiagnosticsActiveRadioFaultsAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeActiveNetworkFaultsAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback,
+                    void (*)(CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback *)>
+        onSuccess(Platform::New<CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    GeneralDiagnosticsCluster * cppCluster = reinterpret_cast<GeneralDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveNetworkFaults::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPGeneralDiagnosticsClusterActiveNetworkFaultsAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPGeneralDiagnosticsActiveNetworkFaultsAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPGeneralDiagnosticsAttributeListAttributeCallback,
+                    void (*)(CHIPGeneralDiagnosticsAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPGeneralDiagnosticsAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPGeneralDiagnosticsAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    GeneralDiagnosticsCluster * cppCluster = reinterpret_cast<GeneralDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::GeneralDiagnostics::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPGeneralDiagnosticsClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPGeneralDiagnosticsAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, GeneralDiagnosticsCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -9623,10 +12400,13 @@ JNI_METHOD(void, GroupKeyManagementCluster, keySetRead)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupKeyManagementCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::Type request;
 
-    request.groupKeySetID =
-        static_cast<decltype(request.groupKeySetID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySetID));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupKeySetID = static_cast<std::remove_reference_t<decltype(request.groupKeySetID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySetID));
 
     std::unique_ptr<CHIPGroupKeyManagementClusterKeySetReadResponseCallback,
                     void (*)(CHIPGroupKeyManagementClusterKeySetReadResponseCallback *)>
@@ -9663,6 +12443,11 @@ JNI_METHOD(void, GroupKeyManagementCluster, keySetRead)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -9673,9 +12458,35 @@ JNI_METHOD(void, GroupKeyManagementCluster, keySetReadAllIndices)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupKeyManagementCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::Type request;
 
-    request.groupKeySetIDs = chip::app::DataModel::List<const uint16_t>();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    {
+        using ListType_0       = std::remove_reference_t<decltype(request.groupKeySetIDs)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint groupKeySetIDsSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(groupKeySetIDs, groupKeySetIDsSize);
+        if (groupKeySetIDsSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(groupKeySetIDsSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(groupKeySetIDsSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(groupKeySetIDs, i_0, element_0);
+                listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0));
+            }
+            request.groupKeySetIDs = ListType_0(listHolder_0->mList, groupKeySetIDsSize);
+        }
+        else
+        {
+            request.groupKeySetIDs = ListType_0();
+        }
+    }
 
     std::unique_ptr<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback,
                     void (*)(CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback *)>
@@ -9713,6 +12524,11 @@ JNI_METHOD(void, GroupKeyManagementCluster, keySetReadAllIndices)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -9723,10 +12539,13 @@ JNI_METHOD(void, GroupKeyManagementCluster, keySetRemove)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupKeyManagementCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type request;
 
-    request.groupKeySetID =
-        static_cast<decltype(request.groupKeySetID)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySetID));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupKeySetID = static_cast<std::remove_reference_t<decltype(request.groupKeySetID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySetID));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -9759,22 +12578,70 @@ JNI_METHOD(void, GroupKeyManagementCluster, keySetRemove)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
 }
 JNI_METHOD(void, GroupKeyManagementCluster, keySetWrite)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetID, jobject securityPolicy,
- jbyteArray epochKey0, jobject epochStartTime0, jbyteArray epochKey1, jobject epochStartTime1, jbyteArray epochKey2,
- jobject epochStartTime2, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySet, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupKeyManagementCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type request;
 
-    request.groupKeySet = chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    jobject groupKeySet_groupKeySetIDItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "groupKeySetID", "Ljava/lang/Integer;",
+                                                      groupKeySet_groupKeySetIDItem_0);
+    request.groupKeySet.groupKeySetID = static_cast<std::remove_reference_t<decltype(request.groupKeySet.groupKeySetID)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySet_groupKeySetIDItem_0));
+    jobject groupKeySet_securityPolicyItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "securityPolicy", "Ljava/lang/Integer;",
+                                                      groupKeySet_securityPolicyItem_0);
+    request.groupKeySet.securityPolicy = static_cast<std::remove_reference_t<decltype(request.groupKeySet.securityPolicy)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupKeySet_securityPolicyItem_0));
+    jobject groupKeySet_epochKey0Item_0;
+    chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochKey0", "[B", groupKeySet_epochKey0Item_0);
+    auto groupKeySet_epochKey0Item_0Jni =
+        chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(groupKeySet_epochKey0Item_0));
+    cleanupByteArrays.push_back(groupKeySet_epochKey0Item_0Jni);
+    request.groupKeySet.epochKey0 = groupKeySet_epochKey0Item_0Jni->byteSpan();
+    jobject groupKeySet_epochStartTime0Item_0;
+    chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochStartTime0", "Ljava/lang/Long;",
+                                                      groupKeySet_epochStartTime0Item_0);
+    request.groupKeySet.epochStartTime0 = static_cast<std::remove_reference_t<decltype(request.groupKeySet.epochStartTime0)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(groupKeySet_epochStartTime0Item_0));
+    jobject groupKeySet_epochKey1Item_0;
+    chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochKey1", "[B", groupKeySet_epochKey1Item_0);
+    auto groupKeySet_epochKey1Item_0Jni =
+        chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(groupKeySet_epochKey1Item_0));
+    cleanupByteArrays.push_back(groupKeySet_epochKey1Item_0Jni);
+    request.groupKeySet.epochKey1 = groupKeySet_epochKey1Item_0Jni->byteSpan();
+    jobject groupKeySet_epochStartTime1Item_0;
+    chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochStartTime1", "Ljava/lang/Long;",
+                                                      groupKeySet_epochStartTime1Item_0);
+    request.groupKeySet.epochStartTime1 = static_cast<std::remove_reference_t<decltype(request.groupKeySet.epochStartTime1)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(groupKeySet_epochStartTime1Item_0));
+    jobject groupKeySet_epochKey2Item_0;
+    chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochKey2", "[B", groupKeySet_epochKey2Item_0);
+    auto groupKeySet_epochKey2Item_0Jni =
+        chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(groupKeySet_epochKey2Item_0));
+    cleanupByteArrays.push_back(groupKeySet_epochKey2Item_0Jni);
+    request.groupKeySet.epochKey2 = groupKeySet_epochKey2Item_0Jni->byteSpan();
+    jobject groupKeySet_epochStartTime2Item_0;
+    chip::JniReferences::GetInstance().GetObjectField(groupKeySet, "epochStartTime2", "Ljava/lang/Long;",
+                                                      groupKeySet_epochStartTime2Item_0);
+    request.groupKeySet.epochStartTime2 = static_cast<std::remove_reference_t<decltype(request.groupKeySet.epochStartTime2)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(groupKeySet_epochStartTime2Item_0));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -9807,6 +12674,89 @@ JNI_METHOD(void, GroupKeyManagementCluster, keySetWrite)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GroupKeyManagementCluster, subscribeGroupKeyMapAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPGroupKeyManagementGroupKeyMapAttributeCallback,
+                    void (*)(CHIPGroupKeyManagementGroupKeyMapAttributeCallback *)>
+        onSuccess(Platform::New<CHIPGroupKeyManagementGroupKeyMapAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPGroupKeyManagementGroupKeyMapAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    GroupKeyManagementCluster * cppCluster = reinterpret_cast<GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeyMap::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupKeyMapAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPGroupKeyManagementGroupKeyMapAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GroupKeyManagementCluster, subscribeGroupTableAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPGroupKeyManagementGroupTableAttributeCallback,
+                    void (*)(CHIPGroupKeyManagementGroupTableAttributeCallback *)>
+        onSuccess(Platform::New<CHIPGroupKeyManagementGroupTableAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPGroupKeyManagementGroupTableAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    GroupKeyManagementCluster * cppCluster = reinterpret_cast<GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::GroupKeyManagement::Attributes::GroupTable::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupTableAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPGroupKeyManagementGroupTableAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -9886,6 +12836,45 @@ JNI_METHOD(void, GroupKeyManagementCluster, subscribeMaxGroupKeysPerFabricAttrib
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, GroupKeyManagementCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPGroupKeyManagementAttributeListAttributeCallback,
+                    void (*)(CHIPGroupKeyManagementAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPGroupKeyManagementAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPGroupKeyManagementAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                         = CHIP_NO_ERROR;
+    GroupKeyManagementCluster * cppCluster = reinterpret_cast<GroupKeyManagementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::GroupKeyManagement::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPGroupKeyManagementClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPGroupKeyManagementAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, GroupKeyManagementCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -9939,10 +12928,16 @@ JNI_METHOD(void, GroupsCluster, addGroup)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Groups::Commands::AddGroup::Type request;
 
-    request.groupId   = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
-    request.groupName = chip::JniUtfString(env, static_cast<jstring>(groupName)).charSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    auto groupNameJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(groupName));
+    cleanupStrings.push_back(groupNameJni);
+    request.groupName = groupNameJni->charSpan();
 
     std::unique_ptr<CHIPGroupsClusterAddGroupResponseCallback, void (*)(CHIPGroupsClusterAddGroupResponseCallback *)> onSuccess(
         Platform::New<CHIPGroupsClusterAddGroupResponseCallback>(callback),
@@ -9977,6 +12972,11 @@ JNI_METHOD(void, GroupsCluster, addGroup)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -9987,10 +12987,16 @@ JNI_METHOD(void, GroupsCluster, addGroupIfIdentifying)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Groups::Commands::AddGroupIfIdentifying::Type request;
 
-    request.groupId   = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
-    request.groupName = chip::JniUtfString(env, static_cast<jstring>(groupName)).charSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    auto groupNameJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(groupName));
+    cleanupStrings.push_back(groupNameJni);
+    request.groupName = groupNameJni->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -10024,6 +13030,11 @@ JNI_METHOD(void, GroupsCluster, addGroupIfIdentifying)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -10034,9 +13045,35 @@ JNI_METHOD(void, GroupsCluster, getGroupMembership)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Groups::Commands::GetGroupMembership::Type request;
 
-    request.groupList = chip::app::DataModel::List<const uint16_t>();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    {
+        using ListType_0       = std::remove_reference_t<decltype(request.groupList)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint groupListSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(groupList, groupListSize);
+        if (groupListSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(groupListSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(groupListSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(groupList, i_0, element_0);
+                listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0));
+            }
+            request.groupList = ListType_0(listHolder_0->mList, groupListSize);
+        }
+        else
+        {
+            request.groupList = ListType_0();
+        }
+    }
 
     std::unique_ptr<CHIPGroupsClusterGetGroupMembershipResponseCallback,
                     void (*)(CHIPGroupsClusterGetGroupMembershipResponseCallback *)>
@@ -10073,6 +13110,11 @@ JNI_METHOD(void, GroupsCluster, getGroupMembership)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -10083,7 +13125,11 @@ JNI_METHOD(void, GroupsCluster, removeAllGroups)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -10117,6 +13163,11 @@ JNI_METHOD(void, GroupsCluster, removeAllGroups)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -10127,9 +13178,13 @@ JNI_METHOD(void, GroupsCluster, removeGroup)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Groups::Commands::RemoveGroup::Type request;
 
-    request.groupId = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
 
     std::unique_ptr<CHIPGroupsClusterRemoveGroupResponseCallback, void (*)(CHIPGroupsClusterRemoveGroupResponseCallback *)>
         onSuccess(Platform::New<CHIPGroupsClusterRemoveGroupResponseCallback>(callback),
@@ -10165,6 +13220,11 @@ JNI_METHOD(void, GroupsCluster, removeGroup)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -10175,9 +13235,13 @@ JNI_METHOD(void, GroupsCluster, viewGroup)
     CHIP_ERROR err = CHIP_NO_ERROR;
     GroupsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Groups::Commands::ViewGroup::Type request;
 
-    request.groupId = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
 
     std::unique_ptr<CHIPGroupsClusterViewGroupResponseCallback, void (*)(CHIPGroupsClusterViewGroupResponseCallback *)> onSuccess(
         Platform::New<CHIPGroupsClusterViewGroupResponseCallback>(callback),
@@ -10212,6 +13276,11 @@ JNI_METHOD(void, GroupsCluster, viewGroup)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -10245,6 +13314,44 @@ JNI_METHOD(void, GroupsCluster, subscribeNameSupportAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, GroupsCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPGroupsAttributeListAttributeCallback, void (*)(CHIPGroupsAttributeListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPGroupsAttributeListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPGroupsAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err             = CHIP_NO_ERROR;
+    GroupsCluster * cppCluster = reinterpret_cast<GroupsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Groups::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPGroupsClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPGroupsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -10305,10 +13412,13 @@ JNI_METHOD(void, IdentifyCluster, identify)
     CHIP_ERROR err = CHIP_NO_ERROR;
     IdentifyCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Identify::Commands::Identify::Type request;
 
-    request.identifyTime =
-        static_cast<decltype(request.identifyTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(identifyTime));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.identifyTime = static_cast<std::remove_reference_t<decltype(request.identifyTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(identifyTime));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -10342,6 +13452,11 @@ JNI_METHOD(void, IdentifyCluster, identify)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -10352,7 +13467,11 @@ JNI_METHOD(void, IdentifyCluster, identifyQuery)
     CHIP_ERROR err = CHIP_NO_ERROR;
     IdentifyCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Identify::Commands::IdentifyQuery::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPIdentifyClusterIdentifyQueryResponseCallback, void (*)(CHIPIdentifyClusterIdentifyQueryResponseCallback *)>
         onSuccess(Platform::New<CHIPIdentifyClusterIdentifyQueryResponseCallback>(callback),
@@ -10388,6 +13507,11 @@ JNI_METHOD(void, IdentifyCluster, identifyQuery)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -10399,12 +13523,15 @@ JNI_METHOD(void, IdentifyCluster, triggerEffect)
     CHIP_ERROR err = CHIP_NO_ERROR;
     IdentifyCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Identify::Commands::TriggerEffect::Type request;
 
-    request.effectIdentifier =
-        static_cast<decltype(request.effectIdentifier)>(chip::JniReferences::GetInstance().IntegerToPrimitive(effectIdentifier));
-    request.effectVariant =
-        static_cast<decltype(request.effectVariant)>(chip::JniReferences::GetInstance().IntegerToPrimitive(effectVariant));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.effectIdentifier = static_cast<std::remove_reference_t<decltype(request.effectIdentifier)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(effectIdentifier));
+    request.effectVariant = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(effectVariant));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -10437,6 +13564,11 @@ JNI_METHOD(void, IdentifyCluster, triggerEffect)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -10508,6 +13640,44 @@ JNI_METHOD(void, IdentifyCluster, subscribeIdentifyTypeAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, IdentifyCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPIdentifyAttributeListAttributeCallback, void (*)(CHIPIdentifyAttributeListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPIdentifyAttributeListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPIdentifyAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    IdentifyCluster * cppCluster = reinterpret_cast<IdentifyCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Identify::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPIdentifyClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPIdentifyAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -10757,6 +13927,45 @@ JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeLightSensorTypeAttribut
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPIlluminanceMeasurementAttributeListAttributeCallback,
+                    void (*)(CHIPIlluminanceMeasurementAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPIlluminanceMeasurementAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPIlluminanceMeasurementAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    IlluminanceMeasurementCluster * cppCluster = reinterpret_cast<IlluminanceMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::IlluminanceMeasurement::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPIlluminanceMeasurementClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPIlluminanceMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, IlluminanceMeasurementCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -10811,9 +14020,13 @@ JNI_METHOD(void, KeypadInputCluster, sendKeyRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     KeypadInputCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::KeypadInput::Commands::SendKeyRequest::Type request;
 
-    request.keyCode = static_cast<decltype(request.keyCode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(keyCode));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.keyCode = static_cast<std::remove_reference_t<decltype(request.keyCode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(keyCode));
 
     std::unique_ptr<CHIPKeypadInputClusterSendKeyResponseCallback, void (*)(CHIPKeypadInputClusterSendKeyResponseCallback *)>
         onSuccess(Platform::New<CHIPKeypadInputClusterSendKeyResponseCallback>(callback),
@@ -10848,6 +14061,49 @@ JNI_METHOD(void, KeypadInputCluster, sendKeyRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, KeypadInputCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPKeypadInputAttributeListAttributeCallback, void (*)(CHIPKeypadInputAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPKeypadInputAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPKeypadInputAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    KeypadInputCluster * cppCluster = reinterpret_cast<KeypadInputCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::KeypadInput::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPKeypadInputClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPKeypadInputAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -10906,14 +14162,19 @@ JNI_METHOD(void, LevelControlCluster, move)
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::LevelControl::Commands::Move::Type request;
 
-    request.moveMode = static_cast<decltype(request.moveMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
-    request.rate     = static_cast<decltype(request.rate)>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
-    request.optionMask =
-        static_cast<decltype(request.optionMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionMask));
-    request.optionOverride =
-        static_cast<decltype(request.optionOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
+    request.rate =
+        static_cast<std::remove_reference_t<decltype(request.rate)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
+    request.optionMask = static_cast<std::remove_reference_t<decltype(request.optionMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionMask));
+    request.optionOverride = static_cast<std::remove_reference_t<decltype(request.optionOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -10946,6 +14207,11 @@ JNI_METHOD(void, LevelControlCluster, move)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -10958,15 +14224,19 @@ JNI_METHOD(void, LevelControlCluster, moveToLevel)
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::LevelControl::Commands::MoveToLevel::Type request;
 
-    request.level = static_cast<decltype(request.level)>(chip::JniReferences::GetInstance().IntegerToPrimitive(level));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionMask =
-        static_cast<decltype(request.optionMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionMask));
-    request.optionOverride =
-        static_cast<decltype(request.optionOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.level =
+        static_cast<std::remove_reference_t<decltype(request.level)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(level));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionMask = static_cast<std::remove_reference_t<decltype(request.optionMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionMask));
+    request.optionOverride = static_cast<std::remove_reference_t<decltype(request.optionOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -10999,6 +14269,11 @@ JNI_METHOD(void, LevelControlCluster, moveToLevel)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -11011,11 +14286,15 @@ JNI_METHOD(void, LevelControlCluster, moveToLevelWithOnOff)
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::LevelControl::Commands::MoveToLevelWithOnOff::Type request;
 
-    request.level = static_cast<decltype(request.level)>(chip::JniReferences::GetInstance().IntegerToPrimitive(level));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.level =
+        static_cast<std::remove_reference_t<decltype(request.level)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(level));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -11048,6 +14327,11 @@ JNI_METHOD(void, LevelControlCluster, moveToLevelWithOnOff)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -11059,10 +14343,15 @@ JNI_METHOD(void, LevelControlCluster, moveWithOnOff)
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::LevelControl::Commands::MoveWithOnOff::Type request;
 
-    request.moveMode = static_cast<decltype(request.moveMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
-    request.rate     = static_cast<decltype(request.rate)>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.moveMode = static_cast<std::remove_reference_t<decltype(request.moveMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(moveMode));
+    request.rate =
+        static_cast<std::remove_reference_t<decltype(request.rate)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(rate));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -11095,6 +14384,11 @@ JNI_METHOD(void, LevelControlCluster, moveWithOnOff)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -11107,16 +14401,21 @@ JNI_METHOD(void, LevelControlCluster, step)
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::LevelControl::Commands::Step::Type request;
 
-    request.stepMode = static_cast<decltype(request.stepMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
-    request.stepSize = static_cast<decltype(request.stepSize)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.optionMask =
-        static_cast<decltype(request.optionMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionMask));
-    request.optionOverride =
-        static_cast<decltype(request.optionOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
+    request.stepSize = static_cast<std::remove_reference_t<decltype(request.stepSize)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    request.optionMask = static_cast<std::remove_reference_t<decltype(request.optionMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionMask));
+    request.optionOverride = static_cast<std::remove_reference_t<decltype(request.optionOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -11149,6 +14448,11 @@ JNI_METHOD(void, LevelControlCluster, step)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -11161,12 +14465,17 @@ JNI_METHOD(void, LevelControlCluster, stepWithOnOff)
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::LevelControl::Commands::StepWithOnOff::Type request;
 
-    request.stepMode = static_cast<decltype(request.stepMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
-    request.stepSize = static_cast<decltype(request.stepSize)>(chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.stepMode = static_cast<std::remove_reference_t<decltype(request.stepMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepMode));
+    request.stepSize = static_cast<std::remove_reference_t<decltype(request.stepSize)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(stepSize));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -11199,6 +14508,11 @@ JNI_METHOD(void, LevelControlCluster, stepWithOnOff)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -11211,12 +14525,15 @@ JNI_METHOD(void, LevelControlCluster, stop)
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::LevelControl::Commands::Stop::Type request;
 
-    request.optionMask =
-        static_cast<decltype(request.optionMask)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionMask));
-    request.optionOverride =
-        static_cast<decltype(request.optionOverride)>(chip::JniReferences::GetInstance().IntegerToPrimitive(optionOverride));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.optionMask = static_cast<std::remove_reference_t<decltype(request.optionMask)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionMask));
+    request.optionOverride = static_cast<std::remove_reference_t<decltype(request.optionOverride)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(optionOverride));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -11249,6 +14566,11 @@ JNI_METHOD(void, LevelControlCluster, stop)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -11260,7 +14582,11 @@ JNI_METHOD(void, LevelControlCluster, stopWithOnOff)
     CHIP_ERROR err = CHIP_NO_ERROR;
     LevelControlCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::LevelControl::Commands::StopWithOnOff::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -11293,6 +14619,11 @@ JNI_METHOD(void, LevelControlCluster, stopWithOnOff)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -11823,6 +15154,44 @@ JNI_METHOD(void, LevelControlCluster, subscribeStartUpCurrentLevelAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, LevelControlCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPLevelControlAttributeListAttributeCallback, void (*)(CHIPLevelControlAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPLevelControlAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPLevelControlAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                   = CHIP_NO_ERROR;
+    LevelControlCluster * cppCluster = reinterpret_cast<LevelControlCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPLevelControlClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPLevelControlAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, LevelControlCluster, subscribeFeatureMapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -11944,6 +15313,47 @@ JNI_METHOD(void, LocalizationConfigurationCluster, subscribeActiveLocaleAttribut
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, LocalizationConfigurationCluster, subscribeSupportedLocalesAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPLocalizationConfigurationSupportedLocalesAttributeCallback,
+                    void (*)(CHIPLocalizationConfigurationSupportedLocalesAttributeCallback *)>
+        onSuccess(Platform::New<CHIPLocalizationConfigurationSupportedLocalesAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPLocalizationConfigurationSupportedLocalesAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                = CHIP_NO_ERROR;
+    LocalizationConfigurationCluster * cppCluster = reinterpret_cast<LocalizationConfigurationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPLocalizationConfigurationClusterSupportedLocalesAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPLocalizationConfigurationSupportedLocalesAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(jlong, LowPowerCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -11960,7 +15370,11 @@ JNI_METHOD(void, LowPowerCluster, sleep)
     CHIP_ERROR err = CHIP_NO_ERROR;
     LowPowerCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::LowPower::Commands::Sleep::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -11993,6 +15407,49 @@ JNI_METHOD(void, LowPowerCluster, sleep)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, LowPowerCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPLowPowerAttributeListAttributeCallback, void (*)(CHIPLowPowerAttributeListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPLowPowerAttributeListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPLowPowerAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    LowPowerCluster * cppCluster = reinterpret_cast<LowPowerCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::LowPower::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPLowPowerClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPLowPowerAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -12050,7 +15507,11 @@ JNI_METHOD(void, MediaInputCluster, hideInputStatusRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaInput::Commands::HideInputStatusRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -12083,6 +15544,11 @@ JNI_METHOD(void, MediaInputCluster, hideInputStatusRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12094,10 +15560,16 @@ JNI_METHOD(void, MediaInputCluster, renameInputRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaInput::Commands::RenameInputRequest::Type request;
 
-    request.index = static_cast<decltype(request.index)>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
-    request.name  = chip::JniUtfString(env, static_cast<jstring>(name)).charSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.index =
+        static_cast<std::remove_reference_t<decltype(request.index)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
+    auto nameJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(name));
+    cleanupStrings.push_back(nameJni);
+    request.name = nameJni->charSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -12130,6 +15602,11 @@ JNI_METHOD(void, MediaInputCluster, renameInputRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12141,9 +15618,13 @@ JNI_METHOD(void, MediaInputCluster, selectInputRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaInput::Commands::SelectInputRequest::Type request;
 
-    request.index = static_cast<decltype(request.index)>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.index =
+        static_cast<std::remove_reference_t<decltype(request.index)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(index));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -12176,6 +15657,11 @@ JNI_METHOD(void, MediaInputCluster, selectInputRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12187,7 +15673,11 @@ JNI_METHOD(void, MediaInputCluster, showInputStatusRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaInputCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaInput::Commands::ShowInputStatusRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -12220,6 +15710,49 @@ JNI_METHOD(void, MediaInputCluster, showInputStatusRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, MediaInputCluster, subscribeMediaInputListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPMediaInputMediaInputListAttributeCallback, void (*)(CHIPMediaInputMediaInputListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPMediaInputMediaInputListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPMediaInputMediaInputListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    MediaInputCluster * cppCluster = reinterpret_cast<MediaInputCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::MediaInput::Attributes::MediaInputList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPMediaInputClusterMediaInputListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPMediaInputMediaInputListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -12254,6 +15787,44 @@ JNI_METHOD(void, MediaInputCluster, subscribeCurrentMediaInputAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, MediaInputCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPMediaInputAttributeListAttributeCallback, void (*)(CHIPMediaInputAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPMediaInputAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPMediaInputAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    MediaInputCluster * cppCluster = reinterpret_cast<MediaInputCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::MediaInput::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPMediaInputClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPMediaInputAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -12314,7 +15885,11 @@ JNI_METHOD(void, MediaPlaybackCluster, fastForwardRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaPlayback::Commands::FastForwardRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
         onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
@@ -12349,6 +15924,11 @@ JNI_METHOD(void, MediaPlaybackCluster, fastForwardRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12360,7 +15940,11 @@ JNI_METHOD(void, MediaPlaybackCluster, nextRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaPlayback::Commands::NextRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
         onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
@@ -12395,6 +15979,11 @@ JNI_METHOD(void, MediaPlaybackCluster, nextRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12406,7 +15995,11 @@ JNI_METHOD(void, MediaPlaybackCluster, pauseRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaPlayback::Commands::PauseRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
         onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
@@ -12441,6 +16034,11 @@ JNI_METHOD(void, MediaPlaybackCluster, pauseRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12452,7 +16050,11 @@ JNI_METHOD(void, MediaPlaybackCluster, playRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaPlayback::Commands::PlayRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
         onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
@@ -12487,6 +16089,11 @@ JNI_METHOD(void, MediaPlaybackCluster, playRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12498,7 +16105,11 @@ JNI_METHOD(void, MediaPlaybackCluster, previousRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaPlayback::Commands::PreviousRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
         onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
@@ -12533,6 +16144,11 @@ JNI_METHOD(void, MediaPlaybackCluster, previousRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12544,7 +16160,11 @@ JNI_METHOD(void, MediaPlaybackCluster, rewindRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaPlayback::Commands::RewindRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
         onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
@@ -12579,6 +16199,11 @@ JNI_METHOD(void, MediaPlaybackCluster, rewindRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12590,9 +16215,13 @@ JNI_METHOD(void, MediaPlaybackCluster, seekRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaPlayback::Commands::SeekRequest::Type request;
 
-    request.position = static_cast<decltype(request.position)>(chip::JniReferences::GetInstance().LongToPrimitive(position));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.position = static_cast<std::remove_reference_t<decltype(request.position)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(position));
 
     std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
         onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
@@ -12627,6 +16256,11 @@ JNI_METHOD(void, MediaPlaybackCluster, seekRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12638,9 +16272,12 @@ JNI_METHOD(void, MediaPlaybackCluster, skipBackwardRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaPlayback::Commands::SkipBackwardRequest::Type request;
 
-    request.deltaPositionMilliseconds = static_cast<decltype(request.deltaPositionMilliseconds)>(
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.deltaPositionMilliseconds = static_cast<std::remove_reference_t<decltype(request.deltaPositionMilliseconds)>>(
         chip::JniReferences::GetInstance().LongToPrimitive(deltaPositionMilliseconds));
 
     std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
@@ -12676,6 +16313,11 @@ JNI_METHOD(void, MediaPlaybackCluster, skipBackwardRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12687,9 +16329,12 @@ JNI_METHOD(void, MediaPlaybackCluster, skipForwardRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaPlayback::Commands::SkipForwardRequest::Type request;
 
-    request.deltaPositionMilliseconds = static_cast<decltype(request.deltaPositionMilliseconds)>(
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.deltaPositionMilliseconds = static_cast<std::remove_reference_t<decltype(request.deltaPositionMilliseconds)>>(
         chip::JniReferences::GetInstance().LongToPrimitive(deltaPositionMilliseconds));
 
     std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
@@ -12726,6 +16371,11 @@ JNI_METHOD(void, MediaPlaybackCluster, skipForwardRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -12736,7 +16386,11 @@ JNI_METHOD(void, MediaPlaybackCluster, startOverRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaPlayback::Commands::StartOverRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
         onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
@@ -12771,6 +16425,11 @@ JNI_METHOD(void, MediaPlaybackCluster, startOverRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -12782,7 +16441,11 @@ JNI_METHOD(void, MediaPlaybackCluster, stopRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     MediaPlaybackCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::MediaPlayback::Commands::StopRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPMediaPlaybackClusterPlaybackResponseCallback, void (*)(CHIPMediaPlaybackClusterPlaybackResponseCallback *)>
         onSuccess(Platform::New<CHIPMediaPlaybackClusterPlaybackResponseCallback>(callback),
@@ -12817,6 +16480,11 @@ JNI_METHOD(void, MediaPlaybackCluster, stopRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -13043,6 +16711,44 @@ JNI_METHOD(void, MediaPlaybackCluster, subscribeSeekRangeStartAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, MediaPlaybackCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPMediaPlaybackAttributeListAttributeCallback, void (*)(CHIPMediaPlaybackAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPMediaPlaybackAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPMediaPlaybackAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    MediaPlaybackCluster * cppCluster = reinterpret_cast<MediaPlaybackCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::MediaPlayback::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPMediaPlaybackClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPMediaPlaybackAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, MediaPlaybackCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -13096,9 +16802,13 @@ JNI_METHOD(void, ModeSelectCluster, changeToMode)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ModeSelectCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ModeSelect::Commands::ChangeToMode::Type request;
 
-    request.newMode = static_cast<decltype(request.newMode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(newMode));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.newMode = static_cast<std::remove_reference_t<decltype(request.newMode)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(newMode));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -13131,6 +16841,11 @@ JNI_METHOD(void, ModeSelectCluster, changeToMode)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -13165,6 +16880,44 @@ JNI_METHOD(void, ModeSelectCluster, subscribeCurrentModeAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ModeSelectCluster, subscribeSupportedModesAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPModeSelectSupportedModesAttributeCallback, void (*)(CHIPModeSelectSupportedModesAttributeCallback *)>
+        onSuccess(Platform::New<CHIPModeSelectSupportedModesAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPModeSelectSupportedModesAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    ModeSelectCluster * cppCluster = reinterpret_cast<ModeSelectCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ModeSelect::Attributes::SupportedModes::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPModeSelectClusterSupportedModesAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPModeSelectSupportedModesAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -13283,6 +17036,44 @@ JNI_METHOD(void, ModeSelectCluster, subscribeDescriptionAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, ModeSelectCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPModeSelectAttributeListAttributeCallback, void (*)(CHIPModeSelectAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPModeSelectAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPModeSelectAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    ModeSelectCluster * cppCluster = reinterpret_cast<ModeSelectCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ModeSelect::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPModeSelectClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPModeSelectAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, ModeSelectCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -13337,10 +17128,16 @@ JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateThreadNetwork)
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type request;
 
-    request.operationalDataset = chip::JniByteArray(env, static_cast<jbyteArray>(operationalDataset)).byteSpan();
-    request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto operationalDatasetJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(operationalDataset));
+    cleanupByteArrays.push_back(operationalDatasetJni);
+    request.operationalDataset = operationalDatasetJni->byteSpan();
+    request.breadcrumb         = static_cast<std::remove_reference_t<decltype(request.breadcrumb)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
 
     std::unique_ptr<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback,
                     void (*)(CHIPNetworkCommissioningClusterNetworkConfigResponseCallback *)>
@@ -13376,6 +17173,11 @@ JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateThreadNetwork)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -13388,11 +17190,19 @@ JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateWiFiNetwork)
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type request;
 
-    request.ssid        = chip::JniByteArray(env, static_cast<jbyteArray>(ssid)).byteSpan();
-    request.credentials = chip::JniByteArray(env, static_cast<jbyteArray>(credentials)).byteSpan();
-    request.breadcrumb  = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto ssidJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(ssid));
+    cleanupByteArrays.push_back(ssidJni);
+    request.ssid        = ssidJni->byteSpan();
+    auto credentialsJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(credentials));
+    cleanupByteArrays.push_back(credentialsJni);
+    request.credentials = credentialsJni->byteSpan();
+    request.breadcrumb  = static_cast<std::remove_reference_t<decltype(request.breadcrumb)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
 
     std::unique_ptr<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback,
                     void (*)(CHIPNetworkCommissioningClusterNetworkConfigResponseCallback *)>
@@ -13429,6 +17239,11 @@ JNI_METHOD(void, NetworkCommissioningCluster, addOrUpdateWiFiNetwork)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -13440,10 +17255,16 @@ JNI_METHOD(void, NetworkCommissioningCluster, connectNetwork)
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::NetworkCommissioning::Commands::ConnectNetwork::Type request;
 
-    request.networkID  = chip::JniByteArray(env, static_cast<jbyteArray>(networkID)).byteSpan();
-    request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto networkIDJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(networkID));
+    cleanupByteArrays.push_back(networkIDJni);
+    request.networkID  = networkIDJni->byteSpan();
+    request.breadcrumb = static_cast<std::remove_reference_t<decltype(request.breadcrumb)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
 
     std::unique_ptr<CHIPNetworkCommissioningClusterConnectNetworkResponseCallback,
                     void (*)(CHIPNetworkCommissioningClusterConnectNetworkResponseCallback *)>
@@ -13480,6 +17301,11 @@ JNI_METHOD(void, NetworkCommissioningCluster, connectNetwork)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -13491,10 +17317,16 @@ JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetwork::Type request;
 
-    request.networkID  = chip::JniByteArray(env, static_cast<jbyteArray>(networkID)).byteSpan();
-    request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto networkIDJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(networkID));
+    cleanupByteArrays.push_back(networkIDJni);
+    request.networkID  = networkIDJni->byteSpan();
+    request.breadcrumb = static_cast<std::remove_reference_t<decltype(request.breadcrumb)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
 
     std::unique_ptr<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback,
                     void (*)(CHIPNetworkCommissioningClusterNetworkConfigResponseCallback *)>
@@ -13530,6 +17362,11 @@ JNI_METHOD(void, NetworkCommissioningCluster, removeNetwork)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -13542,12 +17379,18 @@ JNI_METHOD(void, NetworkCommissioningCluster, reorderNetwork)
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::NetworkCommissioning::Commands::ReorderNetwork::Type request;
 
-    request.networkID = chip::JniByteArray(env, static_cast<jbyteArray>(networkID)).byteSpan();
-    request.networkIndex =
-        static_cast<decltype(request.networkIndex)>(chip::JniReferences::GetInstance().IntegerToPrimitive(networkIndex));
-    request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto networkIDJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(networkID));
+    cleanupByteArrays.push_back(networkIDJni);
+    request.networkID    = networkIDJni->byteSpan();
+    request.networkIndex = static_cast<std::remove_reference_t<decltype(request.networkIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(networkIndex));
+    request.breadcrumb = static_cast<std::remove_reference_t<decltype(request.breadcrumb)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
 
     std::unique_ptr<CHIPNetworkCommissioningClusterNetworkConfigResponseCallback,
                     void (*)(CHIPNetworkCommissioningClusterNetworkConfigResponseCallback *)>
@@ -13584,6 +17427,11 @@ JNI_METHOD(void, NetworkCommissioningCluster, reorderNetwork)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -13594,10 +17442,16 @@ JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)
     CHIP_ERROR err = CHIP_NO_ERROR;
     NetworkCommissioningCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworks::Type request;
 
-    request.ssid       = chip::JniByteArray(env, static_cast<jbyteArray>(ssid)).byteSpan();
-    request.breadcrumb = static_cast<decltype(request.breadcrumb)>(chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto ssidJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(ssid));
+    cleanupByteArrays.push_back(ssidJni);
+    request.ssid       = ssidJni->byteSpan();
+    request.breadcrumb = static_cast<std::remove_reference_t<decltype(request.breadcrumb)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(breadcrumb));
 
     std::unique_ptr<CHIPNetworkCommissioningClusterScanNetworksResponseCallback,
                     void (*)(CHIPNetworkCommissioningClusterScanNetworksResponseCallback *)>
@@ -13634,6 +17488,11 @@ JNI_METHOD(void, NetworkCommissioningCluster, scanNetworks)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -13667,6 +17526,45 @@ JNI_METHOD(void, NetworkCommissioningCluster, subscribeMaxNetworksAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, NetworkCommissioningCluster, subscribeNetworksAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPNetworkCommissioningNetworksAttributeCallback,
+                    void (*)(CHIPNetworkCommissioningNetworksAttributeCallback *)>
+        onSuccess(Platform::New<CHIPNetworkCommissioningNetworksAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPNetworkCommissioningNetworksAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    NetworkCommissioningCluster * cppCluster = reinterpret_cast<NetworkCommissioningCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::NetworkCommissioning::Attributes::Networks::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPNetworkCommissioningClusterNetworksAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPNetworkCommissioningNetworksAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -13991,10 +17889,16 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, applyUpdateRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateProviderCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateRequest::Type request;
 
-    request.updateToken = chip::JniByteArray(env, static_cast<jbyteArray>(updateToken)).byteSpan();
-    request.newVersion  = static_cast<decltype(request.newVersion)>(chip::JniReferences::GetInstance().LongToPrimitive(newVersion));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto updateTokenJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(updateToken));
+    cleanupByteArrays.push_back(updateTokenJni);
+    request.updateToken = updateTokenJni->byteSpan();
+    request.newVersion  = static_cast<std::remove_reference_t<decltype(request.newVersion)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(newVersion));
 
     std::unique_ptr<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback,
                     void (*)(CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback *)>
@@ -14031,6 +17935,11 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, applyUpdateRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -14042,11 +17951,16 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, notifyUpdateApplied)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateProviderCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::Type request;
 
-    request.updateToken = chip::JniByteArray(env, static_cast<jbyteArray>(updateToken)).byteSpan();
-    request.softwareVersion =
-        static_cast<decltype(request.softwareVersion)>(chip::JniReferences::GetInstance().LongToPrimitive(softwareVersion));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto updateTokenJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(updateToken));
+    cleanupByteArrays.push_back(updateTokenJni);
+    request.updateToken     = updateTokenJni->byteSpan();
+    request.softwareVersion = static_cast<std::remove_reference_t<decltype(request.softwareVersion)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(softwareVersion));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -14080,6 +17994,11 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, notifyUpdateApplied)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -14092,25 +18011,75 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateProviderCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImage::Type request;
 
-    request.vendorId  = static_cast<decltype(request.vendorId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(vendorId));
-    request.productId = static_cast<decltype(request.productId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(productId));
-    request.softwareVersion =
-        static_cast<decltype(request.softwareVersion)>(chip::JniReferences::GetInstance().LongToPrimitive(softwareVersion));
-    request.protocolsSupported =
-        chip::app::DataModel::List<const chip::app::Clusters::OtaSoftwareUpdateProvider::OTADownloadProtocol>();
-    chip::JniReferences::GetInstance().GetOptionalValue(hardwareVersion, hardwareVersion);
-    request.hardwareVersion = chip::Optional<uint16_t>(
-        static_cast<decltype(request.hardwareVersion)>(chip::JniReferences::GetInstance().IntegerToPrimitive(hardwareVersion)));
-    chip::JniReferences::GetInstance().GetOptionalValue(location, location);
-    request.location = chip::Optional<chip::CharSpan>(chip::JniUtfString(env, static_cast<jstring>(location)).charSpan());
-    chip::JniReferences::GetInstance().GetOptionalValue(requestorCanConsent, requestorCanConsent);
-    request.requestorCanConsent = chip::Optional<bool>(static_cast<decltype(request.requestorCanConsent)>(
-        chip::JniReferences::GetInstance().BooleanToPrimitive(requestorCanConsent)));
-    chip::JniReferences::GetInstance().GetOptionalValue(metadataForProvider, metadataForProvider);
-    request.metadataForProvider =
-        chip::Optional<chip::ByteSpan>(chip::JniByteArray(env, static_cast<jbyteArray>(metadataForProvider)).byteSpan());
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.vendorId = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(vendorId));
+    request.productId = static_cast<std::remove_reference_t<decltype(request.productId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(productId));
+    request.softwareVersion = static_cast<std::remove_reference_t<decltype(request.softwareVersion)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(softwareVersion));
+    {
+        using ListType_0       = std::remove_reference_t<decltype(request.protocolsSupported)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint protocolsSupportedSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(protocolsSupported, protocolsSupportedSize);
+        if (protocolsSupportedSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(protocolsSupportedSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(protocolsSupportedSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(protocolsSupported, i_0, element_0);
+                listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0));
+            }
+            request.protocolsSupported = ListType_0(listHolder_0->mList, protocolsSupportedSize);
+        }
+        else
+        {
+            request.protocolsSupported = ListType_0();
+        }
+    }
+    if (hardwareVersion != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(hardwareVersion, optionalValue_0);
+        auto & definedValue_0 = request.hardwareVersion.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_0));
+    }
+    if (location != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(location, optionalValue_0);
+        auto & definedValue_0   = request.location.Emplace();
+        auto optionalValue_0Jni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(optionalValue_0));
+        cleanupStrings.push_back(optionalValue_0Jni);
+        definedValue_0 = optionalValue_0Jni->charSpan();
+    }
+    if (requestorCanConsent != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(requestorCanConsent, optionalValue_0);
+        auto & definedValue_0 = request.requestorCanConsent.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().BooleanToPrimitive(optionalValue_0));
+    }
+    if (metadataForProvider != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(metadataForProvider, optionalValue_0);
+        auto & definedValue_0   = request.metadataForProvider.Emplace();
+        auto optionalValue_0Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_0));
+        cleanupByteArrays.push_back(optionalValue_0Jni);
+        definedValue_0 = optionalValue_0Jni->byteSpan();
+    }
 
     std::unique_ptr<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback,
                     void (*)(CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback *)>
@@ -14146,6 +18115,51 @@ JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, queryImage)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, OtaSoftwareUpdateProviderCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback,
+                    void (*)(CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                = CHIP_NO_ERROR;
+    OtaSoftwareUpdateProviderCluster * cppCluster = reinterpret_cast<OtaSoftwareUpdateProviderCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPOtaSoftwareUpdateProviderClusterAttributeListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPOtaSoftwareUpdateProviderAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -14205,17 +18219,28 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OtaSoftwareUpdateRequestorCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::Type request;
 
-    request.providerNodeId =
-        static_cast<decltype(request.providerNodeId)>(chip::JniReferences::GetInstance().LongToPrimitive(providerNodeId));
-    request.vendorId = static_cast<decltype(request.vendorId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(vendorId));
-    request.announcementReason = static_cast<decltype(request.announcementReason)>(
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.providerNodeId = static_cast<std::remove_reference_t<decltype(request.providerNodeId)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(providerNodeId));
+    request.vendorId = static_cast<std::remove_reference_t<decltype(request.vendorId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(vendorId));
+    request.announcementReason = static_cast<std::remove_reference_t<decltype(request.announcementReason)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(announcementReason));
-    chip::JniReferences::GetInstance().GetOptionalValue(metadataForNode, metadataForNode);
-    request.metadataForNode =
-        chip::Optional<chip::ByteSpan>(chip::JniByteArray(env, static_cast<jbyteArray>(metadataForNode)).byteSpan());
-    request.endpoint = static_cast<decltype(request.endpoint)>(chip::JniReferences::GetInstance().IntegerToPrimitive(endpoint));
+    if (metadataForNode != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(metadataForNode, optionalValue_0);
+        auto & definedValue_0   = request.metadataForNode.Emplace();
+        auto optionalValue_0Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_0));
+        cleanupByteArrays.push_back(optionalValue_0Jni);
+        definedValue_0 = optionalValue_0Jni->byteSpan();
+    }
+    request.endpoint = static_cast<std::remove_reference_t<decltype(request.endpoint)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(endpoint));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -14248,6 +18273,52 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, announceOtaProvider)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeDefaultOtaProvidersAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback,
+                    void (*)(CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback *)>
+        onSuccess(Platform::New<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    OtaSoftwareUpdateRequestorCluster * cppCluster = reinterpret_cast<OtaSoftwareUpdateRequestorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProviders::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterDefaultOtaProvidersAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPOtaSoftwareUpdateRequestorDefaultOtaProvidersAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -14362,6 +18433,47 @@ JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeUpdateStateProgress
         onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOtaSoftwareUpdateRequestorUpdateStateProgressAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, OtaSoftwareUpdateRequestorCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback,
+                    void (*)(CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                 = CHIP_NO_ERROR;
+    OtaSoftwareUpdateRequestorCluster * cppCluster = reinterpret_cast<OtaSoftwareUpdateRequestorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPOtaSoftwareUpdateRequestorClusterAttributeListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPOtaSoftwareUpdateRequestorAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -14528,6 +18640,45 @@ JNI_METHOD(void, OccupancySensingCluster, subscribeOccupancySensorTypeBitmapAttr
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, OccupancySensingCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPOccupancySensingAttributeListAttributeCallback,
+                    void (*)(CHIPOccupancySensingAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPOccupancySensingAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPOccupancySensingAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                       = CHIP_NO_ERROR;
+    OccupancySensingCluster * cppCluster = reinterpret_cast<OccupancySensingCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OccupancySensing::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPOccupancySensingClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPOccupancySensingAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, OccupancySensingCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -14580,7 +18731,11 @@ JNI_METHOD(void, OnOffCluster, off)(JNIEnv * env, jobject self, jlong clusterPtr
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OnOff::Commands::Off::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -14613,6 +18768,11 @@ JNI_METHOD(void, OnOffCluster, off)(JNIEnv * env, jobject self, jlong clusterPtr
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -14625,11 +18785,15 @@ JNI_METHOD(void, OnOffCluster, offWithEffect)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OnOff::Commands::OffWithEffect::Type request;
 
-    request.effectId = static_cast<decltype(request.effectId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(effectId));
-    request.effectVariant =
-        static_cast<decltype(request.effectVariant)>(chip::JniReferences::GetInstance().IntegerToPrimitive(effectVariant));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.effectId = static_cast<std::remove_reference_t<decltype(request.effectId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(effectId));
+    request.effectVariant = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(effectVariant));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -14662,6 +18826,11 @@ JNI_METHOD(void, OnOffCluster, offWithEffect)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -14672,7 +18841,11 @@ JNI_METHOD(void, OnOffCluster, on)(JNIEnv * env, jobject self, jlong clusterPtr,
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OnOff::Commands::On::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -14705,6 +18878,11 @@ JNI_METHOD(void, OnOffCluster, on)(JNIEnv * env, jobject self, jlong clusterPtr,
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -14716,7 +18894,11 @@ JNI_METHOD(void, OnOffCluster, onWithRecallGlobalScene)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OnOff::Commands::OnWithRecallGlobalScene::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -14749,6 +18931,11 @@ JNI_METHOD(void, OnOffCluster, onWithRecallGlobalScene)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -14761,13 +18948,17 @@ JNI_METHOD(void, OnOffCluster, onWithTimedOff)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OnOff::Commands::OnWithTimedOff::Type request;
 
-    request.onOffControl =
-        static_cast<decltype(request.onOffControl)>(chip::JniReferences::GetInstance().IntegerToPrimitive(onOffControl));
-    request.onTime = static_cast<decltype(request.onTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(onTime));
-    request.offWaitTime =
-        static_cast<decltype(request.offWaitTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(offWaitTime));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.onOffControl = static_cast<std::remove_reference_t<decltype(request.onOffControl)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(onOffControl));
+    request.onTime = static_cast<std::remove_reference_t<decltype(request.onTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(onTime));
+    request.offWaitTime = static_cast<std::remove_reference_t<decltype(request.offWaitTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(offWaitTime));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -14800,6 +18991,11 @@ JNI_METHOD(void, OnOffCluster, onWithTimedOff)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -14810,7 +19006,11 @@ JNI_METHOD(void, OnOffCluster, toggle)(JNIEnv * env, jobject self, jlong cluster
     CHIP_ERROR err = CHIP_NO_ERROR;
     OnOffCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OnOff::Commands::Toggle::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -14843,6 +19043,11 @@ JNI_METHOD(void, OnOffCluster, toggle)(JNIEnv * env, jobject self, jlong cluster
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -15030,6 +19235,44 @@ JNI_METHOD(void, OnOffCluster, subscribeStartUpOnOffAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, OnOffCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPOnOffAttributeListAttributeCallback, void (*)(CHIPOnOffAttributeListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPOnOffAttributeListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPOnOffAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    OnOffCluster * cppCluster = reinterpret_cast<OnOffCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OnOff::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPOnOffClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPOnOffAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, OnOffCluster, subscribeFeatureMapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -15187,6 +19430,46 @@ JNI_METHOD(void, OnOffSwitchConfigurationCluster, subscribeSwitchActionsAttribut
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, OnOffSwitchConfigurationCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPOnOffSwitchConfigurationAttributeListAttributeCallback,
+                    void (*)(CHIPOnOffSwitchConfigurationAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPOnOffSwitchConfigurationAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPOnOffSwitchConfigurationAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    OnOffSwitchConfigurationCluster * cppCluster = reinterpret_cast<OnOffSwitchConfigurationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OnOffSwitchConfiguration::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPOnOffSwitchConfigurationClusterAttributeListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPOnOffSwitchConfigurationAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, OnOffSwitchConfigurationCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -15242,16 +19525,30 @@ JNI_METHOD(void, OperationalCredentialsCluster, addNOC)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OperationalCredentials::Commands::AddNOC::Type request;
 
-    request.NOCValue = chip::JniByteArray(env, static_cast<jbyteArray>(NOCValue)).byteSpan();
-    chip::JniReferences::GetInstance().GetOptionalValue(ICACValue, ICACValue);
-    request.ICACValue = chip::Optional<chip::ByteSpan>(chip::JniByteArray(env, static_cast<jbyteArray>(ICACValue)).byteSpan());
-    request.IPKValue  = chip::JniByteArray(env, static_cast<jbyteArray>(IPKValue)).byteSpan();
-    request.caseAdminNode =
-        static_cast<decltype(request.caseAdminNode)>(chip::JniReferences::GetInstance().LongToPrimitive(caseAdminNode));
-    request.adminVendorId =
-        static_cast<decltype(request.adminVendorId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(adminVendorId));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto NOCValueJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(NOCValue));
+    cleanupByteArrays.push_back(NOCValueJni);
+    request.NOCValue = NOCValueJni->byteSpan();
+    if (ICACValue != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(ICACValue, optionalValue_0);
+        auto & definedValue_0   = request.ICACValue.Emplace();
+        auto optionalValue_0Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_0));
+        cleanupByteArrays.push_back(optionalValue_0Jni);
+        definedValue_0 = optionalValue_0Jni->byteSpan();
+    }
+    auto IPKValueJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(IPKValue));
+    cleanupByteArrays.push_back(IPKValueJni);
+    request.IPKValue      = IPKValueJni->byteSpan();
+    request.caseAdminNode = static_cast<std::remove_reference_t<decltype(request.caseAdminNode)>>(
+        chip::JniReferences::GetInstance().LongToPrimitive(caseAdminNode));
+    request.adminVendorId = static_cast<std::remove_reference_t<decltype(request.adminVendorId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(adminVendorId));
 
     std::unique_ptr<CHIPOperationalCredentialsClusterNOCResponseCallback,
                     void (*)(CHIPOperationalCredentialsClusterNOCResponseCallback *)>
@@ -15288,6 +19585,11 @@ JNI_METHOD(void, OperationalCredentialsCluster, addNOC)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -15298,9 +19600,14 @@ JNI_METHOD(void, OperationalCredentialsCluster, addTrustedRootCertificate)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OperationalCredentials::Commands::AddTrustedRootCertificate::Type request;
 
-    request.rootCertificate = chip::JniByteArray(env, static_cast<jbyteArray>(rootCertificate)).byteSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto rootCertificateJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(rootCertificate));
+    cleanupByteArrays.push_back(rootCertificateJni);
+    request.rootCertificate = rootCertificateJni->byteSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -15334,6 +19641,11 @@ JNI_METHOD(void, OperationalCredentialsCluster, addTrustedRootCertificate)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -15344,9 +19656,14 @@ JNI_METHOD(void, OperationalCredentialsCluster, attestationRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OperationalCredentials::Commands::AttestationRequest::Type request;
 
-    request.attestationNonce = chip::JniByteArray(env, static_cast<jbyteArray>(attestationNonce)).byteSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto attestationNonceJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(attestationNonce));
+    cleanupByteArrays.push_back(attestationNonceJni);
+    request.attestationNonce = attestationNonceJni->byteSpan();
 
     std::unique_ptr<CHIPOperationalCredentialsClusterAttestationResponseCallback,
                     void (*)(CHIPOperationalCredentialsClusterAttestationResponseCallback *)>
@@ -15383,6 +19700,11 @@ JNI_METHOD(void, OperationalCredentialsCluster, attestationRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -15393,10 +19715,13 @@ JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OperationalCredentials::Commands::CertificateChainRequest::Type request;
 
-    request.certificateType =
-        static_cast<decltype(request.certificateType)>(chip::JniReferences::GetInstance().IntegerToPrimitive(certificateType));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.certificateType = static_cast<std::remove_reference_t<decltype(request.certificateType)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(certificateType));
 
     std::unique_ptr<CHIPOperationalCredentialsClusterCertificateChainResponseCallback,
                     void (*)(CHIPOperationalCredentialsClusterCertificateChainResponseCallback *)>
@@ -15434,6 +19759,11 @@ JNI_METHOD(void, OperationalCredentialsCluster, certificateChainRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -15444,9 +19774,14 @@ JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OperationalCredentials::Commands::OpCSRRequest::Type request;
 
-    request.CSRNonce = chip::JniByteArray(env, static_cast<jbyteArray>(CSRNonce)).byteSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto CSRNonceJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(CSRNonce));
+    cleanupByteArrays.push_back(CSRNonceJni);
+    request.CSRNonce = CSRNonceJni->byteSpan();
 
     std::unique_ptr<CHIPOperationalCredentialsClusterOpCSRResponseCallback,
                     void (*)(CHIPOperationalCredentialsClusterOpCSRResponseCallback *)>
@@ -15483,6 +19818,11 @@ JNI_METHOD(void, OperationalCredentialsCluster, opCSRRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -15493,10 +19833,13 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeFabric)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OperationalCredentials::Commands::RemoveFabric::Type request;
 
-    request.fabricIndex =
-        static_cast<decltype(request.fabricIndex)>(chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.fabricIndex = static_cast<std::remove_reference_t<decltype(request.fabricIndex)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(fabricIndex));
 
     std::unique_ptr<CHIPOperationalCredentialsClusterNOCResponseCallback,
                     void (*)(CHIPOperationalCredentialsClusterNOCResponseCallback *)>
@@ -15533,6 +19876,11 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeFabric)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -15543,9 +19891,14 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeTrustedRootCertificate)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::Type request;
 
-    request.trustedRootIdentifier = chip::JniByteArray(env, static_cast<jbyteArray>(trustedRootIdentifier)).byteSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto trustedRootIdentifierJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(trustedRootIdentifier));
+    cleanupByteArrays.push_back(trustedRootIdentifierJni);
+    request.trustedRootIdentifier = trustedRootIdentifierJni->byteSpan();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -15579,6 +19932,11 @@ JNI_METHOD(void, OperationalCredentialsCluster, removeTrustedRootCertificate)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -15589,9 +19947,14 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateFabricLabel)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OperationalCredentials::Commands::UpdateFabricLabel::Type request;
 
-    request.label = chip::JniUtfString(env, static_cast<jstring>(label)).charSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto labelJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(label));
+    cleanupStrings.push_back(labelJni);
+    request.label = labelJni->charSpan();
 
     std::unique_ptr<CHIPOperationalCredentialsClusterNOCResponseCallback,
                     void (*)(CHIPOperationalCredentialsClusterNOCResponseCallback *)>
@@ -15627,6 +19990,11 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateFabricLabel)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -15639,11 +20007,23 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateNOC)
     CHIP_ERROR err = CHIP_NO_ERROR;
     OperationalCredentialsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::OperationalCredentials::Commands::UpdateNOC::Type request;
 
-    request.NOCValue = chip::JniByteArray(env, static_cast<jbyteArray>(NOCValue)).byteSpan();
-    chip::JniReferences::GetInstance().GetOptionalValue(ICACValue, ICACValue);
-    request.ICACValue = chip::Optional<chip::ByteSpan>(chip::JniByteArray(env, static_cast<jbyteArray>(ICACValue)).byteSpan());
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    auto NOCValueJni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(NOCValue));
+    cleanupByteArrays.push_back(NOCValueJni);
+    request.NOCValue = NOCValueJni->byteSpan();
+    if (ICACValue != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(ICACValue, optionalValue_0);
+        auto & definedValue_0   = request.ICACValue.Emplace();
+        auto optionalValue_0Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(optionalValue_0));
+        cleanupByteArrays.push_back(optionalValue_0Jni);
+        definedValue_0 = optionalValue_0Jni->byteSpan();
+    }
 
     std::unique_ptr<CHIPOperationalCredentialsClusterNOCResponseCallback,
                     void (*)(CHIPOperationalCredentialsClusterNOCResponseCallback *)>
@@ -15679,6 +20059,50 @@ JNI_METHOD(void, OperationalCredentialsCluster, updateNOC)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, OperationalCredentialsCluster, subscribeFabricsListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPOperationalCredentialsFabricsListAttributeCallback,
+                    void (*)(CHIPOperationalCredentialsFabricsListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPOperationalCredentialsFabricsListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPOperationalCredentialsFabricsListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    OperationalCredentialsCluster * cppCluster = reinterpret_cast<OperationalCredentialsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OperationalCredentials::Attributes::FabricsList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPOperationalCredentialsClusterFabricsListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPOperationalCredentialsFabricsListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -15759,6 +20183,47 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeCommissionedFabricsAttr
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, OperationalCredentialsCluster, subscribeTrustedRootCertificatesAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback,
+                    void (*)(CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback *)>
+        onSuccess(Platform::New<CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    OperationalCredentialsCluster * cppCluster = reinterpret_cast<OperationalCredentialsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPOperationalCredentialsClusterTrustedRootCertificatesAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPOperationalCredentialsTrustedRootCertificatesAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, OperationalCredentialsCluster, subscribeCurrentFabricIndexAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -15793,6 +20258,45 @@ JNI_METHOD(void, OperationalCredentialsCluster, subscribeCurrentFabricIndexAttri
         onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
         static_cast<uint16_t>(maxInterval),
         CHIPOperationalCredentialsCurrentFabricIndexAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, OperationalCredentialsCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPOperationalCredentialsAttributeListAttributeCallback,
+                    void (*)(CHIPOperationalCredentialsAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPOperationalCredentialsAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPOperationalCredentialsAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    OperationalCredentialsCluster * cppCluster = reinterpret_cast<OperationalCredentialsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::OperationalCredentials::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPOperationalCredentialsClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPOperationalCredentialsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -16106,6 +20610,45 @@ JNI_METHOD(void, PowerSourceCluster, subscribeBatteryChargeLevelAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, PowerSourceCluster, subscribeActiveBatteryFaultsAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPPowerSourceActiveBatteryFaultsAttributeCallback,
+                    void (*)(CHIPPowerSourceActiveBatteryFaultsAttributeCallback *)>
+        onSuccess(Platform::New<CHIPPowerSourceActiveBatteryFaultsAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPPowerSourceActiveBatteryFaultsAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    PowerSourceCluster * cppCluster = reinterpret_cast<PowerSourceCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::PowerSource::Attributes::ActiveBatteryFaults::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPPowerSourceClusterActiveBatteryFaultsAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPPowerSourceActiveBatteryFaultsAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, PowerSourceCluster, subscribeBatteryChargeStateAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -16136,6 +20679,44 @@ JNI_METHOD(void, PowerSourceCluster, subscribeBatteryChargeStateAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, PowerSourceCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPPowerSourceAttributeListAttributeCallback, void (*)(CHIPPowerSourceAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPPowerSourceAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPPowerSourceAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    PowerSourceCluster * cppCluster = reinterpret_cast<PowerSourceCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::PowerSource::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPPowerSourceClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPPowerSourceAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -16226,6 +20807,85 @@ JNI_METHOD(jlong, PowerSourceConfigurationCluster, initWithDevice)(JNIEnv * env,
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, PowerSourceConfigurationCluster, subscribeSourcesAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPPowerSourceConfigurationSourcesAttributeCallback,
+                    void (*)(CHIPPowerSourceConfigurationSourcesAttributeCallback *)>
+        onSuccess(Platform::New<CHIPPowerSourceConfigurationSourcesAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPPowerSourceConfigurationSourcesAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    PowerSourceConfigurationCluster * cppCluster = reinterpret_cast<PowerSourceConfigurationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::PowerSourceConfiguration::Attributes::Sources::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPPowerSourceConfigurationClusterSourcesAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPPowerSourceConfigurationSourcesAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, PowerSourceConfigurationCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPPowerSourceConfigurationAttributeListAttributeCallback,
+                    void (*)(CHIPPowerSourceConfigurationAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPPowerSourceConfigurationAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPPowerSourceConfigurationAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    PowerSourceConfigurationCluster * cppCluster = reinterpret_cast<PowerSourceConfigurationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::PowerSourceConfiguration::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPPowerSourceConfigurationClusterAttributeListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPPowerSourceConfigurationAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, PowerSourceConfigurationCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -16377,6 +21037,45 @@ JNI_METHOD(void, PressureMeasurementCluster, subscribeMaxMeasuredValueAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, PressureMeasurementCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPPressureMeasurementAttributeListAttributeCallback,
+                    void (*)(CHIPPressureMeasurementAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPPressureMeasurementAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPPressureMeasurementAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    PressureMeasurementCluster * cppCluster = reinterpret_cast<PressureMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::PressureMeasurement::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPPressureMeasurementClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPPressureMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -17342,6 +22041,47 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeAlarmMaskAttribute
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPPumpConfigurationAndControlAttributeListAttributeCallback,
+                    void (*)(CHIPPumpConfigurationAndControlAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPPumpConfigurationAndControlAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPPumpConfigurationAndControlAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    PumpConfigurationAndControlCluster * cppCluster = reinterpret_cast<PumpConfigurationAndControlCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPPumpConfigurationAndControlClusterAttributeListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPPumpConfigurationAndControlAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, PumpConfigurationAndControlCluster, subscribeFeatureMapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -17578,6 +22318,47 @@ JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeToleranceAttribute
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPRelativeHumidityMeasurementAttributeListAttributeCallback,
+                    void (*)(CHIPRelativeHumidityMeasurementAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPRelativeHumidityMeasurementAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPRelativeHumidityMeasurementAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                                  = CHIP_NO_ERROR;
+    RelativeHumidityMeasurementCluster * cppCluster = reinterpret_cast<RelativeHumidityMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::RelativeHumidityMeasurement::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPRelativeHumidityMeasurementClusterAttributeListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPRelativeHumidityMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, RelativeHumidityMeasurementCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -17627,21 +22408,63 @@ JNI_METHOD(jlong, ScenesCluster, initWithDevice)(JNIEnv * env, jobject self, jlo
 
 JNI_METHOD(void, ScenesCluster, addScene)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupId, jobject sceneId, jobject transitionTime,
- jstring sceneName, jobject clusterId, jobject length, jobject value, jobject timedInvokeTimeoutMs)
+ jstring sceneName, jobject extensionFieldSets, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Scenes::Commands::AddScene::Type request;
 
-    request.groupId = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
-    request.sceneId = static_cast<decltype(request.sceneId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(sceneId));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
-    request.sceneName = chip::JniUtfString(env, static_cast<jstring>(sceneName)).charSpan();
-    request.extensionFieldSets =
-        chip::app::DataModel::List<const chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type>();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    request.sceneId = static_cast<std::remove_reference_t<decltype(request.sceneId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(sceneId));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    auto sceneNameJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(sceneName));
+    cleanupStrings.push_back(sceneNameJni);
+    request.sceneName = sceneNameJni->charSpan();
+    {
+        using ListType_0       = std::remove_reference_t<decltype(request.extensionFieldSets)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint extensionFieldSetsSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(extensionFieldSets, extensionFieldSetsSize);
+        if (extensionFieldSetsSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(extensionFieldSetsSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(extensionFieldSetsSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(extensionFieldSets, i_0, element_0);
+                jobject element_0_clusterIdItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "clusterId", "Ljava/lang/Long;",
+                                                                  element_0_clusterIdItem_1);
+                listHolder_0->mList[i_0].clusterId =
+                    static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].clusterId)>>(
+                        chip::JniReferences::GetInstance().LongToPrimitive(element_0_clusterIdItem_1));
+                jobject element_0_lengthItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "length", "Ljava/lang/Integer;",
+                                                                  element_0_lengthItem_1);
+                listHolder_0->mList[i_0].length = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].length)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_lengthItem_1));
+                jobject element_0_valueItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "value", "Ljava/lang/Integer;", element_0_valueItem_1);
+                listHolder_0->mList[i_0].value = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].value)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_valueItem_1));
+            }
+            request.extensionFieldSets = ListType_0(listHolder_0->mList, extensionFieldSetsSize);
+        }
+        else
+        {
+            request.extensionFieldSets = ListType_0();
+        }
+    }
 
     std::unique_ptr<CHIPScenesClusterAddSceneResponseCallback, void (*)(CHIPScenesClusterAddSceneResponseCallback *)> onSuccess(
         Platform::New<CHIPScenesClusterAddSceneResponseCallback>(callback),
@@ -17676,6 +22499,11 @@ JNI_METHOD(void, ScenesCluster, addScene)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -17686,9 +22514,13 @@ JNI_METHOD(void, ScenesCluster, getSceneMembership)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Scenes::Commands::GetSceneMembership::Type request;
 
-    request.groupId = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
 
     std::unique_ptr<CHIPScenesClusterGetSceneMembershipResponseCallback,
                     void (*)(CHIPScenesClusterGetSceneMembershipResponseCallback *)>
@@ -17725,6 +22557,11 @@ JNI_METHOD(void, ScenesCluster, getSceneMembership)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -17736,12 +22573,17 @@ JNI_METHOD(void, ScenesCluster, recallScene)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Scenes::Commands::RecallScene::Type request;
 
-    request.groupId = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
-    request.sceneId = static_cast<decltype(request.sceneId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(sceneId));
-    request.transitionTime =
-        static_cast<decltype(request.transitionTime)>(chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    request.sceneId = static_cast<std::remove_reference_t<decltype(request.sceneId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(sceneId));
+    request.transitionTime = static_cast<std::remove_reference_t<decltype(request.transitionTime)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(transitionTime));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -17775,6 +22617,11 @@ JNI_METHOD(void, ScenesCluster, recallScene)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -17785,9 +22632,13 @@ JNI_METHOD(void, ScenesCluster, removeAllScenes)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Scenes::Commands::RemoveAllScenes::Type request;
 
-    request.groupId = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
 
     std::unique_ptr<CHIPScenesClusterRemoveAllScenesResponseCallback, void (*)(CHIPScenesClusterRemoveAllScenesResponseCallback *)>
         onSuccess(Platform::New<CHIPScenesClusterRemoveAllScenesResponseCallback>(callback),
@@ -17823,6 +22674,11 @@ JNI_METHOD(void, ScenesCluster, removeAllScenes)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -17833,10 +22689,15 @@ JNI_METHOD(void, ScenesCluster, removeScene)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Scenes::Commands::RemoveScene::Type request;
 
-    request.groupId = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
-    request.sceneId = static_cast<decltype(request.sceneId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(sceneId));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    request.sceneId = static_cast<std::remove_reference_t<decltype(request.sceneId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(sceneId));
 
     std::unique_ptr<CHIPScenesClusterRemoveSceneResponseCallback, void (*)(CHIPScenesClusterRemoveSceneResponseCallback *)>
         onSuccess(Platform::New<CHIPScenesClusterRemoveSceneResponseCallback>(callback),
@@ -17872,6 +22733,11 @@ JNI_METHOD(void, ScenesCluster, removeScene)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -17882,10 +22748,15 @@ JNI_METHOD(void, ScenesCluster, storeScene)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Scenes::Commands::StoreScene::Type request;
 
-    request.groupId = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
-    request.sceneId = static_cast<decltype(request.sceneId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(sceneId));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    request.sceneId = static_cast<std::remove_reference_t<decltype(request.sceneId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(sceneId));
 
     std::unique_ptr<CHIPScenesClusterStoreSceneResponseCallback, void (*)(CHIPScenesClusterStoreSceneResponseCallback *)> onSuccess(
         Platform::New<CHIPScenesClusterStoreSceneResponseCallback>(callback),
@@ -17920,6 +22791,11 @@ JNI_METHOD(void, ScenesCluster, storeScene)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -17930,10 +22806,15 @@ JNI_METHOD(void, ScenesCluster, viewScene)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ScenesCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Scenes::Commands::ViewScene::Type request;
 
-    request.groupId = static_cast<decltype(request.groupId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
-    request.sceneId = static_cast<decltype(request.sceneId)>(chip::JniReferences::GetInstance().IntegerToPrimitive(sceneId));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.groupId = static_cast<std::remove_reference_t<decltype(request.groupId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(groupId));
+    request.sceneId = static_cast<std::remove_reference_t<decltype(request.sceneId)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(sceneId));
 
     std::unique_ptr<CHIPScenesClusterViewSceneResponseCallback, void (*)(CHIPScenesClusterViewSceneResponseCallback *)> onSuccess(
         Platform::New<CHIPScenesClusterViewSceneResponseCallback>(callback),
@@ -17967,6 +22848,11 @@ JNI_METHOD(void, ScenesCluster, viewScene)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -18156,6 +23042,44 @@ JNI_METHOD(void, ScenesCluster, subscribeNameSupportAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, ScenesCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPScenesAttributeListAttributeCallback, void (*)(CHIPScenesAttributeListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPScenesAttributeListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPScenesAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err             = CHIP_NO_ERROR;
+    ScenesCluster * cppCluster = reinterpret_cast<ScenesCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Scenes::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPScenesClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPScenesAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, ScenesCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -18209,7 +23133,11 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, resetWatermarks)
     CHIP_ERROR err = CHIP_NO_ERROR;
     SoftwareDiagnosticsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::SoftwareDiagnostics::Commands::ResetWatermarks::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -18242,6 +23170,50 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, resetWatermarks)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeThreadMetricsAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback,
+                    void (*)(CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback *)>
+        onSuccess(Platform::New<CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    SoftwareDiagnosticsCluster * cppCluster = reinterpret_cast<SoftwareDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::SoftwareDiagnostics::Attributes::ThreadMetrics::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPSoftwareDiagnosticsClusterThreadMetricsAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPSoftwareDiagnosticsThreadMetricsAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
 
     onSuccess.release();
     onFailure.release();
@@ -18351,6 +23323,45 @@ JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeCurrentHeapHighWatermarkAt
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, SoftwareDiagnosticsCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPSoftwareDiagnosticsAttributeListAttributeCallback,
+                    void (*)(CHIPSoftwareDiagnosticsAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPSoftwareDiagnosticsAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPSoftwareDiagnosticsAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                          = CHIP_NO_ERROR;
+    SoftwareDiagnosticsCluster * cppCluster = reinterpret_cast<SoftwareDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::SoftwareDiagnostics::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPSoftwareDiagnosticsClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPSoftwareDiagnosticsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -18552,6 +23563,44 @@ JNI_METHOD(void, SwitchCluster, subscribeMultiPressMaxAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, SwitchCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPSwitchAttributeListAttributeCallback, void (*)(CHIPSwitchAttributeListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPSwitchAttributeListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPSwitchAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err             = CHIP_NO_ERROR;
+    SwitchCluster * cppCluster = reinterpret_cast<SwitchCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Switch::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPSwitchClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPSwitchAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, SwitchCluster, subscribeFeatureMapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -18642,10 +23691,16 @@ JNI_METHOD(void, TargetNavigatorCluster, navigateTargetRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TargetNavigatorCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TargetNavigator::Commands::NavigateTargetRequest::Type request;
 
-    request.target = static_cast<decltype(request.target)>(chip::JniReferences::GetInstance().IntegerToPrimitive(target));
-    request.data   = chip::JniUtfString(env, static_cast<jstring>(data)).charSpan();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.target = static_cast<std::remove_reference_t<decltype(request.target)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(target));
+    auto dataJni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(data));
+    cleanupStrings.push_back(dataJni);
+    request.data = dataJni->charSpan();
 
     std::unique_ptr<CHIPTargetNavigatorClusterNavigateTargetResponseCallback,
                     void (*)(CHIPTargetNavigatorClusterNavigateTargetResponseCallback *)>
@@ -18682,6 +23737,50 @@ JNI_METHOD(void, TargetNavigatorCluster, navigateTargetRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, TargetNavigatorCluster, subscribeTargetNavigatorListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPTargetNavigatorTargetNavigatorListAttributeCallback,
+                    void (*)(CHIPTargetNavigatorTargetNavigatorListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPTargetNavigatorTargetNavigatorListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPTargetNavigatorTargetNavigatorListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    TargetNavigatorCluster * cppCluster = reinterpret_cast<TargetNavigatorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TargetNavigator::Attributes::TargetNavigatorList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPTargetNavigatorClusterTargetNavigatorListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPTargetNavigatorTargetNavigatorListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
     onSuccess.release();
     onFailure.release();
 }
@@ -18716,6 +23815,45 @@ JNI_METHOD(void, TargetNavigatorCluster, subscribeCurrentNavigatorTargetAttribut
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, TargetNavigatorCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPTargetNavigatorAttributeListAttributeCallback,
+                    void (*)(CHIPTargetNavigatorAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPTargetNavigatorAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPTargetNavigatorAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    TargetNavigatorCluster * cppCluster = reinterpret_cast<TargetNavigatorCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TargetNavigator::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPTargetNavigatorClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPTargetNavigatorAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -18919,6 +24057,45 @@ JNI_METHOD(void, TemperatureMeasurementCluster, subscribeToleranceAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, TemperatureMeasurementCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPTemperatureMeasurementAttributeListAttributeCallback,
+                    void (*)(CHIPTemperatureMeasurementAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPTemperatureMeasurementAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPTemperatureMeasurementAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    TemperatureMeasurementCluster * cppCluster = reinterpret_cast<TemperatureMeasurementCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TemperatureMeasurement::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPTemperatureMeasurementClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPTemperatureMeasurementAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, TemperatureMeasurementCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -18967,16 +24144,51 @@ JNI_METHOD(jlong, TestClusterCluster, initWithDevice)(JNIEnv * env, jobject self
 }
 
 JNI_METHOD(void, TestClusterCluster, simpleStructEchoRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jbyteArray d, jstring e,
- jobject f, jobject g, jobject h, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type request;
 
-    request.arg1 = chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    jobject arg1_aItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "a", "Ljava/lang/Integer;", arg1_aItem_0);
+    request.arg1.a = static_cast<std::remove_reference_t<decltype(request.arg1.a)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_aItem_0));
+    jobject arg1_bItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "b", "Ljava/lang/Boolean;", arg1_bItem_0);
+    request.arg1.b = static_cast<std::remove_reference_t<decltype(request.arg1.b)>>(
+        chip::JniReferences::GetInstance().BooleanToPrimitive(arg1_bItem_0));
+    jobject arg1_cItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "c", "Ljava/lang/Integer;", arg1_cItem_0);
+    request.arg1.c = static_cast<std::remove_reference_t<decltype(request.arg1.c)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_cItem_0));
+    jobject arg1_dItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "d", "[B", arg1_dItem_0);
+    auto arg1_dItem_0Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(arg1_dItem_0));
+    cleanupByteArrays.push_back(arg1_dItem_0Jni);
+    request.arg1.d = arg1_dItem_0Jni->byteSpan();
+    jobject arg1_eItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "e", "Ljava/lang/String;", arg1_eItem_0);
+    auto arg1_eItem_0Jni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(arg1_eItem_0));
+    cleanupStrings.push_back(arg1_eItem_0Jni);
+    request.arg1.e = arg1_eItem_0Jni->charSpan();
+    jobject arg1_fItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "f", "Ljava/lang/Integer;", arg1_fItem_0);
+    request.arg1.f = static_cast<std::remove_reference_t<decltype(request.arg1.f)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_fItem_0));
+    jobject arg1_gItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "g", "Ljava/lang/Float;", arg1_gItem_0);
+    request.arg1.g = static_cast<std::remove_reference_t<decltype(request.arg1.g)>>(
+        chip::JniReferences::GetInstance().FloatToPrimitive(arg1_gItem_0));
+    jobject arg1_hItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "h", "Ljava/lang/Double;", arg1_hItem_0);
+    request.arg1.h = static_cast<std::remove_reference_t<decltype(request.arg1.h)>>(
+        chip::JniReferences::GetInstance().DoubleToPrimitive(arg1_hItem_0));
 
     std::unique_ptr<CHIPTestClusterClusterSimpleStructResponseCallback,
                     void (*)(CHIPTestClusterClusterSimpleStructResponseCallback *)>
@@ -19013,6 +24225,11 @@ JNI_METHOD(void, TestClusterCluster, simpleStructEchoRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -19023,7 +24240,11 @@ JNI_METHOD(void, TestClusterCluster, test)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::Test::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -19057,6 +24278,11 @@ JNI_METHOD(void, TestClusterCluster, test)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -19067,10 +24293,15 @@ JNI_METHOD(void, TestClusterCluster, testAddArguments)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestAddArguments::Type request;
 
-    request.arg1 = static_cast<decltype(request.arg1)>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg1));
-    request.arg2 = static_cast<decltype(request.arg2)>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg2));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.arg1 =
+        static_cast<std::remove_reference_t<decltype(request.arg1)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg1));
+    request.arg2 =
+        static_cast<std::remove_reference_t<decltype(request.arg2)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg2));
 
     std::unique_ptr<CHIPTestClusterClusterTestAddArgumentsResponseCallback,
                     void (*)(CHIPTestClusterClusterTestAddArgumentsResponseCallback *)>
@@ -19107,6 +24338,11 @@ JNI_METHOD(void, TestClusterCluster, testAddArguments)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -19118,11 +24354,17 @@ JNI_METHOD(void, TestClusterCluster, testEmitTestEventRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::Type request;
 
-    request.arg1 = static_cast<decltype(request.arg1)>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg1));
-    request.arg2 = static_cast<decltype(request.arg2)>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg2));
-    request.arg3 = static_cast<decltype(request.arg3)>(chip::JniReferences::GetInstance().BooleanToPrimitive(arg3));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.arg1 =
+        static_cast<std::remove_reference_t<decltype(request.arg1)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg1));
+    request.arg2 =
+        static_cast<std::remove_reference_t<decltype(request.arg2)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg2));
+    request.arg3 =
+        static_cast<std::remove_reference_t<decltype(request.arg3)>>(chip::JniReferences::GetInstance().BooleanToPrimitive(arg3));
 
     std::unique_ptr<CHIPTestClusterClusterTestEmitTestEventResponseCallback,
                     void (*)(CHIPTestClusterClusterTestEmitTestEventResponseCallback *)>
@@ -19159,6 +24401,11 @@ JNI_METHOD(void, TestClusterCluster, testEmitTestEventRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -19169,10 +24416,15 @@ JNI_METHOD(void, TestClusterCluster, testEnumsRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type request;
 
-    request.arg1 = static_cast<decltype(request.arg1)>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg1));
-    request.arg2 = static_cast<decltype(request.arg2)>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg2));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.arg1 =
+        static_cast<std::remove_reference_t<decltype(request.arg1)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg1));
+    request.arg2 =
+        static_cast<std::remove_reference_t<decltype(request.arg2)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(arg2));
 
     std::unique_ptr<CHIPTestClusterClusterTestEnumsResponseCallback, void (*)(CHIPTestClusterClusterTestEnumsResponseCallback *)>
         onSuccess(Platform::New<CHIPTestClusterClusterTestEnumsResponseCallback>(callback),
@@ -19208,6 +24460,11 @@ JNI_METHOD(void, TestClusterCluster, testEnumsRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -19218,9 +24475,35 @@ JNI_METHOD(void, TestClusterCluster, testListInt8UArgumentRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type request;
 
-    request.arg1 = chip::app::DataModel::List<const uint8_t>();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    {
+        using ListType_0       = std::remove_reference_t<decltype(request.arg1)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint arg1Size;
+        chip::JniReferences::GetInstance().GetArrayListSize(arg1, arg1Size);
+        if (arg1Size != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(arg1Size);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(arg1Size); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(arg1, i_0, element_0);
+                listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0));
+            }
+            request.arg1 = ListType_0(listHolder_0->mList, arg1Size);
+        }
+        else
+        {
+            request.arg1 = ListType_0();
+        }
+    }
 
     std::unique_ptr<CHIPTestClusterClusterBooleanResponseCallback, void (*)(CHIPTestClusterClusterBooleanResponseCallback *)>
         onSuccess(Platform::New<CHIPTestClusterClusterBooleanResponseCallback>(callback),
@@ -19256,6 +24539,11 @@ JNI_METHOD(void, TestClusterCluster, testListInt8UArgumentRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -19266,9 +24554,35 @@ JNI_METHOD(void, TestClusterCluster, testListInt8UReverseRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type request;
 
-    request.arg1 = chip::app::DataModel::List<const uint8_t>();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    {
+        using ListType_0       = std::remove_reference_t<decltype(request.arg1)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint arg1Size;
+        chip::JniReferences::GetInstance().GetArrayListSize(arg1, arg1Size);
+        if (arg1Size != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(arg1Size);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(arg1Size); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(arg1, i_0, element_0);
+                listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0));
+            }
+            request.arg1 = ListType_0(listHolder_0->mList, arg1Size);
+        }
+        else
+        {
+            request.arg1 = ListType_0();
+        }
+    }
 
     std::unique_ptr<CHIPTestClusterClusterTestListInt8UReverseResponseCallback,
                     void (*)(CHIPTestClusterClusterTestListInt8UReverseResponseCallback *)>
@@ -19305,20 +24619,248 @@ JNI_METHOD(void, TestClusterCluster, testListInt8UReverseRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testListNestedStructListArgumentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jobject d, jobject e,
- jbyteArray f, jobject g, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type request;
 
-    request.arg1 = chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::NestedStructList::Type>();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    {
+        using ListType_0       = std::remove_reference_t<decltype(request.arg1)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint arg1Size;
+        chip::JniReferences::GetInstance().GetArrayListSize(arg1, arg1Size);
+        if (arg1Size != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(arg1Size);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(arg1Size); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(arg1, i_0, element_0);
+                jobject element_0_aItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "a", "Ljava/lang/Integer;", element_0_aItem_1);
+                listHolder_0->mList[i_0].a = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].a)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_aItem_1));
+                jobject element_0_bItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "b", "Ljava/lang/Boolean;", element_0_bItem_1);
+                listHolder_0->mList[i_0].b = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].b)>>(
+                    chip::JniReferences::GetInstance().BooleanToPrimitive(element_0_bItem_1));
+                jobject element_0_cItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(
+                    element_0, "c", "Lchip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;", element_0_cItem_1);
+                jobject element_0_cItem_1_aItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_0_cItem_1, "a", "Ljava/lang/Integer;",
+                                                                  element_0_cItem_1_aItem_2);
+                listHolder_0->mList[i_0].c.a = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.a)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_cItem_1_aItem_2));
+                jobject element_0_cItem_1_bItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_0_cItem_1, "b", "Ljava/lang/Boolean;",
+                                                                  element_0_cItem_1_bItem_2);
+                listHolder_0->mList[i_0].c.b = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.b)>>(
+                    chip::JniReferences::GetInstance().BooleanToPrimitive(element_0_cItem_1_bItem_2));
+                jobject element_0_cItem_1_cItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_0_cItem_1, "c", "Ljava/lang/Integer;",
+                                                                  element_0_cItem_1_cItem_2);
+                listHolder_0->mList[i_0].c.c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.c)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_cItem_1_cItem_2));
+                jobject element_0_cItem_1_dItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_0_cItem_1, "d", "[B", element_0_cItem_1_dItem_2);
+                auto element_0_cItem_1_dItem_2Jni =
+                    chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0_cItem_1_dItem_2));
+                cleanupByteArrays.push_back(element_0_cItem_1_dItem_2Jni);
+                listHolder_0->mList[i_0].c.d = element_0_cItem_1_dItem_2Jni->byteSpan();
+                jobject element_0_cItem_1_eItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_0_cItem_1, "e", "Ljava/lang/String;",
+                                                                  element_0_cItem_1_eItem_2);
+                auto element_0_cItem_1_eItem_2Jni =
+                    chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(element_0_cItem_1_eItem_2));
+                cleanupStrings.push_back(element_0_cItem_1_eItem_2Jni);
+                listHolder_0->mList[i_0].c.e = element_0_cItem_1_eItem_2Jni->charSpan();
+                jobject element_0_cItem_1_fItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_0_cItem_1, "f", "Ljava/lang/Integer;",
+                                                                  element_0_cItem_1_fItem_2);
+                listHolder_0->mList[i_0].c.f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.f)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_cItem_1_fItem_2));
+                jobject element_0_cItem_1_gItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_0_cItem_1, "g", "Ljava/lang/Float;",
+                                                                  element_0_cItem_1_gItem_2);
+                listHolder_0->mList[i_0].c.g = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.g)>>(
+                    chip::JniReferences::GetInstance().FloatToPrimitive(element_0_cItem_1_gItem_2));
+                jobject element_0_cItem_1_hItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_0_cItem_1, "h", "Ljava/lang/Double;",
+                                                                  element_0_cItem_1_hItem_2);
+                listHolder_0->mList[i_0].c.h = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c.h)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(element_0_cItem_1_hItem_2));
+                jobject element_0_dItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "d", "Ljava/util/ArrayList;", element_0_dItem_1);
+                {
+                    using ListType_2       = std::remove_reference_t<decltype(listHolder_0->mList[i_0].d)>;
+                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                    jint element_0_dItem_1Size;
+                    chip::JniReferences::GetInstance().GetArrayListSize(element_0_dItem_1, element_0_dItem_1Size);
+                    if (element_0_dItem_1Size != 0)
+                    {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0_dItem_1Size);
+                        listFreer.add(listHolder_2);
+
+                        for (size_t i_2 = 0; i_2 < static_cast<size_t>(element_0_dItem_1Size); ++i_2)
+                        {
+                            jobject element_2;
+                            chip::JniReferences::GetInstance().GetArrayListItem(element_0_dItem_1, i_2, element_2);
+                            jobject element_2_aItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "a", "Ljava/lang/Integer;",
+                                                                              element_2_aItem_3);
+                            listHolder_2->mList[i_2].a = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].a)>>(
+                                chip::JniReferences::GetInstance().IntegerToPrimitive(element_2_aItem_3));
+                            jobject element_2_bItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "b", "Ljava/lang/Boolean;",
+                                                                              element_2_bItem_3);
+                            listHolder_2->mList[i_2].b = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].b)>>(
+                                chip::JniReferences::GetInstance().BooleanToPrimitive(element_2_bItem_3));
+                            jobject element_2_cItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "c", "Ljava/lang/Integer;",
+                                                                              element_2_cItem_3);
+                            listHolder_2->mList[i_2].c = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].c)>>(
+                                chip::JniReferences::GetInstance().IntegerToPrimitive(element_2_cItem_3));
+                            jobject element_2_dItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "d", "[B", element_2_dItem_3);
+                            auto element_2_dItem_3Jni =
+                                chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(element_2_dItem_3));
+                            cleanupByteArrays.push_back(element_2_dItem_3Jni);
+                            listHolder_2->mList[i_2].d = element_2_dItem_3Jni->byteSpan();
+                            jobject element_2_eItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "e", "Ljava/lang/String;",
+                                                                              element_2_eItem_3);
+                            auto element_2_eItem_3Jni =
+                                chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(element_2_eItem_3));
+                            cleanupStrings.push_back(element_2_eItem_3Jni);
+                            listHolder_2->mList[i_2].e = element_2_eItem_3Jni->charSpan();
+                            jobject element_2_fItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "f", "Ljava/lang/Integer;",
+                                                                              element_2_fItem_3);
+                            listHolder_2->mList[i_2].f = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].f)>>(
+                                chip::JniReferences::GetInstance().IntegerToPrimitive(element_2_fItem_3));
+                            jobject element_2_gItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "g", "Ljava/lang/Float;",
+                                                                              element_2_gItem_3);
+                            listHolder_2->mList[i_2].g = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].g)>>(
+                                chip::JniReferences::GetInstance().FloatToPrimitive(element_2_gItem_3));
+                            jobject element_2_hItem_3;
+                            chip::JniReferences::GetInstance().GetObjectField(element_2, "h", "Ljava/lang/Double;",
+                                                                              element_2_hItem_3);
+                            listHolder_2->mList[i_2].h = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2].h)>>(
+                                chip::JniReferences::GetInstance().DoubleToPrimitive(element_2_hItem_3));
+                        }
+                        listHolder_0->mList[i_0].d = ListType_2(listHolder_2->mList, element_0_dItem_1Size);
+                    }
+                    else
+                    {
+                        listHolder_0->mList[i_0].d = ListType_2();
+                    }
+                }
+                jobject element_0_eItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "e", "Ljava/util/ArrayList;", element_0_eItem_1);
+                {
+                    using ListType_2       = std::remove_reference_t<decltype(listHolder_0->mList[i_0].e)>;
+                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                    jint element_0_eItem_1Size;
+                    chip::JniReferences::GetInstance().GetArrayListSize(element_0_eItem_1, element_0_eItem_1Size);
+                    if (element_0_eItem_1Size != 0)
+                    {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0_eItem_1Size);
+                        listFreer.add(listHolder_2);
+
+                        for (size_t i_2 = 0; i_2 < static_cast<size_t>(element_0_eItem_1Size); ++i_2)
+                        {
+                            jobject element_2;
+                            chip::JniReferences::GetInstance().GetArrayListItem(element_0_eItem_1, i_2, element_2);
+                            listHolder_2->mList[i_2] = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2])>>(
+                                chip::JniReferences::GetInstance().LongToPrimitive(element_2));
+                        }
+                        listHolder_0->mList[i_0].e = ListType_2(listHolder_2->mList, element_0_eItem_1Size);
+                    }
+                    else
+                    {
+                        listHolder_0->mList[i_0].e = ListType_2();
+                    }
+                }
+                jobject element_0_fItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "f", "Ljava/util/ArrayList;", element_0_fItem_1);
+                {
+                    using ListType_2       = std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>;
+                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                    jint element_0_fItem_1Size;
+                    chip::JniReferences::GetInstance().GetArrayListSize(element_0_fItem_1, element_0_fItem_1Size);
+                    if (element_0_fItem_1Size != 0)
+                    {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0_fItem_1Size);
+                        listFreer.add(listHolder_2);
+
+                        for (size_t i_2 = 0; i_2 < static_cast<size_t>(element_0_fItem_1Size); ++i_2)
+                        {
+                            jobject element_2;
+                            chip::JniReferences::GetInstance().GetArrayListItem(element_0_fItem_1, i_2, element_2);
+                            auto element_2Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(element_2));
+                            cleanupByteArrays.push_back(element_2Jni);
+                            listHolder_2->mList[i_2] = element_2Jni->byteSpan();
+                        }
+                        listHolder_0->mList[i_0].f = ListType_2(listHolder_2->mList, element_0_fItem_1Size);
+                    }
+                    else
+                    {
+                        listHolder_0->mList[i_0].f = ListType_2();
+                    }
+                }
+                jobject element_0_gItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "g", "Ljava/util/ArrayList;", element_0_gItem_1);
+                {
+                    using ListType_2       = std::remove_reference_t<decltype(listHolder_0->mList[i_0].g)>;
+                    using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                    jint element_0_gItem_1Size;
+                    chip::JniReferences::GetInstance().GetArrayListSize(element_0_gItem_1, element_0_gItem_1Size);
+                    if (element_0_gItem_1Size != 0)
+                    {
+                        auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0_gItem_1Size);
+                        listFreer.add(listHolder_2);
+
+                        for (size_t i_2 = 0; i_2 < static_cast<size_t>(element_0_gItem_1Size); ++i_2)
+                        {
+                            jobject element_2;
+                            chip::JniReferences::GetInstance().GetArrayListItem(element_0_gItem_1, i_2, element_2);
+                            listHolder_2->mList[i_2] = static_cast<std::remove_reference_t<decltype(listHolder_2->mList[i_2])>>(
+                                chip::JniReferences::GetInstance().IntegerToPrimitive(element_2));
+                        }
+                        listHolder_0->mList[i_0].g = ListType_2(listHolder_2->mList, element_0_gItem_1Size);
+                    }
+                    else
+                    {
+                        listHolder_0->mList[i_0].g = ListType_2();
+                    }
+                }
+            }
+            request.arg1 = ListType_0(listHolder_0->mList, arg1Size);
+        }
+        else
+        {
+            request.arg1 = ListType_0();
+        }
+    }
 
     std::unique_ptr<CHIPTestClusterClusterBooleanResponseCallback, void (*)(CHIPTestClusterClusterBooleanResponseCallback *)>
         onSuccess(Platform::New<CHIPTestClusterClusterBooleanResponseCallback>(callback),
@@ -19353,21 +24895,84 @@ JNI_METHOD(void, TestClusterCluster, testListNestedStructListArgumentRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testListStructArgumentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jbyteArray d, jstring e,
- jobject f, jobject g, jobject h, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type request;
 
-    request.arg1 = chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type>();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    {
+        using ListType_0       = std::remove_reference_t<decltype(request.arg1)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint arg1Size;
+        chip::JniReferences::GetInstance().GetArrayListSize(arg1, arg1Size);
+        if (arg1Size != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(arg1Size);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(arg1Size); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(arg1, i_0, element_0);
+                jobject element_0_aItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "a", "Ljava/lang/Integer;", element_0_aItem_1);
+                listHolder_0->mList[i_0].a = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].a)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_aItem_1));
+                jobject element_0_bItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "b", "Ljava/lang/Boolean;", element_0_bItem_1);
+                listHolder_0->mList[i_0].b = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].b)>>(
+                    chip::JniReferences::GetInstance().BooleanToPrimitive(element_0_bItem_1));
+                jobject element_0_cItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "c", "Ljava/lang/Integer;", element_0_cItem_1);
+                listHolder_0->mList[i_0].c = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].c)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_cItem_1));
+                jobject element_0_dItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "d", "[B", element_0_dItem_1);
+                auto element_0_dItem_1Jni =
+                    chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(element_0_dItem_1));
+                cleanupByteArrays.push_back(element_0_dItem_1Jni);
+                listHolder_0->mList[i_0].d = element_0_dItem_1Jni->byteSpan();
+                jobject element_0_eItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "e", "Ljava/lang/String;", element_0_eItem_1);
+                auto element_0_eItem_1Jni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(element_0_eItem_1));
+                cleanupStrings.push_back(element_0_eItem_1Jni);
+                listHolder_0->mList[i_0].e = element_0_eItem_1Jni->charSpan();
+                jobject element_0_fItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "f", "Ljava/lang/Integer;", element_0_fItem_1);
+                listHolder_0->mList[i_0].f = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].f)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0_fItem_1));
+                jobject element_0_gItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "g", "Ljava/lang/Float;", element_0_gItem_1);
+                listHolder_0->mList[i_0].g = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].g)>>(
+                    chip::JniReferences::GetInstance().FloatToPrimitive(element_0_gItem_1));
+                jobject element_0_hItem_1;
+                chip::JniReferences::GetInstance().GetObjectField(element_0, "h", "Ljava/lang/Double;", element_0_hItem_1);
+                listHolder_0->mList[i_0].h = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].h)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(element_0_hItem_1));
+            }
+            request.arg1 = ListType_0(listHolder_0->mList, arg1Size);
+        }
+        else
+        {
+            request.arg1 = ListType_0();
+        }
+    }
 
     std::unique_ptr<CHIPTestClusterClusterBooleanResponseCallback, void (*)(CHIPTestClusterClusterBooleanResponseCallback *)>
         onSuccess(Platform::New<CHIPTestClusterClusterBooleanResponseCallback>(callback),
@@ -19402,20 +25007,72 @@ JNI_METHOD(void, TestClusterCluster, testListStructArgumentRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testNestedStructArgumentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type request;
 
-    request.arg1 = chip::app::Clusters::TestCluster::Structs::NestedStruct::Type();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    jobject arg1_aItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "a", "Ljava/lang/Integer;", arg1_aItem_0);
+    request.arg1.a = static_cast<std::remove_reference_t<decltype(request.arg1.a)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_aItem_0));
+    jobject arg1_bItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "b", "Ljava/lang/Boolean;", arg1_bItem_0);
+    request.arg1.b = static_cast<std::remove_reference_t<decltype(request.arg1.b)>>(
+        chip::JniReferences::GetInstance().BooleanToPrimitive(arg1_bItem_0));
+    jobject arg1_cItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(
+        arg1, "c", "Lchip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;", arg1_cItem_0);
+    jobject arg1_cItem_0_aItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "a", "Ljava/lang/Integer;", arg1_cItem_0_aItem_1);
+    request.arg1.c.a = static_cast<std::remove_reference_t<decltype(request.arg1.c.a)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_cItem_0_aItem_1));
+    jobject arg1_cItem_0_bItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "b", "Ljava/lang/Boolean;", arg1_cItem_0_bItem_1);
+    request.arg1.c.b = static_cast<std::remove_reference_t<decltype(request.arg1.c.b)>>(
+        chip::JniReferences::GetInstance().BooleanToPrimitive(arg1_cItem_0_bItem_1));
+    jobject arg1_cItem_0_cItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "c", "Ljava/lang/Integer;", arg1_cItem_0_cItem_1);
+    request.arg1.c.c = static_cast<std::remove_reference_t<decltype(request.arg1.c.c)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_cItem_0_cItem_1));
+    jobject arg1_cItem_0_dItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "d", "[B", arg1_cItem_0_dItem_1);
+    auto arg1_cItem_0_dItem_1Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(arg1_cItem_0_dItem_1));
+    cleanupByteArrays.push_back(arg1_cItem_0_dItem_1Jni);
+    request.arg1.c.d = arg1_cItem_0_dItem_1Jni->byteSpan();
+    jobject arg1_cItem_0_eItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "e", "Ljava/lang/String;", arg1_cItem_0_eItem_1);
+    auto arg1_cItem_0_eItem_1Jni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(arg1_cItem_0_eItem_1));
+    cleanupStrings.push_back(arg1_cItem_0_eItem_1Jni);
+    request.arg1.c.e = arg1_cItem_0_eItem_1Jni->charSpan();
+    jobject arg1_cItem_0_fItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "f", "Ljava/lang/Integer;", arg1_cItem_0_fItem_1);
+    request.arg1.c.f = static_cast<std::remove_reference_t<decltype(request.arg1.c.f)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_cItem_0_fItem_1));
+    jobject arg1_cItem_0_gItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "g", "Ljava/lang/Float;", arg1_cItem_0_gItem_1);
+    request.arg1.c.g = static_cast<std::remove_reference_t<decltype(request.arg1.c.g)>>(
+        chip::JniReferences::GetInstance().FloatToPrimitive(arg1_cItem_0_gItem_1));
+    jobject arg1_cItem_0_hItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "h", "Ljava/lang/Double;", arg1_cItem_0_hItem_1);
+    request.arg1.c.h = static_cast<std::remove_reference_t<decltype(request.arg1.c.h)>>(
+        chip::JniReferences::GetInstance().DoubleToPrimitive(arg1_cItem_0_hItem_1));
 
     std::unique_ptr<CHIPTestClusterClusterBooleanResponseCallback, void (*)(CHIPTestClusterClusterBooleanResponseCallback *)>
         onSuccess(Platform::New<CHIPTestClusterClusterBooleanResponseCallback>(callback),
@@ -19450,21 +25107,210 @@ JNI_METHOD(void, TestClusterCluster, testNestedStructArgumentRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testNestedStructListArgumentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jobject d, jobject e,
- jbyteArray f, jobject g, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type request;
 
-    request.arg1 = chip::app::Clusters::TestCluster::Structs::NestedStructList::Type();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    jobject arg1_aItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "a", "Ljava/lang/Integer;", arg1_aItem_0);
+    request.arg1.a = static_cast<std::remove_reference_t<decltype(request.arg1.a)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_aItem_0));
+    jobject arg1_bItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "b", "Ljava/lang/Boolean;", arg1_bItem_0);
+    request.arg1.b = static_cast<std::remove_reference_t<decltype(request.arg1.b)>>(
+        chip::JniReferences::GetInstance().BooleanToPrimitive(arg1_bItem_0));
+    jobject arg1_cItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(
+        arg1, "c", "Lchip/devicecontroller/ChipStructs$TestClusterClusterSimpleStruct;", arg1_cItem_0);
+    jobject arg1_cItem_0_aItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "a", "Ljava/lang/Integer;", arg1_cItem_0_aItem_1);
+    request.arg1.c.a = static_cast<std::remove_reference_t<decltype(request.arg1.c.a)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_cItem_0_aItem_1));
+    jobject arg1_cItem_0_bItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "b", "Ljava/lang/Boolean;", arg1_cItem_0_bItem_1);
+    request.arg1.c.b = static_cast<std::remove_reference_t<decltype(request.arg1.c.b)>>(
+        chip::JniReferences::GetInstance().BooleanToPrimitive(arg1_cItem_0_bItem_1));
+    jobject arg1_cItem_0_cItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "c", "Ljava/lang/Integer;", arg1_cItem_0_cItem_1);
+    request.arg1.c.c = static_cast<std::remove_reference_t<decltype(request.arg1.c.c)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_cItem_0_cItem_1));
+    jobject arg1_cItem_0_dItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "d", "[B", arg1_cItem_0_dItem_1);
+    auto arg1_cItem_0_dItem_1Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(arg1_cItem_0_dItem_1));
+    cleanupByteArrays.push_back(arg1_cItem_0_dItem_1Jni);
+    request.arg1.c.d = arg1_cItem_0_dItem_1Jni->byteSpan();
+    jobject arg1_cItem_0_eItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "e", "Ljava/lang/String;", arg1_cItem_0_eItem_1);
+    auto arg1_cItem_0_eItem_1Jni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(arg1_cItem_0_eItem_1));
+    cleanupStrings.push_back(arg1_cItem_0_eItem_1Jni);
+    request.arg1.c.e = arg1_cItem_0_eItem_1Jni->charSpan();
+    jobject arg1_cItem_0_fItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "f", "Ljava/lang/Integer;", arg1_cItem_0_fItem_1);
+    request.arg1.c.f = static_cast<std::remove_reference_t<decltype(request.arg1.c.f)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_cItem_0_fItem_1));
+    jobject arg1_cItem_0_gItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "g", "Ljava/lang/Float;", arg1_cItem_0_gItem_1);
+    request.arg1.c.g = static_cast<std::remove_reference_t<decltype(request.arg1.c.g)>>(
+        chip::JniReferences::GetInstance().FloatToPrimitive(arg1_cItem_0_gItem_1));
+    jobject arg1_cItem_0_hItem_1;
+    chip::JniReferences::GetInstance().GetObjectField(arg1_cItem_0, "h", "Ljava/lang/Double;", arg1_cItem_0_hItem_1);
+    request.arg1.c.h = static_cast<std::remove_reference_t<decltype(request.arg1.c.h)>>(
+        chip::JniReferences::GetInstance().DoubleToPrimitive(arg1_cItem_0_hItem_1));
+    jobject arg1_dItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "d", "Ljava/util/ArrayList;", arg1_dItem_0);
+    {
+        using ListType_1       = std::remove_reference_t<decltype(request.arg1.d)>;
+        using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+        jint arg1_dItem_0Size;
+        chip::JniReferences::GetInstance().GetArrayListSize(arg1_dItem_0, arg1_dItem_0Size);
+        if (arg1_dItem_0Size != 0)
+        {
+            auto * listHolder_1 = new ListHolder<ListMemberType_1>(arg1_dItem_0Size);
+            listFreer.add(listHolder_1);
+
+            for (size_t i_1 = 0; i_1 < static_cast<size_t>(arg1_dItem_0Size); ++i_1)
+            {
+                jobject element_1;
+                chip::JniReferences::GetInstance().GetArrayListItem(arg1_dItem_0, i_1, element_1);
+                jobject element_1_aItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "a", "Ljava/lang/Integer;", element_1_aItem_2);
+                listHolder_1->mList[i_1].a = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].a)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_1_aItem_2));
+                jobject element_1_bItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "b", "Ljava/lang/Boolean;", element_1_bItem_2);
+                listHolder_1->mList[i_1].b = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].b)>>(
+                    chip::JniReferences::GetInstance().BooleanToPrimitive(element_1_bItem_2));
+                jobject element_1_cItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "c", "Ljava/lang/Integer;", element_1_cItem_2);
+                listHolder_1->mList[i_1].c = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].c)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_1_cItem_2));
+                jobject element_1_dItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "d", "[B", element_1_dItem_2);
+                auto element_1_dItem_2Jni =
+                    chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(element_1_dItem_2));
+                cleanupByteArrays.push_back(element_1_dItem_2Jni);
+                listHolder_1->mList[i_1].d = element_1_dItem_2Jni->byteSpan();
+                jobject element_1_eItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "e", "Ljava/lang/String;", element_1_eItem_2);
+                auto element_1_eItem_2Jni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(element_1_eItem_2));
+                cleanupStrings.push_back(element_1_eItem_2Jni);
+                listHolder_1->mList[i_1].e = element_1_eItem_2Jni->charSpan();
+                jobject element_1_fItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "f", "Ljava/lang/Integer;", element_1_fItem_2);
+                listHolder_1->mList[i_1].f = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].f)>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_1_fItem_2));
+                jobject element_1_gItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "g", "Ljava/lang/Float;", element_1_gItem_2);
+                listHolder_1->mList[i_1].g = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].g)>>(
+                    chip::JniReferences::GetInstance().FloatToPrimitive(element_1_gItem_2));
+                jobject element_1_hItem_2;
+                chip::JniReferences::GetInstance().GetObjectField(element_1, "h", "Ljava/lang/Double;", element_1_hItem_2);
+                listHolder_1->mList[i_1].h = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1].h)>>(
+                    chip::JniReferences::GetInstance().DoubleToPrimitive(element_1_hItem_2));
+            }
+            request.arg1.d = ListType_1(listHolder_1->mList, arg1_dItem_0Size);
+        }
+        else
+        {
+            request.arg1.d = ListType_1();
+        }
+    }
+    jobject arg1_eItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "e", "Ljava/util/ArrayList;", arg1_eItem_0);
+    {
+        using ListType_1       = std::remove_reference_t<decltype(request.arg1.e)>;
+        using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+        jint arg1_eItem_0Size;
+        chip::JniReferences::GetInstance().GetArrayListSize(arg1_eItem_0, arg1_eItem_0Size);
+        if (arg1_eItem_0Size != 0)
+        {
+            auto * listHolder_1 = new ListHolder<ListMemberType_1>(arg1_eItem_0Size);
+            listFreer.add(listHolder_1);
+
+            for (size_t i_1 = 0; i_1 < static_cast<size_t>(arg1_eItem_0Size); ++i_1)
+            {
+                jobject element_1;
+                chip::JniReferences::GetInstance().GetArrayListItem(arg1_eItem_0, i_1, element_1);
+                listHolder_1->mList[i_1] = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1])>>(
+                    chip::JniReferences::GetInstance().LongToPrimitive(element_1));
+            }
+            request.arg1.e = ListType_1(listHolder_1->mList, arg1_eItem_0Size);
+        }
+        else
+        {
+            request.arg1.e = ListType_1();
+        }
+    }
+    jobject arg1_fItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "f", "Ljava/util/ArrayList;", arg1_fItem_0);
+    {
+        using ListType_1       = std::remove_reference_t<decltype(request.arg1.f)>;
+        using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+        jint arg1_fItem_0Size;
+        chip::JniReferences::GetInstance().GetArrayListSize(arg1_fItem_0, arg1_fItem_0Size);
+        if (arg1_fItem_0Size != 0)
+        {
+            auto * listHolder_1 = new ListHolder<ListMemberType_1>(arg1_fItem_0Size);
+            listFreer.add(listHolder_1);
+
+            for (size_t i_1 = 0; i_1 < static_cast<size_t>(arg1_fItem_0Size); ++i_1)
+            {
+                jobject element_1;
+                chip::JniReferences::GetInstance().GetArrayListItem(arg1_fItem_0, i_1, element_1);
+                auto element_1Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(element_1));
+                cleanupByteArrays.push_back(element_1Jni);
+                listHolder_1->mList[i_1] = element_1Jni->byteSpan();
+            }
+            request.arg1.f = ListType_1(listHolder_1->mList, arg1_fItem_0Size);
+        }
+        else
+        {
+            request.arg1.f = ListType_1();
+        }
+    }
+    jobject arg1_gItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "g", "Ljava/util/ArrayList;", arg1_gItem_0);
+    {
+        using ListType_1       = std::remove_reference_t<decltype(request.arg1.g)>;
+        using ListMemberType_1 = ListMemberTypeGetter<ListType_1>::Type;
+        jint arg1_gItem_0Size;
+        chip::JniReferences::GetInstance().GetArrayListSize(arg1_gItem_0, arg1_gItem_0Size);
+        if (arg1_gItem_0Size != 0)
+        {
+            auto * listHolder_1 = new ListHolder<ListMemberType_1>(arg1_gItem_0Size);
+            listFreer.add(listHolder_1);
+
+            for (size_t i_1 = 0; i_1 < static_cast<size_t>(arg1_gItem_0Size); ++i_1)
+            {
+                jobject element_1;
+                chip::JniReferences::GetInstance().GetArrayListItem(arg1_gItem_0, i_1, element_1);
+                listHolder_1->mList[i_1] = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i_1])>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_1));
+            }
+            request.arg1.g = ListType_1(listHolder_1->mList, arg1_gItem_0Size);
+        }
+        else
+        {
+            request.arg1.g = ListType_1();
+        }
+    }
 
     std::unique_ptr<CHIPTestClusterClusterBooleanResponseCallback, void (*)(CHIPTestClusterClusterBooleanResponseCallback *)>
         onSuccess(Platform::New<CHIPTestClusterClusterBooleanResponseCallback>(callback),
@@ -19499,6 +25345,11 @@ JNI_METHOD(void, TestClusterCluster, testNestedStructListArgumentRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -19510,7 +25361,11 @@ JNI_METHOD(void, TestClusterCluster, testNotHandled)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestNotHandled::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -19544,6 +25399,11 @@ JNI_METHOD(void, TestClusterCluster, testNotHandled)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -19554,16 +25414,27 @@ JNI_METHOD(void, TestClusterCluster, testNullableOptionalRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type request;
 
-    chip::JniReferences::GetInstance().GetOptionalValue(arg1, arg1);
-    uint8_t arg1Value;
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
     if (arg1 != nullptr)
     {
-        arg1Value = chip::JniReferences::GetInstance().IntegerToPrimitive(arg1);
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(arg1, optionalValue_0);
+        auto & definedValue_0 = request.arg1.Emplace();
+        if (optionalValue_0 == nullptr)
+        {
+            definedValue_0.SetNull();
+        }
+        else
+        {
+            auto & nonNullValue_1 = definedValue_0.SetNonNull();
+            nonNullValue_1        = static_cast<std::remove_reference_t<decltype(nonNullValue_1)>>(
+                chip::JniReferences::GetInstance().IntegerToPrimitive(optionalValue_0));
+        }
     }
-    request.arg1 = chip::Optional<chip::app::DataModel::Nullable<uint8_t>>(
-        arg1 == nullptr ? chip::app::DataModel::Nullable<uint8_t>() : chip::app::DataModel::Nullable<uint8_t>(arg1Value));
 
     std::unique_ptr<CHIPTestClusterClusterTestNullableOptionalResponseCallback,
                     void (*)(CHIPTestClusterClusterTestNullableOptionalResponseCallback *)>
@@ -19600,6 +25471,11 @@ JNI_METHOD(void, TestClusterCluster, testNullableOptionalRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -19610,11 +25486,19 @@ JNI_METHOD(void, TestClusterCluster, testSimpleOptionalArgumentRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type request;
 
-    chip::JniReferences::GetInstance().GetOptionalValue(arg1, arg1);
-    request.arg1 =
-        chip::Optional<bool>(static_cast<decltype(request.arg1)>(chip::JniReferences::GetInstance().BooleanToPrimitive(arg1)));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    if (arg1 != nullptr)
+    {
+        jobject optionalValue_0;
+        chip::JniReferences::GetInstance().GetOptionalValue(arg1, optionalValue_0);
+        auto & definedValue_0 = request.arg1.Emplace();
+        definedValue_0        = static_cast<std::remove_reference_t<decltype(definedValue_0)>>(
+            chip::JniReferences::GetInstance().BooleanToPrimitive(optionalValue_0));
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -19648,6 +25532,11 @@ JNI_METHOD(void, TestClusterCluster, testSimpleOptionalArgumentRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -19658,7 +25547,11 @@ JNI_METHOD(void, TestClusterCluster, testSpecific)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestSpecific::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPTestClusterClusterTestSpecificResponseCallback,
                     void (*)(CHIPTestClusterClusterTestSpecificResponseCallback *)>
@@ -19695,20 +25588,60 @@ JNI_METHOD(void, TestClusterCluster, testSpecific)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
 JNI_METHOD(void, TestClusterCluster, testStructArgumentRequest)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject a, jobject b, jobject c, jbyteArray d, jstring e,
- jobject f, jobject g, jobject h, jobject timedInvokeTimeoutMs)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject arg1, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type request;
 
-    request.arg1 = chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type();
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    jobject arg1_aItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "a", "Ljava/lang/Integer;", arg1_aItem_0);
+    request.arg1.a = static_cast<std::remove_reference_t<decltype(request.arg1.a)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_aItem_0));
+    jobject arg1_bItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "b", "Ljava/lang/Boolean;", arg1_bItem_0);
+    request.arg1.b = static_cast<std::remove_reference_t<decltype(request.arg1.b)>>(
+        chip::JniReferences::GetInstance().BooleanToPrimitive(arg1_bItem_0));
+    jobject arg1_cItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "c", "Ljava/lang/Integer;", arg1_cItem_0);
+    request.arg1.c = static_cast<std::remove_reference_t<decltype(request.arg1.c)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_cItem_0));
+    jobject arg1_dItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "d", "[B", arg1_dItem_0);
+    auto arg1_dItem_0Jni = chip::Platform::New<chip::JniByteArray>(env, static_cast<jbyteArray>(arg1_dItem_0));
+    cleanupByteArrays.push_back(arg1_dItem_0Jni);
+    request.arg1.d = arg1_dItem_0Jni->byteSpan();
+    jobject arg1_eItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "e", "Ljava/lang/String;", arg1_eItem_0);
+    auto arg1_eItem_0Jni = chip::Platform::New<chip::JniUtfString>(env, static_cast<jstring>(arg1_eItem_0));
+    cleanupStrings.push_back(arg1_eItem_0Jni);
+    request.arg1.e = arg1_eItem_0Jni->charSpan();
+    jobject arg1_fItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "f", "Ljava/lang/Integer;", arg1_fItem_0);
+    request.arg1.f = static_cast<std::remove_reference_t<decltype(request.arg1.f)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(arg1_fItem_0));
+    jobject arg1_gItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "g", "Ljava/lang/Float;", arg1_gItem_0);
+    request.arg1.g = static_cast<std::remove_reference_t<decltype(request.arg1.g)>>(
+        chip::JniReferences::GetInstance().FloatToPrimitive(arg1_gItem_0));
+    jobject arg1_hItem_0;
+    chip::JniReferences::GetInstance().GetObjectField(arg1, "h", "Ljava/lang/Double;", arg1_hItem_0);
+    request.arg1.h = static_cast<std::remove_reference_t<decltype(request.arg1.h)>>(
+        chip::JniReferences::GetInstance().DoubleToPrimitive(arg1_hItem_0));
 
     std::unique_ptr<CHIPTestClusterClusterBooleanResponseCallback, void (*)(CHIPTestClusterClusterBooleanResponseCallback *)>
         onSuccess(Platform::New<CHIPTestClusterClusterBooleanResponseCallback>(callback),
@@ -19744,6 +25677,11 @@ JNI_METHOD(void, TestClusterCluster, testStructArgumentRequest)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -19754,7 +25692,11 @@ JNI_METHOD(void, TestClusterCluster, testUnknownCommand)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -19788,6 +25730,11 @@ JNI_METHOD(void, TestClusterCluster, testUnknownCommand)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -19798,7 +25745,11 @@ JNI_METHOD(void, TestClusterCluster, timedInvokeRequest)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TestClusterCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -19824,6 +25775,11 @@ JNI_METHOD(void, TestClusterCluster, timedInvokeRequest)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -20790,6 +26746,121 @@ JNI_METHOD(void, TestClusterCluster, subscribeOctetStringAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, TestClusterCluster, subscribeListInt8uAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPTestClusterListInt8uAttributeCallback, void (*)(CHIPTestClusterListInt8uAttributeCallback *)> onSuccess(
+        Platform::New<CHIPTestClusterListInt8uAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPTestClusterListInt8uAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPTestClusterClusterListInt8uAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPTestClusterListInt8uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, TestClusterCluster, subscribeListOctetStringAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPTestClusterListOctetStringAttributeCallback, void (*)(CHIPTestClusterListOctetStringAttributeCallback *)>
+        onSuccess(Platform::New<CHIPTestClusterListOctetStringAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPTestClusterListOctetStringAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPTestClusterClusterListOctetStringAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPTestClusterListOctetStringAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, TestClusterCluster, subscribeListStructOctetStringAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPTestClusterListStructOctetStringAttributeCallback,
+                    void (*)(CHIPTestClusterListStructOctetStringAttributeCallback *)>
+        onSuccess(Platform::New<CHIPTestClusterListStructOctetStringAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPTestClusterListStructOctetStringAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPTestClusterClusterListStructOctetStringAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPTestClusterListStructOctetStringAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, TestClusterCluster, subscribeLongOctetStringAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -21013,6 +27084,47 @@ JNI_METHOD(void, TestClusterCluster, subscribeVendorIdAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, TestClusterCluster, subscribeListNullablesAndOptionalsStructAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback,
+                    void (*)(CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback *)>
+        onSuccess(Platform::New<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPTestClusterClusterListNullablesAndOptionalsStructAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPTestClusterListNullablesAndOptionalsStructAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, TestClusterCluster, subscribeEnumAttrAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -21191,6 +27303,45 @@ JNI_METHOD(void, TestClusterCluster, subscribeRangeRestrictedInt16sAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16sAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, TestClusterCluster, subscribeListLongOctetStringAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPTestClusterListLongOctetStringAttributeCallback,
+                    void (*)(CHIPTestClusterListLongOctetStringAttributeCallback *)>
+        onSuccess(Platform::New<CHIPTestClusterListLongOctetStringAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPTestClusterListLongOctetStringAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::ListLongOctetString::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPTestClusterClusterListLongOctetStringAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPTestClusterListLongOctetStringAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -22504,6 +28655,44 @@ JNI_METHOD(void, TestClusterCluster, subscribeNullableRangeRestrictedInt16sAttri
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, TestClusterCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPTestClusterAttributeListAttributeCallback, void (*)(CHIPTestClusterAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPTestClusterAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPTestClusterAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    TestClusterCluster * cppCluster = reinterpret_cast<TestClusterCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::TestCluster::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPTestClusterClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPTestClusterAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, TestClusterCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -22557,7 +28746,11 @@ JNI_METHOD(void, ThermostatCluster, clearWeeklySchedule)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Thermostat::Commands::ClearWeeklySchedule::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -22591,6 +28784,11 @@ JNI_METHOD(void, ThermostatCluster, clearWeeklySchedule)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -22601,7 +28799,11 @@ JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Thermostat::Commands::GetRelayStatusLog::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPThermostatClusterGetRelayStatusLogResponseCallback,
                     void (*)(CHIPThermostatClusterGetRelayStatusLogResponseCallback *)>
@@ -22638,6 +28840,11 @@ JNI_METHOD(void, ThermostatCluster, getRelayStatusLog)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -22649,12 +28856,15 @@ JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Thermostat::Commands::GetWeeklySchedule::Type request;
 
-    request.daysToReturn =
-        static_cast<decltype(request.daysToReturn)>(chip::JniReferences::GetInstance().IntegerToPrimitive(daysToReturn));
-    request.modeToReturn =
-        static_cast<decltype(request.modeToReturn)>(chip::JniReferences::GetInstance().IntegerToPrimitive(modeToReturn));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.daysToReturn = static_cast<std::remove_reference_t<decltype(request.daysToReturn)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(daysToReturn));
+    request.modeToReturn = static_cast<std::remove_reference_t<decltype(request.modeToReturn)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(modeToReturn));
 
     std::unique_ptr<CHIPThermostatClusterGetWeeklyScheduleResponseCallback,
                     void (*)(CHIPThermostatClusterGetWeeklyScheduleResponseCallback *)>
@@ -22691,6 +28901,11 @@ JNI_METHOD(void, ThermostatCluster, getWeeklySchedule)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -22702,15 +28917,41 @@ JNI_METHOD(void, ThermostatCluster, setWeeklySchedule)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Thermostat::Commands::SetWeeklySchedule::Type request;
 
-    request.numberOfTransitionsForSequence = static_cast<decltype(request.numberOfTransitionsForSequence)>(
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.numberOfTransitionsForSequence = static_cast<std::remove_reference_t<decltype(request.numberOfTransitionsForSequence)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(numberOfTransitionsForSequence));
-    request.dayOfWeekForSequence = static_cast<decltype(request.dayOfWeekForSequence)>(
+    request.dayOfWeekForSequence = static_cast<std::remove_reference_t<decltype(request.dayOfWeekForSequence)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(dayOfWeekForSequence));
-    request.modeForSequence =
-        static_cast<decltype(request.modeForSequence)>(chip::JniReferences::GetInstance().IntegerToPrimitive(modeForSequence));
-    request.payload = chip::app::DataModel::List<const uint8_t>();
+    request.modeForSequence = static_cast<std::remove_reference_t<decltype(request.modeForSequence)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(modeForSequence));
+    {
+        using ListType_0       = std::remove_reference_t<decltype(request.payload)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        jint payloadSize;
+        chip::JniReferences::GetInstance().GetArrayListSize(payload, payloadSize);
+        if (payloadSize != 0)
+        {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(payloadSize);
+            listFreer.add(listHolder_0);
+
+            for (size_t i_0 = 0; i_0 < static_cast<size_t>(payloadSize); ++i_0)
+            {
+                jobject element_0;
+                chip::JniReferences::GetInstance().GetArrayListItem(payload, i_0, element_0);
+                listHolder_0->mList[i_0] = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0])>>(
+                    chip::JniReferences::GetInstance().IntegerToPrimitive(element_0));
+            }
+            request.payload = ListType_0(listHolder_0->mList, payloadSize);
+        }
+        else
+        {
+            request.payload = ListType_0();
+        }
+    }
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -22743,6 +28984,11 @@ JNI_METHOD(void, ThermostatCluster, setWeeklySchedule)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -22754,10 +29000,15 @@ JNI_METHOD(void, ThermostatCluster, setpointRaiseLower)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThermostatCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::Thermostat::Commands::SetpointRaiseLower::Type request;
 
-    request.mode   = static_cast<decltype(request.mode)>(chip::JniReferences::GetInstance().IntegerToPrimitive(mode));
-    request.amount = static_cast<decltype(request.amount)>(chip::JniReferences::GetInstance().IntegerToPrimitive(amount));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.mode =
+        static_cast<std::remove_reference_t<decltype(request.mode)>>(chip::JniReferences::GetInstance().IntegerToPrimitive(mode));
+    request.amount = static_cast<std::remove_reference_t<decltype(request.amount)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(amount));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -22790,6 +29041,11 @@ JNI_METHOD(void, ThermostatCluster, setpointRaiseLower)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -23423,6 +29679,44 @@ JNI_METHOD(void, ThermostatCluster, subscribeNumberOfDailyTransitionsAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, ThermostatCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPThermostatAttributeListAttributeCallback, void (*)(CHIPThermostatAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPThermostatAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPThermostatAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    ThermostatCluster * cppCluster = reinterpret_cast<ThermostatCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::Thermostat::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPThermostatClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPThermostatAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, ThermostatCluster, subscribeFeatureMapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -23624,6 +29918,48 @@ JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeScheduleP
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPThermostatUserInterfaceConfigurationAttributeListAttributeCallback,
+                    void (*)(CHIPThermostatUserInterfaceConfigurationAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPThermostatUserInterfaceConfigurationAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPThermostatUserInterfaceConfigurationAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ThermostatUserInterfaceConfigurationCluster * cppCluster =
+        reinterpret_cast<ThermostatUserInterfaceConfigurationCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPThermostatUserInterfaceConfigurationClusterAttributeListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPThermostatUserInterfaceConfigurationAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, ThermostatUserInterfaceConfigurationCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -23678,7 +30014,11 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, resetCounts)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ThreadNetworkDiagnosticsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::ThreadNetworkDiagnostics::Commands::ResetCounts::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -23711,6 +30051,11 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, resetCounts)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -23969,6 +30314,87 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeOverrunCountAttribute
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt64uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeNeighborTableListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback,
+                    void (*)(CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    ThreadNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<ThreadNetworkDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::NeighborTableList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterNeighborTableListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPThreadNetworkDiagnosticsNeighborTableListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeRouteTableListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback,
+                    void (*)(CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    ThreadNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<ThreadNetworkDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RouteTableList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterRouteTableListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPThreadNetworkDiagnosticsRouteTableListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -25862,6 +32288,46 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeDelayAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeSecurityPolicyAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback,
+                    void (*)(CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback *)>
+        onSuccess(Platform::New<CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    ThreadNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<ThreadNetworkDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::SecurityPolicy::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterSecurityPolicyAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPThreadNetworkDiagnosticsSecurityPolicyAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeChannelMaskAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -25892,6 +32358,127 @@ JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeChannelMaskAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPOctetStringAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeOperationalDatasetComponentsAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback,
+                    void (*)(CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback *)>
+        onSuccess(Platform::New<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    ThreadNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<ThreadNetworkDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::TypeInfo;
+    auto successFn = chip::Callback::Callback<
+        CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponentsAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeActiveNetworkFaultsListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback,
+                    void (*)(CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    ThreadNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<ThreadNetworkDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterActiveNetworkFaultsListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval),
+        CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, ThreadNetworkDiagnosticsCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback,
+                    void (*)(CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                               = CHIP_NO_ERROR;
+    ThreadNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<ThreadNetworkDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPThreadNetworkDiagnosticsClusterAttributeListAttributeCallbackType>::FromCancelable(
+            onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPThreadNetworkDiagnosticsAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));
@@ -25992,6 +32579,44 @@ JNI_METHOD(jlong, UserLabelCluster, initWithDevice)(JNIEnv * env, jobject self, 
     return reinterpret_cast<jlong>(cppCluster);
 }
 
+JNI_METHOD(void, UserLabelCluster, subscribeLabelListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPUserLabelLabelListAttributeCallback, void (*)(CHIPUserLabelLabelListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPUserLabelLabelListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPUserLabelLabelListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    UserLabelCluster * cppCluster = reinterpret_cast<UserLabelCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPUserLabelClusterLabelListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPUserLabelLabelListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, UserLabelCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -26075,6 +32700,44 @@ JNI_METHOD(void, WakeOnLanCluster, subscribeWakeOnLanMacAddressAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, WakeOnLanCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPWakeOnLanAttributeListAttributeCallback, void (*)(CHIPWakeOnLanAttributeListAttributeCallback *)> onSuccess(
+        Platform::New<CHIPWakeOnLanAttributeListAttributeCallback>(callback, true),
+        chip::Platform::Delete<CHIPWakeOnLanAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    WakeOnLanCluster * cppCluster = reinterpret_cast<WakeOnLanCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::WakeOnLan::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPWakeOnLanClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPWakeOnLanAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, WakeOnLanCluster, subscribeClusterRevisionAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -26128,7 +32791,11 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, resetCounts)
     CHIP_ERROR err = CHIP_NO_ERROR;
     WiFiNetworkDiagnosticsCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::WiFiNetworkDiagnostics::Commands::ResetCounts::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -26161,6 +32828,11 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, resetCounts)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -26651,6 +33323,45 @@ JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeOverrunCountAttribute)
     onSuccess.release();
     onFailure.release();
 }
+JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPWiFiNetworkDiagnosticsAttributeListAttributeCallback,
+                    void (*)(CHIPWiFiNetworkDiagnosticsAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPWiFiNetworkDiagnosticsAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPWiFiNetworkDiagnosticsAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                             = CHIP_NO_ERROR;
+    WiFiNetworkDiagnosticsCluster * cppCluster = reinterpret_cast<WiFiNetworkDiagnosticsCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::AttributeList::TypeInfo;
+    auto successFn = chip::Callback::Callback<CHIPWiFiNetworkDiagnosticsClusterAttributeListAttributeCallbackType>::FromCancelable(
+        onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(
+        onSuccess->mContext, successFn->mCall, failureFn->mCall, static_cast<uint16_t>(minInterval),
+        static_cast<uint16_t>(maxInterval), CHIPWiFiNetworkDiagnosticsAttributeListAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
 JNI_METHOD(void, WiFiNetworkDiagnosticsCluster, subscribeFeatureMapAttribute)
 (JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
@@ -26742,7 +33453,11 @@ JNI_METHOD(void, WindowCoveringCluster, downOrClose)
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::WindowCovering::Commands::DownOrClose::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -26776,6 +33491,11 @@ JNI_METHOD(void, WindowCoveringCluster, downOrClose)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -26787,11 +33507,14 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftPercentage)
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::WindowCovering::Commands::GoToLiftPercentage::Type request;
 
-    request.liftPercentageValue = static_cast<decltype(request.liftPercentageValue)>(
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.liftPercentageValue = static_cast<std::remove_reference_t<decltype(request.liftPercentageValue)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(liftPercentageValue));
-    request.liftPercent100thsValue = static_cast<decltype(request.liftPercent100thsValue)>(
+    request.liftPercent100thsValue = static_cast<std::remove_reference_t<decltype(request.liftPercent100thsValue)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(liftPercent100thsValue));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
@@ -26826,6 +33549,11 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftPercentage)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -26836,9 +33564,13 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftValue)
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::WindowCovering::Commands::GoToLiftValue::Type request;
 
-    request.liftValue = static_cast<decltype(request.liftValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(liftValue));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.liftValue = static_cast<std::remove_reference_t<decltype(request.liftValue)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(liftValue));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -26872,6 +33604,11 @@ JNI_METHOD(void, WindowCoveringCluster, goToLiftValue)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -26883,11 +33620,14 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltPercentage)
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::WindowCovering::Commands::GoToTiltPercentage::Type request;
 
-    request.tiltPercentageValue = static_cast<decltype(request.tiltPercentageValue)>(
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.tiltPercentageValue = static_cast<std::remove_reference_t<decltype(request.tiltPercentageValue)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(tiltPercentageValue));
-    request.tiltPercent100thsValue = static_cast<decltype(request.tiltPercent100thsValue)>(
+    request.tiltPercent100thsValue = static_cast<std::remove_reference_t<decltype(request.tiltPercent100thsValue)>>(
         chip::JniReferences::GetInstance().IntegerToPrimitive(tiltPercent100thsValue));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
@@ -26922,6 +33662,11 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltPercentage)
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
@@ -26932,9 +33677,13 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltValue)
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::WindowCovering::Commands::GoToTiltValue::Type request;
 
-    request.tiltValue = static_cast<decltype(request.tiltValue)>(chip::JniReferences::GetInstance().IntegerToPrimitive(tiltValue));
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
+    request.tiltValue = static_cast<std::remove_reference_t<decltype(request.tiltValue)>>(
+        chip::JniReferences::GetInstance().IntegerToPrimitive(tiltValue));
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -26967,6 +33716,11 @@ JNI_METHOD(void, WindowCoveringCluster, goToTiltValue)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -26978,7 +33732,11 @@ JNI_METHOD(void, WindowCoveringCluster, stopMotion)
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::WindowCovering::Commands::StopMotion::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -27011,6 +33769,11 @@ JNI_METHOD(void, WindowCoveringCluster, stopMotion)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -27022,7 +33785,11 @@ JNI_METHOD(void, WindowCoveringCluster, upOrOpen)
     CHIP_ERROR err = CHIP_NO_ERROR;
     WindowCoveringCluster * cppCluster;
 
+    ListFreer listFreer;
     chip::app::Clusters::WindowCovering::Commands::UpOrOpen::Type request;
+
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
@@ -27055,6 +33822,11 @@ JNI_METHOD(void, WindowCoveringCluster, upOrOpen)
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));
+
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(),
+                  [](chip::JniByteArray * jniByteArray) { chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(),
+                  [](chip::JniUtfString * jniString) { chip::Platform::Delete(jniString); });
 
     onSuccess.release();
     onFailure.release();
@@ -27748,6 +34520,44 @@ JNI_METHOD(void, WindowCoveringCluster, subscribeSafetyStatusAttribute)
     err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
                                                    static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
                                                    CHIPInt16uAttributeCallback::OnSubscriptionEstablished);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error subscribing to attribute", err));
+
+    onSuccess.release();
+    onFailure.release();
+}
+JNI_METHOD(void, WindowCoveringCluster, subscribeAttributeListAttribute)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
+{
+    chip::DeviceLayer::StackLock lock;
+    std::unique_ptr<CHIPWindowCoveringAttributeListAttributeCallback, void (*)(CHIPWindowCoveringAttributeListAttributeCallback *)>
+        onSuccess(Platform::New<CHIPWindowCoveringAttributeListAttributeCallback>(callback, true),
+                  chip::Platform::Delete<CHIPWindowCoveringAttributeListAttributeCallback>);
+    VerifyOrReturn(onSuccess.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
+
+    std::unique_ptr<CHIPDefaultFailureCallback, void (*)(CHIPDefaultFailureCallback *)> onFailure(
+        Platform::New<CHIPDefaultFailureCallback>(callback), chip::Platform::Delete<CHIPDefaultFailureCallback>);
+    VerifyOrReturn(onFailure.get() != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Error creating native failure callback", CHIP_ERROR_NO_MEMORY));
+
+    CHIP_ERROR err                     = CHIP_NO_ERROR;
+    WindowCoveringCluster * cppCluster = reinterpret_cast<WindowCoveringCluster *>(clusterPtr);
+    VerifyOrReturn(cppCluster != nullptr,
+                   chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
+                       env, callback, "Could not get native cluster", CHIP_ERROR_INCORRECT_STATE));
+
+    using TypeInfo = chip::app::Clusters::WindowCovering::Attributes::AttributeList::TypeInfo;
+    auto successFn =
+        chip::Callback::Callback<CHIPWindowCoveringClusterAttributeListAttributeCallbackType>::FromCancelable(onSuccess->Cancel());
+    auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
+
+    err = cppCluster->SubscribeAttribute<TypeInfo>(onSuccess->mContext, successFn->mCall, failureFn->mCall,
+                                                   static_cast<uint16_t>(minInterval), static_cast<uint16_t>(maxInterval),
+                                                   CHIPWindowCoveringAttributeListAttributeCallback::OnSubscriptionEstablished);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error subscribing to attribute", err));

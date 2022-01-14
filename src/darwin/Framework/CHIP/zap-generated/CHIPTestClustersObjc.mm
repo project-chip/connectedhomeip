@@ -22,11 +22,11 @@
 #import "CHIPCluster_internal.h"
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
-#import "CHIPListUtils_internal.h"
 
 #import "zap-generated/CHIPTestClustersObjc.h"
 #import "zap-generated/tests/CHIPClustersTest.h"
 
+#include <lib/support/CHIPListUtils.h>
 #include <type_traits>
 
 using chip::Callback::Callback;
