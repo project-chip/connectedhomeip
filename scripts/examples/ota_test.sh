@@ -15,10 +15,9 @@ provider_pid=$!
 echo  "Commissioning Provider "
 
 ./out/chip-tool pairing onnetwork 1 "$ARG1" > /tmp/ota/chip-tool-commission-provider.txt 
-
-if grep "Device commissioning completed with success" /tmp/ota/chip-commission-provider.txt;
+if grep "Device commissioning completed with success" /tmp/ota/chip-tool-commission-provider.txt;
 then echo Provider Commissioned;
-else echo Provider not commissioned properly exit 1;
+else echo Provider not commissioned properly;
 fi
 
 stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app -u "$ARG3" -d "$ARG2" > /tmp/ota/requestor-log.txt & 
@@ -30,7 +29,7 @@ echo  "Commissioning Requestor "
 
 if grep "Device commissioning completed with success" /tmp/ota/chip-tool-commission-requestor.txt;
 then echo Requestor Commissioned;
-else echo Requestor not commissioned properly exit 1;
+else echo Requestor not commissioned properly;
 fi
 
 echo  "Sending announce-ota-provider "
