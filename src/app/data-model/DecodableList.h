@@ -38,21 +38,27 @@ template <typename T>
 class DecodableList
 {
 public:
-    DecodableList()
-    {
-        // Init to an empty list.
-        mReader.Init(nullptr, 0);
-    }
+    DecodableList() { ClearReader(); }
 
     /*
      * @brief
      *
      * This call stores a TLV reader positioned on the list this class is to manage.
      *
-     * Specifically, the passed-in TLV reader should be pointing into the list just after
+     * Specifically, the passed-in reader should be pointing into the list just after
      * having called `OpenContainer` on the list element.
      */
     void SetReader(const TLV::TLVReader & reader) { mReader = reader; }
+
+    /*
+     * @brief
+     *
+     * This call clears a TLV reader this class is to manage, for a list that is null valued.
+     *
+     * Specifically, the reader should have a `GetContainerType` that is `kTLVType_NotSpecified`
+     * (as if `OpenContainer` were never called).
+     */
+    void ClearReader() { mReader.Init(nullptr, 0); }
 
     class Iterator
     {
@@ -61,7 +67,9 @@ public:
          * Initialize the iterator with a reference to a reader.
          *
          * This reader should be pointing into the list just after
-         * having called `OpenContainer` on the list element.
+         * having called `OpenContainer` on the list element, or should
+         * have a `kTLVType_NotSpecified` container type if there is
+         * no list element.
          */
         Iterator(const TLV::TLVReader & reader)
         {
@@ -77,8 +85,8 @@ public:
          * If an element does exist and was successfully decoded, this
          * shall return true.
          *
-         * Otherwise, if the end of list is reached, this call shall return
-         * false.
+         * Otherwise, if the end of list is reached, or there was no list
+         * (null valued list case), this call shall return false.
          *
          * If an error was encountered at any point during the iteration or decode,
          * this shall return false as well. The caller is expected to invoke GetStatus()
@@ -87,6 +95,11 @@ public:
          */
         bool Next()
         {
+            if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
+            {
+                return false;
+            }
+
             if (mStatus == CHIP_NO_ERROR)
             {
                 mStatus = mReader.Next();
@@ -134,12 +147,24 @@ public:
     Iterator begin() const { return Iterator(mReader); }
 
     /*
-     * Compute the size of the list.  This can fail if the TLV is malformed.  If
+     * Compute the size of the list. This can fail if the TLV is malformed. If
      * this succeeds, that does not guarantee that the individual items can be
      * successfully decoded; consumers should check Iterator::GetStatus() when
-     * actually decoding them.
+     * actually decoding them. If there is no list (null valued list case) then
+     * the size is considered to be zero.
      */
-    CHIP_ERROR ComputeSize(size_t * size) const { return mReader.CountRemainingInContainer(size); }
+    CHIP_ERROR ComputeSize(size_t * size) const
+    {
+        if (mReader.GetContainerType() == TLV::kTLVType_NotSpecified)
+        {
+            *size = 0;
+            return CHIP_NO_ERROR;
+        }
+        else
+        {
+            return mReader.CountRemainingInContainer(size);
+        }
+    }
 
 private:
     TLV::TLVReader mReader;
@@ -148,13 +173,18 @@ private:
 template <typename X>
 CHIP_ERROR Decode(TLV::TLVReader & reader, DecodableList<X> & x)
 {
-    VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
-
-    TLV::TLVType type;
-
-    ReturnErrorOnFailure(reader.EnterContainer(type));
-    x.SetReader(reader);
-    ReturnErrorOnFailure(reader.ExitContainer(type));
+    if (reader.GetType() == TLV::kTLVType_Null)
+    {
+        x.ClearReader();
+    }
+    else
+    {
+        VerifyOrReturnError(reader.GetType() == TLV::kTLVType_Array, CHIP_ERROR_SCHEMA_MISMATCH);
+        TLV::TLVType type;
+        ReturnErrorOnFailure(reader.EnterContainer(type));
+        x.SetReader(reader);
+        ReturnErrorOnFailure(reader.ExitContainer(type));
+    }
 
     return CHIP_NO_ERROR;
 }
