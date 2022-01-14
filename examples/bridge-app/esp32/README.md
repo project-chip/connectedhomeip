@@ -227,7 +227,7 @@ remote device, as well as the network credentials to use.
 The command below uses the default values hard-coded into the debug versions of
 the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
-    $ .out/debug/chip-tool pairing ble-wifi 12344321 ${SSID} ${PASSWORD} 20202021 3840
+    $ ./out/debug/chip-tool pairing ble-wifi 12344321 ${SSID} ${PASSWORD} 20202021 3840
 
 Parameters:
 
@@ -242,6 +242,6 @@ Parameters:
 To use the Client to send Matter commands, run the built executable and pass it
 the target cluster name, the target command name as well as an endpoint id.
 
-    $ .out/debug/chip-tool onoff on 12344321 1
+    $ ./out/debug/chip-tool onoff on 12344321 2
 
 The client will send a single command packet and then exit.
