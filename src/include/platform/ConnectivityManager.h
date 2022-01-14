@@ -28,6 +28,7 @@
 #include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+#include <platform/ConfigurationManager.h>
 
 #include <app/util/basic-types.h>
 
@@ -606,6 +607,10 @@ inline bool ConnectivityManager::IsBLEAdvertisingEnabled()
 
 inline CHIP_ERROR ConnectivityManager::SetBLEAdvertisingEnabled(bool val)
 {
+    if (val) {
+        // enable BLE advertisement
+        ConfigurationMgr().StartAdvertisement();
+    }
     return static_cast<ImplClass *>(this)->_SetBLEAdvertisingEnabled(val);
 }
 

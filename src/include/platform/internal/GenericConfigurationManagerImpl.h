@@ -102,6 +102,7 @@ public:
 #endif
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
+    void StartAdvertisement() override;
     void LogDeviceConfig() override;
 
     virtual ~GenericConfigurationManagerImpl() = default;

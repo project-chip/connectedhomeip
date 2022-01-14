@@ -244,6 +244,17 @@ template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::InitiateFactoryReset()
 {
 #if CHIP_ENABLE_ROTATING_DEVICE_ID
+    // Increment life time counter to protect against long-term tracking of rotating device ID.
+    _IncrementLifetimeCounter();
+#endif
+    // Inheriting classes should call this method so the lifetime counter is updated if necessary.
+}
+
+template <class ImplClass>
+void GenericConfigurationManagerImpl<ImplClass>::StartAdvertisement()
+{
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    // Increment life time counter to protect against long-term tracking of rotating device ID.
     _IncrementLifetimeCounter();
 #endif
     // Inheriting classes should call this method so the lifetime counter is updated if necessary.

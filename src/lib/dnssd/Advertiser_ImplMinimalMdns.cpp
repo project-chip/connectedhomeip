@@ -36,6 +36,7 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/StringBuilder.h>
+#include <platform/ConfigurationManager.h>
 
 // Enable detailed mDNS logging for received queries
 #undef DETAIL_LOGGING
@@ -621,6 +622,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     // Advertise the records we just added as required by RFC 6762.
     // TODO - Don't announce records that haven't been updated.
+    DeviceLayer::ConfigurationMgr().StartAdvertisement();
     AdvertiseRecords();
 
     return CHIP_NO_ERROR;
