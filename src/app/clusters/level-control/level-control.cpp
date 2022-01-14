@@ -1034,15 +1034,14 @@ static bool areStartUpLevelControlServerAttributesNonVolatile(EndpointId endpoin
 {
     EmberAfAttributeMetadata * metadata;
 
-    metadata = emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                              EMBER_AF_NULL_MANUFACTURER_CODE);
+    metadata = emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER);
     if (!metadata->IsNonVolatile())
     {
         return false;
     }
 
-    metadata = emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, ZCL_START_UP_CURRENT_LEVEL_ATTRIBUTE_ID,
-                                              CLUSTER_MASK_SERVER, EMBER_AF_NULL_MANUFACTURER_CODE);
+    metadata =
+        emberAfLocateAttributeMetadata(endpoint, LevelControl::Id, ZCL_START_UP_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER);
     if (!metadata->IsNonVolatile())
     {
         return false;
