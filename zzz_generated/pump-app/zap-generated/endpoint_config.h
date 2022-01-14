@@ -769,10 +769,13 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 27
+#define GENERATED_CLUSTER_COUNT 29
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x001D, ZAP_ATTRIBUTE_INDEX(0), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 0, Cluster: Descriptor (server) */  \
+            {                                                                                                                      \
+                0x001F, ZAP_ATTRIBUTE_INDEX(5), 0, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
+            }, /* Endpoint: 0, Cluster: Access Control (server) */                                                                 \
             { 0x0028,                                                                                                              \
               ZAP_ATTRIBUTE_INDEX(5),                                                                                              \
               12,                                                                                                                  \
@@ -806,6 +809,9 @@
             {                                                                                                                      \
                 0x003E, ZAP_ATTRIBUTE_INDEX(117), 6, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
+            {                                                                                                                      \
+                0x003F, ZAP_ATTRIBUTE_INDEX(123), 0, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+            }, /* Endpoint: 0, Cluster: Group Key Management (server) */                                                           \
             {                                                                                                                      \
                 0x0040, ZAP_ATTRIBUTE_INDEX(123), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                    \
@@ -881,7 +887,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 13, 880 }, { ZAP_CLUSTER_INDEX(13), 14, 105 },                                                     \
+        { ZAP_CLUSTER_INDEX(0), 15, 880 }, { ZAP_CLUSTER_INDEX(15), 14, 105 },                                                     \
     }
 
 // Largest attribute size is needed for various buffers
