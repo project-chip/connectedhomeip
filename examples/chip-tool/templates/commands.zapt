@@ -36,6 +36,30 @@ CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodableClust
 {{/zcl_structs}}
 {{/zcl_clusters}}
 
+void LogEventHeader(const chip::app::EventHeader & eventHeader)
+{
+    ChipLogProgress(chipTool, "Event %" PRIu32 " from cluster " ChipLogFormatMEI " on endpoint: %u", eventHeader.mPath.mEventId,
+                    ChipLogValueMEI(eventHeader.mPath.mClusterId), eventHeader.mPath.mEndpointId);
+    ChipLogProgress(chipTool, "\t Event number: %" PRIu64, eventHeader.mEventNumber);
+    if (eventHeader.mPriorityLevel == chip::app::PriorityLevel::Info)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Info");
+    }
+    else if (eventHeader.mPriorityLevel == chip::app::PriorityLevel::Critical)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Critical");
+    }
+    else if (eventHeader.mPriorityLevel == chip::app::PriorityLevel::Debug)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Debug");
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "\t Priority: Unknown");
+    }
+    ChipLogProgress(chipTool, "\t Timestamp: %" PRIu64, eventHeader.mTimestamp.mValue);
+}
+
 {{#zcl_clusters}}
 {{#zcl_events}}
 {{#unless has_more_than_one_cluster}}
@@ -217,12 +241,18 @@ static void OnDefaultSuccess(void * context, const chip::app::DataModel::NullObj
 };
 
 template <typename T>
-static void OnGeneralAttributeEventResponse(void * context, const char * label, T value)
+static void OnGeneralAttributeResponse(void * context, const char * label, T value)
 {
     CHIP_ERROR err = LogValue(label, 0, value);
 
     auto * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(err);
+}
+
+static void OnDefaultEventFailure(void * context, const chip::app::EventHeader & eventHeader, EmberAfStatus status)
+{
+    LogEventHeader(eventHeader);
+    OnDefaultFailure(context, status);
 }
 
 {{#chip_client_clusters}}
@@ -323,12 +353,14 @@ public:
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType>(this,
           OnEventResponse,
-          OnDefaultFailure);
+          OnDefaultEventFailure,
+          OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response", value);
+       LogEventHeader(eventHeader);
+       LogValue("{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} report", 0, value);
     }
 };
 
@@ -358,7 +390,7 @@ public:
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType>(this,
           OnValueReport,
-          OnDefaultFailure,
+          OnDefaultEventFailure,
           mMinInterval,
           mMaxInterval,
           subscriptionEstablishedCallback);
@@ -369,8 +401,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader, chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType value)
     {
+       LogEventHeader(eventHeader);
        LogValue("{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} report", 0, value);
     }
 
@@ -413,7 +446,7 @@ public:
 
     static void OnAttributeResponse(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} value)
     {
-        OnGeneralAttributeEventResponse(context, "{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response", value);
+        OnGeneralAttributeResponse(context, "{{asUpperCamelCase parent.name}}.{{asUpperCamelCase name}} response", value);
     }
 };
 
