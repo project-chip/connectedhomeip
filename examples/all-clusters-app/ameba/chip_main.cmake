@@ -112,6 +112,16 @@ list(
 )
 endif (matter_enable_rpc)
 
+if (matter_enable_otar)
+list(
+    APPEND ${list_chip_main_sources}
+    #otar
+    ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/OTARequestor.cpp
+    ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
+)
+endif (matter_enable_otar)
+
 list(
     APPEND ${list_chip_main_sources}
 
@@ -228,6 +238,14 @@ list(
     -DCONFIG_ENABLE_PW_RPC=1
 )
 endif (matter_enable_rpc)
+
+if (matter_enable_otar)
+list(
+    APPEND chip_main_flags
+
+    -DCONFIG_ENABLE_OTAR=1
+)
+endif (matter_enable_otar)
 
 list(
     APPEND chip_main_cpp_flags
