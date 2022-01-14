@@ -230,9 +230,10 @@ private:
     NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
     bool mIsFabricFiltered                                   = false;
-    // only for subscription, mHoldSync is set to true when trying to refresh subscription timer, which mean empty sync report
-    // cannot be sent during max interval. mHoldSync is set to false after max interval is passed, it means empty sync report is
-    // allowed to be generated.
+    // mHoldSync is used to prevent subscription empty report delivery while we
+    // are waiting for the max reporting interval to elaps.  When mHoldSync
+    // becomes false, we are allowed to send an empty report to keep the
+    // subscription alive on the client.
     bool mHoldSync                   = false;
     uint32_t mLastWrittenEventsBytes = 0;
     SubjectDescriptor mSubjectDescriptor;
