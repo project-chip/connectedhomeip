@@ -31,6 +31,11 @@ namespace DeviceLayer {
 class GenericOTARequestorDriver : public OTARequestorDriver
 {
 public:
+    /**
+     * Called to perform some initialization including:
+     *   - Set the OTA requestor instance used to direct download progress
+     *   - Set the OTA image processor instance used to apply/abort the downloaded image
+     */
     void Init(OTARequestorInterface * requestor, OTAImageProcessorInterface * processor)
     {
         mRequestor      = requestor;

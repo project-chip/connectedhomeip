@@ -425,6 +425,23 @@ function enhancedCommands(commands, types)
   return commands;
 }
 
+function enhancedEvents(events, types)
+{
+  events.forEach(event => {
+    const argument = {
+      name : event.name,
+      type : event.name,
+      isList : false,
+      isArray : false,
+      isEvent : true,
+      isNullable : false,
+      label : event.name,
+    };
+    event.response = { arguments : [ argument ] };
+  });
+  return events;
+}
+
 function enhancedAttributes(attributes, globalAttributes, types)
 {
   attributes.forEach(attribute => {
@@ -442,6 +459,7 @@ function enhancedAttributes(attributes, globalAttributes, types)
       size : attribute.size,
       isList : attribute.isList,
       isArray : attribute.isList,
+      isEvent : false,
       isNullable : attribute.isNullable,
       chipType : attribute.chipType,
       chipCallback : attribute.chipCallback,
@@ -491,7 +509,7 @@ Clusters.init = async function(context) {
     this._clusters = clusters;
     this._commands = enhancedCommands(commands, types);
     this._attributes = enhancedAttributes(attributes, globalAttributes, types);
-    this._events = events;
+    this._events = enhancedEvents(events, types);
 
     return this.ready.resolve();
   }, err => this.ready.reject(err));

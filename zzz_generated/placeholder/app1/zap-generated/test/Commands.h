@@ -395,3 +395,9 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
 
     return nullptr;
 }
+
+void PrintTestCommands()
+{
+    ChipLogError(chipTool, "Supported commands:");
+    ChipLogError(chipTool, "\t* Test_TC_DM_1_3_Simulated");
+}
