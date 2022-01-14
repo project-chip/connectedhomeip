@@ -622,7 +622,6 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommissionAdvertisingParameters & 
 
     // Advertise the records we just added as required by RFC 6762.
     // TODO - Don't announce records that haven't been updated.
-    DeviceLayer::ConfigurationMgr().StartAdvertisement();
     AdvertiseRecords();
 
     return CHIP_NO_ERROR;
