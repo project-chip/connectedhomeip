@@ -372,7 +372,7 @@ static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, uint8_t
         // The resulting temporary Options bitmap SHALL then be processed as defined
         // in section 3.10.2.2.3.
 
-        // ---------- The following order is important in decission making -------
+        // ---------- The following order is important in decision making -------
         // -----------more readable ----------
         //
         if (optionMask == 0xFF && optionOverride == 0xFF)
