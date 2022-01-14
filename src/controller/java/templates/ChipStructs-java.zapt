@@ -1,0 +1,58 @@
+{{> header}}
+{{#if (chip_has_client_clusters)}}
+package chip.devicecontroller;
+
+import androidx.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
+
+public class ChipStructs {
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+{{#if itemCnt}}
+public static class {{asUpperCamelCase parent.name}}Cluster{{asUnderlyingType name}} {
+{{#zcl_struct_items}}
+public {{asJavaType type null parent.parent.name includeAnnotations=true}} {{asLowerCamelCase (asSymbol label)}};
+{{/zcl_struct_items}}
+
+  public {{asUpperCamelCase parent.name}}Cluster{{asUnderlyingType name}}(
+  {{#zcl_struct_items}}
+    {{#not_first}}, {{/not_first}}{{asJavaType type null parent.parent.name includeAnnotations=true}} {{asLowerCamelCase (asSymbol label)}}
+  {{/zcl_struct_items}}) {
+    {{#zcl_struct_items}}
+    this.{{asLowerCamelCase (asSymbol label)}} = {{asLowerCamelCase (asSymbol label)}};
+    {{/zcl_struct_items}}
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    output.append("{{asUpperCamelCase parent.name}}Cluster{{asUnderlyingType name}} {\n");
+    {{#zcl_struct_items}}
+    {{! TODO: Print more descriptive types for optional, nullable, array, and struct. }}
+    output.append("\t{{asLowerCamelCase name}}: ");
+    {{#if isList}}
+    output.append({{asLowerCamelCase name}});
+    {{else if isArray}}
+    output.append({{asLowerCamelCase name}});
+    {{else if (isOctetString type)}}
+    output.append(Arrays.toString({{asLowerCamelCase name}}));
+    {{else}}
+    output.append({{asLowerCamelCase name}});
+    {{/if}}
+    output.append("\n");
+    {{/zcl_struct_items}}
+    output.append("}\n");
+    return output.toString();
+  }
+}
+{{/if}}
+
+{{/zcl_structs}}
+{{/zcl_clusters}}
+
+}
+
+{{/if}}

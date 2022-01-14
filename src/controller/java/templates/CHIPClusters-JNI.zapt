@@ -13,7 +13,9 @@
 #include <controller/java/CHIPDefaultCallbacks.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
+#include <list>
 #include <jni.h>
+#include <lib/support/CHIPListUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <platform/PlatformManager.h>
@@ -44,16 +46,19 @@ JNI_METHOD(jlong, {{asUpperCamelCase name}}Cluster, initWithDevice)(JNIEnv * env
 }
 
 {{#chip_cluster_commands}}
-JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asJniBasicType type true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}}, jobject timedInvokeTimeoutMs)
+JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback{{#chip_cluster_command_arguments}}, {{asJniBasicType type true}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments}}, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
     {{asUpperCamelCase ../name}}Cluster * cppCluster;
     
+    ListFreer listFreer;
     chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type request;
 
+    std::list<JniByteArray *> cleanupByteArrays;
+    std::list<JniUtfString *> cleanupStrings;
     {{#chip_cluster_command_arguments}}
-    {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(asLowerCamelCase label) cluster=parent.parent.name}}
+    {{>encode_value target=(concat "request." (asLowerCamelCase label)) source=(asLowerCamelCase label) cluster=(asUpperCamelCase parent.parent.name) depth=0}}
     {{/chip_cluster_command_arguments}}
 
     {{#*inline "callbackName"}}{{#if hasSpecificResponse}}{{asUpperCamelCase parent.name false}}Cluster{{asUpperCamelCase responseName false}}{{else}}DefaultSuccess{{/if}}{{/inline}}
@@ -81,6 +86,9 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
     {{/if}}
     VerifyOrReturn(err == CHIP_NO_ERROR, AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command", CHIP_ERROR_INCORRECT_STATE));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(), [](chip::JniByteArray * jniByteArray){ chip::Platform::Delete(jniByteArray);});
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(), [](chip::JniUtfString * jniString){ chip::Platform::Delete(jniString);});
+
     onSuccess.release();
     onFailure.release();
 }
@@ -88,7 +96,6 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
 {{#chip_server_cluster_attributes}}
 {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#if isReportableAttribute}}
-{{#unless isList}}
 JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, subscribe{{asCamelCased name false}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jint minInterval, jint maxInterval)
 {
     chip::DeviceLayer::StackLock lock;
@@ -120,7 +127,6 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, subscribe{{asCamelCased 
     onSuccess.release();
     onFailure.release();
 }
-{{/unless}}
 {{/if}}
 {{/unless}}
 {{/chip_server_cluster_attributes}}

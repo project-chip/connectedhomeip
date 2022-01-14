@@ -14,6 +14,7 @@
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
 #include <jni.h>
+#include <lib/support/CHIPListUtils.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/Span.h>
 #include <platform/PlatformManager.h>
@@ -28,16 +29,18 @@ using namespace chip::Controller;
 {{#chip_server_cluster_attributes}}
 {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#if isWritableAttribute}}
-{{! TODO: Lists not supported in attribute writes yet. }}
-{{#unless isList}}
 
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, {{asJniBasicType type true}} value, jobject timedWriteTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
+    ListFreer listFreer;
     using TypeInfo = chip::app::Clusters::{{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
     TypeInfo::Type cppValue;
 
-    {{>encode_value target="cppValue" source="value" cluster=parent.name}}
+    std::vector<JniByteArray *> cleanupByteArrays;
+    std::vector<JniUtfString *> cleanupStrings;
+
+    {{>encode_value target="cppValue" source="value" cluster=(asUpperCamelCase parent.name) depth=0}}
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -63,10 +66,12 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, write{{asUpperCamelCase na
     {{/if}}
     VerifyOrReturn(err == CHIP_NO_ERROR, chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));
 
+    std::for_each(cleanupByteArrays.cbegin(), cleanupByteArrays.cend(), [](chip::JniByteArray * jniByteArray){ chip::Platform::Delete(jniByteArray); });
+    std::for_each(cleanupStrings.cbegin(), cleanupStrings.cend(), [](chip::JniUtfString * jniString){ chip::Platform::Delete(jniString); });
+
     onSuccess.release();
     onFailure.release();
 }
-{{/unless}}
 {{/if}}
 {{/unless}}
 {{/chip_server_cluster_attributes}}
