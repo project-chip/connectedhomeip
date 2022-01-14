@@ -384,10 +384,10 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         }
     }
 
-if (commissionableNode && mode != chip::Dnssd::CommissioningMode::kDisabled)     
-{
-    DeviceLayer::ConfigurationMgr().StartAdvertisement();
-}
+    if (commissionableNode && mode != chip::Dnssd::CommissioningMode::kDisabled)
+    {
+        DeviceLayer::ConfigurationMgr().StartAdvertisement();
+    }
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
     ChipLogProgress(Discovery, "Advertise commission parameter vendorID=%u productID=%u discriminator=%04u/%02u",
