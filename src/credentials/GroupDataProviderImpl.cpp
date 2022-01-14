@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 #include <credentials/GroupDataProviderImpl.h>
-#include <credentials/MessageSecurity.h>
+#include <crypto/MessageSecurity.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
@@ -38,7 +38,7 @@ struct PersistentData
     virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)        = 0;
     virtual void Clear()                                           = 0;
 
-    CHIP_ERROR Save(chip::PersistentStorageDelegate & storage)
+    virtual CHIP_ERROR Save(chip::PersistentStorageDelegate & storage)
     {
         uint8_t buffer[kMaxSerializedSize] = { 0 };
         DefaultStorageKeyAllocator key;
@@ -77,7 +77,7 @@ struct PersistentData
         return Deserialize(reader);
     }
 
-    CHIP_ERROR Delete(chip::PersistentStorageDelegate & storage)
+    virtual CHIP_ERROR Delete(chip::PersistentStorageDelegate & storage)
     {
         DefaultStorageKeyAllocator key;
         // Update storage key
@@ -349,8 +349,6 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
         ReturnErrorOnFailure(Register(storage));
         return PersistentData::Save(storage);
     }
-
-    CHIP_ERROR Load(chip::PersistentStorageDelegate & storage) override { return PersistentData::Load(storage); }
 
     CHIP_ERROR Delete(chip::PersistentStorageDelegate & storage) override
     {
