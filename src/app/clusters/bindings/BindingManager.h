@@ -33,7 +33,7 @@ namespace chip {
  *
  */
 using BoundDeviceChangedHandler = void (*)(EndpointId localEndpoint, EndpointId remoteEndpoint, ClusterId clusterId,
-                                           OperationalDeviceProxy * peer_device);
+                                           DeviceProxy * peer_device, Optional<GroupId> group);
 
 /**
  *

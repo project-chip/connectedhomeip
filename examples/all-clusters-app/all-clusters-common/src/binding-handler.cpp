@@ -72,10 +72,16 @@ static void RegisterSwitchCommands()
 #endif // defined(ENABLE_CHIP_SHELL)
 
 static void BoundDeviceChangedHandler(chip::EndpointId localEndpoint, chip::EndpointId remoteEndpoint, chip::ClusterId clusterId,
-                                      chip::OperationalDeviceProxy * peer_device)
+                                      chip::DeviceProxy * peer_device, chip::Optional<chip::GroupId> group)
 {
     using namespace chip;
     using namespace chip::app;
+
+    if (group.HasValue())
+    {
+        ChipLogError(NotSpecified, "Group binding is not supported now");
+        return;
+    }
 
     // Unfortunately generating both cluster server and client code is not supported.
     // We need to manually compose the packet here.

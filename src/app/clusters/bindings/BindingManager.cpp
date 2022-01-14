@@ -90,7 +90,7 @@ void BindingManager::SyncPendingClustersToPeer(OperationalDeviceProxy * device, 
             if (emberGetBinding(j, &entry) == EMBER_SUCCESS && entry.type != EMBER_UNUSED_BINDING && entry.clusterId == cluster &&
                 entry.local == endpoint && mBoundDeviceChangedHandler)
             {
-                mBoundDeviceChangedHandler(entry.local, entry.remote, cluster, device);
+                mBoundDeviceChangedHandler(entry.local, entry.remote, cluster, device, Optional<GroupId>());
             }
         }
     }
@@ -144,7 +144,7 @@ CHIP_ERROR BindingManager::NotifyBoundClusterChanged(EndpointId endpoint, Cluste
             if (peerDevice != nullptr && mBoundDeviceChangedHandler)
             {
                 // We already have an active connection
-                mBoundDeviceChangedHandler(entry.local, entry.remote, cluster, peerDevice);
+                mBoundDeviceChangedHandler(entry.local, entry.remote, cluster, peerDevice, Optional<GroupId>());
             }
             else
             {
