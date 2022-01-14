@@ -261,6 +261,15 @@ void GenericConfigurationManagerImpl<ImplClass>::StartAdvertisement()
 }
 
 template <class ImplClass>
+void GenericConfigurationManagerImpl<ImplClass>::StartAdvertisement()
+{
+#if CHIP_ENABLE_ROTATING_DEVICE_ID
+    _IncrementLifetimeCounter();
+#endif
+    // Inheriting classes should call this method so the lifetime counter is updated if necessary.
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::GetSetupPinCode(uint32_t & setupPinCode)
 {
     CHIP_ERROR err;
