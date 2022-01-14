@@ -331,7 +331,7 @@ public:
     }
 
 protected:
-    ClusterBase(uint16_t cluster) : mClusterId(cluster) {}
+    ClusterBase(uint32_t cluster) : mClusterId(cluster) {}
 
     const ClusterId mClusterId;
     DeviceProxy * mDevice;
