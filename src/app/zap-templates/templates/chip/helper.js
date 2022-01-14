@@ -84,6 +84,12 @@ function getCommands(methodName)
                                  : ensureClusters(this).getServerCommands(clusterName);
 }
 
+function getAttributes(methodName)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
+  return ensureClusters(this).getAttributesByClusterName(clusterName);
+}
+
 function getResponses(methodName)
 {
   const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, methodName);
@@ -216,6 +222,20 @@ function chip_cluster_commands(options)
 }
 
 /**
+ * Creates block iterator over the cluster attributes for a given cluster/side.
+ *
+ * This function is meant to be used inside a {{#chip_*_clusters}}
+ * block. It will throw otherwise.
+ *
+ * @param {*} options
+ */
+function chip_cluster_attributes(options)
+{
+  const attributes = getAttributes.call(this, 'chip_cluster_attributes');
+
+  return asBlocks.call(this, attributes, options);
+}
+/**
  * Creates block iterator over the cluster responses for a given cluster/side.
  *
  * This function is meant to be used inside a {{#chip_*_clusters}}
@@ -244,7 +264,8 @@ function chip_cluster_command_arguments(options)
   const commands  = getCommands.call(this.parent, 'chip_cluster_commands_argments');
 
   const filter = command => command.id == commandId;
-  return asBlocks.call(this, commands.then(items => items.find(filter).arguments), options);
+  return asBlocks.call(this,
+      commands.then(items => items.find(filter).arguments.map((value, index) => ({...value, fieldIdentifier : index }))), options);
 }
 
 /**
@@ -293,7 +314,8 @@ function chip_cluster_response_arguments(options)
   const responses = getResponses.call(this.parent, 'chip_cluster_responses_argments');
 
   const filter = command => command.id == commandId;
-  return asBlocks.call(this, responses.then(items => items.find(filter).arguments), options);
+  return asBlocks.call(this,
+      responses.then(items => items.find(filter).arguments.map((value, index) => ({...value, fieldIdentifier : index }))), options);
 }
 
 /**
@@ -392,6 +414,27 @@ function chip_available_cluster_commands(options)
 }
 
 /**
+ * Creates block iterator over structures belonging to the current cluster
+ */
+async function chip_cluster_specific_structs(options)
+{
+  const { clusterName, clusterSide } = checkIsInsideClusterBlock(this, 'chip_cluster_specific_structs');
+
+  const structs = await ensureClusters(this).getStructuresByClusterName(clusterName);
+
+  return templateUtil.collectBlocks(structs, options, this);
+}
+
+/**
+ * Creates block iterator over structures that are shared between clusters
+ */
+async function chip_shared_structs(options)
+{
+  const structs = await ensureClusters(this).getSharedStructs();
+  return templateUtil.collectBlocks(structs, options, this);
+}
+
+/**
  * Checks whether a type is an enum for purposes of its chipType.  That includes
  * both spec-defined enum types and types that we map to enum types in our code.
  */
@@ -424,6 +467,7 @@ exports.chip_has_server_clusters                             = chip_has_server_c
 exports.chip_cluster_commands                                = chip_cluster_commands;
 exports.chip_cluster_command_arguments                       = chip_cluster_command_arguments;
 exports.chip_cluster_command_arguments_with_structs_expanded = chip_cluster_command_arguments_with_structs_expanded;
+exports.chip_cluster_attributes                              = chip_cluster_attributes;
 exports.chip_server_global_responses                         = chip_server_global_responses;
 exports.chip_cluster_responses                               = chip_cluster_responses;
 exports.chip_cluster_response_arguments                      = chip_cluster_response_arguments
@@ -434,3 +478,5 @@ exports.chip_server_has_list_attributes                      = chip_server_has_l
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
 exports.if_chip_enum                                         = if_chip_enum;
 exports.if_in_global_responses                               = if_in_global_responses;
+exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
+exports.chip_shared_structs                                  = chip_shared_structs;
