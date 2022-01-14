@@ -17,8 +17,8 @@
 
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
-#include <platform/CHIPDeviceLayer.h>
 #include <platform/Ameba/NetworkCommissioningDriver.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #include <limits>
 #include <string>
@@ -193,7 +193,7 @@ CHIP_ERROR AmebaWiFiDriver::StartScanWiFiNetworks(ByteSpan ssid)
 void AmebaWiFiDriver::OnScanWiFiNetworkDone()
 {
     uint16_t NumAP = apNum;
-    apNum = 0;
+    apNum          = 0;
     if (!NumAP)
     {
         ChipLogProgress(DeviceLayer, "No AP found");
@@ -205,7 +205,7 @@ void AmebaWiFiDriver::OnScanWiFiNetworkDone()
         return;
     }
 
-    rtw_scan_result_t *ScanResult = (rtw_scan_result*) pvPortMalloc(NumAP * sizeof(rtw_scan_result));
+    rtw_scan_result_t * ScanResult = (rtw_scan_result *) pvPortMalloc(NumAP * sizeof(rtw_scan_result));
     matter_get_scan_results(ScanResult, NumAP);
 
     if (ScanResult)

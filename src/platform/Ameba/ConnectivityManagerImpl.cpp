@@ -151,7 +151,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     if (event->Type == DeviceEventType::kRtkWiFiScanCompletedEvent)
     {
         ChipLogProgress(DeviceLayer, "WiFiScanCompleted");
-        NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnScanWiFiNetworkDone();        
+        NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 }
@@ -816,13 +816,12 @@ void ConnectivityManagerImpl::DHCPProcess(void)
     xTaskCreate(DHCPProcessThread, "DHCPProcess", 4096 / sizeof(StackType_t), this, 1, NULL);
 }
 
-int ConnectivityManagerImpl::conn_callback_dispatcher(void *object)
+int ConnectivityManagerImpl::conn_callback_dispatcher(void * object)
 {
     ConnectivityManagerImpl * connmgr = static_cast<ConnectivityManagerImpl *>(object);
     connmgr->RtkWiFiScanCompletedHandler();
     return 0;
 }
-
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
