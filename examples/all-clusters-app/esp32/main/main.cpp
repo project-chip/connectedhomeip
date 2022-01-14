@@ -513,8 +513,8 @@ void SetupPretendDevices()
     AddCluster("Occupancy Sensor");
     AddAttribute("Occupancy", "1");
     uint8_t attributeValue = 1;
-    emberAfWriteServerAttribute(1, ZCL_OCCUPANCY_SENSING_CLUSTER_ID, ZCL_OCCUPANCY_ATTRIBUTE_ID,
-                                            (uint8_t *) &attributeValue, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+    emberAfWriteServerAttribute(1, ZCL_OCCUPANCY_SENSING_CLUSTER_ID, ZCL_OCCUPANCY_ATTRIBUTE_ID, (uint8_t *) &attributeValue,
+                                ZCL_BITMAP8_ATTRIBUTE_TYPE);
 }
 
 WiFiWidget pairingWindowLED;
