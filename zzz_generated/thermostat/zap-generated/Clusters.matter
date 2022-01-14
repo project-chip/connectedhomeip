@@ -2,8 +2,8 @@
 // It is for view/code review purposes only.
 
 struct LabelStruct {
-  CHAR_STRING kLabel = 1;
-  CHAR_STRING kValue = 2;
+  CHAR_STRING label = 1;
+  CHAR_STRING value = 2;
 }
 
 server cluster AdministratorCommissioning = 60 {
@@ -46,18 +46,18 @@ server cluster AdministratorCommissioning = 60 {
 }
 
 server cluster Basic = 40 {
-  event StartUp(critical) = 0 {
-    kSoftwareVersion = 0,
+  critical event StartUp = 0 {
+    INT32U softwareVersion = 0;
   }
 
-  event ShutDown(critical) = 1 {
+  critical event ShutDown = 1 {
   }
 
-  event Leave(info) = 2 {
+  info event Leave = 2 {
   }
 
-  event ReachableChanged(info) = 3 {
-    kReachableNewValue = 0,
+  info event ReachableChanged = 3 {
+    boolean reachableNewValue = 0;
   }
 
   attribute(readonly, reportable) int16u interactionModelVersion = 0;
@@ -110,8 +110,8 @@ server cluster Binding = 30 {
 
 server cluster Descriptor = 29 {
   struct DeviceType {
-    DEVTYPE_ID kType = 1;
-    INT16U kRevision = 2;
+    DEVTYPE_ID type = 1;
+    INT16U revision = 2;
   }
 
   attribute(readonly, reportable) DeviceType deviceList[] = 0;
@@ -198,7 +198,7 @@ server cluster GeneralCommissioning = 48 {
   }
 
   struct BasicCommissioningInfoType {
-    INT32U kFailSafeExpiryLengthMs = 1;
+    INT32U failSafeExpiryLengthMs = 1;
   }
 
   attribute(writable, reportable) int64u breadcrumb = 0;
@@ -295,31 +295,31 @@ server cluster GeneralDiagnostics = 51 {
   }
 
   struct NetworkInterfaceType {
-    CHAR_STRING kName = 1;
-    BOOLEAN kFabricConnected = 2;
-    BOOLEAN kOffPremiseServicesReachableIPv4 = 3;
-    BOOLEAN kOffPremiseServicesReachableIPv6 = 4;
-    OCTET_STRING kHardwareAddress = 5;
-    InterfaceType kType = 6;
+    CHAR_STRING name = 1;
+    BOOLEAN fabricConnected = 2;
+    BOOLEAN offPremiseServicesReachableIPv4 = 3;
+    BOOLEAN offPremiseServicesReachableIPv6 = 4;
+    OCTET_STRING hardwareAddress = 5;
+    InterfaceType type = 6;
   }
 
-  event HardwareFaultChange(critical) = 0 {
-    kCurrent = 0,
-    kPrevious = 1,
+  critical event HardwareFaultChange = 0 {
+    HardwareFaultType current[] = 0;
+    HardwareFaultType previous[] = 1;
   }
 
-  event RadioFaultChange(critical) = 1 {
-    kCurrent = 0,
-    kPrevious = 1,
+  critical event RadioFaultChange = 1 {
+    RadioFaultType current[] = 0;
+    RadioFaultType previous[] = 1;
   }
 
-  event NetworkFaultChange(critical) = 2 {
-    kCurrent = 0,
-    kPrevious = 1,
+  critical event NetworkFaultChange = 2 {
+    NetworkFaultType current[] = 0;
+    NetworkFaultType previous[] = 1;
   }
 
-  event BootReason(critical) = 3 {
-    kBootReason = 0,
+  critical event BootReason = 3 {
+    BootReasonType bootReason = 0;
   }
 
   attribute(readonly, reportable) NetworkInterfaceType networkInterfaces[] = 0;
@@ -340,16 +340,16 @@ server cluster GroupKeyManagement = 63 {
   }
 
   struct GroupKey {
-    fabric_idx kFabricIndex = 0;
-    INT16U kGroupId = 1;
-    INT16U kGroupKeySetID = 2;
+    fabric_idx fabricIndex = 0;
+    INT16U groupId = 1;
+    INT16U groupKeySetID = 2;
   }
 
   struct GroupInfo {
-    INT16U kFabricIndex = 0;
-    INT16U kGroupId = 1;
-    INT16U kEndpoints[] = 2;
-    CHAR_STRING kGroupName = 3;
+    INT16U fabricIndex = 0;
+    INT16U groupId = 1;
+    INT16U endpoints[] = 2;
+    CHAR_STRING groupName = 3;
   }
 
   attribute(readonly, reportable) GroupKey groupKeyMap[] = 0;
@@ -530,28 +530,28 @@ server cluster NetworkCommissioning = 49 {
   }
 
   struct NetworkInfo {
-    OCTET_STRING kNetworkID = 1;
-    BOOLEAN kConnected = 2;
+    OCTET_STRING networkID = 1;
+    BOOLEAN connected = 2;
   }
 
   struct WiFiInterfaceScanResult {
-    BITMAP8 kSecurity = 1;
-    OCTET_STRING kSsid = 2;
-    OCTET_STRING kBssid = 3;
-    INT16U kChannel = 4;
-    WiFiBand kWiFiBand = 5;
-    INT8S kRssi = 6;
+    BITMAP8 security = 1;
+    OCTET_STRING ssid = 2;
+    OCTET_STRING bssid = 3;
+    INT16U channel = 4;
+    WiFiBand wiFiBand = 5;
+    INT8S rssi = 6;
   }
 
   struct ThreadInterfaceScanResult {
-    INT64U kPanId = 1;
-    INT64U kExtendedPanId = 2;
-    CHAR_STRING kNetworkName = 3;
-    INT16U kChannel = 4;
-    INT8U kVersion = 5;
-    INT64U kExtendedAddress = 6;
-    INT8S kRssi = 7;
-    INT8U kLqi = 8;
+    INT64U panId = 1;
+    INT64U extendedPanId = 2;
+    CHAR_STRING networkName = 3;
+    INT16U channel = 4;
+    INT8U version = 5;
+    INT64U extendedAddress = 6;
+    INT8S rssi = 7;
+    INT8U lqi = 8;
   }
 
   attribute(readonly) int8u maxNetworks = 0;
@@ -703,12 +703,12 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct FabricDescriptor {
-    INT8U kFabricIndex = 1;
-    OCTET_STRING kRootPublicKey = 2;
-    INT16U kVendorId = 3;
-    FABRIC_ID kFabricId = 4;
-    NODE_ID kNodeId = 5;
-    CHAR_STRING kLabel = 6;
+    INT8U fabricIndex = 1;
+    OCTET_STRING rootPublicKey = 2;
+    INT16U vendorId = 3;
+    FABRIC_ID fabricId = 4;
+    NODE_ID nodeId = 5;
+    CHAR_STRING label = 6;
   }
 
   attribute(readonly, reportable) FabricDescriptor fabricsList[] = 1;
@@ -792,9 +792,9 @@ server cluster OperationalCredentials = 62 {
 
 server cluster Scenes = 5 {
   struct SceneExtensionFieldSet {
-    CLUSTER_ID kClusterId = 1;
-    INT8U kLength = 2;
-    INT8U kValue = 3;
+    CLUSTER_ID clusterId = 1;
+    INT8U length = 2;
+    INT8U value = 3;
   }
 
   attribute(readonly, reportable) int8u sceneCount = 0;
@@ -892,15 +892,15 @@ server cluster Scenes = 5 {
 
 server cluster SoftwareDiagnostics = 52 {
   struct ThreadMetrics {
-    INT64U kId = 1;
-    CHAR_STRING kName = 2;
-    INT32U kStackFreeCurrent = 3;
-    INT32U kStackFreeMinimum = 4;
-    INT32U kStackSize = 5;
+    INT64U id = 1;
+    CHAR_STRING name = 2;
+    INT32U stackFreeCurrent = 3;
+    INT32U stackFreeMinimum = 4;
+    INT32U stackSize = 5;
   }
 
-  event SoftwareFault(info) = 0 {
-    kSoftwareFault = 0,
+  info event SoftwareFault = 0 {
+    SoftwareFault softwareFault = 0;
   }
 
   attribute(readonly, reportable) ThreadMetrics threadMetrics[] = 0;
@@ -1008,57 +1008,57 @@ server cluster ThreadNetworkDiagnostics = 53 {
   }
 
   struct NeighborTable {
-    INT64U kExtAddress = 1;
-    INT32U kAge = 2;
-    INT16U kRloc16 = 3;
-    INT32U kLinkFrameCounter = 4;
-    INT32U kMleFrameCounter = 5;
-    INT8U kLqi = 6;
-    INT8S kAverageRssi = 7;
-    INT8S kLastRssi = 8;
-    INT8U kFrameErrorRate = 9;
-    INT8U kMessageErrorRate = 10;
-    BOOLEAN kRxOnWhenIdle = 11;
-    BOOLEAN kFullThreadDevice = 12;
-    BOOLEAN kFullNetworkData = 13;
-    BOOLEAN kIsChild = 14;
+    INT64U extAddress = 1;
+    INT32U age = 2;
+    INT16U rloc16 = 3;
+    INT32U linkFrameCounter = 4;
+    INT32U mleFrameCounter = 5;
+    INT8U lqi = 6;
+    INT8S averageRssi = 7;
+    INT8S lastRssi = 8;
+    INT8U frameErrorRate = 9;
+    INT8U messageErrorRate = 10;
+    BOOLEAN rxOnWhenIdle = 11;
+    BOOLEAN fullThreadDevice = 12;
+    BOOLEAN fullNetworkData = 13;
+    BOOLEAN isChild = 14;
   }
 
   struct RouteTable {
-    INT64U kExtAddress = 1;
-    INT16U kRloc16 = 2;
-    INT8U kRouterId = 3;
-    INT8U kNextHop = 4;
-    INT8U kPathCost = 5;
-    INT8U kLQIIn = 6;
-    INT8U kLQIOut = 7;
-    INT8U kAge = 8;
-    BOOLEAN kAllocated = 9;
-    BOOLEAN kLinkEstablished = 10;
+    INT64U extAddress = 1;
+    INT16U rloc16 = 2;
+    INT8U routerId = 3;
+    INT8U nextHop = 4;
+    INT8U pathCost = 5;
+    INT8U LQIIn = 6;
+    INT8U LQIOut = 7;
+    INT8U age = 8;
+    BOOLEAN allocated = 9;
+    BOOLEAN linkEstablished = 10;
   }
 
   struct SecurityPolicy {
-    INT16U kRotationTime = 1;
-    BITMAP16 kFlags = 2;
+    INT16U rotationTime = 1;
+    BITMAP16 flags = 2;
   }
 
   struct OperationalDatasetComponents {
-    BOOLEAN kActiveTimestampPresent = 1;
-    BOOLEAN kPendingTimestampPresent = 2;
-    BOOLEAN kMasterKeyPresent = 3;
-    BOOLEAN kNetworkNamePresent = 4;
-    BOOLEAN kExtendedPanIdPresent = 5;
-    BOOLEAN kMeshLocalPrefixPresent = 6;
-    BOOLEAN kDelayPresent = 7;
-    BOOLEAN kPanIdPresent = 8;
-    BOOLEAN kChannelPresent = 9;
-    BOOLEAN kPskcPresent = 10;
-    BOOLEAN kSecurityPolicyPresent = 11;
-    BOOLEAN kChannelMaskPresent = 12;
+    BOOLEAN activeTimestampPresent = 1;
+    BOOLEAN pendingTimestampPresent = 2;
+    BOOLEAN masterKeyPresent = 3;
+    BOOLEAN networkNamePresent = 4;
+    BOOLEAN extendedPanIdPresent = 5;
+    BOOLEAN meshLocalPrefixPresent = 6;
+    BOOLEAN delayPresent = 7;
+    BOOLEAN panIdPresent = 8;
+    BOOLEAN channelPresent = 9;
+    BOOLEAN pskcPresent = 10;
+    BOOLEAN securityPolicyPresent = 11;
+    BOOLEAN channelMaskPresent = 12;
   }
 
-  event ConnectionStatus(info) = 0 {
-    kConnectionStatus = 0,
+  info event ConnectionStatus = 0 {
+    ThreadConnectionStatus connectionStatus = 0;
   }
 
   attribute(readonly, reportable) int16u channel = 0;
@@ -1164,17 +1164,17 @@ server cluster WiFiNetworkDiagnostics = 54 {
     k80211ax = 5;
   }
 
-  event Disconnection(info) = 0 {
-    kReasonCode = 0,
+  info event Disconnection = 0 {
+    INT16U reasonCode = 0;
   }
 
-  event AssociationFailure(info) = 1 {
-    kAssociationFailure = 0,
-    kStatus = 1,
+  info event AssociationFailure = 1 {
+    AssociationFailureCause associationFailure = 0;
+    INT16U status = 1;
   }
 
-  event ConnectionStatus(info) = 2 {
-    kConnectionStatus = 0,
+  info event ConnectionStatus = 2 {
+    WiFiConnectionStatus connectionStatus = 0;
   }
 
   attribute(readonly, reportable) octet_string bssid = 0;

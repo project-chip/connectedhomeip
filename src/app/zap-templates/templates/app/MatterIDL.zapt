@@ -3,12 +3,12 @@
 
 {{#chip_shared_structs}}
 {{#if struct_is_fabric_scoped}}
-[fabric_scoped_by=k{{asUpperCamelCase struct_fabric_idx_field}}]
+[fabric_scoped_by={{asUpperCamelCase struct_fabric_idx_field}}]
 {{/if}}
 struct {{name}} {
   {{#zcl_struct_items}}
   {{#if isOptional~}} optional {{/if~}}
-  {{~#if isNullable~}} nullable {{/if~}} {{type}} k{{asUpperCamelCase label}}
+  {{~#if isNullable~}} nullable {{/if~}} {{type}} {{asLowerCamelCase label}}
   {{~#if isArray~}}
     []
   {{~/if}} = {{fieldIdentifier}};
@@ -35,7 +35,7 @@ struct {{name}} {
   struct {{name}} {
     {{#zcl_struct_items}}
     {{#if isOptional~}} optional {{/if~}}
-    {{~#if isNullable~}} nullable {{/if~}} {{type}} k{{asUpperCamelCase label}}
+    {{~#if isNullable~}} nullable {{/if~}} {{type}} {{asLowerCamelCase label}}
     {{~#if isArray~}}
       []
     {{~/if}} = {{fieldIdentifier}};
@@ -44,9 +44,13 @@ struct {{name}} {
 
   {{/chip_cluster_specific_structs}}
   {{#zcl_events}}
-  event {{asUpperCamelCase name}}({{priority}}) = {{code}} {
+  {{priority}} event {{asUpperCamelCase name}} = {{code}} {
     {{#zcl_event_fields}}
-    k{{asUpperCamelCase name}} = {{fieldIdentifier}},
+    {{#if isOptional~}} optional {{/if~}}
+    {{~#if isNullable~}} nullable {{/if~}} {{type}} {{asLowerCamelCase name}}
+    {{~#if isArray~}}
+      []
+    {{~/if}} = {{fieldIdentifier}};
     {{/zcl_event_fields}}
   }
 

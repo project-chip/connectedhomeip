@@ -2,18 +2,18 @@
 // It is for view/code review purposes only.
 
 server cluster Basic = 40 {
-  event StartUp(critical) = 0 {
-    kSoftwareVersion = 0,
+  critical event StartUp = 0 {
+    INT32U softwareVersion = 0;
   }
 
-  event ShutDown(critical) = 1 {
+  critical event ShutDown = 1 {
   }
 
-  event Leave(info) = 2 {
+  info event Leave = 2 {
   }
 
-  event ReachableChanged(info) = 3 {
-    kReachableNewValue = 0,
+  info event ReachableChanged = 3 {
+    boolean reachableNewValue = 0;
   }
 
   attribute(readonly, reportable) int16u interactionModelVersion = 0;
@@ -122,8 +122,8 @@ server cluster ColorControl = 768 {
 
 server cluster Descriptor = 29 {
   struct DeviceType {
-    DEVTYPE_ID kType = 1;
-    INT16U kRevision = 2;
+    DEVTYPE_ID type = 1;
+    INT16U revision = 2;
   }
 
   attribute(readonly, reportable) DeviceType deviceList[] = 0;
@@ -148,7 +148,7 @@ server cluster GeneralCommissioning = 48 {
   }
 
   struct BasicCommissioningInfoType {
-    INT32U kFailSafeExpiryLengthMs = 1;
+    INT32U failSafeExpiryLengthMs = 1;
   }
 
   attribute(writable, reportable) int64u breadcrumb = 0;
@@ -387,28 +387,28 @@ server cluster NetworkCommissioning = 49 {
   }
 
   struct NetworkInfo {
-    OCTET_STRING kNetworkID = 1;
-    BOOLEAN kConnected = 2;
+    OCTET_STRING networkID = 1;
+    BOOLEAN connected = 2;
   }
 
   struct WiFiInterfaceScanResult {
-    BITMAP8 kSecurity = 1;
-    OCTET_STRING kSsid = 2;
-    OCTET_STRING kBssid = 3;
-    INT16U kChannel = 4;
-    WiFiBand kWiFiBand = 5;
-    INT8S kRssi = 6;
+    BITMAP8 security = 1;
+    OCTET_STRING ssid = 2;
+    OCTET_STRING bssid = 3;
+    INT16U channel = 4;
+    WiFiBand wiFiBand = 5;
+    INT8S rssi = 6;
   }
 
   struct ThreadInterfaceScanResult {
-    INT64U kPanId = 1;
-    INT64U kExtendedPanId = 2;
-    CHAR_STRING kNetworkName = 3;
-    INT16U kChannel = 4;
-    INT8U kVersion = 5;
-    INT64U kExtendedAddress = 6;
-    INT8S kRssi = 7;
-    INT8U kLqi = 8;
+    INT64U panId = 1;
+    INT64U extendedPanId = 2;
+    CHAR_STRING networkName = 3;
+    INT16U channel = 4;
+    INT8U version = 5;
+    INT64U extendedAddress = 6;
+    INT8S rssi = 7;
+    INT8U lqi = 8;
   }
 
   attribute(readonly) int8u maxNetworks = 0;
@@ -528,12 +528,12 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct FabricDescriptor {
-    INT8U kFabricIndex = 1;
-    OCTET_STRING kRootPublicKey = 2;
-    INT16U kVendorId = 3;
-    FABRIC_ID kFabricId = 4;
-    NODE_ID kNodeId = 5;
-    CHAR_STRING kLabel = 6;
+    INT8U fabricIndex = 1;
+    OCTET_STRING rootPublicKey = 2;
+    INT16U vendorId = 3;
+    FABRIC_ID fabricId = 4;
+    NODE_ID nodeId = 5;
+    CHAR_STRING label = 6;
   }
 
   attribute(readonly, reportable) FabricDescriptor fabricsList[] = 1;
@@ -617,9 +617,9 @@ server cluster OperationalCredentials = 62 {
 
 server cluster Scenes = 5 {
   struct SceneExtensionFieldSet {
-    CLUSTER_ID kClusterId = 1;
-    INT8U kLength = 2;
-    INT8U kValue = 3;
+    CLUSTER_ID clusterId = 1;
+    INT8U length = 2;
+    INT8U value = 3;
   }
 
   attribute(readonly, reportable) int8u sceneCount = 0;
