@@ -35,7 +35,10 @@
 
   {{else}}
     {{container}} =
-    {{#if_chip_enum type}}
+    {{~#if (chip_tests_variables_has definedValue)~}}
+    {{definedValue}};
+    {{else~}}
+    {{~#if_chip_enum type~}}
       static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});
     {{else if (isCharString type)}}
       chip::Span<const char>("{{definedValue}}garbage: not in length on purpose", {{utf8StringLength definedValue}});
@@ -49,6 +52,8 @@
       {{else}}
       {{asTypedLiteral definedValue type}};
       {{/if_is_bitmap}}
-    {{/if_chip_enum}}
+    {{/if_chip_enum~}}
+    {{~/if~}}
+    
   {{/if_is_struct}}
 {{/if}}
