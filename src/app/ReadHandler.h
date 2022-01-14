@@ -217,10 +217,10 @@ private:
     uint16_t mMinIntervalFloorSeconds   = 0;
     uint16_t mMaxIntervalCeilingSeconds = 0;
     SessionHolder mSessionHandle;
-    // only for subscription, mHoldReport is set to true by current class when trying to refresh subscription sync timer, which
-    // would block report delivery within min interval, and it is set to false by current class after min interval which means it is
-    // allowed to send report with data. There is one exception situation, where if EventManagement/Report Engine needs to send
-    // urgent event, mHoldReport is also set as false, and the urgent event would be generated
+    // mHoldReport is used to prevent subscription data delivery while we are
+    // waiting for the min reporting interval to elapse.  If we have to send a 
+    // report immediately due to an urgent event being queued, 
+    // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
     bool mHoldReport         = false;
     bool mDirty              = false;
     bool mActiveSubscription = false;
