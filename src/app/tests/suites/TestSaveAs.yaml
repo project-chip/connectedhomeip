@@ -675,3 +675,125 @@ tests:
       attribute: "vendor_id"
       response:
           value: readAttributeVendorIdDefaultValue
+
+    # Tests for CHAR_STRING
+
+    - label: "Read attribute char_string Default Value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          saveAs: readAttributeCharStringDefaultValue
+          value: ""
+
+    - label:
+          "Read attribute char_string Default Value and compare to saved value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: readAttributeCharStringDefaultValue
+
+    - label: "Write attribute char_string Not Default Value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: "NotDefault"
+
+    - label: "Read attribute char_string Not Default Value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          saveAs: readAttributeCharStringNotDefaultValue
+          value: "NotDefault"
+          constraints:
+              notValue: readAttributeCharStringDefaultValue
+
+    - label:
+          "Read attribute char_string Not Default Value and compare to saved
+          value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: readAttributeCharStringNotDefaultValue
+          constraints:
+              notValue: readAttributeCharStringDefaultValue
+
+    - label: "Write attribute char_string Not Default Value from saved value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: readAttributeCharStringNotDefaultValue
+
+    - label:
+          "Read attribute char_string Not Default Value and compare to expected
+          value"
+      command: "readAttribute"
+      attribute: "char_string"
+      response:
+          value: "NotDefault"
+
+    - label: "Write attribute char_string Default Value"
+      command: "writeAttribute"
+      attribute: "char_string"
+      arguments:
+          value: readAttributeCharStringDefaultValue
+
+    # Tests for OCTET_STRING
+
+    - label: "Read attribute octet_string Default Value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          saveAs: readAttributeOctetStringDefaultValue
+          value: ""
+
+    - label:
+          "Read attribute octet_string Default Value and compare to saved value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: readAttributeOctetStringDefaultValue
+
+    - label: "Write attribute octet_string Not Default Value"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "NotDefault"
+
+    - label: "Read attribute octet_string Not Default Value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          saveAs: readAttributeOctetStringNotDefaultValue
+          value: "NotDefault"
+          constraints:
+              notValue: readAttributeOctetStringDefaultValue
+
+    - label:
+          "Read attribute octet_string Not Default Value and compare to saved
+          value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: readAttributeOctetStringNotDefaultValue
+          constraints:
+              notValue: readAttributeOctetStringDefaultValue
+
+    - label: "Write attribute octet_string Not Default Value from saved value"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: readAttributeOctetStringNotDefaultValue
+
+    - label:
+          "Read attribute octet_string Not Default Value and compare to expected
+          value"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "NotDefault"
+
+    - label: "Write attribute octet_string Default Value"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: readAttributeOctetStringDefaultValue
