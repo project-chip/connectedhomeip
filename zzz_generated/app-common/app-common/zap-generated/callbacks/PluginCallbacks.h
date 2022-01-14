@@ -65,10 +65,8 @@ void __attribute__((weak)) MatterOtaSoftwareUpdateRequestorPluginClientInitCallb
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
 void __attribute__((weak)) MatterLocalizationConfigurationPluginClientInitCallback() {}
 void MatterLocalizationConfigurationPluginServerInitCallback();
-void __attribute__((weak)) MatterLocalizationTimeFormatPluginClientInitCallback() {}
-void MatterLocalizationTimeFormatPluginServerInitCallback();
-void __attribute__((weak)) MatterLocalizationUnitPluginClientInitCallback() {}
-void MatterLocalizationUnitPluginServerInitCallback();
+void __attribute__((weak)) MatterTimeFormatLocalizationPluginClientInitCallback() {}
+void MatterTimeFormatLocalizationPluginServerInitCallback();
 void __attribute__((weak)) MatterPowerSourceConfigurationPluginClientInitCallback() {}
 void MatterPowerSourceConfigurationPluginServerInitCallback();
 void __attribute__((weak)) MatterPowerSourcePluginClientInitCallback() {}

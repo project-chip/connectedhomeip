@@ -371,13 +371,9 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            CHIPApplicationBasicClusterApplication * _Nonnull value;
-            value = [CHIPApplicationBasicClusterApplication new];
+            CHIPApplicationBasicClusterApplicationBasicApplication * _Nonnull value;
+            value = [CHIPApplicationBasicClusterApplicationBasicApplication new];
             value.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorId];
-            value.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorId];
-            value.applicationId = [[NSString alloc] initWithBytes:cppValue.applicationId.data()
-                                                           length:cppValue.applicationId.size()
-                                                         encoding:NSUTF8StringEncoding];
             value.applicationId = [[NSString alloc] initWithBytes:cppValue.applicationId.data()
                                                            length:cppValue.applicationId.size()
                                                          encoding:NSUTF8StringEncoding];
@@ -2889,12 +2885,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                               length:entry_0.label.size()
                                                             encoding:NSUTF8StringEncoding];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
-                newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                              length:entry_0.value.size()
-                                                            encoding:NSUTF8StringEncoding];
                 newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
                                                               length:entry_0.value.size()
                                                             encoding:NSUTF8StringEncoding];
@@ -3992,6 +3982,52 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             }
             NSNumber * _Nonnull value;
             value = [NSNumber numberWithUnsignedShort:cppValue];
+            return value;
+        }
+        default:
+            *aError = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+            break;
+        }
+        break;
+    }
+    case Clusters::LocalizationConfiguration::Id: {
+        using namespace Clusters::LocalizationConfiguration;
+        switch (aPath.mAttributeId) {
+        case Attributes::ActiveLocale::Id: {
+            using TypeInfo = Attributes::ActiveLocale::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSString * _Nonnull value;
+            value = [[NSString alloc] initWithBytes:cppValue.data() length:cppValue.size() encoding:NSUTF8StringEncoding];
+            return value;
+        }
+        case Attributes::SupportedLocales::Id: {
+            using TypeInfo = Attributes::SupportedLocales::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSArray * _Nonnull value;
+            auto * array_0 = [NSMutableArray new];
+            auto iter_0 = cppValue.begin();
+            while (iter_0.Next()) {
+                auto & entry_0 = iter_0.GetValue();
+                NSString * newElement_0;
+                newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
+                [array_0 addObject:newElement_0];
+            }
+            { // Scope for the error so we will know what it's named
+                CHIP_ERROR err = iter_0.GetStatus();
+                if (err != CHIP_NO_ERROR) {
+                    *aError = err;
+                    return nil;
+                }
+            }
+            value = array_0;
             return value;
         }
         default:
@@ -8806,12 +8842,6 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 newElement_0 = [CHIPUserLabelClusterLabelStruct new];
                 newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                               length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
-                newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                              length:entry_0.label.size()
-                                                            encoding:NSUTF8StringEncoding];
-                newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                              length:entry_0.value.size()
                                                             encoding:NSUTF8StringEncoding];
                 newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
                                                               length:entry_0.value.size()

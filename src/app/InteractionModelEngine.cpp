@@ -46,13 +46,6 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
     mReportingEngine.Init();
 
-    for (uint32_t index = 0; index < CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS - 1; index++)
-    {
-        mClusterInfoPool[index].mpNext = &mClusterInfoPool[index + 1];
-    }
-    mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS - 1].mpNext = nullptr;
-    mpNextAvailableClusterInfo                                      = mClusterInfoPool;
-
     mMagic++;
 
     return CHIP_NO_ERROR;
@@ -132,12 +125,7 @@ void InteractionModelEngine::Shutdown()
 
     mReportingEngine.Shutdown();
 
-    for (uint32_t index = 0; index < CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS; index++)
-    {
-        mClusterInfoPool[index].mpNext = nullptr;
-    }
-
-    mpNextAvailableClusterInfo = nullptr;
+    mClusterInfoPool.ReleaseAll();
 
     mpExchangeMgr->UnregisterUnsolicitedMessageHandlerForProtocol(Protocols::InteractionModel::Id);
 }
@@ -515,57 +503,29 @@ bool InteractionModelEngine::InActiveReadClientList(ReadClient * apReadClient)
 
 void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
 {
-    ClusterInfo * lastClusterInfo = aClusterInfo;
-    if (lastClusterInfo == nullptr)
+    ClusterInfo * current = aClusterInfo;
+    while (current != nullptr)
     {
-        return;
+        ClusterInfo * next = current->mpNext;
+        mClusterInfoPool.ReleaseObject(current);
+        current = next;
     }
 
-    while (lastClusterInfo != nullptr && lastClusterInfo->mpNext != nullptr)
-    {
-        lastClusterInfo = lastClusterInfo->mpNext;
-    }
-    lastClusterInfo->mpNext    = mpNextAvailableClusterInfo;
-    mpNextAvailableClusterInfo = aClusterInfo;
-    aClusterInfo               = nullptr;
+    aClusterInfo = nullptr;
 }
 
 CHIP_ERROR InteractionModelEngine::PushFront(ClusterInfo *& aClusterInfoList, ClusterInfo & aClusterInfo)
 {
-    ClusterInfo * last = aClusterInfoList;
-    if (mpNextAvailableClusterInfo == nullptr)
+    ClusterInfo * clusterInfo = mClusterInfoPool.CreateObject();
+    if (clusterInfo == nullptr)
     {
         ChipLogError(InteractionModel, "ClusterInfo pool full, cannot handle more entries!");
         return CHIP_ERROR_NO_MEMORY;
     }
-    aClusterInfoList           = mpNextAvailableClusterInfo;
-    mpNextAvailableClusterInfo = mpNextAvailableClusterInfo->mpNext;
-    *aClusterInfoList          = aClusterInfo;
-    aClusterInfoList->mpNext   = last;
+    *clusterInfo        = aClusterInfo;
+    clusterInfo->mpNext = aClusterInfoList;
+    aClusterInfoList    = clusterInfo;
     return CHIP_NO_ERROR;
-}
-
-bool InteractionModelEngine::MergeOverlappedAttributePath(ClusterInfo * apAttributePathList, ClusterInfo & aAttributePath)
-{
-    ClusterInfo * runner = apAttributePathList;
-    while (runner != nullptr)
-    {
-        // If overlapped, we would skip this target path,
-        // --If targetPath is part of previous path, return true
-        // --If previous path is part of target path, update filedid and listindex and mflags with target path, return true
-        if (runner->IsAttributePathSupersetOf(aAttributePath))
-        {
-            return true;
-        }
-        if (aAttributePath.IsAttributePathSupersetOf(*runner))
-        {
-            runner->mListIndex   = aAttributePath.mListIndex;
-            runner->mAttributeId = aAttributePath.mAttributeId;
-            return true;
-        }
-        runner = runner->mpNext;
-    }
-    return false;
 }
 
 bool InteractionModelEngine::IsOverlappedAttributePath(ClusterInfo & aAttributePath)

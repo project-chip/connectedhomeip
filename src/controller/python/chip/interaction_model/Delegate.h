@@ -30,6 +30,7 @@ namespace Controller {
 
 // The command status will be used for python script.
 // use packed attribute so we can unpack it from python and no need to worry about padding.
+// This struct needs to match the IMCommandStatus definition in delegate.py
 struct __attribute__((packed)) CommandStatus
 {
     Protocols::InteractionModel::Status status;
@@ -43,7 +44,7 @@ struct __attribute__((packed)) CommandStatus
 static_assert(std::is_same<chip::EndpointId, uint16_t>::value && std::is_same<chip::ClusterId, uint32_t>::value &&
                   std::is_same<chip::CommandId, uint32_t>::value,
               "Members in CommandStatus does not match interaction_model/delegate.py");
-static_assert(sizeof(CommandStatus) == 2 + 1 + 2 + 4 + 4 + 1, "Size of CommandStatus might contain padding");
+static_assert(sizeof(CommandStatus) == 1 + 1 + 2 + 4 + 4 + 1, "Size of CommandStatus might contain padding");
 
 struct __attribute__((packed)) AttributePath
 {
@@ -57,6 +58,7 @@ static_assert(std::is_same<chip::EndpointId, uint16_t>::value && std::is_same<ch
               "Members in AttributePath does not match interaction_model/delegate.py");
 static_assert(sizeof(AttributePath) == 2 + 4 + 4, "AttributePath might contain padding");
 
+// This struct needs to match the IMWriteStatus definition in delegate.py
 struct __attribute__((packed)) AttributeWriteStatus
 {
     chip::NodeId nodeId;
@@ -69,7 +71,7 @@ struct __attribute__((packed)) AttributeWriteStatus
 static_assert(std::is_same<chip::EndpointId, uint16_t>::value && std::is_same<chip::ClusterId, uint32_t>::value &&
                   std::is_same<chip::FieldId, uint32_t>::value,
               "Members in AttributeWriteStatus does not match interaction_model/delegate.py");
-static_assert(sizeof(AttributeWriteStatus) == 8 + 8 + 2 + 2 + 4 + 4, "Size of AttributeWriteStatus might contain padding");
+static_assert(sizeof(AttributeWriteStatus) == 8 + 8 + 1 + 2 + 4 + 4, "Size of AttributeWriteStatus might contain padding");
 
 extern "C" {
 typedef void (*PythonInteractionModelDelegate_OnCommandResponseStatusCodeReceivedFunct)(uint64_t commandSenderPtr,

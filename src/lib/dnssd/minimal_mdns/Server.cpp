@@ -189,10 +189,7 @@ ServerBase::~ServerBase()
 
 void ServerBase::Shutdown()
 {
-    mEndpoints.ForEachActiveObject([&](auto * endpoint) {
-        ShutdownEndpoint(*endpoint);
-        return chip::Loop::Continue;
-    });
+    mEndpoints.ReleaseAll();
 }
 
 void ServerBase::ShutdownEndpoint(EndpointInfo & aEndpoint)

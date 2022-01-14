@@ -17,7 +17,8 @@
  */
 
 #include "ContentLauncherManager.h"
-
+#include "TvApp-JNI.h"
+#include <app-common/zap-generated/ids/Clusters.h>
 #include <jni.h>
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/CHIPJNIError.h>
@@ -28,21 +29,23 @@ using namespace std;
 using namespace chip;
 using namespace chip::app::Clusters::ContentLauncher;
 
-ContentLauncherManager ContentLauncherManager::sInstance;
-
-namespace {
-static ContentLauncherManager contentLauncherManager;
-} // namespace
-
 void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "TV Linux App: ContentLauncher::SetDelegate");
-    chip::app::Clusters::ContentLauncher::SetDelegate(endpoint, &contentLauncherManager);
+    ChipLogProgress(Zcl, "TV Android App: ContentLauncher::PostClusterInit");
+    TvAppJNIMgr().PostClusterInit(chip::app::Clusters::ContentLauncher::Id, endpoint);
 }
 
-Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip::EndpointId endpointId,
-                                                                           const std::list<Parameter> & parameterList,
-                                                                           bool autoplay, const chip::CharSpan & data)
+void ContentLauncherManager::NewManager(jint endpoint, jobject manager)
+{
+    ChipLogProgress(Zcl, "TV Android App: ContentLauncher::SetDefaultDelegate");
+    ContentLauncherManager * mgr = new ContentLauncherManager();
+    mgr->InitializeWithObjects(manager);
+    chip::app::Clusters::ContentLauncher::SetDelegate(static_cast<EndpointId>(endpoint), mgr);
+}
+
+void ContentLauncherManager::HandleLaunchContent(
+    const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
+    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
 {
     Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -59,8 +62,8 @@ Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip:
         // Todo: make parameterList java
         jobjectArray parameterArray = nullptr;
 
-        jobject resp =
-            env->CallObjectMethod(mContentLauncherManagerObject, mLaunchContentMethod, parameterArray, autoplay, jData.jniValue());
+        jobject resp = env->CallObjectMethod(mContentLauncherManagerObject, mLaunchContentMethod, parameterArray,
+                                             static_cast<jboolean>(autoplay), jData.jniValue());
         if (env->ExceptionCheck())
         {
             ChipLogError(Zcl, "Java exception in ContentLauncherManager::LaunchContent");
@@ -83,6 +86,8 @@ Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchContent(chip:
 
         response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = dataStr.charSpan();
+
+        err = responser.Success(response);
     }
 
 exit:
@@ -90,13 +95,12 @@ exit:
     {
         ChipLogError(Zcl, "ContentLauncherManager::LaunchContent status error: %s", err.AsString());
     }
-
-    return response;
 }
 
-Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchUrl(const chip::CharSpan & contentUrl,
-                                                                       const chip::CharSpan & displayString,
-                                                                       const std::list<BrandingInformation> & brandingInformation)
+void ContentLauncherManager::HandleLaunchUrl(
+    const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+    const std::list<BrandingInformation> & brandingInformation,
+    chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> & responser)
 {
     Commands::LaunchResponse::Type response;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -138,6 +142,8 @@ Commands::LaunchResponse::Type ContentLauncherManager::HandleLaunchUrl(const chi
 
         response.status = static_cast<chip::app::Clusters::ContentLauncher::StatusEnum>(status);
         response.data   = dataStr.charSpan();
+
+        err = responser.Success(response);
     }
 
 exit:
@@ -145,11 +151,9 @@ exit:
     {
         ChipLogError(Zcl, "ContentLauncherManager::LaunchUrl status error: %s", err.AsString());
     }
-
-    return response;
 }
 
-std::list<std::string> ContentLauncherManager::HandleGetAcceptHeaderList()
+CHIP_ERROR ContentLauncherManager::HandleGetAcceptHeaderList(chip::app::AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
@@ -160,7 +164,7 @@ std::list<std::string> ContentLauncherManager::HandleGetAcceptHeaderList()
     VerifyOrExit(mGetAcceptHeaderMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    {
+    return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jobjectArray acceptedHeadersArray =
             (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetAcceptHeaderMethod);
         if (env->ExceptionCheck())
@@ -168,20 +172,19 @@ std::list<std::string> ContentLauncherManager::HandleGetAcceptHeaderList()
             ChipLogError(Zcl, "Java exception in ContentLauncherManager::GetAcceptHeader");
             env->ExceptionDescribe();
             env->ExceptionClear();
-            err = CHIP_ERROR_INCORRECT_STATE;
-            goto exit;
+            return CHIP_ERROR_INCORRECT_STATE;
         }
 
         jint size = env->GetArrayLength(acceptedHeadersArray);
         for (int i = 0; i < size; i++)
         {
-
-            jstring jAcceptedHeader     = (jstring) env->GetObjectArrayElement(acceptedHeadersArray, i);
-            const char * convertedValue = (env)->GetStringUTFChars(jAcceptedHeader, JNI_FALSE);
-            std::string acceptedHeader  = std::string(convertedValue, strlen(convertedValue));
-            acceptedHeadersList.push_front(acceptedHeader);
+            jstring jAcceptedHeader = (jstring) env->GetObjectArrayElement(acceptedHeadersArray, i);
+            JniUtfString acceptedHeader(env, jAcceptedHeader);
+            ReturnErrorOnFailure(encoder.Encode(acceptedHeader.charSpan()));
         }
-    }
+
+        return CHIP_NO_ERROR;
+    });
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -189,7 +192,7 @@ exit:
         ChipLogError(Zcl, "ContentLauncherManager::GetAcceptHeader status error: %s", err.AsString());
     }
 
-    return acceptedHeadersList;
+    return err;
 }
 
 uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
@@ -204,8 +207,8 @@ uint32_t ContentLauncherManager::HandleGetSupportedStreamingProtocols()
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     {
-        jint jSupportedStreamingProtocols =
-            env->CallIntMethod(mContentLauncherManagerObject, mGetSupportedStreamingProtocolsMethod);
+        jlong jSupportedStreamingProtocols =
+            env->CallLongMethod(mContentLauncherManagerObject, mGetSupportedStreamingProtocolsMethod);
         supportedStreamingProtocols = (uint32_t) jSupportedStreamingProtocols;
         if (env->ExceptionCheck())
         {
@@ -244,7 +247,7 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
         env->ExceptionClear();
     }
 
-    mGetSupportedStreamingProtocolsMethod = env->GetMethodID(ContentLauncherClass, "getSupportedStreamingProtocols", "()[I");
+    mGetSupportedStreamingProtocolsMethod = env->GetMethodID(ContentLauncherClass, "getSupportedStreamingProtocols", "()J");
     if (mGetSupportedStreamingProtocolsMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ContentLauncherManager 'getSupportedStreamingProtocols' method");
@@ -253,7 +256,7 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
 
     mLaunchContentMethod = env->GetMethodID(
         ContentLauncherClass, "launchContent",
-        "([Lcom/tcl/chip/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/tcl/chip/tvapp/LaunchResponse;");
+        "([Lcom/tcl/chip/tvapp/ContentLaunchSearchParameter;ZLjava/lang/String;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
     if (mLaunchContentMethod == nullptr)
     {
         ChipLogError(Zcl, "Failed to access ContentLauncherManager 'launchContent' method");
@@ -262,7 +265,7 @@ void ContentLauncherManager::InitializeWithObjects(jobject managerObject)
 
     mLaunchUrlMethod = env->GetMethodID(ContentLauncherClass, "launchUrl",
                                         "(Ljava/lang/String;Ljava/lang/String;Lcom/tcl/chip/tvapp/"
-                                        "ContentLaunchBrandingInformation;)Lcom/tcl/chip/tvapp/LaunchResponse;");
+                                        "ContentLaunchBrandingInformation;)Lcom/tcl/chip/tvapp/ContentLaunchResponse;");
     if (mLaunchUrlMethod == nullptr)
     {
         ChipLogError(AppServer, "Failed to access 'launchUrl' method");

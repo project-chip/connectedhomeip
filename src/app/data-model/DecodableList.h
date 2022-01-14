@@ -38,6 +38,12 @@ template <typename T>
 class DecodableList
 {
 public:
+    DecodableList()
+    {
+        // Init to an empty list.
+        mReader.Init(nullptr, 0);
+    }
+
     /*
      * @brief
      *

@@ -179,7 +179,7 @@ CHIP_ERROR ApplicationBasicAttrAccess::ReadProductIdAttribute(app::AttributeValu
 
 CHIP_ERROR ApplicationBasicAttrAccess::ReadApplicationAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    Structs::Application::Type application = delegate->HandleGetApplication();
+    Structs::ApplicationBasicApplication::Type application = delegate->HandleGetApplication();
     return aEncoder.Encode(application);
 }
 

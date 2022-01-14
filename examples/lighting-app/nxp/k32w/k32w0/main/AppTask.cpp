@@ -124,12 +124,7 @@ CHIP_ERROR AppTask::Init()
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
-    // Set server instance used for session establishment
-    chip::Server * server = &(chip::Server::GetInstance());
-    gRequestorCore.SetServerInstance(server);
-
-    // Connect the Requestor and Requestor Driver objects
-    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
+    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
     gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
@@ -143,8 +138,6 @@ CHIP_ERROR AppTask::Init()
 
     // Connect the gDownloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-
-    gRequestorCore.SetBDXDownloader(&gDownloader);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 
     // QR code will be used with CHIP Tool

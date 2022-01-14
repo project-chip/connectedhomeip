@@ -127,190 +127,147 @@ struct AccessControlEntryCodec
         return CHIP_NO_ERROR;
     }
 
+    static CHIP_ERROR Convert(const AccessControl::Entry::Target & from, AccessControlCluster::Structs::Target::Type & to)
+    {
+        if (from.flags & AccessControl::Entry::Target::kCluster)
+        {
+            to.cluster.SetNonNull(from.cluster);
+        }
+        else
+        {
+            to.cluster.SetNull();
+        }
+        if (from.flags & AccessControl::Entry::Target::kEndpoint)
+        {
+            to.endpoint.SetNonNull(from.endpoint);
+        }
+        else
+        {
+            to.endpoint.SetNull();
+        }
+        if (from.flags & AccessControl::Entry::Target::kDeviceType)
+        {
+            to.deviceType.SetNonNull(from.deviceType);
+        }
+        else
+        {
+            to.deviceType.SetNull();
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    static CHIP_ERROR Convert(const AccessControlCluster::Structs::Target::Type & from, AccessControl::Entry::Target & to)
+    {
+        to.flags = 0;
+        if (!from.cluster.IsNull())
+        {
+            to.flags |= AccessControl::Entry::Target::kCluster;
+            to.cluster = from.cluster.Value();
+        }
+        if (!from.endpoint.IsNull())
+        {
+            to.flags |= AccessControl::Entry::Target::kEndpoint;
+            to.endpoint = from.endpoint.Value();
+        }
+        if (!from.deviceType.IsNull())
+        {
+            to.flags |= AccessControl::Entry::Target::kDeviceType;
+            to.deviceType = from.deviceType.Value();
+        }
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR Encode(TLV::TLVWriter & aWriter, TLV::Tag aTag) const
     {
-        TLV::TLVType accessControlEntryContainer;
-        ReturnErrorOnFailure(aWriter.StartContainer(aTag, TLV::kTLVType_Structure, accessControlEntryContainer));
-        using Fields = AccessControlCluster::Structs::AccessControlEntry::Fields;
-        {
-            FabricIndex fabricIndex;
-            ReturnErrorOnFailure(entry.GetFabricIndex(fabricIndex));
-            ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(to_underlying(Fields::kFabricIndex)), fabricIndex));
-        }
+        AccessControlCluster::Structs::AccessControlEntry::Type staging;
+
+        ReturnErrorOnFailure(entry.GetFabricIndex(staging.fabricIndex));
+
         {
             Privilege privilege;
             ReturnErrorOnFailure(entry.GetPrivilege(privilege));
-            AccessControlCluster::Privilege privilegeTemp;
-            ReturnErrorOnFailure(Convert(privilege, privilegeTemp));
-            ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(to_underlying(Fields::kPrivilege)), privilegeTemp));
+            ReturnErrorOnFailure(Convert(privilege, staging.privilege));
         }
+
         {
             AuthMode authMode;
             ReturnErrorOnFailure(entry.GetAuthMode(authMode));
-            AccessControlCluster::AuthMode authModeTemp;
-            ReturnErrorOnFailure(Convert(authMode, authModeTemp));
-            ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(to_underlying(Fields::kAuthMode)), authModeTemp));
+            ReturnErrorOnFailure(Convert(authMode, staging.authMode));
         }
+
+        NodeId subjectBuffer[CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY];
+        size_t subjectCount;
+        ReturnErrorOnFailure(entry.GetSubjectCount(subjectCount));
+        if (subjectCount > 0)
         {
-            size_t count = 0;
-            ReturnErrorOnFailure(entry.GetSubjectCount(count));
-            if (count > 0)
+            for (size_t i = 0; i < subjectCount; ++i)
             {
-                TLV::TLVType subjectsContainer;
-                ReturnErrorOnFailure(aWriter.StartContainer(TLV::ContextTag(to_underlying(Fields::kSubjects)), TLV::kTLVType_Array,
-                                                            subjectsContainer));
-                for (size_t i = 0; i < count; ++i)
-                {
-                    NodeId subject;
-                    ReturnErrorOnFailure(entry.GetSubject(i, subject));
-                    ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::AnonymousTag(), subject));
-                }
-                ReturnErrorOnFailure(aWriter.EndContainer(subjectsContainer));
+                ReturnErrorOnFailure(entry.GetSubject(i, subjectBuffer[i]));
             }
+            staging.subjects.SetNonNull(subjectBuffer, subjectCount);
         }
+
+        AccessControlCluster::Structs::Target::Type targetBuffer[CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY];
+        size_t targetCount;
+        ReturnErrorOnFailure(entry.GetTargetCount(targetCount));
+        if (targetCount > 0)
         {
-            size_t count = 0;
-            ReturnErrorOnFailure(entry.GetTargetCount(count));
-            if (count > 0)
+            for (size_t i = 0; i < targetCount; ++i)
             {
-                TLV::TLVType targetsContainer;
-                ReturnErrorOnFailure(aWriter.StartContainer(TLV::ContextTag(to_underlying(Fields::kTargets)), TLV::kTLVType_Array,
-                                                            targetsContainer));
-                using TargetFields = AccessControlCluster::Structs::Target::Fields;
-                for (size_t i = 0; i < count; ++i)
-                {
-                    TLV::TLVType targetContainer;
-                    ReturnErrorOnFailure(aWriter.StartContainer(TLV::AnonymousTag(), TLV::kTLVType_Structure, targetContainer));
-                    AccessControl::Entry::Target target;
-                    ReturnErrorOnFailure(entry.GetTarget(i, target));
-                    if (target.flags & AccessControl::Entry::Target::kCluster)
-                    {
-                        ReturnErrorOnFailure(
-                            DataModel::Encode(aWriter, TLV::ContextTag(to_underlying(TargetFields::kCluster)), target.cluster));
-                    }
-                    if (target.flags & AccessControl::Entry::Target::kEndpoint)
-                    {
-                        ReturnErrorOnFailure(
-                            DataModel::Encode(aWriter, TLV::ContextTag(to_underlying(TargetFields::kEndpoint)), target.endpoint));
-                    }
-                    if (target.flags & AccessControl::Entry::Target::kDeviceType)
-                    {
-                        ReturnErrorOnFailure(DataModel::Encode(aWriter, TLV::ContextTag(to_underlying(TargetFields::kDeviceType)),
-                                                               target.deviceType));
-                    }
-                    ReturnErrorOnFailure(aWriter.EndContainer(targetContainer));
-                }
-                ReturnErrorOnFailure(aWriter.EndContainer(targetsContainer));
+                AccessControl::Entry::Target target;
+                ReturnErrorOnFailure(entry.GetTarget(i, target));
+                ReturnErrorOnFailure(Convert(target, targetBuffer[i]));
             }
+            staging.targets.SetNonNull(targetBuffer, targetCount);
         }
-        ReturnErrorOnFailure(aWriter.EndContainer(accessControlEntryContainer));
-        return CHIP_NO_ERROR;
+
+        return staging.Encode(aWriter, aTag);
     }
 
     CHIP_ERROR Decode(TLV::TLVReader & aReader)
     {
+        AccessControlCluster::Structs::AccessControlEntry::DecodableType staging;
+
+        ReturnErrorOnFailure(staging.Decode(aReader));
+
         ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        TLV::TLVType accessControlEntryContainer;
-        VerifyOrReturnError(TLV::kTLVType_Structure == aReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-        ReturnErrorOnFailure(aReader.EnterContainer(accessControlEntryContainer));
-        using Fields = AccessControlCluster::Structs::AccessControlEntry::Fields;
-        while ((err = aReader.Next()) == CHIP_NO_ERROR)
+
+        ReturnErrorOnFailure(entry.SetFabricIndex(staging.fabricIndex));
+
         {
-            VerifyOrReturnError(TLV::IsContextTag(aReader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-            switch (TLV::TagNumFromTag(aReader.GetTag()))
-            {
-            case to_underlying(Fields::kFabricIndex): {
-                chip::FabricIndex fabricIndex;
-                ReturnErrorOnFailure(DataModel::Decode(aReader, fabricIndex));
-                ReturnErrorOnFailure(entry.SetFabricIndex(fabricIndex));
-                break;
-            }
-            case to_underlying(Fields::kPrivilege): {
-                AccessControlCluster::Privilege privilegeTemp;
-                ReturnErrorOnFailure(DataModel::Decode(aReader, privilegeTemp));
-                Privilege privilege;
-                ReturnErrorOnFailure(Convert(privilegeTemp, privilege));
-                ReturnErrorOnFailure(entry.SetPrivilege(privilege));
-                break;
-            }
-            case to_underlying(Fields::kAuthMode): {
-                AccessControlCluster::AuthMode authModeTemp;
-                ReturnErrorOnFailure(DataModel::Decode(aReader, authModeTemp));
-                AuthMode authMode;
-                ReturnErrorOnFailure(Convert(authModeTemp, authMode));
-                ReturnErrorOnFailure(entry.SetAuthMode(authMode));
-                break;
-            }
-            case to_underlying(Fields::kSubjects): {
-                TLV::TLVType subjectsContainer;
-                VerifyOrReturnError(TLV::kTLVType_Array == aReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-                ReturnErrorOnFailure(aReader.EnterContainer(subjectsContainer));
-                while ((err = aReader.Next()) == CHIP_NO_ERROR)
-                {
-                    NodeId subject = kUndefinedNodeId;
-                    ReturnErrorOnFailure(DataModel::Decode(aReader, subject));
-                    ReturnErrorOnFailure(entry.AddSubject(nullptr, subject));
-                }
-                VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-                ReturnErrorOnFailure(aReader.ExitContainer(subjectsContainer));
-                break;
-            }
-            case to_underlying(Fields::kTargets): {
-                TLV::TLVType targetsContainer;
-                VerifyOrReturnError(TLV::kTLVType_Array == aReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-                ReturnErrorOnFailure(aReader.EnterContainer(targetsContainer));
-                while ((err = aReader.Next()) == CHIP_NO_ERROR)
-                {
-                    AccessControl::Entry::Target target;
-                    TLV::TLVType targetContainer;
-                    VerifyOrReturnError(TLV::kTLVType_Structure == aReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-                    ReturnErrorOnFailure(aReader.EnterContainer(targetContainer));
-                    using TargetFields = AccessControlCluster::Structs::Target::Fields;
-                    while ((err = aReader.Next()) == CHIP_NO_ERROR)
-                    {
-                        VerifyOrReturnError(TLV::IsContextTag(aReader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-                        switch (TLV::TagNumFromTag(aReader.GetTag()))
-                        {
-                        case to_underlying(TargetFields::kCluster):
-                            if (aReader.GetType() != TLV::kTLVType_Null)
-                            {
-                                ReturnErrorOnFailure(DataModel::Decode(aReader, target.cluster));
-                                target.flags |= target.kCluster;
-                            }
-                            break;
-                        case to_underlying(TargetFields::kEndpoint):
-                            if (aReader.GetType() != TLV::kTLVType_Null)
-                            {
-                                ReturnErrorOnFailure(DataModel::Decode(aReader, target.endpoint));
-                                target.flags |= target.kEndpoint;
-                            }
-                            break;
-                        case to_underlying(TargetFields::kDeviceType):
-                            if (aReader.GetType() != TLV::kTLVType_Null)
-                            {
-                                ReturnErrorOnFailure(DataModel::Decode(aReader, target.deviceType));
-                                target.flags |= target.kDeviceType;
-                            }
-                            break;
-                        default:
-                            break;
-                        }
-                    }
-                    VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-                    ReturnErrorOnFailure(aReader.ExitContainer(targetContainer));
-                    ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
-                }
-                VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-                ReturnErrorOnFailure(aReader.ExitContainer(targetsContainer));
-                break;
-            }
-            default:
-                break;
-            }
+            Privilege privilege;
+            ReturnErrorOnFailure(Convert(staging.privilege, privilege));
+            ReturnErrorOnFailure(entry.SetPrivilege(privilege));
         }
-        VerifyOrReturnError(err == CHIP_END_OF_TLV, err);
-        ReturnErrorOnFailure(aReader.ExitContainer(accessControlEntryContainer));
+
+        {
+            AuthMode authMode;
+            ReturnErrorOnFailure(Convert(staging.authMode, authMode));
+            ReturnErrorOnFailure(entry.SetAuthMode(authMode));
+        }
+
+        if (!staging.subjects.IsNull())
+        {
+            auto iterator = staging.subjects.Value().begin();
+            while (iterator.Next())
+            {
+                ReturnErrorOnFailure(entry.AddSubject(nullptr, iterator.GetValue()));
+            }
+            ReturnErrorOnFailure(iterator.GetStatus());
+        }
+
+        if (!staging.targets.IsNull())
+        {
+            auto iterator = staging.targets.Value().begin();
+            while (iterator.Next())
+            {
+                AccessControl::Entry::Target target;
+                ReturnErrorOnFailure(Convert(iterator.GetValue(), target));
+                ReturnErrorOnFailure(entry.AddTarget(nullptr, target));
+            }
+            ReturnErrorOnFailure(iterator.GetStatus());
+        }
+
         return CHIP_NO_ERROR;
     }
 

@@ -120,12 +120,12 @@ private:
     bool mNodeIdRequested             = false;
 
     // These fields allow us to release the string/byte array memory later.
-    jstring ssidStr;
-    jstring passwordStr;
-    const char * ssid;
-    const char * password;
-    jbyteArray operationalDatasetBytes;
-    jbyte * operationalDataset;
+    jstring ssidStr                    = nullptr;
+    jstring passwordStr                = nullptr;
+    const char * ssid                  = nullptr;
+    const char * password              = nullptr;
+    jbyteArray operationalDatasetBytes = nullptr;
+    jbyte * operationalDataset         = nullptr;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller))
     {

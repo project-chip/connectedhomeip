@@ -31,6 +31,9 @@ declare_args() {
 
   # Enable metrics collection.
   chip_system_config_provide_statistics = true
+
+  # Use OpenThread UDP stack directly
+  chip_system_config_use_open_thread_udp = false
 }
 
 declare_args() {

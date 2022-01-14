@@ -318,7 +318,7 @@
 #define GENERATED_FUNCTION_ARRAYS
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 60
+#define GENERATED_CLUSTER_COUNT 61
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0003, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL }, /* Endpoint: 1, Cluster: Identify (client) */    \
@@ -351,6 +351,9 @@
             {                                                                                                                      \
                 0x002A, ZAP_ATTRIBUTE_INDEX(13), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: OTA Software Update Requestor (client) */                                                  \
+            {                                                                                                                      \
+                0x002B, ZAP_ATTRIBUTE_INDEX(14), 0, 0, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Localization Configuration (client) */                                                     \
             {                                                                                                                      \
                 0x002E, ZAP_ATTRIBUTE_INDEX(14), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Power Source Configuration (client) */                                                     \
@@ -494,7 +497,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 60, 138 },                                                                                         \
+        { ZAP_CLUSTER_INDEX(0), 61, 138 },                                                                                         \
     }
 
 // Largest attribute size is needed for various buffers

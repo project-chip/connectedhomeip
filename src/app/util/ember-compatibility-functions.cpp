@@ -369,34 +369,31 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
                   " (expanded=%d)",
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId), aPath.mExpanded);
 
+    // Check attribute existence. This includes attributes with registered metadata, but also specially handled
+    // mandatory global attributes (which just check for cluster on endpoint).
+
+    EmberAfCluster * attributeCluster            = nullptr;
+    EmberAfAttributeMetadata * attributeMetadata = nullptr;
+
     if (aPath.mAttributeId == Clusters::Globals::Attributes::AttributeList::Id)
     {
-        // This is not in our attribute metadata, so we just check for this
-        // endpoint+cluster existing.
-        EmberAfCluster * cluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
-        if (cluster)
-        {
-            AttributeListReader reader(cluster);
-            bool ignored; // Our reader always tries to encode
-            return ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState, &reader,
-                                          &ignored);
-        }
-
-        // else to save codesize just fall through and do the metadata search
-        // (which we know will fail and error out);
+        attributeCluster = emberAfFindCluster(aPath.mEndpointId, aPath.mClusterId, CLUSTER_MASK_SERVER);
+    }
+    else
+    {
+        attributeMetadata =
+            emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER);
     }
 
-    EmberAfAttributeMetadata * attributeMetadata =
-        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
-
-    if (attributeMetadata == nullptr)
+    if (attributeCluster == nullptr && attributeMetadata == nullptr)
     {
         AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
         ReturnErrorOnFailure(aAttributeReports.GetError());
-
-        // This path is not actually supported.
         return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
     }
+
+    // Check access control. A failed check will disallow the operation, and may or may not generate an attribute report
+    // depending on whether the path was expanded.
 
     {
         Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
@@ -419,19 +416,25 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
         }
     }
 
-    // Value encoder will encode the whole AttributeReport, including the path, value and the version.
-    // The AttributeValueEncoder may encode more than one AttributeReportIB for the list chunking feature.
-    if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
-    {
-        bool triedEncode;
-        ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState,
-                                                    attrOverride, &triedEncode));
+    // Read attribute using attribute override, if appropriate. This includes registered overrides, but also
+    // specially handled mandatory global attributes (which use unregistered overrides).
 
-        if (triedEncode)
+    {
+        // Special handling for mandatory global attributes: these are always for attribute list, using a special
+        // reader (which can be lightweight constructed even from nullptr).
+        AttributeListReader reader(attributeCluster);
+        AttributeAccessInterface * attributeOverride =
+            (attributeCluster != nullptr) ? &reader : findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
+        if (attributeOverride)
         {
-            return CHIP_NO_ERROR;
+            bool triedEncode;
+            ReturnErrorOnFailure(ReadViaAccessInterface(aSubjectDescriptor.fabricIndex, aPath, aAttributeReports, apEncoderState,
+                                                        attributeOverride, &triedEncode));
+            ReturnErrorCodeIf(triedEncode, CHIP_NO_ERROR);
         }
     }
+
+    // Read attribute using Ember, if it doesn't have an override.
 
     AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
     ReturnErrorOnFailure(aAttributeReports.GetError());
@@ -439,7 +442,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
     TLV::TLVWriter backup;
     attributeReport.Checkpoint(backup);
 
-    // We have verified that the attribute exists.
     AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
@@ -460,7 +462,6 @@ CHIP_ERROR ReadSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, c
     record.clusterId          = aPath.mClusterId;
     record.clusterMask        = CLUSTER_MASK_SERVER;
     record.attributeId        = aPath.mAttributeId;
-    record.manufacturerCode   = EMBER_AF_NULL_MANUFACTURER_CODE;
     EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &attributeMetadata, attributeData, sizeof(attributeData),
                                                          /* write = */ false);
 
@@ -834,7 +835,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     // happen when the above TODO is resolved.
     ConcreteDataAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
     const EmberAfAttributeMetadata * attributeMetadata =
-        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
+        emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER);
 
     AttributePathParams attributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 

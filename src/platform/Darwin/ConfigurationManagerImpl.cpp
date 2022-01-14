@@ -164,6 +164,18 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 #endif // TARGET_OS_OSX
 }
 
+CHIP_ERROR ConfigurationManagerImpl::GetActiveLocale(char * buf, size_t bufSize, size_t & codeLen)
+{
+    // TODO: read current active locale.
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreActiveLocale(const char * code, size_t codeLen)
+{
+    // TODO: write current active locale.
+    return CHIP_NO_ERROR;
+}
+
 bool ConfigurationManagerImpl::CanFactoryReset()
 {
     // TODO(#742): query the application to determine if factory reset is allowed.

@@ -26,13 +26,13 @@ jobs:
     # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     esp32:
         name: ESP32
-        timeout-minutes: 105
+        timeout-minutes: 70
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.5.40
+            image: connectedhomeip/chip-build-esp32:0.5.45
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -49,7 +49,7 @@ jobs:
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
             - name: Bootstrap
-              timeout-minutes: 25
+              timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
             - name: Uploading bootstrap logs
               uses: actions/upload-artifact@v2
@@ -99,18 +99,6 @@ jobs:
             - name: Build example Bridge App
               timeout-minutes: 10
               run: scripts/examples/esp_example.sh bridge-app
-            - name: Build example Persistent Storage App
-              timeout-minutes: 10
-              run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults
-            - name: Build example Shell App
-              timeout-minutes: 10
-              run: scripts/examples/esp_example.sh shell sdkconfig.defaults
-            - name: Build example Temperature Measurement App
-              timeout-minutes: 10
-              run: scripts/examples/esp_example.sh temperature-measurement-app sdkconfig.optimize.defaults
-            - name: Build example IPv6 Only App
-              timeout-minutes: 10
-              run: scripts/examples/esp_example.sh ipv6only-app sdkconfig.defaults
 
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
@@ -118,3 +106,58 @@ jobs:
               with:
                   name: Size,ESP32-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
                   path: /tmp/bloat_reports/
+
+    esp32_1:
+        name: ESP32_1
+        timeout-minutes: 60
+
+        runs-on: ubuntu-latest
+        if: github.actor != 'restyled-io[bot]'
+
+        container:
+            image: connectedhomeip/chip-build-esp32:0.5.40
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  submodules: true
+
+            - name: Bootstrap
+              timeout-minutes: 10
+              run: scripts/build/gn_bootstrap.sh
+
+            - name: Uploading bootstrap logs
+              uses: actions/upload-artifact@v2
+              if: ${{ always() }} && ${{ !env.ACT }}
+              with:
+                  name: bootstrap-logs
+                  path: |
+                   .environment/gn_out/.ninja_log
+                   .environment/pigweed-venv/*.log
+
+            - name: Build example Persistent Storage App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh persistent-storage sdkconfig.defaults
+
+            - name: Build example Shell App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh shell sdkconfig.defaults
+
+            - name: Build example Temperature Measurement App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh temperature-measurement-app sdkconfig.optimize.defaults
+
+            - name: Build example IPv6 Only App
+              timeout-minutes: 10
+              run: scripts/examples/esp_example.sh ipv6only-app sdkconfig.defaults
+
+            - name: Build example OTA Requestor App
+              run: scripts/examples/esp_example.sh ota-requestor-app sdkconfig.defaults
+              timeout-minutes: 10
+
+            - name: Build example OTA Provider App
+              run: scripts/examples/esp_example.sh ota-provider-app sdkconfig.defaults
+              timeout-minutes: 10

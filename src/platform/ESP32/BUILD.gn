@@ -20,7 +20,6 @@ assert(chip_device_platform == "esp32")
 
 static_library("ESP32") {
   sources = [
-    "../FreeRTOS/SystemTimeSupport.cpp",
     "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.h",
     "CHIPDevicePlatformConfig.h",
@@ -41,9 +40,11 @@ static_library("ESP32") {
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
     "LwIPCoreLock.cpp",
+    "NetworkCommissioningDriver.h",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemTimeSupport.cpp",
+    "SystemTimeSupport.h",
     "bluedroid/BLEManagerImpl.cpp",
     "nimble/BLEManagerImpl.cpp",
   ]
@@ -67,8 +68,7 @@ static_library("ESP32") {
   if (chip_enable_wifi) {
     sources += [
       "ConnectivityManagerImpl_WiFi.cpp",
-      "WiFiProvisioning.cpp",
-      "WiFiProvisioning.h",
+      "NetworkCommissioningWiFiDriver.cpp",
     ]
   }
 

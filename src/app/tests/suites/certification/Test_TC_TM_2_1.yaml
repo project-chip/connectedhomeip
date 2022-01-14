@@ -51,7 +51,6 @@ tests:
               maxValue: 32767
 
     - label: "read the optional attribute: Tolerance"
-      disabled: true
       optional: true
       command: "readAttribute"
       attribute: "Tolerance"

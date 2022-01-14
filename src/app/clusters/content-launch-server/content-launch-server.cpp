@@ -149,15 +149,7 @@ CHIP_ERROR ContentLauncherAttrAccess::Read(const app::ConcreteReadAttributePath 
 
 CHIP_ERROR ContentLauncherAttrAccess::ReadAcceptHeaderAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    std::list<std::string> acceptHeaderList = delegate->HandleGetAcceptHeaderList();
-    return aEncoder.EncodeList([acceptHeaderList](const auto & encoder) -> CHIP_ERROR {
-        for (const auto & acceptedHeader : acceptHeaderList)
-        {
-            CharSpan span(acceptedHeader.c_str(), acceptedHeader.length());
-            ReturnErrorOnFailure(encoder.Encode(span));
-        }
-        return CHIP_NO_ERROR;
-    });
+    return delegate->HandleGetAcceptHeaderList(aEncoder);
 }
 
 CHIP_ERROR ContentLauncherAttrAccess::ReadSupportedStreamingProtocolsAttribute(app::AttributeValueEncoder & aEncoder,
@@ -185,20 +177,23 @@ bool emberAfContentLauncherClusterLaunchContentRequestCallback(
     // auto searchIterator = commandData.search.begin();
     std::list<Parameter> parameterList;
 
+    app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
+
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
-
     {
-        Commands::LaunchResponse::Type response = delegate->HandleLaunchContent(endpoint, parameterList, autoplay, data);
-        err                                     = commandObj->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleLaunchContent(parameterList, autoplay, data, responder);
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchContentRequestCallback error: %s", err.AsString());
+    }
 
+    // If isDelegateNull, no one will call responder, so HasSentResponse will be false
+    if (!responder.HasSentResponse())
+    {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
@@ -218,20 +213,23 @@ bool emberAfContentLauncherClusterLaunchURLRequestCallback(
     // auto brandingInformationIterator = commandData.brandingInformation.begin();
     std::list<BrandingInformation> brandingInformationList;
 
+    app::CommandResponseHelper<Commands::LaunchResponse::Type> responder(commandObj, commandPath);
+
     Delegate * delegate = GetDelegate(endpoint);
     VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
-
     {
-        Commands::LaunchResponse::Type response = delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList);
-        err                                     = commandObj->AddResponseData(commandPath, response);
-        SuccessOrExit(err);
+        delegate->HandleLaunchUrl(contentUrl, displayString, brandingInformationList, responder);
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchURLCallback error: %s", err.AsString());
+    }
 
+    // If isDelegateNull, no one will call responder, so HasSentResponse will be false
+    if (!responder.HasSentResponse())
+    {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 

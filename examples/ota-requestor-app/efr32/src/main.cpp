@@ -88,6 +88,48 @@ BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
 
 volatile int apperror_cnt;
+
+#include "platform/bootloader/api/application_properties.h"
+
+// Header used for building the image GBL file
+#define APP_PROPERTIES_VERSION 1
+#define APP_PROPERTIES_ID                                                                                                          \
+    {                                                                                                                              \
+        0                                                                                                                          \
+    }
+
+__attribute__((used)) ApplicationProperties_t sl_app_properties = {
+    /// @brief Magic value indicating that this is an ApplicationProperties_t
+    /// Must equal @ref APPLICATION_PROPERTIES_MAGIC
+    .magic = APPLICATION_PROPERTIES_MAGIC,
+
+    /// Version number of this struct
+    .structVersion = APPLICATION_PROPERTIES_VERSION,
+
+    /// Type of signature this application is signed with
+    .signatureType = APPLICATION_SIGNATURE_NONE,
+
+    /// Location of the signature. Typically a pointer to the end of application
+    .signatureLocation = 0,
+
+    /// Information about the application
+    .app = {
+
+      /// Bitfield representing type of application
+      /// e.g. @ref APPLICATION_TYPE_BLUETOOTH_APP
+      .type = APPLICATION_TYPE_ZIGBEE,
+
+      /// Version number for this application
+      .version = APP_PROPERTIES_VERSION,
+
+      /// Capabilities of this application
+      .capabilities = 0,
+
+      /// Unique ID (e.g. UUID/GUID) for the product this application is built for
+      .productId = APP_PROPERTIES_ID,
+    },
+};
+
 // ================================================================================
 // App Error
 //=================================================================================
@@ -172,12 +214,9 @@ int main(void)
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     SetRequestorInstance(&gRequestorCore);
 
-    // Set server instance used for session establishment
-    chip::Server * server = &(chip::Server::GetInstance());
-    gRequestorCore.SetServerInstance(server);
+    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
 
-    // Connect the Requestor and Requestor Driver objects
-    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     OTAImageProcessorParams ipParams;
     ipParams.imageFile = CharSpan("test.txt");
@@ -186,8 +225,6 @@ int main(void)
 
     // Connect the Downloader and Image Processor objects
     gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-
-    gRequestorCore.SetBDXDownloader(&gDownloader);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 
     EFR32_LOG("Starting Platform Manager Event Loop");

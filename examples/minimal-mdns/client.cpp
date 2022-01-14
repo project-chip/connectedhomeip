@@ -301,6 +301,8 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
     }
 }
 
+mdns::Minimal::Server<20> gMdnsServer;
+
 } // namespace
 
 int main(int argc, char ** args)
@@ -324,17 +326,16 @@ int main(int argc, char ** args)
 
     printf("Running...\n");
 
-    mdns::Minimal::Server<20> mdnsServer;
     ReportDelegate reporter;
     CHIP_ERROR err;
 
-    mdnsServer.SetDelegate(&reporter);
+    gMdnsServer.SetDelegate(&reporter);
 
     {
 
         MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
 
-        err = mdnsServer.Listen(chip::DeviceLayer::UDPEndPointManager(), &allInterfaces, gOptions.listenPort);
+        err = gMdnsServer.Listen(chip::DeviceLayer::UDPEndPointManager(), &allInterfaces, gOptions.listenPort);
         if (err != CHIP_NO_ERROR)
         {
             printf("Server failed to listen on all interfaces: %s\n", chip::ErrorStr(err));
@@ -342,11 +343,15 @@ int main(int argc, char ** args)
         }
     }
 
-    BroadcastPacket(&mdnsServer);
+    BroadcastPacket(&gMdnsServer);
 
     err = DeviceLayer::SystemLayer().StartTimer(
         chip::System::Clock::Milliseconds32(gOptions.runtimeMs),
         [](System::Layer *, void *) {
+            // Close all sockets BEFORE system layer is shut down, otherwise
+            // attempts to free UDP sockets with system layer down will segfault
+            gMdnsServer.Shutdown();
+
             DeviceLayer::PlatformMgr().StopEventLoopTask();
             DeviceLayer::PlatformMgr().Shutdown();
         },

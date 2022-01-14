@@ -39,6 +39,7 @@ TestCommand * GetTargetTest()
     if (test.get() == nullptr)
     {
         ChipLogError(chipTool, "Specified test command does not exist: %s", command);
+        PrintTestCommands();
         return nullptr;
     }
 

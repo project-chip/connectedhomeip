@@ -2182,12 +2182,6 @@ void CHIPFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * cont
         newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                       length:entry_0.label.size()
                                                     encoding:NSUTF8StringEncoding];
-        newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                      length:entry_0.label.size()
-                                                    encoding:NSUTF8StringEncoding];
-        newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                      length:entry_0.value.size()
-                                                    encoding:NSUTF8StringEncoding];
         newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
                                                       length:entry_0.value.size()
                                                     encoding:NSUTF8StringEncoding];
@@ -2906,6 +2900,45 @@ void CHIPLevelControlAttributeListListAttributeCallbackBridge::OnSuccessFn(
 void CHIPLevelControlAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPLevelControlAttributeListListAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSString * newElement_0;
+        newElement_0 = [[NSString alloc] initWithBytes:entry_0.data() length:entry_0.size() encoding:NSUTF8StringEncoding];
+        [array_0 addObject:newElement_0];
+    }
+    { // Scope for the error so we will know what it's named
+        CHIP_ERROR err = iter_0.GetStatus();
+        if (err != CHIP_NO_ERROR) {
+            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+            return;
+        }
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPLocalizationConfigurationSupportedLocalesListAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -4911,12 +4944,6 @@ void CHIPUserLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * conte
         newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                       length:entry_0.label.size()
                                                     encoding:NSUTF8StringEncoding];
-        newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
-                                                      length:entry_0.label.size()
-                                                    encoding:NSUTF8StringEncoding];
-        newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
-                                                      length:entry_0.value.size()
-                                                    encoding:NSUTF8StringEncoding];
         newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
                                                       length:entry_0.value.size()
                                                     encoding:NSUTF8StringEncoding];
@@ -5910,6 +5937,16 @@ void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPTestClusterClusterTestAddArgumentsResponseParams new];
     {
         response.returnValue = [NSNumber numberWithUnsignedChar:data.returnValue];
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPTestClusterClusterTestEmitTestEventResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & data)
+{
+    auto * response = [CHIPTestClusterClusterTestEmitTestEventResponseParams new];
+    {
+        response.value = [NSNumber numberWithUnsignedLongLong:data.value];
     }
     DispatchSuccess(context, response);
 };
@@ -7286,17 +7323,17 @@ void CHIPNullableOtaSoftwareUpdateRequestorClusterOTAUpdateStateEnumAttributeCal
     }
 }
 
-void CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LocalizationTimeFormat::CalendarType value)
+void CHIPTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TimeFormatLocalization::CalendarType value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -7310,8 +7347,8 @@ void CHIPLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionB
     }
 }
 
-void CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationTimeFormat::CalendarType> & value)
+void CHIPNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::CalendarType> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -7322,10 +7359,10 @@ void CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableTimeFormatLocalizationClusterCalendarTypeAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -7339,17 +7376,17 @@ void CHIPNullableLocalizationTimeFormatClusterCalendarTypeAttributeCallbackSubsc
     }
 }
 
-void CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LocalizationTimeFormat::HourFormat value)
+void CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::TimeFormatLocalization::HourFormat value)
 {
     NSNumber * _Nonnull objCValue;
     objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+void CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
-    auto * self = static_cast<CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }
@@ -7363,8 +7400,8 @@ void CHIPLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBri
     }
 }
 
-void CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationTimeFormat::HourFormat> & value)
+void CHIPNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::TimeFormatLocalization::HourFormat> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {
@@ -7375,62 +7412,10 @@ void CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackBridge:
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
+void CHIPNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
-    auto * self = static_cast<CHIPNullableLocalizationTimeFormatClusterHourFormatAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPLocalizationUnitClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::LocalizationUnit::TempUnit value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
-    if (!self->mQueue) {
-        return;
-    }
-
-    if (self->mEstablishedHandler != nil) {
-        dispatch_async(self->mQueue, self->mEstablishedHandler);
-        // On failure, mEstablishedHandler will be cleaned up by our destructor,
-        // but we can clean it up earlier on successful subscription
-        // establishment.
-        self->mEstablishedHandler = nil;
-    }
-}
-
-void CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::LocalizationUnit::TempUnit> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
-{
-    auto * self = static_cast<CHIPNullableLocalizationUnitClusterTempUnitAttributeCallbackSubscriptionBridge *>(context);
+    auto * self = static_cast<CHIPNullableTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge *>(context);
     if (!self->mQueue) {
         return;
     }

@@ -103,6 +103,9 @@ private:
     bool mSubscribedConns[CONFIG_BT_MAX_CONN];
     bt_gatt_notify_params mNotifyParams[CONFIG_BT_MAX_CONN];
     bt_conn_cb mConnCallbacks;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    PacketBufferHandle c3CharDataBufferHandle;
+#endif
 
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertising(void);
@@ -113,6 +116,9 @@ private:
     CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
     CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent * event);
     CHIP_ERROR HandleTXCharComplete(const ChipDeviceEvent * event);
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    CHIP_ERROR PrepareC3CharData();
+#endif
     bool IsSubscribed(bt_conn * conn);
     bool SetSubscribed(bt_conn * conn);
     bool UnsetSubscribed(bt_conn * conn);
@@ -139,6 +145,10 @@ public:
     static ssize_t HandleRXWrite(bt_conn * conn, const bt_gatt_attr * attr, const void * buf, uint16_t len, uint16_t offset,
                                  uint8_t flags);
     static ssize_t HandleTXCCCWrite(bt_conn * conn, const bt_gatt_attr * attr, uint16_t value);
+
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    static ssize_t HandleC3Read(struct bt_conn * conn, const struct bt_gatt_attr * attr, void * buf, uint16_t len, uint16_t offset);
+#endif
 };
 
 /**

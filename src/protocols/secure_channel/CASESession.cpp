@@ -38,6 +38,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/secure_channel/StatusReport.h>
 #include <system/TLVPacketBufferBackingStore.h>
+#include <trace/trace.h>
 #include <transport/PairingSession.h>
 #include <transport/SessionManager.h>
 
@@ -225,6 +226,7 @@ CHIP_ERROR CASESession::EstablishSession(const Transport::PeerAddress peerAddres
                                          uint16_t localSessionId, ExchangeContext * exchangeCtxt,
                                          SessionEstablishmentDelegate * delegate, Optional<ReliableMessageProtocolConfig> mrpConfig)
 {
+    TRACE_EVENT_SCOPE("EstablishSession", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Return early on error here, as we have not initialized any state yet
@@ -303,6 +305,7 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoConte
 
 CHIP_ERROR CASESession::SendSigma1()
 {
+    TRACE_EVENT_SCOPE("SendSigma1", "CASESession");
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     size_t data_len            = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
                                                   sizeof(uint16_t),            // initiatorSessionId,
@@ -385,6 +388,7 @@ CHIP_ERROR CASESession::SendSigma1()
 
 CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle && msg)
 {
+    TRACE_EVENT_SCOPE("HandleSigma1_and_SendSigma2", "CASESession");
     ReturnErrorOnFailure(HandleSigma1(std::move(msg)));
 
     return CHIP_NO_ERROR;
@@ -392,6 +396,7 @@ CHIP_ERROR CASESession::HandleSigma1_and_SendSigma2(System::PacketBufferHandle &
 
 CHIP_ERROR CASESession::HandleSigma1(System::PacketBufferHandle && msg)
 {
+    TRACE_EVENT_SCOPE("HandleSigma1", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
 
@@ -469,6 +474,7 @@ exit:
 
 CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
 {
+    TRACE_EVENT_SCOPE("SendSigma2Resume", "CASESession");
     const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     size_t max_sigma2_resume_data_len =
         TLV::EstimateStructOverhead(kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, sizeof(uint16_t), mrpParamsSize);
@@ -519,6 +525,7 @@ CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
 
 CHIP_ERROR CASESession::SendSigma2()
 {
+    TRACE_EVENT_SCOPE("SendSigma2", "CASESession");
     VerifyOrReturnError(mFabricInfo != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     ByteSpan icaCert;
@@ -649,6 +656,7 @@ CHIP_ERROR CASESession::SendSigma2()
 
 CHIP_ERROR CASESession::HandleSigma2Resume(System::PacketBufferHandle && msg)
 {
+    TRACE_EVENT_SCOPE("HandleSigma2Resume", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
@@ -715,6 +723,7 @@ exit:
 
 CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle && msg)
 {
+    TRACE_EVENT_SCOPE("HandleSigma2_and_SendSigma3", "CASESession");
     ReturnErrorOnFailure(HandleSigma2(std::move(msg)));
     ReturnErrorOnFailure(SendSigma3());
 
@@ -723,6 +732,7 @@ CHIP_ERROR CASESession::HandleSigma2_and_SendSigma3(System::PacketBufferHandle &
 
 CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
 {
+    TRACE_EVENT_SCOPE("HandleSigma2", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader tlvReader;
     TLV::TLVReader decryptedDataTlvReader;
@@ -876,6 +886,7 @@ exit:
 
 CHIP_ERROR CASESession::SendSigma3()
 {
+    TRACE_EVENT_SCOPE("SendSigma3", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     MutableByteSpan messageDigestSpan(mMessageDigest);
@@ -1010,6 +1021,7 @@ exit:
 
 CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
 {
+    TRACE_EVENT_SCOPE("HandleSigma3", "CASESession");
     CHIP_ERROR err = CHIP_NO_ERROR;
     MutableByteSpan messageDigestSpan(mMessageDigest);
     System::PacketBufferTLVReader tlvReader;
@@ -1298,20 +1310,39 @@ CHIP_ERROR CASESession::RetrieveIPK(FabricId fabricId, MutableByteSpan & ipk)
     return CHIP_NO_ERROR;
 }
 
-// TODO: Remove this and replace with system method to retrieve current time
-CHIP_ERROR CASESession::SetEffectiveTime(void)
+CHIP_ERROR CASESession::GetHardcodedTime()
 {
     using namespace ASN1;
     ASN1UniversalTime effectiveTime;
 
-    effectiveTime.Year   = 2021;
-    effectiveTime.Month  = 2;
-    effectiveTime.Day    = 12;
+    effectiveTime.Year   = 2022;
+    effectiveTime.Month  = 1;
+    effectiveTime.Day    = 1;
     effectiveTime.Hour   = 10;
     effectiveTime.Minute = 10;
     effectiveTime.Second = 10;
 
     return ASN1ToChipEpochTime(effectiveTime, mValidContext.mEffectiveTime);
+}
+
+CHIP_ERROR CASESession::SetEffectiveTime()
+{
+    System::Clock::Milliseconds64 currentTimeMS;
+    CHIP_ERROR err = System::SystemClock().GetClock_RealTimeMS(currentTimeMS);
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(
+            SecureChannel,
+            "The device does not support GetClock_RealTimeMS() API. This will eventually result in CASE session setup failures.");
+        // TODO: Remove use of hardcoded time during CASE setup
+        return GetHardcodedTime();
+    }
+
+    System::Clock::Seconds32 currentTime = std::chrono::duration_cast<System::Clock::Seconds32>(currentTimeMS);
+    VerifyOrReturnError(UnixEpochToChipEpochTime(currentTime.count(), mValidContext.mEffectiveTime), CHIP_ERROR_INVALID_TIME);
+
+    return CHIP_NO_ERROR;
 }
 
 void CASESession::OnSuccessStatusReport()
