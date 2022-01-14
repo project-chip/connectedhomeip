@@ -685,7 +685,8 @@ tests:
           saveAs: readAttributeCharStringDefaultValue
           value: ""
 
-    - label: "Read attribute char_string Default Value and compare to saved value"
+    - label:
+          "Read attribute char_string Default Value and compare to saved value"
       command: "readAttribute"
       attribute: "char_string"
       response:
@@ -706,7 +707,9 @@ tests:
           constraints:
               notValue: readAttributeCharStringDefaultValue
 
-    - label: "Read attribute char_string Not Default Value and compare to saved value"
+    - label:
+          "Read attribute char_string Not Default Value and compare to saved
+          value"
       command: "readAttribute"
       attribute: "char_string"
       response:
@@ -720,7 +723,9 @@ tests:
       arguments:
           value: readAttributeCharStringNotDefaultValue
 
-    - label: "Read attribute char_string Not Default Value and compare to expected value"
+    - label:
+          "Read attribute char_string Not Default Value and compare to expected
+          value"
       command: "readAttribute"
       attribute: "char_string"
       response:
@@ -741,7 +746,8 @@ tests:
           saveAs: readAttributeOctetStringDefaultValue
           value: ""
 
-    - label: "Read attribute octet_string Default Value and compare to saved value"
+    - label:
+          "Read attribute octet_string Default Value and compare to saved value"
       command: "readAttribute"
       attribute: "octet_string"
       response:
@@ -762,7 +768,9 @@ tests:
           constraints:
               notValue: readAttributeOctetStringDefaultValue
 
-    - label: "Read attribute octet_string Not Default Value and compare to saved value"
+    - label:
+          "Read attribute octet_string Not Default Value and compare to saved
+          value"
       command: "readAttribute"
       attribute: "octet_string"
       response:
@@ -776,7 +784,9 @@ tests:
       arguments:
           value: readAttributeOctetStringNotDefaultValue
 
-    - label: "Read attribute octet_string Not Default Value and compare to expected value"
+    - label:
+          "Read attribute octet_string Not Default Value and compare to expected
+          value"
       command: "readAttribute"
       attribute: "octet_string"
       response:
