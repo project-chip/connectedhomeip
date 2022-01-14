@@ -120,7 +120,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 10
+                value: 100
 
     - label: "reads CurrentLevel attribute from DUT"
       command: "readAttribute"

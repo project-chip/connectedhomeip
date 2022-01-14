@@ -19098,7 +19098,7 @@ private:
     CHIP_ERROR TestWait10ms_12()
     {
         SetIdentity(kIdentityAlpha);
-        return WaitForMs(10);
+        return WaitForMs(100);
     }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_13()

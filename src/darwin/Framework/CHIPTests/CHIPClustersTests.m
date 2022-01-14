@@ -12013,7 +12013,7 @@ CHIPDevice * GetConnectedDevice(void)
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait 10ms"];
 
     dispatch_queue_t queue = dispatch_get_main_queue();
-    WaitForMs(expectation, queue, 10);
+    WaitForMs(expectation, queue, 100);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 - (void)testSendClusterTest_TC_LVL_3_1_000013_ReadAttribute
