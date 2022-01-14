@@ -20,11 +20,13 @@
 #include "app-common/zap-generated/attribute-id.h"
 #include "app-common/zap-generated/attributes/Accessors.h"
 #include "app-common/zap-generated/cluster-id.h"
+#include "app-common/zap-generated/cluster-objects.h"
 #include "app-common/zap-generated/command-id.h"
 #include "app/CommandSender.h"
 #include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
 #include "app/util/af.h"
+#include "controller/CHIPCluster.h"
 #include "lib/core/CHIPError.h"
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -74,18 +76,32 @@ static void BoundDeviceChangedHandler(chip::EndpointId localEndpoint, chip::Endp
 {
     using namespace chip;
     using namespace chip::app;
+
     // Unfortunately generating both cluster server and client code is not supported.
     // We need to manually compose the packet here.
     // TODO: investigate code generation issue for binding
     if (localEndpoint == 1 && clusterId == ZCL_ON_OFF_CLUSTER_ID)
     {
-        CommandId command           = sSwitchOnOffState ? Clusters::OnOff::Commands::On::Id : Clusters::OnOff::Commands::Off::Id;
-        CommandPathParams cmdParams = { remoteEndpoint, /* group id */ 0, clusterId, command,
-                                        (chip::app::CommandPathFlags::kEndpointIdValid) };
-        CommandSender sender(nullptr, peer_device->GetExchangeManager());
-        sender.PrepareCommand(cmdParams);
-        sender.FinishCommand();
-        peer_device->SendCommands(&sender);
+
+        auto onSuccess = [](const app::ConcreteCommandPath & commandPath, const app::StatusIB & status, const auto & dataResponse) {
+            ChipLogProgress(NotSpecified, "OnOff command succeeds");
+        };
+        auto onFailure = [](const app::StatusIB & status, CHIP_ERROR error) {
+            ChipLogError(NotSpecified, "OnOff command failed: %s", error.AsString());
+        };
+
+        if (sSwitchOnOffState)
+        {
+            Clusters::OnOff::Commands::On::Type onCommand;
+            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                             remoteEndpoint, onCommand, onSuccess, onFailure);
+        }
+        else
+        {
+            Clusters::OnOff::Commands::Off::Type offCommand;
+            Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
+                                             remoteEndpoint, offCommand, onSuccess, onFailure);
+        }
     }
 }
 
