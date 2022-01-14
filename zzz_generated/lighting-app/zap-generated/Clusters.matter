@@ -827,6 +827,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     kDownloadProtocolNotSupported = 3;
   }
 
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ApplyUpdateRequestRequest {
     OCTET_STRING updateToken;
@@ -868,6 +869,75 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
   command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
   command QueryImage(QueryImageRequest): QueryImageResponse = 0;
+}
+
+server cluster OtaSoftwareUpdateRequestor = 42 {
+  enum OTAAnnouncementReason : ENUM8 {
+    kSimpleAnnouncement = 0;
+    kUpdateAvailable = 1;
+    kUrgentUpdateAvailable = 2;
+  }
+
+  enum OTAChangeReasonEnum : ENUM8 {
+    kUnknown = 0;
+    kSuccess = 1;
+    kFailure = 2;
+    kTimeOut = 3;
+    kDelayByProvider = 4;
+  }
+
+  enum OTAUpdateStateEnum : ENUM8 {
+    kUnknown = 0;
+    kIdle = 1;
+    kQuerying = 2;
+    kDelayedOnQuery = 3;
+    kDownloading = 4;
+    kApplying = 5;
+    kDelayedOnApply = 6;
+    kRollingBack = 7;
+    kDelayedOnUserConsent = 8;
+  }
+
+  struct ProviderLocation {
+    fabric_idx kFabricIndex = 0;
+    node_id kProviderNodeID = 1;
+    endpoint_no kEndpoint = 2;
+  }
+
+  event StateTransition(info) = 0 {
+    kPreviousState = 0,
+    kNewState = 1,
+    kReason = 2,
+    kTargetSoftwareVersion = 3,
+  }
+
+  event VersionApplied(critical) = 1 {
+    kSoftwareVersion = 0,
+    kProductID = 1,
+  }
+
+  event DownloadError(info) = 2 {
+    kSoftwareVersion = 0,
+    kBytesDownloaded = 1,
+    kProgressPercent = 2,
+    kPlatformCode = 3,
+  }
+
+  attribute(writable, reportable) ProviderLocation defaultOtaProviders[] = 0;
+  attribute(readonly, reportable) boolean updatePossible = 1;
+  attribute(readonly, reportable) OTAUpdateStateEnum updateState = 2;
+  attribute(readonly, reportable) int8u updateStateProgress = 3;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
+
+  request struct AnnounceOtaProviderRequest {
+    node_id providerNodeId;
+    vendor_id vendorId;
+    OTAAnnouncementReason announcementReason;
+    optional OCTET_STRING metadataForNode;
+    endpoint_no endpoint;
+  }
+
+  command AnnounceOtaProvider(AnnounceOtaProviderRequest): DefaultSuccess = 0;
 }
 
 server cluster OccupancySensing = 1030 {
