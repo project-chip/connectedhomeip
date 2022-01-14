@@ -151,7 +151,7 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     if (event->Type == DeviceEventType::kRtkWiFiScanCompletedEvent)
     {
         ChipLogProgress(DeviceLayer, "WiFiScanCompleted");
-        NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnScanWiFiNetworkDone();        
+        NetworkCommissioning::AmebaWiFiDriver::GetInstance().OnScanWiFiNetworkDone();
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 }
