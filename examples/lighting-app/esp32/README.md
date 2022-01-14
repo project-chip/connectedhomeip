@@ -139,6 +139,7 @@ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug c
 ```
 ./out/debug/chip-ota-provider-app -f hello-world.bin
 ```
+
 hello-world.bin can be obtained from compiling the hello-world ESP-IDF example.
 
 -   Provision the Linux OTA Provider using chip-tool
