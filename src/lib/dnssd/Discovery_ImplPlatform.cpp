@@ -32,6 +32,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/ConfigurationManager.h>
 
 namespace chip {
 namespace Dnssd {
@@ -341,6 +342,8 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameter
             subTypes[subTypeSize++] = deviceTypeSubType;
         }
     }
+
+    DeviceLayer::ConfigurationMgr().StartAdvertisement();
 
     service.mTextEntries   = textEntries;
     service.mTextEntrySize = textEntrySize;
