@@ -1013,8 +1013,8 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster FixedLabel = 64 {
-  attribute(readonly, reportable) LabelStruct labelList[] = 0;
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(readonly) LabelStruct labelList[] = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
 }
 
 server cluster FlowMeasurement = 1028 {
