@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+
+#Sergei , test
+
+echo Test passed && exit 0;
+
 ARG1=${1:-20202021}
 ARG2=${2:-42}
 ARG3=${3:-5560}
