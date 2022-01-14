@@ -17,16 +17,12 @@
 
 #include "binding-handler.h"
 
-#include "app-common/zap-generated/attribute-id.h"
-#include "app-common/zap-generated/attributes/Accessors.h"
-#include "app-common/zap-generated/cluster-id.h"
-#include "app-common/zap-generated/cluster-objects.h"
-#include "app-common/zap-generated/command-id.h"
+#include "app-common/zap-generated/ids/Clusters.h"
+#include "app-common/zap-generated/ids/Commands.h"
 #include "app/CommandSender.h"
 #include "app/clusters/bindings/BindingManager.h"
 #include "app/server/Server.h"
-#include "app/util/af.h"
-#include "controller/CHIPCluster.h"
+#include "controller/InvokeInteraction.h"
 #include "lib/core/CHIPError.h"
 
 #if defined(ENABLE_CHIP_SHELL)
@@ -44,7 +40,7 @@ static bool sSwitchOnOffState = false;
 static void ToggleSwitchOnOff(bool newState)
 {
     sSwitchOnOffState = newState;
-    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, ZCL_ON_OFF_CLUSTER_ID);
+    chip::BindingManager::GetInstance().NotifyBoundClusterChanged(1, chip::app::Clusters::OnOff::Id, nullptr);
 }
 
 static CHIP_ERROR SwitchCommandHandler(int argc, char ** argv)
@@ -71,8 +67,8 @@ static void RegisterSwitchCommands()
 }
 #endif // defined(ENABLE_CHIP_SHELL)
 
-static void BoundDeviceChangedHandler(chip::EndpointId localEndpoint, chip::EndpointId remoteEndpoint, chip::ClusterId clusterId,
-                                      chip::DeviceProxy * peer_device, chip::Optional<chip::GroupId> group)
+static void BoundDeviceChangedHandler(const EmberBindingTableEntry * binding, chip::DeviceProxy * peer_device,
+                                      chip::Optional<chip::GroupId> group, void * context)
 {
     using namespace chip;
     using namespace chip::app;
@@ -83,30 +79,26 @@ static void BoundDeviceChangedHandler(chip::EndpointId localEndpoint, chip::Endp
         return;
     }
 
-    // Unfortunately generating both cluster server and client code is not supported.
-    // We need to manually compose the packet here.
-    // TODO: investigate code generation issue for binding
-    if (localEndpoint == 1 && clusterId == ZCL_ON_OFF_CLUSTER_ID)
+    if (binding->type == EMBER_UNICAST_BINDING && binding->local == 1 && binding->clusterId == Clusters::OnOff::Id)
     {
-
-        auto onSuccess = [](const app::ConcreteCommandPath & commandPath, const app::StatusIB & status, const auto & dataResponse) {
+        auto onSuccess = [](const ConcreteCommandPath & commandPath, const StatusIB & status, const auto & dataResponse) {
             ChipLogProgress(NotSpecified, "OnOff command succeeds");
         };
-        auto onFailure = [](const app::StatusIB & status, CHIP_ERROR error) {
-            ChipLogError(NotSpecified, "OnOff command failed: %s", error.AsString());
+        auto onFailure = [](const StatusIB & status, CHIP_ERROR error) {
+            ChipLogError(NotSpecified, "OnOff command failed: %" CHIP_ERROR_FORMAT, error.Format());
         };
 
         if (sSwitchOnOffState)
         {
             Clusters::OnOff::Commands::On::Type onCommand;
             Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             remoteEndpoint, onCommand, onSuccess, onFailure);
+                                             binding->remote, onCommand, onSuccess, onFailure);
         }
         else
         {
             Clusters::OnOff::Commands::Off::Type offCommand;
             Controller::InvokeCommandRequest(peer_device->GetExchangeManager(), peer_device->GetSecureSession().Value(),
-                                             remoteEndpoint, offCommand, onSuccess, onFailure);
+                                             binding->remote, offCommand, onSuccess, onFailure);
         }
     }
 }

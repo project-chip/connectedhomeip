@@ -45,7 +45,6 @@ static_library("app") {
     "BufferedReadCallback.cpp",
     "CASEClient.cpp",
     "CASEClient.h",
-    "CASEClient.h",
     "CASEClientPool.h",
     "CASESessionManager.cpp",
     "CASESessionManager.h",

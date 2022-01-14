@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 namespace chip {
 
 /**
- * Application callback function when a cluster associated with a bound peer changes.
+ * Application callback function when a cluster associated with a binding changes.
  *
  * The connection is managed by the stack and peer_device is guaranteed to be available.
  * The application shall decide the content to be sent to the peer.
@@ -32,17 +32,17 @@ namespace chip {
  * E.g. The application will send on/off commands to peer for the OnOff cluster.
  *
  */
-using BoundDeviceChangedHandler = void (*)(EndpointId localEndpoint, EndpointId remoteEndpoint, ClusterId clusterId,
-                                           DeviceProxy * peer_device, Optional<GroupId> group);
+using BoundDeviceChangedHandler = void (*)(const EmberBindingTableEntry * binding, DeviceProxy * peer_device,
+                                           Optional<GroupId> group, void * context);
 
 /**
  *
- * The BindingManager class manages the CASEConnection and attribute writes to bound peers.
+ * The BindingManager class manages the connections for unicast bindings and notifies the application
+ * when a binding is ready to be communicated with.
  *
- * The binding cluster will tell the device about the peer to connect to and the cluster to watch.
  * A CASE connection will be triggered when:
- *  - The binding cluster adds an entry to the binding table.
- *  - A watched cluster changes but we cannot find an active connection to the peer.
+ *  - The binding cluster adds a unicast entry to the binding table.
+ *  - A watched cluster changes with a unicast binding but we cannot find an active connection to the peer.
  *
  * The class uses an LRU mechanism to choose the connection to eliminate when there is no space for a new connection.
  * The BindingManager class will not actively re-establish connection and will connect on-demand (when binding cluster
@@ -61,93 +61,110 @@ public:
     void SetAppServer(Server * appServer) { mAppServer = appServer; }
 
     /*
-     * Adds a binding entry. Can be called for adding a new cluster to a node already connected.
+     * Notifies the BindingManager that a new unicast binding is created.
      *
      */
-    CHIP_ERROR CreateBinding(FabricIndex fabric, NodeId node, EndpointId localEndpoint, ClusterId cluster);
+    CHIP_ERROR UnicastBindingCreated(FabricIndex fabric, NodeId node) { return EstablishConnection(fabric, node); }
 
     /*
-     * Totally disconnect a device. Call this function only when no binding table entry is associated with the node.
+     * Notfies the BindingManager that the **last** unicast binding to a device has been removed.
      *
      */
-    CHIP_ERROR DisconnectDevice(FabricIndex fabric, NodeId node);
+    CHIP_ERROR LastUnicastBindingRemoved(FabricIndex fabric, NodeId node);
 
     /*
-     * Notify a cluster change to **all** bound devices associated with the cluster.
+     * Notify a cluster change to **all** bound devices associated with the (endpoint, cluster) tuple.
+     *
+     * For unicast bindings with an active session and multicast bindings, the BoundDeviceChangedHandler
+     * will be called before the function returns.
+     *
+     * For unicast bindings without an active session, the notification will be queued and a new session will
+     * be initiated. The BoundDeviceChangedHandler will be called once the session is established.
      *
      */
-    CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster);
+    CHIP_ERROR NotifyBoundClusterChanged(EndpointId endpoint, ClusterId cluster, void * context);
 
     static BindingManager & GetInstance() { return sBindingManager; }
 
 private:
     static BindingManager sBindingManager;
 
-    static constexpr uint8_t kMaxPendingClusters = 5;
+    static constexpr uint8_t kMaxPendingNotifications = 5;
 
     struct ClusterPath
     {
         EndpointId endpoint;
         ClusterId cluster;
+        void * context;
     };
 
-    // A pending command to be sent to a bound peer waiting for the CASE session to be established.
-    class PendingClusterEntry
+    // A pending notification to be sent to a binding waiting for the CASE session to be established.
+    class PendingNotificationEntry
     {
     public:
-        PendingClusterEntry(PeerId peerId) : mPeerId(peerId) {}
+        PendingNotificationEntry(PeerId peerId) : mPeerId(peerId) {}
 
         PeerId GetPeerId() { return mPeerId; }
 
         System::Clock::Timestamp GetLastUpdateTime() { return mLastUpdateTime; }
         void Touch() { mLastUpdateTime = System::SystemClock().GetMonotonicTimestamp(); }
 
-        ClusterPath * begin() { return &mPendingClusters[0]; }
-        ClusterPath * end() { return &mPendingClusters[mNumPendingClusters]; }
+        ClusterPath * begin() { return &mPendingNotifications[0]; }
+        ClusterPath * end() { return &mPendingNotifications[mNumPendingNotifications]; }
 
-        void AddPendingCluster(EndpointId endpoint, ClusterId cluster)
+        void AddPendingNotification(EndpointId endpoint, ClusterId cluster, void * context)
         {
-            if (mNumPendingClusters < kMaxPendingClusters)
+            for (ClusterPath & path : *this)
             {
-                mPendingClusters[mNumPendingClusters++] = { endpoint, cluster };
+                // New notifications for the same (endpoint, cluster) shall
+                // simply overrride the old ones
+                if (path.cluster == cluster && path.endpoint == endpoint)
+                {
+                    path.context = context;
+                    return;
+                }
+            }
+            if (mNumPendingNotifications < kMaxPendingNotifications)
+            {
+                mPendingNotifications[mNumPendingNotifications++] = { endpoint, cluster, context };
             }
             else
             {
-                mPendingClusters[mNextToOverride] = { endpoint, cluster };
+                mPendingNotifications[mNextToOverride] = { endpoint, cluster, context };
                 mNextToOverride++;
-                mNextToOverride %= kMaxPendingClusters;
+                mNextToOverride %= kMaxPendingNotifications;
             }
         }
 
     private:
-        uint8_t mNumPendingClusters = 0;
-        uint8_t mNextToOverride     = 0;
+        uint8_t mNumPendingNotifications = 0;
+        uint8_t mNextToOverride          = 0;
 
         PeerId mPeerId;
-        ClusterPath mPendingClusters[kMaxPendingClusters];
+        ClusterPath mPendingNotifications[kMaxPendingNotifications];
         System::Clock::Timestamp mLastUpdateTime;
     };
 
     // The pool for all the pending comands.
-    class PendingClusterMap
+    class PendingNotificationMap
     {
     public:
-        PendingClusterEntry * FindLRUEntry();
+        PendingNotificationEntry * FindLRUEntry();
 
-        PendingClusterEntry * FindEntry(PeerId peerId);
+        PendingNotificationEntry * FindEntry(PeerId peerId);
 
-        CHIP_ERROR AddPendingCluster(PeerId peer, EndpointId endpoint, ClusterId cluster);
+        CHIP_ERROR AddPendingNotification(PeerId peer, EndpointId endpoint, ClusterId cluster, void * context);
 
-        void RemoveEntry(PendingClusterEntry * entry) { mPendingClusterMap.ReleaseObject(entry); }
+        void RemoveEntry(PendingNotificationEntry * entry) { mPendingNotificationMap.ReleaseObject(entry); }
 
         template <typename Function>
         Loop ForEachActiveObject(Function && function)
         {
-            return mPendingClusterMap.ForEachActiveObject(std::forward<Function>(function));
+            return mPendingNotificationMap.ForEachActiveObject(std::forward<Function>(function));
         }
 
     private:
-        BitMapObjectPool<PendingClusterEntry, EMBER_BINDING_TABLE_SIZE> mPendingClusterMap;
+        BitMapObjectPool<PendingNotificationEntry, EMBER_BINDING_TABLE_SIZE> mPendingNotificationMap;
     };
 
     static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
@@ -156,15 +173,17 @@ private:
     static void HandleDeviceConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
     void HandleDeviceConnectionFailure(PeerId peerId, CHIP_ERROR error);
 
+    CHIP_ERROR EstablishConnection(FabricIndex fabric, NodeId node);
+
     // Called when CASE session is established to a peer device. Will send all the pending commands to the peer.
-    void SyncPendingClustersToPeer(OperationalDeviceProxy * device, PendingClusterEntry * pendingClusters);
+    void SyncPendingNotificationsToPeer(OperationalDeviceProxy * device, PendingNotificationEntry * pendingClusters);
 
-    // Called when CASE session is not established to a bound peer. Will enqueue the command and initialize connection.
-    CHIP_ERROR EnqueueClusterAndConnect(FabricIndex fabric, NodeId node, EndpointId endpoint, ClusterId cluster);
+    // Called when CASE session is not established to a peer device. Will enqueue the command and initialize connection.
+    CHIP_ERROR EnqueueUnicastNotification(FabricIndex fabric, NodeId node, EndpointId endpoint, ClusterId cluster, void * context);
 
-    PendingClusterMap mPendingClusterMap;
+    PendingNotificationMap mPendingNotificationMap;
     BoundDeviceChangedHandler mBoundDeviceChangedHandler;
-    Server * mAppServer;
+    Server * mAppServer = nullptr;
 
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;

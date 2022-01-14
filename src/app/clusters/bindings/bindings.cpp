@@ -34,7 +34,7 @@ using namespace chip::app::Clusters::Binding;
 
 // TODO: add binding table to the persistent storage
 
-EmberStatus getBindingIndex(EmberBindingTableEntry & newEntry, uint8_t * bindingIndex)
+static EmberStatus getBindingIndex(EmberBindingTableEntry & newEntry, uint8_t * bindingIndex)
 {
     EmberBindingTableEntry currentEntry;
     for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
@@ -50,7 +50,7 @@ EmberStatus getBindingIndex(EmberBindingTableEntry & newEntry, uint8_t * binding
     return EMBER_NOT_FOUND;
 }
 
-EmberStatus getUnusedBindingIndex(uint8_t * bindingIndex)
+static EmberStatus getUnusedBindingIndex(uint8_t * bindingIndex)
 {
     EmberBindingTableEntry currentEntry;
     for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
@@ -79,7 +79,7 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
 
     ChipLogDetail(Zcl, "RX: BindCallback");
 
-    if ((groupId != 0 && nodeId != 0) || (groupId == 0 && nodeId == 0))
+    if ((groupId != 0 && nodeId != 0) || (groupId == 0 && nodeId == 0) || (groupId != 0 && remoteEndpoint != 0))
     {
         ChipLogError(Zcl, "Binding: Invalid request");
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_MALFORMED_COMMAND);
@@ -88,7 +88,7 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
 
     if (groupId)
     {
-        bindingEntry = EmberBindingTableEntry::ForGroup(fabricIndex, groupId, localEndpoint, remoteEndpoint, clusterId);
+        bindingEntry = EmberBindingTableEntry::ForGroup(fabricIndex, groupId, localEndpoint, clusterId);
     }
     else
     {
@@ -108,26 +108,28 @@ bool emberAfBindingClusterBindCallback(app::CommandHandler * commandObj, const a
         return true;
     }
 
-    CHIP_ERROR err = BindingManager::GetInstance().CreateBinding(fabricIndex, nodeId, localEndpoint, clusterId);
-    if (err != CHIP_NO_ERROR)
+    if (nodeId)
     {
-        ChipLogError(Zcl, "Binding: Failed to add binding for device " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
-                     err.AsString());
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
-        return true;
+        CHIP_ERROR err = BindingManager::GetInstance().UnicastBindingCreated(fabricIndex, nodeId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(
+                Zcl, "Binding: Failed to create session for unicast binding to device " ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
+                ChipLogValueX64(nodeId), err.Format());
+        }
     }
     emberSetBinding(bindingIndex, &bindingEntry);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-uint8_t GetNumberOfBindingForNode(FabricIndex fabric, NodeId node)
+static uint8_t GetNumberOfUnicastBindingForNode(FabricIndex fabric, NodeId node)
 {
     uint8_t numBinding = 0;
     EmberBindingTableEntry entry;
     for (uint8_t i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
-        if (emberGetBinding(i, &entry) == EMBER_SUCCESS && entry.type != EMBER_UNUSED_BINDING && entry.fabricIndex == fabric &&
+        if (emberGetBinding(i, &entry) == EMBER_SUCCESS && entry.type == EMBER_UNICAST_BINDING && entry.fabricIndex == fabric &&
             entry.nodeId == node)
         {
             numBinding++;
@@ -157,7 +159,7 @@ bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const
     }
     if (groupId)
     {
-        bindingEntry = EmberBindingTableEntry::ForGroup(fabricIndex, groupId, localEndpoint, remoteEndpoint, clusterId);
+        bindingEntry = EmberBindingTableEntry::ForGroup(fabricIndex, groupId, localEndpoint, clusterId);
     }
     else
     {
@@ -171,18 +173,17 @@ bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const
         return true;
     }
 
-    if (GetNumberOfBindingForNode(fabricIndex, nodeId) == 1)
+    emberDeleteBinding(bindingIndex);
+    if (nodeId != 0 && GetNumberOfUnicastBindingForNode(fabricIndex, nodeId) == 0)
     {
-        CHIP_ERROR err = BindingManager::GetInstance().DisconnectDevice(fabricIndex, nodeId);
+        CHIP_ERROR err = BindingManager::GetInstance().LastUnicastBindingRemoved(fabricIndex, nodeId);
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Zcl, "Binding: Failed to disconnect device " ChipLogFormatX64 ": %s", ChipLogValueX64(nodeId),
                          err.AsString());
-            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
         }
     }
 
-    emberDeleteBinding(bindingIndex);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
