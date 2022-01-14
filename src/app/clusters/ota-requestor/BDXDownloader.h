@@ -69,6 +69,7 @@ public:
     CHIP_ERROR BeginPrepareDownload() override;
     CHIP_ERROR OnPreparedForDownload(CHIP_ERROR status) override;
     void OnDownloadTimeout() override;
+    uint8_t GetDownloadPercentComplete() override;
     // BDX does not provide a mechanism for the driver of a transfer to gracefully end the exchange, so it will abort the transfer
     // instead.
     void EndDownload(CHIP_ERROR reason = CHIP_NO_ERROR) override;

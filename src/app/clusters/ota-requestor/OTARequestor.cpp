@@ -270,6 +270,21 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
                    ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
+CHIP_ERROR OTARequestor::GetUpdateProgress(EndpointId endpointId, uint8_t & progress)
+{
+    VerifyOrReturnError(mBdxDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(OtaRequestorServerGetUpdateStateProgress(endpointId, progress) == EMBER_ZCL_STATUS_SUCCESS,
+                        CHIP_ERROR_BAD_REQUEST);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR OTARequestor::GetState(EndpointId endpointId, OTAUpdateStateEnum & state)
+{
+    VerifyOrReturnError(mBdxDownloader != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(OtaRequestorServerGetUpdateState(endpointId, state) == EMBER_ZCL_STATUS_SUCCESS, CHIP_ERROR_BAD_REQUEST);
+    return CHIP_NO_ERROR;
+}
+
 // Called whenever FindOrEstablishSession is successful
 void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * deviceProxy)
 {
