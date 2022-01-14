@@ -52,8 +52,12 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     return CHIP_NO_ERROR;
 }
 
-CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage)
+CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR lastErr)
 {
+    if (lastErr != CHIP_NO_ERROR)
+    {
+        return CommissioningStage::kCleanup;
+    }
     switch (currentStage)
     {
     case CommissioningStage::kSecurePairing:
@@ -138,14 +142,14 @@ void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
 
 void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
 {
-
     if (report.stageCompleted == CommissioningStage::kFindOperational)
     {
         mOperationalDeviceProxy = report.OperationalNodeFoundData.operationalProxy;
     }
-    CommissioningStage nextStage = GetNextCommissioningStage(report.stageCompleted);
+    CommissioningStage nextStage = GetNextCommissioningStage(report.stageCompleted, err);
     DeviceProxy * proxy          = mCommissioneeDeviceProxy;
-    if (nextStage == CommissioningStage::kSendComplete || nextStage == CommissioningStage::kCleanup)
+    if (nextStage == CommissioningStage::kSendComplete ||
+        (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy != nullptr))
     {
         proxy = mOperationalDeviceProxy;
     }
@@ -155,6 +159,7 @@ void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDe
         ChipLogError(Controller, "Invalid device for commissioning");
         return;
     }
+    mParams.SetCompletionStatus(err);
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this);
 }
 
