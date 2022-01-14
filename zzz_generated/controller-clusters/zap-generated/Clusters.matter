@@ -1766,6 +1766,7 @@ client cluster LevelControl = 8 {
   attribute(writable, reportable) int8u defaultMoveRate = 20;
   attribute(writable, reportable) int8u startUpCurrentLevel = 16384;
   attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct MoveRequest {

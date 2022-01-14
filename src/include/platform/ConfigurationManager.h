@@ -140,7 +140,7 @@ public:
     virtual bool IsFullyProvisioned()   = 0;
     virtual void InitiateFactoryReset() = 0;
 
-    // Gets called when starting BLE/MNDS advertisement
+    // Gets called when starting BLE/DNS-SD advertisement
     virtual void StartAdvertisement() = 0;
 
     virtual void LogDeviceConfig() = 0;
