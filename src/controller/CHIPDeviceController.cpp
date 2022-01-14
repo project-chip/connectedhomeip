@@ -619,13 +619,10 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 
     params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
-#if 0 // TODO: SessionID persistence results in bugs when instantiating multiple DeviceCommissioners
-      // on multiple fabrics due to not doing persistence completely, i.e not persisting the session ID
-      // upon completion of CASE. This results in the 2nd-to-N commissioners upon initialization picking
-      // up a stale value for the next available session ID and colliding with a previously picked local session ID
-      // from another commissioner instance.
-      //
-      // For now, just disable all persistence.
+#if 0 //
+      // We cannot reinstantiate session ID allocator state from each fabric-scoped commissioner
+      // individually because the session ID allocator space is and must be shared for all users
+      // of the Session Manager. Disable persistence for now. #12821 tracks a proper fix this issue.
       //
 
     uint16_t nextKeyID = 0;
