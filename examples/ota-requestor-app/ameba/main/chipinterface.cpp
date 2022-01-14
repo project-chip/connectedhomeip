@@ -99,6 +99,30 @@ extern "C" void amebaApplyUpdateCmdHandler()
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000), ApplyUpdateTimerHandler, nullptr);
 }
 
+static void InitOTARequestor(void)
+{
+    // Initialize and interconnect the Requestor and Image Processor objects -- START
+    SetRequestorInstance(&gRequestorCore);
+
+    // Set server instance used for session establishment
+    gRequestorCore.Init(&(chip::Server::GetInstance()), &gRequestorUser, &gDownloader);
+
+    // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
+    // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
+    // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
+    // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
+    OTAImageProcessorParams ipParams;
+    gImageProcessor.SetOTAImageProcessorParams(ipParams);
+    gImageProcessor.SetOTADownloader(&gDownloader);
+
+    // Connect the Downloader and Image Processor objects
+    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
+
+    // Initialize and interconnect the Requestor and Image Processor objects -- END
+
+}
+
 extern "C" void ChipTest(void)
 {
     ChipLogProgress(SoftwareUpdate, "ota-requestor!");
@@ -122,30 +146,7 @@ extern "C" void ChipTest(void)
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
-    // Initialize and interconnect the Requestor and Image Processor objects -- START
-    SetRequestorInstance(&gRequestorCore);
-
-    // Set server instance used for session establishment
-    chip::Server * server = &(chip::Server::GetInstance());
-    gRequestorCore.SetServerInstance(server);
-
-    // Connect the Requestor and Requestor Driver objects
-    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
-
-    // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
-    // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
-    // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
-    // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
-    OTAImageProcessorParams ipParams;
-    gImageProcessor.SetOTAImageProcessorParams(ipParams);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-
-    // Connect the Downloader and Image Processor objects
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-
-    gRequestorCore.SetBDXDownloader(&gDownloader);
-    // Initialize and interconnect the Requestor and Image Processor objects -- END
+    InitOTARequestor();
 
     while (true)
         vTaskDelay(pdMS_TO_TICKS(50));
