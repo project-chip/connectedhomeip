@@ -447,7 +447,7 @@ void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
 
     if (delegate != nullptr)
     {
-        SoftwareDiagnostics::Structs::SoftwareFault::Type softwareFault;
+        SoftwareDiagnostics::Structs::SoftwareFaultStruct::Type softwareFault;
         char threadName[kMaxThreadNameLength + 1];
 
         softwareFault.id = gettid();
