@@ -507,6 +507,12 @@ void SetupPretendDevices()
     AddEndpoint("Door 2");
     AddCluster("Door");
     AddAttribute("State", "Closed");
+
+    AddDevice("Occupancy Sensor");
+    AddEndpoint("External");
+    AddCluster("Occupancy Sensor");
+    AddAttribute("Occupancy", "1");
+    app::Clusters::OccupancySensing::Attributes::Occupancy::Set(1, 1);
 }
 
 WiFiWidget pairingWindowLED;
