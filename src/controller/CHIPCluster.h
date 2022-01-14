@@ -48,6 +48,10 @@ template <typename T>
 using ReadResponseSuccessCallback     = void (*)(void * context, T responseData);
 using ReadResponseFailureCallback     = void (*)(void * context, EmberAfStatus status);
 using SubscriptionEstablishedCallback = void (*)(void * context);
+template <typename T>
+using ReadEventResponseSuccessCallback = void (*)(void * context, const app::EventHeader &, T responseData);
+using ReadEventResponseFailureCallback = void (*)(void * context, const app::EventHeader &, EmberAfStatus status);
+using ReadEventResponseDoneCallback    = void (*)(void * context);
 
 class DLL_EXPORT ClusterBase
 {
@@ -271,15 +275,15 @@ public:
      * Read an event and get a type-safe callback with the event data.
      */
     template <typename DecodableType>
-    CHIP_ERROR ReadEvent(void * context, ReadResponseSuccessCallback<DecodableType> successCb,
-                         ReadResponseFailureCallback failureCb)
+    CHIP_ERROR ReadEvent(void * context, ReadEventResponseSuccessCallback<DecodableType> successCb,
+                         ReadEventResponseFailureCallback failureCb, ReadEventResponseDoneCallback doneCb = nullptr)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
         auto onSuccessCb = [context, successCb](const app::EventHeader & eventHeader, const DecodableType & aData) {
             if (successCb != nullptr)
             {
-                successCb(context, aData);
+                successCb(context, eventHeader, aData);
             }
         };
 
@@ -287,17 +291,29 @@ public:
                                                 CHIP_ERROR error) {
             if (failureCb != nullptr)
             {
-                failureCb(context, app::ToEmberAfStatus(status));
+                app::EventHeader header;
+                header.mPath          = eventHeader->mPath;
+                header.mEventNumber   = eventHeader->mEventNumber;
+                header.mPriorityLevel = eventHeader->mPriorityLevel;
+                header.mTimestamp     = eventHeader->mTimestamp;
+                failureCb(context, header, app::ToEmberAfStatus(status));
+            }
+        };
+
+        auto onDoneCb = [context, doneCb]() {
+            if (doneCb != nullptr)
+            {
+                doneCb(context);
             }
         };
 
         return Controller::ReadEvent<DecodableType>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                                    onSuccessCb, onFailureCb);
+                                                    onSuccessCb, onFailureCb, onDoneCb);
     }
 
     template <typename DecodableType>
-    CHIP_ERROR SubscribeEvent(void * context, ReadResponseSuccessCallback<DecodableType> reportCb,
-                              ReadResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
+    CHIP_ERROR SubscribeEvent(void * context, ReadEventResponseSuccessCallback<DecodableType> reportCb,
+                              ReadEventResponseFailureCallback failureCb, uint16_t minIntervalFloorSeconds,
                               uint16_t maxIntervalCeilingSeconds,
                               SubscriptionEstablishedCallback subscriptionEstablishedCb = nullptr)
     {
@@ -306,7 +322,7 @@ public:
         auto onReportCb = [context, reportCb](const app::EventHeader & eventHeader, const DecodableType & aData) {
             if (reportCb != nullptr)
             {
-                reportCb(context, aData);
+                reportCb(context, eventHeader, aData);
             }
         };
 
@@ -314,7 +330,12 @@ public:
                                                 CHIP_ERROR aError) {
             if (failureCb != nullptr)
             {
-                failureCb(context, app::ToEmberAfStatus(status));
+                app::EventHeader header;
+                header.mPath          = eventHeader->mPath;
+                header.mEventNumber   = eventHeader->mEventNumber;
+                header.mPriorityLevel = eventHeader->mPriorityLevel;
+                header.mTimestamp     = eventHeader->mTimestamp;
+                failureCb(context, header, app::ToEmberAfStatus(status));
             }
         };
 

@@ -164,6 +164,7 @@ struct ReportEventParams : public app::ReadPrepareParams
     typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType mOnErrorCb;
     typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablishedCb =
         nullptr;
+    typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType mOnDoneCb = nullptr;
     app::ReadClient::InteractionType mReportType = app::ReadClient::InteractionType::Read;
 };
 
@@ -180,7 +181,12 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
     readParams.mpEventPathParamsList    = &eventPath;
     readParams.mEventPathParamsListSize = 1;
 
-    auto onDone = [](app::ReadClient * apReadClient, TypedReadEventCallback<DecodableEventType> * callback) {
+    auto onDoneCb = readParams.mOnDoneCb;
+    auto onDone   = [onDoneCb](app::ReadClient * apReadClient, TypedReadEventCallback<DecodableEventType> * callback) {
+        if (onDoneCb != nullptr)
+        {
+            onDoneCb();
+        }
         chip::Platform::Delete(apReadClient);
         chip::Platform::Delete(callback);
     };
@@ -218,11 +224,13 @@ CHIP_ERROR ReportEvent(Messaging::ExchangeManager * apExchangeMgr, EndpointId en
 template <typename DecodableEventType>
 CHIP_ERROR ReadEvent(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, EndpointId endpointId,
                      typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType onSuccessCb,
-                     typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb)
+                     typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb,
+                     typename TypedReadEventCallback<DecodableEventType>::OnSubscriptionEstablishedCallbackType onDoneCb = nullptr)
 {
     detail::ReportEventParams<DecodableEventType> params(sessionHandle);
     params.mOnReportCb = onSuccessCb;
     params.mOnErrorCb  = onErrorCb;
+    params.mOnDoneCb   = onDoneCb;
     return detail::ReportEvent(exchangeMgr, endpointId, std::move(params));
 }
 
