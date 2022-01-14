@@ -65,7 +65,7 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
     // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
     mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
 
-    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+    SuccessOrExit(err = mDevice->SendCommands(sender.get(), mTimeout));
 
     // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object now.
     sender.release();
