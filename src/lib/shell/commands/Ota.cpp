@@ -99,7 +99,8 @@ void RegisterOtaCommands()
         { &QueryImageHandler, "query", "Query for a new image. Usage: ota query <fabric-index> <provider-node-id> <endpoint-id>" },
         { &ApplyImageHandler, "apply",
           "Apply the current update. Usage ota apply <fabric-index> <provider-node-id> <endpoint-id>" },
-        { &NotifyImageHandler, "notify", "Notify the new image has been applied. Usage: ota notify <fabric-index> <provider-node-id> <endpoint-id>" },
+        { &NotifyImageHandler, "notify",
+          "Notify the new image has been applied. Usage: ota notify <fabric-index> <provider-node-id> <endpoint-id>" },
     };
 
     sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
