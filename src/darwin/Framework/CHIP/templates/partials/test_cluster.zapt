@@ -5,7 +5,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
 {{/if}}
 {{#chip_tests_item_response_parameters}}
 {{#if saveAs}}
-{{asBasicType chipType}} {{saveAs}};
+{{asObjectiveCBasicType type is_mutable=true}} {{saveAs}};
 {{/if}}
 {{/chip_tests_item_response_parameters}}
 
@@ -103,7 +103,13 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
           {{> actualValue}}
           {{>check_test_value actual="actualValue" expected=expectedValue cluster=../cluster}}
           {{#if saveAs}}
+          {{#if (isOctetString type)}}
+          {{saveAs}} = [NSMutableData dataWithData:actualValue];
+          {{else if (isCharString type)}}
+          {{saveAs}} = [NSMutableString stringWithString:actualValue];
+          {{else}}
           {{saveAs}} = [actualValue {{asObjectiveCNumberType "" type true}}Value];
+          {{/if}}
           {{/if}}
         }
         {{/if}}
@@ -177,7 +183,11 @@ ResponseHandler {{> subscribeDataCallback}} = nil;
           XCTAssertFalse(actualValue == nil);
         {{else}}
           if (actualValue != nil) {
+            {{#if (isString type)}}
+            XCTAssertNotEqualObjects(actualValue, {{expectedConstraints.notValue}});
+            {{else}}
             XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.notValue type}});
+            {{/if}}
           }
         {{/if}}
         }

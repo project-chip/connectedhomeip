@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2022 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-import("${chip_root}/examples/platform/qpg/args.gni")
-
-qpg_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+import("//build_overrides/pigweed.gni")
 
 declare_args() {
-  chip_enable_ota_requestor = true
+  chip_build_pw_trace_lib = false
+}
+
+source_set("trace") {
+  sources = [ "trace.h" ]
+
+  if (chip_build_pw_trace_lib) {
+    cflags = [ "-DPW_TRACE_BACKEND_SET=1" ]
+    public_deps = [ "${dir_pigweed}/pw_trace" ]
+  }
 }

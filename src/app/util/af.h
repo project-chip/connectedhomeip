@@ -92,59 +92,29 @@
  * @return Returns pointer to the attribute metadata location.
  */
 EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                          chip::AttributeId attributeId, uint8_t mask, uint16_t manufacturerCode);
+                                                          chip::AttributeId attributeId, uint8_t mask);
 
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 /** @brief Returns true if the attribute exists. */
-bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t mask,
-                              uint16_t manufacturerCode);
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t mask);
 #else
-#define emberAfContainsAttribute(endpoint, clusterId, attributeId, mask, manufacturerCode)                                         \
-    (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask, manufacturerCode) != NULL)
+#define emberAfContainsAttribute(endpoint, clusterId, attributeId, mask)                                                           \
+    (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask) != NULL)
 #endif
-
-/**
- * @brief Returns true if endpoint contains a cluster, checking for mfg code.
- *
- * This function returns true regardless of whether
- * the endpoint contains server, client or both.
- * For standard libraries (when ClusterId < FC00),
- * the manufacturerCode is ignored.
- */
-bool emberAfContainsClusterWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
 
 /**
  * @brief Returns true if endpoint contains the ZCL cluster with specified id.
  *
  * This function returns true regardless of whether
  * the endpoint contains server, client or both in the Zigbee cluster Library.
- * This wraps emberAfContainsClusterWithMfgCode with
- * manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE
- * If this function is used with a manufacturer specific clusterId
- * then this will return the first cluster that it finds in the Cluster table.
- * and will not return any other clusters that share that id.
  */
 bool emberAfContainsCluster(chip::EndpointId endpoint, chip::ClusterId clusterId);
-
-/**
- * @brief Returns true if endpoint has cluster server, checking for mfg code.
- *
- * This function returns true if
- * the endpoint contains server of a given cluster.
- * For standard librarys (when ClusterId < FC00), the manufacturerCode is ignored.
- */
-bool emberAfContainsServerWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
 
 /**
  * @brief Returns true if endpoint contains the ZCL server with specified id.
  *
  * This function returns true if
  * the endpoint contains server of a given cluster.
- * This wraps emberAfContainsServer with
- * manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE
- * If this function is used with a manufacturer specific clusterId
- * then this will return the first cluster that it finds in the Cluster table.
- * and will not return any other clusters that share that id.
  */
 bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
@@ -160,25 +130,10 @@ bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId)
 bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
 
 /**
- * @brief Returns true if endpoint contains cluster client.
- *
- * This function returns true if
- * the endpoint contains client of a given cluster.
- * For standard library clusters (when ClusterId < FC00),
- * the manufacturerCode is ignored.
- */
-bool emberAfContainsClientWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
-
-/**
  * @brief Returns true if endpoint contains the ZCL client with specified id.
  *
  * This function returns true if
  * the endpoint contains client of a given cluster.
- * This wraps emberAfContainsClient with
- * manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE
- * If this function is used with a manufacturer specific clusterId
- * then this will return the first cluster that it finds in the Cluster table.
- * and will not return any other clusters that share that id.
  */
 bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId);
 

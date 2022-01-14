@@ -21,11 +21,20 @@ const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 const queryCommand = require(zapPath + 'db/query-command.js')
 const zclQuery     = require(zapPath + 'db/query-zcl.js')
+const queryEvents  = require(zapPath + 'db/query-event.js')
 const cHelper      = require(zapPath + 'generator/helper-c.js')
 const string       = require(zapPath + 'util/string.js')
+const dbEnum       = require(zapPath + '../src-shared/db-enum.js')
 
 const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
+
+zclHelper['isEvent'] = function(db, event_name, packageId) {
+    return queryEvents
+      .selectAllEvents(db, packageId)
+      .then(events => events.find(event => event.name == event_name))
+      .then(events => events ? 'event' : dbEnum.zclType.unknown);
+}
 
 // This list of attributes is taken from section '11.2. Global Attributes' of the
 // Data Model specification.
@@ -398,6 +407,10 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
       return ns + 'Structs::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
     }
 
+    if (await typeChecker('isEvent')) {
+      return ns + 'Events::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
+    }
+
     return zclHelper.asUnderlyingZclType.call({ global : this.global }, type, options);
   }
 
@@ -690,6 +703,22 @@ function hasProperty(obj, prop)
   return prop in obj;
 }
 
+async function zcl_events_fields_by_event_name(name, options)
+{
+  const { db, sessionId } = this.global;
+  const packageId         = await templateUtil.ensureZclPackageId(this)
+
+  const promise = queryEvents.selectAllEvents(db, packageId)
+                      .then(events => events.find(event => event.name == name))
+                      .then(evt => queryEvents.selectEventFieldsByEventId(db, evt.id))
+                      .then(fields => fields.map(field => {
+                        field.label = field.name;
+                        return field;
+                      }))
+                      .then(fields => templateUtil.collectBlocks(fields, options, this))
+  return templateUtil.templatePromise(this.global, promise)
+}
+
 //
 // Module exports
 //
@@ -710,3 +739,4 @@ exports.getResponseCommandName              = getResponseCommandName;
 exports.isWeaklyTypedEnum                   = isWeaklyTypedEnum;
 exports.getPythonFieldDefault               = getPythonFieldDefault;
 exports.incrementDepth                      = incrementDepth;
+exports.zcl_events_fields_by_event_name     = zcl_events_fields_by_event_name;

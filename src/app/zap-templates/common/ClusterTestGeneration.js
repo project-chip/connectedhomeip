@@ -26,9 +26,10 @@ const path              = require('path');
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
-const { getClusters, getCommands, getAttributes, isTestOnlyCluster } = require('./simulated-clusters/SimulatedClusters.js');
-const { asBlocks, ensureClusters }                                   = require('./ClustersHelper.js');
-const { Variables }                                                  = require('./variables/Variables.js');
+const { getClusters, getCommands, getAttributes, getEvents, isTestOnlyCluster }
+= require('./simulated-clusters/SimulatedClusters.js');
+const { asBlocks, ensureClusters } = require('./ClustersHelper.js');
+const { Variables }                = require('./variables/Variables.js');
 
 const kIdentityName           = 'identity';
 const kClusterName            = 'cluster';
@@ -86,6 +87,15 @@ function setDefaultTypeForWaitCommand(test)
 {
   const type = test[kWaitCommandName];
   switch (type) {
+  case 'readEvent':
+    test.isEvent     = true;
+    test.isReadEvent = true;
+    break;
+  case 'subscribeEvent':
+    test.isEvent          = true;
+    test.isSubscribe      = true;
+    test.isSubscribeEvent = true;
+    break;
   case 'readAttribute':
     test.isAttribute     = true;
     test.isReadAttribute = true;
@@ -96,6 +106,7 @@ function setDefaultTypeForWaitCommand(test)
     break;
   case 'subscribeAttribute':
     test.isAttribute          = true;
+    test.isSubscribe          = true;
     test.isSubscribeAttribute = true;
     break;
   default:
@@ -111,6 +122,19 @@ function setDefaultTypeForCommand(test)
 {
   const type = test[kCommandName];
   switch (type) {
+  case 'readEvent':
+    test.commandName = 'Read';
+    test.isEvent     = true;
+    test.isReadEvent = true;
+    break;
+
+  case 'subscribeEvent':
+    test.commandName      = 'Subscribe';
+    test.isEvent          = true;
+    test.isSubscribe      = true;
+    test.isSubscribeEvent = true;
+    break;
+
   case 'readAttribute':
     test.commandName     = 'Read';
     test.isAttribute     = true;
@@ -130,6 +154,7 @@ function setDefaultTypeForCommand(test)
   case 'subscribeAttribute':
     test.commandName          = 'Subscribe';
     test.isAttribute          = true;
+    test.isSubscribe          = true;
     test.isSubscribeAttribute = true;
     break;
 
@@ -243,13 +268,13 @@ function setDefaultResponse(test)
     return;
   }
 
-  if (!test.isAttribute) {
+  if (!test.isAttribute && !test.isEvent) {
     return;
   }
 
-  if (test.isWriteAttribute || test.isSubscribeAttribute) {
+  if (test.isWriteAttribute || test.isSubscribe) {
     if (hasResponseValueOrConstraints) {
-      const errorStr = 'Attribute test has a "value" or a "constraints" defined.';
+      const errorStr = 'Test has a "value" or a "constraints" defined.';
       throwError(test, errorStr);
     }
 
@@ -263,14 +288,19 @@ function setDefaultResponse(test)
     throwError(test, errorStr);
   }
 
+  const name     = test.isAttribute ? test.attribute : test.event;
+  const response = test[kResponseName];
   if (hasResponseValue) {
-    test[kResponseName].values.push(
-        { name : test.attribute, value : test[kResponseName].value, saveAs : test[kResponseName].saveAs });
+    const value = { name, value : response.value, saveAs : response.saveAs };
+    response.values.push(value);
   }
 
   if (hasResponseConstraints) {
-    test[kResponseName].values.push(
-        { name : test.attribute, constraints : test[kResponseName].constraints, saveAs : test[kResponseName].saveAs });
+    let constraints = { name : name, constraints : response.constraints };
+    if ('saveAs' in response && !hasResponseValue) {
+      constraints.saveAs = response.saveAs;
+    }
+    response.values.push(constraints);
   }
 
   delete test[kResponseName].value;
@@ -364,7 +394,7 @@ function printErrorAndExit(context, msg)
   process.exit(1);
 }
 
-function assertCommandOrAttribute(context)
+function assertCommandOrAttributeOrEvent(context)
 {
   const clusterName = context.cluster;
   return getClusters(context).then(clusters => {
@@ -382,6 +412,9 @@ function assertCommandOrAttribute(context)
     } else if (context.isAttribute) {
       filterName = context.attribute;
       items      = getAttributes(context, clusterName);
+    } else if (context.isEvent) {
+      filterName = context.event;
+      items      = getEvents(context, clusterName);
     } else {
       printErrorAndExit(context, 'Unsupported command type: ', context);
     }
@@ -389,17 +422,17 @@ function assertCommandOrAttribute(context)
     return items.then(items => {
       const filter = item => item.name.toLowerCase() == filterName.toLowerCase();
       const item          = items.find(filter);
-      const itemType      = (context.isCommand ? 'Command' : 'Attribute');
+      const itemType      = (context.isCommand ? 'Command' : context.isAttribute ? 'Attribute' : 'Event');
 
-      // If the command or attribute is not found, it could be because of a typo in the test
-      // description, or an attribute name not matching the spec, or a wrongly configured zap
+      // If the command/attribute/event is not found, it could be because of a typo in the test
+      // description, or an attribute/event name not matching the spec, or a wrongly configured zap
       // file.
       if (!item) {
         const names = items.map(item => item.name);
         printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" in: \n\t* ' + names.join('\n\t* '));
       }
 
-      // If the command or attribute has been found but the response can not be found, it could be
+      // If the command/attribute/event has been found but the response can not be found, it could be
       // because of a wrongly configured cluster definition.
       if (!item.response) {
         printErrorAndExit(context, 'Missing ' + itemType + ' "' + filterName + '" response');
@@ -437,7 +470,7 @@ function chip_tests_pics(options)
 
 async function chip_tests(list, options)
 {
-  // Set a global on our items so assertCommandOrAttribute can work.
+  // Set a global on our items so assertCommandOrAttributeOrEvent can work.
   let global  = this.global;
   const items = Array.isArray(list) ? list : list.split(',');
   const names = items.map(name => name.trim());
@@ -448,11 +481,14 @@ async function chip_tests(list, options)
     test.tests = await Promise.all(test.tests.map(async function(item) {
       item.global = global;
       if (item.isCommand) {
-        let command        = await assertCommandOrAttribute(item);
+        let command        = await assertCommandOrAttributeOrEvent(item);
         item.commandObject = command;
       } else if (item.isAttribute) {
-        let attr             = await assertCommandOrAttribute(item);
+        let attr             = await assertCommandOrAttributeOrEvent(item);
         item.attributeObject = attr;
+      } else if (item.isEvent) {
+        let evt          = await assertCommandOrAttributeOrEvent(item);
+        item.eventObject = evt;
       }
       return item;
     }));
@@ -472,12 +508,7 @@ function chip_tests_items(options)
   return templateUtil.collectBlocks(this.tests, options, this);
 }
 
-function chip_tests_config(options)
-{
-  return templateUtil.collectBlocks(this.variables.config, options, this);
-}
-
-function getConfigVariable(context, name)
+function getVariable(context, key, name)
 {
   while (!('variables' in context) && context.parent) {
     context = context.parent;
@@ -487,33 +518,55 @@ function getConfigVariable(context, name)
     return null;
   }
 
-  return context.variables.config.find(variable => variable.name == name);
+  return context.variables[key].find(variable => variable.name == name);
 }
 
-function getConfigVariableOrThrow(context, name)
+function getVariableOrThrow(context, key, name)
 {
-  const variable = getConfigVariable(context, name);
+  const variable = getVariable(context, key, name);
   if (variable == null) {
     throw new Error(`Variable ${name} can not be found`);
   }
   return variable;
 }
 
+function chip_tests_variables(options)
+{
+  return templateUtil.collectBlocks(this.variables.tests, options, this);
+}
+
+function chip_tests_variables_has(name, options)
+{
+  const variable = getVariable(this, 'tests', name);
+  return !!variable;
+}
+
+function chip_tests_variables_get_type(name, options)
+{
+  const variable = getVariableOrThrow(this, 'tests', name);
+  return variable.type;
+}
+
+function chip_tests_config(options)
+{
+  return templateUtil.collectBlocks(this.variables.config, options, this);
+}
+
 function chip_tests_config_has(name, options)
 {
-  const variable = getConfigVariable(this, name);
+  const variable = getVariable(this, 'config', name);
   return !!variable;
 }
 
 function chip_tests_config_get_default_value(name, options)
 {
-  const variable = getConfigVariableOrThrow(this, name);
+  const variable = getVariableOrThrow(this, 'config', name);
   return variable.defaultValue;
 }
 
 function chip_tests_config_get_type(name, options)
 {
-  const variable = getConfigVariableOrThrow(this, name);
+  const variable = getVariableOrThrow(this, 'config', name);
   return variable.type;
 }
 
@@ -557,9 +610,9 @@ function chip_tests_item_parameters(options)
 {
   const commandValues = this.arguments.values;
 
-  const promise = assertCommandOrAttribute(this).then(item => {
-    if (this.isAttribute && !this.isWriteAttribute) {
-      if (this.isSubscribeAttribute) {
+  const promise = assertCommandOrAttributeOrEvent(this).then(item => {
+    if ((this.isAttribute || this.isEvent) && !this.isWriteAttribute) {
+      if (this.isSubscribe) {
         const minInterval = { name : 'minInterval', type : 'int16u', chipType : 'uint16_t', definedValue : this.minInterval };
         const maxInterval = { name : 'maxInterval', type : 'int16u', chipType : 'uint16_t', definedValue : this.maxInterval };
         return [ minInterval, maxInterval ];
@@ -595,7 +648,7 @@ function chip_tests_item_response_parameters(options)
 {
   const responseValues = this.response.values.slice();
 
-  const promise = assertCommandOrAttribute(this).then(item => {
+  const promise = assertCommandOrAttributeOrEvent(this).then(item => {
     if (this.isWriteAttribute) {
       return [];
     }
@@ -686,6 +739,9 @@ exports.chip_tests_config                   = chip_tests_config;
 exports.chip_tests_config_has               = chip_tests_config_has;
 exports.chip_tests_config_get_default_value = chip_tests_config_get_default_value;
 exports.chip_tests_config_get_type          = chip_tests_config_get_type;
+exports.chip_tests_variables                = chip_tests_variables;
+exports.chip_tests_variables_has            = chip_tests_variables_has;
+exports.chip_tests_variables_get_type       = chip_tests_variables_get_type;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
 exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;
