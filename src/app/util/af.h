@@ -94,14 +94,6 @@
 EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                           chip::AttributeId attributeId, uint8_t mask);
 
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-/** @brief Returns true if the attribute exists. */
-bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t mask);
-#else
-#define emberAfContainsAttribute(endpoint, clusterId, attributeId, mask)                                                           \
-    (emberAfLocateAttributeMetadata(endpoint, clusterId, attributeId, mask) != NULL)
-#endif
-
 /**
  * @brief Returns true if endpoint contains the ZCL cluster with specified id.
  *
