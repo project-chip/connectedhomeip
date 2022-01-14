@@ -104,7 +104,8 @@ private:
             ReturnErrorOnFailure(DeviceLayer::PersistedStorage::KeyValueStoreMgr().Get(key, buffer, size, &bytesRead));
             if (!CanCastTo<uint16_t>(bytesRead))
             {
-                ChipLogDetail(AppServer, "%zu is too big to fit in uint16_t", bytesRead);
+                ChipLogDetail(AppServer, "0x" ChipLogFormatX64 " is too big to fit in uint16_t",
+                              ChipLogValueX64(static_cast<uint64_t>(bytesRead)));
                 return CHIP_ERROR_BUFFER_TOO_SMALL;
             }
             ChipLogProgress(AppServer, "Retrieved from server storage: %s", key);

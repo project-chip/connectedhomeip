@@ -3,8 +3,9 @@
 // Prevent multiple inclusion
 #pragma once
 
-{{#endpoint_config}}
+#include <lib/core/CHIPConfig.h>
 
+{{#endpoint_config}}
 
 // Default values for the attributes longer than a pointer,
 // in a form of a binary blob
@@ -72,6 +73,9 @@
 
 // Largest attribute size is needed for various buffers
 #define ATTRIBUTE_LARGEST ({{endpoint_largest_attribute_size}})
+
+static_assert(ATTRIBUTE_LARGEST <= CHIP_CONFIG_MAX_ATTRIBUTE_STORE_ELEMENT_SIZE,
+              "ATTRIBUTE_LARGEST larger than expected");
 
 // Total size of singleton attributes
 #define ATTRIBUTE_SINGLETONS_SIZE ({{endpoint_singletons_size}})
