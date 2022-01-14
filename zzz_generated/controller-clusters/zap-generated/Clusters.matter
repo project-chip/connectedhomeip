@@ -2,8 +2,8 @@
 // It is for view/code review purposes only.
 
 struct LabelStruct {
-  CHAR_STRING label = 1;
-  CHAR_STRING value = 2;
+    CHAR_STRING label = 1;
+    CHAR_STRING value = 2;
 }
 
 client cluster AccessControl = 31 {
@@ -51,24 +51,21 @@ client cluster AccountLogin = 1294 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct GetSetupPINRequestRequest {
-    CHAR_STRING tempAccountIdentifier;
+    CHAR_STRING tempAccountIdentifier = 0;
   }
 
   request struct LoginRequestRequest {
-    CHAR_STRING tempAccountIdentifier;
-    CHAR_STRING setupPIN;
-  }
-
-  request struct LogoutRequestRequest {
+    CHAR_STRING tempAccountIdentifier = 0;
+    CHAR_STRING setupPIN = 1;
   }
 
   response struct GetSetupPINResponse {
-    CHAR_STRING setupPIN;
+    CHAR_STRING setupPIN = 0;
   }
 
   command GetSetupPINRequest(GetSetupPINRequestRequest): GetSetupPINResponse = 0;
   command LoginRequest(LoginRequestRequest): DefaultSuccess = 2;
-  command LogoutRequest(LogoutRequestRequest): DefaultSuccess = 3;
+  command LogoutRequest(): DefaultSuccess = 3;
 }
 
 client cluster AdministratorCommissioning = 60 {
@@ -91,24 +88,21 @@ client cluster AdministratorCommissioning = 60 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct OpenBasicCommissioningWindowRequest {
-    INT16U CommissioningTimeout;
+    INT16U commissioningTimeout = 0;
   }
 
   request struct OpenCommissioningWindowRequest {
-    INT16U CommissioningTimeout;
-    OCTET_STRING PAKEVerifier;
-    INT16U Discriminator;
-    INT32U Iterations;
-    OCTET_STRING Salt;
-    INT16U PasscodeID;
-  }
-
-  request struct RevokeCommissioningRequest {
+    INT16U commissioningTimeout = 0;
+    OCTET_STRING PAKEVerifier = 1;
+    INT16U discriminator = 2;
+    INT32U iterations = 3;
+    OCTET_STRING salt = 4;
+    INT16U passcodeID = 5;
   }
 
   command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
   command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
-  command RevokeCommissioning(RevokeCommissioningRequest): DefaultSuccess = 2;
+  command RevokeCommissioning(): DefaultSuccess = 2;
 }
 
 client cluster ApplicationBasic = 1293 {
@@ -153,21 +147,21 @@ client cluster ApplicationLauncher = 1292 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct HideAppRequestRequest {
-    ApplicationLauncherApplication application;
+    ApplicationLauncherApplication application = 0;
   }
 
   request struct LaunchAppRequestRequest {
-    CHAR_STRING data;
-    ApplicationLauncherApplication application;
+    CHAR_STRING data = 0;
+    ApplicationLauncherApplication application = 1;
   }
 
   request struct StopAppRequestRequest {
-    ApplicationLauncherApplication application;
+    ApplicationLauncherApplication application = 0;
   }
 
   response struct LauncherResponse {
-    StatusEnum status;
-    CHAR_STRING data;
+    StatusEnum status = 0;
+    CHAR_STRING data = 1;
   }
 
   command HideAppRequest(HideAppRequestRequest): LauncherResponse = 2;
@@ -197,12 +191,12 @@ client cluster AudioOutput = 1291 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct RenameOutputRequestRequest {
-    INT8U index;
-    CHAR_STRING name;
+    INT8U index = 0;
+    CHAR_STRING name = 1;
   }
 
   request struct SelectOutputRequestRequest {
-    INT8U index;
+    INT8U index = 0;
   }
 
   command RenameOutputRequest(RenameOutputRequestRequest): DefaultSuccess = 1;
@@ -218,14 +212,11 @@ client cluster BarrierControl = 259 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct BarrierControlGoToPercentRequest {
-    INT8U percentOpen;
-  }
-
-  request struct BarrierControlStopRequest {
+    INT8U percentOpen = 0;
   }
 
   command BarrierControlGoToPercent(BarrierControlGoToPercentRequest): DefaultSuccess = 0;
-  command BarrierControlStop(BarrierControlStopRequest): DefaultSuccess = 1;
+  command BarrierControlStop(): DefaultSuccess = 1;
 }
 
 client cluster Basic = 40 {
@@ -265,10 +256,7 @@ client cluster Basic = 40 {
   attribute(readonly) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
-  request struct MfgSpecificPingRequest {
-  }
-
-  command MfgSpecificPing(MfgSpecificPingRequest): DefaultSuccess = 0;
+  command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 client cluster BinaryInputBasic = 15 {
@@ -284,17 +272,17 @@ client cluster Binding = 30 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct BindRequest {
-    NODE_ID nodeId;
-    GROUP_ID groupId;
-    ENDPOINT_NO endpointId;
-    CLUSTER_ID clusterId;
+    NODE_ID nodeId = 0;
+    GROUP_ID groupId = 1;
+    ENDPOINT_NO endpointId = 2;
+    CLUSTER_ID clusterId = 3;
   }
 
   request struct UnbindRequest {
-    NODE_ID nodeId;
-    GROUP_ID groupId;
-    ENDPOINT_NO endpointId;
-    CLUSTER_ID clusterId;
+    NODE_ID nodeId = 0;
+    GROUP_ID groupId = 1;
+    ENDPOINT_NO endpointId = 2;
+    CLUSTER_ID clusterId = 3;
   }
 
   command Bind(BindRequest): DefaultSuccess = 0;
@@ -376,68 +364,68 @@ client cluster BridgedActions = 37 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct DisableActionRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
   }
 
   request struct DisableActionWithDurationRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
-    INT32U Duration;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
+    INT32U duration = 2;
   }
 
   request struct EnableActionRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
   }
 
   request struct EnableActionWithDurationRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
-    INT32U Duration;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
+    INT32U duration = 2;
   }
 
   request struct InstantActionRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
   }
 
   request struct InstantActionWithTransitionRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
-    INT16U TransitionTime;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
+    INT16U transitionTime = 2;
   }
 
   request struct PauseActionRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
   }
 
   request struct PauseActionWithDurationRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
-    INT32U Duration;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
+    INT32U duration = 2;
   }
 
   request struct ResumeActionRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
   }
 
   request struct StartActionRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
   }
 
   request struct StartActionWithDurationRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
-    INT32U Duration;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
+    INT32U duration = 2;
   }
 
   request struct StopActionRequest {
-    INT16U ActionID;
-    optional INT32U InvokeID;
+    INT16U actionID = 0;
+    optional INT32U invokeID = 1;
   }
 
   command DisableAction(DisableActionRequest): DefaultSuccess = 10;
@@ -482,21 +470,21 @@ client cluster Channel = 1284 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ChangeChannelByNumberRequestRequest {
-    INT16U majorNumber;
-    INT16U minorNumber;
+    INT16U majorNumber = 0;
+    INT16U minorNumber = 1;
   }
 
   request struct ChangeChannelRequestRequest {
-    CHAR_STRING match;
+    CHAR_STRING match = 0;
   }
 
   request struct SkipChannelRequestRequest {
-    INT16U count;
+    INT16U count = 0;
   }
 
   response struct ChangeChannelResponse {
-    ChannelInfo channelMatch;
-    ErrorTypeEnum errorType;
+    ChannelInfo channelMatch = 0;
+    ErrorTypeEnum errorType = 1;
   }
 
   command ChangeChannelByNumberRequest(ChangeChannelByNumberRequestRequest): DefaultSuccess = 2;
@@ -607,151 +595,151 @@ client cluster ColorControl = 768 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ColorLoopSetRequest {
-    ColorLoopUpdateFlags updateFlags;
-    ColorLoopAction action;
-    ColorLoopDirection direction;
-    INT16U time;
-    INT16U startHue;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    ColorLoopUpdateFlags updateFlags = 0;
+    ColorLoopAction action = 1;
+    ColorLoopDirection direction = 2;
+    INT16U time = 3;
+    INT16U startHue = 4;
+    BITMAP8 optionsMask = 5;
+    BITMAP8 optionsOverride = 6;
   }
 
   request struct EnhancedMoveHueRequest {
-    HueMoveMode moveMode;
-    INT16U rate;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    HueMoveMode moveMode = 0;
+    INT16U rate = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct EnhancedMoveToHueRequest {
-    INT16U enhancedHue;
-    HueDirection direction;
-    INT16U transitionTime;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    INT16U enhancedHue = 0;
+    HueDirection direction = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct EnhancedMoveToHueAndSaturationRequest {
-    INT16U enhancedHue;
-    INT8U saturation;
-    INT16U transitionTime;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    INT16U enhancedHue = 0;
+    INT8U saturation = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct EnhancedStepHueRequest {
-    HueStepMode stepMode;
-    INT16U stepSize;
-    INT16U transitionTime;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    HueStepMode stepMode = 0;
+    INT16U stepSize = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct MoveColorRequest {
-    INT16S rateX;
-    INT16S rateY;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    INT16S rateX = 0;
+    INT16S rateY = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveColorTemperatureRequest {
-    HueMoveMode moveMode;
-    INT16U rate;
-    INT16U colorTemperatureMinimum;
-    INT16U colorTemperatureMaximum;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    HueMoveMode moveMode = 0;
+    INT16U rate = 1;
+    INT16U colorTemperatureMinimum = 2;
+    INT16U colorTemperatureMaximum = 3;
+    BITMAP8 optionsMask = 4;
+    BITMAP8 optionsOverride = 5;
   }
 
   request struct MoveHueRequest {
-    HueMoveMode moveMode;
-    INT8U rate;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    HueMoveMode moveMode = 0;
+    INT8U rate = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveSaturationRequest {
-    SaturationMoveMode moveMode;
-    INT8U rate;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    SaturationMoveMode moveMode = 0;
+    INT8U rate = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveToColorRequest {
-    INT16U colorX;
-    INT16U colorY;
-    INT16U transitionTime;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    INT16U colorX = 0;
+    INT16U colorY = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct MoveToColorTemperatureRequest {
-    INT16U colorTemperature;
-    INT16U transitionTime;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    INT16U colorTemperature = 0;
+    INT16U transitionTime = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct MoveToHueRequest {
-    INT8U hue;
-    HueDirection direction;
-    INT16U transitionTime;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    INT8U hue = 0;
+    HueDirection direction = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct MoveToHueAndSaturationRequest {
-    INT8U hue;
-    INT8U saturation;
-    INT16U transitionTime;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    INT8U hue = 0;
+    INT8U saturation = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct MoveToSaturationRequest {
-    INT8U saturation;
-    INT16U transitionTime;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    INT8U saturation = 0;
+    INT16U transitionTime = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
   }
 
   request struct StepColorRequest {
-    INT16S stepX;
-    INT16S stepY;
-    INT16U transitionTime;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    INT16S stepX = 0;
+    INT16S stepY = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct StepColorTemperatureRequest {
-    HueStepMode stepMode;
-    INT16U stepSize;
-    INT16U transitionTime;
-    INT16U colorTemperatureMinimum;
-    INT16U colorTemperatureMaximum;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    HueStepMode stepMode = 0;
+    INT16U stepSize = 1;
+    INT16U transitionTime = 2;
+    INT16U colorTemperatureMinimum = 3;
+    INT16U colorTemperatureMaximum = 4;
+    BITMAP8 optionsMask = 5;
+    BITMAP8 optionsOverride = 6;
   }
 
   request struct StepHueRequest {
-    HueStepMode stepMode;
-    INT8U stepSize;
-    INT8U transitionTime;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    HueStepMode stepMode = 0;
+    INT8U stepSize = 1;
+    INT8U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct StepSaturationRequest {
-    SaturationStepMode stepMode;
-    INT8U stepSize;
-    INT8U transitionTime;
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    SaturationStepMode stepMode = 0;
+    INT8U stepSize = 1;
+    INT8U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
   }
 
   request struct StopMoveStepRequest {
-    BITMAP8 optionsMask;
-    BITMAP8 optionsOverride;
+    BITMAP8 optionsMask = 0;
+    BITMAP8 optionsOverride = 1;
   }
 
   command ColorLoopSet(ColorLoopSetRequest): DefaultSuccess = 68;
@@ -845,20 +833,20 @@ client cluster ContentLauncher = 1290 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct LaunchContentRequestRequest {
-    BOOLEAN autoPlay;
-    CHAR_STRING data;
-    ContentSearch search;
+    BOOLEAN autoPlay = 0;
+    CHAR_STRING data = 1;
+    ContentSearch search[] = 2;
   }
 
   request struct LaunchURLRequestRequest {
-    CHAR_STRING contentURL;
-    CHAR_STRING displayString;
-    BrandingInformation brandingInformation;
+    CHAR_STRING contentURL = 0;
+    CHAR_STRING displayString = 1;
+    BrandingInformation brandingInformation = 2;
   }
 
   response struct LaunchResponse {
-    StatusEnum status;
-    CHAR_STRING data;
+    StatusEnum status = 0;
+    CHAR_STRING data = 1;
   }
 
   command LaunchContentRequest(LaunchContentRequestRequest): LaunchResponse = 0;
@@ -902,16 +890,16 @@ client cluster DiagnosticLogs = 50 {
   attribute(readonly) attrib_id attributeList[] = 65531;
 
   request struct RetrieveLogsRequestRequest {
-    LogsIntent intent;
-    LogsTransferProtocol requestedProtocol;
-    OCTET_STRING transferFileDesignator;
+    LogsIntent intent = 0;
+    LogsTransferProtocol requestedProtocol = 1;
+    OCTET_STRING transferFileDesignator = 2;
   }
 
   response struct RetrieveLogsResponse {
-    LogsStatus status;
-    OCTET_STRING content;
-    epoch_s timeStamp;
-    INT32U timeSinceBoot;
+    LogsStatus status = 0;
+    OCTET_STRING content = 1;
+    epoch_s timeStamp = 2;
+    INT32U timeSinceBoot = 3;
   }
 
   command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
@@ -1173,70 +1161,70 @@ client cluster DoorLock = 257 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ClearCredentialRequest {
-    DlCredential credential;
+    DlCredential credential = 0;
   }
 
   request struct ClearUserRequest {
-    INT16U userIndex;
+    INT16U userIndex = 0;
   }
 
   request struct GetCredentialStatusRequest {
-    DlCredential credential;
+    DlCredential credential = 0;
   }
 
   request struct GetUserRequest {
-    INT16U userIndex;
+    INT16U userIndex = 0;
   }
 
   request struct LockDoorRequest {
-    optional OCTET_STRING pinCode;
+    optional OCTET_STRING pinCode = 0;
   }
 
   request struct SetCredentialRequest {
-    DlDataOperationType operationType;
-    DlCredential credential;
-    LONG_OCTET_STRING credentialData;
-    INT16U userIndex;
-    DlUserStatus userStatus;
+    DlDataOperationType operationType = 0;
+    DlCredential credential = 1;
+    LONG_OCTET_STRING credentialData = 2;
+    INT16U userIndex = 3;
+    DlUserStatus userStatus = 4;
   }
 
   request struct SetUserRequest {
-    DlDataOperationType operationType;
-    INT16U userIndex;
-    nullable CHAR_STRING userName;
-    nullable INT32U userUniqueId;
-    DlUserStatus userStatus;
-    DlUserType userType;
-    DlCredentialRule credentialRule;
+    DlDataOperationType operationType = 0;
+    INT16U userIndex = 1;
+    nullable CHAR_STRING userName = 2;
+    nullable INT32U userUniqueId = 3;
+    DlUserStatus userStatus = 4;
+    DlUserType userType = 5;
+    DlCredentialRule credentialRule = 6;
   }
 
   request struct UnlockDoorRequest {
-    optional OCTET_STRING pinCode;
+    optional OCTET_STRING pinCode = 0;
   }
 
   response struct GetCredentialStatusResponse {
-    boolean credentialExists;
-    nullable INT16U userIndex;
-    nullable INT16U nextCredentialIndex;
+    boolean credentialExists = 0;
+    nullable INT16U userIndex = 1;
+    nullable INT16U nextCredentialIndex = 2;
   }
 
   response struct GetUserResponse {
-    INT16U userIndex;
-    nullable CHAR_STRING userName;
-    nullable INT32U userUniqueId;
-    nullable DlUserStatus userStatus;
-    nullable DlUserType userType;
-    nullable DlCredentialRule credentialRule;
-    nullable DlCredential credentials;
-    nullable fabric_idx creatorFabricIndex;
-    nullable fabric_idx lastModifiedFabricIndex;
-    INT16U nextUserIndex;
+    INT16U userIndex = 0;
+    nullable CHAR_STRING userName = 1;
+    nullable INT32U userUniqueId = 2;
+    nullable DlUserStatus userStatus = 3;
+    nullable DlUserType userType = 4;
+    nullable DlCredentialRule credentialRule = 5;
+    nullable DlCredential credentials[] = 6;
+    nullable fabric_idx creatorFabricIndex = 7;
+    nullable fabric_idx lastModifiedFabricIndex = 8;
+    INT16U nextUserIndex = 9;
   }
 
   response struct SetCredentialResponse {
-    DlStatus status;
-    nullable INT16U userIndex;
-    nullable INT16U nextCredentialIndex;
+    DlStatus status = 0;
+    nullable INT16U userIndex = 1;
+    nullable INT16U nextCredentialIndex = 2;
   }
 
   command ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
@@ -1292,10 +1280,7 @@ client cluster EthernetNetworkDiagnostics = 55 {
   attribute(readonly) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
-  request struct ResetCountsRequest {
-  }
-
-  command ResetCounts(ResetCountsRequest): DefaultSuccess = 0;
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 client cluster FixedLabel = 64 {
@@ -1339,38 +1324,35 @@ client cluster GeneralCommissioning = 48 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
-    INT16U expiryLengthSeconds;
-    INT64U breadcrumb;
-    INT32U timeoutMs;
-  }
-
-  request struct CommissioningCompleteRequest {
+    INT16U expiryLengthSeconds = 0;
+    INT64U breadcrumb = 1;
+    INT32U timeoutMs = 2;
   }
 
   request struct SetRegulatoryConfigRequest {
-    RegulatoryLocationType location;
-    CHAR_STRING countryCode;
-    INT64U breadcrumb;
-    INT32U timeoutMs;
+    RegulatoryLocationType location = 0;
+    CHAR_STRING countryCode = 1;
+    INT64U breadcrumb = 2;
+    INT32U timeoutMs = 3;
   }
 
   response struct ArmFailSafeResponse {
-    GeneralCommissioningError errorCode;
-    CHAR_STRING debugText;
+    GeneralCommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
   }
 
   response struct CommissioningCompleteResponse {
-    GeneralCommissioningError errorCode;
-    CHAR_STRING debugText;
+    GeneralCommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
   }
 
   response struct SetRegulatoryConfigResponse {
-    GeneralCommissioningError errorCode;
-    CHAR_STRING debugText;
+    GeneralCommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
   }
 
   command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
-  command CommissioningComplete(CommissioningCompleteRequest): CommissioningCompleteResponse = 4;
+  command CommissioningComplete(): CommissioningCompleteResponse = 4;
   command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
 }
 
@@ -1502,27 +1484,27 @@ client cluster GroupKeyManagement = 63 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct KeySetReadRequest {
-    INT16U groupKeySetID;
+    INT16U groupKeySetID = 0;
   }
 
   request struct KeySetReadAllIndicesRequest {
-    INT16U groupKeySetIDs;
+    INT16U groupKeySetIDs[] = 0;
   }
 
   request struct KeySetRemoveRequest {
-    INT16U groupKeySetID;
+    INT16U groupKeySetID = 0;
   }
 
   request struct KeySetWriteRequest {
-    GroupKeySet groupKeySet;
+    GroupKeySet groupKeySet = 0;
   }
 
   response struct KeySetReadAllIndicesResponse {
-    INT16U groupKeySetIDs;
+    INT16U groupKeySetIDs[] = 0;
   }
 
   response struct KeySetReadResponse {
-    GroupKeySet groupKeySet;
+    GroupKeySet groupKeySet = 0;
   }
 
   command KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
@@ -1537,55 +1519,52 @@ client cluster Groups = 4 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
-    INT16U groupId;
-    CHAR_STRING groupName;
+    INT16U groupId = 0;
+    CHAR_STRING groupName = 1;
   }
 
   request struct AddGroupIfIdentifyingRequest {
-    INT16U groupId;
-    CHAR_STRING groupName;
+    INT16U groupId = 0;
+    CHAR_STRING groupName = 1;
   }
 
   request struct GetGroupMembershipRequest {
-    INT16U groupList;
-  }
-
-  request struct RemoveAllGroupsRequest {
+    INT16U groupList[] = 0;
   }
 
   request struct RemoveGroupRequest {
-    INT16U groupId;
+    INT16U groupId = 0;
   }
 
   request struct ViewGroupRequest {
-    INT16U groupId;
+    INT16U groupId = 0;
   }
 
   response struct AddGroupResponse {
-    ENUM8 status;
-    INT16U groupId;
+    ENUM8 status = 0;
+    INT16U groupId = 1;
   }
 
   response struct GetGroupMembershipResponse {
-    INT8U capacity;
-    INT16U groupList;
+    INT8U capacity = 0;
+    INT16U groupList[] = 1;
   }
 
   response struct RemoveGroupResponse {
-    ENUM8 status;
-    INT16U groupId;
+    ENUM8 status = 0;
+    INT16U groupId = 1;
   }
 
   response struct ViewGroupResponse {
-    ENUM8 status;
-    INT16U groupId;
-    CHAR_STRING groupName;
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+    CHAR_STRING groupName = 2;
   }
 
   command AddGroup(AddGroupRequest): AddGroupResponse = 0;
   command AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
   command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
-  command RemoveAllGroups(RemoveAllGroupsRequest): DefaultSuccess = 4;
+  command RemoveAllGroups(): DefaultSuccess = 4;
   command RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
   command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
 }
@@ -1619,23 +1598,20 @@ client cluster Identify = 3 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
-    INT16U identifyTime;
-  }
-
-  request struct IdentifyQueryRequest {
+    INT16U identifyTime = 0;
   }
 
   request struct TriggerEffectRequest {
-    IdentifyEffectIdentifier effectIdentifier;
-    IdentifyEffectVariant effectVariant;
+    IdentifyEffectIdentifier effectIdentifier = 0;
+    IdentifyEffectVariant effectVariant = 1;
   }
 
   response struct IdentifyQueryResponse {
-    INT16U timeout;
+    INT16U timeout = 0;
   }
 
   command Identify(IdentifyRequest): DefaultSuccess = 0;
-  command IdentifyQuery(IdentifyQueryRequest): IdentifyQueryResponse = 1;
+  command IdentifyQuery(): IdentifyQueryResponse = 1;
   command TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
 }
 
@@ -1754,11 +1730,11 @@ client cluster KeypadInput = 1289 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct SendKeyRequestRequest {
-    CecKeyCode keyCode;
+    CecKeyCode keyCode = 0;
   }
 
   response struct SendKeyResponse {
-    StatusEnum status;
+    StatusEnum status = 0;
   }
 
   command SendKeyRequest(SendKeyRequestRequest): SendKeyResponse = 0;
@@ -1793,49 +1769,46 @@ client cluster LevelControl = 8 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct MoveRequest {
-    MoveMode moveMode;
-    INT8U rate;
-    BITMAP8 optionMask;
-    BITMAP8 optionOverride;
+    MoveMode moveMode = 0;
+    INT8U rate = 1;
+    BITMAP8 optionMask = 2;
+    BITMAP8 optionOverride = 3;
   }
 
   request struct MoveToLevelRequest {
-    INT8U level;
-    INT16U transitionTime;
-    BITMAP8 optionMask;
-    BITMAP8 optionOverride;
+    INT8U level = 0;
+    INT16U transitionTime = 1;
+    BITMAP8 optionMask = 2;
+    BITMAP8 optionOverride = 3;
   }
 
   request struct MoveToLevelWithOnOffRequest {
-    INT8U level;
-    INT16U transitionTime;
+    INT8U level = 0;
+    INT16U transitionTime = 1;
   }
 
   request struct MoveWithOnOffRequest {
-    MoveMode moveMode;
-    INT8U rate;
+    MoveMode moveMode = 0;
+    INT8U rate = 1;
   }
 
   request struct StepRequest {
-    StepMode stepMode;
-    INT8U stepSize;
-    INT16U transitionTime;
-    BITMAP8 optionMask;
-    BITMAP8 optionOverride;
+    StepMode stepMode = 0;
+    INT8U stepSize = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionMask = 3;
+    BITMAP8 optionOverride = 4;
   }
 
   request struct StepWithOnOffRequest {
-    StepMode stepMode;
-    INT8U stepSize;
-    INT16U transitionTime;
+    StepMode stepMode = 0;
+    INT8U stepSize = 1;
+    INT16U transitionTime = 2;
   }
 
   request struct StopRequest {
-    BITMAP8 optionMask;
-    BITMAP8 optionOverride;
-  }
-
-  request struct StopWithOnOffRequest {
+    BITMAP8 optionMask = 0;
+    BITMAP8 optionOverride = 1;
   }
 
   command Move(MoveRequest): DefaultSuccess = 1;
@@ -1845,7 +1818,7 @@ client cluster LevelControl = 8 {
   command Step(StepRequest): DefaultSuccess = 2;
   command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
   command Stop(StopRequest): DefaultSuccess = 3;
-  command StopWithOnOff(StopWithOnOffRequest): DefaultSuccess = 7;
+  command StopWithOnOff(): DefaultSuccess = 7;
 }
 
 client cluster LocalizationConfiguration = 43 {
@@ -1857,10 +1830,7 @@ client cluster LowPower = 1288 {
   attribute(readonly) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
-  request struct SleepRequest {
-  }
-
-  command Sleep(SleepRequest): DefaultSuccess = 0;
+  command Sleep(): DefaultSuccess = 0;
 }
 
 client cluster MediaInput = 1287 {
@@ -1891,25 +1861,19 @@ client cluster MediaInput = 1287 {
   attribute(readonly) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
-  request struct HideInputStatusRequestRequest {
-  }
-
   request struct RenameInputRequestRequest {
-    INT8U index;
-    CHAR_STRING name;
+    INT8U index = 0;
+    CHAR_STRING name = 1;
   }
 
   request struct SelectInputRequestRequest {
-    INT8U index;
+    INT8U index = 0;
   }
 
-  request struct ShowInputStatusRequestRequest {
-  }
-
-  command HideInputStatusRequest(HideInputStatusRequestRequest): DefaultSuccess = 2;
+  command HideInputStatusRequest(): DefaultSuccess = 2;
   command RenameInputRequest(RenameInputRequestRequest): DefaultSuccess = 3;
   command SelectInputRequest(SelectInputRequestRequest): DefaultSuccess = 0;
-  command ShowInputStatusRequest(ShowInputStatusRequestRequest): DefaultSuccess = 1;
+  command ShowInputStatusRequest(): DefaultSuccess = 1;
 }
 
 client cluster MediaPlayback = 1286 {
@@ -1938,57 +1902,33 @@ client cluster MediaPlayback = 1286 {
   attribute(readonly) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
-  request struct FastForwardRequestRequest {
-  }
-
-  request struct NextRequestRequest {
-  }
-
-  request struct PauseRequestRequest {
-  }
-
-  request struct PlayRequestRequest {
-  }
-
-  request struct PreviousRequestRequest {
-  }
-
-  request struct RewindRequestRequest {
-  }
-
   request struct SeekRequestRequest {
-    INT64U position;
+    INT64U position = 0;
   }
 
   request struct SkipBackwardRequestRequest {
-    INT64U deltaPositionMilliseconds;
+    INT64U deltaPositionMilliseconds = 0;
   }
 
   request struct SkipForwardRequestRequest {
-    INT64U deltaPositionMilliseconds;
-  }
-
-  request struct StartOverRequestRequest {
-  }
-
-  request struct StopRequestRequest {
+    INT64U deltaPositionMilliseconds = 0;
   }
 
   response struct PlaybackResponse {
-    StatusEnum status;
+    StatusEnum status = 0;
   }
 
-  command FastForwardRequest(FastForwardRequestRequest): PlaybackResponse = 7;
-  command NextRequest(NextRequestRequest): PlaybackResponse = 5;
-  command PauseRequest(PauseRequestRequest): PlaybackResponse = 1;
-  command PlayRequest(PlayRequestRequest): PlaybackResponse = 0;
-  command PreviousRequest(PreviousRequestRequest): PlaybackResponse = 4;
-  command RewindRequest(RewindRequestRequest): PlaybackResponse = 6;
+  command FastForwardRequest(): PlaybackResponse = 7;
+  command NextRequest(): PlaybackResponse = 5;
+  command PauseRequest(): PlaybackResponse = 1;
+  command PlayRequest(): PlaybackResponse = 0;
+  command PreviousRequest(): PlaybackResponse = 4;
+  command RewindRequest(): PlaybackResponse = 6;
   command SeekRequest(SeekRequestRequest): PlaybackResponse = 11;
   command SkipBackwardRequest(SkipBackwardRequestRequest): PlaybackResponse = 9;
   command SkipForwardRequest(SkipForwardRequestRequest): PlaybackResponse = 8;
-  command StartOverRequest(StartOverRequestRequest): PlaybackResponse = 3;
-  command StopRequest(StopRequestRequest): PlaybackResponse = 2;
+  command StartOverRequest(): PlaybackResponse = 3;
+  command StopRequest(): PlaybackResponse = 2;
 }
 
 client cluster ModeSelect = 80 {
@@ -2007,7 +1947,7 @@ client cluster ModeSelect = 80 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ChangeToModeRequest {
-    INT8U NewMode;
+    INT8U newMode = 0;
   }
 
   command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
@@ -2075,53 +2015,53 @@ client cluster NetworkCommissioning = 49 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
-    OCTET_STRING OperationalDataset;
-    INT64U Breadcrumb;
+    OCTET_STRING operationalDataset = 0;
+    INT64U breadcrumb = 1;
   }
 
   request struct AddOrUpdateWiFiNetworkRequest {
-    OCTET_STRING SSID;
-    OCTET_STRING Credentials;
-    INT64U breadcrumb;
+    OCTET_STRING ssid = 0;
+    OCTET_STRING credentials = 1;
+    INT64U breadcrumb = 2;
   }
 
   request struct ConnectNetworkRequest {
-    OCTET_STRING NetworkID;
-    INT64U Breadcrumb;
+    OCTET_STRING networkID = 0;
+    INT64U breadcrumb = 1;
   }
 
   request struct RemoveNetworkRequest {
-    OCTET_STRING NetworkID;
-    INT64U Breadcrumb;
+    OCTET_STRING networkID = 0;
+    INT64U breadcrumb = 1;
   }
 
   request struct ReorderNetworkRequest {
-    OCTET_STRING NetworkID;
-    INT8U NetworkIndex;
-    INT64U Breadcrumb;
+    OCTET_STRING networkID = 0;
+    INT8U networkIndex = 1;
+    INT64U breadcrumb = 2;
   }
 
   request struct ScanNetworksRequest {
-    OCTET_STRING SSID;
-    INT64U Breadcrumb;
+    OCTET_STRING ssid = 0;
+    INT64U breadcrumb = 1;
   }
 
   response struct ConnectNetworkResponse {
-    NetworkCommissioningStatus NetworkingStatus;
-    CHAR_STRING DebugText;
-    INT32S ErrorValue;
+    NetworkCommissioningStatus networkingStatus = 0;
+    CHAR_STRING debugText = 1;
+    INT32S errorValue = 2;
   }
 
   response struct NetworkConfigResponse {
-    NetworkCommissioningStatus NetworkingStatus;
-    CHAR_STRING DebugText;
+    NetworkCommissioningStatus networkingStatus = 0;
+    CHAR_STRING debugText = 1;
   }
 
   response struct ScanNetworksResponse {
-    NetworkCommissioningStatus NetworkingStatus;
-    CHAR_STRING DebugText;
-    optional WiFiInterfaceScanResult WiFiScanResults;
-    optional ThreadInterfaceScanResult ThreadScanResults;
+    NetworkCommissioningStatus networkingStatus = 0;
+    CHAR_STRING debugText = 1;
+    optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
+    optional ThreadInterfaceScanResult threadScanResults[] = 3;
   }
 
   command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
@@ -2157,40 +2097,40 @@ client cluster OtaSoftwareUpdateProvider = 41 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ApplyUpdateRequestRequest {
-    OCTET_STRING updateToken;
-    INT32U newVersion;
+    OCTET_STRING updateToken = 0;
+    INT32U newVersion = 1;
   }
 
   request struct NotifyUpdateAppliedRequest {
-    OCTET_STRING updateToken;
-    INT32U softwareVersion;
+    OCTET_STRING updateToken = 0;
+    INT32U softwareVersion = 1;
   }
 
   request struct QueryImageRequest {
-    vendor_id vendorId;
-    INT16U productId;
-    INT32U softwareVersion;
-    OTADownloadProtocol protocolsSupported;
-    optional INT16U hardwareVersion;
-    optional CHAR_STRING location;
-    optional BOOLEAN requestorCanConsent;
-    optional OCTET_STRING metadataForProvider;
+    vendor_id vendorId = 0;
+    INT16U productId = 1;
+    INT32U softwareVersion = 2;
+    OTADownloadProtocol protocolsSupported[] = 3;
+    optional INT16U hardwareVersion = 4;
+    optional CHAR_STRING location = 5;
+    optional BOOLEAN requestorCanConsent = 6;
+    optional OCTET_STRING metadataForProvider = 7;
   }
 
   response struct ApplyUpdateResponse {
-    OTAApplyUpdateAction action;
-    INT32U delayedActionTime;
+    OTAApplyUpdateAction action = 0;
+    INT32U delayedActionTime = 1;
   }
 
   response struct QueryImageResponse {
-    OTAQueryStatus status;
-    optional INT32U delayedActionTime;
-    optional CHAR_STRING imageURI;
-    optional INT32U softwareVersion;
-    optional CHAR_STRING softwareVersionString;
-    optional OCTET_STRING updateToken;
-    optional BOOLEAN userConsentNeeded;
-    optional OCTET_STRING metadataForRequestor;
+    OTAQueryStatus status = 0;
+    optional INT32U delayedActionTime = 1;
+    optional CHAR_STRING imageURI = 2;
+    optional INT32U softwareVersion = 3;
+    optional CHAR_STRING softwareVersionString = 4;
+    optional OCTET_STRING updateToken = 5;
+    optional BOOLEAN userConsentNeeded = 6;
+    optional OCTET_STRING metadataForRequestor = 7;
   }
 
   command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
@@ -2258,11 +2198,11 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
-    node_id providerNodeId;
-    vendor_id vendorId;
-    OTAAnnouncementReason announcementReason;
-    optional OCTET_STRING metadataForNode;
-    endpoint_no endpoint;
+    node_id providerNodeId = 0;
+    vendor_id vendorId = 1;
+    OTAAnnouncementReason announcementReason = 2;
+    optional OCTET_STRING metadataForNode = 3;
+    endpoint_no endpoint = 4;
   }
 
   command AnnounceOtaProvider(AnnounceOtaProviderRequest): DefaultSuccess = 0;
@@ -2301,35 +2241,23 @@ client cluster OnOff = 6 {
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
-  request struct OffRequest {
-  }
-
   request struct OffWithEffectRequest {
-    OnOffEffectIdentifier EffectId;
-    OnOffDelayedAllOffEffectVariant EffectVariant;
-  }
-
-  request struct OnRequest {
-  }
-
-  request struct OnWithRecallGlobalSceneRequest {
+    OnOffEffectIdentifier effectId = 0;
+    OnOffDelayedAllOffEffectVariant effectVariant = 1;
   }
 
   request struct OnWithTimedOffRequest {
-    OnOffControl OnOffControl;
-    int16u OnTime;
-    int16u OffWaitTime;
+    OnOffControl onOffControl = 0;
+    int16u onTime = 1;
+    int16u offWaitTime = 2;
   }
 
-  request struct ToggleRequest {
-  }
-
-  command Off(OffRequest): DefaultSuccess = 0;
+  command Off(): DefaultSuccess = 0;
   command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  command On(OnRequest): DefaultSuccess = 1;
-  command OnWithRecallGlobalScene(OnWithRecallGlobalSceneRequest): DefaultSuccess = 65;
+  command On(): DefaultSuccess = 1;
+  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
   command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
-  command Toggle(ToggleRequest): DefaultSuccess = 2;
+  command Toggle(): DefaultSuccess = 2;
 }
 
 client cluster OnOffSwitchConfiguration = 7 {
@@ -2371,64 +2299,64 @@ client cluster OperationalCredentials = 62 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
-    OCTET_STRING NOCValue;
-    optional OCTET_STRING ICACValue;
-    OCTET_STRING IPKValue;
-    NODE_ID CaseAdminNode;
-    INT16U AdminVendorId;
+    OCTET_STRING NOCValue = 0;
+    optional OCTET_STRING ICACValue = 1;
+    OCTET_STRING IPKValue = 2;
+    NODE_ID caseAdminNode = 3;
+    INT16U adminVendorId = 4;
   }
 
   request struct AddTrustedRootCertificateRequest {
-    OCTET_STRING RootCertificate;
+    OCTET_STRING rootCertificate = 0;
   }
 
   request struct AttestationRequestRequest {
-    OCTET_STRING AttestationNonce;
+    OCTET_STRING attestationNonce = 0;
   }
 
   request struct CertificateChainRequestRequest {
-    INT8U CertificateType;
+    INT8U certificateType = 0;
   }
 
   request struct OpCSRRequestRequest {
-    OCTET_STRING CSRNonce;
+    OCTET_STRING CSRNonce = 0;
   }
 
   request struct RemoveFabricRequest {
-    INT8U FabricIndex;
+    INT8U fabricIndex = 0;
   }
 
   request struct RemoveTrustedRootCertificateRequest {
-    OCTET_STRING TrustedRootIdentifier;
+    OCTET_STRING trustedRootIdentifier = 0;
   }
 
   request struct UpdateFabricLabelRequest {
-    CHAR_STRING Label;
+    CHAR_STRING label = 0;
   }
 
   request struct UpdateNOCRequest {
-    OCTET_STRING NOCValue;
-    optional OCTET_STRING ICACValue;
+    OCTET_STRING NOCValue = 0;
+    optional OCTET_STRING ICACValue = 1;
   }
 
   response struct AttestationResponse {
-    OCTET_STRING AttestationElements;
-    OCTET_STRING Signature;
+    OCTET_STRING attestationElements = 0;
+    OCTET_STRING signature = 1;
   }
 
   response struct CertificateChainResponse {
-    OCTET_STRING Certificate;
+    OCTET_STRING certificate = 0;
   }
 
   response struct NOCResponse {
-    INT8U StatusCode;
-    INT8U FabricIndex;
-    CHAR_STRING DebugText;
+    INT8U statusCode = 0;
+    INT8U fabricIndex = 1;
+    CHAR_STRING debugText = 2;
   }
 
   response struct OpCSRResponse {
-    OCTET_STRING NOCSRElements;
-    OCTET_STRING AttestationSignature;
+    OCTET_STRING NOCSRElements = 0;
+    OCTET_STRING attestationSignature = 1;
   }
 
   command AddNOC(AddNOCRequest): NOCResponse = 6;
@@ -2593,80 +2521,80 @@ client cluster Scenes = 5 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
-    INT16U groupId;
-    INT8U sceneId;
-    INT16U transitionTime;
-    CHAR_STRING sceneName;
-    SceneExtensionFieldSet extensionFieldSets;
+    INT16U groupId = 0;
+    INT8U sceneId = 1;
+    INT16U transitionTime = 2;
+    CHAR_STRING sceneName = 3;
+    SceneExtensionFieldSet extensionFieldSets[] = 4;
   }
 
   request struct GetSceneMembershipRequest {
-    INT16U groupId;
+    INT16U groupId = 0;
   }
 
   request struct RecallSceneRequest {
-    INT16U groupId;
-    INT8U sceneId;
-    INT16U transitionTime;
+    INT16U groupId = 0;
+    INT8U sceneId = 1;
+    INT16U transitionTime = 2;
   }
 
   request struct RemoveAllScenesRequest {
-    INT16U groupId;
+    INT16U groupId = 0;
   }
 
   request struct RemoveSceneRequest {
-    INT16U groupId;
-    INT8U sceneId;
+    INT16U groupId = 0;
+    INT8U sceneId = 1;
   }
 
   request struct StoreSceneRequest {
-    INT16U groupId;
-    INT8U sceneId;
+    INT16U groupId = 0;
+    INT8U sceneId = 1;
   }
 
   request struct ViewSceneRequest {
-    INT16U groupId;
-    INT8U sceneId;
+    INT16U groupId = 0;
+    INT8U sceneId = 1;
   }
 
   response struct AddSceneResponse {
-    ENUM8 status;
-    INT16U groupId;
-    INT8U sceneId;
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+    INT8U sceneId = 2;
   }
 
   response struct GetSceneMembershipResponse {
-    ENUM8 status;
-    INT8U capacity;
-    INT16U groupId;
-    INT8U sceneCount;
-    INT8U sceneList;
+    ENUM8 status = 0;
+    INT8U capacity = 1;
+    INT16U groupId = 2;
+    INT8U sceneCount = 3;
+    INT8U sceneList[] = 4;
   }
 
   response struct RemoveAllScenesResponse {
-    ENUM8 status;
-    INT16U groupId;
+    ENUM8 status = 0;
+    INT16U groupId = 1;
   }
 
   response struct RemoveSceneResponse {
-    ENUM8 status;
-    INT16U groupId;
-    INT8U sceneId;
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+    INT8U sceneId = 2;
   }
 
   response struct StoreSceneResponse {
-    ENUM8 status;
-    INT16U groupId;
-    INT8U sceneId;
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+    INT8U sceneId = 2;
   }
 
   response struct ViewSceneResponse {
-    ENUM8 status;
-    INT16U groupId;
-    INT8U sceneId;
-    INT16U transitionTime;
-    CHAR_STRING sceneName;
-    SceneExtensionFieldSet extensionFieldSets;
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+    INT8U sceneId = 2;
+    INT16U transitionTime = 3;
+    CHAR_STRING sceneName = 4;
+    SceneExtensionFieldSet extensionFieldSets[] = 5;
   }
 
   command AddScene(AddSceneRequest): AddSceneResponse = 0;
@@ -2699,10 +2627,7 @@ client cluster SoftwareDiagnostics = 52 {
   attribute(readonly) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
-  request struct ResetWatermarksRequest {
-  }
-
-  command ResetWatermarks(ResetWatermarksRequest): DefaultSuccess = 0;
+  command ResetWatermarks(): DefaultSuccess = 0;
 }
 
 client cluster Switch = 59 {
@@ -2762,13 +2687,13 @@ client cluster TargetNavigator = 1285 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct NavigateTargetRequestRequest {
-    INT8U target;
-    CHAR_STRING data;
+    INT8U target = 0;
+    CHAR_STRING data = 1;
   }
 
   response struct NavigateTargetResponse {
-    StatusEnum status;
-    CHAR_STRING data;
+    StatusEnum status = 0;
+    CHAR_STRING data = 1;
   }
 
   command NavigateTargetRequest(NavigateTargetRequestRequest): NavigateTargetResponse = 0;
@@ -2929,114 +2854,99 @@ client cluster TestCluster = 1295 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct SimpleStructEchoRequestRequest {
-    SimpleStruct arg1;
-  }
-
-  request struct TestRequest {
+    SimpleStruct arg1 = 0;
   }
 
   request struct TestAddArgumentsRequest {
-    INT8U arg1;
-    INT8U arg2;
+    INT8U arg1 = 0;
+    INT8U arg2 = 1;
   }
 
   request struct TestEmitTestEventRequestRequest {
-    INT8U arg1;
-    SimpleEnum arg2;
-    BOOLEAN arg3;
+    INT8U arg1 = 0;
+    SimpleEnum arg2 = 1;
+    BOOLEAN arg3 = 2;
   }
 
   request struct TestEnumsRequestRequest {
-    vendor_id arg1;
-    SimpleEnum arg2;
+    vendor_id arg1 = 0;
+    SimpleEnum arg2 = 1;
   }
 
   request struct TestListInt8UArgumentRequestRequest {
-    INT8U arg1;
+    INT8U arg1[] = 0;
   }
 
   request struct TestListInt8UReverseRequestRequest {
-    INT8U arg1;
+    INT8U arg1[] = 0;
   }
 
   request struct TestListNestedStructListArgumentRequestRequest {
-    NestedStructList arg1;
+    NestedStructList arg1[] = 0;
   }
 
   request struct TestListStructArgumentRequestRequest {
-    SimpleStruct arg1;
+    SimpleStruct arg1[] = 0;
   }
 
   request struct TestNestedStructArgumentRequestRequest {
-    NestedStruct arg1;
+    NestedStruct arg1 = 0;
   }
 
   request struct TestNestedStructListArgumentRequestRequest {
-    NestedStructList arg1;
-  }
-
-  request struct TestNotHandledRequest {
+    NestedStructList arg1 = 0;
   }
 
   request struct TestNullableOptionalRequestRequest {
-    optional nullable INT8U arg1;
+    optional nullable INT8U arg1 = 0;
   }
 
   request struct TestSimpleOptionalArgumentRequestRequest {
-    optional BOOLEAN arg1;
-  }
-
-  request struct TestSpecificRequest {
+    optional BOOLEAN arg1 = 0;
   }
 
   request struct TestStructArgumentRequestRequest {
-    SimpleStruct arg1;
-  }
-
-  request struct TestUnknownCommandRequest {
-  }
-
-  request struct TimedInvokeRequestRequest {
+    SimpleStruct arg1 = 0;
   }
 
   response struct BooleanResponse {
-    BOOLEAN value;
+    BOOLEAN value = 0;
   }
 
   response struct SimpleStructResponse {
-    SimpleStruct arg1;
+    SimpleStruct arg1 = 0;
   }
 
   response struct TestAddArgumentsResponse {
-    INT8U returnValue;
+    INT8U returnValue = 0;
   }
 
   response struct TestEmitTestEventResponse {
-    INT64U value;
+    INT64U value = 0;
   }
 
   response struct TestEnumsResponse {
-    vendor_id arg1;
-    SimpleEnum arg2;
+    vendor_id arg1 = 0;
+    SimpleEnum arg2 = 1;
   }
 
   response struct TestListInt8UReverseResponse {
-    INT8U arg1;
+    INT8U arg1[] = 0;
   }
 
   response struct TestNullableOptionalResponse {
-    BOOLEAN wasPresent;
-    optional BOOLEAN wasNull;
-    optional INT8U value;
-    optional nullable INT8U originalValue;
+    BOOLEAN wasPresent = 0;
+    optional BOOLEAN wasNull = 1;
+    optional INT8U value = 2;
+    optional nullable INT8U originalValue = 3;
   }
 
   response struct TestSpecificResponse {
-    INT8U returnValue;
+    INT8U returnValue = 0;
   }
 
   command SimpleStructEchoRequest(SimpleStructEchoRequestRequest): SimpleStructResponse = 17;
-  command Test(TestRequest): DefaultSuccess = 0;
+  command Test(): DefaultSuccess = 0;
   command TestAddArguments(TestAddArgumentsRequest): TestAddArgumentsResponse = 4;
   command TestEmitTestEventRequest(TestEmitTestEventRequestRequest): TestEmitTestEventResponse = 20;
   command TestEnumsRequest(TestEnumsRequestRequest): TestEnumsResponse = 14;
@@ -3046,13 +2956,13 @@ client cluster TestCluster = 1295 {
   command TestListStructArgumentRequest(TestListStructArgumentRequestRequest): BooleanResponse = 9;
   command TestNestedStructArgumentRequest(TestNestedStructArgumentRequestRequest): BooleanResponse = 8;
   command TestNestedStructListArgumentRequest(TestNestedStructListArgumentRequestRequest): BooleanResponse = 11;
-  command TestNotHandled(TestNotHandledRequest): DefaultSuccess = 1;
+  command TestNotHandled(): DefaultSuccess = 1;
   command TestNullableOptionalRequest(TestNullableOptionalRequestRequest): TestNullableOptionalResponse = 15;
   command TestSimpleOptionalArgumentRequest(TestSimpleOptionalArgumentRequestRequest): DefaultSuccess = 19;
-  command TestSpecific(TestSpecificRequest): TestSpecificResponse = 2;
+  command TestSpecific(): TestSpecificResponse = 2;
   command TestStructArgumentRequest(TestStructArgumentRequestRequest): BooleanResponse = 7;
-  command TestUnknownCommand(TestUnknownCommandRequest): DefaultSuccess = 3;
-  command TimedInvokeRequest(TimedInvokeRequestRequest): DefaultSuccess = 18;
+  command TestUnknownCommand(): DefaultSuccess = 3;
+  command TimedInvokeRequest(): DefaultSuccess = 18;
 }
 
 client cluster Thermostat = 513 {
@@ -3083,47 +2993,41 @@ client cluster Thermostat = 513 {
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
-  request struct ClearWeeklyScheduleRequest {
-  }
-
-  request struct GetRelayStatusLogRequest {
-  }
-
   request struct GetWeeklyScheduleRequest {
-    DayOfWeek daysToReturn;
-    ModeForSequence modeToReturn;
+    DayOfWeek daysToReturn = 0;
+    ModeForSequence modeToReturn = 1;
   }
 
   request struct SetWeeklyScheduleRequest {
-    ENUM8 numberOfTransitionsForSequence;
-    DayOfWeek dayOfWeekForSequence;
-    ModeForSequence modeForSequence;
-    INT8U payload;
+    ENUM8 numberOfTransitionsForSequence = 0;
+    DayOfWeek dayOfWeekForSequence = 1;
+    ModeForSequence modeForSequence = 2;
+    INT8U payload[] = 3;
   }
 
   request struct SetpointRaiseLowerRequest {
-    SetpointAdjustMode mode;
-    INT8S amount;
+    SetpointAdjustMode mode = 0;
+    INT8S amount = 1;
   }
 
   response struct GetRelayStatusLogResponse {
-    INT16U timeOfDay;
-    BITMAP16 relayStatus;
-    INT16S localTemperature;
-    INT8U humidityInPercentage;
-    INT16S setpoint;
-    INT16U unreadEntries;
+    INT16U timeOfDay = 0;
+    BITMAP16 relayStatus = 1;
+    INT16S localTemperature = 2;
+    INT8U humidityInPercentage = 3;
+    INT16S setpoint = 4;
+    INT16U unreadEntries = 5;
   }
 
   response struct GetWeeklyScheduleResponse {
-    ENUM8 numberOfTransitionsForSequence;
-    DayOfWeek dayOfWeekForSequence;
-    ModeForSequence modeForSequence;
-    INT8U payload;
+    ENUM8 numberOfTransitionsForSequence = 0;
+    DayOfWeek dayOfWeekForSequence = 1;
+    ModeForSequence modeForSequence = 2;
+    INT8U payload[] = 3;
   }
 
-  command ClearWeeklySchedule(ClearWeeklyScheduleRequest): DefaultSuccess = 3;
-  command GetRelayStatusLog(GetRelayStatusLogRequest): GetRelayStatusLogResponse = 4;
+  command ClearWeeklySchedule(): DefaultSuccess = 3;
+  command GetRelayStatusLog(): GetRelayStatusLogResponse = 4;
   command GetWeeklySchedule(GetWeeklyScheduleRequest): GetWeeklyScheduleResponse = 2;
   command SetWeeklySchedule(SetWeeklyScheduleRequest): DefaultSuccess = 1;
   command SetpointRaiseLower(SetpointRaiseLowerRequest): DefaultSuccess = 0;
@@ -3281,10 +3185,7 @@ client cluster ThreadNetworkDiagnostics = 53 {
   attribute(readonly) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
-  request struct ResetCountsRequest {
-  }
-
-  command ResetCounts(ResetCountsRequest): DefaultSuccess = 0;
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 client cluster UserLabel = 65 {
@@ -3359,10 +3260,7 @@ client cluster WiFiNetworkDiagnostics = 54 {
   attribute(readonly) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
-  request struct ResetCountsRequest {
-  }
-
-  command ResetCounts(ResetCountsRequest): DefaultSuccess = 0;
+  command ResetCounts(): DefaultSuccess = 0;
 }
 
 client cluster WindowCovering = 258 {
@@ -3388,40 +3286,31 @@ client cluster WindowCovering = 258 {
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
-  request struct DownOrCloseRequest {
-  }
-
   request struct GoToLiftPercentageRequest {
-    Percent liftPercentageValue;
-    Percent100ths liftPercent100thsValue;
+    Percent liftPercentageValue = 0;
+    Percent100ths liftPercent100thsValue = 1;
   }
 
   request struct GoToLiftValueRequest {
-    INT16U liftValue;
+    INT16U liftValue = 0;
   }
 
   request struct GoToTiltPercentageRequest {
-    Percent tiltPercentageValue;
-    Percent100ths tiltPercent100thsValue;
+    Percent tiltPercentageValue = 0;
+    Percent100ths tiltPercent100thsValue = 1;
   }
 
   request struct GoToTiltValueRequest {
-    INT16U tiltValue;
+    INT16U tiltValue = 0;
   }
 
-  request struct StopMotionRequest {
-  }
-
-  request struct UpOrOpenRequest {
-  }
-
-  command DownOrClose(DownOrCloseRequest): DefaultSuccess = 1;
+  command DownOrClose(): DefaultSuccess = 1;
   command GoToLiftPercentage(GoToLiftPercentageRequest): DefaultSuccess = 5;
   command GoToLiftValue(GoToLiftValueRequest): DefaultSuccess = 4;
   command GoToTiltPercentage(GoToTiltPercentageRequest): DefaultSuccess = 8;
   command GoToTiltValue(GoToTiltValueRequest): DefaultSuccess = 7;
-  command StopMotion(StopMotionRequest): DefaultSuccess = 2;
-  command UpOrOpen(UpOrOpenRequest): DefaultSuccess = 0;
+  command StopMotion(): DefaultSuccess = 2;
+  command UpOrOpen(): DefaultSuccess = 0;
 }
 
 
