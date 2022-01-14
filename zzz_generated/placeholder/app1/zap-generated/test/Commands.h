@@ -30,6 +30,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_DM_1_3_Simulated() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {

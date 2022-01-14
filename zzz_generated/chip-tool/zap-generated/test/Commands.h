@@ -183,6 +183,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_BI_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -382,6 +384,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_BI_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -813,6 +817,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_BI_2_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -1190,6 +1196,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_BOOL_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -1389,6 +1397,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_BOOL_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -1590,6 +1600,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -1721,6 +1733,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_CC_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -7067,6 +7081,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_3_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -7382,6 +7398,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_3_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -7693,6 +7711,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_3_3() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -7944,6 +7964,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_4_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -8161,6 +8183,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_CC_4_2() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -8535,6 +8559,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_4_3() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -8786,6 +8812,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_4_4() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -9005,6 +9033,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_5_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -9223,6 +9253,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_CC_5_2() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -9471,6 +9503,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_5_3() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -9690,6 +9724,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_6_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -9907,6 +9943,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_CC_6_2() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -10194,6 +10232,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_6_3() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -10449,6 +10489,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_7_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -10702,6 +10744,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_CC_7_2() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -11014,6 +11058,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_7_3() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -11265,6 +11311,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_7_4() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -11483,6 +11531,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_CC_8_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -12079,6 +12129,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_CC_9_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -13490,6 +13542,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_CC_9_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -14072,6 +14126,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_CC_9_3() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -14656,6 +14712,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_DD_1_5() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -14721,6 +14779,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_DD_1_6() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -14809,6 +14869,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_DD_1_7() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -14885,6 +14947,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_DD_1_8() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -14959,6 +15023,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_DD_1_9() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -15045,6 +15111,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_DM_1_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -15791,6 +15859,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_DM_3_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -15855,6 +15925,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_DM_2_2() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -16069,6 +16141,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_EMR_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -16273,6 +16347,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_FLW_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -16404,6 +16480,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_FLW_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -16912,6 +16990,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_FLW_2_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -17042,6 +17122,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_ILL_1_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -17247,6 +17329,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_LVL_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -17378,6 +17462,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_LVL_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -17947,6 +18033,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_LVL_2_2() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -18531,6 +18619,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_LVL_3_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -18997,6 +19087,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_LVL_4_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -19496,6 +19588,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_LVL_5_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -19884,6 +19978,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_LVL_6_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -20223,6 +20319,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -20355,6 +20453,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_2_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -20447,6 +20547,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_3_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -20511,6 +20613,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_MC_3_2() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -20577,6 +20681,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_3_3() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -20641,6 +20747,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_MC_3_4() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -20707,6 +20815,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_3_5() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -20771,6 +20881,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_MC_3_6() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -20837,6 +20949,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_3_7() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -20901,6 +21015,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_MC_3_8() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -20967,6 +21083,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_3_9() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -21031,6 +21149,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_MC_3_10() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -21097,6 +21217,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_3_11() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -21161,6 +21283,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_MC_5_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -21263,6 +21387,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_5_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -21338,6 +21464,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_5_3() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -21412,6 +21540,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_MC_6_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -21551,6 +21681,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_MC_6_2() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -21721,6 +21853,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_6_3() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -21815,6 +21949,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_MC_6_4() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -22043,6 +22179,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_7_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -22108,6 +22246,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_MC_7_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -22172,6 +22312,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_MC_8_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -22312,6 +22454,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_MC_9_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -22590,6 +22734,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_OCC_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -22755,6 +22901,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_OCC_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -23137,6 +23285,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_OCC_2_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -23277,6 +23427,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_OO_1_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -23621,6 +23773,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_OO_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -24180,6 +24334,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_OO_2_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -24671,6 +24827,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_OO_2_3() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -26374,6 +26532,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_PRS_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -26506,6 +26666,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_PRS_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -26878,6 +27040,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_PCC_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -27045,6 +27209,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_PCC_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -28890,6 +29056,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_PCC_2_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -29059,6 +29227,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_PCC_2_3() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -29450,6 +29620,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_RH_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -29583,6 +29755,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_RH_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -29796,6 +29970,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_RH_2_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -29938,6 +30114,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_TM_1_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -30143,6 +30321,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_TM_2_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -30279,6 +30459,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_TM_2_2() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -30422,6 +30604,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_TSTAT_1_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -30587,6 +30771,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_TSTAT_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -32729,6 +32915,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_TSTAT_2_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -34600,6 +34788,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_TSUIC_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -34734,6 +34924,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_TSUIC_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -35314,6 +35506,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_TSUIC_2_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -35735,6 +35929,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_DIAGTH_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -35938,6 +36134,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_WNCV_1_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -36211,6 +36409,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_WNCV_2_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -38217,6 +38417,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_WNCV_2_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -38281,6 +38483,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_WNCV_2_4() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -38426,6 +38630,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_WNCV_2_5() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -38569,6 +38775,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_WNCV_3_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -38723,6 +38931,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_WNCV_3_2() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -38876,6 +39086,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_WNCV_3_3() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -39028,6 +39240,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TV_TargetNavigatorCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -39214,6 +39428,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TV_AudioOutputCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -39427,6 +39643,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TV_ApplicationLauncherCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -39647,6 +39865,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~TV_KeypadInputCluster() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -39744,6 +39964,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TV_AccountLoginCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -39902,6 +40124,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~TV_WakeOnLanCluster() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -40000,6 +40224,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TV_ApplicationBasicCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -40269,6 +40495,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TV_MediaPlaybackCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -40894,6 +41122,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~TV_ChannelCluster() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -41113,6 +41343,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~TV_LowPowerCluster() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -41204,6 +41436,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TV_ContentLauncherCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -41457,6 +41691,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TV_MediaInputCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -41721,6 +41957,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TestCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -57939,6 +58177,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~TestClusterComplexTypes() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -58688,6 +58928,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~TestConstraints() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -59417,6 +59659,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~TestDelayCommands() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -59491,6 +59735,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TestLogCommands() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -59575,6 +59821,30 @@ public:
     {
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
+    }
+
+    ~TestSaveAs()
+    {
+        if (readAttributeCharStringDefaultValueBuffer != nullptr)
+        {
+            chip::Platform::MemoryFree(readAttributeCharStringDefaultValueBuffer);
+            readAttributeCharStringDefaultValueBuffer = nullptr;
+        }
+        if (readAttributeCharStringNotDefaultValueBuffer != nullptr)
+        {
+            chip::Platform::MemoryFree(readAttributeCharStringNotDefaultValueBuffer);
+            readAttributeCharStringNotDefaultValueBuffer = nullptr;
+        }
+        if (readAttributeOctetStringDefaultValueBuffer != nullptr)
+        {
+            chip::Platform::MemoryFree(readAttributeOctetStringDefaultValueBuffer);
+            readAttributeOctetStringDefaultValueBuffer = nullptr;
+        }
+        if (readAttributeOctetStringNotDefaultValueBuffer != nullptr)
+        {
+            chip::Platform::MemoryFree(readAttributeOctetStringNotDefaultValueBuffer);
+            readAttributeOctetStringNotDefaultValueBuffer = nullptr;
+        }
     }
 
     /////////// TestCommand Interface /////////
@@ -59978,6 +60248,76 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 93 : Read attribute vendor_id Default Value\n");
             err = TestReadAttributeVendorIdDefaultValue_93();
             break;
+        case 94:
+            ChipLogProgress(chipTool, " ***** Test Step 94 : Read attribute char_string Default Value\n");
+            err = TestReadAttributeCharStringDefaultValue_94();
+            break;
+        case 95:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 95 : Read attribute char_string Default Value and compare to saved value\n");
+            err = TestReadAttributeCharStringDefaultValueAndCompareToSavedValue_95();
+            break;
+        case 96:
+            ChipLogProgress(chipTool, " ***** Test Step 96 : Write attribute char_string Not Default Value\n");
+            err = TestWriteAttributeCharStringNotDefaultValue_96();
+            break;
+        case 97:
+            ChipLogProgress(chipTool, " ***** Test Step 97 : Read attribute char_string Not Default Value\n");
+            err = TestReadAttributeCharStringNotDefaultValue_97();
+            break;
+        case 98:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 98 : Read attribute char_string Not Default Value and compare to saved value\n");
+            err = TestReadAttributeCharStringNotDefaultValueAndCompareToSavedValue_98();
+            break;
+        case 99:
+            ChipLogProgress(chipTool, " ***** Test Step 99 : Write attribute char_string Not Default Value from saved value\n");
+            err = TestWriteAttributeCharStringNotDefaultValueFromSavedValue_99();
+            break;
+        case 100:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 100 : Read attribute char_string Not Default Value and compare to expected value\n");
+            err = TestReadAttributeCharStringNotDefaultValueAndCompareToExpectedValue_100();
+            break;
+        case 101:
+            ChipLogProgress(chipTool, " ***** Test Step 101 : Write attribute char_string Default Value\n");
+            err = TestWriteAttributeCharStringDefaultValue_101();
+            break;
+        case 102:
+            ChipLogProgress(chipTool, " ***** Test Step 102 : Read attribute octet_string Default Value\n");
+            err = TestReadAttributeOctetStringDefaultValue_102();
+            break;
+        case 103:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 103 : Read attribute octet_string Default Value and compare to saved value\n");
+            err = TestReadAttributeOctetStringDefaultValueAndCompareToSavedValue_103();
+            break;
+        case 104:
+            ChipLogProgress(chipTool, " ***** Test Step 104 : Write attribute octet_string Not Default Value\n");
+            err = TestWriteAttributeOctetStringNotDefaultValue_104();
+            break;
+        case 105:
+            ChipLogProgress(chipTool, " ***** Test Step 105 : Read attribute octet_string Not Default Value\n");
+            err = TestReadAttributeOctetStringNotDefaultValue_105();
+            break;
+        case 106:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 106 : Read attribute octet_string Not Default Value and compare to saved value\n");
+            err = TestReadAttributeOctetStringNotDefaultValueAndCompareToSavedValue_106();
+            break;
+        case 107:
+            ChipLogProgress(chipTool, " ***** Test Step 107 : Write attribute octet_string Not Default Value from saved value\n");
+            err = TestWriteAttributeOctetStringNotDefaultValueFromSavedValue_107();
+            break;
+        case 108:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 108 : Read attribute octet_string Not Default Value and compare to expected value\n");
+            err = TestReadAttributeOctetStringNotDefaultValueAndCompareToExpectedValue_108();
+            break;
+        case 109:
+            ChipLogProgress(chipTool, " ***** Test Step 109 : Write attribute octet_string Default Value\n");
+            err = TestWriteAttributeOctetStringDefaultValue_109();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -59989,7 +60329,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 94;
+    const uint16_t mTestCount = 110;
 
     chip::Optional<chip::CharSpan> mCluster;
     chip::Optional<chip::EndpointId> mEndpoint;
@@ -60013,6 +60353,14 @@ private:
     uint64_t readAttributeEpochUSDefaultValue;
     uint32_t readAttributeEpochSDefaultValue;
     chip::VendorId readAttributeVendorIdDefaultValue;
+    char * readAttributeCharStringDefaultValueBuffer = nullptr;
+    chip::CharSpan readAttributeCharStringDefaultValue;
+    char * readAttributeCharStringNotDefaultValueBuffer = nullptr;
+    chip::CharSpan readAttributeCharStringNotDefaultValue;
+    uint8_t * readAttributeOctetStringDefaultValueBuffer = nullptr;
+    chip::ByteSpan readAttributeOctetStringDefaultValue;
+    uint8_t * readAttributeOctetStringNotDefaultValueBuffer = nullptr;
+    chip::ByteSpan readAttributeOctetStringNotDefaultValue;
 
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
@@ -60805,6 +61153,148 @@ private:
     {
         (static_cast<TestSaveAs *>(context))->OnSuccessResponse_93(vendorId);
     }
+
+    static void OnFailureCallback_94(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_94(status);
+    }
+
+    static void OnSuccessCallback_94(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_94(charString);
+    }
+
+    static void OnFailureCallback_95(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_95(status);
+    }
+
+    static void OnSuccessCallback_95(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_95(charString);
+    }
+
+    static void OnFailureCallback_96(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_96(status);
+    }
+
+    static void OnSuccessCallback_96(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_96(); }
+
+    static void OnFailureCallback_97(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_97(status);
+    }
+
+    static void OnSuccessCallback_97(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_97(charString);
+    }
+
+    static void OnFailureCallback_98(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_98(status);
+    }
+
+    static void OnSuccessCallback_98(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_98(charString);
+    }
+
+    static void OnFailureCallback_99(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_99(status);
+    }
+
+    static void OnSuccessCallback_99(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_99(); }
+
+    static void OnFailureCallback_100(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_100(status);
+    }
+
+    static void OnSuccessCallback_100(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_100(charString);
+    }
+
+    static void OnFailureCallback_101(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_101(status);
+    }
+
+    static void OnSuccessCallback_101(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_101(); }
+
+    static void OnFailureCallback_102(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_102(status);
+    }
+
+    static void OnSuccessCallback_102(void * context, chip::ByteSpan octetString)
+    {
+        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_102(octetString);
+    }
+
+    static void OnFailureCallback_103(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_103(status);
+    }
+
+    static void OnSuccessCallback_103(void * context, chip::ByteSpan octetString)
+    {
+        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_103(octetString);
+    }
+
+    static void OnFailureCallback_104(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_104(status);
+    }
+
+    static void OnSuccessCallback_104(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_104(); }
+
+    static void OnFailureCallback_105(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_105(status);
+    }
+
+    static void OnSuccessCallback_105(void * context, chip::ByteSpan octetString)
+    {
+        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_105(octetString);
+    }
+
+    static void OnFailureCallback_106(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_106(status);
+    }
+
+    static void OnSuccessCallback_106(void * context, chip::ByteSpan octetString)
+    {
+        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_106(octetString);
+    }
+
+    static void OnFailureCallback_107(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_107(status);
+    }
+
+    static void OnSuccessCallback_107(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_107(); }
+
+    static void OnFailureCallback_108(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_108(status);
+    }
+
+    static void OnSuccessCallback_108(void * context, chip::ByteSpan octetString)
+    {
+        (static_cast<TestSaveAs *>(context))->OnSuccessResponse_108(octetString);
+    }
+
+    static void OnFailureCallback_109(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestSaveAs *>(context))->OnFailureResponse_109(status);
+    }
+
+    static void OnSuccessCallback_109(void * context) { (static_cast<TestSaveAs *>(context))->OnSuccessResponse_109(); }
 
     //
     // Tests methods
@@ -62622,7 +63112,7 @@ private:
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::VendorId vendorIdArgument;
-        vendorIdArgument = static_cast<chip::VendorId>(readAttributeVendorIdDefaultValue);
+        vendorIdArgument = readAttributeVendorIdDefaultValue;
 
         ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
             vendorIdArgument, this, OnSuccessCallback_92, OnFailureCallback_92));
@@ -62652,6 +63142,344 @@ private:
 
         NextTest();
     }
+
+    CHIP_ERROR TestReadAttributeCharStringDefaultValue_94()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_94, OnFailureCallback_94));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_94(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_94(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("", 0)));
+
+        if (readAttributeCharStringDefaultValueBuffer != nullptr)
+        {
+            chip::Platform::MemoryFree(readAttributeCharStringDefaultValueBuffer);
+        }
+        readAttributeCharStringDefaultValueBuffer = static_cast<char *>(chip::Platform::MemoryAlloc(charString.size()));
+        memcpy(readAttributeCharStringDefaultValueBuffer, charString.data(), charString.size());
+        readAttributeCharStringDefaultValue = chip::CharSpan(readAttributeCharStringDefaultValueBuffer, charString.size());
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeCharStringDefaultValueAndCompareToSavedValue_95()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_95, OnFailureCallback_95));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_95(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_95(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckValueAsString("charString", charString, readAttributeCharStringDefaultValue));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringNotDefaultValue_96()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("NotDefaultgarbage: not in length on purpose", 10);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_96, OnFailureCallback_96));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_96(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_96() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringNotDefaultValue_97()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_97, OnFailureCallback_97));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_97(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_97(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("NotDefault", 10)));
+
+        if (readAttributeCharStringNotDefaultValueBuffer != nullptr)
+        {
+            chip::Platform::MemoryFree(readAttributeCharStringNotDefaultValueBuffer);
+        }
+        readAttributeCharStringNotDefaultValueBuffer = static_cast<char *>(chip::Platform::MemoryAlloc(charString.size()));
+        memcpy(readAttributeCharStringNotDefaultValueBuffer, charString.data(), charString.size());
+        readAttributeCharStringNotDefaultValue = chip::CharSpan(readAttributeCharStringNotDefaultValueBuffer, charString.size());
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeCharStringNotDefaultValueAndCompareToSavedValue_98()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_98, OnFailureCallback_98));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_98(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_98(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckValueAsString("charString", charString, readAttributeCharStringNotDefaultValue));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringNotDefaultValueFromSavedValue_99()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = readAttributeCharStringNotDefaultValue;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_99, OnFailureCallback_99));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_99(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_99() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringNotDefaultValueAndCompareToExpectedValue_100()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            this, OnSuccessCallback_100, OnFailureCallback_100));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_100(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_100(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("NotDefault", 10)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringDefaultValue_101()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = readAttributeCharStringDefaultValue;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_101, OnFailureCallback_101));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_101(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_101() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeOctetStringDefaultValue_102()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            this, OnSuccessCallback_102, OnFailureCallback_102));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_102(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_102(chip::ByteSpan octetString)
+    {
+        VerifyOrReturn(CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
+
+        if (readAttributeOctetStringDefaultValueBuffer != nullptr)
+        {
+            chip::Platform::MemoryFree(readAttributeOctetStringDefaultValueBuffer);
+        }
+        readAttributeOctetStringDefaultValueBuffer = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(octetString.size()));
+        memcpy(readAttributeOctetStringDefaultValueBuffer, octetString.data(), octetString.size());
+        readAttributeOctetStringDefaultValue = chip::ByteSpan(readAttributeOctetStringDefaultValueBuffer, octetString.size());
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeOctetStringDefaultValueAndCompareToSavedValue_103()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            this, OnSuccessCallback_103, OnFailureCallback_103));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_103(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_103(chip::ByteSpan octetString)
+    {
+        VerifyOrReturn(CheckValueAsString("octetString", octetString, readAttributeOctetStringDefaultValue));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeOctetStringNotDefaultValue_104()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::ByteSpan octetStringArgument;
+        octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("NotDefaultgarbage: not in length on purpose"), 10);
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            octetStringArgument, this, OnSuccessCallback_104, OnFailureCallback_104));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_104(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_104() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeOctetStringNotDefaultValue_105()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            this, OnSuccessCallback_105, OnFailureCallback_105));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_105(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_105(chip::ByteSpan octetString)
+    {
+        VerifyOrReturn(
+            CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("NotDefault"), 10)));
+
+        if (readAttributeOctetStringNotDefaultValueBuffer != nullptr)
+        {
+            chip::Platform::MemoryFree(readAttributeOctetStringNotDefaultValueBuffer);
+        }
+        readAttributeOctetStringNotDefaultValueBuffer = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(octetString.size()));
+        memcpy(readAttributeOctetStringNotDefaultValueBuffer, octetString.data(), octetString.size());
+        readAttributeOctetStringNotDefaultValue = chip::ByteSpan(readAttributeOctetStringNotDefaultValueBuffer, octetString.size());
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeOctetStringNotDefaultValueAndCompareToSavedValue_106()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            this, OnSuccessCallback_106, OnFailureCallback_106));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_106(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_106(chip::ByteSpan octetString)
+    {
+        VerifyOrReturn(CheckValueAsString("octetString", octetString, readAttributeOctetStringNotDefaultValue));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeOctetStringNotDefaultValueFromSavedValue_107()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::ByteSpan octetStringArgument;
+        octetStringArgument = readAttributeOctetStringNotDefaultValue;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            octetStringArgument, this, OnSuccessCallback_107, OnFailureCallback_107));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_107(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_107() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeOctetStringNotDefaultValueAndCompareToExpectedValue_108()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            this, OnSuccessCallback_108, OnFailureCallback_108));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_108(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_108(chip::ByteSpan octetString)
+    {
+        VerifyOrReturn(
+            CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("NotDefault"), 10)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeOctetStringDefaultValue_109()
+    {
+        const chip::EndpointId endpoint = mEndpoint.HasValue() ? mEndpoint.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::ByteSpan octetStringArgument;
+        octetStringArgument = readAttributeOctetStringDefaultValue;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            octetStringArgument, this, OnSuccessCallback_109, OnFailureCallback_109));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_109(EmberAfStatus status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_109() { NextTest(); }
 };
 
 class TestConfigVariables : public TestCommand
@@ -62664,6 +63492,8 @@ public:
         AddArgument("arg1", 0, UINT8_MAX, &mArg1);
         AddArgument("returnValueWithArg1", 0, UINT8_MAX, &mReturnValueWithArg1);
     }
+
+    ~TestConfigVariables() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -62802,6 +63632,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TestDescriptorCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -63074,6 +63906,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~TestBasicInformation() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -63276,6 +64110,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~TestIdentifyCluster() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -63368,6 +64204,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TestGroupsCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -64090,6 +64928,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~TestGroupKeyManagementCluster() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -64224,6 +65064,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TestOperationalCredentialsCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -64394,6 +65236,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TestModeSelectCluster() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -64745,6 +65589,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~TestGroupMessaging() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -64944,6 +65790,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_SWDIAG_1_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -65128,6 +65976,8 @@ public:
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
 
+    ~Test_TC_SWDIAG_2_1() {}
+
     /////////// TestCommand Interface /////////
     void NextTest() override
     {
@@ -65182,6 +66032,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_SWDIAG_3_1() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -65332,6 +66184,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~TestSubscribe_OnOff() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
