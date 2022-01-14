@@ -50,6 +50,7 @@ def build_actual_output(root: str, out: str, args: List[str]) -> List[str]:
         'TIZEN_HOME': 'TEST_TIZEN_HOME',
         'TELINK_ZEPHYR_SDK_DIR': 'TELINK_ZEPHYR_SDK_DIR',
         'SYSROOT_AARCH64': 'SYSROOT_AARCH64',
+        'NXP_K32W061_SDK_ROOT': 'TEST_NXP_K32W061_SDK_ROOT',
     })
 
     retval = subprocess.run([
@@ -104,6 +105,13 @@ class TestBuilder(unittest.TestCase):
         self.assertCommandOutput(
             os.path.join('testdata', 'all_targets_except_host.txt'),
             '--skip-target-glob {linux,darwin}-* targets'.split(' ')
+        )
+
+    def test_glob_targets(self):
+        self.assertCommandOutput(
+            os.path.join('testdata', 'glob_star_targets_except_host.txt'),
+            '--target-glob * --skip-target-glob {linux,darwin}-* targets'.split(
+                ' ')
         )
 
     @unittest.skipUnless(sys.platform == 'linux', 'Build on linux test')

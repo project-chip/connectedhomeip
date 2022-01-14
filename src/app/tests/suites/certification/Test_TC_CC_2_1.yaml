@@ -1,0 +1,1357 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 27.2.1. [TC-CC-2.1] Attributes with server as DUT
+
+config:
+    cluster: "Color Control"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "Reads mandatory attribute: CurrentHue"
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          value: 0
+
+    - label: "Validate constraints of attribute: current hue"
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Write the default value to mandatory attribute: CurrentHue"
+      command: "writeAttribute"
+      attribute: "current hue"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: CurrentHue"
+      command: "readAttribute"
+      attribute: "current hue"
+      response:
+          value: 0
+
+    - label: "Reads mandatory attribute: CurrentSaturation"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          value: 0
+
+    - label: "Validate constraints of attribute: CurrentSaturation"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 254
+
+    - label: "Write the default value to mandatory attribute: CurrentSaturation"
+      command: "writeAttribute"
+      attribute: "current saturation"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: CurrentSaturation"
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: CurrentX"
+      command: "readAttribute"
+      attribute: "current x"
+      response:
+          value: 24939
+
+    - label: "Validate constraints of attribute: CurrentX"
+      command: "readAttribute"
+      attribute: "current x"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default value to mandatory attribute: CurrentX"
+      command: "writeAttribute"
+      attribute: "current x"
+      arguments:
+          value: 24939
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: CurrentX"
+      command: "readAttribute"
+      attribute: "current x"
+      response:
+          value: 24939
+
+    - label: "Read the mandatory attribute: CurrentY"
+      command: "readAttribute"
+      attribute: "current y"
+      response:
+          value: 24701
+
+    - label: "Validate constraints of attribute: CurrentY"
+      command: "readAttribute"
+      attribute: "current y"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default values to mandatory attribute: CurrentY"
+      command: "writeAttribute"
+      attribute: "current y"
+      arguments:
+          value: 24701
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: CurrentY"
+      command: "readAttribute"
+      attribute: "current y"
+      response:
+          value: 24701
+
+    - label: "Read the mandatory attribute: ColorTemperatureMireds"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color temperature"
+      response:
+          value: 250
+
+    - label: "Validate constraints of attribute: ColorTemperatureMireds"
+      command: "readAttribute"
+      attribute: "color temperature"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Write the default values to mandatory attribute:
+          ColorTemperatureMireds"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "color temperature"
+      arguments:
+          value: 250
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: ColorTemperatureMireds"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color temperature"
+      response:
+          value: 250
+
+    - label: "Read the mandatory attribute: ColorMode"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color mode"
+      response:
+          value: 1
+
+    - label: "Validate constraints of attribute: ColorMode"
+      command: "readAttribute"
+      attribute: "color mode"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 2
+
+    - label: "Write the default values to mandatory attribute: ColorMode"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "color mode"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: ColorMode"
+      disabled: true
+      command: "readAttribute"
+      attribute: "color mode"
+      response:
+          value: 1
+
+    - label: "Read the mandatory attribute: Options"
+      command: "readAttribute"
+      attribute: "color control options"
+      response:
+          value: 0
+
+    - label: "Validate constraints of attribute: Options"
+      command: "readAttribute"
+      attribute: "color control options"
+      response:
+          constraints:
+              type: map8
+
+    - label: "Write the default values to mandatory attribute: Options"
+      command: "writeAttribute"
+      attribute: "color control options"
+      arguments:
+          value: 0
+
+    - label: "Reads back mandatory attribute: Options"
+      command: "readAttribute"
+      attribute: "color control options"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: EnhancedCurrentHue"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 0
+
+    - label: "Validate constraints of attribute: EnhancedCurrentHue"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "Write the default values to mandatory attribute: EnhancedCurrentHue"
+      command: "writeAttribute"
+      attribute: "enhanced current hue"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: EnhancedCurrentHue"
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: EnhancedColorMode"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced color mode"
+      response:
+          value: 1
+
+    - label: "Validate constraints of attribute: EnhancedColorMode"
+      command: "readAttribute"
+      attribute: "enhanced color mode"
+      response:
+          constraints:
+              type: enum8
+
+    - label:
+          "Write the default values to mandatory attribute: EnhancedColorMode"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "enhanced color mode"
+      arguments:
+          value: 1
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: EnhancedColorMode"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced color mode"
+      response:
+          value: 1
+
+    - label: "Read the mandatory attribute: ColorLoopActive"
+      command: "readAttribute"
+      attribute: "color loop active"
+      response:
+          value: 0
+
+    - label: "Validate constraints of attribute: ColorLoopActive"
+      command: "readAttribute"
+      attribute: "color loop active"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Write the default values to mandatory attribute: ColorLoopActive"
+      command: "writeAttribute"
+      attribute: "color loop active"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: ColorLoopActive"
+      command: "readAttribute"
+      attribute: "color loop active"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: ColorLoopDirection"
+      command: "readAttribute"
+      attribute: "color loop direction"
+      response:
+          value: 0
+
+    - label: "Validate constraints of attribute: ColorLoopDirection"
+      command: "readAttribute"
+      attribute: "color loop direction"
+      response:
+          constraints:
+              type: uint8
+
+    - label:
+          "Write the default values to mandatory attribute: ColorLoopDirection"
+      command: "writeAttribute"
+      attribute: "color loop direction"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: ColorLoopDirection"
+      command: "readAttribute"
+      attribute: "color loop direction"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: ColorLoopTime"
+      command: "readAttribute"
+      attribute: "color loop time"
+      response:
+          value: 25
+
+    - label: "Validate constraints of attribute: ColorLoopTime"
+      command: "readAttribute"
+      attribute: "color loop time"
+      response:
+          constraints:
+              type: uint16
+
+    - label: "Write the default values to mandatory attribute: ColorLoopTime"
+      command: "writeAttribute"
+      attribute: "color loop time"
+      arguments:
+          value: 25
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: ColorLoopTime"
+      command: "readAttribute"
+      attribute: "color loop time"
+      response:
+          value: 25
+
+    - label: "Read the mandatory attribute: ColorLoopStartEnhancedHue"
+      command: "readAttribute"
+      attribute: "color loop start enhanced hue"
+      response:
+          value: 8960
+
+    - label: "Validate constraints of attribute: ColorLoopStartEnhancedHue"
+      command: "readAttribute"
+      attribute: "color loop start enhanced hue"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "Write the default values to mandatory attribute:
+          ColorLoopStartEnhancedHue"
+      command: "writeAttribute"
+      attribute: "color loop start enhanced hue"
+      arguments:
+          value: 8960
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: ColorLoopStartEnhancedHue"
+      command: "readAttribute"
+      attribute: "color loop start enhanced hue"
+      response:
+          value: 8960
+
+    - label: "Read the mandatory attribute: ColorLoopStoredEnhancedHue"
+      command: "readAttribute"
+      attribute: "color loop stored enhanced hue"
+      response:
+          value: 0
+
+    - label: "Validate constraints of attribute: ColorLoopStoredEnhancedHue"
+      command: "readAttribute"
+      attribute: "color loop stored enhanced hue"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "Write the default values to mandatory attribute:
+          ColorLoopStoredEnhancedHue"
+      command: "writeAttribute"
+      attribute: "color loop stored enhanced hue"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: ColorLoopStoredEnhancedHue"
+      command: "readAttribute"
+      attribute: "color loop stored enhanced hue"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: ColorCapabilities"
+      command: "readAttribute"
+      attribute: "color capabilities"
+      response:
+          value: 0
+
+    - label: "Validate constraints of attribute: ColorCapabilities"
+      command: "readAttribute"
+      attribute: "color capabilities"
+      response:
+          constraints:
+              type: map16
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Write the default values to mandatory attribute: ColorCapabilities"
+      command: "writeAttribute"
+      attribute: "color capabilities"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: ColorCapabilities"
+      command: "readAttribute"
+      attribute: "color capabilities"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: ColorTempPhysicalMinMireds"
+      command: "readAttribute"
+      attribute: "color temp physical min"
+      response:
+          value: 0
+
+    - label: "Validate constraints of attribute: ColorTempPhysicalMinMireds"
+      command: "readAttribute"
+      attribute: "color temp physical min"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Write the default values to mandatory  attribute:
+          ColorTempPhysicalMinMireds"
+      command: "writeAttribute"
+      attribute: "color temp physical min"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: ColorTempPhysicalMinMireds"
+      command: "readAttribute"
+      attribute: "color temp physical min"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: ColorTempPhysicalMaxMireds"
+      command: "readAttribute"
+      attribute: "color temp physical max"
+      response:
+          value: 65279
+
+    - label: "Validate constraints of attribute: ColorTempPhysicalMaxMireds"
+      command: "readAttribute"
+      attribute: "color temp physical max"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Write the default values to mandatory attribute:
+          ColorTempPhysicalMaxMireds"
+      command: "writeAttribute"
+      attribute: "color temp physical max"
+      arguments:
+          value: 65279
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back mandatory attribute: ColorTempPhysicalMaxMireds"
+      command: "readAttribute"
+      attribute: "color temp physical max"
+      response:
+          value: 65279
+
+    - label: "Read the optional attribute: CoupleColorTempToLevelMinMireds"
+      optional: true
+      command: "readAttribute"
+      attribute: "couple color temp to level min-mireds"
+      response:
+          constraints:
+              type: uint16
+
+    - label:
+          "Write the default values to optional attribute:
+          CoupleColorTempToLevelMinMireds"
+      optional: true
+      command: "writeAttribute"
+      attribute: "couple color temp to level min-mireds"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back optional attribute: CoupleColorTempToLevelMinMireds"
+      optional: true
+      command: "readAttribute"
+      attribute: "couple color temp to level min-mireds"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: StartUpColorTemperatureMireds"
+      optional: true
+      command: "readAttribute"
+      attribute: "start up color temperature mireds"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label:
+          "Write the default values to optional attribute:
+          StartUpColorTemperatureMireds"
+      optional: true
+      command: "writeAttribute"
+      attribute: "start up color temperature mireds"
+      arguments:
+          value: 0
+
+    - label: "Reads back optional attribute: StartUpColorTemperatureMireds"
+      optional: true
+      command: "readAttribute"
+      attribute: "start up color temperature mireds"
+      response:
+          value: 0
+
+    - label: "Read the Optional attribute: RemainingTime"
+      optional: true
+      command: "readAttribute"
+      attribute: "remaining time"
+      response:
+          value: 0
+
+    - label: "Validate constraints of attribute: RemainingTime"
+      optional: true
+      command: "readAttribute"
+      attribute: "remaining time"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 254
+
+    - label: "Write the default values to optional attribute: RemainingTime"
+      optional: true
+      command: "writeAttribute"
+      attribute: "remaining time"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back optional attribute: RemainingTime"
+      optional: true
+      command: "readAttribute"
+      attribute: "remaining time"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: DriftCompensation"
+      optional: true
+      command: "readAttribute"
+      attribute: "drift compensation"
+      response:
+          constraints:
+              type: enum8
+              minValue: 0
+              maxValue: 4
+
+    - label: "Write the default values to optional attribute: DriftCompensation"
+      optional: true
+      command: "writeAttribute"
+      attribute: "drift compensation"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back optional attribute: DriftCompensation"
+      optional: true
+      command: "readAttribute"
+      attribute: "drift compensation"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: CompensationText"
+      optional: true
+      command: "readAttribute"
+      attribute: "compensation text"
+      response:
+          constraints:
+              type: string
+              maxLength: 254
+
+    - label: "Write the default values to optional attribute: CompensationText"
+      optional: true
+      command: "writeAttribute"
+      attribute: "compensation text"
+      arguments:
+          value: ""
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Reads back optional attribute: CompensationText"
+      optional: true
+      command: "readAttribute"
+      attribute: "compensation text"
+      response:
+          value: ""
+
+    #Defined Primaries Information Attribute Set
+
+    - label: "Read the mandatory attribute: NumberOfPrimaries"
+      command: "readAttribute"
+      attribute: "number of primaries"
+      response:
+          constraints:
+              type: uint8
+              minValue: 0
+              maxValue: 6
+
+    - label: "Write the default mandatory attribute: NumberOfPrimaries"
+      command: "writeAttribute"
+      attribute: "number of primaries"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: NumberOfPrimaries"
+      command: "readAttribute"
+      attribute: "number of primaries"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary1X"
+      command: "readAttribute"
+      attribute: "primary 1 x"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary1X"
+      command: "writeAttribute"
+      attribute: "primary 1 x"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary1X"
+      command: "readAttribute"
+      attribute: "primary 1 x"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary1Y"
+      command: "readAttribute"
+      attribute: "primary 1 y"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary1Y"
+      command: "writeAttribute"
+      attribute: "primary 1 y"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary1Y"
+      command: "readAttribute"
+      attribute: "primary 1 y"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary1Intensity"
+      command: "readAttribute"
+      attribute: "primary 1 intensity"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Write the default mandatory attribute: Primary1Intensity"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "primary 1 intensity"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary1Intensity"
+      disabled: true
+      command: "readAttribute"
+      attribute: "primary 1 intensity"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary2X"
+      command: "readAttribute"
+      attribute: "primary 2 x"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary2X"
+      command: "writeAttribute"
+      attribute: "primary 2 x"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary2X"
+      command: "readAttribute"
+      attribute: "primary 2 x"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary2Y"
+      command: "readAttribute"
+      attribute: "primary 2 y"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary2Y"
+      command: "writeAttribute"
+      attribute: "primary 2 y"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary2Y"
+      command: "readAttribute"
+      attribute: "primary 2 y"
+      response:
+          value: 0
+
+    - label: "Validate constraints of attribute: Primary2Intensity"
+      command: "readAttribute"
+      attribute: "primary 2 intensity"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Write the default mandatory attribute: Primary2Intensity"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "primary 2 intensity"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary2Intensity"
+      disabled: true
+      command: "readAttribute"
+      attribute: "primary 2 intensity"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary3X"
+      command: "readAttribute"
+      attribute: "primary 3 x"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary3X"
+      command: "writeAttribute"
+      attribute: "primary 3 x"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary3X"
+      command: "readAttribute"
+      attribute: "primary 3 x"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary3Y"
+      command: "readAttribute"
+      attribute: "primary 3 y"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary3Y"
+      command: "writeAttribute"
+      attribute: "primary 3 y"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary3Y"
+      command: "readAttribute"
+      attribute: "primary 3 y"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary3Intensity"
+      command: "readAttribute"
+      attribute: "primary 3 intensity"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Write the default mandatory attribute: Primary3Intensity"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "primary 3 intensity"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary3Intensity"
+      disabled: true
+      command: "readAttribute"
+      attribute: "primary 3 intensity"
+      response:
+          value: 0
+
+    #Additional Defined Primaries Information Attribute Set
+    - label: "Read the mandatory attribute: Primary4X"
+      command: "readAttribute"
+      attribute: "primary 4 x"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary4X"
+      command: "writeAttribute"
+      attribute: "primary 4 x"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary4X"
+      command: "readAttribute"
+      attribute: "primary 4 x"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary4Y"
+      command: "readAttribute"
+      attribute: "primary 4 y"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary4Y"
+      command: "writeAttribute"
+      attribute: "primary 4 y"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary4Y"
+      command: "readAttribute"
+      attribute: "primary 4 y"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary4Intensity"
+      command: "readAttribute"
+      attribute: "primary 4 intensity"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Write the default mandatory attribute: Primary4Intensity"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "primary 4 intensity"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary4Intensity"
+      disabled: true
+      command: "readAttribute"
+      attribute: "primary 4 intensity"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary5X"
+      command: "readAttribute"
+      attribute: "primary 5 x"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary5X"
+      command: "writeAttribute"
+      attribute: "primary 5 x"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary5X"
+      command: "readAttribute"
+      attribute: "primary 5 x"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary5Y"
+      command: "readAttribute"
+      attribute: "primary 5 y"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary5Y"
+      command: "writeAttribute"
+      attribute: "primary 5 y"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary5Y"
+      command: "readAttribute"
+      attribute: "primary 5 y"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary5Intensity"
+      command: "readAttribute"
+      attribute: "primary 5 intensity"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Write the default mandatory attribute: Primary5Intensity"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "primary 5 intensity"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary5Intensity"
+      disabled: true
+      command: "readAttribute"
+      attribute: "primary 5 intensity"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary6X"
+      command: "readAttribute"
+      attribute: "primary 6 x"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary6X"
+      command: "writeAttribute"
+      attribute: "primary 6 x"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary6X"
+      command: "readAttribute"
+      attribute: "primary 6 x"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary6Y"
+      command: "readAttribute"
+      attribute: "primary 6 y"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default mandatory attribute: Primary6Y"
+      command: "writeAttribute"
+      attribute: "primary 6 y"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary6Y"
+      command: "readAttribute"
+      attribute: "primary 6 y"
+      response:
+          value: 0
+
+    - label: "Read the mandatory attribute: Primary6Intensity"
+      command: "readAttribute"
+      attribute: "primary 6 intensity"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Write the default mandatory attribute: Primary6Intensity"
+      disabled: true
+      command: "writeAttribute"
+      attribute: "primary 6 intensity"
+      arguments:
+          value: 0
+      response:
+          error: UNSUPPORTED_WRITE
+
+    - label: "Read back the mandatory attribute: Primary6Intensity"
+      disabled: true
+      command: "readAttribute"
+      attribute: "primary 6 intensity"
+      response:
+          value: 0
+
+    #Defined Color Points Settings Attribute Set
+    - label: "Read the optional attribute: WhitePointX"
+      optional: true
+      command: "readAttribute"
+      attribute: "white point x"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default optional attribute: WhitePointX"
+      optional: true
+      command: "writeAttribute"
+      attribute: "white point x"
+      arguments:
+          value: 0
+
+    - label: "Read back the optional attribute: WhitePointX"
+      optional: true
+      command: "readAttribute"
+      attribute: "white point x"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: WhitePointY"
+      optional: true
+      command: "readAttribute"
+      attribute: "white point y"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default optional attribute: WhitePointY"
+      optional: true
+      command: "writeAttribute"
+      attribute: "white point y"
+      arguments:
+          value: 0
+
+    - label: "Read back the optional attribute: WhitePointY"
+      optional: true
+      command: "readAttribute"
+      attribute: "white point y"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: ColorPointRX"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point r x"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default optional attribute: ColorPointRX"
+      optional: true
+      command: "writeAttribute"
+      attribute: "color point r x"
+      arguments:
+          value: 0
+
+    - label: "Read back the optional attribute: ColorPointRX"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point r x"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: ColorPointRY"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point r y"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default optional attribute: ColorPointRY"
+      optional: true
+      command: "writeAttribute"
+      attribute: "color point r y"
+      arguments:
+          value: 0
+
+    - label: "Read back the optional attribute: ColorPointRY"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point r y"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: ColorPointRIntensity"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point r intensity"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Write the default optional attribute: ColorPointRIntensity"
+      optional: true
+      command: "writeAttribute"
+      attribute: "color point r intensity"
+      arguments:
+          value: 0
+
+    - label: "Read back the optional attribute: ColorPointRIntensity"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point r intensity"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: ColorPointGX"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point g x"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default optional attribute: ColorPointGX"
+      optional: true
+      command: "writeAttribute"
+      attribute: "color point g x"
+      arguments:
+          value: 0
+
+    - label: "Read back the optional attribute: ColorPointGX"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point g x"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: ColorPointGY"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point g y"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default optional attribute: ColorPointGY"
+      optional: true
+      command: "writeAttribute"
+      attribute: "color point g y"
+      arguments:
+          value: 0
+
+    - label: "Read back the optional attribute: ColorPointGY"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point g y"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: ColorPointGIntensity"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point g intensity"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Write the default optional attribute: ColorPointGIntensity"
+      optional: true
+      command: "writeAttribute"
+      attribute: "color point g intensity"
+      arguments:
+          value: 0
+
+    - label: "Read back the optional attribute: ColorPointGIntensity"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point g intensity"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: ColorPointBX"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point b x"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default optional attribute: ColorPointBX"
+      optional: true
+      command: "writeAttribute"
+      attribute: "color point b x"
+      arguments:
+          value: 0
+
+    - label: "Read back the optional attribute: ColorPointBX"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point b x"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: ColorPointBY"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point b y"
+      response:
+          constraints:
+              type: uint16
+              minValue: 0
+              maxValue: 65279
+
+    - label: "Write the default optional attribute: ColorPointBY"
+      optional: true
+      command: "writeAttribute"
+      attribute: "color point b y"
+      arguments:
+          value: 0
+
+    - label: "Read back the optional attribute: ColorPointBY"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point b y"
+      response:
+          value: 0
+
+    - label: "Read the optional attribute: ColorPointBIntensity"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point b intensity"
+      response:
+          constraints:
+              type: uint8
+
+    - label: "Write the default optional attribute: ColorPointBIntensity"
+      optional: true
+      command: "writeAttribute"
+      attribute: "color point b intensity"
+      arguments:
+          value: 0
+
+    - label: "Read back the optional attribute: ColorPointBIntensity"
+      optional: true
+      command: "readAttribute"
+      attribute: "color point b intensity"
+      response:
+          value: 0

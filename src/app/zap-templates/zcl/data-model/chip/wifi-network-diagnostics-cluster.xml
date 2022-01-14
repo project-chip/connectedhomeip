@@ -33,6 +33,18 @@ limitations under the License.
     <item name="802.11n" value="0x03"/>
     <item name="802.11ac" value="0x04"/>
     <item name="802.11ax" value="0x05"/>    
+  </enum>
+  <enum name="AssociationFailureCause" type="ENUM8">
+    <cluster code="0x0036"/>
+    <item name="Unknown" value="0x00"/>
+    <item name="AssociationFailed" value="0x01"/>
+    <item name="AuthenticationFailed" value="0x02"/>
+    <item name="SsidNotFound" value="0x03"/>
+  </enum>
+  <enum name="WiFiConnectionStatus" type="ENUM8">
+    <cluster code="0x0036"/>
+    <item name="Connected" value="0x00"/>
+    <item name="NotConnected" value="0x01"/>
   </enum>  
   <cluster>
     <domain>General</domain>
@@ -55,6 +67,23 @@ limitations under the License.
     <attribute side="server" code="0x0C" define="OVERRUN_COUNT" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="false" default="0x0000000000000000" optional="true">OverrunCount</attribute>
     <command source="client" code="0x00" name="ResetCounts" optional="true" cli="chip wifi_network_diagnostics resetcounts">
       <description>Reception of this command SHALL reset the Breacon and Packet related count attributes to 0</description>
-    </command>           
+    </command>
+    <event side="server" code="0x00" name="Disconnection" priority="info" optional="true">
+      <description>Indicate that a Node’s Wi-Fi connection has been disconnected as a result of de-authenticated or dis-association and indicates the reason.</description>
+      <field id="0" name="ReasonCode" type="INT16U"/>
+    </event>
+    <event side="server" code="0x01" name="AssociationFailure" priority="info" optional="true">
+      <description>Indicate that a Node has failed to connect, or reconnect, to a Wi-Fi access point.</description>
+      <field id="0" name="AssociationFailure" type="AssociationFailureCause"/>
+      <field id="1" name="Status" type="INT16U"/>      
+    </event>
+    <event side="server" code="0x02" name="ConnectionStatus" priority="info" optional="true">
+      <description>Indicate that a Node’s connection status to a Wi-Fi network has changed.</description>
+      <field id="0" name="ConnectionStatus" type="WiFiConnectionStatus"/>
+    </event>                  
   </cluster>
+  <bitmap name="WiFiNetworkDiagnosticsFeature" type="BITMAP32">
+    <field name="PacketCounts" mask="0x1"/>
+    <field name="ErrorCounts" mask="0x2"/>
+  </bitmap>  
 </configurator>

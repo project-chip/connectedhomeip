@@ -42,6 +42,11 @@
 
 #include "radio.h"
 
+#include <AppTask.h>
+
+const uint16_t shell_task_size    = 3096;
+const uint8_t shell_task_priority = 0;
+
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
@@ -62,9 +67,15 @@ extern "C" unsigned int sleep(unsigned int seconds)
     return 0;
 }
 
+static void shell_task(void * args)
+{
+    Engine::Root().RunMainLoop();
+}
+
 extern "C" void main_task(void const * argument)
 {
     int status = 0;
+    BaseType_t shellTaskHandle;
 
     /* Call C++ constructors */
     InitFunc * pFunc = &__init_array_start;
@@ -122,19 +133,33 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-    status = chip::Shell::streamer_init(chip::Shell::streamer_get());
-    if (status != 0)
-    {
-        K32W_LOG("Error during streamer_init");
-        goto exit;
-    }
-
-    cmd_otcli_init();
+    // cmd_otcli_init();
     cmd_ping_init();
     cmd_send_init();
 
-    Engine::Root().RunMainLoop();
+    shellTaskHandle = xTaskCreate(shell_task, "shell_task", shell_task_size / sizeof(StackType_t), NULL, shell_task_priority, NULL);
+    if (!shellTaskHandle)
+    {
+        K32W_LOG("Error while creating the shell task!");
+        goto exit;
+    }
+
+    ret = GetAppTask().StartAppTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        K32W_LOG("Error during GetAppTask().StartAppTask()");
+        goto exit;
+    }
+    GetAppTask().AppTaskMain(NULL);
 
 exit:
     return;
+}
+
+extern "C" void otSysEventSignalPending(void)
+{
+    {
+        BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
+        portYIELD_FROM_ISR(yieldRequired);
+    }
 }

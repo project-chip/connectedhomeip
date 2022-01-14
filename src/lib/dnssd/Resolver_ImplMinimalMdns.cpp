@@ -22,6 +22,7 @@
 
 #include <lib/core/CHIPConfig.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
+#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/ActiveResolveAttempts.h>
@@ -74,8 +75,7 @@ public:
         mDelegate(delegate),
         mDiscoveryType(discoveryType), mPacketRange(packet)
     {
-        mInterfaceId           = interfaceId;
-        mNodeData.mInterfaceId = interfaceId;
+        mInterfaceId = interfaceId;
     }
 
     // ParserDelegate implementation
@@ -109,8 +109,9 @@ private:
 
 void PacketDataReporter::OnQuery(const QueryData & data)
 {
-    ChipLogError(Discovery, "Unexpected query packet being parsed as a response");
-    mValid = false;
+    // Ignore queries:
+    //   - unicast answers will include the corresponding query in the answer
+    //     packet, however that is not interesting for the resolver.
 }
 
 void PacketDataReporter::OnHeader(ConstHeaderRef & header)
@@ -177,8 +178,13 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     // This code assumes that all entries in the mDNS packet relate to the
     // same entity. This may not be correct if multiple servers are reported
     // (if multi-admin decides to use unique ports for every ecosystem).
-    mNodeData.mAddress = addr;
-    mHasIP             = true;
+    if (mNodeData.mNumIPs >= ResolvedNodeData::kMaxIPAddresses)
+    {
+        return;
+    }
+    mNodeData.mAddress[mNodeData.mNumIPs++] = addr;
+    mNodeData.mInterfaceId                  = mInterfaceId;
+    mHasIP                                  = true;
 }
 
 void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)
@@ -341,10 +347,10 @@ public:
     void OnMdnsPacketData(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
 
     ///// Resolver implementation
-    CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override;
+    CHIP_ERROR Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager) override;
     void Shutdown() override;
     void SetResolverDelegate(ResolverDelegate * delegate) override { mDelegate = delegate; }
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
@@ -398,18 +404,18 @@ void MinMdnsResolver::OnMdnsPacketData(const BytesRange & data, const chip::Inet
     }
 }
 
-CHIP_ERROR MinMdnsResolver::Init(chip::Inet::InetLayer * inetLayer)
+CHIP_ERROR MinMdnsResolver::Init(chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager)
 {
     /// Note: we do not double-check the port as we assume the APP will always use
-    /// the same inetLayer and port for mDNS.
+    /// the same udpEndPointManager and port for mDNS.
+    mSystemLayer = &udpEndPointManager->SystemLayer();
+
     if (GlobalMinimalMdnsServer::Server().IsListening())
     {
         return CHIP_NO_ERROR;
     }
 
-    mSystemLayer = inetLayer->SystemLayer();
-
-    return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, kMdnsPort);
+    return GlobalMinimalMdnsServer::Instance().StartServer(udpEndPointManager, kMdnsPort);
 }
 
 void MinMdnsResolver::Shutdown()
@@ -427,14 +433,13 @@ CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Mini
 
     mdns::Minimal::Query query(qname);
     query.SetType(type).SetClass(mdns::Minimal::QClass::IN);
-    // TODO(cecille): Not sure why unicast response isn't working - fix.
-    query.SetAnswerViaUnicast(false);
+    query.SetAnswerViaUnicast(true);
 
     builder.AddQuery(query);
 
     ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
 
-    return GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort);
+    return GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort);
 }
 
 CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
@@ -500,7 +505,7 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
     return SendQuery(qname, mdns::Minimal::QType::ANY);
 }
 
-CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
 {
     mDiscoveryType = DiscoveryType::kOperational;
     mActiveResolves.MarkPending(peerId);
@@ -513,14 +518,14 @@ CHIP_ERROR MinMdnsResolver::ScheduleResolveRetries()
     ReturnErrorCodeIf(mSystemLayer == nullptr, CHIP_ERROR_INCORRECT_STATE);
     mSystemLayer->CancelTimer(&ResolveRetryCallback, this);
 
-    Optional<uint32_t> delayMs = mActiveResolves.GetMsUntilNextExpectedResponse();
+    Optional<System::Clock::Timeout> delay = mActiveResolves.GetTimeUntilNextExpectedResponse();
 
-    if (!delayMs.HasValue())
+    if (!delay.HasValue())
     {
         return CHIP_NO_ERROR;
     }
 
-    return mSystemLayer->StartTimer(System::Clock::Milliseconds32(delayMs.Value()), &ResolveRetryCallback, this);
+    return mSystemLayer->StartTimer(delay.Value(), &ResolveRetryCallback, this);
 }
 
 void MinMdnsResolver::ResolveRetryCallback(System::Layer *, void * self)
@@ -555,9 +560,9 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
             Query query(instanceQName);
 
             query
-                .SetClass(QClass::IN)       //
-                .SetType(QType::ANY)        //
-                .SetAnswerViaUnicast(false) //
+                .SetClass(QClass::IN)      //
+                .SetType(QType::ANY)       //
+                .SetAnswerViaUnicast(true) //
                 ;
 
             // NOTE: type above is NOT A or AAAA because the name searched for is
@@ -578,7 +583,7 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
 
         ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
 
-        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
     }
 
     return ScheduleResolveRetries();
@@ -591,6 +596,31 @@ MinMdnsResolver gResolver;
 Resolver & chip::Dnssd::Resolver::Instance()
 {
     return gResolver;
+}
+
+// Minimal implementation does not support associating a context to a request (while platforms implementations do). So keep
+// updating the delegate that ends up being used by the server by calling 'SetResolverDelegate'.
+// This effectively allow minimal to have multiple controllers issuing requests as long the requests are serialized, but
+// it won't work well if requests are issued in parallel.
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type, dnssdCacheBypass);
+}
+
+CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().FindCommissionableNodes(filter);
+}
+
+CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
+{
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(mDelegate);
+    return chip::Dnssd::Resolver::Instance().FindCommissioners(filter);
 }
 
 } // namespace Dnssd

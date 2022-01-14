@@ -1,0 +1,131 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+
+import("${build_root}/config/android_abi.gni")
+import("${chip_root}/build/chip/java/rules.gni")
+import("${chip_root}/build/chip/tools.gni")
+
+shared_library("jni") {
+  output_name = "libTvApp"
+
+  sources = [
+    "${chip_root}/examples/tv-app/tv-common/include/CHIPProjectAppConfig.h",
+    "include/account-login/AccountLoginManager.cpp",
+    "include/account-login/AccountLoginManager.h",
+    "include/application-basic/ApplicationBasicManager.cpp",
+    "include/application-basic/ApplicationBasicManager.h",
+    "include/application-launcher/ApplicationLauncherManager.cpp",
+    "include/application-launcher/ApplicationLauncherManager.h",
+    "include/audio-output/AudioOutputManager.cpp",
+    "include/audio-output/AudioOutputManager.h",
+    "include/cluster-change-attribute.cpp",
+    "include/cluster-init.cpp",
+    "include/endpoint-configuration/EndpointConfigurationStorage.cpp",
+    "include/endpoint-configuration/EndpointConfigurationStorage.h",
+    "include/target-navigator/TargetNavigatorManager.cpp",
+    "include/target-navigator/TargetNavigatorManager.h",
+    "java/ChannelManager.cpp",
+    "java/ChannelManager.h",
+    "java/ContentLauncherManager.cpp",
+    "java/ContentLauncherManager.h",
+    "java/KeypadInputManager.cpp",
+    "java/KeypadInputManager.h",
+    "java/LowPowerManager.cpp",
+    "java/LowPowerManager.h",
+    "java/MediaInputManager.cpp",
+    "java/MediaInputManager.h",
+    "java/MediaPlaybackManager.cpp",
+    "java/MediaPlaybackManager.h",
+    "java/TVApp-JNI.cpp",
+    "java/WakeOnLanManager.cpp",
+    "java/WakeOnLanManager.h",
+  ]
+
+  deps = [
+    "${chip_root}/examples/tv-app/tv-common",
+    "${chip_root}/src/app/server/java:jni",
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/inipp",
+  ]
+
+  cflags = [ "-Wconversion" ]
+
+  output_dir = "${root_out_dir}/lib/jni/${android_abi}"
+
+  ldflags = [ "-Wl,--gc-sections" ]
+}
+
+android_library("java") {
+  output_name = "TvApp.jar"
+
+  deps = [
+    ":android",
+    "${chip_root}/third_party/android_deps:annotation",
+  ]
+
+  data_deps = [
+    ":jni",
+    "${chip_root}/build/chip/java:shared_cpplib",
+  ]
+
+  sources = [
+    "java/src/com/tcl/chip/tvapp/ChannelInfo.java",
+    "java/src/com/tcl/chip/tvapp/ChannelLineupInfo.java",
+    "java/src/com/tcl/chip/tvapp/ChannelManager.java",
+    "java/src/com/tcl/chip/tvapp/ChannelManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/Clusters.java",
+    "java/src/com/tcl/chip/tvapp/ContentLaunchBrandingInformation.java",
+    "java/src/com/tcl/chip/tvapp/ContentLaunchManager.java",
+    "java/src/com/tcl/chip/tvapp/ContentLaunchManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/ContentLaunchResponse.java",
+    "java/src/com/tcl/chip/tvapp/ContentLaunchSearchParameter.java",
+    "java/src/com/tcl/chip/tvapp/KeypadInputManager.java",
+    "java/src/com/tcl/chip/tvapp/KeypadInputManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/LowPowerManager.java",
+    "java/src/com/tcl/chip/tvapp/LowPowerManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/MediaInputInfo.java",
+    "java/src/com/tcl/chip/tvapp/MediaInputManager.java",
+    "java/src/com/tcl/chip/tvapp/MediaInputManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/MediaPlaybackManager.java",
+    "java/src/com/tcl/chip/tvapp/MediaPlaybackManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/MediaPlaybackPosition.java",
+    "java/src/com/tcl/chip/tvapp/TvApp.java",
+    "java/src/com/tcl/chip/tvapp/TvAppCallback.java",
+    "java/src/com/tcl/chip/tvapp/WakeOnLanManager.java",
+    "java/src/com/tcl/chip/tvapp/WakeOnLanManagerStub.java",
+  ]
+
+  javac_flags = [ "-Xlint:deprecation" ]
+
+  # TODO: add classpath support (we likely need to add something like
+  #  ..../platforms/android-21/android.jar to access BLE items)
+}
+
+java_prebuilt("android") {
+  jar_path = "${android_sdk_root}/platforms/android-21/android.jar"
+}
+
+group("default") {
+  deps = [
+    ":android",
+    ":java",
+    ":jni",
+    "${chip_root}/src/app/server/java",
+    "${chip_root}/src/platform/android:java",
+    "${chip_root}/src/setup_payload/java",
+  ]
+}

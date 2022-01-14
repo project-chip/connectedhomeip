@@ -48,7 +48,13 @@ struct List : public Span<T>
     // List<T> instances as though they were just Spans.
     //
     using Span<T>::Span;
-    using Span<T>::operator=;
+
+    template <size_t N>
+    constexpr List & operator=(T (&databuf)[N])
+    {
+        Span<T>::operator=(databuf);
+        return (*this);
+    }
 };
 
 template <typename X>
@@ -59,7 +65,7 @@ inline CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag, List<X> list)
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Array, type));
     for (auto & item : list)
     {
-        ReturnErrorOnFailure(Encode(writer, TLV::AnonymousTag, item));
+        ReturnErrorOnFailure(Encode(writer, TLV::AnonymousTag(), item));
     }
     ReturnErrorOnFailure(writer.EndContainer(type));
 

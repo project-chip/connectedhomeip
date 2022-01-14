@@ -68,7 +68,7 @@ def ValidateRepoPath(context, parameter, value):
     type=click.Choice(
         ['all'] + [t.name for t in build.ALL_TARGETS], case_sensitive=False),
     multiple=True,
-    help='Build target(s)'
+    help='Build target(s). Note that "all" includes glob blacklisted targets'
 )
 @click.option(
     '--target-glob',
@@ -139,6 +139,8 @@ before running this script.
         runner = ShellRunner(root=repo)
 
     if 'all' in target:
+        # NOTE: ALL includes things that are glob blacklisted (so that 'targets' works and
+        # displays all)
         targets = build.ALL_TARGETS
     else:
         requested_targets = set([t.lower for t in target])
@@ -152,7 +154,8 @@ before running this script.
 
     if target_glob:
         matcher = GlobMatcher(target_glob)
-        targets = [t for t in targets if matcher.matches(t.name)]
+        targets = [t for t in targets if matcher.matches(
+            t.name) and not t.IsGlobBlacklisted]
 
     if skip_target_glob:
         matcher = GlobMatcher(skip_target_glob)
@@ -184,7 +187,11 @@ def cmd_generate(context):
 @click.pass_context
 def cmd_generate(context):
     for builder in context.obj.builders:
-        print(builder.identifier)
+        if builder.target.IsGlobBlacklisted:
+            print("%s (NOGLOB: %s)" %
+                  (builder.target.name, builder.target.GlobBlacklistReason))
+        else:
+            print(builder.target.name)
 
 
 @main.command('build', help='generate and run ninja/make as needed to compile')

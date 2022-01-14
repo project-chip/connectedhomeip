@@ -144,10 +144,8 @@ oids = [
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 4]),
     ("AttributeType",  "ChipFabricId",            21,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 5]),
-    ("AttributeType",  "ChipAuthTag1",            22,      [iso(1), organization(
+    ("AttributeType",  "ChipCASEAuthenticatedTag", 22,      [iso(1), organization(
         3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 6]),
-    ("AttributeType",  "ChipAuthTag2",            23,      [iso(1), organization(
-        3), dod(6), internet(1), private(4), enterprise(1), zigbee(37244), chip(1), 7]),
 
     # Elliptic Curves
     ("EllipticCurve",  "prime256v1",              1,       [

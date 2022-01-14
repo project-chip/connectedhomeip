@@ -63,9 +63,11 @@
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
+#include <app/util/util.h>
 #include <system/SystemLayer.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::IasZone;
 
 #define UNDEFINED_ZONE_ID 0xFF
@@ -94,7 +96,7 @@ typedef struct
 {
     EndpointId endpoint;
     uint16_t status;
-    uint32_t eventTimeMs;
+    System::Clock::Timestamp eventTime;
 } IasZoneStatusQueueEntry;
 
 typedef struct
@@ -149,7 +151,7 @@ static void resetCurrentQueueRetryParams(void)
 // Forward declarations
 
 static void setZoneId(EndpointId endpoint, uint8_t zoneId);
-static bool areZoneServerAttributesTokenized(EndpointId endpoint);
+static bool areZoneServerAttributesNonVolatile(EndpointId endpoint);
 static bool isValidEnrollmentMode(EmberAfIasZoneEnrollmentMode method);
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
 static uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry);
@@ -413,9 +415,9 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
 {
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
     IasZoneStatusQueueEntry newBufferEntry;
-    newBufferEntry.endpoint    = endpoint;
-    newBufferEntry.status      = newStatus;
-    newBufferEntry.eventTimeMs = System::SystemClock().GetMonotonicMilliseconds();
+    newBufferEntry.endpoint  = endpoint;
+    newBufferEntry.status    = newStatus;
+    newBufferEntry.eventTime = System::SystemClock().GetMonotonicTimestamp();
 #endif
     EmberStatus sendStatus = EMBER_SUCCESS;
 
@@ -527,7 +529,7 @@ void emberAfPluginIasZoneServerManageQueueEventHandler(void)
         status = bufferStart->status;
         emberAfIasZoneClusterPrintln("Attempting to resend a queued zone status update (status: 0x%02X, "
                                      "event time (s): %d) with time of %d. Retry count: %d",
-                                     bufferStart->status, bufferStart->eventTimeMs / MILLISECOND_TICKS_PER_SECOND, elapsedTimeQs,
+                                     bufferStart->status, bufferStart->eventTime / MILLISECOND_TICKS_PER_SECOND, elapsedTimeQs,
                                      queueRetryParams.currentRetryCount);
         sendZoneUpdate(status, elapsedTimeQs, bufferStart->endpoint);
         emberEventControlSetInactive(&emberAfPluginIasZoneServerManageQueueEventControl);
@@ -540,7 +542,7 @@ void emberAfPluginIasZoneServerManageQueueEventHandler(void)
 void emberAfIasZoneClusterServerInitCallback(EndpointId endpoint)
 {
     EmberAfIasZoneType zoneType;
-    if (!areZoneServerAttributesTokenized(endpoint))
+    if (!areZoneServerAttributesNonVolatile(endpoint))
     {
         emberAfAppPrint("WARNING: ATTRIBUTES ARE NOT BEING STORED IN FLASH! ");
         emberAfAppPrintln("DEVICE WILL NOT FUNCTION PROPERLY AFTER REBOOTING!!");
@@ -587,37 +589,15 @@ uint8_t emberAfPluginIasZoneServerGetZoneId(EndpointId endpoint)
 //
 // This function will verify that all attributes necessary for the IAS zone
 // server to properly retain functionality through a power failure are
-// tokenized.
+// non-volatile.
 //
 //------------------------------------------------------------------------------
-static bool areZoneServerAttributesTokenized(EndpointId endpoint)
+static bool areZoneServerAttributesNonVolatile(EndpointId endpoint)
 {
-    EmberAfAttributeMetadata * metadata;
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID,
-                                              CLUSTER_MASK_SERVER, EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!emberAfAttributeIsTokenized(metadata))
-    {
-        return false;
-    }
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_STATE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                              EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!emberAfAttributeIsTokenized(metadata))
-    {
-        return false;
-    }
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_TYPE_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                              EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!emberAfAttributeIsTokenized(metadata))
-    {
-        return false;
-    }
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_ID_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
-                                              EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!emberAfAttributeIsTokenized(metadata))
+    if (!emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::IasCieAddress::Id, true) ||
+        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneState::Id, true) ||
+        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneType::Id, true) ||
+        !emberAfIsNonVolatileAttribute(endpoint, IasZone::Id, Attributes::ZoneId::Id, true))
     {
         return false;
     }
@@ -749,7 +729,7 @@ void emberAfPluginIasZoneServerPrintQueue(void)
     for (int i = 0; i < messageQueue.entriesInQueue; i++)
     {
         emberAfIasZoneClusterPrintln("Entry %d: Endpoint: %d Status: %d EventTimeMs: %d", i, messageQueue.buffer[i].endpoint,
-                                     messageQueue.buffer[i].status, messageQueue.buffer[i].eventTimeMs);
+                                     messageQueue.buffer[i].status, messageQueue.buffer[i].eventTime);
     }
 }
 
@@ -801,7 +781,7 @@ void emberAfIasZoneClusterServerMessageSentCallback(const MessageSendDestination
     // If a change status change notification command is not received by the
     // client, delay the option specified amount of time and try to resend it.
     // The event handler will perform the retransmit per the preset queue retry
-    // parameteres, and the original send request will handle populating the buffer.
+    // parameters, and the original send request will handle populating the buffer.
     // Do not try to retransmit again if the maximum number of retries attempts
     // is reached, this is however discarded if configured for unlimited retries.
     if ((status == EMBER_DELIVERY_FAILED) &&
@@ -877,9 +857,9 @@ static int16_t copyToBuffer(IasZoneStatusQueue * ring, const IasZoneStatusQueueE
         ring->lastIdx = 0;
     }
 
-    ring->buffer[ring->lastIdx].endpoint    = entry->endpoint;
-    ring->buffer[ring->lastIdx].status      = entry->status;
-    ring->buffer[ring->lastIdx].eventTimeMs = entry->eventTimeMs;
+    ring->buffer[ring->lastIdx].endpoint  = entry->endpoint;
+    ring->buffer[ring->lastIdx].status    = entry->status;
+    ring->buffer[ring->lastIdx].eventTime = entry->eventTime;
 
     ring->entriesInQueue++;
     return ring->lastIdx;
@@ -913,8 +893,8 @@ static int16_t popFromBuffer(IasZoneStatusQueue * ring, IasZoneStatusQueueEntry 
 
 uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry)
 {
-    uint64_t currentTimeMs = System::SystemClock().GetMonotonicMilliseconds();
-    int64_t deltaTimeMs    = currentTimeMs - entry->eventTimeMs;
+    System::Clock::Milliseconds64 currentTimeMs = System::SystemClock().GetMonotonicMilliseconds64();
+    int64_t deltaTimeMs                         = currentTimeMs.count() - entry->eventTime.count();
 
     if (deltaTimeMs < 0)
     {
@@ -924,3 +904,5 @@ uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry)
     return deltaTimeMs / MILLISECOND_TICKS_PER_QUARTERSECOND;
 }
 #endif
+
+void MatterIasZonePluginServerInitCallback() {}

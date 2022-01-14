@@ -29,7 +29,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <system/SystemLayer.h>
-#include <system/SystemObject.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/TCP.h>
 
@@ -107,7 +106,7 @@ public:
 
     void InitializeMessageTest(TCPImpl & tcp, const IPAddress & addr)
     {
-        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&mContext.GetInetLayer()).SetAddressType(addr.Type()));
+        CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(mContext.GetTCPEndPointManager()).SetAddressType(addr.Type()));
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
         mTransportMgrBase.SetSessionManager(this);
@@ -132,17 +131,9 @@ public:
 
         // Should be able to send a message to itself by just calling send.
         err = tcp.SendMessage(Transport::PeerAddress::TCP(addr), std::move(buffer));
-        if (err == CHIP_ERROR_POSIX(EADDRNOTAVAIL))
-        {
-            // TODO(#2698): the underlying system does not support IPV6. This early return
-            // should be removed and error should be made fatal.
-            printf("%s:%u: System does NOT support IPV6.\n", __FILE__, __LINE__);
-            return;
-        }
-
         NL_TEST_ASSERT(mSuite, err == CHIP_NO_ERROR);
 
-        mContext.DriveIOUntil(5000 /* ms */, [this]() { return mReceiveHandlerCallCount != 0; });
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [this]() { return mReceiveHandlerCallCount != 0; });
         NL_TEST_ASSERT(mSuite, mReceiveHandlerCallCount == 1);
 
         SetCallback(nullptr);
@@ -152,7 +143,7 @@ public:
     {
         // Disconnect and wait for seeing peer close
         tcp.Disconnect(Transport::PeerAddress::TCP(addr));
-        mContext.DriveIOUntil(5000 /* ms */, [&tcp]() { return !tcp.HasActiveConnections(); });
+        mContext.DriveIOUntil(chip::System::Clock::Seconds16(5), [&tcp]() { return !tcp.HasActiveConnections(); });
     }
 
     int mReceiveHandlerCallCount = 0;
@@ -173,7 +164,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     TCPImpl tcp;
 
-    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(&ctx.GetInetLayer()).SetAddressType(type));
+    CHIP_ERROR err = tcp.Init(Transport::TcpListenParameters(ctx.GetTCPEndPointManager()).SetAddressType(type));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -402,7 +393,7 @@ void chip::Transport::TCPTest::CheckProcessReceivedBuffer(nlTestSuite * inSuite,
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, gMockTransportMgrDelegate.mReceiveHandlerCallCount == 1);
 
-    // Test a message in a chain of three packet buffers. The message length is split accross buffers.
+    // Test a message in a chain of three packet buffers. The message length is split across buffers.
     gMockTransportMgrDelegate.mReceiveHandlerCallCount = 0;
     NL_TEST_ASSERT(inSuite, testData[0].Init((const uint16_t[]){ 1, 122, 123, 0 }));
     err = tcp.ProcessReceivedBuffer(lEndPoint, lPeerAddress, std::move(testData[0].mHandle));
@@ -475,7 +466,7 @@ static nlTestSuite sSuite =
  */
 static int Initialize(void * aContext)
 {
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite);
+    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Init();
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 

@@ -46,7 +46,7 @@ OptionDef gCmdOptionDefs[] =
     { "type",                kArgumentRequired, 't' },
     { "subject-chip-id",     kArgumentRequired, 'i' },
     { "subject-fab-id",      kArgumentRequired, 'f' },
-    { "subject-at",          kArgumentRequired, 'a' },
+    { "subject-cat",         kArgumentRequired, 'a' },
     { "subject-cn-u",        kArgumentRequired, 'c' },
     { "path-len-constraint", kArgumentRequired, 'p' },
     { "future-ext-sub",      kArgumentRequired, 'x' },
@@ -83,9 +83,9 @@ const char * const gCmdOptionHelp =
     "\n"
     "       Subject DN Fabric Id attribute (in hex).\n"
     "\n"
-    "   -a, --subject-at <hex-digits>\n"
+    "   -a, --subject-cat <hex-digits>\n"
     "\n"
-    "       Subject DN CHIP Authentication Tag (in hex).\n"
+    "       Subject DN CHIP CASE Authentication Tag (in hex).\n"
     "\n"
     "   -c, --subject-cn-u <string>\n"
     "\n"
@@ -192,6 +192,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint64_t chip64bitAttr;
+    uint32_t chip32bitAttr;
     OID attrOID;
 
     switch (id)
@@ -226,7 +227,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'i':
-        if (!ParseChip64bitAttr(arg, chip64bitAttr))
+        if (!ParseInt(arg, chip64bitAttr, 16))
         {
             PrintArgError("%s: Invalid value specified for subject chip id attribute: %s\n", progName, arg);
             return false;
@@ -260,27 +261,14 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'a':
-        if (!ParseChip64bitAttr(arg, chip64bitAttr))
+        if (!ParseInt(arg, chip32bitAttr, 16))
         {
             PrintArgError("%s: Invalid value specified for the subject authentication tag attribute: %s\n", progName, arg);
             return false;
         }
+        attrOID = kOID_AttributeType_ChipCASEAuthenticatedTag;
 
-        if (!gSubjectDN.HasAttr(kOID_AttributeType_ChipAuthTag1))
-        {
-            attrOID = kOID_AttributeType_ChipAuthTag1;
-        }
-        else if (!gSubjectDN.HasAttr(kOID_AttributeType_ChipAuthTag2))
-        {
-            attrOID = kOID_AttributeType_ChipAuthTag2;
-        }
-        else
-        {
-            PrintArgError("%s: Too many authentication tag attributes are specified: %s\n", progName, arg);
-            return false;
-        }
-
-        err = gSubjectDN.AddAttribute(attrOID, chip64bitAttr);
+        err = gSubjectDN.AddAttribute(attrOID, chip32bitAttr);
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add subject DN attribute: %s\n", chip::ErrorStr(err));
@@ -296,7 +284,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         }
         break;
     case 'f':
-        if (!ParseChip64bitAttr(arg, chip64bitAttr))
+        if (!ParseInt(arg, chip64bitAttr, 16))
         {
             PrintArgError("%s: Invalid value specified for subject fabric id attribute: %s\n", progName, arg);
             return false;
@@ -311,8 +299,7 @@ bool HandleOption(const char * progName, OptionSet * optSet, int id, const char 
         break;
 
     case 'c':
-        err = gSubjectDN.AddAttribute(kOID_AttributeType_CommonName,
-                                      chip::ByteSpan(reinterpret_cast<const uint8_t *>(arg), strlen(arg)));
+        err = gSubjectDN.AddAttribute(kOID_AttributeType_CommonName, chip::CharSpan(arg, strlen(arg)));
         if (err != CHIP_NO_ERROR)
         {
             fprintf(stderr, "Failed to add Common Name attribute to the subject DN: %s\n", chip::ErrorStr(err));

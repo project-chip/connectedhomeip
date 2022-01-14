@@ -23,13 +23,11 @@
 
 #pragma once
 
+#include <platform/AttributeList.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
+#include <system/PlatformEventSupport.h>
 #include <system/SystemLayer.h>
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <system/LwIPEventSupport.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 namespace chip {
 
@@ -39,17 +37,19 @@ class DiscoveryImplPlatform;
 
 namespace DeviceLayer {
 
+static constexpr size_t kMaxFixedLabels  = 10;
+static constexpr size_t kMaxUserLabels   = 10;
+static constexpr size_t kMaxLanguageTags = 254; // Maximum number of entry type 'ARRAY' supports
+
 class PlatformManagerImpl;
 class ConnectivityManagerImpl;
 class ConfigurationManagerImpl;
+class DeviceControlServer;
 class TraitManager;
 class ThreadStackManagerImpl;
 class TimeSyncManager;
 
 namespace Internal {
-class DeviceControlServer;
-class FabricProvisioningServer;
-class ServiceProvisioningServer;
 class BLEManagerImpl;
 template <class>
 class GenericConfigurationManagerImpl;
@@ -68,6 +68,28 @@ class GenericThreadStackManagerImpl_OpenThread;
 template <class>
 class GenericThreadStackManagerImpl_OpenThread_LwIP;
 } // namespace Internal
+
+/**
+ * Defines the delegate class of Platform Manager to notify platform updates.
+ */
+class PlatformManagerDelegate
+{
+public:
+    virtual ~PlatformManagerDelegate() {}
+
+    /**
+     * @brief
+     *   Called by the current Node after completing a boot or reboot process.
+     */
+    virtual void OnStartUp(uint32_t softwareVersion) {}
+
+    /**
+     * @brief
+     *   Called by the current Node prior to any orderly shutdown sequence on a
+     *   best-effort basis.
+     */
+    virtual void OnShutDown() {}
+};
 
 /**
  * Provides features for initializing and interacting with the chip network
@@ -91,6 +113,8 @@ public:
     CHIP_ERROR InitChipStack();
     CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
+    void SetDelegate(PlatformManagerDelegate * delegate) { mDelegate = delegate; }
+    PlatformManagerDelegate * GetDelegate() const { return mDelegate; }
 
     /**
      * ScheduleWork can be called after InitChipStack has been called.  Calls
@@ -154,39 +178,32 @@ public:
     void UnlockChipStack();
     CHIP_ERROR Shutdown();
 
-    /**
-     * Software Diagnostics methods.
-     */
-    CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree);
-    CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed);
-    CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark);
-
-    /**
-     * General Diagnostics methods.
-     */
-    CHIP_ERROR GetRebootCount(uint16_t & rebootCount);
-    CHIP_ERROR GetUpTime(uint64_t & upTime);
-    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR GetBootReasons(uint8_t & bootReasons);
-
 #if CHIP_STACK_LOCK_TRACKING_ENABLED
     bool IsChipStackLockedByCurrentThread() const;
 #endif
 
+    CHIP_ERROR GetFixedLabelList(EndpointId endpoint,
+                                 AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+    CHIP_ERROR SetUserLabelList(EndpointId endpoint,
+                                AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR GetUserLabelList(EndpointId endpoint,
+                                AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
+
 private:
-    bool mInitialized = false;
+    bool mInitialized                   = false;
+    PlatformManagerDelegate * mDelegate = nullptr;
+
     // ===== Members for internal use by the following friends.
 
     friend class PlatformManagerImpl;
     friend class ConnectivityManagerImpl;
     friend class ConfigurationManagerImpl;
+    friend class DeviceControlServer;
     friend class Dnssd::DiscoveryImplPlatform;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
-    friend class Internal::DeviceControlServer;
-    friend class Internal::FabricProvisioningServer;
-    friend class Internal::ServiceProvisioningServer;
     friend class Internal::BLEManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
@@ -204,9 +221,7 @@ private:
     friend class Internal::GenericThreadStackManagerImpl_OpenThread_LwIP;
     template <class>
     friend class Internal::GenericConfigurationManagerImpl;
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
     friend class System::PlatformEventing;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     /*
      * PostEvent can be called safely on any thread without locking the stack.
@@ -372,8 +387,10 @@ inline CHIP_ERROR PlatformManager::StopEventLoopTask()
  */
 inline CHIP_ERROR PlatformManager::Shutdown()
 {
-    mInitialized = false;
-    return static_cast<ImplClass *>(this)->_Shutdown();
+    CHIP_ERROR err = static_cast<ImplClass *>(this)->_Shutdown();
+    if (err == CHIP_NO_ERROR)
+        mInitialized = false;
+    return err;
 }
 
 inline void PlatformManager::LockChipStack()
@@ -413,39 +430,29 @@ inline CHIP_ERROR PlatformManager::StartChipTimer(System::Clock::Timeout duratio
     return static_cast<ImplClass *>(this)->_StartChipTimer(duration);
 }
 
-inline CHIP_ERROR PlatformManager::GetCurrentHeapFree(uint64_t & currentHeapFree)
+inline CHIP_ERROR PlatformManager::GetFixedLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
 {
-    return static_cast<ImplClass *>(this)->_GetCurrentHeapFree(currentHeapFree);
+    return static_cast<ImplClass *>(this)->_GetFixedLabelList(endpoint, labelList);
 }
 
-inline CHIP_ERROR PlatformManager::GetCurrentHeapUsed(uint64_t & currentHeapUsed)
+inline CHIP_ERROR
+PlatformManager::SetUserLabelList(EndpointId endpoint,
+                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
-    return static_cast<ImplClass *>(this)->_GetCurrentHeapUsed(currentHeapUsed);
+    return static_cast<ImplClass *>(this)->_SetUserLabelList(endpoint, labelList);
 }
 
-inline CHIP_ERROR PlatformManager::GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
+inline CHIP_ERROR
+PlatformManager::GetUserLabelList(EndpointId endpoint,
+                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
 {
-    return static_cast<ImplClass *>(this)->_GetCurrentHeapHighWatermark(currentHeapHighWatermark);
+    return static_cast<ImplClass *>(this)->_GetUserLabelList(endpoint, labelList);
 }
 
-inline CHIP_ERROR PlatformManager::GetRebootCount(uint16_t & rebootCount)
+inline CHIP_ERROR PlatformManager::GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
 {
-    return static_cast<ImplClass *>(this)->_GetRebootCount(rebootCount);
-}
-
-inline CHIP_ERROR PlatformManager::GetUpTime(uint64_t & upTime)
-{
-    return static_cast<ImplClass *>(this)->_GetUpTime(upTime);
-}
-
-inline CHIP_ERROR PlatformManager::GetTotalOperationalHours(uint32_t & totalOperationalHours)
-{
-    return static_cast<ImplClass *>(this)->_GetTotalOperationalHours(totalOperationalHours);
-}
-
-inline CHIP_ERROR PlatformManager::GetBootReasons(uint8_t & bootReasons)
-{
-    return static_cast<ImplClass *>(this)->_GetBootReasons(bootReasons);
+    return static_cast<ImplClass *>(this)->_GetSupportedLocales(supportedLocales);
 }
 
 } // namespace DeviceLayer

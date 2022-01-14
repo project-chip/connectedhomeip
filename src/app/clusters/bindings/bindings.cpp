@@ -154,3 +154,5 @@ bool emberAfBindingClusterUnbindCallback(app::CommandHandler * commandObj, const
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
+
+void MatterBindingPluginServerInitCallback() {}

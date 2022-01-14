@@ -384,7 +384,7 @@ static void TestASN1_FromTLVReader(nlTestSuite * inSuite, void * inContext)
     {
         tlvWriter.Init(tlvEncodedData);
 
-        err = tlvWriter.StartContainer(AnonymousTag, kTLVType_Structure, outerContainerType);
+        err = tlvWriter.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainerType);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = tlvWriter.PutBytes(TLV::ContextTag(1), kTestVal_20_OctetString, sizeof(kTestVal_20_OctetString));
@@ -424,7 +424,7 @@ static void TestASN1_FromTLVReader(nlTestSuite * inSuite, void * inContext)
     writer.Init(asn1EncodedData2);
     ASN1_START_SEQUENCE
     {
-        err = tlvReader.Next(kTLVType_Structure, AnonymousTag);
+        err = tlvReader.Next(kTLVType_Structure, AnonymousTag());
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = tlvReader.EnterContainer(outerContainerType);

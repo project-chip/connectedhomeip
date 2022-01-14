@@ -78,6 +78,9 @@ public:
 
 private:
     Transport::Tuple<TransportTypes...> mTransport;
+
+public:
+    auto & GetTransport() { return mTransport; }
 };
 
 } // namespace chip

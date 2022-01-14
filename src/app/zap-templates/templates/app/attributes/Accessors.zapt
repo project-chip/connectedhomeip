@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include <app/data-model/Nullable.h>
 #include <app/util/af-types.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <lib/support/Span.h>
 
 namespace chip {
@@ -16,27 +18,28 @@ namespace Clusters {
 
 {{#zcl_clusters}}
 {{#zcl_attributes_server}}
-{{#if (hasSpecificAttributes)}}
 {{#first}}
 namespace {{asUpperCamelCase parent.label}} {
 namespace Attributes {
 
 {{/first}}
-{{#if clusterRef}}
-{{#if (canHaveSimpleAccessors type)}}
+{{#if_is_struct type}}
+{{else if (canHaveSimpleAccessors this)}}
 namespace {{asUpperCamelCase label}} {
-EmberAfStatus Get(chip::EndpointId endpoint, {{asUnderlyingZclType type}} * {{asLowerCamelCase label}}); // {{type}} {{isArray}}
-EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} {{asLowerCamelCase label}});
+EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value); // {{type}} {{isArray}}
+EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name forceNotNullable=true forceNotOptional=true}} value);
+{{#if isNullable}}
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, {{zapTypeToEncodableClusterObjectType type ns=parent.name isArgument=true forceNotOptional=true}} value);
+{{/if}}
 } // namespace {{asUpperCamelCase label}}
 
-{{/if}}
-{{/if}}
+{{/if_is_struct}}
 {{#last}}
 } // namespace Attributes
 } // {{asUpperCamelCase parent.label}}
 
 {{/last}}
-{{/if}}
 {{/zcl_attributes_server}}
 {{/zcl_clusters}}
 

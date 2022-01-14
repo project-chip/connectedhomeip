@@ -41,7 +41,9 @@ function asPythonType(zclType)
     return 'str';
   case 'uint8_t *':
   case 'chip::ByteSpan':
-    return 'bytes'
+    return 'bytes';
+  case 'chip::CharSpan':
+    return 'str';
   }
 }
 

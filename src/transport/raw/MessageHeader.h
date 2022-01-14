@@ -110,6 +110,11 @@ enum class SecFlagValues : uint8_t
     kMsgExtensionFlag = 0b00100000,
 };
 
+enum SecFlagMask
+{
+    kSessionTypeMask = 0b00000011, ///< Mask to extract sessionType
+};
+
 using MsgFlags = BitFlags<MsgFlagValues>;
 using SecFlags = BitFlags<SecFlagValues>;
 
@@ -158,6 +163,23 @@ public:
     uint16_t GetSessionId() const { return mSessionId; }
     Header::SessionType GetSessionType() const { return mSessionType; }
 
+    uint8_t GetMessageFlags() const { return mMsgFlags.Raw(); }
+
+    uint8_t GetSecurityFlags() const { return mSecFlags.Raw(); }
+
+    bool HasPrivacyFlag() const { return mSecFlags.Has(Header::SecFlagValues::kPrivacyFlag); }
+
+    void SetFlags(Header::SecFlagValues value) { mSecFlags.Set(value); }
+    void SetFlags(Header::MsgFlagValues value) { mMsgFlags.Set(value); }
+
+    void SetMessageFlags(uint8_t flags) { mMsgFlags.SetRaw(flags); }
+
+    void SetSecurityFlags(uint8_t securityFlags)
+    {
+        mSecFlags.SetRaw(securityFlags);
+        mSessionType = static_cast<Header::SessionType>(securityFlags & Header::SecFlagMask::kSessionTypeMask);
+    }
+
     bool IsGroupSession() const { return mSessionType == Header::SessionType::kGroupSession; }
     bool IsUnicastSession() const { return mSessionType == Header::SessionType::kUnicastSession; }
 
@@ -172,6 +194,20 @@ public:
         default:
             return false;
         }
+    }
+
+    bool IsValidGroupMsg() const
+    {
+        // Check is based on spec 4.11.2
+        return (IsGroupSession() && GetSourceNodeId().HasValue() && GetDestinationGroupId().HasValue() &&
+                !IsSecureSessionControlMsg() && HasPrivacyFlag());
+    }
+
+    bool IsValidMCSPMsg() const
+    {
+        // Check is based on spec 4.9.2.4
+        return (IsGroupSession() && GetSourceNodeId().HasValue() && GetDestinationNodeId().HasValue() &&
+                IsSecureSessionControlMsg() && HasPrivacyFlag());
     }
 
     bool IsEncrypted() const { return !((mSessionId == kMsgUnicastSessionIdUnsecured) && IsUnicastSession()); }

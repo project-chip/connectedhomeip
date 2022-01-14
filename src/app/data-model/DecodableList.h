@@ -38,6 +38,12 @@ template <typename T>
 class DecodableList
 {
 public:
+    DecodableList()
+    {
+        // Init to an empty list.
+        mReader.Init(nullptr, 0);
+    }
+
     /*
      * @brief
      *
@@ -126,6 +132,14 @@ public:
     };
 
     Iterator begin() const { return Iterator(mReader); }
+
+    /*
+     * Compute the size of the list.  This can fail if the TLV is malformed.  If
+     * this succeeds, that does not guarantee that the individual items can be
+     * successfully decoded; consumers should check Iterator::GetStatus() when
+     * actually decoding them.
+     */
+    CHIP_ERROR ComputeSize(size_t * size) const { return mReader.CountRemainingInContainer(size); }
 
 private:
     TLV::TLVReader mReader;

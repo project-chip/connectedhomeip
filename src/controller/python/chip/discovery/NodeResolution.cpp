@@ -42,12 +42,14 @@ public:
         {
             char ipAddressBuffer[128];
 
-            mSuccessCallback(                                                         //
-                nodeData.mPeerId.GetCompressedFabricId(),                             //
-                nodeData.mPeerId.GetNodeId(),                                         //
-                nodeData.mInterfaceId,                                                //
-                nodeData.mAddress.ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
-                nodeData.mPort                                                        //
+            // TODO: For now, just provide addr 0, but this should really provide all and
+            // allow the caller to choose.
+            mSuccessCallback(                                                            //
+                nodeData.mPeerId.GetCompressedFabricId(),                                //
+                nodeData.mPeerId.GetNodeId(),                                            //
+                nodeData.mInterfaceId.GetPlatformInterface(),                            //
+                nodeData.mAddress[0].ToString(ipAddressBuffer, sizeof(ipAddressBuffer)), //
+                nodeData.mPort                                                           //
             );
         }
         else
@@ -93,7 +95,7 @@ extern "C" ChipError::StorageType pychip_discovery_resolve(uint64_t fabricId, ui
     CHIP_ERROR result = CHIP_NO_ERROR;
 
     chip::python::ChipMainThreadScheduleAndWait([&] {
-        result = Resolver::Instance().Init(&chip::DeviceLayer::InetLayer);
+        result = Resolver::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
         ReturnOnFailure(result);
         Resolver::Instance().SetResolverDelegate(&gPythonResolverDelegate);
 

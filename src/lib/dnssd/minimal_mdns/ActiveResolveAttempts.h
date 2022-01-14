@@ -38,8 +38,8 @@ namespace Minimal {
 class ActiveResolveAttempts
 {
 public:
-    static constexpr size_t kRetryQueueSize     = 4;
-    static constexpr uint32_t kMaxRetryDelaySec = 16;
+    static constexpr size_t kRetryQueueSize                      = 4;
+    static constexpr chip::System::Clock::Timeout kMaxRetryDelay = chip::System::Clock::Seconds16(16);
 
     ActiveResolveAttempts(chip::System::Clock::ClockBase * clock) : mClock(clock) { Reset(); }
 
@@ -55,10 +55,10 @@ public:
     /// by NextScheduledPeer (potentially with others as well)
     void MarkPending(const chip::PeerId & peerId);
 
-    // Get minimum milliseconds until the next pending reply is required.
+    // Get minimum time until the next pending reply is required.
     //
     // Returns missing if no actively tracked elements exist.
-    chip::Optional<uint32_t> GetMsUntilNextExpectedResponse() const;
+    chip::Optional<chip::System::Clock::Timeout> GetTimeUntilNextExpectedResponse() const;
 
     // Get the peer Id that needs scheduling for a query
     //
@@ -79,7 +79,7 @@ private:
         chip::PeerId peerId;
 
         // When a reply is expected for this item
-        chip::System::Clock::MonotonicMilliseconds queryDueTimeMs;
+        chip::System::Clock::Timestamp queryDueTime;
 
         // Next expected delay for sending if reply is not reached by
         // 'queryDueTimeMs'
@@ -89,7 +89,7 @@ private:
         //      one second
         //    - the intervals between successive queries MUST increase by at
         //      least a factor of two
-        uint32_t nextRetryDelaySec = 1;
+        chip::System::Clock::Timeout nextRetryDelay = chip::System::Clock::Seconds16(1);
     };
 
     chip::System::Clock::ClockBase * mClock;

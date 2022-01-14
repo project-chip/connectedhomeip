@@ -29,13 +29,14 @@ if(${IDF_TARGET} STREQUAL "esp32")
     list(APPEND EXTRA_COMPONENT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/tft"
                                      "${CMAKE_CURRENT_LIST_DIR}/../../common/m5stack-tft/repo/components/spidriver"
                                      "${CMAKE_CURRENT_LIST_DIR}/../../common/screen-framework")
-elseif(${IDF_TARGET} STREQUAL "esp32c3")
-    list(APPEND EXTRA_COMPONENT_DIRS "$ENV{IDF_PATH}/examples/peripherals/rmt/led_strip/components")
 endif()
 
 project(chip-all-clusters-app)
 idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++17;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
+# For the C3, project_include.cmake sets -Wno-format, but does not clear various
+# flags that depend on -Wformat
+idf_build_set_property(COMPILE_OPTIONS "-Wno-format-nonliteral;-Wno-format-security" APPEND)
 
 flashing_script()
 
@@ -45,6 +46,7 @@ include(third_party/connectedhomeip/third_party/pigweed/repo/pw_build/pigweed.cm
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert pw_assert_log)
 pw_set_backend(pw_sys_io pw_sys_io.esp32)
+pw_set_backend(pw_trace pw_trace_tokenized)
 
 add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
 add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)

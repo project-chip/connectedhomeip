@@ -90,8 +90,8 @@ public:
 
     virtual ~PASESession();
 
-    // TODO: The SetPeerNodeId method should not be exposed; we should not need
-    // to associate a node ID with a PASE session.
+    // TODO: The SetPeerNodeId method should not be exposed; PASE sessions
+    // should not need to be told their peer node ID
     using PairingSession::SetPeerNodeId;
 
     /**
@@ -107,7 +107,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t mySessionId,
-                              SessionEstablishmentDelegate * delegate);
+                              Optional<ReliableMessageProtocolConfig> mrpConfig, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -123,7 +123,8 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t passcodeID,
-                              uint16_t mySessionId, SessionEstablishmentDelegate * delegate);
+                              uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                              SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -141,7 +142,8 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
-                    Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
+                    Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
+                    SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -163,16 +165,12 @@ public:
      *   Derive a secure session from the paired session. The API will return error
      *   if called before pairing is established.
      *
-     * @param session     Referene to the secure session that will be
+     * @param session     Reference to the secure session that will be
      *                    initialized once pairing is complete
      * @param role        Role of the new session (initiator or responder)
      * @return CHIP_ERROR The result of session derivation
      */
     CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
-
-    const char * GetI2RSessionInfo() const override { return kSpake2pI2RSessionInfo; }
-
-    const char * GetR2ISessionInfo() const override { return kSpake2pR2ISessionInfo; }
 
     /** @brief Serialize the Pairing Session to a string.
      *
@@ -203,8 +201,6 @@ public:
      **/
     void Clear();
 
-    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
-
     //// ExchangeDelegate Implementation ////
     /**
      * @brief
@@ -231,11 +227,7 @@ public:
      */
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SessionManager * sessionManager) override
-    {
-        return &mMessageDispatch;
-    }
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
 private:
     enum Spake2pErrorType : uint8_t
@@ -269,10 +261,13 @@ private:
     void OnSuccessStatusReport() override;
     CHIP_ERROR OnFailureStatusReport(Protocols::SecureChannel::GeneralStatusCode generalCode, uint16_t protocolCode) override;
 
-    // TODO - Move EstimateTLVStructOverhead to CHIPTLV header file
-    constexpr size_t EstimateTLVStructOverhead(size_t dataLen, size_t nFields) { return dataLen + (sizeof(uint64_t) * nFields); }
-
     void CloseExchange();
+
+    /**
+     * Clear our reference to our exchange context pointer so that it can close
+     * itself at some later time.
+     */
+    void DiscardExchange();
 
     SessionEstablishmentDelegate * mDelegate = nullptr;
 
@@ -305,7 +300,7 @@ private:
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
 
-    SessionEstablishmentExchangeDispatch mMessageDispatch;
+    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
 
     struct Spake2pErrorMsg
     {
@@ -371,10 +366,6 @@ public:
         memcpy(serializable.mKe, kTestSecret, secretLen);
         return CHIP_NO_ERROR;
     }
-
-    const char * GetI2RSessionInfo() const override { return "i2r"; }
-
-    const char * GetR2ISessionInfo() const override { return "r2i"; }
 
 private:
     const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;

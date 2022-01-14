@@ -67,7 +67,7 @@ public:
 
     /**
      * @brief
-     * Erases all data in the KVS partition, KVS needs to be initalized after
+     * Erases all data in the KVS partition, KVS needs to be initialized after
      * this operation.
      *
      * @return CHIP_NO_ERROR the partiton was erased.

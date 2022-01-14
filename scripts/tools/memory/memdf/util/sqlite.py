@@ -97,14 +97,18 @@ class Database:
         self.connection().execute(q, v)
 
     def get_matching(self, table: str, columns: List[str], **kwargs):
-        return self.connection().execute(
-            f"SELECT {','.join(columns)} FROM {table}"
-            f"  WHERE {'=? AND '.join(kwargs.keys())}=?",
-            list(kwargs.values()))
+        q = (f"SELECT {','.join(columns)} FROM {table}"
+             f"  WHERE {'=? AND '.join(kwargs.keys())}=?")
+        v = list(kwargs.values())
+        return self.connection().execute(q, v)
 
     def get_matching_id(self, table: str, **kwargs):
-        return self.get_matching(table, ['id'], **kwargs).fetchone()[0]
+        cur = self.get_matching(table, ['id'], **kwargs)
+        row = cur.fetchone()
+        if row:
+            return row[0]
+        return None
 
-    def store_and_return_id(self, table: str, **kwargs) -> int:
+    def store_and_return_id(self, table: str, **kwargs) -> Optional[int]:
         self.store(table, **kwargs)
         return self.get_matching_id(table, **kwargs)

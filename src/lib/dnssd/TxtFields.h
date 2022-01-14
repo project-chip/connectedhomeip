@@ -20,6 +20,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/Span.h>
+#include <system/SystemClock.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -27,20 +28,22 @@
 namespace chip {
 namespace Dnssd {
 
+using namespace System::Clock::Literals;
+
 // Operational node TXT entries
-static constexpr size_t kTxtRetryIntervalIdleMaxLength   = 7; // [CRI] 0-3600000
-static constexpr size_t kTxtRetryIntervalActiveMaxLength = 7; // [CRA] 0-3600000
-static constexpr size_t kMaxRetryInterval                = 3600000;
-static constexpr size_t kKeyTcpSupportMaxLength          = 1;
+static constexpr size_t kKeyMrpRetryIntervalIdleMaxLength        = 7; // [CRI] 0-3600000
+static constexpr size_t kKeyMrpRetryIntervalActiveMaxLength      = 7; // [CRA] 0-3600000
+static constexpr System::Clock::Milliseconds32 kMaxRetryInterval = 3600000_ms32;
+static constexpr size_t kKeyTcpSupportedMaxLength                = 1;
 
 // Commissionable/commissioner node TXT entries
-static constexpr size_t kKeyDiscriminatorMaxLength           = 5;
+static constexpr size_t kKeyLongDiscriminatorMaxLength       = 5;
 static constexpr size_t kKeyVendorProductMaxLength           = 11;
 static constexpr size_t kKeyAdditionalCommissioningMaxLength = 1;
 static constexpr size_t kKeyCommissioningModeMaxLength       = 1;
 static constexpr size_t kKeyDeviceTypeMaxLength              = 5;
 static constexpr size_t kKeyDeviceNameMaxLength              = 32;
-static constexpr size_t kKeyRotatingIdMaxLength              = 100;
+static constexpr size_t kKeyRotatingDeviceIdMaxLength        = 100;
 static constexpr size_t kKeyPairingInstructionMaxLength      = 128;
 static constexpr size_t kKeyPairingHintMaxLength             = 10;
 
@@ -65,7 +68,7 @@ enum class TxtFieldKey : uint8_t
     kPairingHint,
     kMrpRetryIntervalIdle,
     kMrpRetryIntervalActive,
-    kTcpSupport,
+    kTcpSupported,
     kCount,
 };
 
@@ -80,18 +83,18 @@ struct TxtFieldInfo
 
 constexpr const TxtFieldInfo txtFieldInfo[static_cast<size_t>(TxtFieldKey::kCount)] = {
     { TxtFieldKey::kUnknown, 0, "", TxtKeyUse::kNone },
-    { TxtFieldKey::kLongDiscriminator, kKeyDiscriminatorMaxLength, "D", TxtKeyUse::kCommission },
+    { TxtFieldKey::kLongDiscriminator, kKeyLongDiscriminatorMaxLength, "D", TxtKeyUse::kCommission },
     { TxtFieldKey::kVendorProduct, kKeyVendorProductMaxLength, "VP", TxtKeyUse::kCommission },
     { TxtFieldKey::kAdditionalPairing, kKeyAdditionalCommissioningMaxLength, "AP", TxtKeyUse::kCommission },
     { TxtFieldKey::kCommissioningMode, kKeyCommissioningModeMaxLength, "CM", TxtKeyUse::kCommission },
     { TxtFieldKey::kDeviceType, kKeyDeviceTypeMaxLength, "DT", TxtKeyUse::kCommission },
     { TxtFieldKey::kDeviceName, kKeyDeviceNameMaxLength, "DN", TxtKeyUse::kCommission },
-    { TxtFieldKey::kRotatingDeviceId, kKeyRotatingIdMaxLength, "RI", TxtKeyUse::kCommission },
+    { TxtFieldKey::kRotatingDeviceId, kKeyRotatingDeviceIdMaxLength, "RI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingInstruction, kKeyPairingInstructionMaxLength, "PI", TxtKeyUse::kCommission },
     { TxtFieldKey::kPairingHint, kKeyPairingHintMaxLength, "PH", TxtKeyUse::kCommission },
-    { TxtFieldKey::kMrpRetryIntervalIdle, kTxtRetryIntervalIdleMaxLength, "CRI", TxtKeyUse::kCommon },
-    { TxtFieldKey::kMrpRetryIntervalActive, kTxtRetryIntervalActiveMaxLength, "CRA", TxtKeyUse::kCommon },
-    { TxtFieldKey::kTcpSupport, kKeyTcpSupportMaxLength, "T", TxtKeyUse::kCommon },
+    { TxtFieldKey::kMrpRetryIntervalIdle, kKeyMrpRetryIntervalIdleMaxLength, "CRI", TxtKeyUse::kCommon },
+    { TxtFieldKey::kMrpRetryIntervalActive, kKeyMrpRetryIntervalActiveMaxLength, "CRA", TxtKeyUse::kCommon },
+    { TxtFieldKey::kTcpSupported, kKeyTcpSupportedMaxLength, "T", TxtKeyUse::kCommon },
 };
 #ifdef CHIP_CONFIG_TEST
 
@@ -120,7 +123,7 @@ constexpr size_t MaxKeyLen(TxtKeyUse use)
             max = sizeof(info.keyStr) > max ? sizeof(info.keyStr) : max;
         }
     }
-    // minus 1 becuase sizeof includes the null terminator.
+    // minus 1 because sizeof includes the null terminator.
     return max - 1;
 }
 constexpr size_t TotalKeyLen(TxtKeyUse use)
@@ -146,7 +149,7 @@ constexpr size_t MaxValueLen(TxtKeyUse use)
             max = info.valMaxSize > max ? info.valMaxSize : max;
         }
     }
-    // minus 1 becuase sizeof includes the null terminator.
+    // minus 1 because sizeof includes the null terminator.
     return max - 1;
 }
 constexpr size_t TotalValueLen(TxtKeyUse use)

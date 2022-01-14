@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "read the mandatory attribute: TemperatureDisplayMode"
       command: "readAttribute"
       attribute: "temperature display mode"
@@ -37,8 +41,6 @@ tests:
       attribute: "temperature display mode"
       arguments:
           value: 0
-      response:
-          error: 0
 
     - label: "read the mandatory attribute: TemperatureDisplayMode"
       command: "readAttribute"
@@ -71,8 +73,6 @@ tests:
       attribute: "keypad lockout"
       arguments:
           value: 0
-      response:
-          error: 0
 
     - label: "read the mandatory attribute: KeypadLockout"
       command: "readAttribute"
@@ -105,8 +105,6 @@ tests:
       attribute: "schedule programming visibility"
       arguments:
           value: 0
-      response:
-          error: 0
 
     - label: "read the optional attribute: ScheduleProgrammingVisibility"
       command: "readAttribute"

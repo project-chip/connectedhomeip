@@ -87,6 +87,8 @@ public:
         ProvisionedStateChanged,
         ConnectivityStateChanged,
         BLEConnectionsChanged,
+        WinkOff,
+        WinkOn,
     };
 
     struct Event
@@ -136,6 +138,7 @@ protected:
         bool isThreadProvisioned = false;
         bool isThreadEnabled     = false;
         bool haveBLEConnections  = false;
+        bool isWinking           = false;
     };
 
     Cover & GetCover();

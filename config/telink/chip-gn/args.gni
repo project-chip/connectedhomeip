@@ -24,3 +24,5 @@ chip_ble_project_config_include = ""
 chip_config_network_layer_ble = false
 
 custom_toolchain = "${chip_root}/config/telink/chip-gn/toolchain:zephyr"
+
+pw_build_PIP_CONSTRAINTS = [ "${chip_root}/scripts/constraints.txt" ]

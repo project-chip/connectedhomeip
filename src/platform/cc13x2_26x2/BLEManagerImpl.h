@@ -71,6 +71,8 @@ using namespace chip::Ble;
 
 #define CHIPOBLE_ADV_DATA_MAX_SIZE (GAP_DEVICE_NAME_LEN + CHIPOBLE_SCANRES_SIZE_NO_NAME)
 
+#define CHIPOBLE_DEVICE_DESC_LENGTH (4)
+
 // How often to read current current RPA (in ms)
 #define READ_RPA_EVT_PERIOD 3000
 
@@ -205,6 +207,7 @@ private:
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
+    CHIP_ERROR _Shutdown() { return CHIP_NO_ERROR; }
     CHIPoBLEServiceMode _GetCHIPoBLEServiceMode(void);
     CHIP_ERROR _SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
     bool _IsAdvertisingEnabled(void);

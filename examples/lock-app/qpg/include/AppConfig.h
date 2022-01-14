@@ -20,12 +20,12 @@
 #define APP_CONFIG_H
 
 // ---- Lock Example App Config ----
-
+#define APP_TASK_NAME "APP"
 #define APP_LOCK_BUTTON BTN_SW4
 #define APP_FUNCTION_BUTTON BTN_SW5
 
 #define SYSTEM_STATE_LED LED_GREEN
-#define LOCK_STATE_LED LED_RED
+#define LOCK_STATE_LED LED_WHITE
 
 // Time it takes in ms for the simulated actuator to move from one
 // state to another.
@@ -34,9 +34,5 @@
 // ---- Lock Example SWU Config ----
 #define SWU_INTERVAl_WINDOW_MIN_MS (23 * 60 * 60 * 1000) // 23 hours
 #define SWU_INTERVAl_WINDOW_MAX_MS (24 * 60 * 60 * 1000) // 24 hours
-
-// ---- Thread Polling Config ----
-#define THREAD_ACTIVE_POLLING_INTERVAL_MS 100
-#define THREAD_INACTIVE_POLLING_INTERVAL_MS 1000
 
 #endif // APP_CONFIG_H

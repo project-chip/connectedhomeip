@@ -53,7 +53,7 @@ class GenericPlatformManagerImpl_POSIX : public GenericPlatformManagerImpl<ImplC
 {
 protected:
     // OS-specific members (pthread)
-    pthread_mutex_t mChipStackLock;
+    pthread_mutex_t mChipStackLock = PTHREAD_MUTEX_INITIALIZER;
 
     enum TaskType
     {

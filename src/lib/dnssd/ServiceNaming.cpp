@@ -97,7 +97,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
     size_t requiredSize;
     switch (subtype.type)
     {
-    case DiscoveryFilterType::kShort:
+    case DiscoveryFilterType::kShortDiscriminator:
         // 4-bit number
         if (subtype.code >= 1 << 4)
         {
@@ -105,7 +105,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         }
         requiredSize = snprintf(buffer, bufferLen, "_S%" PRIu16, static_cast<uint16_t>(subtype.code));
         break;
-    case DiscoveryFilterType::kLong:
+    case DiscoveryFilterType::kLongDiscriminator:
         // 12-bit number
         if (subtype.code >= 1 << 12)
         {
@@ -113,7 +113,7 @@ CHIP_ERROR MakeServiceSubtype(char * buffer, size_t bufferLen, DiscoveryFilter s
         }
         requiredSize = snprintf(buffer, bufferLen, "_L%" PRIu16, static_cast<uint16_t>(subtype.code));
         break;
-    case DiscoveryFilterType::kVendor:
+    case DiscoveryFilterType::kVendorId:
         if (subtype.code >= 1 << 16)
         {
             return CHIP_ERROR_INVALID_ARGUMENT;

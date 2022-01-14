@@ -1,11 +1,11 @@
-# CHIP CC1352 CC2652 Persistent Storage Example Application
+# Matter CC1352 CC2652 Persistent Storage Example Application
 
 An example test application showing the persistent storage system for
-[CHIP][chip] on the Texas Instruments CC13X2_26X2 family of Wireless MCUs.
+[Matter][matter] on the Texas Instruments CC13X2_26X2 family of Wireless MCUs.
 
 ---
 
--   [CHIP CC1352 CC2652 Persistent Storage Application](#chip-cc1352-cc2652-persistent-storage-example-application)
+-   [Matter CC1352 CC2652 Persistent Storage Application](#matter-cc1352-cc2652-persistent-storage-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -26,8 +26,8 @@ offers information on proper usage of the KVS system.
 
 This example is enabled to build for CC2652R7 devices. This upcoming devices are
 currently not yet in full production. For more information on device
-availability or early access to an engineering build of our CHIP-enabled SDK,
-please reach out [here][ti_cc13x2_26x2_r7_chip_request].
+availability or early access to an engineering build of our Matter-enabled SDK,
+please reach out [here][ti_cc13x2_26x2_r7_matter_request].
 
 ## Device UI
 
@@ -55,7 +55,7 @@ section will need to be done when migrating to new versions of the SDK. This
 guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
 -   An engineering SDK from TI is required. Please request access for it
-    [here][ti_cc13x2_26x2_r7_chip_request].
+    [here][ti_cc13x2_26x2_r7_matter_request].
 
     -   Follow the default installation instructions when executing the
         installer.
@@ -141,15 +141,15 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/simplelink_cc13x2_26x2_sdk_4_40_05_02_eng` and
-    `/home/username/ti/sysconfig_1.7.0`. On Windows the default directory is
+    `/home/username/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng` and
+    `/home/username/ti/sysconfig_1.10.0`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
     ```
     $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
-    $ export TI_SIMPLELINK_SDK_ROOT=$HOME/ti/simplelink_cc13x2_26x2_sdk_4_40_05_02_eng
-    $ export TI_SYSCONFIG_ROOT=$HOME/ti/sysconfig_1.7.0
+    $ export TI_SIMPLELINK_SDK_ROOT=$HOME/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng
+    $ export TI_SYSCONFIG_ROOT=$HOME/ti/sysconfig_1.10.0
     $ gn gen out/debug --args="ti_simplelink_sdk_root=\"${TI_SIMPLELINK_SDK_ROOT}\" ti_sysconfig_root=\"${TI_SYSCONFIG_ROOT}\""
     $ ninja -C out/debug
 
@@ -237,7 +237,7 @@ terminal emulator to that port to see the output with the following options:
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
-[chip]: https://github.com/project-chip/connectedhomeip
+[matter]: https://github.com/project-chip/connectedhomeip
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch
@@ -250,6 +250,6 @@ Additionally, we welcome any feedback.
 [e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig_recommended]:
-    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.7.0_1746-setup.run
-[ti_cc13x2_26x2_r7_chip_request]: https://ti.com/chip_sdk
+    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.10.0_2163-setup.run
+[ti_cc13x2_26x2_r7_matter_request]: https://ti.com/chip_sdk
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH

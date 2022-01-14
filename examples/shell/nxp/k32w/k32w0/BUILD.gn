@@ -39,6 +39,7 @@ k32w0_sdk("sdk") {
     "main/include",
     "main",
     "include",
+    "${k32w0_platform_dir}/app/project_include",
     "${k32w0_platform_dir}/app/support",
     "${k32w0_platform_dir}/util/include",
   ]
@@ -54,16 +55,20 @@ k32w0_sdk("sdk") {
 k32w0_executable("shell_app") {
   output_name = "chip-k32w061-shell-example"
 
-  sources = [ "main/main.cpp" ]
+  sources = [
+    "${k32w0_platform_dir}/util/LEDWidget.cpp",
+    "${k32w0_platform_dir}/util/include/LEDWidget.h",
+    "main/AppTask.cpp",
+    "main/main.cpp",
+  ]
 
   deps = [
     ":sdk",
+    "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/examples/shell/shell_common:shell_common",
-    "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",
     "${chip_root}/third_party/simw-top-mini:se05x",
     "${k32w0_platform_dir}/app/support:freertos_mbedtls_utils",
-    "${openthread_root}:libopenthread-ftd",
   ]
 
   cflags = [ "-Wconversion" ]

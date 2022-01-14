@@ -20,13 +20,14 @@ Development Framework and the xtensa-esp32-elf toolchain.
 The VSCode devcontainer has these components pre-installed, so you can skip this
 step. To install these components manually, follow these steps:
 
--   Clone the Espressif ESP-IDF and checkout release/v4.1 branch
+-   Clone the Espressif ESP-IDF and checkout
+    [v4.4-beta1 pre-release](https://github.com/espressif/esp-idf/releases/tag/v4.4-beta1)
 
           $ mkdir ${HOME}/tools
           $ cd ${HOME}/tools
           $ git clone https://github.com/espressif/esp-idf.git
           $ cd esp-idf
-          $ git checkout release/v4.3
+          $ git checkout v4.4-beta1
           $ git submodule update --init
           $ ./install.sh
 
@@ -54,6 +55,10 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     If packages are already installed then simply activate them.
 
         $ source ./scripts/activate.sh
+
+-   Select IDF Target
+
+        $ idf.py set-target esp32(or esp32c3)
 
 -   Configuration Options
 
@@ -95,10 +100,10 @@ Start the console:
 
 An example flow of performing a scan, connecting, and getting the IPv6 address:
 
-    scan = rpcs.chip.rpc.Wifi.StartScan(pw_rpc_timeout_s=5)
+    scan = rpcs.chip.rpc.WiFi.StartScan(pw_rpc_timeout_s=5)
     ap = next(filter(lambda a: b"SSID\000" in a.ssid, next(scan.responses()).aps))
 
     connect = protos.chip.rpc.ConnectionData(ssid=ap.ssid,security_type=ap.security_type,secret=b"PASSWORD")
-    rpcs.chip.rpc.Wifi.Connect(connect, pw_rpc_timeout_s=10)
+    rpcs.chip.rpc.WiFi.Connect(connect, pw_rpc_timeout_s=10)
 
-    rpcs.chip.rpc.Wifi.GetIP6Address()
+    rpcs.chip.rpc.WiFi.GetIP6Address()

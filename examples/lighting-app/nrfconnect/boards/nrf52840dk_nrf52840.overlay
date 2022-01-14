@@ -15,6 +15,9 @@
  */
 
 / {
+	chosen {
+		nordic,pm-ext-flash = &mx25r64;
+	};
 
 	/*
 	* In some default configurations within the nRF Connect SDK,

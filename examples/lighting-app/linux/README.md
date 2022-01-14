@@ -73,20 +73,9 @@ To cross-compile this example on x64 host and run on **NXP i.MX 8M Mini**
 
 ## Running the Complete Example on Raspberry Pi 4
 
-> If you want to test ZCL, please disable Rendezvous
+> If you want to test Echo protocol, please enable Echo handler
 >
->     gn gen out/debug --args='chip_bypass_rendezvous=true'
->     ninja -C out/debug
->
-> Note that GN will set chip_bypass_rendezvous for future builds, to enable
-> rendezvous, re-generate using
->
->     gn gen out/debug --args='chip_bypass_rendezvous=false'
-
-> If you want to test Echo protocol, please disable Rendezvous and enable Echo
-> handler
->
->     gn gen out/debug --args='chip_bypass_rendezvous=true chip_app_use_echo=true'
+>     gn gen out/debug --args='chip_app_use_echo=true'
 >     ninja -C out/debug
 
 -   Prerequisites

@@ -32,6 +32,7 @@ namespace Internal {
 // ---- WiFi-specific Limits ----
 constexpr size_t kMaxWiFiSSIDLength = 32;
 constexpr size_t kMaxWiFiKeyLength  = 64;
+constexpr size_t kWiFiBSSIDLength   = 6;
 
 /**
  * Ids for well-known network provision types.

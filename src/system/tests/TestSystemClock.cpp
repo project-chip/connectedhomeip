@@ -85,23 +85,16 @@ void TestRealClock(nlTestSuite * inSuite, void * inContext)
 
 void TestMockClock(nlTestSuite * inSuite, void * inContext)
 {
-    class MockClock : public Clock::ClockBase
-    {
-    public:
-        Clock::Microseconds64 GetMonotonicMicroseconds64() override { return mTime; }
-        Clock::Milliseconds64 GetMonotonicMilliseconds64() override { return mTime; }
-        Clock::Milliseconds64 mTime{ 0 };
-    };
-    MockClock clock;
+    Clock::Internal::MockClock clock;
 
     Clock::ClockBase * savedRealClock = &SystemClock();
     Clock::Internal::SetSystemClockForTesting(&clock);
 
-    NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMilliseconds64() == Clock::Zero);
-    NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMicroseconds64() == Clock::Zero);
+    NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMilliseconds64() == Clock::kZero);
+    NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMicroseconds64() == Clock::kZero);
 
-    constexpr Clock::Milliseconds64 k1234{ 1234 };
-    clock.mTime = k1234;
+    constexpr Clock::Milliseconds64 k1234 = Clock::Milliseconds64(1234);
+    clock.SetMonotonic(k1234);
     NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMilliseconds64() == k1234);
     NL_TEST_ASSERT(inSuite, SystemClock().GetMonotonicMicroseconds64() == k1234);
 

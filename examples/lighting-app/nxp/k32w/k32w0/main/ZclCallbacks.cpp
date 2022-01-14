@@ -33,19 +33,45 @@ using namespace ::chip::app::Clusters;
 void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & path, uint8_t mask, uint8_t type, uint16_t size,
                                        uint8_t * value)
 {
-    if (path.mClusterId != OnOff::Id)
+    if (path.mClusterId == OnOff::Id)
     {
-        ChipLogProgress(Zcl, "Unknown cluster ID: " ChipLogFormatMEI, ChipLogValueMEI(path.mClusterId));
-        return;
-    }
+        if (path.mAttributeId != OnOff::Attributes::OnOff::Id)
+        {
+            ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(path.mAttributeId));
+            return;
+        }
 
-    if (path.mAttributeId != OnOff::Attributes::OnOff::Id)
+        LightingMgr().InitiateAction(0, *value ? LightingManager::TURNON_ACTION : LightingManager::TURNOFF_ACTION);
+    }
+    else if (path.mClusterId == LevelControl::Id)
+    {
+        ChipLogProgress(Zcl,
+                        "Level Control attribute ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
+                        ChipLogValueMEI(path.mAttributeId), type, *value, size);
+
+        // WIP Apply attribute change to Light
+    }
+    else if (path.mClusterId == ColorControl::Id)
+    {
+        ChipLogProgress(Zcl,
+                        "Color Control attribute ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16 ", length %" PRIu16,
+                        ChipLogValueMEI(path.mAttributeId), type, *value, size);
+
+        // WIP Apply attribute change to Light
+    }
+    else if (path.mClusterId == OnOffSwitchConfiguration::Id)
+    {
+        ChipLogProgress(Zcl,
+                        "OnOff Switch Configuration attribute ID: " ChipLogFormatMEI " Type: %" PRIu8 " Value: %" PRIu16
+                        ", length %" PRIu16,
+                        ChipLogValueMEI(path.mAttributeId), type, *value, size);
+
+        // WIP Apply attribute change to Light
+    }
+    else
     {
         ChipLogProgress(Zcl, "Unknown attribute ID: " ChipLogFormatMEI, ChipLogValueMEI(path.mAttributeId));
-        return;
     }
-
-    LightingMgr().InitiateAction(0, *value ? LightingManager::TURNON_ACTION : LightingManager::TURNOFF_ACTION);
 }
 
 /** @brief OnOff Cluster Init

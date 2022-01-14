@@ -1,0 +1,110 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Channel Cluster Tests
+
+config:
+    cluster: "Channel"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "Read attribute Channel list"
+      command: "readAttribute"
+      attribute: "Channel list"
+      response:
+          value:
+              [
+                  {
+                      majorNumber: 1,
+                      minorNumber: 2,
+                      name: "exampleName",
+                      callSign: "exampleCSign",
+                      affiliateCallSign: "exampleASign",
+                  },
+                  {
+                      majorNumber: 2,
+                      minorNumber: 3,
+                      name: "exampleName",
+                      callSign: "exampleCSign",
+                      affiliateCallSign: "exampleASign",
+                  },
+              ]
+    # TODO: Enable once attribute struct is supported
+    - label: "Read attribute channel lineup"
+      disabled: true
+      command: "readAttribute"
+      attribute: "channel lineup"
+      response:
+          value:
+              {
+                  operatorName: "operatorName",
+                  lineupName: "lineupName",
+                  postalCode: "postalCode",
+                  lineupInfoType: 0,
+              }
+
+    # TODO: Enable once attribute struct is supported
+    - label: "Read attribute current channel"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current channel"
+      response:
+          value:
+              {
+                  majorNumber: 1,
+                  minorNumber: 0,
+                  name: "name",
+                  callSign: "callSign",
+                  affiliateCallSign: "affiliateCallSign",
+              }
+
+    - label: "Change Channel Command"
+      command: "changeChannelRequest"
+      arguments:
+          values:
+              - name: "match"
+                value: "CNN"
+      response:
+          values:
+              - name: "errorType"
+                value: 0
+              - name: "channelMatch"
+                value:
+                    {
+                        majorNumber: 1,
+                        minorNumber: 0,
+                        name: "name",
+                        callSign: "callSign",
+                        affiliateCallSign: "affiliateCallSign",
+                    }
+
+    - label: "Change Channel By Number Command"
+      command: "changeChannelByNumberRequest"
+      arguments:
+          values:
+              - name: "majorNumber"
+                value: 1
+              - name: "minorNumber"
+                value: 2
+
+    - label: "Skip Channel Command"
+      command: "skipChannelRequest"
+      arguments:
+          values:
+              - name: "count"
+                value: 1

@@ -23,18 +23,22 @@
  *      related enumerated constants. The CHIP Inet Layer uses objects
  *      of this class to represent Internet protocol addresses of both
  *      IPv4 and IPv6 address families. (IPv4 addresses are stored
- *      internally in the V4COMPAT format, reserved for that purpose.)
+ *      internally as IPv4-Mapped IPv6 addresses.)
  */
 
 #pragma once
 
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
+#include <type_traits>
 
+#include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
 
 #include <inet/InetConfig.h>
+#include <inet/InetError.h>
 
 #include "inet/IANAConstants.h"
 
@@ -58,24 +62,6 @@
 
 #define NL_INET_IPV6_ADDR_LEN_IN_BYTES (16)
 #define NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES (14)
-
-/**
- * @brief   Adaptation for LwIP ip4_addr_t type.
- *
- * @details
- *  Before LwIP 2.0.0, the \c ip_addr_t type alias referred to a structure comprising
- *  an IPv4 address. At LwIP 2.0.0 and thereafter, this type alias is renamed \c ip4_addr_t
- *  and \c ip_addr_t is replaced with an alias to a union of both. Here, the \c ip4_addr_t
- *  type alias is provided even when the LwIP version is earlier than 2.0.0 so as to prepare
- *  for the import of the new logic.
- */
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && INET_CONFIG_ENABLE_IPV4 && LWIP_VERSION_MAJOR < 2 && LWIP_VERSION_MINOR < 5
-typedef ip_addr_t ip4_addr_t;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && INET_CONFIG_ENABLE_IPV4 && LWIP_VERSION_MAJOR < 2 && LWIP_VERSION_MINOR < 5
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 1 && LWIP_VERSION_MINOR >= 5
-typedef u8_t lwip_ip_addr_type;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 1 && LWIP_VERSION_MINOR >= 5
 
 namespace chip {
 namespace Inet {
@@ -109,9 +95,20 @@ enum class IPv6MulticastFlag : uint8_t
 };
 using IPv6MulticastFlags = BitFlags<IPv6MulticastFlag>;
 
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
+union SockAddr
+{
+    sockaddr any;
+    sockaddr_in in;
+    sockaddr_in6 in6;
+    sockaddr_storage storage;
+};
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
+
 /**
- * Internet protocol address
+ * @brief   Internet protocol address
  *
+ * @details
  *  The CHIP Inet Layer uses objects of this class to represent Internet
  *  protocol addresses (independent of protocol version).
  */
@@ -128,21 +125,33 @@ public:
     static constexpr uint16_t kMaxStringLength = INET6_ADDRSTRLEN;
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-    IPAddress() = default;
-
-    /**
-     *  Copy constructor for the IPAddress class.
-     *
-     */
+public:
+    IPAddress()                        = default;
     IPAddress(const IPAddress & other) = default;
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    explicit IPAddress(const ip6_addr_t & ipv6Addr);
+#if INET_CONFIG_ENABLE_IPV4 || LWIP_IPV4
+    explicit IPAddress(const ip4_addr_t & ipv4Addr);
+    explicit IPAddress(const ip_addr_t & addr);
+#endif // INET_CONFIG_ENABLE_IPV4
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+#if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+    explicit IPAddress(const struct in6_addr & ipv6Addr);
+#if INET_CONFIG_ENABLE_IPV4
+    explicit IPAddress(const struct in_addr & ipv4Addr);
+#endif // INET_CONFIG_ENABLE_IPV4
+#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     /**
      * @brief   Opaque word array to contain IP addresses (independent of protocol version)
      *
      * @details
      *  IPv6 address use all 128-bits split into four 32-bit network byte
-     *  ordered unsigned integers. IPv4 addresses are V4COMPAT, i.e. the
-     *  first three words are zero, and the fourth word contains the IPv4
+     *  ordered unsigned integers. IPv4 addresses are IPv4-Mapped IPv6 addresses,
+     *  i.e. the first two words are zero, the third word contains 0xFFFF in
+     *  network byte order, and the fourth word contains the IPv4
      *  address in network byte order.
      */
     uint32_t Addr[4];
@@ -375,8 +384,8 @@ public:
      * @details
      *  Use <tt>WriteAddress(uint8_t *&p)</tt> to encode the IP address in
      *  the binary format defined by RFC 4291 for IPv6 addresses.  IPv4
-     *  addresses are encoded according to section 2.5.5.1 "IPv4-Compatible
-     *  IPv6 Address" (V4COMPAT).
+     *  addresses are encoded according to section 2.5.5.2 "IPv4-Mapped
+     *  IPv6 Address".
      */
     void WriteAddress(uint8_t *& p) const;
 
@@ -462,45 +471,8 @@ public:
      *      either unspecified or not an IPv4 address.
      */
 
-    /**
-     * @fn      static IPAddress FromIPv4(const struct in_addr & addr)
-     *
-     * @brief   Inject the IPv4 address from a platform data structure.
-     *
-     * @details
-     *  Use <tt>FromIPv4(const ip4_addr_t &addr)</tt> to inject \c addr as an
-     *  IPv4 address.
-     *
-     *  The argument \c addr is either of type <tt>const struct in_addr&</tt>
-     *  (on POSIX) or <tt>const ip4_addr_t&</tt> (on LwIP).
-     *
-     * @return  The constructed IP address.
-     */
-    /**
-     * @overload static IPAddress FromIPv4(const ip4_addr_t &addr)
-     */
-
-    /**
-     * @fn      static IPAddress FromIPv6(const struct in6_addr& addr)
-     *
-     * @brief   Inject the IPv6 address from a platform data structure.
-     *
-     * @details
-     *  Use <tt>FromIPv6(const ip6_addr_t &addr)</tt> to inject \c addr as an
-     *  IPv6 address.
-     *
-     *  The argument \c addr is either of type <tt>const struct in6_addr&</tt>
-     *  (on POSIX) or <tt>const ip6_addr_t&</tt> (on LwIP).
-     *
-     * @return  The constructed IP address.
-     */
-    /**
-     * @overload     static IPAddress FromIPv6(const ip6_addr_t &addr)
-     */
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
     /**
      * @fn      ToLwIPAddr() const
      *
@@ -515,36 +487,27 @@ public:
     ip_addr_t ToLwIPAddr(void) const;
 
     /**
-     * @fn      static IPAddress FromLwIPAddr(const ip_addr_t& addr)
+     * Extract the IP address as a LwIP ip_addr_t structure.
      *
-     * @brief   Inject the IP address from an LwIP ip_addr_t structure.
-     *
-     * @details
-     *  Use <tt>FromLwIPAddr(const ip_addr_t &addr)</tt> to inject \c addr as an
-     *  Inet layer IP address.
-     *
-     *  The argument \c addr is of type <tt>const ip_addr_t&</tt> (on LwIP).
-     *
-     * @return  The constructed IP address.
+     * If the IP address is Any, the result is IP6_ADDR_ANY unless the requested addressType is kIPv4.
+     * If the requested addressType is IPAddressType::kAny, extracts the IP address as an LwIP ip_addr_t structure.
+     * Otherwise, returns INET_ERROR_WRONG_ADDRESS_TYPE if the requested addressType does not match the IP address.
      */
-    static IPAddress FromLwIPAddr(const ip_addr_t & addr);
+    CHIP_ERROR ToLwIPAddr(IPAddressType addressType, ip_addr_t & outAddress) const;
 
     /**
      * @brief   Convert the INET layer address type to its underlying LwIP type.
      *
      * @details
      *  Use <tt>ToLwIPAddrType(IPAddressType)</tt> to convert the IP address type
-     *  to its underlying LwIP address type code. (LWIP_VERSION_MAJOR > 1 only).
+     *  to its underlying LwIP address type code.
      */
     static lwip_ip_addr_type ToLwIPAddrType(IPAddressType);
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 
     ip6_addr_t ToIPv6(void) const;
-    static IPAddress FromIPv6(const ip6_addr_t & addr);
 
 #if INET_CONFIG_ENABLE_IPV4
     ip4_addr_t ToIPv4(void) const;
-    static IPAddress FromIPv4(const ip4_addr_t & addr);
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -552,23 +515,23 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
     struct in6_addr ToIPv6() const;
-    static IPAddress FromIPv6(const struct in6_addr & addr);
 
 #if INET_CONFIG_ENABLE_IPV4
     struct in_addr ToIPv4() const;
-    static IPAddress FromIPv4(const struct in_addr & addr);
 #endif // INET_CONFIG_ENABLE_IPV4
 
     /**
-     * @brief   Inject the IPv6 address from a POSIX <tt>struct sockaddr&</tt>
-     *
-     * @details
-     *  Use <tt>FromSockAddr(const struct sockaddr& sockaddr)</tt> to inject
-     *  <tt>sockaddr.sa_addr</tt> as an IPv6 address.
-     *
-     * @return  The constructed IP address.
+     * Get the IP address from a SockAddr.
      */
-    static IPAddress FromSockAddr(const struct sockaddr & sockaddr);
+    static CHIP_ERROR GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddress & outIPAddress);
+    static CHIP_ERROR GetIPAddressFromSockAddr(const sockaddr & sockaddr, IPAddress & outIPAddress)
+    {
+        return GetIPAddressFromSockAddr(reinterpret_cast<const SockAddr &>(sockaddr), outIPAddress);
+    }
+    static IPAddress FromSockAddr(const sockaddr_in6 & sockaddr) { return IPAddress(sockaddr.sin6_addr); }
+#if INET_CONFIG_ENABLE_IPV4
+    static IPAddress FromSockAddr(const sockaddr_in & sockaddr) { return IPAddress(sockaddr.sin_addr); }
+#endif // INET_CONFIG_ENABLE_IPV4
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_USE_NETWORK_FRAMEWORK
 
@@ -614,7 +577,7 @@ public:
      * @brief   Construct an IPv6 multicast address from its parts.
      *
      * @details
-     *  Use <tt>MakeIPv6Multicast(IPv6MulticastFlag flags, uint8_t scope,
+     *  Use <tt>MakeIPv6Multicast(uint8_t flags, uint8_t scope,
      *  uint32_t groupId)</tt> to construct an IPv6 multicast
      *  address with \c flags for routing scope \c scope and group
      *  identifier \c groupId.
@@ -639,7 +602,7 @@ public:
      * @brief   Construct a transient IPv6 multicast address from its parts.
      *
      * @details
-     *  Use <tt>MakeIPv6TransientMulticast(IPv6MulticastFlag flags, uint8_t scope,
+     *  Use <tt>MakeIPv6TransientMulticast(uint8_t flags, uint8_t scope,
      *  uint8_t groupId[14])</tt> to construct a transient IPv6
      *  multicast address with \c flags for routing scope \c scope and
      *  group identifier octets \c groupId.

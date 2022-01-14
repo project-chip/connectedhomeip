@@ -18,6 +18,7 @@ import("//build_overrides/openthread.gni")
 import("//build_overrides/qpg_sdk.gni")
 
 import("${build_root}/config/defaults.gni")
+import("${chip_root}/src/platform/device.gni")
 import("${qpg_sdk_build_root}/qpg_executable.gni")
 import("${qpg_sdk_build_root}/qpg_sdk.gni")
 assert(current_os == "freertos")
@@ -26,10 +27,7 @@ qpg_project_dir = "${chip_root}/examples/lighting-app/qpg"
 examples_plat_dir = "${chip_root}/examples/platform/qpg"
 
 qpg_sdk("sdk") {
-  sources = [
-    "${examples_plat_dir}/app/include/Service.h",
-    "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
-  ]
+  sources = [ "${examples_plat_dir}/project_include/CHIPProjectConfig.h" ]
 
   include_dirs = [
     "${chip_root}/src/platform/qpg",
@@ -40,9 +38,12 @@ qpg_sdk("sdk") {
 qpg_executable("lighting_app") {
   output_name = "chip-${qpg_target_ic}-lighting-example.out"
 
+  include_dirs = []
+
   sources = [
     "${chip_root}/examples/lighting-app/lighting-common/color_format/color_format.cpp",
     "${examples_plat_dir}/app/main.cpp",
+    "${examples_plat_dir}/ota/ota.cpp",
     "src/AppTask.cpp",
     "src/LightingManager.cpp",
     "src/ZclCallbacks.cpp",
@@ -55,16 +56,26 @@ qpg_executable("lighting_app") {
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
   ]
+
+  if (chip_openthread_ftd) {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
+    ]
+  } else {
+    deps += [
+      "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+      "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+    ]
+  }
 
   cflags = [ "-Wconversion" ]
 
   include_dirs = [
     "${qpg_project_dir}/include/",
     "${examples_plat_dir}",
-    "${examples_plat_dir}/app/include",
+    "${examples_plat_dir}/ota",
     "${chip_root}/examples/lighting-app/lighting-common/color_format",
   ]
 

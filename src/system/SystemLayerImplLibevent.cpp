@@ -133,8 +133,7 @@ CHIP_ERROR LayerImplLibevent::Shutdown()
     mEventBase   = nullptr;
     mSystemLayer = nullptr;
 
-    mLayerState.SetShutdown();
-    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
+    mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }
 
@@ -210,7 +209,7 @@ CHIP_ERROR LayerImplLibevent::ScheduleWork(TimerCompleteCallback onComplete, voi
     assertChipStackLockedByCurrentThread();
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    return StartTimer(Clock::Zero, onComplete, appState);
+    return StartTimer(Clock::kZero, onComplete, appState);
 }
 
 // static

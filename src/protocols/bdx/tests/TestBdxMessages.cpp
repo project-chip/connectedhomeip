@@ -119,6 +119,16 @@ void TestDataBlockMessage(nlTestSuite * inSuite, void * inContext)
     TestHelperWrittenAndParsedMatch<DataBlock>(inSuite, inContext, testMsg);
 }
 
+void TestBlockQueryWithSkipMessage(nlTestSuite * inSuite, void * inContext)
+{
+    BlockQueryWithSkip testMsg;
+
+    testMsg.BlockCounter = 5;
+    testMsg.BytesToSkip  = 16;
+
+    TestHelperWrittenAndParsedMatch<BlockQueryWithSkip>(inSuite, inContext, testMsg);
+}
+
 // Test Suite
 
 /**
@@ -132,6 +142,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("TestReceiveAcceptMessage", TestReceiveAcceptMessage),
     NL_TEST_DEF("TestCounterMessage", TestCounterMessage),
     NL_TEST_DEF("TestDataBlockMessage", TestDataBlockMessage),
+    NL_TEST_DEF("TestBlockQueryWithSkipMessage", TestBlockQueryWithSkipMessage),
 
     NL_TEST_SENTINEL()
 };

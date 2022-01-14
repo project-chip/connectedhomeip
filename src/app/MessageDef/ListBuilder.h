@@ -15,11 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines List builder in CHIP interaction model
- *
- */
 
 #pragma once
 
@@ -33,11 +28,8 @@
 
 namespace chip {
 namespace app {
-class ListBuilder : public chip::app::Builder
+class ListBuilder : public Builder
 {
-protected:
-    ListBuilder();
-
 public:
     /**
      * Init the TLV array container with an particular context tag.
@@ -49,7 +41,7 @@ public:
      * @return                  CHIP_ERROR codes returned by chip::TLV objects.
      */
 
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
+    CHIP_ERROR Init(TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
     /**
      * Init the TLV array container with an anonymous tag.
      * Required to implement arrays of arrays, and to test ListBuilder.
@@ -58,8 +50,7 @@ public:
      *
      * @return                  CHIP_ERROR codes returned by chip::TLV objects.
      */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
+    CHIP_ERROR Init(TLV::TLVWriter * const apWriter);
 };
-
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

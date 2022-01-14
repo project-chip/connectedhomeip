@@ -38,13 +38,14 @@ void TestSrv(nlTestSuite * inSuite, void * inContext)
     HeaderRef header(headerBuffer);
 
     BigEndian::BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
 
     SrvResourceRecord record(kName, kServerName, kPort);
     record.SetTtl(128);
 
     header.Clear();
 
-    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAdditional, output));
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAdditional, writer));
     NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 0);
     NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
     NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 1);

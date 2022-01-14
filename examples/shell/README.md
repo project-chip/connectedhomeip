@@ -36,6 +36,7 @@ Done
 -   [otcli](README_OTCLI.md)
 -   [ping](#ping)
 -   [rand](#rand)
+-   [server](README_SERVER.md)
 -   [version](#version)
 
 ## Matter Shell Command Details

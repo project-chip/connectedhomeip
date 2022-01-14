@@ -66,25 +66,24 @@ static void TestConfigurationMgr_SerialNumber(nlTestSuite * inSuite, void * inCo
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     char buf[64];
-    size_t serialNumberLen    = 0;
     const char * serialNumber = "89051AAZZ236";
 
     err = ConfigurationMgr().StoreSerialNumber(serialNumber, strlen(serialNumber));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetSerialNumber(buf, 64, serialNumberLen);
+    err = ConfigurationMgr().GetSerialNumber(buf, 64);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, serialNumberLen == strlen(serialNumber));
+    NL_TEST_ASSERT(inSuite, strlen(buf) == 12);
     NL_TEST_ASSERT(inSuite, strcmp(buf, serialNumber) == 0);
 
     err = ConfigurationMgr().StoreSerialNumber(serialNumber, 5);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetSerialNumber(buf, 64, serialNumberLen);
+    err = ConfigurationMgr().GetSerialNumber(buf, 64);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, serialNumberLen == 5);
+    NL_TEST_ASSERT(inSuite, strlen(buf) == 5);
     NL_TEST_ASSERT(inSuite, strcmp(buf, "89051") == 0);
 }
 
@@ -108,18 +107,18 @@ static void TestConfigurationMgr_ManufacturingDate(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, dayOfMonth == 20);
 }
 
-static void TestConfigurationMgr_ProductRevision(nlTestSuite * inSuite, void * inContext)
+static void TestConfigurationMgr_HardwareVersion(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t productRev;
+    uint16_t hardwareVer;
 
-    err = ConfigurationMgr().StoreProductRevision(1234);
+    err = ConfigurationMgr().StoreHardwareVersion(1234);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = ConfigurationMgr().GetProductRevision(productRev);
+    err = ConfigurationMgr().GetHardwareVersion(hardwareVer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, productRev == 1234);
+    NL_TEST_ASSERT(inSuite, hardwareVer == 1234);
 }
 
 static void TestConfigurationMgr_SetupPinCode(nlTestSuite * inSuite, void * inContext)
@@ -152,20 +151,6 @@ static void TestConfigurationMgr_SetupDiscriminator(nlTestSuite * inSuite, void 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, getSetupDiscriminator == setSetupDiscriminator);
-}
-
-static void TestConfigurationMgr_RegulatoryLocation(nlTestSuite * inSuite, void * inContext)
-{
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    uint32_t location = 0;
-
-    err = ConfigurationMgr().StoreRegulatoryLocation(12345);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ConfigurationMgr().GetRegulatoryLocation(location);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, location == 12345);
 }
 
 static void TestConfigurationMgr_CountryCode(nlTestSuite * inSuite, void * inContext)
@@ -233,11 +218,59 @@ static void TestConfigurationMgr_GetPrimaryMACAddress(nlTestSuite * inSuite, voi
     {
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+#ifndef __MBED__
         // Verify default MAC address value
         NL_TEST_ASSERT(inSuite,
                        strncmp(reinterpret_cast<char *>(mac6Bytes.data()), reinterpret_cast<const char *>(defaultMacAddress),
                                mac6Bytes.size()) == 0);
+#endif
     }
+}
+
+static void TestConfigurationMgr_ActiveLocale(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    char buf[8];
+    size_t activeLocaleLen    = 0;
+    const char * activeLocale = "en-US";
+
+    err = ConfigurationMgr().StoreActiveLocale(activeLocale, strlen(activeLocale));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetActiveLocale(buf, 8, activeLocaleLen);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, activeLocaleLen == strlen(activeLocale));
+    NL_TEST_ASSERT(inSuite, strcmp(buf, activeLocale) == 0);
+}
+
+static void TestConfigurationMgr_HourFormat(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t format = 0;
+
+    err = ConfigurationMgr().StoreHourFormat(3);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetHourFormat(format);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, format == 3);
+}
+
+static void TestConfigurationMgr_CalendarType(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t type   = 0;
+
+    err = ConfigurationMgr().StoreCalendarType(3);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetCalendarType(type);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, type == 3);
 }
 
 /**
@@ -251,13 +284,15 @@ static const nlTest sTests[] = {
 #endif
     NL_TEST_DEF("Test ConfigurationMgr::SerialNumber", TestConfigurationMgr_SerialNumber),
     NL_TEST_DEF("Test ConfigurationMgr::ManufacturingDate", TestConfigurationMgr_ManufacturingDate),
-    NL_TEST_DEF("Test ConfigurationMgr::ProductRevision", TestConfigurationMgr_ProductRevision),
+    NL_TEST_DEF("Test ConfigurationMgr::HardwareVersion", TestConfigurationMgr_HardwareVersion),
     NL_TEST_DEF("Test ConfigurationMgr::SetupPinCode", TestConfigurationMgr_SetupPinCode),
     NL_TEST_DEF("Test ConfigurationMgr::SetupDiscriminator", TestConfigurationMgr_SetupDiscriminator),
-    NL_TEST_DEF("Test ConfigurationMgr::RegulatoryLocation", TestConfigurationMgr_RegulatoryLocation),
     NL_TEST_DEF("Test ConfigurationMgr::CountryCode", TestConfigurationMgr_CountryCode),
     NL_TEST_DEF("Test ConfigurationMgr::Breadcrumb", TestConfigurationMgr_Breadcrumb),
     NL_TEST_DEF("Test ConfigurationMgr::GetPrimaryMACAddress", TestConfigurationMgr_GetPrimaryMACAddress),
+    NL_TEST_DEF("Test ConfigurationMgr::ActiveLocale", TestConfigurationMgr_ActiveLocale),
+    NL_TEST_DEF("Test ConfigurationMgr::HourFormat", TestConfigurationMgr_HourFormat),
+    NL_TEST_DEF("Test ConfigurationMgr::CalendarType", TestConfigurationMgr_CalendarType),
     NL_TEST_SENTINEL()
 };
 

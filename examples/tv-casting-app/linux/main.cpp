@@ -16,19 +16,25 @@
  *    limitations under the License.
  */
 
+#include <app/OperationalDeviceProxy.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <controller/CHIPCommissionableNodeController.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DeviceControlServer.h>
 #include <system/SystemLayer.h>
 #include <transport/raw/PeerAddress.h>
+#include <zap-generated/CHIPClusters.h>
+
+#include <list>
+#include <string>
 
 using namespace chip;
 using namespace chip::Controller;
@@ -36,22 +42,30 @@ using namespace chip::Credentials;
 using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
+using namespace chip::app::Clusters::ContentLauncher::Commands;
 
-struct DeviceType
+struct TVExampleDeviceType
 {
     const char * name;
     uint16_t id;
 };
 
-constexpr DeviceType kKnownDeviceTypes[]             = { { "video-player", 35 }, { "dimmable-light", 257 } };
+constexpr TVExampleDeviceType kKnownDeviceTypes[]    = { { "video-player", 35 }, { "dimmable-light", 257 } };
 constexpr int kKnownDeviceTypesCount                 = sizeof kKnownDeviceTypes / sizeof *kKnownDeviceTypes;
 constexpr uint16_t kOptionDeviceType                 = 't';
 constexpr uint16_t kCommissioningWindowTimeoutInSec  = 3 * 60;
 constexpr uint32_t kCommissionerDiscoveryTimeoutInMs = 5 * 1000;
 
+// TODO: Accept these values over CLI
+const char * kContentUrl         = "https://www.test.com/videoid";
+const char * kContentDisplayStr  = "Test video";
+constexpr EndpointId kTvEndpoint = 1;
+
 CommissionableNodeController gCommissionableNodeController;
 chip::System::SocketWatchToken gToken;
 Dnssd::DiscoveryFilter gDiscoveryFilter = Dnssd::DiscoveryFilter();
+
+CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> gCASEClientPool;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -185,6 +199,67 @@ void InitCommissioningFlow(intptr_t commandArg)
     }
 }
 
+void OnContentLauncherSuccessResponse(void * context, const LaunchResponse::DecodableType & response)
+{
+    ChipLogProgress(AppServer, "ContentLauncher: Default Success Response");
+}
+
+void OnContentLauncherFailureResponse(void * context, EmberAfStatus status)
+{
+    ChipLogError(AppServer, "ContentLauncher: Default Failure Response: %" PRIu8, status);
+}
+
+void DeviceEventCallback(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+{
+    if (event->Type == DeviceLayer::DeviceEventType::kCommissioningComplete)
+    {
+        chip::NodeId tvNodeId             = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr().GetPeerNodeId();
+        chip::FabricIndex peerFabricIndex = chip::DeviceLayer::DeviceControlServer::DeviceControlSvr().GetFabricIndex();
+
+        Server * server           = &(chip::Server::GetInstance());
+        chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(peerFabricIndex);
+        if (fabric == nullptr)
+        {
+            ChipLogError(AppServer, "Did not find fabric for index %d", peerFabricIndex);
+            return;
+        }
+
+        chip::DeviceProxyInitParams initParams = {
+            .sessionManager = &(server->GetSecureSessionManager()),
+            .exchangeMgr    = &(server->GetExchangeManager()),
+            .idAllocator    = &(server->GetSessionIDAllocator()),
+            .fabricTable    = &(server->GetFabricTable()),
+            .clientPool     = &gCASEClientPool,
+            .imDelegate     = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
+        };
+
+        PeerId peerID = fabric->GetPeerIdForNode(tvNodeId);
+        chip::OperationalDeviceProxy * operationalDeviceProxy =
+            chip::Platform::New<chip::OperationalDeviceProxy>(initParams, peerID);
+        if (operationalDeviceProxy == nullptr)
+        {
+            ChipLogError(AppServer, "Failed in creating an instance of OperationalDeviceProxy");
+            return;
+        }
+
+        SessionHandle handle = server->GetSecureSessionManager().FindSecureSessionForNode(tvNodeId);
+        operationalDeviceProxy->SetConnectedSession(handle);
+
+        ContentLauncherCluster cluster;
+        CHIP_ERROR err = cluster.Associate(operationalDeviceProxy, kTvEndpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Associate() failed: %" CHIP_ERROR_FORMAT, err.Format());
+            return;
+        }
+        LaunchURLRequest::Type request;
+        request.contentURL          = chip::CharSpan(kContentUrl, strlen(kContentUrl));
+        request.displayString       = chip::CharSpan(kContentDisplayStr, strlen(kContentDisplayStr));
+        request.brandingInformation = chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type();
+        cluster.InvokeCommand(request, nullptr, OnContentLauncherSuccessResponse, OnContentLauncherFailureResponse);
+    }
+}
+
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -195,8 +270,12 @@ int main(int argc, char * argv[])
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
-    // Initialize device attestation verifier
-    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
+    // Initialize device attestation verifier from a constant version
+    {
+        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    }
 
     if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))
     {
@@ -211,7 +290,8 @@ int main(int argc, char * argv[])
         chip::System::Clock::Milliseconds32(kCommissionerDiscoveryTimeoutInMs),
         [](System::Layer *, void *) { chip::DeviceLayer::PlatformMgr().ScheduleWork(InitCommissioningFlow); }, nullptr);
 
-    // TBD: Content casting commands
+    // Add callback to send Content casting commands after commissioning completes
+    chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(DeviceEventCallback, 0);
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 exit:

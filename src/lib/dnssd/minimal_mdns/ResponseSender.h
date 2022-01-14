@@ -23,7 +23,6 @@
 
 #include <lib/dnssd/minimal_mdns/responders/QueryResponder.h>
 
-#include <inet/InetLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace mdns {

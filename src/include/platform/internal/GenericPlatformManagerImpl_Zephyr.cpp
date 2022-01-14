@@ -61,6 +61,8 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_InitChipStack(void)
     k_msgq_init(&mChipEventQueue, reinterpret_cast<char *>(&mChipEventRingBuffer), sizeof(ChipDeviceEvent),
                 CHIP_DEVICE_CONFIG_MAX_EVENT_QUEUE_SIZE);
 
+    mShouldRunEventLoop = false;
+
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
     SuccessOrExit(err);
@@ -97,8 +99,8 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartChipTimer(System:
 template <class ImplClass>
 CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StopEventLoopTask(void)
 {
-    VerifyOrDieWithMsg(false, DeviceLayer, "StopEventLoopTask is not implemented");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    mShouldRunEventLoop = false;
+    return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
@@ -137,8 +139,15 @@ void GenericPlatformManagerImpl_Zephyr<ImplClass>::_RunEventLoop(void)
 {
     Impl()->LockChipStack();
 
+    if (mShouldRunEventLoop)
+    {
+        ChipLogError(DeviceLayer, "Error trying to run the event loop while it is already running");
+        return;
+    }
+    mShouldRunEventLoop = true;
+
     SystemLayerSocketsLoop().EventLoopBegins();
-    while (true)
+    while (mShouldRunEventLoop)
     {
         SystemLayerSocketsLoop().PrepareEvents();
 

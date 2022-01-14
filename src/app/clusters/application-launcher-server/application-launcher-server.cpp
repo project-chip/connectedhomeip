@@ -22,67 +22,229 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/zap-generated/command-id.h>
-#include <app-common/zap-generated/enums.h>
+#include <app/clusters/application-launcher-server/application-launcher-delegate.h>
+#include <app/clusters/application-launcher-server/application-launcher-server.h>
+
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
-#include <app/clusters/application-launcher-server/application-launcher-server.h>
-#include <app/util/af.h>
+#include <app/data-model/Encode.h>
+#include <app/util/attribute-storage.h>
 
 using namespace chip;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(::ApplicationLauncherApp application, std::string data);
+// -----------------------------------------------------------------------------
+// Delegate Implementation
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * commandObj,
-                                                        const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
-                                                        uint8_t *, uint8_t *, Commands::LaunchApp::DecodableType & commandData)
+using chip::app::Clusters::ApplicationLauncher::Delegate;
+
+namespace {
+
+Delegate * gDelegateTable[EMBER_AF_APPLICATION_LAUNCHER_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
+
+Delegate * GetDelegate(EndpointId endpoint)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationLauncher::Id);
+    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
 }
 
-void sendResponse(app::CommandHandler * command, ApplicationLauncherResponse response)
+bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_APPLICATION_LAUNCHER_CLUSTER_ID,
-                                         ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
-    SuccessOrExit(err = command->PrepareCommand(cmdParams));
-    VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(0), response.status));
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(1), reinterpret_cast<const char *>(response.data)));
-    SuccessOrExit(err = command->FinishCommand());
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (delegate == nullptr)
     {
-        ChipLogError(Zcl, "Failed to send LaunchAppResponse. Error:%s", ErrorStr(err));
+        ChipLogError(Zcl, "Application Launcher has no delegate set for endpoint:%" PRIu16, endpoint);
+        return true;
+    }
+    return false;
+}
+} // namespace
+
+namespace chip {
+namespace app {
+namespace Clusters {
+namespace ApplicationLauncher {
+
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
+{
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationLauncher::Id);
+    if (ep != 0xFFFF)
+    {
+        gDelegateTable[ep] = delegate;
+    }
+    else
+    {
     }
 }
 
-::ApplicationLauncherApp getApplicationFromCommand(uint16_t catalogVendorId, CharSpan applicationId)
+} // namespace ApplicationLauncher
+} // namespace Clusters
+} // namespace app
+} // namespace chip
+
+// -----------------------------------------------------------------------------
+// Attribute Accessor Implementation
+
+namespace {
+
+class ApplicationLauncherAttrAccess : public app::AttributeAccessInterface
 {
-    ::ApplicationLauncherApp application = {};
-    // TODO: Need to figure out what types we're using here.
-    // application.applicationId            = applicationId;
-    application.catalogVendorId = catalogVendorId;
-    return application;
+public:
+    ApplicationLauncherAttrAccess() :
+        app::AttributeAccessInterface(Optional<EndpointId>::Missing(), chip::app::Clusters::ApplicationLauncher::Id)
+    {}
+
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadCatalogListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+    CHIP_ERROR ReadCurrentAppAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate);
+};
+
+ApplicationLauncherAttrAccess gApplicationLauncherAttrAccess;
+
+CHIP_ERROR ApplicationLauncherAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
+{
+    EndpointId endpoint = aPath.mEndpointId;
+    Delegate * delegate = GetDelegate(endpoint);
+
+    if (isDelegateNull(delegate, endpoint))
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherList::Id: {
+        return ReadCatalogListAttribute(aEncoder, delegate);
+    }
+    case app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherApp::Id: {
+        return ReadCurrentAppAttribute(aEncoder, delegate);
+    }
+    default: {
+        break;
+    }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
-bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::LaunchApp::DecodableType & commandData)
+CHIP_ERROR ApplicationLauncherAttrAccess::ReadCatalogListAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
 {
-    auto & requestData                       = commandData.data;
-    auto & requestApplicationCatalogVendorId = commandData.catalogVendorId;
-    auto & requestApplicationId              = commandData.applicationId;
+    std::list<uint16_t> catalogList = delegate->HandleGetCatalogList();
+    return aEncoder.EncodeList([catalogList](const auto & encoder) -> CHIP_ERROR {
+        for (const auto & catalog : catalogList)
+        {
+            ReturnErrorOnFailure(encoder.Encode(catalog));
+        }
+        return CHIP_NO_ERROR;
+    });
+}
 
-    ::ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
-    std::string reqestDataString(requestData.data(), requestData.size());
-    ApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);
-    sendResponse(command, response);
+CHIP_ERROR ApplicationLauncherAttrAccess::ReadCurrentAppAttribute(app::AttributeValueEncoder & aEncoder, Delegate * delegate)
+{
+    Structs::ApplicationEP::Type currentApp = delegate->HandleGetCurrentApp();
+    return aEncoder.Encode(currentApp);
+}
+
+} // anonymous namespace
+
+// -----------------------------------------------------------------------------
+// Matter Framework Callbacks Implementation
+
+bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandler * command,
+                                                               const app::ConcreteCommandPath & commandPath,
+                                                               const Commands::LaunchAppRequest::DecodableType & commandData)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    auto & data         = commandData.data;
+    auto & application  = commandData.application;
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        Commands::LauncherResponse::Type response = delegate->HandleLaunchApp(data, application);
+        err                                       = command->AddResponseData(commandPath, response);
+        SuccessOrExit(err);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfApplicationLauncherClusterLaunchAppRequestCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
+}
+
+/**
+ * @brief Application Launcher Cluster StopApp Command callback (from client)
+ */
+bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler * command,
+                                                             const app::ConcreteCommandPath & commandPath,
+                                                             const Commands::StopAppRequest::DecodableType & commandData)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    auto & application  = commandData.application;
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        Commands::LauncherResponse::Type response = delegate->HandleStopApp(application);
+        err                                       = command->AddResponseData(commandPath, response);
+        SuccessOrExit(err);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfApplicationLauncherClusterStopAppRequestCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
+    return true;
+}
+
+/**
+ * @brief Application Launcher Cluster HideApp Command callback (from client)
+ */
+bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler * command,
+                                                             const app::ConcreteCommandPath & commandPath,
+                                                             const Commands::HideAppRequest::DecodableType & commandData)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    EndpointId endpoint = commandPath.mEndpointId;
+    auto & application  = commandData.application;
+
+    Delegate * delegate = GetDelegate(endpoint);
+    VerifyOrExit(isDelegateNull(delegate, endpoint) != true, err = CHIP_ERROR_INCORRECT_STATE);
+
+    {
+        Commands::LauncherResponse::Type response = delegate->HandleHideApp(application);
+        err                                       = command->AddResponseData(commandPath, response);
+        SuccessOrExit(err);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfApplicationLauncherClusterStopAppRequestCallback error: %s", err.AsString());
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
+    return true;
+}
+
+// -----------------------------------------------------------------------------
+// Plugin initialization
+
+void MatterApplicationLauncherPluginServerInitCallback(void)
+{
+    registerAttributeAccessOverride(&gApplicationLauncherAttrAccess);
 }

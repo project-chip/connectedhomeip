@@ -21,7 +21,7 @@ using namespace ::chip::Protocols;
 
 namespace {
 // Use this as a timestamp if not needing to test BDX timeouts.
-constexpr uint64_t kNoAdvanceTime = 0;
+constexpr System::Clock::Timestamp kNoAdvanceTime = System::Clock::kZero;
 
 const TLV::Tag tlvStrTag  = TLV::ContextTag(4);
 const TLV::Tag tlvListTag = TLV::ProfileTag(7777, 8888);
@@ -137,22 +137,22 @@ void VerifyNoMoreOutput(nlTestSuite * inSuite, void * inContext, TransferSession
 
 // Helper method for initializing two TransferSession objects, generating a TransferInit message, and passing it to a responding
 // TransferSession.
-void SendAndVerifyTransferInit(nlTestSuite * inSuite, void * inContext, TransferSession::OutputEvent & outEvent, uint32_t timeoutMs,
-                               TransferSession & initiator, TransferRole initiatorRole, TransferSession::TransferInitData initData,
-                               TransferSession & responder, BitFlags<TransferControlFlags> & responderControlOpts,
-                               uint16_t responderMaxBlock)
+void SendAndVerifyTransferInit(nlTestSuite * inSuite, void * inContext, TransferSession::OutputEvent & outEvent,
+                               System::Clock::Timeout timeout, TransferSession & initiator, TransferRole initiatorRole,
+                               TransferSession::TransferInitData initData, TransferSession & responder,
+                               BitFlags<TransferControlFlags> & responderControlOpts, uint16_t responderMaxBlock)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     TransferRole responderRole  = (initiatorRole == TransferRole::kSender) ? TransferRole::kReceiver : TransferRole::kSender;
     MessageType expectedInitMsg = (initiatorRole == TransferRole::kSender) ? MessageType::SendInit : MessageType::ReceiveInit;
 
     // Initializer responder to wait for transfer
-    err = responder.WaitForTransfer(responderRole, responderControlOpts, responderMaxBlock, timeoutMs);
+    err = responder.WaitForTransfer(responderRole, responderControlOpts, responderMaxBlock, timeout);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     VerifyNoMoreOutput(inSuite, inContext, responder);
 
     // Verify initiator outputs respective Init message (depending on role) after StartTransfer()
-    err = initiator.StartTransfer(initiatorRole, initData, timeoutMs);
+    err = initiator.StartTransfer(initiatorRole, initData, timeout);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     initiator.PollOutput(outEvent, kNoAdvanceTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::OutputEventType::kMsgToSend);
@@ -278,7 +278,7 @@ void SendAndVerifyQuery(nlTestSuite * inSuite, void * inContext, TransferSession
 // Helper method for preparing a sending a Block message between two TransferSession objects. The sender refers to the node that is
 // sending Blocks. Uses a static counter incremented with each call. Also verifies that block data received matches what was sent.
 void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, TransferSession & sender, TransferSession & receiver,
-                                 TransferSession::OutputEvent & outEvent, bool isEof)
+                                 TransferSession::OutputEvent & outEvent, bool isEof, uint32_t inBlockCounter)
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
     static uint8_t dataCount = 0;
@@ -319,6 +319,7 @@ void SendAndVerifyArbitraryBlock(nlTestSuite * inSuite, void * inContext, Transf
     if (outEvent.EventType == TransferSession::OutputEventType::kBlockReceived && outEvent.blockdata.Data != nullptr)
     {
         NL_TEST_ASSERT(inSuite, !memcmp(fakeBlockData, outEvent.blockdata.Data, outEvent.blockdata.Length));
+        NL_TEST_ASSERT(inSuite, outEvent.blockdata.BlockCounter == inBlockCounter);
     }
     VerifyNoMoreOutput(inSuite, inContext, receiver);
 }
@@ -357,12 +358,12 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     uint32_t numBlocksSent = 0;
 
     // Chosen arbitrarily for this test
-    uint32_t numBlockSends        = 10;
-    uint16_t proposedBlockSize    = 128;
-    uint16_t testSmallerBlockSize = 64;
-    uint64_t proposedOffset       = 64;
-    uint64_t proposedLength       = 0;
-    uint32_t timeoutMs            = 1000 * 24;
+    uint32_t numBlockSends         = 10;
+    uint16_t proposedBlockSize     = 128;
+    uint16_t testSmallerBlockSize  = 64;
+    uint64_t proposedOffset        = 64;
+    uint64_t proposedLength        = 0;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
 
     // Chosen specifically for this test
     TransferControlFlags driveMode = TransferControlFlags::kReceiverDrive;
@@ -379,7 +380,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
     BitFlags<TransferControlFlags> senderOpts;
     senderOpts.Set(driveMode);
 
-    SendAndVerifyTransferInit(inSuite, inContext, outEvent, timeoutMs, initiatingReceiver, TransferRole::kReceiver, initOptions,
+    SendAndVerifyTransferInit(inSuite, inContext, outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions,
                               respondingSender, senderOpts, proposedBlockSize);
 
     // Test metadata for Accept message
@@ -414,7 +415,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
 
     // Test BlockQuery -> Block -> BlockAck
     SendAndVerifyQuery(inSuite, inContext, respondingSender, initiatingReceiver, outEvent);
-    SendAndVerifyArbitraryBlock(inSuite, inContext, respondingSender, initiatingReceiver, outEvent, false);
+    SendAndVerifyArbitraryBlock(inSuite, inContext, respondingSender, initiatingReceiver, outEvent, false, numBlocksSent);
     numBlocksSent++;
 
     // Test only one block can be prepared at a time, without receiving a response to the first
@@ -441,7 +442,7 @@ void TestInitiatingReceiverReceiverDrive(nlTestSuite * inSuite, void * inContext
         bool isEof = (numBlocksSent == numBlockSends - 1);
 
         SendAndVerifyQuery(inSuite, inContext, respondingSender, initiatingReceiver, outEvent);
-        SendAndVerifyArbitraryBlock(inSuite, inContext, respondingSender, initiatingReceiver, outEvent, isEof);
+        SendAndVerifyArbitraryBlock(inSuite, inContext, respondingSender, initiatingReceiver, outEvent, isEof, numBlocksSent);
 
         numBlocksSent++;
     }
@@ -462,8 +463,8 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     TransferControlFlags driveMode = TransferControlFlags::kSenderDrive;
 
     // Chosen arbitrarily for this test
-    uint16_t transferBlockSize = 10;
-    uint32_t timeoutMs         = 1000 * 24;
+    uint16_t transferBlockSize     = 10;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
 
     // Initialize respondingReceiver
     BitFlags<TransferControlFlags> receiverOpts;
@@ -487,7 +488,7 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     initOptions.Metadata         = tlvBuf;
     initOptions.MetadataLength   = metadataSize;
 
-    SendAndVerifyTransferInit(inSuite, inContext, outEvent, timeoutMs, initiatingSender, TransferRole::kSender, initOptions,
+    SendAndVerifyTransferInit(inSuite, inContext, outEvent, timeout, initiatingSender, TransferRole::kSender, initOptions,
                               respondingReceiver, receiverOpts, transferBlockSize);
 
     // Verify parsed TLV metadata matches the original
@@ -509,14 +510,16 @@ void TestInitiatingSenderSenderDrive(nlTestSuite * inSuite, void * inContext)
     SendAndVerifyAcceptMsg(inSuite, inContext, outEvent, respondingReceiver, TransferRole::kReceiver, acceptData, initiatingSender,
                            initOptions);
 
+    uint32_t numBlocksSent = 0;
     // Test multiple Block -> BlockAck -> Block
     for (int i = 0; i < 3; i++)
     {
-        SendAndVerifyArbitraryBlock(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, false);
+        SendAndVerifyArbitraryBlock(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, false, numBlocksSent);
         SendAndVerifyBlockAck(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, false);
+        numBlocksSent++;
     }
 
-    SendAndVerifyArbitraryBlock(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, true);
+    SendAndVerifyArbitraryBlock(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, true, numBlocksSent);
     SendAndVerifyBlockAck(inSuite, inContext, initiatingSender, respondingReceiver, outEvent, true);
 }
 
@@ -532,7 +535,7 @@ void TestBadAcceptMessageFields(nlTestSuite * inSuite, void * inContext)
     TransferControlFlags driveMode = TransferControlFlags::kReceiverDrive;
     uint64_t commonLength          = 0;
     uint64_t commonOffset          = 0;
-    uint32_t timeoutMs             = 1000 * 24;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
 
     // Initialize struct with TransferInit parameters
     TransferSession::TransferInitData initOptions;
@@ -550,7 +553,7 @@ void TestBadAcceptMessageFields(nlTestSuite * inSuite, void * inContext)
     BitFlags<TransferControlFlags> responderControl;
     responderControl.Set(driveMode);
 
-    SendAndVerifyTransferInit(inSuite, inContext, outEvent, timeoutMs, initiatingReceiver, TransferRole::kReceiver, initOptions,
+    SendAndVerifyTransferInit(inSuite, inContext, outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions,
                               respondingSender, responderControl, maxBlockSize);
 
     // Verify AcceptTransfer() returns error for choosing larger max block size
@@ -580,9 +583,9 @@ void TestTimeout(nlTestSuite * inSuite, void * inContext)
     TransferSession initiator;
     TransferSession::OutputEvent outEvent;
 
-    uint32_t timeoutMs   = 24;
-    uint64_t startTimeMs = 100;
-    uint64_t endTimeMs   = 124;
+    System::Clock::Timeout timeout     = System::Clock::Milliseconds32(24);
+    System::Clock::Timestamp startTime = System::Clock::Milliseconds64(100);
+    System::Clock::Timestamp endTime   = System::Clock::Milliseconds64(124);
 
     // Initialize struct with arbitrary TransferInit parameters
     TransferSession::TransferInitData initOptions;
@@ -599,17 +602,17 @@ void TestTimeout(nlTestSuite * inSuite, void * inContext)
     TransferRole role = TransferRole::kReceiver;
 
     // Verify initiator outputs respective Init message (depending on role) after StartTransfer()
-    err = initiator.StartTransfer(role, initOptions, timeoutMs);
+    err = initiator.StartTransfer(role, initOptions, timeout);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // First PollOutput() should output the TransferInit message
-    initiator.PollOutput(outEvent, startTimeMs);
+    initiator.PollOutput(outEvent, startTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::OutputEventType::kMsgToSend);
     MessageType expectedInitMsg = (role == TransferRole::kSender) ? MessageType::SendInit : MessageType::ReceiveInit;
     VerifyBdxMessageToSend(inSuite, inContext, outEvent, expectedInitMsg);
 
     // Second PollOutput() with no call to HandleMessageReceived() should result in a timeout.
-    initiator.PollOutput(outEvent, endTimeMs);
+    initiator.PollOutput(outEvent, endTime);
     NL_TEST_ASSERT(inSuite, outEvent.EventType == TransferSession::OutputEventType::kTransferTimeout);
 }
 
@@ -628,9 +631,9 @@ void TestDuplicateBlockError(nlTestSuite * inSuite, void * inContext)
     uint16_t blockSize   = sizeof(fakeData);
 
     // Chosen arbitrarily for this test
-    uint64_t proposedOffset = 64;
-    uint64_t proposedLength = 0;
-    uint32_t timeoutMs      = 1000 * 24;
+    uint64_t proposedOffset        = 64;
+    uint64_t proposedLength        = 0;
+    System::Clock::Timeout timeout = System::Clock::Seconds16(24);
 
     // Chosen specifically for this test
     TransferControlFlags driveMode = TransferControlFlags::kReceiverDrive;
@@ -647,7 +650,7 @@ void TestDuplicateBlockError(nlTestSuite * inSuite, void * inContext)
     BitFlags<TransferControlFlags> senderOpts;
     senderOpts.Set(driveMode);
 
-    SendAndVerifyTransferInit(inSuite, inContext, outEvent, timeoutMs, initiatingReceiver, TransferRole::kReceiver, initOptions,
+    SendAndVerifyTransferInit(inSuite, inContext, outEvent, timeout, initiatingReceiver, TransferRole::kReceiver, initOptions,
                               respondingSender, senderOpts, blockSize);
 
     // Compose ReceiveAccept parameters struct and give to respondingSender

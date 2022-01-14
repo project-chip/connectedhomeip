@@ -96,6 +96,8 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
+    SHA_ClkInit(SHA_INSTANCE);
+
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     PWR_Init();
 
@@ -143,21 +145,6 @@ extern "C" void main_task(void const * argument)
     if (ret != CHIP_NO_ERROR)
     {
         goto exit;
-    }
-
-    // Configure the Thread polling behavior for the device.
-    {
-        ConnectivityManager::ThreadPollingConfig pollingConfig;
-        pollingConfig.Clear();
-        pollingConfig.ActivePollingIntervalMS   = THREAD_ACTIVE_POLLING_INTERVAL_MS;
-        pollingConfig.InactivePollingIntervalMS = THREAD_INACTIVE_POLLING_INTERVAL_MS;
-
-        ret = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
-        if (ret != CHIP_NO_ERROR)
-        {
-            K32W_LOG("Error during ConnectivityMgr().SetThreadPollingConfig(pollingConfig)");
-            goto exit;
-        }
     }
 
     ret = PlatformMgr().StartEventLoopTask();

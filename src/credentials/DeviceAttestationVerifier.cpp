@@ -30,19 +30,49 @@ namespace {
 class UnimplementedDACVerifier : public DeviceAttestationVerifier
 {
 public:
-    AttestationVerificationResult VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
-                                                               const ByteSpan & attestationChallengeBuffer,
-                                                               const ByteSpan & attestationSignatureBuffer,
-                                                               const ByteSpan & paiCertDerBuffer, const ByteSpan & dacCertDerBuffer,
-                                                               const ByteSpan & attestationNonce) override
+    void VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
+                                      const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
+                                      const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce,
+                                      Callback::Callback<OnAttestationInformationVerification> * onCompletion) override
     {
         (void) attestationInfoBuffer;
         (void) attestationChallengeBuffer;
         (void) attestationSignatureBuffer;
-        (void) paiCertDerBuffer;
-        (void) dacCertDerBuffer;
+        (void) paiDerBuffer;
+        (void) dacDerBuffer;
         (void) attestationNonce;
+        (void) onCompletion;
+    }
+
+    AttestationVerificationResult ValidateCertificationDeclarationSignature(const ByteSpan & cmsEnvelopeBuffer,
+                                                                            ByteSpan & certDeclBuffer) override
+    {
+        (void) cmsEnvelopeBuffer;
+        (void) certDeclBuffer;
         return AttestationVerificationResult::kNotImplemented;
+    }
+
+    AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
+                                                                        const ByteSpan & firmwareInfo,
+                                                                        const DeviceInfoForAttestation & deviceInfo) override
+    {
+        (void) certDeclBuffer;
+        (void) firmwareInfo;
+        (void) deviceInfo;
+        return AttestationVerificationResult::kNotImplemented;
+    }
+
+    CHIP_ERROR VerifyNodeOperationalCSRInformation(const ByteSpan & nocsrElementsBuffer,
+                                                   const ByteSpan & attestationChallengeBuffer,
+                                                   const ByteSpan & attestationSignatureBuffer,
+                                                   const Crypto::P256PublicKey & dacPublicKey, const ByteSpan & csrNonce) override
+    {
+        (void) nocsrElementsBuffer;
+        (void) attestationChallengeBuffer;
+        (void) attestationSignatureBuffer;
+        (void) dacPublicKey;
+        (void) csrNonce;
+        return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 };
 

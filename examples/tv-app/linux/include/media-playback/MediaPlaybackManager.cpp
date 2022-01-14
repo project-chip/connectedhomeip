@@ -16,64 +16,132 @@
  */
 
 #include "MediaPlaybackManager.h"
-#include <app/Command.h>
-#include <app/util/af.h>
-#include <iostream>
-
-#include <map>
-#include <string>
 
 using namespace std;
+using namespace chip::app::Clusters::MediaPlayback;
 
-CHIP_ERROR MediaPlaybackManager::Init()
+PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // TODO: Store feature map once it is supported
-    map<string, bool> featureMap;
-    featureMap["AS"] = true;
-
-    SuccessOrExit(err);
-exit:
-    return err;
+    return PlaybackStateEnum::kPlaying;
 }
 
-EmberAfMediaPlaybackStatus MediaPlaybackManager::proxyMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
-                                                                           uint64_t deltaPositionMilliseconds)
+uint64_t MediaPlaybackManager::HandleGetStartTime()
 {
-    switch (mediaPlaybackRequest)
-    {
-    case MEDIA_PLAYBACK_REQUEST_PLAY:
-    // TODO: Insert code here
-    case MEDIA_PLAYBACK_REQUEST_PAUSE:
-    // TODO: Insert code here
-    case MEDIA_PLAYBACK_REQUEST_STOP:
-    // TODO: Insert code here
-    case MEDIA_PLAYBACK_REQUEST_START_OVER:
-    // TODO: Insert code here
-    case MEDIA_PLAYBACK_REQUEST_PREVIOUS:
-    // TODO: Insert code here
-    case MEDIA_PLAYBACK_REQUEST_NEXT:
-    // TODO: Insert code here
-    case MEDIA_PLAYBACK_REQUEST_REWIND:
-    // TODO: Insert code here
-    case MEDIA_PLAYBACK_REQUEST_FAST_FORWARD:
-    // TODO: Insert code here
-    case MEDIA_PLAYBACK_REQUEST_SKIP_FORWARD:
-    // TODO: Insert code here
-    case MEDIA_PLAYBACK_REQUEST_SKIP_BACKWARD:
-    // TODO: Insert code here
-    case MEDIA_PLAYBACK_REQUEST_SEEK:
-        return EMBER_ZCL_MEDIA_PLAYBACK_STATUS_SUCCESS;
-        break;
-    default: {
-        return EMBER_ZCL_MEDIA_PLAYBACK_STATUS_SUCCESS;
-    }
-    }
+    return 0;
 }
 
-EmberAfMediaPlaybackStatus mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
-                                                                        uint64_t deltaPositionMilliseconds)
+uint64_t MediaPlaybackManager::HandleGetDuration()
 {
-    return MediaPlaybackManager().proxyMediaPlaybackRequest(mediaPlaybackRequest, deltaPositionMilliseconds);
+    return 0;
+}
+
+Structs::PlaybackPosition::Type MediaPlaybackManager::HandleGetSampledPosition()
+{
+    Structs::PlaybackPosition::Type sampledPosition;
+    sampledPosition.updatedAt = 0;
+    sampledPosition.position  = 0;
+    return sampledPosition;
+}
+
+float MediaPlaybackManager::HandleGetPlaybackSpeed()
+{
+    return 0;
+}
+
+uint64_t MediaPlaybackManager::HandleGetSeekRangeStart()
+{
+    return 0;
+}
+
+uint64_t MediaPlaybackManager::HandleGetSeekRangeEnd()
+{
+    return 0;
+}
+
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePlay()
+{
+    // TODO: Insert code here
+    Commands::PlaybackResponse::Type response;
+    response.status = StatusEnum::kSuccess;
+    return response;
+}
+
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePause()
+{
+    // TODO: Insert code here
+    Commands::PlaybackResponse::Type response;
+    response.status = StatusEnum::kSuccess;
+    return response;
+}
+
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandleStop()
+{
+    // TODO: Insert code here
+    Commands::PlaybackResponse::Type response;
+    response.status = StatusEnum::kSuccess;
+    return response;
+}
+
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandleFastForward()
+{
+    // TODO: Insert code here
+    Commands::PlaybackResponse::Type response;
+    response.status = StatusEnum::kSuccess;
+    return response;
+}
+
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandlePrevious()
+{
+    // TODO: Insert code here
+    Commands::PlaybackResponse::Type response;
+    response.status = StatusEnum::kSuccess;
+    return response;
+}
+
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandleRewind()
+{
+    // TODO: Insert code here
+    Commands::PlaybackResponse::Type response;
+    response.status = StatusEnum::kSuccess;
+    return response;
+}
+
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSkipBackward(const uint64_t & deltaPositionMilliseconds)
+{
+    // TODO: Insert code here
+    Commands::PlaybackResponse::Type response;
+    response.status = StatusEnum::kSuccess;
+    return response;
+}
+
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSkipForward(const uint64_t & deltaPositionMilliseconds)
+{
+    // TODO: Insert code here
+    Commands::PlaybackResponse::Type response;
+    response.status = StatusEnum::kSuccess;
+    return response;
+}
+
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandleSeekRequest(const uint64_t & positionMilliseconds)
+{
+    // TODO: Insert code here
+    Commands::PlaybackResponse::Type response;
+    response.status = StatusEnum::kSuccess;
+    return response;
+}
+
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandleNext()
+{
+    // TODO: Insert code here
+    Commands::PlaybackResponse::Type response;
+    response.status = StatusEnum::kSuccess;
+    return response;
+}
+
+Commands::PlaybackResponse::Type MediaPlaybackManager::HandleStartOverRequest()
+{
+    // TODO: Insert code here
+    Commands::PlaybackResponse::Type response;
+    response.status = StatusEnum::kSuccess;
+    return response;
 }

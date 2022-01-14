@@ -41,6 +41,10 @@ function convertBasicCTypeToJavaType(cType)
     return 'long';
   case 'bool':
     return 'boolean';
+  case 'float':
+    return 'float';
+  case 'double':
+    return 'double';
   default:
     error = 'Unhandled type ' + cType;
     throw error;
@@ -56,6 +60,10 @@ function convertBasicCTypeToJniType(cType)
     return 'jlong';
   case 'boolean':
     return 'jboolean';
+  case 'float':
+    return 'jfloat';
+  case 'double':
+    return 'jdouble';
   default:
     error = 'Unhandled type ' + cType;
     throw error;
@@ -71,6 +79,10 @@ function convertBasicCTypeToJavaBoxedType(cType)
     return 'Long';
   case 'boolean':
     return 'Boolean';
+  case 'float':
+    return 'Float';
+  case 'double':
+    return 'Double';
   default:
     error = 'Unhandled type ' + cType;
     throw error;
@@ -88,13 +100,29 @@ function asJavaBasicType(type)
   }
 }
 
-function asJniBasicType(type)
+function asJavaBoxedType(type)
 {
   if (StringHelper.isOctetString(type)) {
+    return 'byte[]';
+  } else if (StringHelper.isCharString(type)) {
+    return 'String';
+  } else {
+    return convertBasicCTypeToJavaBoxedType(ChipTypesHelper.asBasicType(this.chipType));
+  }
+}
+
+function asJniBasicType(type, useBoxedTypes)
+{
+  if (this.isOptional) {
+    return 'jobject';
+  } else if (StringHelper.isOctetString(type)) {
     return 'jbyteArray';
   } else if (StringHelper.isCharString(type)) {
     return 'jstring';
   } else {
+    if (useBoxedTypes) {
+      return 'jobject';
+    }
     return convertBasicCTypeToJniType(ChipTypesHelper.asBasicType(this.chipType));
   }
 }
@@ -134,13 +162,13 @@ function asJniBasicTypeForZclType(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asJniSignature(type)
+function asJniSignature(type, useBoxedTypes)
 {
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
-      return convertCTypeToJniSignature(ChipTypesHelper.asBasicType(zclType));
+      return convertCTypeToJniSignature(ChipTypesHelper.asBasicType(zclType), useBoxedTypes);
     })
   }
 
@@ -151,9 +179,15 @@ function asJniSignature(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function convertCTypeToJniSignature(cType)
+function convertCTypeToJniSignature(cType, useBoxedTypes)
 {
-  const javaType = convertBasicCTypeToJavaType(cType);
+  let javaType;
+  if (useBoxedTypes) {
+    javaType = convertBasicCTypeToJavaBoxedType(cType);
+  } else {
+    javaType = convertBasicCTypeToJavaType(cType);
+  }
+
   switch (javaType) {
   case 'int':
     return 'I';
@@ -161,6 +195,20 @@ function convertCTypeToJniSignature(cType)
     return 'J';
   case 'boolean':
     return 'Z';
+  case 'Boolean':
+    return 'Ljava/lang/Boolean;';
+  case 'Integer':
+    return 'Ljava/lang/Integer;';
+  case 'Long':
+    return 'Ljava/lang/Long;';
+  case 'double':
+    return 'D';
+  case 'Double':
+    return 'Ljava/lang/Double;';
+  case 'float':
+    return 'F';
+  case 'Float':
+    return 'Ljava/lang/Float;';
   default:
     error = 'Unhandled Java type ' + javaType + ' for C type ' + cType;
     throw error;
@@ -179,34 +227,43 @@ function convertAttributeCallbackTypeToJavaName(cType)
   }
 }
 
-function omitCommaForFirstNonStatusCommand(id, index)
+function notLastSupportedEntryTypes(context, options)
 {
-  let promise = templateUtil.ensureZclPackageId(this)
-                    .then((pkgId) => { return queryCommand.selectCommandArgumentsByCommandId(this.global.db, id, pkgId) })
-                    .catch(err => {
-                      console.log(err);
-                      throw err;
-                    })
-                    .then((result) => {
-                      // Currently, we omit array types, so don't count it as a valid non-status command.
-                      let firstNonStatusCommandIndex = result.findIndex((command) => !command.isArray);
-                      if (firstNonStatusCommandIndex == -1 || firstNonStatusCommandIndex != index) {
-                        return ", ";
-                      }
-                      return "";
-                    })
-                    .catch(err => {
-                      console.log(err);
-                      throw err;
-                    });
+  if (context.items.length == 0) {
+    return
+  }
 
-  return templateUtil.templatePromise(this.global, promise);
+  let lastIndex = context.items.length - 1;
+  while (context.items[lastIndex].isStruct || context.items[lastIndex].isArray) {
+    lastIndex--;
+  }
+
+  if (this.index != lastIndex) {
+    return options.fn(this);
+  }
+}
+
+function notLastSupportedCommandResponseType(items, options)
+{
+  if (items.length == 0) {
+    return
+  }
+
+  let lastIndex = items.length - 1;
+  while (items[lastIndex].isArray) {
+    lastIndex--;
+  }
+
+  if (this.index != lastIndex) {
+    return options.fn(this);
+  }
 }
 
 //
 // Module exports
 //
 exports.asJavaBasicType                        = asJavaBasicType;
+exports.asJavaBoxedType                        = asJavaBoxedType;
 exports.asJniBasicType                         = asJniBasicType;
 exports.asJniBasicTypeForZclType               = asJniBasicTypeForZclType;
 exports.asJniSignature                         = asJniSignature;
@@ -215,4 +272,5 @@ exports.convertBasicCTypeToJniType             = convertBasicCTypeToJniType;
 exports.convertCTypeToJniSignature             = convertCTypeToJniSignature;
 exports.convertBasicCTypeToJavaBoxedType       = convertBasicCTypeToJavaBoxedType;
 exports.convertAttributeCallbackTypeToJavaName = convertAttributeCallbackTypeToJavaName;
-exports.omitCommaForFirstNonStatusCommand      = omitCommaForFirstNonStatusCommand;
+exports.notLastSupportedEntryTypes             = notLastSupportedEntryTypes;
+exports.notLastSupportedCommandResponseType    = notLastSupportedCommandResponseType;

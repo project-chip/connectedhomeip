@@ -53,13 +53,10 @@ const P6Config::Key P6Config::kConfigKey_MfrDeviceId         = { kConfigNamespac
 const P6Config::Key P6Config::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
 const P6Config::Key P6Config::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
 const P6Config::Key P6Config::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
-const P6Config::Key P6Config::kConfigKey_ProductRevision     = { kConfigNamespace_ChipFactory, "product-rev" };
+const P6Config::Key P6Config::kConfigKey_HardwareVersion     = { kConfigNamespace_ChipFactory, "hardware-ver" };
 const P6Config::Key P6Config::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
 const P6Config::Key P6Config::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
 const P6Config::Key P6Config::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
-const P6Config::Key P6Config::kConfigKey_RegulatoryLocation  = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const P6Config::Key P6Config::kConfigKey_CountryCode         = { kConfigNamespace_ChipConfig, "country-code" };
-const P6Config::Key P6Config::kConfigKey_Breadcrumb          = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
 // Keys stored in the chip-config namespace
 const P6Config::Key P6Config::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
@@ -70,6 +67,17 @@ const P6Config::Key P6Config::kConfigKey_GroupKeyIndex      = { kConfigNamespace
 const P6Config::Key P6Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const P6Config::Key P6Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const P6Config::Key P6Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
+const P6Config::Key P6Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const P6Config::Key P6Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const P6Config::Key P6Config::kConfigKey_ActiveLocale       = { kConfigNamespace_ChipConfig, "active-locale" };
+const P6Config::Key P6Config::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const P6Config::Key P6Config::kConfigKey_HourFormat         = { kConfigNamespace_ChipConfig, "hour-format" };
+const P6Config::Key P6Config::kConfigKey_CalendarType       = { kConfigNamespace_ChipConfig, "calendar-type" };
+
+// Keys stored in the Chip-counters namespace
+const P6Config::Key P6Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
+const P6Config::Key P6Config::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
+const P6Config::Key P6Config::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters, "total-hours" };
 
 // Prefix used for keys that contain Chip group encryption keys.
 const char P6Config::kGroupKeyNamePrefix[] = "gk-";

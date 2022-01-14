@@ -34,7 +34,12 @@
 #include <openthread/netdata.h>
 #include <openthread/thread.h>
 
+#include <credentials/GroupDataProvider.h>
+
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
+
+#include <app/server/Server.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -225,6 +230,39 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                     addrAssigned[addrIdx] = true;
                 }
             }
+
+// Multicast won't work with LWIP on top of OT
+// Duplication of listeners, unecessary timers, buffer duplication, hardfault etc...
+#if CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
+            // Refresh Multicast listening
+            if (GenericThreadStackManagerImpl_OpenThread<ImplClass>::IsThreadAttachedNoLock())
+            {
+                ChipLogDetail(DeviceLayer, "Thread Attached updating Multicast address");
+
+                Credentials::GroupDataProvider * provider = Credentials::GetGroupDataProvider();
+                TransportMgrBase * transportMgr           = &(chip::Server::GetInstance().GetTransportManager());
+                Credentials::GroupDataProvider::GroupInfo group;
+                CHIP_ERROR err = CHIP_NO_ERROR;
+                for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
+                {
+                    auto it = provider->IterateGroupInfo(fabricInfo.GetFabricIndex());
+                    if (it)
+                    {
+                        while (it->Next(group))
+                        {
+                            err = transportMgr->MulticastGroupJoinLeave(
+                                Transport::PeerAddress::Multicast(fabricInfo.GetFabricIndex(), group.group_id), true);
+                            if (err != CHIP_NO_ERROR)
+                            {
+                                ChipLogError(DeviceLayer, "Failed to Join Multicast Group: %s", err.AsString());
+                                break;
+                            }
+                        }
+                        it->Release();
+                    }
+                }
+            }
+#endif // CHIP_SYSTEM_CONFIG_USE_OPEN_THREAD_UDP
         }
 
         ChipLogDetail(DeviceLayer, "LwIP Thread interface addresses %s", isInterfaceUp ? "updated" : "cleared");
@@ -247,7 +285,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                 uint8_t state = netif_ip6_addr_state(mNetIf, addrIdx);
                 if (state != IP6_ADDR_INVALID)
                 {
-                    Inet::IPAddress addr = Inet::IPAddress::FromIPv6(*netif_ip6_addr(mNetIf, addrIdx));
+                    Inet::IPAddress addr = Inet::IPAddress(*netif_ip6_addr(mNetIf, addrIdx));
                     char addrStr[50];
                     addr.ToString(addrStr, sizeof(addrStr));
                     const char * typeStr;
@@ -275,9 +313,9 @@ err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::DoInitThreadNetI
     netif->name[0]    = CHIP_DEVICE_CONFIG_LWIP_THREAD_IF_NAME[0];
     netif->name[1]    = CHIP_DEVICE_CONFIG_LWIP_THREAD_IF_NAME[1];
     netif->output_ip6 = SendPacket;
-#if LWIP_IPV4 || LWIP_VERSION_MAJOR < 2
+#if LWIP_IPV4
     netif->output = NULL;
-#endif /* LWIP_IPV4 || LWIP_VERSION_MAJOR < 2 */
+#endif // LWIP_IPV4
     netif->linkoutput = NULL;
     netif->flags      = NETIF_FLAG_UP | NETIF_FLAG_LINK_UP | NETIF_FLAG_BROADCAST;
     netif->mtu        = CHIP_DEVICE_CONFIG_THREAD_IF_MTU;
@@ -293,13 +331,8 @@ err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::DoInitThreadNetI
  * NB: This method is called in the LwIP TCPIP thread with the LwIP core lock held.
  */
 template <class ImplClass>
-#if LWIP_VERSION_MAJOR < 2
-err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::SendPacket(struct netif * netif, struct pbuf * pktPBuf,
-                                                                           struct ip6_addr * ipaddr)
-#else
 err_t GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::SendPacket(struct netif * netif, struct pbuf * pktPBuf,
                                                                            const struct ip6_addr * ipaddr)
-#endif
 {
     err_t lwipErr = ERR_OK;
     otError otErr;
@@ -351,6 +384,11 @@ exit:
     if (pktMsg != NULL)
     {
         otMessageFree(pktMsg);
+    }
+
+    if (lwipErr == ERR_MEM)
+    {
+        ThreadStackMgrImpl().OverrunErrorTally();
     }
 
     // Unlock the OpenThread stack.

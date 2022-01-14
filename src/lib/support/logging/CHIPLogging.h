@@ -29,6 +29,7 @@
  *         - #CHIP_ERROR_LOGGING
  *         - #CHIP_PROGRESS_LOGGING
  *         - #CHIP_DETAIL_LOGGING
+ *         - #CHIP_AUTOMATION_LOGGING
  *
  */
 
@@ -38,6 +39,7 @@
 
 #include <platform/logging/LogV.h>
 
+#include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/Constants.h>
 
 #include <inttypes.h>
@@ -62,31 +64,26 @@
  *        - #CHIP_ERROR_LOGGING
  *        - #CHIP_PROGRESS_LOGGING
  *        - #CHIP_DETAIL_LOGGING
+ *         - #CHIP_AUTOMATION_LOGGING
  *
  */
 
 namespace chip {
+
+template <class T>
+class Span;
+using ByteSpan = Span<const uint8_t>;
+
 namespace Logging {
 
 using LogRedirectCallback_t = void (*)(const char * module, uint8_t category, const char * msg, va_list args);
 
 void SetLogRedirectCallback(LogRedirectCallback_t callback);
 
-/**
- * gcc and clang provide a way to warn for a custom formatter when formats don't
- * match arguments.  Use that for Log() so we catch mistakes.  The "format"
- * attribute takes the type of format, which arg is the format string, and which
- * arg is the first variadic arg, with both arg numbers 1-based.
- */
-
-#if defined(__GNUC__)
-#define ENFORCE_FORMAT(n, m) __attribute__((format(printf, n, m)))
-#else                        // __GNUC__
-#define ENFORCE_FORMAT(n, m) /* How to do with MSVC? */
-#endif                       // __GNUC__
-
-void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);
+void LogV(uint8_t module, uint8_t category, const char * msg, va_list args) ENFORCE_FORMAT(3, 0);
 void Log(uint8_t module, uint8_t category, const char * msg, ...) ENFORCE_FORMAT(3, 4);
+
+void LogByteSpan(uint8_t module, uint8_t category, const ByteSpan & span);
 
 uint8_t GetLogFilter();
 void SetLogFilter(uint8_t category);
@@ -158,11 +155,41 @@ void SetLogFilter(uint8_t category);
 #define ChipLogDetail(MOD, MSG, ...) ((void) 0)
 #endif
 
-#if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING
+#if CHIP_DETAIL_LOGGING
+#ifndef ChipLogByteSpan
+#define ChipLogByteSpan(MOD, DATA)                                                                                                 \
+    chip::Logging::LogByteSpan(chip::Logging::kLogModule_##MOD, chip::Logging::kLogCategory_Detail, DATA)
+#endif
+#else
+#define ChipLogByteSpan(MOD, DATA) ((void) 0)
+#endif
+
+#ifndef CHIP_AUTOMATION_LOGGING
+#define CHIP_AUTOMATION_LOGGING 1
+#endif
+
+#if CHIP_AUTOMATION_LOGGING
+/**
+ * @def ChipLogAutomation(MSG, ...)
+ *
+ * @brief
+ *   Log a chip message for the specified module in the 'Automation'
+ *   category.
+ *
+ */
+#ifndef ChipLogAutomation
+#define ChipLogAutomation(MSG, ...)                                                                                                \
+    chip::Logging::Log(chip::Logging::kLogModule_Automation, chip::Logging::kLogCategory_Automation, MSG, ##__VA_ARGS__)
+#endif
+#else
+#define ChipLogAutomation(MOD, MSG, ...) ((void) 0)
+#endif
+
+#if CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_AUTOMATION_LOGGING
 #define _CHIP_USE_LOGGING 1
 #else
 #define _CHIP_USE_LOGGING 0
-#endif /* CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING */
+#endif /* CHIP_ERROR_LOGGING || CHIP_PROGRESS_LOGGING || CHIP_DETAIL_LOGGING || CHIP_AUTOMATION_LOGGING */
 
 #if _CHIP_USE_LOGGING
 

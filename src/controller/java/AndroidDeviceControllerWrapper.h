@@ -35,9 +35,9 @@
  * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
  */
 class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate,
-                                       public chip::Controller::DeviceStatusDelegate,
                                        public chip::Controller::OperationalCredentialsDelegate,
-                                       public chip::PersistentStorageDelegate
+                                       public chip::PersistentStorageDelegate,
+                                       public chip::FabricStorage
 {
 public:
     ~AndroidDeviceControllerWrapper();
@@ -49,6 +49,11 @@ public:
 
     void CallJavaMethod(const char * methodName, jint argument);
     CHIP_ERROR InitializeOperationalCredentialsIssuer();
+
+    /**
+     * Convert network credentials from Java, and apply them to the commissioning parameters object.
+     */
+    CHIP_ERROR ApplyNetworkCredentials(chip::Controller::CommissioningParameters & params, jobject networkCredentials);
 
     // DevicePairingDelegate implementation
     void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
@@ -69,14 +74,15 @@ public:
 
     void SetFabricIdForNextNOCRequest(chip::FabricId fabricId) override { mNextFabricId = fabricId; }
 
-    // DeviceStatusDelegate implementation
-    void OnMessage(chip::System::PacketBufferHandle && msg) override;
-    void OnStatusChange(void) override;
-
     // PersistentStorageDelegate implementation
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override;
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
+
+    // FabricStorage implementation
+    CHIP_ERROR SyncStore(chip::FabricIndex fabricIndex, const char * key, const void * buffer, uint16_t size) override;
+    CHIP_ERROR SyncLoad(chip::FabricIndex fabricIndex, const char * key, void * buffer, uint16_t & size) override;
+    CHIP_ERROR SyncDelete(chip::FabricIndex fabricIndex, const char * key) override;
 
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {
@@ -84,7 +90,9 @@ public:
     }
 
     static AndroidDeviceControllerWrapper * AllocateNew(JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId,
-                                                        chip::System::Layer * systemLayer, chip::Inet::InetLayer * inetLayer,
+                                                        chip::System::Layer * systemLayer,
+                                                        chip::Inet::EndPointManager<chip::Inet::TCPEndPoint> * tcpEndPointManager,
+                                                        chip::Inet::EndPointManager<chip::Inet::UDPEndPoint> * udpEndPointManager,
                                                         CHIP_ERROR * errInfoOnFailure);
 
     CHIP_ERROR GenerateNOCChainAfterValidation(chip::NodeId nodeId, chip::FabricId fabricId,
@@ -110,6 +118,14 @@ private:
     chip::NodeId mNextRequestedNodeId = 1;
     chip::FabricId mNextFabricId      = 0;
     bool mNodeIdRequested             = false;
+
+    // These fields allow us to release the string/byte array memory later.
+    jstring ssidStr                    = nullptr;
+    jstring passwordStr                = nullptr;
+    const char * ssid                  = nullptr;
+    const char * password              = nullptr;
+    jbyteArray operationalDatasetBytes = nullptr;
+    jbyte * operationalDataset         = nullptr;
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller))
     {

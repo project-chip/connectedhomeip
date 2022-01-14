@@ -20,7 +20,6 @@
 
 #include "../../config/PersistentStorage.h"
 #include "Command.h"
-#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <map>
 
 class Commands
@@ -33,14 +32,18 @@ public:
 
 private:
     CHIP_ERROR RunCommand(int argc, char ** argv);
+
     std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
     Command * GetGlobalCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
+    bool IsAttributeCommand(std::string commandName) const;
+    bool IsEventCommand(std::string commandName) const;
     bool IsGlobalCommand(std::string commandName) const;
 
     void ShowClusters(std::string executable);
     void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands);
     void ShowClusterAttributes(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
+    void ShowClusterEvents(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowCommand(std::string executable, std::string clusterName, Command * command);
 
     std::map<std::string, CommandsVector> mClusters;

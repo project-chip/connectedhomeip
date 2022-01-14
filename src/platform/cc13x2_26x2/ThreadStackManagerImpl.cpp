@@ -210,3 +210,13 @@ extern "C" void otSysProcessDrivers(otInstance * aInstance)
 {
     ThreadStackMgrImpl()._ProcMessage(aInstance);
 }
+
+/**
+ * Get a pointer to the OpenThread instance object.
+ *
+ * @return Pointer to the OpenThread instance object.
+ */
+extern "C" otInstance * OtInstance_get(void)
+{
+    return ThreadStackMgrImpl().OTInstance();
+}

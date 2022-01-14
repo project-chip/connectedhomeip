@@ -1,0 +1,1109 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.2.3. [TC-OO-2.3] Secondary functionality with server as DUT
+
+config:
+    cluster: "On/Off"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "Send On Command"
+      command: "On"
+      PICS: CR_ON
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads GlobalSceneControl attribute from DUT"
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: A_GLOBALSCENECONTROL
+      response:
+          value: 1
+
+    #Issue #339/#9810 OffWithEffect command is failing
+    - label: "Sends OffWithEffect command to DUT"
+      disabled: true
+      command: "OffWithEffect"
+      PICS: CR_OFFWITHEFFECT
+      arguments:
+          values:
+              - name: "EffectId"
+                value: 0
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "Wait 1000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads GlobalSceneControl attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: A_GLOBALSCENECONTROL
+      response:
+          value: 0
+
+    #Issue #339/#9810 OnWithRecallGlobalScene command is failing
+    - label: "Sends OnWithRecallGlobalScene command to DUT"
+      disabled: true
+      command: "OnWithRecallGlobalScene"
+      PICS: CR_ONWITHRECALL
+
+    - label: "Wait 1000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads GlobalSceneControl attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: A_GLOBALSCENECONTROL
+      response:
+          value: 1
+
+    #Issue #339/#9810 OffWithEffect command is failing
+    - label: "Sends OffWithEffect command to DUT"
+      disabled: true
+      command: "OffWithEffect"
+      PICS: CR_OFFWITHEFFECT
+      arguments:
+          values:
+              - name: "EffectId"
+                value: 0
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "Wait 1000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads GlobalSceneControl attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: A_GLOBALSCENECONTROL
+      response:
+          value: 0
+
+    - label: "Send On Command"
+      command: "On"
+      PICS: CR_ON
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads GlobalSceneControl attribute from DUT"
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: A_GLOBALSCENECONTROL
+      response:
+          value: 1
+
+    #Issue #339/#9810 OffWithEffect command is failing
+    - label: "Sends OffWithEffect command to DUT"
+      disabled: true
+      command: "OffWithEffect"
+      PICS: CR_OFFWITHEFFECT
+      arguments:
+          values:
+              - name: "EffectId"
+                value: 0
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "Wait 1000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads GlobalSceneControl attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: A_GLOBALSCENECONTROL
+      response:
+          value: 0
+
+    - label: "Send On Command"
+      command: "On"
+      PICS: CR_ON
+
+    - label: "Wait 1000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads GlobalSceneControl attribute from DUT"
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: A_GLOBALSCENECONTROL
+      response:
+          value: 1
+
+    #Issue #339/#9810 OnWithRecallGlobalScene command is failing
+    - label: "Sends OnWithRecallGlobalScene command to DUT"
+      disabled: true
+      command: "OnWithRecallGlobalScene"
+      PICS: CR_ONWITHRECALL
+
+    - label: "Wait 1000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 1000
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads GlobalSceneControl attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "GlobalSceneControl"
+      PICS: A_GLOBALSCENECONTROL
+      response:
+          value: 1
+
+    - label: "Reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 0
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads OnTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 300
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 300
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads OnTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 300
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 300
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    #Issue #339/#9810 OffWithEffect command is failing
+    - label: "Sends OffWithEffect command to DUT"
+      disabled: true
+      command: "OffWithEffect"
+      PICS: CR_OFFWITHEFFECT
+      arguments:
+          values:
+              - name: "EffectId"
+                value: 0
+              - name: "EffectVariant"
+                value: 0
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads OnTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 300
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads OnTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 200
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Send On Command"
+      command: "On"
+      PICS: CR_ON
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 0
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Send Off Command"
+      command: "Off"
+      PICS: CR_OFF
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 300
+
+    - label: "Wait 30000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 30000
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 0
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads OnTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 0
+
+    - label: "Send On Command"
+      command: "On"
+      PICS: CR_ON
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads OnTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 300
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 300
+
+    - label: "Wait 40000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40000
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 0
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads OnTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 300
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 300
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 0
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 1
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads OnTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 200
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 300
+
+    - label: "Send Off Command"
+      command: "Off"
+      PICS: CR_OFF
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 300
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 0
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 200
+
+    - label: "Send On Command"
+      command: "On"
+      PICS: CR_ON
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 0
+
+    - label: "Wait 10000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 10000
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 0
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Send Off Command"
+      command: "Off"
+      PICS: CR_OFF
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 300
+
+    - label: "Wait 40000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40000
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 0
+
+    #Issue #339/#9810 OnWithTimedOff command is failing
+    - label: "Sends OnWithTimedOff command to DUT"
+      disabled: true
+      command: "OnWithTimedOff"
+      PICS: CR_ONWITHTIMEOFF
+      arguments:
+          values:
+              - name: "OnOffControl"
+                value: 0
+              - name: "OnTime"
+                value: 300
+              - name: "OffWaitTime"
+                value: 300
+
+    - label: "Reads OnOff attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 1
+
+    - label: "Reads OnTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 300
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 300
+
+    - label: "Wait 40000ms"
+      disabled: true
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 40000
+
+    - label: "Reads OnOff attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnOff"
+      PICS: A_ONOFF
+      response:
+          value: 0
+
+    - label: "Reads OnTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OnTime"
+      PICS: A_ONTIME
+      response:
+          value: 0
+
+    - label: "Reads OffWaitTime attribute from DUT"
+      command: "readAttribute"
+      attribute: "OffWaitTime"
+      PICS: A_OFFWAITTIME
+      response:
+          value: 0
+
+    - label: "Send Off Command"
+      command: "Off"
+      PICS: CR_OFF

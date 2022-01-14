@@ -91,7 +91,7 @@ class TestPythonController(CHIPVirtualHome):
         self.execute_device_cmd(req_device_id, "pip3 install {}".format(os.path.join(
             CHIP_REPO, "out/debug/linux_x64_gcc/controller/python/chip-0.0-cp37-abi3-linux_x86_64.whl")))
 
-        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 75 -a {}".format(
+        command = "gdb -return-child-result -q -ex run -ex bt --args python3 {} -t 150 -a {}".format(
             os.path.join(
                 CHIP_REPO, "src/controller/python/test/test_scripts/mobile-device-test.py"),
             ethernet_ip)
@@ -114,9 +114,9 @@ class TestPythonController(CHIPVirtualHome):
             self.logger.info("checking device log for {}".format(
                 self.get_device_pretty_id(device_id)))
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), [
-                "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0002",
+                "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0001",
                 "Toggle on/off from 0 to 1",
-                "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0002",
+                "Received command for Endpoint=1 Cluster=0x0000_0006 Command=0x0000_0000",
                 "Toggle on/off from 1 to 0",
                 "No Cluster 0x0000_0006 on Endpoint 0xe9"]),
                 "Datamodel test failed: cannot find matching string from device {}".format(device_id))

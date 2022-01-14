@@ -21,7 +21,6 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
-#include <app/Command.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/DecodableList.h>
 #include <app/util/af-enums.h>
@@ -36,8 +35,8 @@
 // #6308 should handle IM error code on the application side, either modify this function or remove this.
 
 // Cluster Specific Response Callbacks
-typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateRequestResponseCallback)(void * context, uint8_t action,
-                                                                                   uint32_t delayedActionTime);
+typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback)(void * context, uint8_t action,
+                                                                            uint32_t delayedActionTime);
 typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(
     void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI, uint32_t softwareVersion,
     chip::CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor);

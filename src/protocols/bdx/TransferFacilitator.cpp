@@ -29,6 +29,9 @@
 namespace chip {
 namespace bdx {
 
+constexpr System::Clock::Timeout TransferFacilitator::kDefaultPollFreq;
+constexpr System::Clock::Timeout TransferFacilitator::kImmediatePollDelay;
+
 CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
                                                   chip::System::PacketBufferHandle && payload)
 {
@@ -40,7 +43,7 @@ CHIP_ERROR TransferFacilitator::OnMessageReceived(chip::Messaging::ExchangeConte
     ChipLogDetail(BDX, "%s: message " ChipLogFormatMessageType " protocol " ChipLogFormatProtocolId, __FUNCTION__,
                   payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()));
     CHIP_ERROR err =
-        mTransfer.HandleMessageReceived(payloadHeader, std::move(payload), System::SystemClock().GetMonotonicMilliseconds());
+        mTransfer.HandleMessageReceived(payloadHeader, std::move(payload), System::SystemClock().GetMonotonicTimestamp());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(BDX, "failed to handle message: %s", ErrorStr(err));
@@ -71,44 +74,44 @@ void TransferFacilitator::PollTimerHandler(chip::System::Layer * systemLayer, vo
 void TransferFacilitator::PollForOutput()
 {
     TransferSession::OutputEvent outEvent;
-    mTransfer.PollOutput(outEvent, System::SystemClock().GetMonotonicMilliseconds());
+    mTransfer.PollOutput(outEvent, System::SystemClock().GetMonotonicTimestamp());
     HandleTransferSessionOutput(outEvent);
 
     VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
-    mSystemLayer->StartTimer(System::Clock::Milliseconds32(mPollFreqMs), PollTimerHandler, this);
+    mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
 }
 
 void TransferFacilitator::ScheduleImmediatePoll()
 {
     VerifyOrReturn(mSystemLayer != nullptr, ChipLogError(BDX, "%s mSystemLayer is null", __FUNCTION__));
-    mSystemLayer->StartTimer(System::Clock::Milliseconds32(kImmediatePollDelayMs), PollTimerHandler, this);
+    mSystemLayer->StartTimer(System::Clock::Milliseconds32(kImmediatePollDelay), PollTimerHandler, this);
 }
 
 CHIP_ERROR Responder::PrepareForTransfer(System::Layer * layer, TransferRole role, BitFlags<TransferControlFlags> xferControlOpts,
-                                         uint16_t maxBlockSize, uint32_t timeoutMs, uint32_t pollFreqMs)
+                                         uint16_t maxBlockSize, System::Clock::Timeout timeout, System::Clock::Timeout pollFreq)
 {
     VerifyOrReturnError(layer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mPollFreqMs  = pollFreqMs;
+    mPollFreq    = pollFreq;
     mSystemLayer = layer;
 
-    ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeoutMs));
+    ReturnErrorOnFailure(mTransfer.WaitForTransfer(role, xferControlOpts, maxBlockSize, timeout));
 
-    mSystemLayer->StartTimer(System::Clock::Milliseconds32(mPollFreqMs), PollTimerHandler, this);
+    mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Initiator::InitiateTransfer(System::Layer * layer, TransferRole role, const TransferSession::TransferInitData & initData,
-                                       uint32_t timeoutMs, uint32_t pollFreqMs)
+                                       System::Clock::Timeout timeout, System::Clock::Timeout pollFreq)
 {
     VerifyOrReturnError(layer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    mPollFreqMs  = pollFreqMs;
+    mPollFreq    = pollFreq;
     mSystemLayer = layer;
 
-    ReturnErrorOnFailure(mTransfer.StartTransfer(role, initData, timeoutMs));
+    ReturnErrorOnFailure(mTransfer.StartTransfer(role, initData, timeout));
 
-    mSystemLayer->StartTimer(System::Clock::Milliseconds32(mPollFreqMs), PollTimerHandler, this);
+    mSystemLayer->StartTimer(mPollFreq, PollTimerHandler, this);
     return CHIP_NO_ERROR;
 }
 

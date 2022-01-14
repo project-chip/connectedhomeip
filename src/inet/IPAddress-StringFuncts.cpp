@@ -30,7 +30,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <inet/InetLayer.h>
+#include <inet/IPAddress.h>
 #include <lib/support/CodeUtils.h>
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -46,13 +46,8 @@ char * IPAddress::ToString(char * buf, uint32_t bufSize) const
 #if INET_CONFIG_ENABLE_IPV4
     if (IsIPv4())
     {
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip4_addr_t ip4_addr = ToIPv4();
         ip4addr_ntoa_r(&ip4_addr, buf, (int) bufSize);
-#else  // LWIP_VERSION_MAJOR <= 1
-        ip_addr_t ip4_addr = ToIPv4();
-        ipaddr_ntoa_r(&ip4_addr, buf, (int) bufSize);
-#endif // LWIP_VERSION_MAJOR <= 1
     }
     else
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -93,21 +88,15 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
     if (strchr(str, ':') == nullptr)
     {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip4_addr_t ipv4Addr;
         if (!ip4addr_aton(str, &ipv4Addr))
             return false;
-#else  // LWIP_VERSION_MAJOR <= 1
-        ip_addr_t ipv4Addr;
-        if (!ipaddr_aton(str, &ipv4Addr))
-            return false;
-#endif // LWIP_VERSION_MAJOR <= 1
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
         struct in_addr ipv4Addr;
         if (inet_pton(AF_INET, str, &ipv4Addr) < 1)
             return false;
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
-        output = FromIPv4(ipv4Addr);
+        output = IPAddress(ipv4Addr);
     }
     else
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -121,7 +110,7 @@ bool IPAddress::FromString(const char * str, IPAddress & output)
         if (inet_pton(AF_INET6, str, &ipv6Addr) < 1)
             return false;
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
-        output = FromIPv6(ipv6Addr);
+        output = IPAddress(ipv6Addr);
     }
 
     return true;

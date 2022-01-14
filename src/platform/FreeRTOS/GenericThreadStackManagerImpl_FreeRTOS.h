@@ -84,6 +84,10 @@ private:
     StackType_t mThreadStack[CHIP_DEVICE_CONFIG_THREAD_TASK_STACK_SIZE / sizeof(StackType_t)];
     StaticTask_t mThreadTaskStruct;
 #endif
+
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
+    StaticSemaphore_t mThreadStackLockMutex;
+#endif
 };
 
 // Instruct the compiler to instantiate the template only when explicitly told to do so.

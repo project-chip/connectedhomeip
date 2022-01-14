@@ -230,20 +230,21 @@ def write_json(_config: Config, df: DF, output: IO, **kwargs) -> None:
 
 def write_csv(_config: Config, df: DF, output: IO, **kwargs) -> None:
     """Write a memory usage data frame in csv or tsv form."""
-    kinds = {'csv': ',', 'tsv': '\t'}
-    method = kwargs.get('method', 'csv')
-    delimiter = kwargs.get('delimiter', kinds.get(method, method))
-    df.to_csv(output, index=False, sep=delimiter)
+    keywords = ('sep', 'na_rep', 'float_format', 'columns', 'header', 'index',
+                'index_label', 'quoting', 'quotechar', 'line_terminator',
+                'date_format', 'doublequote', 'escapechar', 'decimal')
+    args = {k: kwargs[k] for k in keywords if k in kwargs}
+    df.to_csv(output, **args)
 
 
 def write_markdown(_config: Config, df: DF, output: IO, **kwargs) -> None:
     """Write a memory usage data frame as markdown."""
-    args = {k: kwargs[k] for k in ('index',) if k in kwargs}
-    if 'tabulate' in kwargs:
-        args.update(kwargs['tabulate'])
+    keywords = ('index', 'headers', 'showindex', 'tablefmt', 'numalign',
+                'stralign', 'disable_numparse', 'colalign', 'floatfmt')
+    args = {k: kwargs[k] for k in keywords if k in kwargs}
     if 'tablefmt' not in args:
         args['tablefmt'] = kwargs.get('method', 'pipe')
-    df.to_markdown(output, index=False, **args)
+    df.to_markdown(output, **args)
     print(file=output)
 
 
@@ -402,7 +403,9 @@ class MarkdownWriter(Writer):
     def __init__(self,
                  defaults: Optional[Dict] = None,
                  overrides: Optional[Dict] = None):
-        super().__init__(write_one, write_markdown, defaults, overrides)
+        d = {'index': False}
+        d.update(defaults or {})
+        super().__init__(write_one, write_markdown, d, overrides)
 
 
 class JsonWriter(Writer):
@@ -417,7 +420,9 @@ class CsvWriter(Writer):
     def __init__(self,
                  defaults: Optional[Dict] = None,
                  overrides: Optional[Dict] = None):
-        super().__init__(write_many, write_csv, defaults, overrides)
+        d = {'index': False}
+        d.update(defaults or {})
+        super().__init__(write_many, write_csv, d, overrides)
         self.overrides['hierify'] = False
 
 
@@ -430,8 +435,8 @@ WRITERS: Dict[str, Writer] = {
     'json_columns': JsonWriter(),
     'json_values': JsonWriter(),
     'json_table': JsonWriter(),
-    'csv': CsvWriter({'delimiter': ','}),
-    'tsv': CsvWriter({'delimiter': '\t'}),
+    'csv': CsvWriter({'sep': ','}),
+    'tsv': CsvWriter({'sep': '\t'}),
     'plain': MarkdownWriter({'titlefmt': '\n{}\n'}),
     'simple': MarkdownWriter({'titlefmt': '\n{}\n'}),
     'grid': MarkdownWriter({'titlefmt': '\n\n'}),

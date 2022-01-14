@@ -39,7 +39,8 @@
 
 #include <sys/time.h>
 
-#include <inet/InetLayer.h>
+#include <inet/TCPEndPointImpl.h>
+#include <inet/UDPEndPointImpl.h>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemLayerImpl.h>
 
@@ -53,7 +54,8 @@
 
 extern chip::System::LayerImpl gSystemLayer;
 
-extern chip::Inet::InetLayer gInet;
+extern chip::Inet::TCPEndPointManagerImpl gTCP;
+extern chip::Inet::UDPEndPointManagerImpl gUDP;
 
 extern bool gDone;
 

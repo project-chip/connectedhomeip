@@ -26,9 +26,22 @@
 BoltLockManager BoltLockManager::sLock;
 
 TimerHandle_t sLockTimer;
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
+StaticTimer_t sLockTimerBuffer;
+#endif
 
 CHIP_ERROR BoltLockManager::Init()
 {
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
+    sLockTimer = xTimerCreateStatic("lockTmr",         // Just a text name, not used by the RTOS kernel
+                                    1,                 // == default timer period (mS)
+                                    false,             // no timer reload (==one-shot)
+                                    (void *) this,     // init timer id = ble obj context
+                                    TimerEventHandler, // timer callback handler
+                                    &sLockTimerBuffer  // static buffer for timer
+
+    );
+#else
     // Create FreeRTOS sw timer for lock timer.
     sLockTimer = xTimerCreate("lockTmr",        // Just a text name, not used by the RTOS kernel
                               1,                // == default timer period (mS)
@@ -36,7 +49,7 @@ CHIP_ERROR BoltLockManager::Init()
                               (void *) this,    // init timer id = lock obj context
                               TimerEventHandler // timer callback handler
     );
-
+#endif
     if (sLockTimer == NULL)
     {
         ChipLogProgress(NotSpecified, "sLockTimer timer create failed");

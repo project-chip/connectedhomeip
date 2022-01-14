@@ -48,15 +48,14 @@ using namespace ::chip;
     return nullptr;
 }
 
-- (chip::ByteSpan)asSpan:(id)value
+- (chip::ByteSpan)asByteSpan:(NSData *)value
 {
-    if ([value isKindOfClass:[NSData class]]) {
-        NSData * v = (NSData *) value;
-        return chip::ByteSpan((const uint8_t *) v.bytes, v.length);
-    } else {
-        NSString * v = (NSString *) value;
-        return chip::ByteSpan((const uint8_t *) [v dataUsingEncoding:NSUTF8StringEncoding].bytes,
-            [v lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
-    }
+    return chip::ByteSpan(static_cast<const uint8_t *>(value.bytes), value.length);
+}
+
+- (chip::CharSpan)asCharSpan:(NSString *)value
+{
+    return chip::CharSpan(static_cast<const char *>([value dataUsingEncoding:NSUTF8StringEncoding].bytes),
+        [value lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 }
 @end

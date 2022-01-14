@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Turn on light for color control tests"
       cluster: "On/Off"
       command: "on"
@@ -30,7 +34,7 @@ tests:
       response:
           value: 1
 
-    - label: "Color Loop Set Command - Set all Attributs"
+    - label: "Color Loop Set Command - Set all Attributes"
       command: "ColorLoopSet"
       arguments:
           values:

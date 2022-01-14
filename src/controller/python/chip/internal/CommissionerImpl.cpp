@@ -20,7 +20,7 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -79,6 +79,7 @@ private:
 };
 
 ServerStorageDelegate gServerStorage;
+chip::SimpleFabricStorage gFabricStorage;
 ScriptDevicePairingDelegate gPairingDelegate;
 chip::Controller::ExampleOperationalCredentialsIssuer gOperationalCredentialsIssuer;
 
@@ -102,18 +103,24 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         // already assumed initialized
         chip::Controller::SetupParams commissionerParams;
         chip::Controller::FactoryInitParams factoryParams;
-
-        commissionerParams.pairingDelegate = &gPairingDelegate;
-        factoryParams.storageDelegate      = &gServerStorage;
-
         chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
         chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
         chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
+        chip::Crypto::P256Keypair ephemeralKey;
 
         // Initialize device attestation verifier
-        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());
+        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
-        chip::Crypto::P256Keypair ephemeralKey;
+        err = gFabricStorage.Initialize(&gServerStorage);
+        SuccessOrExit(err);
+
+        factoryParams.fabricStorage = &gFabricStorage;
+
+        commissionerParams.pairingDelegate = &gPairingDelegate;
+        commissionerParams.storageDelegate = &gServerStorage;
+
         err = ephemeralKey.Initialize();
         SuccessOrExit(err);
 

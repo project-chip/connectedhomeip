@@ -58,6 +58,10 @@ const char * const sHelp =
     "\n"
     "    print-cert -- Print a CHIP certificate.\n"
     "\n"
+    "    gen-att-cert -- Generate a CHIP attestation certificate.\n"
+    "\n"
+    "    gen-cd -- Generate a CHIP certification declaration signed message.\n"
+    "\n"
     "    version -- Print the program version and exit.\n"
     "\n";
 // clang-format on
@@ -122,6 +126,10 @@ extern "C" int main(int argc, char * argv[])
     else if (strcasecmp(argv[1], "gen-att-cert") == 0 || strcasecmp(argv[1], "genattcert") == 0)
     {
         res = Cmd_GenAttCert(argc - 1, argv + 1);
+    }
+    else if (strcasecmp(argv[1], "gen-cd") == 0 || strcasecmp(argv[1], "gencd") == 0)
+    {
+        res = Cmd_GenCD(argc - 1, argv + 1);
     }
     else
     {

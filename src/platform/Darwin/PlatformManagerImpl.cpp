@@ -24,6 +24,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/Darwin/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
@@ -43,6 +44,8 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     mRunLoopSem = dispatch_semaphore_create(0);
 
@@ -120,6 +123,29 @@ CHIP_ERROR PlatformManagerImpl::_PostEvent(const ChipDeviceEvent * event)
     dispatch_async(mWorkQueue, ^{
         Impl()->DispatchEvent(&eventCopy);
     });
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PlatformManagerImpl::_SetUserLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR
+PlatformManagerImpl::_GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
+{
+    // In Darwin simulation, return following hardcoded list of Strings that are valid values for the ActiveLocale.
+    supportedLocales.add(CharSpan("en-US", strlen("en-US")));
+    supportedLocales.add(CharSpan("de-DE", strlen("de-DE")));
+    supportedLocales.add(CharSpan("fr-FR", strlen("fr-FR")));
+    supportedLocales.add(CharSpan("en-GB", strlen("en-GB")));
+    supportedLocales.add(CharSpan("es-ES", strlen("es-ES")));
+    supportedLocales.add(CharSpan("zh-CN", strlen("zh-CN")));
+    supportedLocales.add(CharSpan("it-IT", strlen("it-IT")));
+    supportedLocales.add(CharSpan("ja-JP", strlen("ja-JP")));
+
     return CHIP_NO_ERROR;
 }
 

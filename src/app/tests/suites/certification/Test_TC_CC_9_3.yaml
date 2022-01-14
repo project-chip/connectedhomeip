@@ -1,0 +1,243 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 27.2.22. [TC-CC-9.3] ColorLoopSet Validation - change time without stop
+
+config:
+    cluster: "Color Control"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "Precondition: Turn on light for color control tests"
+      cluster: "On/Off"
+      command: "on"
+
+    - label:
+          "Precondition: Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      response:
+          value: 1
+
+    - label: "Sends ColorLoopSet Command - Set all Attributes"
+      command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 15
+              - name: "action"
+                value: 0
+              - name: "direction"
+                value: 0
+              - name: "time"
+                value: 30
+              - name: "startHue"
+                value: 160
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
+      response:
+          value: 0
+
+    - label: "Read ColorLoopDirection attribute from DUT."
+      command: "readAttribute"
+      attribute: "color loop direction"
+      PICS: A_COLORLOOPDIRECTION
+      response:
+          value: 0
+
+    - label: "Read ColorLoopTime attribute from DUT."
+      command: "readAttribute"
+      attribute: "color loop time"
+      PICS: A_COLORLOOPTIME
+      response:
+          value: 30
+
+    - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
+      command: "readAttribute"
+      attribute: "color loop start enhanced hue"
+      PICS: A_COLORLOOPSTARTENHANCEDHUE
+      response:
+          value: 160
+
+    - label: "Color Loop Set Command - Set all Attributes"
+      command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 1
+              - name: "action"
+                value: 1
+              - name: "direction"
+                value: 0
+              - name: "time"
+                value: 0
+              - name: "startHue"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT."
+      command: "readAttribute"
+      attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
+      response:
+          value: 1
+
+    #Issue #10816 Need to store EnhancedCurrentHue value and compare it with ColorLoopStoredEnhancedHue attribute
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          value: 0
+
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+      disabled: true
+      command: "readAttribute"
+      attribute: "color loop stored enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
+      response:
+          value: 0
+
+    # Test is disabled because a sleep/wait is necessary to let the hue change over time
+    # Once sleep/wait is available, test case will need to be adapted
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          value: 500
+
+    # Test is disabled because a sleep/wait is necessary to let the hue change over time
+    # Once sleep/wait is available, test case will need to be adapted
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          value: 500
+
+    - label: "Color Loop Set Command - Start Color Loop"
+      command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 4
+              - name: "action"
+                value: 0
+              - name: "direction"
+                value: 0
+              - name: "time"
+                value: 60
+              - name: "startHue"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopTime attribute from DUT."
+      command: "readAttribute"
+      attribute: "color loop time"
+      PICS: A_COLORLOOPTIME
+      response:
+          value: 60
+
+    # Test is disabled because a sleep/wait is necessary to let the hue change over time
+    # Once sleep/wait is available, test case will need to be adapted
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          value: 500
+
+    # Test is disabled because a sleep/wait is necessary to let the hue change over time
+    # Once sleep/wait is available, test case will need to be adapted
+    - label: "Read EnhancedCurrentHue attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          value: 500
+
+    - label: "Color Loop Set Command - Start Color Loop"
+      command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
+      arguments:
+          values:
+              - name: "updateFlags"
+                value: 1
+              - name: "action"
+                value: 0
+              - name: "direction"
+                value: 0
+              - name: "time"
+                value: 0
+              - name: "startHue"
+                value: 0
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read ColorLoopActive attribute from DUT"
+      command: "readAttribute"
+      attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
+      response:
+          value: 0
+
+    #Issue #10816 Need to store ColorLoopStoredEnhancedHue value and compare it with EnhancedCurrentHue attribute
+    - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
+      disabled: true
+      command: "readAttribute"
+      attribute: "color loop stored enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
+      response:
+          value: 0
+
+    - label: "Read EnhancedCurrentHue attribute from DUT."
+      disabled: true
+      command: "readAttribute"
+      attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
+      response:
+          value: 0
+
+    - label: "Turn off light for color control tests"
+      cluster: "On/Off"
+      command: "off"

@@ -23,7 +23,6 @@
 #include <app/util/chip-message-send.h>
 
 #include <assert.h>
-#include <inet/InetLayer.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -111,7 +110,7 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     }
 
     Messaging::ExchangeContext * exchange =
-        exchangeMgr->NewContext(SessionHandle(destination, 0, Transport::kAnyKeyId, 0), nullptr);
+        exchangeMgr->NewContext(exchangeMgr->GetSessionManager()->FindSecureSessionForNode(destination), nullptr);
     if (exchange == nullptr)
     {
         return EMBER_DELIVERY_FAILED;

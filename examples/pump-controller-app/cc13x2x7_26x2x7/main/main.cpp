@@ -33,11 +33,13 @@
 #include <ti/drivers/UART.h>
 
 #include <ti/drivers/AESECB.h>
+#include <ti/drivers/ECDH.h>
+#include <ti/drivers/ECDSA.h>
 #include <ti/drivers/ECJPAKE.h>
 #include <ti/drivers/SHA2.h>
 
 #include <bget.h>
-#define TOTAL_ICALL_HEAP_SIZE (0xf000)
+#define TOTAL_ICALL_HEAP_SIZE (0xE000)
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -71,14 +73,18 @@ int main(void)
 
     UART_init();
 
+    ECDH_init();
+
+    ECDSA_init();
+
     ECJPAKE_init();
 
     AESECB_init();
 
     SHA2_init();
 
-    CHIP_ERROR ret = GetAppTask().StartAppTask();
-    if (ret != CHIP_NO_ERROR)
+    int ret = GetAppTask().StartAppTask();
+    if (ret != 0)
     {
         // can't log until the kernel is started
         // PLAT_LOG("GetAppTask().StartAppTask() failed");

@@ -47,32 +47,17 @@ void Builder::ResetError()
 
 void Builder::ResetError(CHIP_ERROR aErr)
 {
-    mError              = aErr;
-    mOuterContainerType = chip::TLV::kTLVType_NotSpecified;
+    mError = aErr;
 }
 
 void Builder::EndOfContainer()
 {
     // skip if error has already been set
-    SuccessOrExit(mError);
-
-    mError = mpWriter->EndContainer(mOuterContainerType);
-    SuccessOrExit(mError);
-
+    ReturnOnFailure(mError);
+    ReturnOnFailure(mError = mpWriter->EndContainer(mOuterContainerType));
     // we've just closed properly
     // mark it so we do not panic when the build object destructor is called
     mOuterContainerType = chip::TLV::kTLVType_NotSpecified;
-
-exit:;
 }
-
-CHIP_ERROR Builder::InitAnonymousStructure(chip::TLV::TLVWriter * const apWriter)
-{
-    mpWriter            = apWriter;
-    mOuterContainerType = chip::TLV::kTLVType_NotSpecified;
-    mError              = mpWriter->StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, mOuterContainerType);
-
-    return mError;
-}
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip

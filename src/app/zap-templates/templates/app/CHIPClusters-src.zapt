@@ -3,23 +3,7 @@
 {{#if (chip_has_client_clusters)}}
 #include "CHIPClusters.h"
 
-#include <cstdint>
-
-
-#include <app/InteractionModelEngine.h>
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/util/basic-types.h>
-#include <app/CommandSender.h>
-#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/ids/Attributes.h>
-#include <controller/CommandSenderAllocator.h>
-#include <lib/core/CHIPSafeCasts.h>
-#include <lib/support/BufferWriter.h>
-#include <lib/support/CodeUtils.h>
-#include <lib/support/SafeInt.h>
-#include <lib/support/CHIPMem.h>
-#include <lib/support/logging/CHIPLogging.h>
-#include <system/SystemPacketBuffer.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 
 namespace chip {
@@ -38,7 +22,7 @@ namespace Controller {
 
 // {{asUpperCamelCase name}} Cluster Commands
 {{#chip_cluster_commands}}
-CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}})
+CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}, {{chipType}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}})
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVWriter * writer     = nullptr;
@@ -60,17 +44,18 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
 {{#chip_cluster_command_arguments_with_structs_expanded}}
+{{#if_is_struct type}}
+{{else}}
 {{#first}}
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 {{/first}}
     // {{asLowerCamelCase label}}: {{asLowerCamelCase type}}
 {{#if (isCharString type)}}
-    {{! The server expects to get a UTF-8 string, but we have ByteSpan.  Do
-        some conversion to get the right thing to happen. }}
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), Span<const char>(Uint8::to_const_char({{asLowerCamelCase label}}.data()), {{asLowerCamelCase label}}.size())));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
 {{else}}
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
 {{/if}}
+{{/if_is_struct}}
 {{else}}
     // Command takes no arguments.
 {{/chip_cluster_command_arguments_with_structs_expanded}}
@@ -89,80 +74,8 @@ exit:
 }
 
 {{/chip_cluster_commands}}
-// {{asUpperCamelCase name}} Cluster Attributes
-{{#chip_server_cluster_attributes}}
-CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReadAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = {{asHex code 8}};
-    attributePath.mFlags.Set(app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,{{#if isList}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter{{else}}BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>{{/if}});
-}
 
-{{#if isWritableAttribute}}
-CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
-{
-    app::WriteClientHandle handle;
-    chip::app::AttributePathParams attributePath;
-    attributePath.mNodeId         = mDevice->GetDeviceId();
-    attributePath.mEndpointId     = mEndpoint;
-    attributePath.mClusterId      = mClusterId;
-    attributePath.mFieldId        = {{ asHex code 8 }};
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(attributePath, value));
-
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-{{/if}}
-{{#if isReportableAttribute}}
-CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::SubscribeAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mFieldId    = {{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id;
-    attributePath.mFlags.Set(chip::app::AttributePathParams::Flags::kFieldIdValid);
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReportAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id, onReportCallback, BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>);
-}
-
-{{/if}}
-{{/chip_server_cluster_attributes}}
-
-{{#chip_cluster_commands}}
-{{#*inline "requestType"}}chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type{{/inline}}
-{{#*inline "responseType"}}chip::app::{{#if hasSpecificResponse}}Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase response.name}}::DecodableType{{else}}DataModel::NullObjectType{{/if}}{{/inline}}
-template CHIP_ERROR ClusterBase::InvokeCommand<{{>requestType}}, {{>responseType}}>(const {{>requestType}} &, void *, CommandResponseSuccessCallback<{{>responseType}}>, CommandResponseFailureCallback);
-{{/chip_cluster_commands}}
 {{/chip_client_clusters}}
-
-template <typename RequestDataT, typename ResponseDataT>
-CHIP_ERROR ClusterBase::InvokeCommand(const RequestDataT & requestData, void * context,
-                         CommandResponseSuccessCallback<ResponseDataT> successCb, CommandResponseFailureCallback failureCb)
-{
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mDevice->LoadSecureSessionParametersIfNeeded());
-
-    auto onSuccessCb = [context, successCb](const app::ConcreteCommandPath & commandPath, const ResponseDataT & responseData) {
-        successCb(context, responseData);
-    };
-
-    auto onFailureCb = [context, failureCb](Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
-        failureCb(context, app::ToEmberAfStatus(aIMStatus));
-    };
-
-    return InvokeCommandRequest<ResponseDataT>(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint,
-                                               requestData, onSuccessCb, onFailureCb);
-};
 
 } // namespace Controller
 } // namespace chip
