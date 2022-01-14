@@ -133,7 +133,20 @@ void AutoCommissioner::StartCommissioning(CommissioneeDeviceProxy * proxy)
 {
     // TODO: check that there is no commissioning in progress currently.
     mCommissioneeDeviceProxy = proxy;
-    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe, mParams, this);
+    mCommissioner->PerformCommissioningStep(mCommissioneeDeviceProxy, CommissioningStage::kArmFailsafe, mParams, this, 0,
+                                            GetCommandTimeout(CommissioningStage::kArmFailsafe));
+}
+
+Optional<System::Clock::Timeout> AutoCommissioner::GetCommandTimeout(CommissioningStage stage)
+{
+    switch (stage)
+    {
+    case CommissioningStage::kWiFiNetworkEnable:
+    case CommissioningStage::kThreadNetworkEnable:
+        return Optional<System::Clock::Timeout>(System::Clock::Timeout(System::Clock::Seconds16(30)));
+    default:
+        return Optional<System::Clock::Timeout>();
+    }
 }
 
 void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report)
@@ -155,7 +168,8 @@ void AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, CommissioningDe
         ChipLogError(Controller, "Invalid device for commissioning");
         return;
     }
-    mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this);
+    // TODO: Get real endpoint
+    mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this, 0, GetCommandTimeout(nextStage));
 }
 
 } // namespace Controller

@@ -1690,13 +1690,22 @@ void DeviceCommissioner::OnDeviceConnectionFailureFn(void * context, PeerId peer
     commissioner->mPairingDelegate->OnCommissioningComplete(peerId.GetNodeId(), error);
 }
 
+void DeviceCommissioner::SetupCluster(ClusterBase & base, DeviceProxy * proxy, EndpointId endpoint,
+                                      Optional<System::Clock::Timeout> timeout)
+{
+    base.Associate(proxy, 0);
+    base.SetCommandTimeout(timeout);
+}
+
 void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, CommissioningStage step, CommissioningParameters & params,
-                                                  CommissioningDelegate * delegate)
+                                                  CommissioningDelegate * delegate, EndpointId endpoint,
+                                                  Optional<System::Clock::Timeout> timeout)
 {
     // For now, we ignore errors coming in from the device since not all commissioning clusters are implemented on the device
     // side.
     mCommissioningStage    = step;
     mCommissioningDelegate = delegate;
+    // TODO: Extend timeouts to the DAC and Opcert requests.
 
     // TODO(cecille): We probably want something better than this for breadcrumbs.
     uint64_t breadcrumb = static_cast<uint64_t>(step);
@@ -1707,13 +1716,10 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     switch (step)
     {
     case CommissioningStage::kArmFailsafe: {
-        // TODO(cecille): This is NOT the right way to do this - we should consider attaching an im delegate per command or
-        // something. Per exchange context?
         ChipLogProgress(Controller, "Arming failsafe");
         // TODO(cecille): Find a way to enumerate the clusters here.
         GeneralCommissioningCluster genCom;
-        // TODO: should get the endpoint information from the descriptor cluster.
-        genCom.Associate(proxy, 0);
+        SetupCluster(genCom, proxy, endpoint, timeout);
         // TODO(cecille): Make this a parameter
         uint16_t commissioningExpirySeconds = 60;
         genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
@@ -1756,7 +1762,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         chip::CharSpan countryCode(countryCodeStr, actualCountryCodeSize);
 
         GeneralCommissioningCluster genCom;
-        genCom.Associate(proxy, 0);
+        SetupCluster(genCom, proxy, endpoint, timeout);
         genCom.SetRegulatoryConfig(mSuccess.Cancel(), mFailure.Cancel(), regulatoryLocation, countryCode, breadcrumb,
                                    kCommandTimeoutMs);
     }
@@ -1807,7 +1813,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         ChipLogProgress(Controller, "Adding wifi network");
         NetworkCommissioningCluster netCom;
-        netCom.Associate(proxy, 0);
+        SetupCluster(netCom, proxy, endpoint, timeout);
         netCom.AddOrUpdateWiFiNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWiFiCredentials().Value().ssid,
                                       params.GetWiFiCredentials().Value().credentials, breadcrumb);
     }
@@ -1822,7 +1828,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         ChipLogProgress(Controller, "Adding thread network");
         NetworkCommissioningCluster netCom;
-        netCom.Associate(proxy, 0);
+        SetupCluster(netCom, proxy, endpoint, timeout);
         netCom.AddOrUpdateThreadNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetThreadOperationalDataset().Value(),
                                         breadcrumb);
     }
@@ -1837,7 +1843,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         ChipLogProgress(Controller, "Enabling wifi network");
         NetworkCommissioningCluster netCom;
-        netCom.Associate(proxy, 0);
+        SetupCluster(netCom, proxy, endpoint, timeout);
         netCom.ConnectNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWiFiCredentials().Value().ssid, breadcrumb);
     }
     break;
@@ -1856,7 +1862,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         }
         ChipLogProgress(Controller, "Enabling thread network");
         NetworkCommissioningCluster netCom;
-        netCom.Associate(proxy, 0);
+        SetupCluster(netCom, proxy, endpoint, timeout);
         netCom.ConnectNetwork(mSuccess.Cancel(), mFailure.Cancel(), extendedPanId, breadcrumb);
     }
     break;
@@ -1867,7 +1873,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kSendComplete: {
         ChipLogProgress(Controller, "Calling commissioning complete");
         GeneralCommissioningCluster genCom;
-        genCom.Associate(proxy, 0);
+        SetupCluster(genCom, proxy, endpoint, timeout);
         genCom.CommissioningComplete(mSuccess.Cancel(), mFailure.Cancel());
     }
     break;

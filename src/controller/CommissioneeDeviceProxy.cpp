@@ -77,12 +77,19 @@ CHIP_ERROR CommissioneeDeviceProxy::LoadSecureSessionParametersIfNeeded(bool & d
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommissioneeDeviceProxy::SendCommands(app::CommandSender * commandObj)
+CHIP_ERROR CommissioneeDeviceProxy::SendCommands(app::CommandSender * commandObj, Optional<System::Clock::Timeout> timeout)
 {
     bool loadedSecureSession = false;
     ReturnErrorOnFailure(LoadSecureSessionParametersIfNeeded(loadedSecureSession));
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    return commandObj->SendCommandRequest(mSecureSession.Get());
+    if (timeout.HasValue())
+    {
+        return commandObj->SendCommandRequest(mSecureSession.Get(), timeout.Value());
+    }
+    else
+    {
+        return commandObj->SendCommandRequest(mSecureSession.Get());
+    }
 }
 
 void CommissioneeDeviceProxy::OnSessionReleased()

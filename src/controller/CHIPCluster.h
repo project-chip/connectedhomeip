@@ -33,6 +33,7 @@
 #include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>
 #include <lib/core/Optional.h>
+#include <system/SystemClock.h>
 
 namespace chip {
 namespace Controller {
@@ -58,6 +59,7 @@ public:
     CHIP_ERROR AssociateWithGroup(DeviceProxy * device, GroupId groupId);
 
     void Dissociate();
+    void SetCommandTimeout(Optional<System::Clock::Timeout> timeout) { mTimeout = timeout; }
 
     ClusterId GetClusterId() const { return mClusterId; }
 
@@ -337,6 +339,7 @@ protected:
     DeviceProxy * mDevice;
     EndpointId mEndpoint;
     SessionHolder mGroupSession;
+    Optional<System::Clock::Timeout> mTimeout;
 };
 
 } // namespace Controller

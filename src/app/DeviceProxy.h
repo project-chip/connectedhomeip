@@ -56,7 +56,8 @@ public:
     virtual CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
                                                  Callback::Cancelable * onFailureCallback);
 
-    virtual CHIP_ERROR SendCommands(app::CommandSender * commandObj);
+    virtual CHIP_ERROR SendCommands(app::CommandSender * commandObj,
+                                    chip::Optional<System::Clock::Timeout> timeout = chip::Optional<System::Clock::Timeout>());
 
     // Interaction model uses the object and callback interface instead of sequence number to mark different transactions.
     virtual void AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,
