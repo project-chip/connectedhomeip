@@ -216,7 +216,7 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
     responseDirective = kSendDataResponse;
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+                                           onFailureCb, Optional<System::Clock::Timeout>());
 
     ctx.DrainAndServiceIO();
 
@@ -255,7 +255,7 @@ void TestCommandInteraction::TestSuccessNoDataResponse(nlTestSuite * apSuite, vo
     responseDirective = kSendSuccessStatusCode;
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+                                           onFailureCb, Optional<System::Clock::Timeout>());
 
     ctx.DrainAndServiceIO();
 
@@ -294,7 +294,7 @@ void TestCommandInteraction::TestAsyncResponse(nlTestSuite * apSuite, void * apC
     responseDirective = kAsync;
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+                                           onFailureCb, Optional<System::Clock::Timeout>());
 
     ctx.DrainAndServiceIO();
 
@@ -345,7 +345,7 @@ void TestCommandInteraction::TestFailure(nlTestSuite * apSuite, void * apContext
     responseDirective = kSendError;
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+                                           onFailureCb, Optional<System::Clock::Timeout>());
 
     ctx.DrainAndServiceIO();
 
@@ -385,7 +385,7 @@ void TestCommandInteraction::TestSuccessNoDataResponseWithClusterStatus(nlTestSu
     responseDirective = kSendSuccessStatusCodeWithClusterStatus;
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+                                           onFailureCb, Optional<System::Clock::Timeout>());
 
     ctx.DrainAndServiceIO();
 
@@ -420,7 +420,7 @@ void TestCommandInteraction::TestFailureWithClusterStatus(nlTestSuite * apSuite,
     responseDirective = kSendErrorWithClusterStatus;
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+                                           onFailureCb, Optional<System::Clock::Timeout>());
 
     ctx.DrainAndServiceIO();
 

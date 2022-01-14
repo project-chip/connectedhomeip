@@ -151,7 +151,7 @@ void TestCommandInteraction::TestNoHandler(nlTestSuite * apSuite, void * apConte
     ctx.EnableAsyncDispatch();
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+                                           onFailureCb, Optional<System::Clock::Timeout>());
 
     ctx.DrainAndServiceIO();
 
@@ -229,7 +229,7 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
     responseDirective = kSendDataResponse;
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb);
+                                           onFailureCb, Optional<System::Clock::Timeout>());
 
     ctx.DrainAndServiceIO();
 

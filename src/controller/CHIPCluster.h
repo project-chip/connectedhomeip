@@ -86,7 +86,7 @@ public:
         };
 
         return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
-                                    onSuccessCb, onFailureCb, timedInvokeTimeoutMs);
+                                    onSuccessCb, onFailureCb, timedInvokeTimeoutMs, mTimeout);
     }
 
     template <typename RequestDataT>
