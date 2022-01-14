@@ -198,8 +198,7 @@ EmberAfStatus emberAfWriteClientAttribute(chip::EndpointId endpoint, chip::Clust
  * @param dataType ZCL attribute type.
  */
 EmberAfStatus emberAfVerifyAttributeWrite(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
-                                          uint8_t mask, uint8_t * dataPtr,
-                                          EmberAfAttributeType dataType);
+                                          uint8_t mask, uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
  * @brief Read the attribute value, performing all the checks.

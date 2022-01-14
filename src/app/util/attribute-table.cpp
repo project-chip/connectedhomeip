@@ -98,8 +98,7 @@ EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attr
 EmberAfStatus emberAfWriteClientAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                           EmberAfAttributeType dataType)
 {
-    return emAfWriteAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_CLIENT, dataPtr,
-                              dataType,
+    return emAfWriteAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_CLIENT, dataPtr, dataType,
                               true,   // override read-only?
                               false); // just test?
 }
@@ -107,8 +106,7 @@ EmberAfStatus emberAfWriteClientAttribute(EndpointId endpoint, ClusterId cluster
 EmberAfStatus emberAfWriteServerAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                           EmberAfAttributeType dataType)
 {
-    return emAfWriteAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_SERVER, dataPtr,
-                              dataType,
+    return emAfWriteAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_SERVER, dataPtr, dataType,
                               true,   // override read-only?
                               false); // just test?
 }
@@ -130,15 +128,13 @@ EmberAfStatus emberAfReadAttribute(EndpointId endpoint, ClusterId cluster, Attri
 EmberAfStatus emberAfReadServerAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                          uint16_t readLength)
 {
-    return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_SERVER, dataPtr,
-                             readLength, NULL);
+    return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_SERVER, dataPtr, readLength, NULL);
 }
 
 EmberAfStatus emberAfReadClientAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t * dataPtr,
                                          uint16_t readLength)
 {
-    return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_CLIENT, dataPtr,
-                             readLength, NULL);
+    return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_CLIENT, dataPtr, readLength, NULL);
 }
 
 static void emberAfAttributeDecodeAndPrintCluster(ClusterId cluster)
@@ -189,8 +185,8 @@ void emberAfPrintAttributeTable(void)
                     (metaData->IsNonVolatile() ? " nonvolatile " : (metaData->IsExternal() ? " extern " : "  RAM  ")));
                 emberAfAttributesFlush();
                 status = emAfReadAttribute(ep->endpoint, cluster->clusterId, metaData->attributeId,
-                                           (emberAfAttributeIsClient(metaData) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER),
-                                           data, ATTRIBUTE_LARGEST, NULL);
+                                           (emberAfAttributeIsClient(metaData) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER), data,
+                                           ATTRIBUTE_LARGEST, NULL);
                 if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
                 {
                     emberAfAttributesPrintln("Unsupported");
@@ -301,9 +297,8 @@ static bool IsNullValue(const uint8_t * data, uint16_t dataLen, bool isAttribute
 // the table or the data is too large, returns true and writes to dataPtr
 // if the attribute is supported and the readLength specified is less than
 // the length of the data.
-EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t mask,
-                                 uint8_t * data, EmberAfAttributeType dataType,
-                                 bool overrideReadOnlyAndDataType, bool justTest)
+EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t mask, uint8_t * data,
+                                 EmberAfAttributeType dataType, bool overrideReadOnlyAndDataType, bool justTest)
 {
     EmberAfAttributeMetadata * metadata = NULL;
     EmberAfAttributeSearchRecord record;
@@ -447,8 +442,8 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
 // If dataPtr is NULL, no data is copied to the caller.
 // readLength should be 0 in that case.
 
-EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t mask,
-                                uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType)
+EmberAfStatus emAfReadAttribute(EndpointId endpoint, ClusterId cluster, AttributeId attributeID, uint8_t mask, uint8_t * dataPtr,
+                                uint16_t readLength, EmberAfAttributeType * dataType)
 {
     EmberAfAttributeMetadata * metadata = NULL;
     EmberAfAttributeSearchRecord record;
