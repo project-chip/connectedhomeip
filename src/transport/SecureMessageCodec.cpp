@@ -38,24 +38,15 @@ using System::PacketBufferHandle;
 
 namespace SecureMessageCodec {
 
-CHIP_ERROR Encrypt(Transport::SecureSession * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
-                   System::PacketBufferHandle & msgBuf, MessageCounter & counter)
+CHIP_ERROR Encrypt(Transport::SecureSession * session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+                   System::PacketBufferHandle & msgBuf)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrReturnError(msgBuf->TotalLength() <= kMaxAppMessageLen, CHIP_ERROR_MESSAGE_TOO_LONG);
 
-    uint32_t messageCounter = counter.Value();
-
     static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
                   "Addition to generate payloadLength might overflow");
-
-    packetHeader
-        .SetMessageCounter(messageCounter) //
-        .SetSessionId(state->GetPeerSessionId());
-
-    // TODO set Session Type (Unicast or Group)
-    // packetHeader.SetSessionType(Header::SessionType::kUnicastSession);
 
     ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(msgBuf));
 
@@ -63,9 +54,8 @@ CHIP_ERROR Encrypt(Transport::SecureSession * state, PayloadHeader & payloadHead
     uint16_t totalLen = msgBuf->TotalLength();
 
     CHIP_TRACE_MESSAGE(payloadHeader, packetHeader, data, totalLen);
-
     MessageAuthenticationCode mac;
-    ReturnErrorOnFailure(state->EncryptBeforeSend(data, totalLen, data, packetHeader, mac));
+    ReturnErrorOnFailure(session->EncryptBeforeSend(data, totalLen, data, packetHeader, mac));
 
     uint16_t taglen = 0;
     ReturnErrorOnFailure(mac.Encode(packetHeader, &data[totalLen], msgBuf->AvailableDataLength(), &taglen));
@@ -73,11 +63,10 @@ CHIP_ERROR Encrypt(Transport::SecureSession * state, PayloadHeader & payloadHead
     VerifyOrReturnError(CanCastTo<uint16_t>(totalLen + taglen), CHIP_ERROR_INTERNAL);
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
-    ReturnErrorOnFailure(counter.Advance());
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR Decrypt(Transport::SecureSession * state, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
+CHIP_ERROR Decrypt(Transport::SecureSession * session, PayloadHeader & payloadHeader, const PacketHeader & packetHeader,
                    System::PacketBufferHandle & msg)
 {
     ReturnErrorCodeIf(msg.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -107,7 +96,7 @@ CHIP_ERROR Decrypt(Transport::SecureSession * state, PayloadHeader & payloadHead
     msg->SetDataLength(len);
 
     uint8_t * plainText = msg->Start();
-    ReturnErrorOnFailure(state->DecryptOnReceive(data, len, plainText, packetHeader, mac));
+    ReturnErrorOnFailure(session->DecryptOnReceive(data, len, plainText, packetHeader, mac));
 
     ReturnErrorOnFailure(payloadHeader.DecodeAndConsume(msg));
     return CHIP_NO_ERROR;
