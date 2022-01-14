@@ -28,9 +28,14 @@ CHIP_ROOT_DIR = os.path.realpath(
 class ZAPGenerateTarget:
     def __init__(self, zap_config, template=None, output_dir=None):
         self.script = './scripts/tools/zap/generate.py'
-        self.output_dir = output_dir
-        self.zap_config = zap_config
+        self.zap_config = str(zap_config)
         self.template = template
+
+        if output_dir:
+            # make sure we convert  any os.PathLike object to string
+            self.output_dir = str(output_dir)
+        else:
+            self.output_dir = None
 
     def generate(self):
         """Runs a ZAP generate command on the configured zap/template/outputs.
@@ -52,6 +57,10 @@ class ZAPGenerateTarget:
         """Searches for Clusters.matter in the output directory and if found,
         will move it to stay along with the zap file config
         """
+        if not self.output_dir:
+            # TODO: where do things get generated if no output dir?
+            # Assume here that IDL is not generated in such cases
+            return
 
         idl_path = os.path.join(self.output_dir, "Clusters.matter")
         if not os.path.exists(idl_path):
@@ -62,8 +71,9 @@ class ZAPGenerateTarget:
             # We expect "something.zap" and don't handle corner cases of
             # multiple extensions. This is to work with existing codebase only
             raise Error("Unexpected input zap file  %s" % self.zap_config)
-            
+
         os.rename(idl_path, target_path)
+
 
 def checkPythonVersion():
     if sys.version_info[0] < 3:
@@ -96,10 +106,9 @@ def getGlobalTemplatesTargets():
                 os.makedirs(output_dir)
             template = 'examples/placeholder/templates/templates.json'
 
-            targets.append(ZAPGenerateTarget(
-                str(filepath), output_dir=output_dir))
+            targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir))
             targets.append(
-                ZAPGenerateTarget(str(filepath), output_dir=output_dir, template=template))
+                ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
             continue
 
         logging.info("Found example %s (via %s)" %
@@ -112,7 +121,7 @@ def getGlobalTemplatesTargets():
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        targets.append(ZAPGenerateTarget(str(filepath), output_dir=output_dir))
+        targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir))
 
     targets.append(ZAPGenerateTarget(
         './src/controller/data_model/controller-clusters.zap',
