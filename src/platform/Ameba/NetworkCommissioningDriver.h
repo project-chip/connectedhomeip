@@ -17,8 +17,8 @@
 
 #pragma once
 #include "chip_porting.h"
-#include <wifi_structures.h>
 #include <platform/NetworkCommissioning.h>
+#include <wifi_structures.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -44,10 +44,10 @@ public:
 
         // copy the available information into WiFiScanResponse struct, which will be copied to the result to be sent
         item.security = mpScanResults[mIternum].security;
-        item.ssidLen = mpScanResults[mIternum].SSID.len;
+        item.ssidLen  = mpScanResults[mIternum].SSID.len;
         item.channel  = mpScanResults[mIternum].channel;
         item.wiFiBand = chip::DeviceLayer::NetworkCommissioning::WiFiBand::k2g4;
-        //item.rssi     = mpScanResults[mIternum].rssi;
+        // item.rssi     = mpScanResults[mIternum].rssi;
         memcpy(item.ssid, mpScanResults[mIternum].SSID.val, item.ssidLen);
         memcpy(item.bssid, mpScanResults[mIternum].BSSID.octet, 6);
 
@@ -57,9 +57,9 @@ public:
     void Release() override {}
 
 private:
-    const size_t mSize; // no of network scanned
+    const size_t mSize;                      // no of network scanned
     const rtw_scan_result_t * mpScanResults; // list of scanned network info of size mSize
-    size_t mIternum = 0; // to iterate through mpScanResults of size mSize
+    size_t mIternum = 0;                     // to iterate through mpScanResults of size mSize
 };
 
 class AmebaWiFiDriver final : public WiFiDriver
