@@ -775,8 +775,6 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     ApplicationLauncher::Commands::HideAppRequest::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.applicationId = [self asCharSpan:params.application.applicationId];
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
@@ -795,8 +793,6 @@ using namespace chip::app::Clusters;
     ApplicationLauncher::Commands::LaunchAppRequest::Type request;
     request.data = [self asCharSpan:params.data];
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.applicationId = [self asCharSpan:params.application.applicationId];
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
@@ -814,8 +810,6 @@ using namespace chip::app::Clusters;
     ListFreer listFreer;
     ApplicationLauncher::Commands::StopAppRequest::Type request;
     request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.catalogVendorId = params.application.catalogVendorId.unsignedShortValue;
-    request.application.applicationId = [self asCharSpan:params.application.applicationId];
     request.application.applicationId = [self asCharSpan:params.application.applicationId];
 
     new CHIPApplicationLauncherClusterLauncherResponseCallbackBridge(
@@ -14496,6 +14490,24 @@ using namespace chip::app::Clusters;
     new CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
             auto successFn = Callback<CHIPTestClusterClusterTestAddArgumentsResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)testEmitTestEventRequestWithParams:(CHIPTestClusterClusterTestEmitTestEventRequestParams *)params
+                         completionHandler:(void (^)(CHIPTestClusterClusterTestEmitTestEventResponseParams * _Nullable data,
+                                               NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    TestCluster::Commands::TestEmitTestEventRequest::Type request;
+    request.arg1 = params.arg1.unsignedCharValue;
+    request.arg2 = static_cast<std::remove_reference_t<decltype(request.arg2)>>(params.arg2.unsignedCharValue);
+    request.arg3 = params.arg3.boolValue;
+
+    new CHIPTestClusterClusterTestEmitTestEventResponseCallbackBridge(
+        self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPTestClusterClusterTestEmitTestEventResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });

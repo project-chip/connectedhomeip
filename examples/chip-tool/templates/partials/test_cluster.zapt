@@ -145,7 +145,7 @@ class {{filename}}: public TestCommand
         (static_cast<{{filename}} *>(context))->{{>successResponse}}({{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}});
     }
 
-    {{#if isSubscribeAttribute}}
+    {{#if isSubscribe}}
     static void {{> staticSubscriptionEstablished}}({{> staticSubscriptionEstablishedArguments}})
     {
         (static_cast<{{filename}} *>(context))->{{> subscriptionEstablished}}();
@@ -258,6 +258,10 @@ class {{filename}}: public TestCommand
             {{~#if isGroupCommand}}, {{>staticDoneResponse}}{{/if~}}
             ));
           {{> maybeWait }}
+        {{else if isReadEvent}}
+          ReturnErrorOnFailure(cluster.ReadEvent<{{zapTypeToDecodableClusterObjectType event ns=cluster isArgument=true}}>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}));
+        {{else if isSubscribeEvent}}
+          ReturnErrorOnFailure(cluster.SubscribeEvent<{{zapTypeToDecodableClusterObjectType event ns=cluster isArgument=true}}>(this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}, minIntervalArgument, maxIntervalArgument, {{>staticSubscriptionEstablished}}));
         {{else if isReadAttribute}}
           ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>staticSuccessResponse}}, {{>staticFailureResponse}}));
         {{else if isSubscribeAttribute}}
@@ -288,7 +292,7 @@ class {{filename}}: public TestCommand
         {{/if}}
     }
 
-    {{#if isSubscribeAttribute}}
+    {{#if isSubscribe}}
     void {{>successResponse}}({{> subscribeResponseArguments attr=attributeObject}})
     {
         {{#if response.error}}

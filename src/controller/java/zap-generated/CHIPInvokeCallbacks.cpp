@@ -2828,6 +2828,68 @@ void CHIPTestClusterClusterTestAddArgumentsResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, returnValue);
 }
+CHIPTestClusterClusterTestEmitTestEventResponseCallback::CHIPTestClusterClusterTestEmitTestEventResponseCallback(
+    jobject javaCallback) :
+    Callback::Callback<CHIPTestClusterClusterTestEmitTestEventResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPTestClusterClusterTestEmitTestEventResponseCallback::~CHIPTestClusterClusterTestEmitTestEventResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPTestClusterClusterTestEmitTestEventResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPTestClusterClusterTestEmitTestEventResponseCallback,
+                    void (*)(CHIPTestClusterClusterTestEmitTestEventResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPTestClusterClusterTestEmitTestEventResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPTestClusterClusterTestEmitTestEventResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Long;)V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject value;
+
+    std::string valueClassName     = "java/lang/Long";
+    std::string valueCtorSignature = "(J)V";
+    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(valueClassName.c_str(), valueCtorSignature.c_str(),
+                                                                   dataResponse.value, value);
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, value);
+}
 CHIPTestClusterClusterTestEnumsResponseCallback::CHIPTestClusterClusterTestEnumsResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPTestClusterClusterTestEnumsResponseCallbackType>(CallbackFn, this)
 {

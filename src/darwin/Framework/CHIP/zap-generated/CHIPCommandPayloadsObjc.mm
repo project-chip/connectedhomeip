@@ -3495,7 +3495,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _data = @"";
 
-        _application = [CHIPApplicationLauncherClusterApplication new];
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
     }
     return self;
 }
@@ -3506,7 +3506,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplication new];
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
     }
     return self;
 }
@@ -3517,7 +3517,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplication new];
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
     }
     return self;
 }

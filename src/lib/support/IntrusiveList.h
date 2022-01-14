@@ -188,7 +188,12 @@ protected:
     //    \------------------------------------------/
     //
     IntrusiveListBase() : mNode(&mNode, &mNode) {}
-    ~IntrusiveListBase() { mNode.Remove(); /* clear mNode such that the destructor checking mNode.IsInList doesn't fail */ }
+    ~IntrusiveListBase()
+    {
+        VerifyOrDie(Empty());
+        /* clear mNode such that the destructor checking mNode.IsInList doesn't fail */
+        mNode.Remove();
+    }
 
     ConstIteratorBase begin() const { return ConstIteratorBase(mNode.mNext); }
     ConstIteratorBase end() const { return ConstIteratorBase(&mNode); }
@@ -216,7 +221,7 @@ private:
     IntrusiveListNodeBase mNode;
 };
 
-/// The hook convert between node object T and IntrusiveListNodeBase
+/// The hook converts between node object T and IntrusiveListNodeBase
 ///
 /// When using this hook, the node type (T) MUST inherit from IntrusiveListNodeBase.
 ///
@@ -235,10 +240,12 @@ public:
 
 /// A double-linked list where the data is stored together with the previous/next pointers for cache efficiency / and compactness.
 ///
-/// The default hook (IntrusiveListBaseHook<T>) requires T inherit from IntrusiveListNodeBase.
+/// The default hook (IntrusiveListBaseHook<T>) requires T to inherit from IntrusiveListNodeBase.
 ///
-/// IntrusiveListNodeBase object associated with a node is assumed to be longer than the list they belong to. A list is effcively a
-/// single node into / a chain of other nodes referenced by pointers.
+/// Consumers must ensure that the IntrusiveListNodeBase object associated with
+/// a node is removed from any list it might belong to before it is destroyed.
+///
+/// Consumers must ensure that a list is empty before it is destroyed.
 ///
 /// A node may only belong to a single list. The code will assert (via VerifyOrDie) on this invariant.
 ///
@@ -252,6 +259,8 @@ public:
 ///     list.PushBack(&a);
 ///     list.PushFront(&b);
 ///     assert(list.Contains(&a)  && list.Contains(&b) && !list.Contains(&c));
+///     list.Remove(&a);
+///     list.Remove(&b);
 template <typename T, typename Hook = IntrusiveListBaseHook<T>>
 class IntrusiveList : public IntrusiveListBase
 {

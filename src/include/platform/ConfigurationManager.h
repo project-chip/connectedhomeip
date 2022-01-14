@@ -98,6 +98,7 @@ public:
     virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator)                         = 0;
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
     virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter)                  = 0;
+    virtual CHIP_ERROR IncrementLifetimeCounter()                                      = 0;
     virtual CHIP_ERROR GetRegulatoryLocation(uint8_t & location)                       = 0;
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
     virtual CHIP_ERROR GetActiveLocale(char * buf, size_t bufSize, size_t & codeLen)   = 0;

@@ -57,10 +57,6 @@ EmberAfStatus emberAfAppendAttributeReportFields(chip::EndpointId endpoint, chip
                                                  uint8_t * bufIndex);
 void emberAfPrintAttributeTable(void);
 
-bool emberAfReadSequentialAttributesAddToResponse(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                  chip::AttributeId startAttributeId, uint8_t mask, uint16_t manufacturerCode,
-                                                  uint8_t maxAttributeIds, bool includeAccessControl);
-
 EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
                                  uint16_t manufacturerCode, uint8_t * data, EmberAfAttributeType dataType,
                                  bool overrideReadOnlyAndDataType, bool justTest);

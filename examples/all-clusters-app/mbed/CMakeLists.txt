@@ -67,7 +67,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
 
                ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
-               ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/ota-requestor-stub.cpp
                ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
                ${APP_UTIL}/DataModelHandler.cpp
@@ -82,8 +81,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_UTIL}/ember-print.cpp
                ${APP_UTIL}/ember-compatibility-functions.cpp
                ${APP_UTIL}/message.cpp
-               ${APP_UTIL}/process-cluster-message.cpp
-               ${APP_UTIL}/process-global-message.cpp
                ${APP_UTIL}/util.cpp
                ${APP_UTIL}/error-mapping.cpp
 
@@ -139,6 +136,9 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/general-diagnostics-server/general-diagnostics-server.cpp
                ${APP_CLUSTERS}/group-key-mgmt-server/group-key-mgmt-server.cpp
                ${APP_CLUSTERS}/power-source-configuration-server/power-source-configuration-server.cpp
+               ${APP_CLUSTERS}/ota-requestor/ota-requestor-server.cpp
+               ${APP_CLUSTERS}/ota-requestor/BDXDownloader.cpp
+               ${APP_CLUSTERS}/ota-requestor/OTARequestor.cpp
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)

@@ -309,8 +309,8 @@ CHIP_ERROR SessionManager::NewPairing(SessionHolder & sessionHolder, const Optio
         mSecureSessions.ReleaseSession(session.Value()->AsSecureSession());
     }
 
-    ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", key %d!!", ChipLogValueX64(peerNodeId),
-                  peerSessionId);
+    ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", LSID:%d PSID:%d!",
+                  ChipLogValueX64(peerNodeId), localSessionId, peerSessionId);
     session = mSecureSessions.CreateNewSecureSession(pairing->GetSecureSessionType(), localSessionId, peerNodeId,
                                                      pairing->GetPeerCATs(), peerSessionId, fabric, pairing->GetMRPConfig());
     ReturnErrorCodeIf(!session.HasValue(), CHIP_ERROR_NO_MEMORY);
@@ -472,7 +472,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     if (!session.HasValue())
     {
-        ChipLogError(Inet, "Data received on an unknown connection (%d). Dropping it!!", packetHeader.GetSessionId());
+        ChipLogError(Inet, "Data received on an unknown session (LSID=%d). Dropping it!", packetHeader.GetSessionId());
         return;
     }
 
@@ -540,12 +540,6 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
         return; // malformed packet
     }
 
-    Optional<SessionHandle> session = FindGroupSession(packetHeader.GetDestinationGroupId().Value());
-    if (!session.HasValue())
-    {
-        return;
-    }
-
     if (msg.IsNull())
     {
         ChipLogError(Inet, "Secure transport received Groupcast NULL packet, discarding");
@@ -603,7 +597,12 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
 
     if (mCB != nullptr)
     {
+        Optional<SessionHandle> session = CreateGroupSession(packetHeader.GetDestinationGroupId().Value());
+        VerifyOrReturn(session.HasValue(), ChipLogError(Inet, "Error when creating group session handle."));
+
         mCB->OnMessageReceived(packetHeader, payloadHeader, session.Value(), peerAddress, isDuplicate, std::move(msg));
+
+        RemoveGroupSession(session.Value()->AsGroupSession());
     }
 }
 
