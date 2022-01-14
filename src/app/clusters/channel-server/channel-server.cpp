@@ -58,7 +58,7 @@ using chip::app::Clusters::Channel::Delegate;
 
 namespace {
 
-Delegate * gDelegate = NULL;
+Delegate * gDelegateTable[EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT] = { nullptr };
 
 Delegate * GetDelegate(EndpointId endpoint)
 {
@@ -72,7 +72,8 @@ Delegate * GetDelegate(EndpointId endpoint)
 #endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ChipLogError(Zcl, "Channel NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
 
-    return gDelegate;
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::Channel::Id);
+    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -91,9 +92,17 @@ namespace app {
 namespace Clusters {
 namespace Channel {
 
-void SetDefaultDelegate(Delegate * delegate)
+void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
 {
-    gDelegate = delegate;
+    uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::Channel::Id);
+    // if endpoint is found and is not a dynamic endpoint
+    if (ep != 0xFFFF && ep < EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        gDelegateTable[ep] = delegate;
+    }
+    else
+    {
+    }
 }
 
 } // namespace Channel

@@ -49,7 +49,7 @@ void MediaPlaybackManager::NewManager(jint endpoint, jobject manager)
     ChipLogProgress(Zcl, "TV Android App: MediaPlayback::SetDefaultDelegate");
     MediaPlaybackManager * mgr = new MediaPlaybackManager();
     mgr->InitializeWithObjects(manager);
-    chip::app::Clusters::MediaPlayback::SetDefaultDelegate(mgr);
+    chip::app::Clusters::MediaPlayback::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
 PlaybackStateEnum MediaPlaybackManager::HandleGetCurrentState()

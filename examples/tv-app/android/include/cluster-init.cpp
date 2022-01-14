@@ -50,7 +50,7 @@ static TargetNavigatorManager targetNavigatorManager;
 void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: ApplicationBasic::SetDefaultDelegate");
-    chip::app::Clusters::ApplicationBasic::SetDefaultDelegate(&applicationBasicManager);
+    chip::app::Clusters::ApplicationBasic::SetDefaultDelegate(endpoint, &applicationBasicManager);
 }
 
 /** @brief Application Launcher  Cluster Init
@@ -65,7 +65,7 @@ void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
 void emberAfApplicationLauncherClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: ApplicationLauncher::SetDefaultDelegate");
-    chip::app::Clusters::ApplicationLauncher::SetDefaultDelegate(&applicationLauncherManager);
+    chip::app::Clusters::ApplicationLauncher::SetDefaultDelegate(endpoint, &applicationLauncherManager);
 }
 
 /** @brief Audio Output Cluster Init
@@ -95,5 +95,5 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
 void emberAfTargetNavigatorClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: TargetNavigator::SetDefaultDelegate");
-    chip::app::Clusters::TargetNavigator::SetDefaultDelegate(&targetNavigatorManager);
+    chip::app::Clusters::TargetNavigator::SetDefaultDelegate(endpoint, &targetNavigatorManager);
 }
