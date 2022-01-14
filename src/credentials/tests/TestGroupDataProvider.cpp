@@ -17,7 +17,7 @@
  */
 
 #include <credentials/GroupDataProviderImpl.h>
-#include <credentials/MessageSecurity.h>
+#include <transport/raw/MessageSecurity.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/TestPersistentStorageDelegate.h>
