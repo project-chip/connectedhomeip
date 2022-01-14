@@ -619,6 +619,15 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 
     params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
+#if 0 // TODO: SessionID persistence results in bugs when instantiating multiple DeviceCommissioners
+      // on multiple fabrics due to not doing persistence completely, i.e not persisting the session ID
+      // upon completion of CASE. This results in the 2nd-to-N commissioners upon initialization picking
+      // up a stale value for the next available session ID and colliding with a previously picked local session ID
+      // from another commissioner instance.
+      //
+      // For now, just disable all persistence.
+      //
+
     uint16_t nextKeyID = 0;
     uint16_t size      = sizeof(nextKeyID);
     CHIP_ERROR error   = mStorageDelegate->SyncGetKeyValue(kNextAvailableKeyID, &nextKeyID, size);
@@ -627,6 +636,8 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
         nextKeyID = 0;
     }
     ReturnErrorOnFailure(mIDAllocator.ReserveUpTo(nextKeyID));
+#endif
+
     mPairingDelegate = params.pairingDelegate;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY // make this commissioner discoverable
@@ -840,7 +851,10 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     // Immediately persist the updated mNextKeyID value
     // TODO maybe remove FreeRendezvousSession() since mNextKeyID is always persisted immediately
-    PersistNextKeyId();
+    //
+    // Disabling session ID persistence (see previous comment in Init() about persisting key ids)
+    //
+    // PersistNextKeyId();
 
 exit:
     if (err != CHIP_NO_ERROR)
