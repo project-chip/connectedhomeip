@@ -148,6 +148,30 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType & value);
 
+void LogEventHeader(const chip::app::EventHeader & eventHeader)
+{
+    ChipLogProgress(chipTool, "Event %" PRIu32 " from cluster " ChipLogFormatMEI " on endpoint: %u", eventHeader.mPath.mEventId,
+                    ChipLogValueMEI(eventHeader.mPath.mClusterId), eventHeader.mPath.mEndpointId);
+    ChipLogProgress(chipTool, "\t Event number: %" PRIu64, eventHeader.mEventNumber);
+    if (eventHeader.mPriorityLevel == chip::app::PriorityLevel::Info)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Info");
+    }
+    else if (eventHeader.mPriorityLevel == chip::app::PriorityLevel::Critical)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Critical");
+    }
+    else if (eventHeader.mPriorityLevel == chip::app::PriorityLevel::Debug)
+    {
+        ChipLogProgress(chipTool, "\t Priority: Debug");
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "\t Priority: Unknown");
+    }
+    ChipLogProgress(chipTool, "\t Timestamp: %" PRIu64, eventHeader.mTimestamp.mValue);
+}
+
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -3479,12 +3503,18 @@ static void OnDefaultSuccess(void * context, const chip::app::DataModel::NullObj
 };
 
 template <typename T>
-static void OnGeneralAttributeEventResponse(void * context, const char * label, T value)
+static void OnGeneralAttributeResponse(void * context, const char * label, T value)
 {
     CHIP_ERROR err = LogValue(label, 0, value);
 
     auto * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(err);
+}
+
+static void OnDefaultEventFailure(void * context, const chip::app::EventHeader & eventHeader, EmberAfStatus status)
+{
+    LogEventHeader(eventHeader);
+    OnDefaultFailure(context, status);
 }
 
 static void OnAccountLoginGetSetupPINResponseSuccess(
@@ -4547,7 +4577,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
             value)
     {
-        OnGeneralAttributeEventResponse(context, "AccessControl.Acl response", value);
+        OnGeneralAttributeResponse(context, "AccessControl.Acl response", value);
     }
 };
 
@@ -4625,7 +4655,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &
             value)
     {
-        OnGeneralAttributeEventResponse(context, "AccessControl.Extension response", value);
+        OnGeneralAttributeResponse(context, "AccessControl.Extension response", value);
     }
 };
 
@@ -4700,7 +4730,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "AccessControl.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "AccessControl.AttributeList response", value);
     }
 };
 
@@ -4730,7 +4760,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "AccessControl.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "AccessControl.ClusterRevision response", value);
     }
 };
 
@@ -4844,7 +4874,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "AccountLogin.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "AccountLogin.AttributeList response", value);
     }
 };
 
@@ -4874,7 +4904,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "AccountLogin.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "AccountLogin.ClusterRevision response", value);
     }
 };
 
@@ -5034,7 +5064,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "AdministratorCommissioning.WindowStatus response", value);
+        OnGeneralAttributeResponse(context, "AdministratorCommissioning.WindowStatus response", value);
     }
 };
 
@@ -5064,7 +5094,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::FabricIndex value)
     {
-        OnGeneralAttributeEventResponse(context, "AdministratorCommissioning.AdminFabricIndex response", value);
+        OnGeneralAttributeResponse(context, "AdministratorCommissioning.AdminFabricIndex response", value);
     }
 };
 
@@ -5094,7 +5124,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "AdministratorCommissioning.AdminVendorId response", value);
+        OnGeneralAttributeResponse(context, "AdministratorCommissioning.AdminVendorId response", value);
     }
 };
 
@@ -5124,7 +5154,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "AdministratorCommissioning.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "AdministratorCommissioning.AttributeList response", value);
     }
 };
 
@@ -5154,7 +5184,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "AdministratorCommissioning.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "AdministratorCommissioning.ClusterRevision response", value);
     }
 };
 
@@ -5246,7 +5276,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationBasic.VendorName response", value);
+        OnGeneralAttributeResponse(context, "ApplicationBasic.VendorName response", value);
     }
 };
 
@@ -5315,7 +5345,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationBasic.VendorId response", value);
+        OnGeneralAttributeResponse(context, "ApplicationBasic.VendorId response", value);
     }
 };
 
@@ -5384,7 +5414,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationBasic.ApplicationName response", value);
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationName response", value);
     }
 };
 
@@ -5456,7 +5486,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationBasic.ProductId response", value);
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ProductId response", value);
     }
 };
 
@@ -5525,7 +5555,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationBasic.ApplicationStatus response", value);
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationStatus response", value);
     }
 };
 
@@ -5597,7 +5627,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationBasic.ApplicationVersion response", value);
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationVersion response", value);
     }
 };
 
@@ -5669,7 +5699,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationBasic.AllowedVendorList response", value);
+        OnGeneralAttributeResponse(context, "ApplicationBasic.AllowedVendorList response", value);
     }
 };
 
@@ -5699,7 +5729,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationBasic.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "ApplicationBasic.AttributeList response", value);
     }
 };
 
@@ -5729,7 +5759,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationBasic.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ClusterRevision response", value);
     }
 };
 
@@ -5887,7 +5917,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationLauncher.ApplicationLauncherList response", value);
+        OnGeneralAttributeResponse(context, "ApplicationLauncher.ApplicationLauncherList response", value);
     }
 };
 
@@ -5959,7 +5989,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationLauncher.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "ApplicationLauncher.AttributeList response", value);
     }
 };
 
@@ -5989,7 +6019,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ApplicationLauncher.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "ApplicationLauncher.ClusterRevision response", value);
     }
 };
 
@@ -6125,7 +6155,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::OutputInfo::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "AudioOutput.AudioOutputList response", value);
+        OnGeneralAttributeResponse(context, "AudioOutput.AudioOutputList response", value);
     }
 };
 
@@ -6199,7 +6229,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "AudioOutput.CurrentAudioOutput response", value);
+        OnGeneralAttributeResponse(context, "AudioOutput.CurrentAudioOutput response", value);
     }
 };
 
@@ -6268,7 +6298,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "AudioOutput.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "AudioOutput.AttributeList response", value);
     }
 };
 
@@ -6298,7 +6328,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "AudioOutput.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "AudioOutput.ClusterRevision response", value);
     }
 };
 
@@ -6429,7 +6459,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "BarrierControl.BarrierMovingState response", value);
+        OnGeneralAttributeResponse(context, "BarrierControl.BarrierMovingState response", value);
     }
 };
 
@@ -6498,7 +6528,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "BarrierControl.BarrierSafetyStatus response", value);
+        OnGeneralAttributeResponse(context, "BarrierControl.BarrierSafetyStatus response", value);
     }
 };
 
@@ -6567,7 +6597,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "BarrierControl.BarrierCapabilities response", value);
+        OnGeneralAttributeResponse(context, "BarrierControl.BarrierCapabilities response", value);
     }
 };
 
@@ -6636,7 +6666,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "BarrierControl.BarrierPosition response", value);
+        OnGeneralAttributeResponse(context, "BarrierControl.BarrierPosition response", value);
     }
 };
 
@@ -6705,7 +6735,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "BarrierControl.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "BarrierControl.AttributeList response", value);
     }
 };
 
@@ -6735,7 +6765,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "BarrierControl.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "BarrierControl.ClusterRevision response", value);
     }
 };
 
@@ -6854,13 +6884,15 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::Basic::Events::StartUp::DecodableType>(this, OnEventResponse,
-                                                                                             OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::Basic::Events::StartUp::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::Basic::Events::StartUp::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::Basic::Events::StartUp::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.StartUp response", value);
+        LogEventHeader(eventHeader);
+        LogValue("Basic.StartUp report", 0, value);
     }
 };
 
@@ -6887,7 +6919,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::Basic::Events::StartUp::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -6895,8 +6927,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::Basic::Events::StartUp::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::Basic::Events::StartUp::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("Basic.StartUp report", 0, value);
     }
 
@@ -6925,13 +6959,15 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::Basic::Events::ShutDown::DecodableType>(this, OnEventResponse,
-                                                                                              OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::Basic::Events::ShutDown::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::Basic::Events::ShutDown::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::Basic::Events::ShutDown::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.ShutDown response", value);
+        LogEventHeader(eventHeader);
+        LogValue("Basic.ShutDown report", 0, value);
     }
 };
 
@@ -6958,7 +6994,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::Basic::Events::ShutDown::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -6966,8 +7002,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::Basic::Events::ShutDown::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::Basic::Events::ShutDown::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("Basic.ShutDown report", 0, value);
     }
 
@@ -6996,12 +7034,15 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::Basic::Events::Leave::DecodableType>(this, OnEventResponse, OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::Basic::Events::Leave::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::Basic::Events::Leave::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::Basic::Events::Leave::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.Leave response", value);
+        LogEventHeader(eventHeader);
+        LogValue("Basic.Leave report", 0, value);
     }
 };
 
@@ -7028,7 +7069,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::Basic::Events::Leave::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -7036,8 +7077,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::Basic::Events::Leave::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::Basic::Events::Leave::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("Basic.Leave report", 0, value);
     }
 
@@ -7066,13 +7109,15 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType>(this, OnEventResponse,
-                                                                                                      OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.ReachableChanged response", value);
+        LogEventHeader(eventHeader);
+        LogValue("Basic.ReachableChanged report", 0, value);
     }
 };
 
@@ -7099,7 +7144,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -7107,8 +7152,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::Basic::Events::ReachableChanged::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("Basic.ReachableChanged report", 0, value);
     }
 
@@ -7144,7 +7191,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.InteractionModelVersion response", value);
+        OnGeneralAttributeResponse(context, "Basic.InteractionModelVersion response", value);
     }
 };
 
@@ -7213,7 +7260,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.VendorName response", value);
+        OnGeneralAttributeResponse(context, "Basic.VendorName response", value);
     }
 };
 
@@ -7282,7 +7329,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::VendorId value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.VendorID response", value);
+        OnGeneralAttributeResponse(context, "Basic.VendorID response", value);
     }
 };
 
@@ -7351,7 +7398,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.ProductName response", value);
+        OnGeneralAttributeResponse(context, "Basic.ProductName response", value);
     }
 };
 
@@ -7420,7 +7467,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.ProductID response", value);
+        OnGeneralAttributeResponse(context, "Basic.ProductID response", value);
     }
 };
 
@@ -7489,7 +7536,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.NodeLabel response", value);
+        OnGeneralAttributeResponse(context, "Basic.NodeLabel response", value);
     }
 };
 
@@ -7584,7 +7631,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.Location response", value);
+        OnGeneralAttributeResponse(context, "Basic.Location response", value);
     }
 };
 
@@ -7679,7 +7726,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.HardwareVersion response", value);
+        OnGeneralAttributeResponse(context, "Basic.HardwareVersion response", value);
     }
 };
 
@@ -7748,7 +7795,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.HardwareVersionString response", value);
+        OnGeneralAttributeResponse(context, "Basic.HardwareVersionString response", value);
     }
 };
 
@@ -7817,7 +7864,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.SoftwareVersion response", value);
+        OnGeneralAttributeResponse(context, "Basic.SoftwareVersion response", value);
     }
 };
 
@@ -7886,7 +7933,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.SoftwareVersionString response", value);
+        OnGeneralAttributeResponse(context, "Basic.SoftwareVersionString response", value);
     }
 };
 
@@ -7955,7 +8002,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.ManufacturingDate response", value);
+        OnGeneralAttributeResponse(context, "Basic.ManufacturingDate response", value);
     }
 };
 
@@ -8024,7 +8071,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.PartNumber response", value);
+        OnGeneralAttributeResponse(context, "Basic.PartNumber response", value);
     }
 };
 
@@ -8093,7 +8140,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.ProductURL response", value);
+        OnGeneralAttributeResponse(context, "Basic.ProductURL response", value);
     }
 };
 
@@ -8162,7 +8209,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.ProductLabel response", value);
+        OnGeneralAttributeResponse(context, "Basic.ProductLabel response", value);
     }
 };
 
@@ -8231,7 +8278,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.SerialNumber response", value);
+        OnGeneralAttributeResponse(context, "Basic.SerialNumber response", value);
     }
 };
 
@@ -8300,7 +8347,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.LocalConfigDisabled response", value);
+        OnGeneralAttributeResponse(context, "Basic.LocalConfigDisabled response", value);
     }
 };
 
@@ -8395,7 +8442,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.Reachable response", value);
+        OnGeneralAttributeResponse(context, "Basic.Reachable response", value);
     }
 };
 
@@ -8464,7 +8511,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.UniqueID response", value);
+        OnGeneralAttributeResponse(context, "Basic.UniqueID response", value);
     }
 };
 
@@ -8494,7 +8541,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "Basic.AttributeList response", value);
     }
 };
 
@@ -8524,7 +8571,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Basic.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "Basic.ClusterRevision response", value);
     }
 };
 
@@ -8608,7 +8655,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "BinaryInputBasic.OutOfService response", value);
+        OnGeneralAttributeResponse(context, "BinaryInputBasic.OutOfService response", value);
     }
 };
 
@@ -8703,7 +8750,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "BinaryInputBasic.PresentValue response", value);
+        OnGeneralAttributeResponse(context, "BinaryInputBasic.PresentValue response", value);
     }
 };
 
@@ -8798,7 +8845,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "BinaryInputBasic.StatusFlags response", value);
+        OnGeneralAttributeResponse(context, "BinaryInputBasic.StatusFlags response", value);
     }
 };
 
@@ -8867,7 +8914,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "BinaryInputBasic.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "BinaryInputBasic.AttributeList response", value);
     }
 };
 
@@ -8897,7 +8944,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "BinaryInputBasic.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "BinaryInputBasic.ClusterRevision response", value);
     }
 };
 
@@ -9034,7 +9081,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Binding.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "Binding.AttributeList response", value);
     }
 };
 
@@ -9064,7 +9111,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Binding.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "Binding.ClusterRevision response", value);
     }
 };
 
@@ -9141,13 +9188,15 @@ public:
 
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::BooleanState::Events::StateChange::DecodableType>(this, OnEventResponse,
-                                                                                                        OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::BooleanState::Events::StateChange::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "BooleanState.StateChange response", value);
+        LogEventHeader(eventHeader);
+        LogValue("BooleanState.StateChange report", 0, value);
     }
 };
 
@@ -9174,7 +9223,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::BooleanState::Events::StateChange::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -9182,8 +9231,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::BooleanState::Events::StateChange::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("BooleanState.StateChange report", 0, value);
     }
 
@@ -9219,7 +9270,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "BooleanState.StateValue response", value);
+        OnGeneralAttributeResponse(context, "BooleanState.StateValue response", value);
     }
 };
 
@@ -9288,7 +9339,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "BooleanState.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "BooleanState.AttributeList response", value);
     }
 };
 
@@ -9318,7 +9369,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "BooleanState.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "BooleanState.ClusterRevision response", value);
     }
 };
 
@@ -9715,13 +9766,15 @@ public:
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType>(this, OnEventResponse,
-                                                                                                           OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "BridgedActions.StateChanged response", value);
+        LogEventHeader(eventHeader);
+        LogValue("BridgedActions.StateChanged report", 0, value);
     }
 };
 
@@ -9748,7 +9801,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -9756,8 +9809,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("BridgedActions.StateChanged report", 0, value);
     }
 
@@ -9786,13 +9841,15 @@ public:
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType>(this, OnEventResponse,
-                                                                                                           OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "BridgedActions.ActionFailed response", value);
+        LogEventHeader(eventHeader);
+        LogValue("BridgedActions.ActionFailed report", 0, value);
     }
 };
 
@@ -9819,7 +9876,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -9827,8 +9884,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::BridgedActions::Events::ActionFailed::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("BridgedActions.ActionFailed report", 0, value);
     }
 
@@ -9867,7 +9926,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &
             value)
     {
-        OnGeneralAttributeEventResponse(context, "BridgedActions.ActionList response", value);
+        OnGeneralAttributeResponse(context, "BridgedActions.ActionList response", value);
     }
 };
 
@@ -9945,7 +10004,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
             value)
     {
-        OnGeneralAttributeEventResponse(context, "BridgedActions.EndpointList response", value);
+        OnGeneralAttributeResponse(context, "BridgedActions.EndpointList response", value);
     }
 };
 
@@ -10020,7 +10079,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "BridgedActions.SetupUrl response", value);
+        OnGeneralAttributeResponse(context, "BridgedActions.SetupUrl response", value);
     }
 };
 
@@ -10089,7 +10148,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "BridgedActions.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "BridgedActions.AttributeList response", value);
     }
 };
 
@@ -10119,7 +10178,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "BridgedActions.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "BridgedActions.ClusterRevision response", value);
     }
 };
 
@@ -10200,7 +10259,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "BridgedDeviceBasic.AttributeList response", value);
     }
 };
 
@@ -10230,7 +10289,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "BridgedDeviceBasic.ClusterRevision response", value);
     }
 };
 
@@ -10390,7 +10449,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Channel.ChannelList response", value);
+        OnGeneralAttributeResponse(context, "Channel.ChannelList response", value);
     }
 };
 
@@ -10464,7 +10523,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Channel.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "Channel.AttributeList response", value);
     }
 };
 
@@ -10494,7 +10553,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Channel.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "Channel.ClusterRevision response", value);
     }
 };
 
@@ -11188,7 +11247,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.CurrentHue response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.CurrentHue response", value);
     }
 };
 
@@ -11257,7 +11316,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.CurrentSaturation response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.CurrentSaturation response", value);
     }
 };
 
@@ -11326,7 +11385,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.RemainingTime response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.RemainingTime response", value);
     }
 };
 
@@ -11395,7 +11454,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.CurrentX response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.CurrentX response", value);
     }
 };
 
@@ -11464,7 +11523,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.CurrentY response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.CurrentY response", value);
     }
 };
 
@@ -11533,7 +11592,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.DriftCompensation response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.DriftCompensation response", value);
     }
 };
 
@@ -11602,7 +11661,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.CompensationText response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.CompensationText response", value);
     }
 };
 
@@ -11671,7 +11730,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorTemperature response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorTemperature response", value);
     }
 };
 
@@ -11740,7 +11799,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorMode response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorMode response", value);
     }
 };
 
@@ -11809,7 +11868,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorControlOptions response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorControlOptions response", value);
     }
 };
 
@@ -11904,7 +11963,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.NumberOfPrimaries response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.NumberOfPrimaries response", value);
     }
 };
 
@@ -11973,7 +12032,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary1X response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary1X response", value);
     }
 };
 
@@ -12042,7 +12101,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary1Y response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary1Y response", value);
     }
 };
 
@@ -12111,7 +12170,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary1Intensity response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary1Intensity response", value);
     }
 };
 
@@ -12180,7 +12239,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary2X response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary2X response", value);
     }
 };
 
@@ -12249,7 +12308,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary2Y response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary2Y response", value);
     }
 };
 
@@ -12318,7 +12377,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary2Intensity response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary2Intensity response", value);
     }
 };
 
@@ -12387,7 +12446,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary3X response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary3X response", value);
     }
 };
 
@@ -12456,7 +12515,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary3Y response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary3Y response", value);
     }
 };
 
@@ -12525,7 +12584,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary3Intensity response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary3Intensity response", value);
     }
 };
 
@@ -12594,7 +12653,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary4X response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary4X response", value);
     }
 };
 
@@ -12663,7 +12722,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary4Y response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary4Y response", value);
     }
 };
 
@@ -12732,7 +12791,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary4Intensity response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary4Intensity response", value);
     }
 };
 
@@ -12801,7 +12860,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary5X response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary5X response", value);
     }
 };
 
@@ -12870,7 +12929,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary5Y response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary5Y response", value);
     }
 };
 
@@ -12939,7 +12998,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary5Intensity response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary5Intensity response", value);
     }
 };
 
@@ -13008,7 +13067,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary6X response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary6X response", value);
     }
 };
 
@@ -13077,7 +13136,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary6Y response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary6Y response", value);
     }
 };
 
@@ -13146,7 +13205,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.Primary6Intensity response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.Primary6Intensity response", value);
     }
 };
 
@@ -13215,7 +13274,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.WhitePointX response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.WhitePointX response", value);
     }
 };
 
@@ -13310,7 +13369,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.WhitePointY response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.WhitePointY response", value);
     }
 };
 
@@ -13405,7 +13464,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorPointRX response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointRX response", value);
     }
 };
 
@@ -13500,7 +13559,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorPointRY response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointRY response", value);
     }
 };
 
@@ -13595,7 +13654,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorPointRIntensity response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointRIntensity response", value);
     }
 };
 
@@ -13690,7 +13749,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorPointGX response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointGX response", value);
     }
 };
 
@@ -13785,7 +13844,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorPointGY response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointGY response", value);
     }
 };
 
@@ -13880,7 +13939,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorPointGIntensity response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointGIntensity response", value);
     }
 };
 
@@ -13975,7 +14034,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorPointBX response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointBX response", value);
     }
 };
 
@@ -14070,7 +14129,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorPointBY response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointBY response", value);
     }
 };
 
@@ -14165,7 +14224,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorPointBIntensity response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointBIntensity response", value);
     }
 };
 
@@ -14260,7 +14319,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.EnhancedCurrentHue response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.EnhancedCurrentHue response", value);
     }
 };
 
@@ -14329,7 +14388,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.EnhancedColorMode response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.EnhancedColorMode response", value);
     }
 };
 
@@ -14398,7 +14457,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorLoopActive response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorLoopActive response", value);
     }
 };
 
@@ -14467,7 +14526,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorLoopDirection response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorLoopDirection response", value);
     }
 };
 
@@ -14536,7 +14595,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorLoopTime response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorLoopTime response", value);
     }
 };
 
@@ -14605,7 +14664,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorLoopStartEnhancedHue response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorLoopStartEnhancedHue response", value);
     }
 };
 
@@ -14677,7 +14736,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorLoopStoredEnhancedHue response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorLoopStoredEnhancedHue response", value);
     }
 };
 
@@ -14749,7 +14808,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorCapabilities response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorCapabilities response", value);
     }
 };
 
@@ -14818,7 +14877,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorTempPhysicalMin response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorTempPhysicalMin response", value);
     }
 };
 
@@ -14887,7 +14946,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ColorTempPhysicalMax response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ColorTempPhysicalMax response", value);
     }
 };
 
@@ -14956,7 +15015,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.CoupleColorTempToLevelMinMireds response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.CoupleColorTempToLevelMinMireds response", value);
     }
 };
 
@@ -15028,7 +15087,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.StartUpColorTemperatureMireds response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.StartUpColorTemperatureMireds response", value);
     }
 };
 
@@ -15126,7 +15185,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.AttributeList response", value);
     }
 };
 
@@ -15156,7 +15215,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ColorControl.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "ColorControl.ClusterRevision response", value);
     }
 };
 
@@ -15293,7 +15352,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ContentLauncher.AcceptHeaderList response", value);
+        OnGeneralAttributeResponse(context, "ContentLauncher.AcceptHeaderList response", value);
     }
 };
 
@@ -15365,7 +15424,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ContentLauncher.SupportedStreamingProtocols response", value);
+        OnGeneralAttributeResponse(context, "ContentLauncher.SupportedStreamingProtocols response", value);
     }
 };
 
@@ -15463,7 +15522,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ContentLauncher.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "ContentLauncher.AttributeList response", value);
     }
 };
 
@@ -15493,7 +15552,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ContentLauncher.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "ContentLauncher.ClusterRevision response", value);
     }
 };
 
@@ -15580,7 +15639,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Descriptor.DeviceList response", value);
+        OnGeneralAttributeResponse(context, "Descriptor.DeviceList response", value);
     }
 };
 
@@ -15654,7 +15713,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Descriptor.ServerList response", value);
+        OnGeneralAttributeResponse(context, "Descriptor.ServerList response", value);
     }
 };
 
@@ -15726,7 +15785,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Descriptor.ClientList response", value);
+        OnGeneralAttributeResponse(context, "Descriptor.ClientList response", value);
     }
 };
 
@@ -15798,7 +15857,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Descriptor.PartsList response", value);
+        OnGeneralAttributeResponse(context, "Descriptor.PartsList response", value);
     }
 };
 
@@ -15870,7 +15929,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Descriptor.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "Descriptor.AttributeList response", value);
     }
 };
 
@@ -15900,7 +15959,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Descriptor.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "Descriptor.ClusterRevision response", value);
     }
 };
 
@@ -16009,7 +16068,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "DiagnosticLogs.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "DiagnosticLogs.AttributeList response", value);
     }
 };
 
@@ -16282,13 +16341,15 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType>(this, OnEventResponse,
-                                                                                                      OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.DoorLockAlarm response", value);
+        LogEventHeader(eventHeader);
+        LogValue("DoorLock.DoorLockAlarm report", 0, value);
     }
 };
 
@@ -16315,7 +16376,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -16323,8 +16384,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::DoorLock::Events::DoorLockAlarm::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("DoorLock.DoorLockAlarm report", 0, value);
     }
 
@@ -16353,13 +16416,15 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType>(this, OnEventResponse,
-                                                                                                        OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.DoorStateChange response", value);
+        LogEventHeader(eventHeader);
+        LogValue("DoorLock.DoorStateChange report", 0, value);
     }
 };
 
@@ -16386,7 +16451,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -16394,8 +16459,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::DoorLock::Events::DoorStateChange::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("DoorLock.DoorStateChange report", 0, value);
     }
 
@@ -16424,13 +16491,15 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType>(this, OnEventResponse,
-                                                                                                      OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.LockOperation response", value);
+        LogEventHeader(eventHeader);
+        LogValue("DoorLock.LockOperation report", 0, value);
     }
 };
 
@@ -16457,7 +16526,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -16465,8 +16534,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::DoorLock::Events::LockOperation::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("DoorLock.LockOperation report", 0, value);
     }
 
@@ -16495,13 +16566,15 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType>(this, OnEventResponse,
-                                                                                                           OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.LockOperationError response", value);
+        LogEventHeader(eventHeader);
+        LogValue("DoorLock.LockOperationError report", 0, value);
     }
 };
 
@@ -16528,7 +16601,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -16536,8 +16609,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::DoorLock::Events::LockOperationError::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("DoorLock.LockOperationError report", 0, value);
     }
 
@@ -16566,13 +16641,15 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType>(this, OnEventResponse,
-                                                                                                       OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.LockUserChange response", value);
+        LogEventHeader(eventHeader);
+        LogValue("DoorLock.LockUserChange report", 0, value);
     }
 };
 
@@ -16599,7 +16676,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -16607,8 +16684,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::DoorLock::Events::LockUserChange::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("DoorLock.LockUserChange report", 0, value);
     }
 
@@ -16645,7 +16724,7 @@ public:
     static void OnAttributeResponse(void * context,
                                     const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlLockState> & value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.LockState response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.LockState response", value);
     }
 };
 
@@ -16718,7 +16797,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::app::Clusters::DoorLock::DlLockType value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.LockType response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.LockType response", value);
     }
 };
 
@@ -16790,7 +16869,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.ActuatorEnabled response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.ActuatorEnabled response", value);
     }
 };
 
@@ -16860,7 +16939,7 @@ public:
     static void OnAttributeResponse(void * context,
                                     const chip::app::DataModel::Nullable<chip::app::Clusters::DoorLock::DlDoorState> & value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.DoorState response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.DoorState response", value);
     }
 };
 
@@ -16933,7 +17012,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.NumberOfTotalUsersSupported response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.NumberOfTotalUsersSupported response", value);
     }
 };
 
@@ -16963,7 +17042,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.NumberOfPINUsersSupported response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.NumberOfPINUsersSupported response", value);
     }
 };
 
@@ -16993,7 +17072,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.MaxPINCodeLength response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.MaxPINCodeLength response", value);
     }
 };
 
@@ -17023,7 +17102,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.MinPINCodeLength response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.MinPINCodeLength response", value);
     }
 };
 
@@ -17053,7 +17132,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.Language response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.Language response", value);
     }
 };
 
@@ -17148,7 +17227,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.AutoRelockTime response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.AutoRelockTime response", value);
     }
 };
 
@@ -17243,7 +17322,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.SoundVolume response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.SoundVolume response", value);
     }
 };
 
@@ -17338,7 +17417,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::app::Clusters::DoorLock::DlOperatingMode value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.OperatingMode response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.OperatingMode response", value);
     }
 };
 
@@ -17436,7 +17515,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.SupportedOperatingModes response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.SupportedOperatingModes response", value);
     }
 };
 
@@ -17466,7 +17545,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.EnableOneTouchLocking response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.EnableOneTouchLocking response", value);
     }
 };
 
@@ -17561,7 +17640,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.EnablePrivacyModeButton response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.EnablePrivacyModeButton response", value);
     }
 };
 
@@ -17656,7 +17735,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.WrongCodeEntryLimit response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.WrongCodeEntryLimit response", value);
     }
 };
 
@@ -17751,7 +17830,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.AttributeList response", value);
     }
 };
 
@@ -17781,7 +17860,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "DoorLock.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "DoorLock.ClusterRevision response", value);
     }
 };
 
@@ -17873,7 +17952,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.MeasurementType response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.MeasurementType response", value);
     }
 };
 
@@ -17945,7 +18024,7 @@ public:
 
     static void OnAttributeResponse(void * context, int32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.TotalActivePower response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.TotalActivePower response", value);
     }
 };
 
@@ -18017,7 +18096,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.RmsVoltage response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsVoltage response", value);
     }
 };
 
@@ -18086,7 +18165,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.RmsVoltageMin response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsVoltageMin response", value);
     }
 };
 
@@ -18155,7 +18234,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.RmsVoltageMax response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsVoltageMax response", value);
     }
 };
 
@@ -18224,7 +18303,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.RmsCurrent response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsCurrent response", value);
     }
 };
 
@@ -18293,7 +18372,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.RmsCurrentMin response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsCurrentMin response", value);
     }
 };
 
@@ -18362,7 +18441,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.RmsCurrentMax response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsCurrentMax response", value);
     }
 };
 
@@ -18431,7 +18510,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.ActivePower response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.ActivePower response", value);
     }
 };
 
@@ -18500,7 +18579,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.ActivePowerMin response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.ActivePowerMin response", value);
     }
 };
 
@@ -18569,7 +18648,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.ActivePowerMax response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.ActivePowerMax response", value);
     }
 };
 
@@ -18638,7 +18717,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.AttributeList response", value);
     }
 };
 
@@ -18668,7 +18747,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ElectricalMeasurement.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.ClusterRevision response", value);
     }
 };
 
@@ -18783,7 +18862,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.PHYRate response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.PHYRate response", value);
     }
 };
 
@@ -18852,7 +18931,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.FullDuplex response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.FullDuplex response", value);
     }
 };
 
@@ -18921,7 +19000,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.PacketRxCount response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.PacketRxCount response", value);
     }
 };
 
@@ -18993,7 +19072,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.PacketTxCount response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.PacketTxCount response", value);
     }
 };
 
@@ -19065,7 +19144,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.TxErrCount response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.TxErrCount response", value);
     }
 };
 
@@ -19137,7 +19216,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.CollisionCount response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.CollisionCount response", value);
     }
 };
 
@@ -19209,7 +19288,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.OverrunCount response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.OverrunCount response", value);
     }
 };
 
@@ -19281,7 +19360,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.CarrierDetect response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.CarrierDetect response", value);
     }
 };
 
@@ -19350,7 +19429,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.TimeSinceReset response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.TimeSinceReset response", value);
     }
 };
 
@@ -19422,7 +19501,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.AttributeList response", value);
     }
 };
 
@@ -19452,7 +19531,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.FeatureMap response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.FeatureMap response", value);
     }
 };
 
@@ -19482,7 +19561,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.ClusterRevision response", value);
     }
 };
 
@@ -19569,7 +19648,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "FixedLabel.LabelList response", value);
+        OnGeneralAttributeResponse(context, "FixedLabel.LabelList response", value);
     }
 };
 
@@ -19643,7 +19722,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "FixedLabel.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "FixedLabel.AttributeList response", value);
     }
 };
 
@@ -19673,7 +19752,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "FixedLabel.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "FixedLabel.ClusterRevision response", value);
     }
 };
 
@@ -19758,7 +19837,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "FlowMeasurement.MeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "FlowMeasurement.MeasuredValue response", value);
     }
 };
 
@@ -19827,7 +19906,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "FlowMeasurement.MinMeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "FlowMeasurement.MinMeasuredValue response", value);
     }
 };
 
@@ -19896,7 +19975,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "FlowMeasurement.MaxMeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "FlowMeasurement.MaxMeasuredValue response", value);
     }
 };
 
@@ -19965,7 +20044,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "FlowMeasurement.Tolerance response", value);
+        OnGeneralAttributeResponse(context, "FlowMeasurement.Tolerance response", value);
     }
 };
 
@@ -20034,7 +20113,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "FlowMeasurement.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "FlowMeasurement.AttributeList response", value);
     }
 };
 
@@ -20064,7 +20143,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "FlowMeasurement.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "FlowMeasurement.ClusterRevision response", value);
     }
 };
 
@@ -20226,7 +20305,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralCommissioning.Breadcrumb response", value);
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.Breadcrumb response", value);
     }
 };
 
@@ -20324,7 +20403,7 @@ public:
                         const chip::app::DataModel::DecodableList<
                             chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralCommissioning.BasicCommissioningInfoList response", value);
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.BasicCommissioningInfoList response", value);
     }
 };
 
@@ -20400,7 +20479,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralCommissioning.RegulatoryConfig response", value);
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.RegulatoryConfig response", value);
     }
 };
 
@@ -20430,7 +20509,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralCommissioning.LocationCapability response", value);
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.LocationCapability response", value);
     }
 };
 
@@ -20460,7 +20539,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralCommissioning.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.AttributeList response", value);
     }
 };
 
@@ -20490,7 +20569,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralCommissioning.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.ClusterRevision response", value);
     }
 };
 
@@ -20578,13 +20657,14 @@ public:
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::GeneralDiagnostics::Events::HardwareFaultChange::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::GeneralDiagnostics::Events::HardwareFaultChange::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.HardwareFaultChange response", value);
+        LogEventHeader(eventHeader);
+        LogValue("GeneralDiagnostics.HardwareFaultChange report", 0, value);
     }
 };
 
@@ -20611,7 +20691,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::GeneralDiagnostics::Events::HardwareFaultChange::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -20619,9 +20699,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::GeneralDiagnostics::Events::HardwareFaultChange::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("GeneralDiagnostics.HardwareFaultChange report", 0, value);
     }
 
@@ -20651,13 +20732,14 @@ public:
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::GeneralDiagnostics::Events::RadioFaultChange::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::GeneralDiagnostics::Events::RadioFaultChange::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.RadioFaultChange response", value);
+        LogEventHeader(eventHeader);
+        LogValue("GeneralDiagnostics.RadioFaultChange report", 0, value);
     }
 };
 
@@ -20684,7 +20766,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::GeneralDiagnostics::Events::RadioFaultChange::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -20692,9 +20774,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::GeneralDiagnostics::Events::RadioFaultChange::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("GeneralDiagnostics.RadioFaultChange report", 0, value);
     }
 
@@ -20724,13 +20807,14 @@ public:
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::GeneralDiagnostics::Events::NetworkFaultChange::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::GeneralDiagnostics::Events::NetworkFaultChange::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.NetworkFaultChange response", value);
+        LogEventHeader(eventHeader);
+        LogValue("GeneralDiagnostics.NetworkFaultChange report", 0, value);
     }
 };
 
@@ -20757,7 +20841,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::GeneralDiagnostics::Events::NetworkFaultChange::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -20765,9 +20849,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::GeneralDiagnostics::Events::NetworkFaultChange::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("GeneralDiagnostics.NetworkFaultChange report", 0, value);
     }
 
@@ -20796,13 +20881,15 @@ public:
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType>(this, OnEventResponse,
-                                                                                                             OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.BootReason response", value);
+        LogEventHeader(eventHeader);
+        LogValue("GeneralDiagnostics.BootReason report", 0, value);
     }
 };
 
@@ -20829,7 +20916,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -20837,8 +20924,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::GeneralDiagnostics::Events::BootReason::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("GeneralDiagnostics.BootReason report", 0, value);
     }
 
@@ -20877,7 +20966,7 @@ public:
                         const chip::app::DataModel::DecodableList<
                             chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.NetworkInterfaces response", value);
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.NetworkInterfaces response", value);
     }
 };
 
@@ -20951,7 +21040,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.RebootCount response", value);
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.RebootCount response", value);
     }
 };
 
@@ -21020,7 +21109,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.UpTime response", value);
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.UpTime response", value);
     }
 };
 
@@ -21089,7 +21178,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.TotalOperationalHours response", value);
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.TotalOperationalHours response", value);
     }
 };
 
@@ -21161,7 +21250,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.BootReasons response", value);
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.BootReasons response", value);
     }
 };
 
@@ -21230,7 +21319,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.ActiveHardwareFaults response", value);
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.ActiveHardwareFaults response", value);
     }
 };
 
@@ -21302,7 +21391,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.ActiveRadioFaults response", value);
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.ActiveRadioFaults response", value);
     }
 };
 
@@ -21374,7 +21463,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.ActiveNetworkFaults response", value);
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.ActiveNetworkFaults response", value);
     }
 };
 
@@ -21446,7 +21535,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.AttributeList response", value);
     }
 };
 
@@ -21476,7 +21565,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GeneralDiagnostics.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.ClusterRevision response", value);
     }
 };
 
@@ -21664,7 +21753,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
             value)
     {
-        OnGeneralAttributeEventResponse(context, "GroupKeyManagement.GroupKeyMap response", value);
+        OnGeneralAttributeResponse(context, "GroupKeyManagement.GroupKeyMap response", value);
     }
 };
 
@@ -21742,7 +21831,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &
             value)
     {
-        OnGeneralAttributeEventResponse(context, "GroupKeyManagement.GroupTable response", value);
+        OnGeneralAttributeResponse(context, "GroupKeyManagement.GroupTable response", value);
     }
 };
 
@@ -21817,7 +21906,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GroupKeyManagement.MaxGroupsPerFabric response", value);
+        OnGeneralAttributeResponse(context, "GroupKeyManagement.MaxGroupsPerFabric response", value);
     }
 };
 
@@ -21847,7 +21936,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GroupKeyManagement.MaxGroupKeysPerFabric response", value);
+        OnGeneralAttributeResponse(context, "GroupKeyManagement.MaxGroupKeysPerFabric response", value);
     }
 };
 
@@ -21877,7 +21966,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "GroupKeyManagement.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "GroupKeyManagement.AttributeList response", value);
     }
 };
 
@@ -21907,7 +21996,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "GroupKeyManagement.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "GroupKeyManagement.ClusterRevision response", value);
     }
 };
 
@@ -22137,7 +22226,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Groups.NameSupport response", value);
+        OnGeneralAttributeResponse(context, "Groups.NameSupport response", value);
     }
 };
 
@@ -22206,7 +22295,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Groups.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "Groups.AttributeList response", value);
     }
 };
 
@@ -22236,7 +22325,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Groups.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "Groups.ClusterRevision response", value);
     }
 };
 
@@ -22393,7 +22482,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Identify.IdentifyTime response", value);
+        OnGeneralAttributeResponse(context, "Identify.IdentifyTime response", value);
     }
 };
 
@@ -22488,7 +22577,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Identify.IdentifyType response", value);
+        OnGeneralAttributeResponse(context, "Identify.IdentifyType response", value);
     }
 };
 
@@ -22557,7 +22646,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Identify.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "Identify.AttributeList response", value);
     }
 };
 
@@ -22587,7 +22676,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Identify.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "Identify.ClusterRevision response", value);
     }
 };
 
@@ -22673,7 +22762,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "IlluminanceMeasurement.MeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.MeasuredValue response", value);
     }
 };
 
@@ -22745,7 +22834,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "IlluminanceMeasurement.MinMeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.MinMeasuredValue response", value);
     }
 };
 
@@ -22817,7 +22906,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "IlluminanceMeasurement.MaxMeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.MaxMeasuredValue response", value);
     }
 };
 
@@ -22889,7 +22978,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "IlluminanceMeasurement.Tolerance response", value);
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.Tolerance response", value);
     }
 };
 
@@ -22958,7 +23047,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "IlluminanceMeasurement.LightSensorType response", value);
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.LightSensorType response", value);
     }
 };
 
@@ -23030,7 +23119,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "IlluminanceMeasurement.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.AttributeList response", value);
     }
 };
 
@@ -23060,7 +23149,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "IlluminanceMeasurement.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.ClusterRevision response", value);
     }
 };
 
@@ -23170,7 +23259,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "KeypadInput.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "KeypadInput.AttributeList response", value);
     }
 };
 
@@ -23200,7 +23289,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "KeypadInput.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "KeypadInput.ClusterRevision response", value);
     }
 };
 
@@ -23510,7 +23599,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.CurrentLevel response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.CurrentLevel response", value);
     }
 };
 
@@ -23579,7 +23668,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.RemainingTime response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.RemainingTime response", value);
     }
 };
 
@@ -23648,7 +23737,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.MinLevel response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.MinLevel response", value);
     }
 };
 
@@ -23717,7 +23806,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.MaxLevel response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.MaxLevel response", value);
     }
 };
 
@@ -23786,7 +23875,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.CurrentFrequency response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.CurrentFrequency response", value);
     }
 };
 
@@ -23855,7 +23944,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.MinFrequency response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.MinFrequency response", value);
     }
 };
 
@@ -23924,7 +24013,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.MaxFrequency response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.MaxFrequency response", value);
     }
 };
 
@@ -23993,7 +24082,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.Options response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.Options response", value);
     }
 };
 
@@ -24088,7 +24177,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.OnOffTransitionTime response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.OnOffTransitionTime response", value);
     }
 };
 
@@ -24183,7 +24272,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.OnLevel response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.OnLevel response", value);
     }
 };
 
@@ -24281,7 +24370,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.OnTransitionTime response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.OnTransitionTime response", value);
     }
 };
 
@@ -24379,7 +24468,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.OffTransitionTime response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.OffTransitionTime response", value);
     }
 };
 
@@ -24477,7 +24566,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.DefaultMoveRate response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.DefaultMoveRate response", value);
     }
 };
 
@@ -24575,7 +24664,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.StartUpCurrentLevel response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.StartUpCurrentLevel response", value);
     }
 };
 
@@ -24670,7 +24759,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.AttributeList response", value);
     }
 };
 
@@ -24700,7 +24789,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LevelControl.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "LevelControl.ClusterRevision response", value);
     }
 };
 
@@ -24781,7 +24870,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "LocalizationConfiguration.ActiveLocale response", value);
+        OnGeneralAttributeResponse(context, "LocalizationConfiguration.ActiveLocale response", value);
     }
 };
 
@@ -24837,7 +24926,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
     {
-        OnGeneralAttributeEventResponse(context, "LocalizationConfiguration.SupportedLocales response", value);
+        OnGeneralAttributeResponse(context, "LocalizationConfiguration.SupportedLocales response", value);
     }
 };
 
@@ -24900,7 +24989,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "LowPower.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "LowPower.AttributeList response", value);
     }
 };
 
@@ -24930,7 +25019,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "LowPower.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "LowPower.ClusterRevision response", value);
     }
 };
 
@@ -25108,7 +25197,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::InputInfo::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaInput.MediaInputList response", value);
+        OnGeneralAttributeResponse(context, "MediaInput.MediaInputList response", value);
     }
 };
 
@@ -25182,7 +25271,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaInput.CurrentMediaInput response", value);
+        OnGeneralAttributeResponse(context, "MediaInput.CurrentMediaInput response", value);
     }
 };
 
@@ -25251,7 +25340,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaInput.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "MediaInput.AttributeList response", value);
     }
 };
 
@@ -25281,7 +25370,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaInput.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "MediaInput.ClusterRevision response", value);
     }
 };
 
@@ -25611,7 +25700,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::app::Clusters::MediaPlayback::PlaybackStateEnum value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaPlayback.PlaybackState response", value);
+        OnGeneralAttributeResponse(context, "MediaPlayback.PlaybackState response", value);
     }
 };
 
@@ -25683,7 +25772,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaPlayback.StartTime response", value);
+        OnGeneralAttributeResponse(context, "MediaPlayback.StartTime response", value);
     }
 };
 
@@ -25752,7 +25841,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaPlayback.Duration response", value);
+        OnGeneralAttributeResponse(context, "MediaPlayback.Duration response", value);
     }
 };
 
@@ -25821,7 +25910,7 @@ public:
 
     static void OnAttributeResponse(void * context, float value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaPlayback.PlaybackSpeed response", value);
+        OnGeneralAttributeResponse(context, "MediaPlayback.PlaybackSpeed response", value);
     }
 };
 
@@ -25851,7 +25940,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaPlayback.SeekRangeEnd response", value);
+        OnGeneralAttributeResponse(context, "MediaPlayback.SeekRangeEnd response", value);
     }
 };
 
@@ -25920,7 +26009,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaPlayback.SeekRangeStart response", value);
+        OnGeneralAttributeResponse(context, "MediaPlayback.SeekRangeStart response", value);
     }
 };
 
@@ -25989,7 +26078,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaPlayback.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "MediaPlayback.AttributeList response", value);
     }
 };
 
@@ -26019,7 +26108,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "MediaPlayback.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "MediaPlayback.ClusterRevision response", value);
     }
 };
 
@@ -26130,7 +26219,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ModeSelect.CurrentMode response", value);
+        OnGeneralAttributeResponse(context, "ModeSelect.CurrentMode response", value);
     }
 };
 
@@ -26202,7 +26291,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
             value)
     {
-        OnGeneralAttributeEventResponse(context, "ModeSelect.SupportedModes response", value);
+        OnGeneralAttributeResponse(context, "ModeSelect.SupportedModes response", value);
     }
 };
 
@@ -26277,7 +26366,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ModeSelect.OnMode response", value);
+        OnGeneralAttributeResponse(context, "ModeSelect.OnMode response", value);
     }
 };
 
@@ -26372,7 +26461,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ModeSelect.StartUpMode response", value);
+        OnGeneralAttributeResponse(context, "ModeSelect.StartUpMode response", value);
     }
 };
 
@@ -26441,7 +26530,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "ModeSelect.Description response", value);
+        OnGeneralAttributeResponse(context, "ModeSelect.Description response", value);
     }
 };
 
@@ -26510,7 +26599,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ModeSelect.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "ModeSelect.AttributeList response", value);
     }
 };
 
@@ -26540,7 +26629,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ModeSelect.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "ModeSelect.ClusterRevision response", value);
     }
 };
 
@@ -26787,7 +26876,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "NetworkCommissioning.MaxNetworks response", value);
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.MaxNetworks response", value);
     }
 };
 
@@ -26820,7 +26909,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
             value)
     {
-        OnGeneralAttributeEventResponse(context, "NetworkCommissioning.Networks response", value);
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.Networks response", value);
     }
 };
 
@@ -26850,7 +26939,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "NetworkCommissioning.ScanMaxTimeSeconds response", value);
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.ScanMaxTimeSeconds response", value);
     }
 };
 
@@ -26880,7 +26969,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "NetworkCommissioning.ConnectMaxTimeSeconds response", value);
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.ConnectMaxTimeSeconds response", value);
     }
 };
 
@@ -26910,7 +26999,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "NetworkCommissioning.InterfaceEnabled response", value);
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.InterfaceEnabled response", value);
     }
 };
 
@@ -26966,7 +27055,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value)
     {
-        OnGeneralAttributeEventResponse(context, "NetworkCommissioning.LastNetworkingStatus response", value);
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.LastNetworkingStatus response", value);
     }
 };
 
@@ -26996,7 +27085,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::ByteSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "NetworkCommissioning.LastNetworkID response", value);
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.LastNetworkID response", value);
     }
 };
 
@@ -27026,7 +27115,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "NetworkCommissioning.LastConnectErrorValue response", value);
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.LastConnectErrorValue response", value);
     }
 };
 
@@ -27056,7 +27145,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "NetworkCommissioning.FeatureMap response", value);
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.FeatureMap response", value);
     }
 };
 
@@ -27125,7 +27214,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "NetworkCommissioning.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.ClusterRevision response", value);
     }
 };
 
@@ -27290,7 +27379,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateProvider.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateProvider.AttributeList response", value);
     }
 };
 
@@ -27320,7 +27409,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateProvider.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateProvider.ClusterRevision response", value);
     }
 };
 
@@ -27437,13 +27526,14 @@ public:
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateRequestor.StateTransition response", value);
+        LogEventHeader(eventHeader);
+        LogValue("OtaSoftwareUpdateRequestor.StateTransition report", 0, value);
     }
 };
 
@@ -27470,7 +27560,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -27478,9 +27568,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::StateTransition::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("OtaSoftwareUpdateRequestor.StateTransition report", 0, value);
     }
 
@@ -27510,13 +27601,14 @@ public:
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateRequestor.VersionApplied response", value);
+        LogEventHeader(eventHeader);
+        LogValue("OtaSoftwareUpdateRequestor.VersionApplied report", 0, value);
     }
 };
 
@@ -27543,7 +27635,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -27551,9 +27643,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::VersionApplied::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("OtaSoftwareUpdateRequestor.VersionApplied report", 0, value);
     }
 
@@ -27583,13 +27676,14 @@ public:
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateRequestor.DownloadError response", value);
+        LogEventHeader(eventHeader);
+        LogValue("OtaSoftwareUpdateRequestor.DownloadError report", 0, value);
     }
 };
 
@@ -27616,7 +27710,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -27624,9 +27718,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::OtaSoftwareUpdateRequestor::Events::DownloadError::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("OtaSoftwareUpdateRequestor.DownloadError report", 0, value);
     }
 
@@ -27665,7 +27760,7 @@ public:
                         const chip::app::DataModel::DecodableList<
                             chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateRequestor.DefaultOtaProviders response", value);
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.DefaultOtaProviders response", value);
     }
 };
 
@@ -27741,7 +27836,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateRequestor.UpdatePossible response", value);
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.UpdatePossible response", value);
     }
 };
 
@@ -27813,7 +27908,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum value)
     {
-        OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateRequestor.UpdateState response", value);
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.UpdateState response", value);
     }
 };
 
@@ -27885,7 +27980,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateRequestor.UpdateStateProgress response", value);
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.UpdateStateProgress response", value);
     }
 };
 
@@ -27958,7 +28053,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateRequestor.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.AttributeList response", value);
     }
 };
 
@@ -27988,7 +28083,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateRequestor.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.ClusterRevision response", value);
     }
 };
 
@@ -28075,7 +28170,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OccupancySensing.Occupancy response", value);
+        OnGeneralAttributeResponse(context, "OccupancySensing.Occupancy response", value);
     }
 };
 
@@ -28144,7 +28239,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OccupancySensing.OccupancySensorType response", value);
+        OnGeneralAttributeResponse(context, "OccupancySensing.OccupancySensorType response", value);
     }
 };
 
@@ -28213,7 +28308,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OccupancySensing.OccupancySensorTypeBitmap response", value);
+        OnGeneralAttributeResponse(context, "OccupancySensing.OccupancySensorTypeBitmap response", value);
     }
 };
 
@@ -28285,7 +28380,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "OccupancySensing.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "OccupancySensing.AttributeList response", value);
     }
 };
 
@@ -28315,7 +28410,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OccupancySensing.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "OccupancySensing.ClusterRevision response", value);
     }
 };
 
@@ -28542,7 +28637,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOff.OnOff response", value);
+        OnGeneralAttributeResponse(context, "OnOff.OnOff response", value);
     }
 };
 
@@ -28611,7 +28706,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOff.GlobalSceneControl response", value);
+        OnGeneralAttributeResponse(context, "OnOff.GlobalSceneControl response", value);
     }
 };
 
@@ -28680,7 +28775,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOff.OnTime response", value);
+        OnGeneralAttributeResponse(context, "OnOff.OnTime response", value);
     }
 };
 
@@ -28775,7 +28870,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOff.OffWaitTime response", value);
+        OnGeneralAttributeResponse(context, "OnOff.OffWaitTime response", value);
     }
 };
 
@@ -28870,7 +28965,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOff.StartUpOnOff response", value);
+        OnGeneralAttributeResponse(context, "OnOff.StartUpOnOff response", value);
     }
 };
 
@@ -28965,7 +29060,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOff.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "OnOff.AttributeList response", value);
     }
 };
 
@@ -28995,7 +29090,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOff.FeatureMap response", value);
+        OnGeneralAttributeResponse(context, "OnOff.FeatureMap response", value);
     }
 };
 
@@ -29064,7 +29159,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOff.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "OnOff.ClusterRevision response", value);
     }
 };
 
@@ -29147,7 +29242,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOffSwitchConfiguration.SwitchType response", value);
+        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.SwitchType response", value);
     }
 };
 
@@ -29216,7 +29311,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOffSwitchConfiguration.SwitchActions response", value);
+        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.SwitchActions response", value);
     }
 };
 
@@ -29314,7 +29409,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOffSwitchConfiguration.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.AttributeList response", value);
     }
 };
 
@@ -29344,7 +29439,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OnOffSwitchConfiguration.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.ClusterRevision response", value);
     }
 };
 
@@ -29666,7 +29761,7 @@ public:
                         const chip::app::DataModel::DecodableList<
                             chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "OperationalCredentials.FabricsList response", value);
+        OnGeneralAttributeResponse(context, "OperationalCredentials.FabricsList response", value);
     }
 };
 
@@ -29740,7 +29835,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OperationalCredentials.SupportedFabrics response", value);
+        OnGeneralAttributeResponse(context, "OperationalCredentials.SupportedFabrics response", value);
     }
 };
 
@@ -29812,7 +29907,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OperationalCredentials.CommissionedFabrics response", value);
+        OnGeneralAttributeResponse(context, "OperationalCredentials.CommissionedFabrics response", value);
     }
 };
 
@@ -29884,7 +29979,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
     {
-        OnGeneralAttributeEventResponse(context, "OperationalCredentials.TrustedRootCertificates response", value);
+        OnGeneralAttributeResponse(context, "OperationalCredentials.TrustedRootCertificates response", value);
     }
 };
 
@@ -29957,7 +30052,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::FabricIndex value)
     {
-        OnGeneralAttributeEventResponse(context, "OperationalCredentials.CurrentFabricIndex response", value);
+        OnGeneralAttributeResponse(context, "OperationalCredentials.CurrentFabricIndex response", value);
     }
 };
 
@@ -30029,7 +30124,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "OperationalCredentials.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "OperationalCredentials.AttributeList response", value);
     }
 };
 
@@ -30059,7 +30154,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "OperationalCredentials.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "OperationalCredentials.ClusterRevision response", value);
     }
 };
 
@@ -30153,7 +30248,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.Status response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.Status response", value);
     }
 };
 
@@ -30222,7 +30317,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.Order response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.Order response", value);
     }
 };
 
@@ -30291,7 +30386,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.Description response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.Description response", value);
     }
 };
 
@@ -30360,7 +30455,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.BatteryVoltage response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.BatteryVoltage response", value);
     }
 };
 
@@ -30429,7 +30524,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.BatteryPercentRemaining response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.BatteryPercentRemaining response", value);
     }
 };
 
@@ -30498,7 +30593,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.BatteryTimeRemaining response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.BatteryTimeRemaining response", value);
     }
 };
 
@@ -30567,7 +30662,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.BatteryChargeLevel response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.BatteryChargeLevel response", value);
     }
 };
 
@@ -30636,7 +30731,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.ActiveBatteryFaults response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.ActiveBatteryFaults response", value);
     }
 };
 
@@ -30708,7 +30803,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.BatteryChargeState response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.BatteryChargeState response", value);
     }
 };
 
@@ -30777,7 +30872,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.AttributeList response", value);
     }
 };
 
@@ -30807,7 +30902,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.FeatureMap response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.FeatureMap response", value);
     }
 };
 
@@ -30876,7 +30971,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSource.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "PowerSource.ClusterRevision response", value);
     }
 };
 
@@ -30958,7 +31053,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSourceConfiguration.Sources response", value);
+        OnGeneralAttributeResponse(context, "PowerSourceConfiguration.Sources response", value);
     }
 };
 
@@ -30988,7 +31083,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSourceConfiguration.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "PowerSourceConfiguration.AttributeList response", value);
     }
 };
 
@@ -31018,7 +31113,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PowerSourceConfiguration.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "PowerSourceConfiguration.ClusterRevision response", value);
     }
 };
 
@@ -31063,7 +31158,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PressureMeasurement.MeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "PressureMeasurement.MeasuredValue response", value);
     }
 };
 
@@ -31132,7 +31227,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PressureMeasurement.MinMeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "PressureMeasurement.MinMeasuredValue response", value);
     }
 };
 
@@ -31201,7 +31296,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PressureMeasurement.MaxMeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "PressureMeasurement.MaxMeasuredValue response", value);
     }
 };
 
@@ -31270,7 +31365,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "PressureMeasurement.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "PressureMeasurement.AttributeList response", value);
     }
 };
 
@@ -31300,7 +31395,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PressureMeasurement.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "PressureMeasurement.ClusterRevision response", value);
     }
 };
 
@@ -31418,13 +31513,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.SupplyVoltageLow response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.SupplyVoltageLow report", 0, value);
     }
 };
 
@@ -31451,7 +31547,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -31459,9 +31555,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageLow::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.SupplyVoltageLow report", 0, value);
     }
 
@@ -31491,13 +31588,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.SupplyVoltageHigh response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.SupplyVoltageHigh report", 0, value);
     }
 };
 
@@ -31524,7 +31622,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -31532,9 +31630,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::SupplyVoltageHigh::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.SupplyVoltageHigh report", 0, value);
     }
 
@@ -31564,13 +31663,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.PowerMissingPhase response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.PowerMissingPhase report", 0, value);
     }
 };
 
@@ -31597,7 +31697,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -31605,9 +31705,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::PowerMissingPhase::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.PowerMissingPhase report", 0, value);
     }
 
@@ -31637,13 +31738,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.SystemPressureLow response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.SystemPressureLow report", 0, value);
     }
 };
 
@@ -31670,7 +31772,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -31678,9 +31780,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureLow::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.SystemPressureLow report", 0, value);
     }
 
@@ -31710,13 +31813,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.SystemPressureHigh response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.SystemPressureHigh report", 0, value);
     }
 };
 
@@ -31743,7 +31847,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -31751,9 +31855,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::SystemPressureHigh::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.SystemPressureHigh report", 0, value);
     }
 
@@ -31783,13 +31888,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::DryRunning::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::DryRunning::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.DryRunning response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.DryRunning report", 0, value);
     }
 };
 
@@ -31816,7 +31922,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::DryRunning::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -31824,9 +31930,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::DryRunning::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.DryRunning report", 0, value);
     }
 
@@ -31856,13 +31963,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MotorTemperatureHigh response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.MotorTemperatureHigh report", 0, value);
     }
 };
 
@@ -31890,7 +31998,7 @@ public:
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster
             .SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType>(
-                this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+                this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -31898,9 +32006,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::MotorTemperatureHigh::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.MotorTemperatureHigh report", 0, value);
     }
 
@@ -31930,14 +32039,15 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
     static void
-    OnEventResponse(void * context,
+    OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                     chip::app::Clusters::PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.PumpMotorFatalFailure response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.PumpMotorFatalFailure report", 0, value);
     }
 };
 
@@ -31965,7 +32075,7 @@ public:
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster
             .SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType>(
-                this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+                this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -31973,9 +32083,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::PumpMotorFatalFailure::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.PumpMotorFatalFailure report", 0, value);
     }
 
@@ -32006,14 +32117,15 @@ public:
         cluster.Associate(device, endpointId);
         return cluster
             .ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType>(
-                this, OnEventResponse, OnDefaultFailure);
+                this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
     static void
-    OnEventResponse(void * context,
+    OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                     chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.ElectronicTemperatureHigh response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.ElectronicTemperatureHigh report", 0, value);
     }
 };
 
@@ -32041,7 +32153,7 @@ public:
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster
             .SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType>(
-                this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+                this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -32050,9 +32162,10 @@ public:
     }
 
     static void
-    OnValueReport(void * context,
+    OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                   chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicTemperatureHigh::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.ElectronicTemperatureHigh report", 0, value);
     }
 
@@ -32082,13 +32195,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::PumpBlocked::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::PumpBlocked::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.PumpBlocked response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.PumpBlocked report", 0, value);
     }
 };
 
@@ -32115,7 +32229,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::PumpBlocked::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -32123,9 +32237,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::PumpBlocked::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.PumpBlocked report", 0, value);
     }
 
@@ -32155,13 +32270,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::SensorFailure::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::SensorFailure::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.SensorFailure response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.SensorFailure report", 0, value);
     }
 };
 
@@ -32188,7 +32304,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::SensorFailure::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -32196,9 +32312,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::SensorFailure::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.SensorFailure report", 0, value);
     }
 
@@ -32229,14 +32346,15 @@ public:
         cluster.Associate(device, endpointId);
         return cluster
             .ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType>(
-                this, OnEventResponse, OnDefaultFailure);
+                this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
     static void
-    OnEventResponse(void * context,
+    OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                     chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.ElectronicNonFatalFailure response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.ElectronicNonFatalFailure report", 0, value);
     }
 };
 
@@ -32264,7 +32382,7 @@ public:
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster
             .SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType>(
-                this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+                this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -32273,9 +32391,10 @@ public:
     }
 
     static void
-    OnValueReport(void * context,
+    OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                   chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicNonFatalFailure::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.ElectronicNonFatalFailure report", 0, value);
     }
 
@@ -32305,14 +32424,15 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
     static void
-    OnEventResponse(void * context,
+    OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                     chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.ElectronicFatalFailure response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.ElectronicFatalFailure report", 0, value);
     }
 };
 
@@ -32340,7 +32460,7 @@ public:
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster
             .SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType>(
-                this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+                this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -32348,9 +32468,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::ElectronicFatalFailure::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.ElectronicFatalFailure report", 0, value);
     }
 
@@ -32380,13 +32501,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::GeneralFault::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::GeneralFault::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.GeneralFault response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.GeneralFault report", 0, value);
     }
 };
 
@@ -32413,7 +32535,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::GeneralFault::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -32421,9 +32543,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::GeneralFault::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.GeneralFault report", 0, value);
     }
 
@@ -32453,13 +32576,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::Leakage::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::Leakage::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.Leakage response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.Leakage report", 0, value);
     }
 };
 
@@ -32486,7 +32610,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::Leakage::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -32494,9 +32618,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::Leakage::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.Leakage report", 0, value);
     }
 
@@ -32526,13 +32651,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.AirDetection response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.AirDetection report", 0, value);
     }
 };
 
@@ -32559,7 +32685,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -32567,9 +32693,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::AirDetection::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.AirDetection report", 0, value);
     }
 
@@ -32599,13 +32726,14 @@ public:
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.TurbineOperation response", value);
+        LogEventHeader(eventHeader);
+        LogValue("PumpConfigurationAndControl.TurbineOperation report", 0, value);
     }
 };
 
@@ -32632,7 +32760,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -32640,9 +32768,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::PumpConfigurationAndControl::Events::TurbineOperation::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("PumpConfigurationAndControl.TurbineOperation report", 0, value);
     }
 
@@ -32678,7 +32807,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MaxPressure response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxPressure response", value);
     }
 };
 
@@ -32750,7 +32879,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MaxSpeed response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxSpeed response", value);
     }
 };
 
@@ -32819,7 +32948,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MaxFlow response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxFlow response", value);
     }
 };
 
@@ -32888,7 +33017,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MinConstPressure response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MinConstPressure response", value);
     }
 };
 
@@ -32960,7 +33089,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MaxConstPressure response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxConstPressure response", value);
     }
 };
 
@@ -33032,7 +33161,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MinCompPressure response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MinCompPressure response", value);
     }
 };
 
@@ -33104,7 +33233,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MaxCompPressure response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxCompPressure response", value);
     }
 };
 
@@ -33176,7 +33305,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MinConstSpeed response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MinConstSpeed response", value);
     }
 };
 
@@ -33248,7 +33377,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MaxConstSpeed response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxConstSpeed response", value);
     }
 };
 
@@ -33320,7 +33449,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MinConstFlow response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MinConstFlow response", value);
     }
 };
 
@@ -33392,7 +33521,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MaxConstFlow response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxConstFlow response", value);
     }
 };
 
@@ -33464,7 +33593,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MinConstTemp response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MinConstTemp response", value);
     }
 };
 
@@ -33536,7 +33665,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.MaxConstTemp response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxConstTemp response", value);
     }
 };
 
@@ -33608,7 +33737,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.PumpStatus response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.PumpStatus response", value);
     }
 };
 
@@ -33681,7 +33810,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.EffectiveOperationMode response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.EffectiveOperationMode response", value);
     }
 };
 
@@ -33754,7 +33883,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.EffectiveControlMode response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.EffectiveControlMode response", value);
     }
 };
 
@@ -33827,7 +33956,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.Capacity response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.Capacity response", value);
     }
 };
 
@@ -33896,7 +34025,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.Speed response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.Speed response", value);
     }
 };
 
@@ -33965,7 +34094,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.LifetimeRunningHours response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.LifetimeRunningHours response", value);
     }
 };
 
@@ -34064,7 +34193,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.Power response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.Power response", value);
     }
 };
 
@@ -34134,7 +34263,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.LifetimeEnergyConsumed response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.LifetimeEnergyConsumed response", value);
     }
 };
 
@@ -34234,7 +34363,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.OperationMode response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.OperationMode response", value);
     }
 };
 
@@ -34332,7 +34461,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.ControlMode response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.ControlMode response", value);
     }
 };
 
@@ -34430,7 +34559,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.AlarmMask response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.AlarmMask response", value);
     }
 };
 
@@ -34502,7 +34631,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.AttributeList response", value);
     }
 };
 
@@ -34532,7 +34661,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.FeatureMap response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.FeatureMap response", value);
     }
 };
 
@@ -34604,7 +34733,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "PumpConfigurationAndControl.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.ClusterRevision response", value);
     }
 };
 
@@ -34692,7 +34821,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "RelativeHumidityMeasurement.MeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.MeasuredValue response", value);
     }
 };
 
@@ -34764,7 +34893,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "RelativeHumidityMeasurement.MinMeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.MinMeasuredValue response", value);
     }
 };
 
@@ -34836,7 +34965,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "RelativeHumidityMeasurement.MaxMeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.MaxMeasuredValue response", value);
     }
 };
 
@@ -34908,7 +35037,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "RelativeHumidityMeasurement.Tolerance response", value);
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.Tolerance response", value);
     }
 };
 
@@ -34980,7 +35109,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "RelativeHumidityMeasurement.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.AttributeList response", value);
     }
 };
 
@@ -35010,7 +35139,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "RelativeHumidityMeasurement.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.ClusterRevision response", value);
     }
 };
 
@@ -35283,7 +35412,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Scenes.SceneCount response", value);
+        OnGeneralAttributeResponse(context, "Scenes.SceneCount response", value);
     }
 };
 
@@ -35352,7 +35481,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Scenes.CurrentScene response", value);
+        OnGeneralAttributeResponse(context, "Scenes.CurrentScene response", value);
     }
 };
 
@@ -35421,7 +35550,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Scenes.CurrentGroup response", value);
+        OnGeneralAttributeResponse(context, "Scenes.CurrentGroup response", value);
     }
 };
 
@@ -35490,7 +35619,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "Scenes.SceneValid response", value);
+        OnGeneralAttributeResponse(context, "Scenes.SceneValid response", value);
     }
 };
 
@@ -35559,7 +35688,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Scenes.NameSupport response", value);
+        OnGeneralAttributeResponse(context, "Scenes.NameSupport response", value);
     }
 };
 
@@ -35628,7 +35757,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Scenes.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "Scenes.AttributeList response", value);
     }
 };
 
@@ -35658,7 +35787,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Scenes.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "Scenes.ClusterRevision response", value);
     }
 };
 
@@ -35761,13 +35890,14 @@ public:
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "SoftwareDiagnostics.SoftwareFault response", value);
+        LogEventHeader(eventHeader);
+        LogValue("SoftwareDiagnostics.SoftwareFault report", 0, value);
     }
 };
 
@@ -35794,7 +35924,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -35802,8 +35932,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::SoftwareDiagnostics::Events::SoftwareFault::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("SoftwareDiagnostics.SoftwareFault report", 0, value);
     }
 
@@ -35842,7 +35974,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
             value)
     {
-        OnGeneralAttributeEventResponse(context, "SoftwareDiagnostics.ThreadMetrics response", value);
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.ThreadMetrics response", value);
     }
 };
 
@@ -35917,7 +36049,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "SoftwareDiagnostics.CurrentHeapFree response", value);
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.CurrentHeapFree response", value);
     }
 };
 
@@ -35986,7 +36118,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "SoftwareDiagnostics.CurrentHeapUsed response", value);
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.CurrentHeapUsed response", value);
     }
 };
 
@@ -36055,7 +36187,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "SoftwareDiagnostics.CurrentHeapHighWatermark response", value);
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.CurrentHeapHighWatermark response", value);
     }
 };
 
@@ -36127,7 +36259,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "SoftwareDiagnostics.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.AttributeList response", value);
     }
 };
 
@@ -36157,7 +36289,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "SoftwareDiagnostics.FeatureMap response", value);
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.FeatureMap response", value);
     }
 };
 
@@ -36187,7 +36319,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "SoftwareDiagnostics.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.ClusterRevision response", value);
     }
 };
 
@@ -36273,13 +36405,15 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType>(this, OnEventResponse,
-                                                                                                    OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.SwitchLatched response", value);
+        LogEventHeader(eventHeader);
+        LogValue("Switch.SwitchLatched report", 0, value);
     }
 };
 
@@ -36306,7 +36440,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -36314,8 +36448,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::Switch::Events::SwitchLatched::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("Switch.SwitchLatched report", 0, value);
     }
 
@@ -36344,13 +36480,15 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::InitialPress::DecodableType>(this, OnEventResponse,
-                                                                                                   OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::InitialPress::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::Switch::Events::InitialPress::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::Switch::Events::InitialPress::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.InitialPress response", value);
+        LogEventHeader(eventHeader);
+        LogValue("Switch.InitialPress report", 0, value);
     }
 };
 
@@ -36377,7 +36515,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::Switch::Events::InitialPress::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -36385,8 +36523,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::InitialPress::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::Switch::Events::InitialPress::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("Switch.InitialPress report", 0, value);
     }
 
@@ -36415,13 +36555,15 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::LongPress::DecodableType>(this, OnEventResponse,
-                                                                                                OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::LongPress::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::Switch::Events::LongPress::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::Switch::Events::LongPress::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.LongPress response", value);
+        LogEventHeader(eventHeader);
+        LogValue("Switch.LongPress report", 0, value);
     }
 };
 
@@ -36448,7 +36590,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::Switch::Events::LongPress::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -36456,8 +36598,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::LongPress::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::Switch::Events::LongPress::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("Switch.LongPress report", 0, value);
     }
 
@@ -36486,13 +36630,15 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::ShortRelease::DecodableType>(this, OnEventResponse,
-                                                                                                   OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::ShortRelease::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::Switch::Events::ShortRelease::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::Switch::Events::ShortRelease::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.ShortRelease response", value);
+        LogEventHeader(eventHeader);
+        LogValue("Switch.ShortRelease report", 0, value);
     }
 };
 
@@ -36519,7 +36665,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::Switch::Events::ShortRelease::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -36527,8 +36673,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::ShortRelease::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::Switch::Events::ShortRelease::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("Switch.ShortRelease report", 0, value);
     }
 
@@ -36557,13 +36705,15 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::LongRelease::DecodableType>(this, OnEventResponse,
-                                                                                                  OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::LongRelease::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::Switch::Events::LongRelease::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::Switch::Events::LongRelease::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.LongRelease response", value);
+        LogEventHeader(eventHeader);
+        LogValue("Switch.LongRelease report", 0, value);
     }
 };
 
@@ -36590,7 +36740,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::Switch::Events::LongRelease::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -36598,8 +36748,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::LongRelease::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::Switch::Events::LongRelease::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("Switch.LongRelease report", 0, value);
     }
 
@@ -36628,13 +36780,15 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType>(this, OnEventResponse,
-                                                                                                        OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.MultiPressOngoing response", value);
+        LogEventHeader(eventHeader);
+        LogValue("Switch.MultiPressOngoing report", 0, value);
     }
 };
 
@@ -36661,7 +36815,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -36669,8 +36823,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::Switch::Events::MultiPressOngoing::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("Switch.MultiPressOngoing report", 0, value);
     }
 
@@ -36699,13 +36855,15 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType>(this, OnEventResponse,
-                                                                                                         OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.MultiPressComplete response", value);
+        LogEventHeader(eventHeader);
+        LogValue("Switch.MultiPressComplete report", 0, value);
     }
 };
 
@@ -36732,7 +36890,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -36740,8 +36898,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::Switch::Events::MultiPressComplete::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("Switch.MultiPressComplete report", 0, value);
     }
 
@@ -36777,7 +36937,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.NumberOfPositions response", value);
+        OnGeneralAttributeResponse(context, "Switch.NumberOfPositions response", value);
     }
 };
 
@@ -36846,7 +37006,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.CurrentPosition response", value);
+        OnGeneralAttributeResponse(context, "Switch.CurrentPosition response", value);
     }
 };
 
@@ -36915,7 +37075,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.MultiPressMax response", value);
+        OnGeneralAttributeResponse(context, "Switch.MultiPressMax response", value);
     }
 };
 
@@ -36984,7 +37144,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "Switch.AttributeList response", value);
     }
 };
 
@@ -37014,7 +37174,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.FeatureMap response", value);
+        OnGeneralAttributeResponse(context, "Switch.FeatureMap response", value);
     }
 };
 
@@ -37083,7 +37243,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Switch.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "Switch.ClusterRevision response", value);
     }
 };
 
@@ -37194,7 +37354,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TargetNavigator::Structs::TargetInfo::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TargetNavigator.TargetNavigatorList response", value);
+        OnGeneralAttributeResponse(context, "TargetNavigator.TargetNavigatorList response", value);
     }
 };
 
@@ -37268,7 +37428,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TargetNavigator.CurrentNavigatorTarget response", value);
+        OnGeneralAttributeResponse(context, "TargetNavigator.CurrentNavigatorTarget response", value);
     }
 };
 
@@ -37340,7 +37500,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TargetNavigator.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "TargetNavigator.AttributeList response", value);
     }
 };
 
@@ -37370,7 +37530,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TargetNavigator.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "TargetNavigator.ClusterRevision response", value);
     }
 };
 
@@ -37455,7 +37615,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TemperatureMeasurement.MeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.MeasuredValue response", value);
     }
 };
 
@@ -37524,7 +37684,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TemperatureMeasurement.MinMeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.MinMeasuredValue response", value);
     }
 };
 
@@ -37596,7 +37756,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TemperatureMeasurement.MaxMeasuredValue response", value);
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.MaxMeasuredValue response", value);
     }
 };
 
@@ -37668,7 +37828,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TemperatureMeasurement.Tolerance response", value);
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.Tolerance response", value);
     }
 };
 
@@ -37737,7 +37897,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TemperatureMeasurement.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.AttributeList response", value);
     }
 };
 
@@ -37767,7 +37927,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TemperatureMeasurement.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.ClusterRevision response", value);
     }
 };
 
@@ -38358,13 +38518,15 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadEvent<chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType>(this, OnEventResponse,
-                                                                                                     OnDefaultFailure);
+        return cluster.ReadEvent<chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType>(
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context, chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value)
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
+                                chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.TestEvent response", value);
+        LogEventHeader(eventHeader);
+        LogValue("TestCluster.TestEvent report", 0, value);
     }
 };
 
@@ -38391,7 +38553,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -38399,8 +38561,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context, chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value)
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
+                              chip::app::Clusters::TestCluster::Events::TestEvent::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("TestCluster.TestEvent report", 0, value);
     }
 
@@ -38436,7 +38600,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Boolean response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Boolean response", value);
     }
 };
 
@@ -38531,7 +38695,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Bitmap8 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Bitmap8 response", value);
     }
 };
 
@@ -38626,7 +38790,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Bitmap16 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Bitmap16 response", value);
     }
 };
 
@@ -38721,7 +38885,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Bitmap32 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Bitmap32 response", value);
     }
 };
 
@@ -38816,7 +38980,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Bitmap64 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Bitmap64 response", value);
     }
 };
 
@@ -38911,7 +39075,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int8u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int8u response", value);
     }
 };
 
@@ -39006,7 +39170,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int16u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int16u response", value);
     }
 };
 
@@ -39101,7 +39265,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int24u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int24u response", value);
     }
 };
 
@@ -39196,7 +39360,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int32u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int32u response", value);
     }
 };
 
@@ -39291,7 +39455,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int40u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int40u response", value);
     }
 };
 
@@ -39386,7 +39550,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int48u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int48u response", value);
     }
 };
 
@@ -39481,7 +39645,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int56u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int56u response", value);
     }
 };
 
@@ -39576,7 +39740,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int64u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int64u response", value);
     }
 };
 
@@ -39671,7 +39835,7 @@ public:
 
     static void OnAttributeResponse(void * context, int8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int8s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int8s response", value);
     }
 };
 
@@ -39766,7 +39930,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int16s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int16s response", value);
     }
 };
 
@@ -39861,7 +40025,7 @@ public:
 
     static void OnAttributeResponse(void * context, int32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int24s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int24s response", value);
     }
 };
 
@@ -39956,7 +40120,7 @@ public:
 
     static void OnAttributeResponse(void * context, int32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int32s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int32s response", value);
     }
 };
 
@@ -40051,7 +40215,7 @@ public:
 
     static void OnAttributeResponse(void * context, int64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int40s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int40s response", value);
     }
 };
 
@@ -40146,7 +40310,7 @@ public:
 
     static void OnAttributeResponse(void * context, int64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int48s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int48s response", value);
     }
 };
 
@@ -40241,7 +40405,7 @@ public:
 
     static void OnAttributeResponse(void * context, int64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int56s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int56s response", value);
     }
 };
 
@@ -40336,7 +40500,7 @@ public:
 
     static void OnAttributeResponse(void * context, int64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Int64s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Int64s response", value);
     }
 };
 
@@ -40431,7 +40595,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Enum8 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Enum8 response", value);
     }
 };
 
@@ -40526,7 +40690,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Enum16 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Enum16 response", value);
     }
 };
 
@@ -40621,7 +40785,7 @@ public:
 
     static void OnAttributeResponse(void * context, float value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.FloatSingle response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.FloatSingle response", value);
     }
 };
 
@@ -40716,7 +40880,7 @@ public:
 
     static void OnAttributeResponse(void * context, double value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.FloatDouble response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.FloatDouble response", value);
     }
 };
 
@@ -40811,7 +40975,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::ByteSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.OctetString response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.OctetString response", value);
     }
 };
 
@@ -40906,7 +41070,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.ListInt8u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.ListInt8u response", value);
     }
 };
 
@@ -40978,7 +41142,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.ListOctetString response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.ListOctetString response", value);
     }
 };
 
@@ -41053,7 +41217,7 @@ public:
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
             value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.ListStructOctetString response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.ListStructOctetString response", value);
     }
 };
 
@@ -41128,7 +41292,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::ByteSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.LongOctetString response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.LongOctetString response", value);
     }
 };
 
@@ -41223,7 +41387,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.CharString response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.CharString response", value);
     }
 };
 
@@ -41318,7 +41482,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.LongCharString response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.LongCharString response", value);
     }
 };
 
@@ -41413,7 +41577,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.EpochUs response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.EpochUs response", value);
     }
 };
 
@@ -41508,7 +41672,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.EpochS response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.EpochS response", value);
     }
 };
 
@@ -41603,7 +41767,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::VendorId value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.VendorId response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.VendorId response", value);
     }
 };
 
@@ -41701,7 +41865,7 @@ public:
                         const chip::app::DataModel::DecodableList<
                             chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.ListNullablesAndOptionalsStruct response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.ListNullablesAndOptionalsStruct response", value);
     }
 };
 
@@ -41775,7 +41939,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::app::Clusters::TestCluster::SimpleEnum value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.EnumAttr response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.EnumAttr response", value);
     }
 };
 
@@ -41873,7 +42037,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.RangeRestrictedInt8u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.RangeRestrictedInt8u response", value);
     }
 };
 
@@ -41968,7 +42132,7 @@ public:
 
     static void OnAttributeResponse(void * context, int8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.RangeRestrictedInt8s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.RangeRestrictedInt8s response", value);
     }
 };
 
@@ -42063,7 +42227,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.RangeRestrictedInt16u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.RangeRestrictedInt16u response", value);
     }
 };
 
@@ -42158,7 +42322,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.RangeRestrictedInt16s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.RangeRestrictedInt16s response", value);
     }
 };
 
@@ -42253,7 +42417,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.ListLongOctetString response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.ListLongOctetString response", value);
     }
 };
 
@@ -42283,7 +42447,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.TimedWriteBoolean response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.TimedWriteBoolean response", value);
     }
 };
 
@@ -42339,7 +42503,7 @@ public:
 
     static void OnAttributeResponse(void * context, bool value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.Unsupported response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.Unsupported response", value);
     }
 };
 
@@ -42434,7 +42598,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<bool> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableBoolean response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableBoolean response", value);
     }
 };
 
@@ -42532,7 +42696,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableBitmap8 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableBitmap8 response", value);
     }
 };
 
@@ -42630,7 +42794,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableBitmap16 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableBitmap16 response", value);
     }
 };
 
@@ -42728,7 +42892,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableBitmap32 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableBitmap32 response", value);
     }
 };
 
@@ -42826,7 +42990,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableBitmap64 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableBitmap64 response", value);
     }
 };
 
@@ -42924,7 +43088,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt8u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt8u response", value);
     }
 };
 
@@ -43022,7 +43186,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt16u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt16u response", value);
     }
 };
 
@@ -43120,7 +43284,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt24u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt24u response", value);
     }
 };
 
@@ -43218,7 +43382,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt32u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt32u response", value);
     }
 };
 
@@ -43316,7 +43480,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt40u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt40u response", value);
     }
 };
 
@@ -43414,7 +43578,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt48u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt48u response", value);
     }
 };
 
@@ -43512,7 +43676,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt56u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt56u response", value);
     }
 };
 
@@ -43610,7 +43774,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt64u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt64u response", value);
     }
 };
 
@@ -43708,7 +43872,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt8s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt8s response", value);
     }
 };
 
@@ -43806,7 +43970,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt16s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt16s response", value);
     }
 };
 
@@ -43904,7 +44068,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt24s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt24s response", value);
     }
 };
 
@@ -44002,7 +44166,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt32s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt32s response", value);
     }
 };
 
@@ -44100,7 +44264,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt40s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt40s response", value);
     }
 };
 
@@ -44198,7 +44362,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt48s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt48s response", value);
     }
 };
 
@@ -44296,7 +44460,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt56s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt56s response", value);
     }
 };
 
@@ -44394,7 +44558,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableInt64s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt64s response", value);
     }
 };
 
@@ -44492,7 +44656,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableEnum8 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableEnum8 response", value);
     }
 };
 
@@ -44590,7 +44754,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableEnum16 response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableEnum16 response", value);
     }
 };
 
@@ -44688,7 +44852,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<float> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableFloatSingle response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableFloatSingle response", value);
     }
 };
 
@@ -44786,7 +44950,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<double> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableFloatDouble response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableFloatDouble response", value);
     }
 };
 
@@ -44884,7 +45048,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableOctetString response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableOctetString response", value);
     }
 };
 
@@ -44982,7 +45146,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableCharString response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableCharString response", value);
     }
 };
 
@@ -45081,7 +45245,7 @@ public:
     static void OnAttributeResponse(void * context,
                                     const chip::app::DataModel::Nullable<chip::app::Clusters::TestCluster::SimpleEnum> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableEnumAttr response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableEnumAttr response", value);
     }
 };
 
@@ -45180,7 +45344,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableRangeRestrictedInt8u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableRangeRestrictedInt8u response", value);
     }
 };
 
@@ -45278,7 +45442,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableRangeRestrictedInt8s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableRangeRestrictedInt8s response", value);
     }
 };
 
@@ -45376,7 +45540,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableRangeRestrictedInt16u response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableRangeRestrictedInt16u response", value);
     }
 };
 
@@ -45474,7 +45638,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.NullableRangeRestrictedInt16s response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.NullableRangeRestrictedInt16s response", value);
     }
 };
 
@@ -45572,7 +45736,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.AttributeList response", value);
     }
 };
 
@@ -45602,7 +45766,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "TestCluster.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "TestCluster.ClusterRevision response", value);
     }
 };
 
@@ -45830,7 +45994,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.LocalTemperature response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.LocalTemperature response", value);
     }
 };
 
@@ -45899,7 +46063,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.AbsMinHeatSetpointLimit response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.AbsMinHeatSetpointLimit response", value);
     }
 };
 
@@ -45968,7 +46132,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.AbsMaxHeatSetpointLimit response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.AbsMaxHeatSetpointLimit response", value);
     }
 };
 
@@ -46037,7 +46201,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.AbsMinCoolSetpointLimit response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.AbsMinCoolSetpointLimit response", value);
     }
 };
 
@@ -46106,7 +46270,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.AbsMaxCoolSetpointLimit response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.AbsMaxCoolSetpointLimit response", value);
     }
 };
 
@@ -46175,7 +46339,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.OccupiedCoolingSetpoint response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.OccupiedCoolingSetpoint response", value);
     }
 };
 
@@ -46270,7 +46434,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.OccupiedHeatingSetpoint response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.OccupiedHeatingSetpoint response", value);
     }
 };
 
@@ -46365,7 +46529,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.MinHeatSetpointLimit response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.MinHeatSetpointLimit response", value);
     }
 };
 
@@ -46460,7 +46624,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.MaxHeatSetpointLimit response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.MaxHeatSetpointLimit response", value);
     }
 };
 
@@ -46555,7 +46719,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.MinCoolSetpointLimit response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.MinCoolSetpointLimit response", value);
     }
 };
 
@@ -46650,7 +46814,7 @@ public:
 
     static void OnAttributeResponse(void * context, int16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.MaxCoolSetpointLimit response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.MaxCoolSetpointLimit response", value);
     }
 };
 
@@ -46745,7 +46909,7 @@ public:
 
     static void OnAttributeResponse(void * context, int8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.MinSetpointDeadBand response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.MinSetpointDeadBand response", value);
     }
 };
 
@@ -46840,7 +47004,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.ControlSequenceOfOperation response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.ControlSequenceOfOperation response", value);
     }
 };
 
@@ -46935,7 +47099,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.SystemMode response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.SystemMode response", value);
     }
 };
 
@@ -47030,7 +47194,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.StartOfWeek response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.StartOfWeek response", value);
     }
 };
 
@@ -47099,7 +47263,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.NumberOfWeeklyTransitions response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.NumberOfWeeklyTransitions response", value);
     }
 };
 
@@ -47168,7 +47332,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.NumberOfDailyTransitions response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.NumberOfDailyTransitions response", value);
     }
 };
 
@@ -47237,7 +47401,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.AttributeList response", value);
     }
 };
 
@@ -47267,7 +47431,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.FeatureMap response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.FeatureMap response", value);
     }
 };
 
@@ -47336,7 +47500,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "Thermostat.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "Thermostat.ClusterRevision response", value);
     }
 };
 
@@ -47421,7 +47585,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThermostatUserInterfaceConfiguration.TemperatureDisplayMode response", value);
+        OnGeneralAttributeResponse(context, "ThermostatUserInterfaceConfiguration.TemperatureDisplayMode response", value);
     }
 };
 
@@ -47522,7 +47686,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThermostatUserInterfaceConfiguration.KeypadLockout response", value);
+        OnGeneralAttributeResponse(context, "ThermostatUserInterfaceConfiguration.KeypadLockout response", value);
     }
 };
 
@@ -47623,8 +47787,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThermostatUserInterfaceConfiguration.ScheduleProgrammingVisibility response",
-                                        value);
+        OnGeneralAttributeResponse(context, "ThermostatUserInterfaceConfiguration.ScheduleProgrammingVisibility response", value);
     }
 };
 
@@ -47725,7 +47888,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ThermostatUserInterfaceConfiguration.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "ThermostatUserInterfaceConfiguration.AttributeList response", value);
     }
 };
 
@@ -47756,7 +47919,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThermostatUserInterfaceConfiguration.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "ThermostatUserInterfaceConfiguration.ClusterRevision response", value);
     }
 };
 
@@ -47922,13 +48085,14 @@ public:
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.ConnectionStatus response", value);
+        LogEventHeader(eventHeader);
+        LogValue("ThreadNetworkDiagnostics.ConnectionStatus report", 0, value);
     }
 };
 
@@ -47955,7 +48119,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -47963,9 +48127,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::ThreadNetworkDiagnostics::Events::ConnectionStatus::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("ThreadNetworkDiagnostics.ConnectionStatus report", 0, value);
     }
 
@@ -48001,7 +48166,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.Channel response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.Channel response", value);
     }
 };
 
@@ -48070,7 +48235,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RoutingRole response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RoutingRole response", value);
     }
 };
 
@@ -48139,7 +48304,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::ByteSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.NetworkName response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.NetworkName response", value);
     }
 };
 
@@ -48211,7 +48376,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.PanId response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.PanId response", value);
     }
 };
 
@@ -48280,7 +48445,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.ExtendedPanId response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ExtendedPanId response", value);
     }
 };
 
@@ -48352,7 +48517,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::ByteSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.MeshLocalPrefix response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.MeshLocalPrefix response", value);
     }
 };
 
@@ -48424,7 +48589,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.OverrunCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.OverrunCount response", value);
     }
 };
 
@@ -48499,7 +48664,7 @@ public:
                         const chip::app::DataModel::DecodableList<
                             chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.NeighborTableList response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.NeighborTableList response", value);
     }
 };
 
@@ -48575,7 +48740,7 @@ public:
                                     const chip::app::DataModel::DecodableList<
                                         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RouteTableList response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RouteTableList response", value);
     }
 };
 
@@ -48649,7 +48814,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.PartitionId response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.PartitionId response", value);
     }
 };
 
@@ -48718,7 +48883,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.Weighting response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.Weighting response", value);
     }
 };
 
@@ -48787,7 +48952,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.DataVersion response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.DataVersion response", value);
     }
 };
 
@@ -48856,7 +49021,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.StableDataVersion response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.StableDataVersion response", value);
     }
 };
 
@@ -48928,7 +49093,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.LeaderRouterId response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.LeaderRouterId response", value);
     }
 };
 
@@ -49000,7 +49165,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.DetachedRoleCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.DetachedRoleCount response", value);
     }
 };
 
@@ -49072,7 +49237,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.ChildRoleCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ChildRoleCount response", value);
     }
 };
 
@@ -49144,7 +49309,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RouterRoleCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RouterRoleCount response", value);
     }
 };
 
@@ -49216,7 +49381,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.LeaderRoleCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.LeaderRoleCount response", value);
     }
 };
 
@@ -49288,7 +49453,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.AttachAttemptCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.AttachAttemptCount response", value);
     }
 };
 
@@ -49360,7 +49525,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.PartitionIdChangeCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.PartitionIdChangeCount response", value);
     }
 };
 
@@ -49434,7 +49599,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.BetterPartitionAttachAttemptCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.BetterPartitionAttachAttemptCount response", value);
     }
 };
 
@@ -49507,7 +49672,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.ParentChangeCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ParentChangeCount response", value);
     }
 };
 
@@ -49579,7 +49744,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxTotalCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxTotalCount response", value);
     }
 };
 
@@ -49651,7 +49816,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxUnicastCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxUnicastCount response", value);
     }
 };
 
@@ -49723,7 +49888,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxBroadcastCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxBroadcastCount response", value);
     }
 };
 
@@ -49795,7 +49960,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxAckRequestedCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxAckRequestedCount response", value);
     }
 };
 
@@ -49867,7 +50032,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxAckedCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxAckedCount response", value);
     }
 };
 
@@ -49939,7 +50104,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxNoAckRequestedCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxNoAckRequestedCount response", value);
     }
 };
 
@@ -50012,7 +50177,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxDataCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxDataCount response", value);
     }
 };
 
@@ -50081,7 +50246,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxDataPollCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxDataPollCount response", value);
     }
 };
 
@@ -50153,7 +50318,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxBeaconCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxBeaconCount response", value);
     }
 };
 
@@ -50225,7 +50390,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxBeaconRequestCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxBeaconRequestCount response", value);
     }
 };
 
@@ -50298,7 +50463,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxOtherCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxOtherCount response", value);
     }
 };
 
@@ -50370,7 +50535,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxRetryCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxRetryCount response", value);
     }
 };
 
@@ -50443,7 +50608,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxDirectMaxRetryExpiryCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxDirectMaxRetryExpiryCount response", value);
     }
 };
 
@@ -50517,7 +50682,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxIndirectMaxRetryExpiryCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxIndirectMaxRetryExpiryCount response", value);
     }
 };
 
@@ -50590,7 +50755,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxErrCcaCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxErrCcaCount response", value);
     }
 };
 
@@ -50662,7 +50827,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxErrAbortCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxErrAbortCount response", value);
     }
 };
 
@@ -50734,7 +50899,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.TxErrBusyChannelCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxErrBusyChannelCount response", value);
     }
 };
 
@@ -50807,7 +50972,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxTotalCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxTotalCount response", value);
     }
 };
 
@@ -50879,7 +51044,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxUnicastCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxUnicastCount response", value);
     }
 };
 
@@ -50951,7 +51116,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxBroadcastCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxBroadcastCount response", value);
     }
 };
 
@@ -51023,7 +51188,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxDataCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxDataCount response", value);
     }
 };
 
@@ -51092,7 +51257,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxDataPollCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxDataPollCount response", value);
     }
 };
 
@@ -51164,7 +51329,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxBeaconCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxBeaconCount response", value);
     }
 };
 
@@ -51236,7 +51401,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxBeaconRequestCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxBeaconRequestCount response", value);
     }
 };
 
@@ -51309,7 +51474,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxOtherCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxOtherCount response", value);
     }
 };
 
@@ -51381,7 +51546,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxAddressFilteredCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxAddressFilteredCount response", value);
     }
 };
 
@@ -51454,7 +51619,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxDestAddrFilteredCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxDestAddrFilteredCount response", value);
     }
 };
 
@@ -51527,7 +51692,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxDuplicatedCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxDuplicatedCount response", value);
     }
 };
 
@@ -51599,7 +51764,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxErrNoFrameCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrNoFrameCount response", value);
     }
 };
 
@@ -51672,7 +51837,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxErrUnknownNeighborCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrUnknownNeighborCount response", value);
     }
 };
 
@@ -51745,7 +51910,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxErrInvalidSrcAddrCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrInvalidSrcAddrCount response", value);
     }
 };
 
@@ -51818,7 +51983,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxErrSecCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrSecCount response", value);
     }
 };
 
@@ -51890,7 +52055,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxErrFcsCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrFcsCount response", value);
     }
 };
 
@@ -51962,7 +52127,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.RxErrOtherCount response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrOtherCount response", value);
     }
 };
 
@@ -52034,7 +52199,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.ActiveTimestamp response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ActiveTimestamp response", value);
     }
 };
 
@@ -52106,7 +52271,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.PendingTimestamp response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.PendingTimestamp response", value);
     }
 };
 
@@ -52178,7 +52343,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.Delay response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.Delay response", value);
     }
 };
 
@@ -52250,7 +52415,7 @@ public:
                         const chip::app::DataModel::DecodableList<
                             chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.SecurityPolicy response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.SecurityPolicy response", value);
     }
 };
 
@@ -52324,7 +52489,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::ByteSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.ChannelMask response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ChannelMask response", value);
     }
 };
 
@@ -52400,7 +52565,7 @@ public:
         const chip::app::DataModel::DecodableList<
             chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.OperationalDatasetComponents response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.OperationalDatasetComponents response", value);
     }
 };
 
@@ -52478,7 +52643,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.ActiveNetworkFaultsList response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ActiveNetworkFaultsList response", value);
     }
 };
 
@@ -52553,7 +52718,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.AttributeList response", value);
     }
 };
 
@@ -52583,7 +52748,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.FeatureMap response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.FeatureMap response", value);
     }
 };
 
@@ -52613,7 +52778,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ClusterRevision response", value);
     }
 };
 
@@ -52699,7 +52864,7 @@ public:
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value)
     {
-        OnGeneralAttributeEventResponse(context, "UserLabel.LabelList response", value);
+        OnGeneralAttributeResponse(context, "UserLabel.LabelList response", value);
     }
 };
 
@@ -52729,7 +52894,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "UserLabel.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "UserLabel.ClusterRevision response", value);
     }
 };
 
@@ -52772,7 +52937,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::CharSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "WakeOnLan.WakeOnLanMacAddress response", value);
+        OnGeneralAttributeResponse(context, "WakeOnLan.WakeOnLanMacAddress response", value);
     }
 };
 
@@ -52841,7 +53006,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "WakeOnLan.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "WakeOnLan.AttributeList response", value);
     }
 };
 
@@ -52871,7 +53036,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WakeOnLan.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "WakeOnLan.ClusterRevision response", value);
     }
 };
 
@@ -52985,13 +53150,14 @@ public:
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::WiFiNetworkDiagnostics::Events::Disconnection::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::WiFiNetworkDiagnostics::Events::Disconnection::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.Disconnection response", value);
+        LogEventHeader(eventHeader);
+        LogValue("WiFiNetworkDiagnostics.Disconnection report", 0, value);
     }
 };
 
@@ -53018,7 +53184,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::WiFiNetworkDiagnostics::Events::Disconnection::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -53026,9 +53192,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::WiFiNetworkDiagnostics::Events::Disconnection::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("WiFiNetworkDiagnostics.Disconnection report", 0, value);
     }
 
@@ -53058,13 +53225,14 @@ public:
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.AssociationFailure response", value);
+        LogEventHeader(eventHeader);
+        LogValue("WiFiNetworkDiagnostics.AssociationFailure report", 0, value);
     }
 };
 
@@ -53091,7 +53259,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -53099,9 +53267,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::WiFiNetworkDiagnostics::Events::AssociationFailure::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("WiFiNetworkDiagnostics.AssociationFailure report", 0, value);
     }
 
@@ -53131,13 +53300,14 @@ public:
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
         return cluster.ReadEvent<chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType>(
-            this, OnEventResponse, OnDefaultFailure);
+            this, OnEventResponse, OnDefaultEventFailure, OnDefaultSuccessResponse);
     }
 
-    static void OnEventResponse(void * context,
+    static void OnEventResponse(void * context, const chip::app::EventHeader & eventHeader,
                                 chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.ConnectionStatus response", value);
+        LogEventHeader(eventHeader);
+        LogValue("WiFiNetworkDiagnostics.ConnectionStatus report", 0, value);
     }
 };
 
@@ -53164,7 +53334,7 @@ public:
 
         auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
         return cluster.SubscribeEvent<chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType>(
-            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+            this, OnValueReport, OnDefaultEventFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
     }
 
     chip::System::Clock::Timeout GetWaitDuration() const override
@@ -53172,9 +53342,10 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(void * context,
+    static void OnValueReport(void * context, const chip::app::EventHeader & eventHeader,
                               chip::app::Clusters::WiFiNetworkDiagnostics::Events::ConnectionStatus::DecodableType value)
     {
+        LogEventHeader(eventHeader);
         LogValue("WiFiNetworkDiagnostics.ConnectionStatus report", 0, value);
     }
 
@@ -53210,7 +53381,7 @@ public:
 
     static void OnAttributeResponse(void * context, chip::ByteSpan value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.Bssid response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.Bssid response", value);
     }
 };
 
@@ -53279,7 +53450,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.SecurityType response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.SecurityType response", value);
     }
 };
 
@@ -53348,7 +53519,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.WiFiVersion response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.WiFiVersion response", value);
     }
 };
 
@@ -53417,7 +53588,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.ChannelNumber response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.ChannelNumber response", value);
     }
 };
 
@@ -53486,7 +53657,7 @@ public:
 
     static void OnAttributeResponse(void * context, int8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.Rssi response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.Rssi response", value);
     }
 };
 
@@ -53555,7 +53726,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.BeaconLostCount response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.BeaconLostCount response", value);
     }
 };
 
@@ -53627,7 +53798,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.BeaconRxCount response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.BeaconRxCount response", value);
     }
 };
 
@@ -53696,7 +53867,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.PacketMulticastRxCount response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.PacketMulticastRxCount response", value);
     }
 };
 
@@ -53769,7 +53940,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.PacketMulticastTxCount response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.PacketMulticastTxCount response", value);
     }
 };
 
@@ -53842,7 +54013,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.PacketUnicastRxCount response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.PacketUnicastRxCount response", value);
     }
 };
 
@@ -53914,7 +54085,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.PacketUnicastTxCount response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.PacketUnicastTxCount response", value);
     }
 };
 
@@ -53986,7 +54157,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.CurrentMaxRate response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.CurrentMaxRate response", value);
     }
 };
 
@@ -54058,7 +54229,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint64_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.OverrunCount response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.OverrunCount response", value);
     }
 };
 
@@ -54127,7 +54298,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.AttributeList response", value);
     }
 };
 
@@ -54157,7 +54328,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.FeatureMap response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.FeatureMap response", value);
     }
 };
 
@@ -54187,7 +54358,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.ClusterRevision response", value);
     }
 };
 
@@ -54455,7 +54626,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.Type response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.Type response", value);
     }
 };
 
@@ -54524,7 +54695,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.CurrentPositionLift response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionLift response", value);
     }
 };
 
@@ -54596,7 +54767,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.CurrentPositionTilt response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionTilt response", value);
     }
 };
 
@@ -54668,7 +54839,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.ConfigStatus response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.ConfigStatus response", value);
     }
 };
 
@@ -54737,7 +54908,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent> & value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.CurrentPositionLiftPercentage response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionLiftPercentage response", value);
     }
 };
 
@@ -54809,7 +54980,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent> & value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.CurrentPositionTiltPercentage response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionTiltPercentage response", value);
     }
 };
 
@@ -54881,7 +55052,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.OperationalStatus response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.OperationalStatus response", value);
     }
 };
 
@@ -54950,7 +55121,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.TargetPositionLiftPercent100ths response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.TargetPositionLiftPercent100ths response", value);
     }
 };
 
@@ -55023,7 +55194,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.TargetPositionTiltPercent100ths response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.TargetPositionTiltPercent100ths response", value);
     }
 };
 
@@ -55096,7 +55267,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.EndProductType response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.EndProductType response", value);
     }
 };
 
@@ -55165,7 +55336,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.CurrentPositionLiftPercent100ths response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionLiftPercent100ths response", value);
     }
 };
 
@@ -55238,7 +55409,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::Percent100ths> & value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.CurrentPositionTiltPercent100ths response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionTiltPercent100ths response", value);
     }
 };
 
@@ -55311,7 +55482,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.InstalledOpenLimitLift response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.InstalledOpenLimitLift response", value);
     }
 };
 
@@ -55383,7 +55554,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.InstalledClosedLimitLift response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.InstalledClosedLimitLift response", value);
     }
 };
 
@@ -55455,7 +55626,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.InstalledOpenLimitTilt response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.InstalledOpenLimitTilt response", value);
     }
 };
 
@@ -55527,7 +55698,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.InstalledClosedLimitTilt response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.InstalledClosedLimitTilt response", value);
     }
 };
 
@@ -55599,7 +55770,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint8_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.Mode response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.Mode response", value);
     }
 };
 
@@ -55694,7 +55865,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.SafetyStatus response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.SafetyStatus response", value);
     }
 };
 
@@ -55763,7 +55934,7 @@ public:
 
     static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.AttributeList response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.AttributeList response", value);
     }
 };
 
@@ -55793,7 +55964,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.FeatureMap response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.FeatureMap response", value);
     }
 };
 
@@ -55862,7 +56033,7 @@ public:
 
     static void OnAttributeResponse(void * context, uint16_t value)
     {
-        OnGeneralAttributeEventResponse(context, "WindowCovering.ClusterRevision response", value);
+        OnGeneralAttributeResponse(context, "WindowCovering.ClusterRevision response", value);
     }
 };
 
