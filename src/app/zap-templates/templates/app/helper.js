@@ -412,6 +412,7 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     }
 
     if (await typeChecker('isEvent')) {
+      passByReference = true;
       return ns + 'Events::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
     }
 
