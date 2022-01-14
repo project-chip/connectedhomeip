@@ -5116,14 +5116,14 @@ class AccessControl(Cluster):
     def descriptor(cls) -> ClusterObjectDescriptor:
         return ClusterObjectDescriptor(
             Fields = [
-                ClusterObjectFieldDescriptor(Label="acl", Tag=0x00000000, Type=typing.List[AccessControl.Structs.AccessControlEntry]),
+                ClusterObjectFieldDescriptor(Label="acl", Tag=0x00000000, Type=typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlEntry]]),
                 ClusterObjectFieldDescriptor(Label="extension", Tag=0x00000001, Type=typing.List[AccessControl.Structs.ExtensionEntry]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
             ])
 
-    acl: 'typing.List[AccessControl.Structs.AccessControlEntry]' = None
+    acl: 'typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlEntry]]' = None
     extension: 'typing.List[AccessControl.Structs.ExtensionEntry]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
@@ -5207,9 +5207,9 @@ class AccessControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[AccessControl.Structs.AccessControlEntry])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlEntry]])
 
-            value: 'typing.List[AccessControl.Structs.AccessControlEntry]' = field(default_factory=lambda: [])
+            value: 'typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlEntry]]' = NullValue
 
         @dataclass
         class Extension(ClusterAttributeDescriptor):

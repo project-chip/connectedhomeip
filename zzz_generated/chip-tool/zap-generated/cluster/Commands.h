@@ -4542,10 +4542,9 @@ public:
                                                                                                     OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-            value)
+    static void OnAttributeResponse(void * context,
+                                    const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                                        chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>> & value)
     {
         OnGeneralAttributeEventResponse(context, "AccessControl.Acl response", value);
     }
@@ -4582,10 +4581,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-            value)
+    static void OnValueReport(void * context,
+                              const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                                  chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>> & value)
     {
         LogValue("AccessControl.Acl report", 0, value);
     }

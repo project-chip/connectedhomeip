@@ -44,81 +44,85 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSArray * _Nonnull value;
-            auto * array_0 = [NSMutableArray new];
-            auto iter_0 = cppValue.begin();
-            while (iter_0.Next()) {
-                auto & entry_0 = iter_0.GetValue();
-                CHIPAccessControlClusterAccessControlEntry * newElement_0;
-                newElement_0 = [CHIPAccessControlClusterAccessControlEntry new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
-                newElement_0.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.privilege)];
-                newElement_0.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.authMode)];
-                if (entry_0.subjects.IsNull()) {
-                    newElement_0.subjects = nil;
-                } else {
-                    auto * array_3 = [NSMutableArray new];
-                    auto iter_3 = entry_0.subjects.Value().begin();
-                    while (iter_3.Next()) {
-                        auto & entry_3 = iter_3.GetValue();
-                        NSNumber * newElement_3;
-                        newElement_3 = [NSNumber numberWithUnsignedLongLong:entry_3];
-                        [array_3 addObject:newElement_3];
-                    }
-                    { // Scope for the error so we will know what it's named
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            *aError = err;
-                            return nil;
+            NSArray * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                auto * array_1 = [NSMutableArray new];
+                auto iter_1 = cppValue.Value().begin();
+                while (iter_1.Next()) {
+                    auto & entry_1 = iter_1.GetValue();
+                    CHIPAccessControlClusterAccessControlEntry * newElement_1;
+                    newElement_1 = [CHIPAccessControlClusterAccessControlEntry new];
+                    newElement_1.fabricIndex = [NSNumber numberWithUnsignedChar:entry_1.fabricIndex];
+                    newElement_1.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.privilege)];
+                    newElement_1.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_1.authMode)];
+                    if (entry_1.subjects.IsNull()) {
+                        newElement_1.subjects = nil;
+                    } else {
+                        auto * array_4 = [NSMutableArray new];
+                        auto iter_4 = entry_1.subjects.Value().begin();
+                        while (iter_4.Next()) {
+                            auto & entry_4 = iter_4.GetValue();
+                            NSNumber * newElement_4;
+                            newElement_4 = [NSNumber numberWithUnsignedLongLong:entry_4];
+                            [array_4 addObject:newElement_4];
                         }
+                        { // Scope for the error so we will know what it's named
+                            CHIP_ERROR err = iter_4.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                        }
+                        newElement_1.subjects = array_4;
                     }
-                    newElement_0.subjects = array_3;
+                    if (entry_1.targets.IsNull()) {
+                        newElement_1.targets = nil;
+                    } else {
+                        auto * array_4 = [NSMutableArray new];
+                        auto iter_4 = entry_1.targets.Value().begin();
+                        while (iter_4.Next()) {
+                            auto & entry_4 = iter_4.GetValue();
+                            CHIPAccessControlClusterTarget * newElement_4;
+                            newElement_4 = [CHIPAccessControlClusterTarget new];
+                            if (entry_4.cluster.IsNull()) {
+                                newElement_4.cluster = nil;
+                            } else {
+                                newElement_4.cluster = [NSNumber numberWithUnsignedInt:entry_4.cluster.Value()];
+                            }
+                            if (entry_4.endpoint.IsNull()) {
+                                newElement_4.endpoint = nil;
+                            } else {
+                                newElement_4.endpoint = [NSNumber numberWithUnsignedShort:entry_4.endpoint.Value()];
+                            }
+                            if (entry_4.deviceType.IsNull()) {
+                                newElement_4.deviceType = nil;
+                            } else {
+                                newElement_4.deviceType = [NSNumber numberWithUnsignedInt:entry_4.deviceType.Value()];
+                            }
+                            [array_4 addObject:newElement_4];
+                        }
+                        { // Scope for the error so we will know what it's named
+                            CHIP_ERROR err = iter_4.GetStatus();
+                            if (err != CHIP_NO_ERROR) {
+                                *aError = err;
+                                return nil;
+                            }
+                        }
+                        newElement_1.targets = array_4;
+                    }
+                    [array_1 addObject:newElement_1];
                 }
-                if (entry_0.targets.IsNull()) {
-                    newElement_0.targets = nil;
-                } else {
-                    auto * array_3 = [NSMutableArray new];
-                    auto iter_3 = entry_0.targets.Value().begin();
-                    while (iter_3.Next()) {
-                        auto & entry_3 = iter_3.GetValue();
-                        CHIPAccessControlClusterTarget * newElement_3;
-                        newElement_3 = [CHIPAccessControlClusterTarget new];
-                        if (entry_3.cluster.IsNull()) {
-                            newElement_3.cluster = nil;
-                        } else {
-                            newElement_3.cluster = [NSNumber numberWithUnsignedInt:entry_3.cluster.Value()];
-                        }
-                        if (entry_3.endpoint.IsNull()) {
-                            newElement_3.endpoint = nil;
-                        } else {
-                            newElement_3.endpoint = [NSNumber numberWithUnsignedShort:entry_3.endpoint.Value()];
-                        }
-                        if (entry_3.deviceType.IsNull()) {
-                            newElement_3.deviceType = nil;
-                        } else {
-                            newElement_3.deviceType = [NSNumber numberWithUnsignedInt:entry_3.deviceType.Value()];
-                        }
-                        [array_3 addObject:newElement_3];
+                { // Scope for the error so we will know what it's named
+                    CHIP_ERROR err = iter_1.GetStatus();
+                    if (err != CHIP_NO_ERROR) {
+                        *aError = err;
+                        return nil;
                     }
-                    { // Scope for the error so we will know what it's named
-                        CHIP_ERROR err = iter_3.GetStatus();
-                        if (err != CHIP_NO_ERROR) {
-                            *aError = err;
-                            return nil;
-                        }
-                    }
-                    newElement_0.targets = array_3;
                 }
-                [array_0 addObject:newElement_0];
+                value = array_1;
             }
-            { // Scope for the error so we will know what it's named
-                CHIP_ERROR err = iter_0.GetStatus();
-                if (err != CHIP_NO_ERROR) {
-                    *aError = err;
-                    return nil;
-                }
-            }
-            value = array_0;
             return value;
         }
         case Attributes::Extension::Id: {

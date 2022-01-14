@@ -1242,10 +1242,9 @@ public:
                                                     bool keepAlive = false) :
         CHIPCallbackBridge<AccessControlAclListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-            value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>> & value);
 };
 
 class CHIPAccessControlAclListAttributeCallbackSubscriptionBridge : public CHIPAccessControlAclListAttributeCallbackBridge

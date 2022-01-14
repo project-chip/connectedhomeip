@@ -120,7 +120,8 @@ void AccessControlClusterAclListAttributeFilter(chip::TLV::TLVReader * data, chi
                                                 chip::Callback::Cancelable * onFailureCallback);
 typedef void (*AccessControlAclListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+    const chip::app::DataModel::Nullable<
+        chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>> &
         data);
 void AccessControlClusterExtensionListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                       chip::Callback::Cancelable * onFailureCallback);
