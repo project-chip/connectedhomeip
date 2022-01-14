@@ -248,8 +248,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::StoreManufacturingDate(
 
 template <class ConfigClass>
 void GenericConfigurationManagerImpl<ConfigClass>::InitiateFactoryReset()
-{
-}
+{}
 
 template <class ImplClass>
 void GenericConfigurationManagerImpl<ImplClass>::StartAdvertisement()
