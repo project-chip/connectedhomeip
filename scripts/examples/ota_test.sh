@@ -3,6 +3,8 @@
 
 #Sergei , test
 
+echo "Generating output to test artifact upload" > /tmp/ota/artifact_test.txt
+
 echo Test passed && exit 0;
 
 ARG1=${1:-20202021}
