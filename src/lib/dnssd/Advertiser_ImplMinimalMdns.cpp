@@ -36,7 +36,6 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/StringBuilder.h>
-#include <platform/ConfigurationManager.h>
 
 // Enable detailed mDNS logging for received queries
 #undef DETAIL_LOGGING

@@ -32,7 +32,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/ConfigurationManager.h>
 
 namespace chip {
 namespace Dnssd {
@@ -487,7 +486,6 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const OperationalAdvertisingParamete
     ADD_TXT_RECORD(TcpSupported);
 
     ADD_PTR_RECORD(CompressedFabricId);
-    DeviceLayer::ConfigurationMgr().StartAdvertisement();
     PUBLISH_RECORDS(Operational);
 }
 
