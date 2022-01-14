@@ -218,8 +218,8 @@ private:
     uint16_t mMaxIntervalCeilingSeconds = 0;
     SessionHolder mSessionHandle;
     // mHoldReport is used to prevent subscription data delivery while we are
-    // waiting for the min reporting interval to elapse.  If we have to send a 
-    // report immediately due to an urgent event being queued, 
+    // waiting for the min reporting interval to elapse.  If we have to send a
+    // report immediately due to an urgent event being queued,
     // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
     bool mHoldReport         = false;
     bool mDirty              = false;
