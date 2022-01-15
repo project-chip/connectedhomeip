@@ -87,12 +87,39 @@ function loadStructs(packageId)
       .then(structs => Promise.all(structs.map(struct => loadStructItems.call(this, struct, packageId))));
 }
 
-function loadClusters()
+/**
+ * Loads endpoint data, specifically what endpoints are available and what clusters
+ * are defined within those endpoints.
+ */
+async function loadEndpoints()
+{
+  let result = [];
+
+  const { db, sessionId } = this.global;
+
+  const endpoints = await queryEndpoint.selectAllEndpoints(db, sessionId);
+
+  // Selection is one by one since existing API does not seem to provide
+  // linkage between cluster and what endpoint it belongs to.
+  //
+  // TODO: there should be a better way
+  for (const endpoint of endpoints) {
+    const endpointClusters
+        = await queryEndpointType.selectAllClustersDetailsFromEndpointTypes(db, [ { endpointTypeId : endpoint.endpointTypeRef } ]);
+    result.push({...endpoint, clusters : endpointClusters.filter(c => c.enabled == 1) });
+  }
+
+  return result;
+}
+
+async function loadClusters()
 {
   const { db, sessionId } = this.global;
-  return queryEndpointType.selectEndpointTypeIds(db, sessionId)
-      .then(endpointTypes => queryEndpointType.selectAllClustersDetailsFromEndpointTypes(db, endpointTypes))
-      .then(clusters => clusters.filter(cluster => cluster.enabled == 1));
+
+  const endpointTypes = await queryEndpointType.selectEndpointTypeIds(db, sessionId);
+  const clusters      = await queryEndpointType.selectAllClustersDetailsFromEndpointTypes(db, endpointTypes);
+
+  return clusters.filter(cluster => cluster.enabled == 1);
 }
 
 function loadCommandResponse(command, packageId)
@@ -360,9 +387,7 @@ function inlineStructItems(args)
       return;
     }
 
-    argument.items.forEach(item => {
-      arguments.push(item);
-    });
+    argument.items.forEach(item => { arguments.push(item); });
   });
 
   return arguments;
@@ -370,11 +395,7 @@ function inlineStructItems(args)
 
 function enhancedCommands(commands, types)
 {
-  commands.forEach(command => {
-    command.arguments.forEach(argument => {
-      enhancedItem(argument, types);
-    });
-  });
+  commands.forEach(command => { command.arguments.forEach(argument => { enhancedItem(argument, types); }); });
 
   commands.forEach(command => {
     // Flag things ending in "Response" so we can filter out unused responses,
@@ -594,6 +615,7 @@ Clusters.init = async function(context) {
 
   const promises = [
     Promise.all(loadTypes),
+    loadEndpoints.call(context),
     loadClusters.call(context),
     loadCommands.call(context, packageId),
     loadAttributes.call(context, packageId),
@@ -601,8 +623,9 @@ Clusters.init = async function(context) {
     loadEvents.call(context, packageId),
   ];
 
-  let [types, clusters, commands, attributes, globalAttributes, events] = await Promise.all(promises);
+  let [types, endpoints, clusters, commands, attributes, globalAttributes, events] = await Promise.all(promises);
 
+  this._endpoints = endpoints;
   this._clusters = clusters;
   this._commands = enhancedCommands(commands, types);
   this._attributes = enhancedAttributes(attributes, globalAttributes, types);
@@ -656,6 +679,11 @@ Clusters.ensurePostProcessingDone = function()
 Clusters.getClusters = function()
 {
     return this.ensureReady().then(() => this._clusters);
+}
+
+Clusters.getEndPoints = function()
+{
+    return this.ensureReady().then(() => this._endpoints);
 }
 
 Clusters.getCommands = function()

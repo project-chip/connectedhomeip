@@ -3316,5 +3316,66 @@ client cluster WindowCovering = 258 {
 
 
 endpoint 1 {
+  instantiate cluster AccessControl;
+  instantiate cluster AccountLogin;
+  instantiate cluster AdministratorCommissioning;
+  instantiate cluster ApplicationBasic;
+  instantiate cluster ApplicationLauncher;
+  instantiate cluster AudioOutput;
+  instantiate cluster BarrierControl;
+  instantiate cluster Basic;
+  instantiate cluster BinaryInputBasic;
+  instantiate cluster Binding;
+  instantiate cluster BooleanState;
+  instantiate cluster BridgedActions;
+  instantiate cluster BridgedDeviceBasic;
+  instantiate cluster Channel;
+  instantiate cluster ColorControl;
+  instantiate cluster ContentLauncher;
+  instantiate cluster Descriptor;
+  instantiate cluster DiagnosticLogs;
+  instantiate cluster DoorLock;
+  instantiate cluster ElectricalMeasurement;
+  instantiate cluster EthernetNetworkDiagnostics;
+  instantiate cluster FixedLabel;
+  instantiate cluster FlowMeasurement;
+  instantiate cluster GeneralCommissioning;
+  instantiate cluster GeneralDiagnostics;
+  instantiate cluster GroupKeyManagement;
+  instantiate cluster Groups;
+  instantiate cluster Identify;
+  instantiate cluster IlluminanceMeasurement;
+  instantiate cluster KeypadInput;
+  instantiate cluster LevelControl;
+  instantiate cluster LocalizationConfiguration;
+  instantiate cluster LowPower;
+  instantiate cluster MediaInput;
+  instantiate cluster MediaPlayback;
+  instantiate cluster ModeSelect;
+  instantiate cluster NetworkCommissioning;
+  instantiate cluster OtaSoftwareUpdateProvider;
+  instantiate cluster OtaSoftwareUpdateRequestor;
+  instantiate cluster OccupancySensing;
+  instantiate cluster OnOff;
+  instantiate cluster OnOffSwitchConfiguration;
+  instantiate cluster OperationalCredentials;
+  instantiate cluster PowerSource;
+  instantiate cluster PowerSourceConfiguration;
+  instantiate cluster PressureMeasurement;
+  instantiate cluster PumpConfigurationAndControl;
+  instantiate cluster RelativeHumidityMeasurement;
+  instantiate cluster Scenes;
+  instantiate cluster SoftwareDiagnostics;
+  instantiate cluster Switch;
+  instantiate cluster TargetNavigator;
+  instantiate cluster TemperatureMeasurement;
+  instantiate cluster TestCluster;
+  instantiate cluster Thermostat;
+  instantiate cluster ThermostatUserInterfaceConfiguration;
+  instantiate cluster ThreadNetworkDiagnostics;
+  instantiate cluster UserLabel;
+  instantiate cluster WakeOnLan;
+  instantiate cluster WiFiNetworkDiagnostics;
+  instantiate cluster WindowCovering;
 }
 

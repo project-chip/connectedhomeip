@@ -799,8 +799,28 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 
 endpoint 0 {
+  instantiate cluster AdministratorCommissioning;
+  instantiate cluster Basic;
+  instantiate cluster Descriptor;
+  instantiate cluster DiagnosticLogs;
+  instantiate cluster EthernetNetworkDiagnostics;
+  instantiate cluster FixedLabel;
+  instantiate cluster GeneralCommissioning;
+  instantiate cluster GeneralDiagnostics;
+  instantiate cluster LocalizationConfiguration;
+  instantiate cluster NetworkCommissioning;
+  instantiate cluster OperationalCredentials;
+  instantiate cluster PowerSource;
+  instantiate cluster PowerSourceConfiguration;
+  instantiate cluster SoftwareDiagnostics;
+  instantiate cluster ThreadNetworkDiagnostics;
+  instantiate cluster UserLabel;
+  instantiate cluster WiFiNetworkDiagnostics;
 }
 
 endpoint 1 {
+  instantiate cluster Descriptor;
+  instantiate cluster OnOff;
+  instantiate cluster PowerSource;
 }
 
