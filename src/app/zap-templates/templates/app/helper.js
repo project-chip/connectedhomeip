@@ -394,20 +394,38 @@ async function zapTypeToClusterObjectType(type, isDecodable, options)
     const ns          = options.hash.ns ? ('chip::app::Clusters::' + nsValueToNamespace(options.hash.ns) + '::') : '';
     const typeChecker = async (method) => zclHelper[method](this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
-    if (await typeChecker('isEnum')) {
+    const types = {
+      isEnum : await typeChecker('isEnum'),
+      isBitmap : await typeChecker('isBitmap'),
+      isEvent : await typeChecker('isEvent'),
+      isStruct : await typeChecker('isStruct'),
+    };
+
+    const typesCount = Object.values(types).filter(isType => isType).length;
+    if (typesCount > 1) {
+      let error = type + ' is ambiguous: \n';
+      Object.entries(types).forEach(([ key, value ]) => {
+        if (value) {
+          error += '\t' + key + ': ' + value + '\n';
+        }
+      });
+      throw error;
+    }
+
+    if (types.isEnum) {
       return ns + type;
     }
 
-    if (await typeChecker('isBitmap')) {
+    if (types.isBitmap) {
       return 'chip::BitFlags<' + ns + type + '>';
     }
 
-    if (await typeChecker('isStruct')) {
+    if (types.isStruct) {
       passByReference = true;
       return ns + 'Structs::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
     }
 
-    if (await typeChecker('isEvent')) {
+    if (types.isEvent) {
       passByReference = true;
       return ns + 'Events::' + type + '::' + (isDecodable ? 'DecodableType' : 'Type');
     }
