@@ -43,6 +43,7 @@
 #include "lwip/sys.h"
 #include "lwip/timeouts.h"
 #include <malloc.h>
+#include <platform/P6/P6Config.h>
 
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
@@ -104,8 +105,7 @@ CHIP_ERROR P6Utils::IsAPEnabled(bool & apEnabled)
 bool P6Utils::IsStationProvisioned(void)
 {
     wifi_config_t stationConfig;
-    return (p6_wifi_get_config(WIFI_IF_STA, &stationConfig) == CY_RSLT_SUCCESS &&
-            strlen((const char *) stationConfig.sta.ssid) != 0);
+    return (p6_wifi_get_config(WIFI_IF_STA, &stationConfig) == CHIP_NO_ERROR && strlen((const char *) stationConfig.sta.ssid) != 0);
 }
 
 CHIP_ERROR P6Utils::IsStationConnected(bool & connected)
@@ -153,6 +153,7 @@ CHIP_ERROR P6Utils::EnableStationMode(void)
     {
         WiFiMode = WIFI_MODE_STA;
     }
+    wifi_set_mode(WiFiMode);
     return err;
 }
 
@@ -202,12 +203,64 @@ const char * P6Utils::WiFiModeToStr(wifi_mode_t wifiMode)
         return "(unknown)";
     }
 }
-cy_rslt_t P6Utils::p6_wifi_set_config(wifi_interface_t interface, wifi_config_t * conf)
+
+CHIP_ERROR P6Utils::GetWiFiSSID(char * buf, size_t bufSize)
 {
+    size_t num = 0;
+    return P6Config::ReadConfigValueStr(P6Config::kConfigKey_WiFiSSID, buf, bufSize, num);
+}
+
+CHIP_ERROR P6Utils::StoreWiFiSSID(char * buf)
+{
+    return P6Config::WriteConfigValueStr(P6Config::kConfigKey_WiFiSSID, buf);
+}
+
+CHIP_ERROR P6Utils::GetWiFiPassword(char * buf, size_t bufSize)
+{
+    size_t num = 0;
+    return P6Config::ReadConfigValueStr(P6Config::kConfigKey_WiFiPassword, buf, bufSize, num);
+}
+
+CHIP_ERROR P6Utils::StoreWiFiPassword(char * buf)
+{
+    return P6Config::WriteConfigValueStr(P6Config::kConfigKey_WiFiPassword, buf);
+}
+
+CHIP_ERROR P6Utils::GetWiFiSecurityCode(uint32_t & security)
+{
+    return P6Config::ReadConfigValue(P6Config::kConfigKey_WiFiSecurity, security);
+}
+
+CHIP_ERROR P6Utils::StoreWiFiSecurityCode(uint32_t security)
+{
+    return P6Config::WriteConfigValue(P6Config::kConfigKey_WiFiSecurity, security);
+}
+
+CHIP_ERROR P6Utils::wifi_get_mode(uint32_t & mode)
+{
+    return P6Config::ReadConfigValue(P6Config::kConfigKey_WiFiMode, mode);
+}
+
+CHIP_ERROR P6Utils::wifi_set_mode(uint32_t mode)
+{
+    return P6Config::WriteConfigValue(P6Config::kConfigKey_WiFiMode, mode);
+}
+
+CHIP_ERROR P6Utils::p6_wifi_set_config(wifi_interface_t interface, wifi_config_t * conf)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (interface == WIFI_IF_STA)
     {
+        /* Store Wi-Fi Configurations in Storage */
+        err = StoreWiFiSSID((char *) conf->sta.ssid);
+        SuccessOrExit(err);
+
+        err = StoreWiFiPassword((char *) conf->sta.password);
+        SuccessOrExit(err);
+
+        err = StoreWiFiSecurityCode(conf->sta.security);
+        SuccessOrExit(err);
         populate_wifi_config_t(&wifi_conf, interface, &conf->sta.ssid, &conf->sta.password, conf->sta.security);
-        ChipLogProgress(DeviceLayer, "STA %s : [%s] [%s] \r\n", __func__, wifi_conf.sta.ssid, wifi_conf.sta.password);
     }
     else
     {
@@ -216,17 +269,37 @@ cy_rslt_t P6Utils::p6_wifi_set_config(wifi_interface_t interface, wifi_config_t 
         wifi_conf.ap.ip_settings.ip_address = conf->ap.ip_settings.ip_address;
         wifi_conf.ap.ip_settings.netmask    = conf->ap.ip_settings.netmask;
         wifi_conf.ap.ip_settings.gateway    = conf->ap.ip_settings.gateway;
-        ChipLogProgress(DeviceLayer, "AP %s : [%s] [%s] channel %d\r\n", __func__, wifi_conf.ap.ssid, wifi_conf.ap.password,
-                        wifi_conf.ap.channel);
     }
-    return CY_RSLT_SUCCESS;
+
+exit:
+    return err;
 }
 
-cy_rslt_t P6Utils::p6_wifi_get_config(wifi_interface_t interface, wifi_config_t * conf)
+CHIP_ERROR P6Utils::p6_wifi_get_config(wifi_interface_t interface, wifi_config_t * conf)
 {
+    uint32 code    = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     if (interface == WIFI_IF_STA)
     {
-        populate_wifi_config_t(conf, interface, &wifi_conf.sta.ssid, &wifi_conf.sta.password, wifi_conf.sta.security);
+        if (P6Config::ConfigValueExists(P6Config::kConfigKey_WiFiSSID) &&
+            P6Config::ConfigValueExists(P6Config::kConfigKey_WiFiPassword) &&
+            P6Config::ConfigValueExists(P6Config::kConfigKey_WiFiSecurity))
+        {
+            /* Retrieve Wi-Fi Configurations from Storage */
+            err = GetWiFiSSID((char *) conf->sta.ssid, sizeof(conf->sta.ssid));
+            SuccessOrExit(err);
+
+            err = GetWiFiPassword((char *) conf->sta.password, sizeof(conf->sta.password));
+            SuccessOrExit(err);
+
+            err = GetWiFiSecurityCode(code);
+            SuccessOrExit(err);
+            conf->sta.security = static_cast<cy_wcm_security_t>(code);
+        }
+        else
+        {
+            populate_wifi_config_t(conf, interface, &wifi_conf.sta.ssid, &wifi_conf.sta.password, wifi_conf.sta.security);
+        }
     }
     else
     {
@@ -235,20 +308,19 @@ cy_rslt_t P6Utils::p6_wifi_get_config(wifi_interface_t interface, wifi_config_t 
         conf->ap.ip_settings.ip_address = wifi_conf.ap.ip_settings.ip_address;
         conf->ap.ip_settings.netmask    = wifi_conf.ap.ip_settings.netmask;
         conf->ap.ip_settings.gateway    = wifi_conf.ap.ip_settings.gateway;
-        ChipLogProgress(DeviceLayer, "AP %s [%s] [%s] channel %d\r\n", __func__, wifi_conf.ap.ssid, wifi_conf.ap.password,
-                        wifi_conf.ap.channel);
     }
-    return CY_RSLT_SUCCESS;
+
+exit:
+    return err;
 }
 
 CHIP_ERROR P6Utils::GetWiFiStationProvision(Internal::DeviceNetworkInfo & netInfo, bool includeCredentials)
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    cy_rslt_t result = CY_RSLT_SUCCESS;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t stationConfig;
 
-    result = p6_wifi_get_config(WIFI_IF_STA, &stationConfig);
-    VerifyOrExit(result == CY_RSLT_SUCCESS, err = CHIP_ERROR_INTERNAL);
+    err = p6_wifi_get_config(WIFI_IF_STA, &stationConfig);
+    SuccessOrExit(err);
 
     ChipLogProgress(DeviceLayer, "GetWiFiStationProvision");
     VerifyOrExit(strlen((const char *) stationConfig.sta.ssid) != 0, err = CHIP_ERROR_INCORRECT_STATE);
@@ -274,8 +346,7 @@ exit:
 
 CHIP_ERROR P6Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo & netInfo)
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
-    cy_rslt_t result = CY_RSLT_SUCCESS;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     wifi_config_t wifiConfig;
     ChipLogProgress(DeviceLayer, "SetWiFiStationProvision");
     char wifiSSID[kMaxWiFiSSIDLength + 1];
@@ -301,13 +372,7 @@ CHIP_ERROR P6Utils::SetWiFiStationProvision(const Internal::DeviceNetworkInfo & 
     populate_wifi_config_t(&wifiConfig, WIFI_IF_STA, (cy_wcm_ssid_t *) wifiSSID, (cy_wcm_passphrase_t *) netInfo.WiFiKey);
 
     // Configure the P6 WiFi interface.
-    result = p6_wifi_set_config(WIFI_IF_STA, &wifiConfig);
-    if (result != CY_RSLT_SUCCESS)
-    {
-        ChipLogError(DeviceLayer, "p6_wifi_set_config() failed ");
-        err = CHIP_ERROR_INTERNAL;
-    }
-    SuccessOrExit(err);
+    ReturnLogErrorOnFailure(p6_wifi_set_config(WIFI_IF_STA, &wifiConfig));
 
     ChipLogProgress(DeviceLayer, "WiFi station provision set (SSID: %s)", netInfo.WiFiSSID);
 
@@ -322,7 +387,7 @@ CHIP_ERROR P6Utils::ClearWiFiStationProvision(void)
     ChipLogProgress(DeviceLayer, "ClearWiFiStationProvision");
     // Clear the P6 WiFi station configuration.
     memset(&stationConfig.sta, 0, sizeof(stationConfig.sta));
-    p6_wifi_set_config(WIFI_IF_STA, &stationConfig);
+    ReturnLogErrorOnFailure(p6_wifi_set_config(WIFI_IF_STA, &stationConfig));
     return err;
 }
 
@@ -355,8 +420,7 @@ CHIP_ERROR P6Utils::p6_wifi_connect(void)
     memcpy(&connect_param.ap_credentials.password, &stationConfig.sta.password, strlen((char *) stationConfig.sta.password));
     connect_param.ap_credentials.security = stationConfig.sta.security;
 
-    ChipLogProgress(DeviceLayer, "p6_wifi_connect ssid %s pass %s sec %d \r\n", connect_param.ap_credentials.SSID,
-                    connect_param.ap_credentials.password, connect_param.ap_credentials.security);
+    ChipLogProgress(DeviceLayer, "Connecting to AP : [%s] \r\n", connect_param.ap_credentials.SSID);
 
     result = cy_wcm_connect_ap(&connect_param, &ip_addr);
     if (result != CY_RSLT_SUCCESS)
@@ -391,7 +455,7 @@ CHIP_ERROR P6Utils::p6_start_ap(void)
     memcpy(&ap_conf.ip_settings, &stationConfig.ap.ip_settings, sizeof(stationConfig.ap.ip_settings));
     ap_conf.ap_credentials.security = stationConfig.ap.security;
     ap_conf.channel                 = stationConfig.ap.channel;
-    ChipLogProgress(DeviceLayer, "p6_start_ap %s %s \r\n", ap_conf.ap_credentials.SSID, ap_conf.ap_credentials.password);
+    ChipLogProgress(DeviceLayer, "p6_start_ap %s \r\n", ap_conf.ap_credentials.SSID);
 
     /* Start AP */
     result = cy_wcm_start_ap(&ap_conf);
