@@ -725,6 +725,7 @@ OTA
 OTADownloader
 OTAImageProcessorDriver
 OTAImageProcessorInterface
+OTAProvider
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
