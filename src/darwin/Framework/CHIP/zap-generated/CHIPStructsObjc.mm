@@ -291,7 +291,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPSoftwareDiagnosticsClusterSoftwareFault
+@implementation CHIPSoftwareDiagnosticsClusterSoftwareFaultStruct
 - (instancetype)init
 {
     if (self = [super init]) {

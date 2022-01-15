@@ -956,6 +956,24 @@ client cluster OnOff = 6 {
   attribute(writable, reportable) enum8 startUpOnOff = 16387;
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
+
+  request struct OffWithEffectRequest {
+    OnOffEffectIdentifier effectId = 0;
+    OnOffDelayedAllOffEffectVariant effectVariant = 1;
+  }
+
+  request struct OnWithTimedOffRequest {
+    OnOffControl onOffControl = 0;
+    int16u onTime = 1;
+    int16u offWaitTime = 2;
+  }
+
+  command Off(): DefaultSuccess = 0;
+  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  command On(): DefaultSuccess = 1;
+  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
+  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
+  command Toggle(): DefaultSuccess = 2;
 }
 
 server cluster OnOff = 6 {
@@ -981,24 +999,6 @@ server cluster OnOff = 6 {
   attribute(writable, reportable) enum8 startUpOnOff = 16387;
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
-
-  request struct OffWithEffectRequest {
-    OnOffEffectIdentifier effectId = 0;
-    OnOffDelayedAllOffEffectVariant effectVariant = 1;
-  }
-
-  request struct OnWithTimedOffRequest {
-    OnOffControl onOffControl = 0;
-    int16u onTime = 1;
-    int16u offWaitTime = 2;
-  }
-
-  command Off(): DefaultSuccess = 0;
-  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
-  command On(): DefaultSuccess = 1;
-  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
-  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
-  command Toggle(): DefaultSuccess = 2;
 }
 
 server cluster OnOffSwitchConfiguration = 7 {
@@ -1119,7 +1119,7 @@ server cluster SoftwareDiagnostics = 52 {
   }
 
   info event SoftwareFault = 0 {
-    SoftwareFault softwareFault = 0;
+    SoftwareFaultStruct softwareFault = 0;
   }
 
   attribute(readonly, reportable) ThreadMetrics threadMetrics[] = 0;

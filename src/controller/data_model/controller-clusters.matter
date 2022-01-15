@@ -2617,7 +2617,7 @@ client cluster SoftwareDiagnostics = 52 {
   }
 
   info event SoftwareFault = 0 {
-    SoftwareFault softwareFault = 0;
+    SoftwareFaultStruct softwareFault = 0;
   }
 
   attribute(readonly, reportable) ThreadMetrics threadMetrics[] = 0;
