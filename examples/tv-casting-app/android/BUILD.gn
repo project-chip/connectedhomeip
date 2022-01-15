@@ -51,7 +51,7 @@ android_library("java") {
     "${chip_root}/build/chip/java:shared_cpplib",
   ]
 
-  sources = []
+  sources = [ "java/src/com/chip/casting/TvCastingApp.java" ]
 
   javac_flags = [ "-Xlint:deprecation" ]
 
