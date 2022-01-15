@@ -2496,6 +2496,11 @@ class ChipClusters:
                     "attributeId": 0x0000FFFB,
                     "type": "int",
                 },
+                0x0000FFFC: {
+                    "attributeName": "FeatureMap",
+                    "attributeId": 0x0000FFFC,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
