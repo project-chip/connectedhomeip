@@ -115,11 +115,6 @@ public:
     CHIP_ERROR FinishAttribute();
     TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 
-    NodeId GetSourceNodeId() const
-    {
-        return mpExchangeCtx != nullptr ? mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetPeerNodeId() : kUndefinedNodeId;
-    }
-
 private:
     friend class TestWriteInteraction;
     friend class InteractionModelEngine;
