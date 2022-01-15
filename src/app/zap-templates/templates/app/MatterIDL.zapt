@@ -30,7 +30,7 @@
   }
 
   {{/zcl_events}}
-  {{#chip_cluster_attributes}}
+  {{#chip_server_cluster_attributes}}
   attribute(
     {{~#if isWritableAttribute~}}
       writable
@@ -44,7 +44,7 @@
     {{~#if isList~}}
       []
     {{~/if}} = {{code}};
-  {{/chip_cluster_attributes}}
+  {{/chip_server_cluster_attributes}}
   {{#chip_cluster_commands}}
   {{#if arguments}}
 
