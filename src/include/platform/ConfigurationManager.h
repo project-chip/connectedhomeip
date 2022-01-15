@@ -141,7 +141,11 @@ public:
     virtual void InitiateFactoryReset() = 0;
 
     // Gets called when starting BLE/DNS-SD advertisement
-    virtual void StartAdvertisement() = 0;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    virtual void NotifyOfAdvertisementStart() {}
+#else
+    void NotifyOfAdvertisementStart() {}
+#endif
 
     virtual void LogDeviceConfig() = 0;
 

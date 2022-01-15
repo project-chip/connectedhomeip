@@ -522,8 +522,8 @@ inline CHIP_ERROR ConnectivityManager::SetBLEAdvertisingEnabled(bool val)
 {
     if (val)
     {
-        // enable BLE advertisement
-        ConfigurationMgr().StartAdvertisement();
+        // Notify BLE advertisement
+        ConfigurationMgr().NotifyOfAdvertisementStart();
     }
     return static_cast<ImplClass *>(this)->_SetBLEAdvertisingEnabled(val);
 }

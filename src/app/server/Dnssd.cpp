@@ -386,7 +386,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
 
     if (commissionableNode && mode != chip::Dnssd::CommissioningMode::kDisabled)
     {
-        DeviceLayer::ConfigurationMgr().StartAdvertisement();
+        DeviceLayer::ConfigurationMgr().NotifyOfAdvertisementStart();
     }
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 

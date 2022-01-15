@@ -117,7 +117,11 @@ public:
     CHIP_ERROR RunUnitTests(void) override;
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
-    void StartAdvertisement() override;
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    void NotifyOfAdvertisementStart() override;
+#else
+    void NotifyOfAdvertisementStart();
+#endif
     void LogDeviceConfig() override;
 
     virtual ~GenericConfigurationManagerImpl() = default;
