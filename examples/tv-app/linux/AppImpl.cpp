@@ -149,6 +149,17 @@ DECLARE_DYNAMIC_ENDPOINT(contentAppEndpoint, contentAppClusters);
 
 ContentAppFactoryImpl::ContentAppFactoryImpl() {}
 
+uint16_t ContentAppFactoryImpl::GetPlatformCatalogVendorId()
+{
+    return kCatalogVendorId;
+}
+
+CharSpan ContentAppFactoryImpl::GetPlatformCatalogApplicationId(Application application)
+{
+    // for now, just return the applicationId passed in
+    return application.applicationId;
+}
+
 ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
 {
     for (auto & app : mContentApps)

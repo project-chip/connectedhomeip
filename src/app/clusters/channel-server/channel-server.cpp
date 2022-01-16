@@ -64,7 +64,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
-    if (app != NULL && app->GetChannelDelegate() != NULL)
+    if (app != NULL)
     {
         ChipLogError(Zcl, "Channel returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
         return app->GetChannelDelegate();
@@ -73,7 +73,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogError(Zcl, "Channel NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::Channel::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_CHANNEL_CLUSTER_SERVER_ENDPOINT_COUNT) ? NULL : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)

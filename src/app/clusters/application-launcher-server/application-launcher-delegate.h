@@ -34,7 +34,21 @@ namespace ApplicationLauncher {
 class Delegate
 {
 public:
-    virtual chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type HandleGetCurrentApp() = 0;
+    Delegate() : Delegate(false){};
+    Delegate(bool featureMapContentPlatform) { mFeatureMapContentPlatform = featureMapContentPlatform; };
+
+    inline bool HasFeature(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherFeature feature)
+    {
+        if (feature == chip::app::Clusters::ApplicationLauncher::ApplicationLauncherFeature::kApplicationPlatform)
+        {
+            return mFeatureMapContentPlatform;
+        }
+        return false;
+    }
+
+    // this attribute should only be enabled for app platform instance (endpoint 1)
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type HandleGetCurrentApp();
+
     // TODO: refactor this method signature to address memory issue (see PR 13398)
     virtual std::list<uint16_t> HandleGetCatalogList() = 0;
 
@@ -47,6 +61,9 @@ public:
     HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) = 0;
 
     virtual ~Delegate() = default;
+
+protected:
+    bool mFeatureMapContentPlatform = false;
 };
 
 } // namespace ApplicationLauncher

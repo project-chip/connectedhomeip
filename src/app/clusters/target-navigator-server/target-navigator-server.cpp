@@ -50,7 +50,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
-    if (app != NULL && app->GetTargetNavigatorDelegate() != NULL)
+    if (app != NULL)
     {
         ChipLogError(Zcl, "TargetNavigator returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
         return app->GetTargetNavigatorDelegate();
@@ -59,7 +59,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogError(Zcl, "TargetNavigator NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::TargetNavigator::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_TARGET_NAVIGATOR_CLUSTER_SERVER_ENDPOINT_COUNT) ? NULL : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)

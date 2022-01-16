@@ -23,24 +23,29 @@
 class ApplicationBasicManager : public chip::app::Clusters::ApplicationBasic::Delegate
 {
 public:
-    ApplicationBasicManager() : ApplicationBasicManager("exampleVendorName1", 1, "exampleName1", 1, "exampleVersion"){};
-    ApplicationBasicManager(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
-                            const char * szApplicationVersion);
+    ApplicationBasicManager() :
+        ApplicationBasicManager(123, "applicationId", "exampleVendorName1", 1, "exampleName1", 1, "exampleVersion"){};
+    ApplicationBasicManager(uint16_t szCatalogVendorId, const char * szApplicationId, const char * szVendorName, uint16_t vendorId,
+                            const char * szApplicationName, uint16_t productId, const char * szApplicationVersion) :
+        chip::app::Clusters::ApplicationBasic::Delegate(szCatalogVendorId, szApplicationId)
+    {
+
+        ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Application Name=\"%s\"", szApplicationId, szApplicationName);
+
+        strncpy(mApplicationName, szApplicationName, sizeof(mApplicationName));
+        strncpy(mVendorName, szVendorName, sizeof(mVendorName));
+        mVendorId = vendorId;
+        strncpy(mApplicationVersion, szApplicationVersion, sizeof(mApplicationVersion));
+        mProductId = productId;
+    };
     virtual ~ApplicationBasicManager(){};
 
     chip::CharSpan HandleGetVendorName() override;
     uint16_t HandleGetVendorId() override;
     chip::CharSpan HandleGetApplicationName() override;
     uint16_t HandleGetProductId() override;
-    chip::app::Clusters::ApplicationBasic::Structs::Application::Type HandleGetApplication() override;
-    chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum HandleGetStatus() override;
     chip::CharSpan HandleGetApplicationVersion() override;
     std::list<uint16_t> HandleGetAllowedVendorList() override;
-
-    inline void SetApplicationStatus(chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum applicationStatus)
-    {
-        mApplicationStatus = applicationStatus;
-    };
 
 protected:
     static const int kVendorNameSize         = 32;
@@ -51,7 +56,5 @@ protected:
     uint16_t mVendorId;
     char mApplicationName[kApplicationNameSize];
     uint16_t mProductId;
-    chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum mApplicationStatus =
-        chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum::kStopped;
     char mApplicationVersion[kApplicationVersionSize];
 };

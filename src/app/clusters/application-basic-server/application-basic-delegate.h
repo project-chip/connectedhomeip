@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 
 #include <app/util/af.h>
@@ -34,16 +35,32 @@ namespace ApplicationBasic {
 class Delegate
 {
 public:
-    virtual chip::CharSpan HandleGetVendorName()                                                     = 0;
-    virtual uint16_t HandleGetVendorId()                                                             = 0;
-    virtual chip::CharSpan HandleGetApplicationName()                                                = 0;
-    virtual uint16_t HandleGetProductId()                                                            = 0;
-    virtual chip::app::Clusters::ApplicationBasic::Structs::Application::Type HandleGetApplication() = 0;
-    virtual ApplicationStatusEnum HandleGetStatus()                                                  = 0;
-    virtual chip::CharSpan HandleGetApplicationVersion()                                             = 0;
-    virtual std::list<uint16_t> HandleGetAllowedVendorList()                                         = 0;
+    Delegate() : Delegate(123, "applicationId"){};
+    Delegate(uint16_t szCatalogVendorId, const char * szApplicationId)
+    {
+        mCatalogVendorId = szCatalogVendorId;
+        strncpy(mApplicationId, szApplicationId, sizeof(mApplicationId));
+    };
+
+    virtual chip::CharSpan HandleGetVendorName()      = 0;
+    virtual uint16_t HandleGetVendorId()              = 0;
+    virtual chip::CharSpan HandleGetApplicationName() = 0;
+    virtual uint16_t HandleGetProductId()             = 0;
+    chip::app::Clusters::ApplicationBasic::Structs::Application::Type HandleGetApplication();
+    inline ApplicationStatusEnum HandleGetStatus() { return mApplicationStatus; }
+    virtual chip::CharSpan HandleGetApplicationVersion()     = 0;
+    virtual std::list<uint16_t> HandleGetAllowedVendorList() = 0;
+
+    inline void SetApplicationStatus(ApplicationStatusEnum status) { mApplicationStatus = status; }
+    bool Matches(Application match);
 
     virtual ~Delegate() = default;
+
+protected:
+    static const int kApplicationIdSize = 32;
+    char mApplicationId[kApplicationIdSize];
+    uint16_t mCatalogVendorId;
+    ApplicationStatusEnum mApplicationStatus = ApplicationStatusEnum::kStopped;
 };
 
 } // namespace ApplicationBasic

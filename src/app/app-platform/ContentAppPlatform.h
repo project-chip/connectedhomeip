@@ -40,6 +40,12 @@ public:
     virtual ~ContentAppFactory()                                        = default;
     virtual ContentApp * LoadContentAppByVendorId(uint16_t vendorId)    = 0;
     virtual ContentApp * LoadContentAppByAppId(Application application) = 0;
+
+    // Gets the vendor ID for this platform
+    virtual uint16_t GetPlatformCatalogVendorId() = 0;
+
+    // Gets the Application ID for the given Application in the platform catalog
+    virtual CharSpan GetPlatformCatalogApplicationId(Application application) = 0;
 };
 
 class DLL_EXPORT AppPlatform
@@ -67,8 +73,29 @@ public:
 
     // helpful method to get a Content App by endpoint in order to perform attribute or command ops
     ContentApp * GetContentAppByEndpointId(chip::EndpointId id);
+    ContentApp * GetContentAppByAppId(Application application);
+
+    // sets the current app for this platform
+    void SetCurrentApp(uint16_t catalogVendorId, CharSpan appId, chip::EndpointId endpoint);
+
+    // returns true if there is a current app for this platform
+    inline bool HasCurrentApp() { return !mNoCurrentApp; }
+
+    // returns true if the vendor/app arguments are the current app
+    bool IsCurrentApp(uint16_t catalogVendorId, CharSpan appId);
+
+    // returns the current app
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type * GetCurrentApp();
+
+    // unset this as current app, if it is current app
+    void UnsetIfCurrentApp(uint16_t catalogVendorId, CharSpan appId);
 
 protected:
+    bool mNoCurrentApp = true;
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type mCurrentApp;
+    static const int kEndpointStringSize = 6;
+    char mCurrentApplicationEndpoint[kEndpointStringSize];
+
     ContentAppFactory * mContentAppFactory = nullptr;
     EndpointId mCurrentEndpointId;
     EndpointId mFirstDynamicEndpointId;

@@ -24,7 +24,10 @@
 class ApplicationLauncherManager : public chip::app::Clusters::ApplicationLauncher::Delegate
 {
 public:
-    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type HandleGetCurrentApp() override;
+    ApplicationLauncherManager() : chip::app::Clusters::ApplicationLauncher::Delegate(){};
+    ApplicationLauncherManager(bool featureMapContentPlatform) :
+        chip::app::Clusters::ApplicationLauncher::Delegate(featureMapContentPlatform){};
+
     std::list<uint16_t> HandleGetCatalogList() override;
 
     chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type

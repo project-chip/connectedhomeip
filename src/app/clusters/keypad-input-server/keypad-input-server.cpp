@@ -47,7 +47,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
-    if (app != NULL && app->GetKeypadInputDelegate() != NULL)
+    if (app != NULL)
     {
         ChipLogError(Zcl, "KeypadInput returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
         return app->GetKeypadInputDelegate();
@@ -56,7 +56,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogError(Zcl, "KeypadInput NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::KeypadInput::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_KEYPAD_INPUT_CLUSTER_SERVER_ENDPOINT_COUNT) ? NULL : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)

@@ -52,12 +52,15 @@
 namespace chip {
 namespace AppPlatform {
 
+static const int kCatalogVendorId = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
+
 class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
     ContentAppImpl(const char * szVendorName, uint16_t vendorId, const char * szApplicationName, uint16_t productId,
                    const char * szApplicationVersion, const char * setupPIN) :
-        mApplicationBasicDelegate(szVendorName, vendorId, szApplicationName, productId, szApplicationVersion),
+        mApplicationBasicDelegate(kCatalogVendorId, szApplicationName, szVendorName, vendorId, szApplicationName, productId,
+                                  szApplicationVersion),
         mAccountLoginDelegate(setupPIN),
         mContentLauncherDelegate({ "image/*", "video/*" },
                                  static_cast<uint32_t>(chip::app::Clusters::ContentLauncher::SupportedStreamingProtocol::kDash) |
@@ -105,8 +108,14 @@ public:
     ContentAppFactoryImpl();
     virtual ~ContentAppFactoryImpl() {}
 
-    ContentApp * LoadContentAppByVendorId(uint16_t vendorId);
-    ContentApp * LoadContentAppByAppId(Application application);
+    ContentApp * LoadContentAppByVendorId(uint16_t vendorId) override;
+    ContentApp * LoadContentAppByAppId(Application application) override;
+
+    // Returns the ContentApp platform's internal catalog vendor ID
+    uint16_t GetPlatformCatalogVendorId() override;
+
+    // Gets the Application ID for the given Application in the platform catalog
+    chip::CharSpan GetPlatformCatalogApplicationId(Application application) override;
 
 protected:
     ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1", "34567890"),

@@ -50,7 +50,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
-    if (app != NULL && app->GetMediaPlaybackDelegate() != NULL)
+    if (app != NULL)
     {
         ChipLogError(Zcl, "MediaPlayback returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
         return app->GetMediaPlaybackDelegate();
@@ -59,7 +59,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogError(Zcl, "MediaPlayback NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::MediaPlayback::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_MEDIA_PLAYBACK_CLUSTER_SERVER_ENDPOINT_COUNT) ? NULL : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)

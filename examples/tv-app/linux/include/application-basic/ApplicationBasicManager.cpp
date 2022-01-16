@@ -21,18 +21,6 @@
 using namespace std;
 using namespace chip::app::Clusters::ApplicationBasic;
 
-ApplicationBasicManager::ApplicationBasicManager(const char * szVendorName, uint16_t vendorId, const char * szApplicationName,
-                                                 uint16_t productId, const char * szApplicationVersion)
-{
-    ChipLogProgress(DeviceLayer, "ApplicationBasic[%s]: Application Name=\"%s\"", szApplicationName, szApplicationName);
-
-    strncpy(mApplicationName, szApplicationName, sizeof(mApplicationName));
-    strncpy(mVendorName, szVendorName, sizeof(mVendorName));
-    mVendorId = vendorId;
-    strncpy(mApplicationVersion, szApplicationVersion, sizeof(mApplicationVersion));
-    mProductId = productId;
-}
-
 chip::CharSpan ApplicationBasicManager::HandleGetVendorName()
 {
     return chip::CharSpan(mVendorName, strlen(mVendorName));
@@ -51,19 +39,6 @@ chip::CharSpan ApplicationBasicManager::HandleGetApplicationName()
 uint16_t ApplicationBasicManager::HandleGetProductId()
 {
     return mProductId;
-}
-
-chip::app::Clusters::ApplicationBasic::Structs::Application::Type ApplicationBasicManager::HandleGetApplication()
-{
-    chip::app::Clusters::ApplicationBasic::Structs::Application::Type application;
-    application.catalogVendorId = 123;
-    application.applicationId   = chip::CharSpan(mApplicationName, strlen(mApplicationName));
-    return application;
-}
-
-ApplicationStatusEnum ApplicationBasicManager::HandleGetStatus()
-{
-    return mApplicationStatus;
 }
 
 chip::CharSpan ApplicationBasicManager::HandleGetApplicationVersion()

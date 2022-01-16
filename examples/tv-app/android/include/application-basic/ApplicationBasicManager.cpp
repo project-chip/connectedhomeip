@@ -41,19 +41,6 @@ uint16_t ApplicationBasicManager::HandleGetProductId()
     return 1;
 }
 
-chip::app::Clusters::ApplicationBasic::Structs::Application::Type ApplicationBasicManager::HandleGetApplication()
-{
-    chip::app::Clusters::ApplicationBasic::Structs::Application::Type application;
-    application.catalogVendorId = 123;
-    application.applicationId   = chip::CharSpan("applicationId", strlen("applicationId"));
-    return application;
-}
-
-ApplicationStatusEnum ApplicationBasicManager::HandleGetStatus()
-{
-    return ApplicationStatusEnum::kStopped;
-}
-
 chip::CharSpan ApplicationBasicManager::HandleGetApplicationVersion()
 {
     return chip::CharSpan("exampleVersion", strlen("exampleVersion"));

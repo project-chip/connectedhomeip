@@ -49,7 +49,7 @@ Delegate * GetDelegate(EndpointId endpoint)
 {
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
-    if (app != NULL && app->GetApplicationBasicDelegate() != NULL)
+    if (app != NULL)
     {
         ChipLogError(Zcl, "ApplicationBasic returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
         return app->GetApplicationBasicDelegate();
@@ -58,7 +58,7 @@ Delegate * GetDelegate(EndpointId endpoint)
     ChipLogError(Zcl, "ApplicationBasic NOT returning ContentApp delegate for endpoint:%" PRIu16, endpoint);
 
     uint16_t ep = emberAfFindClusterServerEndpointIndex(endpoint, chip::app::Clusters::ApplicationBasic::Id);
-    return (ep == 0xFFFF ? NULL : gDelegateTable[ep]);
+    return ((ep == 0xFFFF || ep >= EMBER_AF_APPLICATION_BASIC_CLUSTER_SERVER_ENDPOINT_COUNT) ? NULL : gDelegateTable[ep]);
 }
 
 bool isDelegateNull(Delegate * delegate, EndpointId endpoint)
@@ -88,6 +88,27 @@ void SetDefaultDelegate(EndpointId endpoint, Delegate * delegate)
     else
     {
     }
+}
+
+Delegate * GetDefaultDelegate(EndpointId endpoint)
+{
+    return GetDelegate(endpoint);
+}
+
+chip::app::Clusters::ApplicationBasic::Structs::Application::Type Delegate::HandleGetApplication()
+{
+    chip::app::Clusters::ApplicationBasic::Structs::Application::Type application;
+    application.catalogVendorId = mCatalogVendorId;
+    application.applicationId   = chip::CharSpan(mApplicationId, strlen(mApplicationId));
+    return application;
+}
+
+bool Delegate::Matches(Application match)
+{
+    chip::app::Clusters::ApplicationBasic::Structs::Application::Type application = HandleGetApplication();
+    return (application.catalogVendorId == match.catalogVendorId &&
+            application.applicationId.size() == match.applicationId.size() &&
+            strncmp(application.applicationId.data(), match.applicationId.data(), match.applicationId.size()) == 0);
 }
 
 } // namespace ApplicationBasic

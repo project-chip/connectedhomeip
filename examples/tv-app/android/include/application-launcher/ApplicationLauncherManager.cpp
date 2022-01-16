@@ -21,15 +21,6 @@
 using namespace std;
 using namespace chip::app::Clusters::ApplicationLauncher;
 
-Structs::ApplicationEP::Type ApplicationLauncherManager::HandleGetCurrentApp()
-{
-    Structs::ApplicationEP::Type currentApp;
-    currentApp.application.catalogVendorId = 123;
-    currentApp.application.applicationId   = chip::CharSpan("applicationId", strlen("applicationId"));
-    currentApp.endpoint                    = chip::CharSpan("endpointId", strlen("endpointId"));
-    return currentApp;
-}
-
 std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList()
 {
     return { 123, 456 };

@@ -59,9 +59,14 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * comm
 namespace {
 static AccountLoginManager accountLoginManager;
 static ApplicationBasicManager applicationBasicManager;
-static ApplicationLauncherManager applicationLauncherManager;
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+static ApplicationLauncherManager applicationLauncherManager(true);
+#else  // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+static ApplicationLauncherManager applicationLauncherManager(false);
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 static AudioOutputManager audioOutputManager;
 static ChannelManager channelManager;
+static ContentLauncherManager contentLauncherManager;
 static KeypadInputManager keypadInputManager;
 static LowPowerManager lowPowerManager;
 static MediaInputManager mediaInputManager;
@@ -100,7 +105,7 @@ int main(int argc, char * argv[])
 void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 {
     ChipLogProgress(Zcl, "TV Linux App: ContentLauncher::SetDefaultDelegate");
-    chip::app::Clusters::ContentLauncher::SetDefaultDelegate(endpoint, new ContentLauncherManager());
+    chip::app::Clusters::ContentLauncher::SetDefaultDelegate(endpoint, &contentLauncherManager);
 }
 
 void emberAfAccountLoginClusterInitCallback(EndpointId endpoint)

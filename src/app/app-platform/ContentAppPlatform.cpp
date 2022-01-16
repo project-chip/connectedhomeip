@@ -239,6 +239,27 @@ ContentApp * AppPlatform::GetLoadContentAppByAppId(Application application)
     return NULL;
 }
 
+ContentApp * AppPlatform::GetContentAppByAppId(Application application)
+{
+    ChipLogProgress(DeviceLayer, "GetContentAppByAppId()");
+    Application internalApplication;
+    internalApplication.catalogVendorId = mContentAppFactory->GetPlatformCatalogVendorId();
+    internalApplication.applicationId   = mContentAppFactory->GetPlatformCatalogApplicationId(application);
+
+    uint8_t index = 0;
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+    {
+        ContentApp * app = mContentApps[index];
+        if (app != NULL && app->GetApplicationBasicDelegate()->Matches(internalApplication))
+        {
+            return app;
+        }
+        index++;
+    }
+    ChipLogProgress(DeviceLayer, "GetContentAppByAppId() - application not found ");
+    return NULL;
+}
+
 ContentApp * AppPlatform::GetContentAppByEndpointId(chip::EndpointId id)
 {
     uint8_t index = 0;
@@ -253,6 +274,79 @@ ContentApp * AppPlatform::GetContentAppByEndpointId(chip::EndpointId id)
     }
     ChipLogProgress(DeviceLayer, "GetContentAppByEndpointId() - endpoint %d not found ", id);
     return NULL;
+}
+
+void AppPlatform::SetCurrentApp(uint16_t catalogVendorId, CharSpan appId, chip::EndpointId endpoint)
+{
+    ContentApp * previousApp = NULL;
+    // if this is the current app, then no action
+    if (IsCurrentApp(catalogVendorId, appId))
+    {
+        ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp already current app");
+        return;
+    }
+    // if there is another current app, then need to hide it
+    if (HasCurrentApp())
+    {
+        ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp has a current app");
+        Application application;
+        application.catalogVendorId = mCurrentApp.application.catalogVendorId;
+        application.applicationId   = mCurrentApp.application.applicationId;
+
+        previousApp = GetContentAppByAppId(application);
+        if (previousApp == NULL)
+        {
+            ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp current app not found");
+        }
+    }
+
+    sprintf(mCurrentApplicationEndpoint, "%d", endpoint);
+
+    mCurrentApp.application.catalogVendorId = catalogVendorId;
+    mCurrentApp.application.applicationId   = chip::CharSpan(appId.data(), appId.size());
+    mCurrentApp.endpoint                    = chip::CharSpan(mCurrentApplicationEndpoint, strlen(mCurrentApplicationEndpoint));
+    mNoCurrentApp                           = false;
+
+    if (previousApp != NULL)
+    {
+        // make sure to mark previousApp as hidden
+        previousApp->GetApplicationBasicDelegate()->SetApplicationStatus(
+            chip::app::Clusters::ApplicationBasic::ApplicationStatusEnum::kActiveHidden);
+    }
+    return;
+}
+
+bool AppPlatform::IsCurrentApp(uint16_t catalogVendorId, CharSpan appId)
+{
+    if (mNoCurrentApp)
+    {
+        return false;
+    }
+    return (mCurrentApp.application.catalogVendorId == catalogVendorId &&
+            mCurrentApp.application.applicationId.size() == appId.size() &&
+            strncmp(mCurrentApp.application.applicationId.data(), appId.data(), mCurrentApp.application.applicationId.size()) == 0);
+}
+
+chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type * AppPlatform::GetCurrentApp()
+{
+    if (mNoCurrentApp)
+    {
+        return NULL;
+    }
+    return &mCurrentApp;
+}
+
+void AppPlatform::UnsetIfCurrentApp(uint16_t catalogVendorId, CharSpan appId)
+{
+    if (IsCurrentApp(catalogVendorId, appId))
+    {
+        ChipLogProgress(DeviceLayer, "UnsetIfCurrentApp setting to no current app");
+        mNoCurrentApp = true;
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "UnsetIfCurrentApp not current app");
+    }
 }
 
 } // namespace AppPlatform
