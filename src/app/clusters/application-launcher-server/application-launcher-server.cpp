@@ -202,7 +202,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
     auto & data         = commandData.data;
     auto & application  = commandData.application;
 
-    Application appInput;
+    ApplicationLauncherApplication appInput;
     appInput.catalogVendorId = application.catalogVendorId;
     appInput.applicationId   = (application.applicationId.size() > 0) ? application.applicationId : data;
 
@@ -229,7 +229,7 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
                 err             = command->AddResponseData(commandPath, response);
                 SuccessOrExit(err);
             }
-            chip::app::Clusters::ApplicationBasic::Structs::Application::Type applicationType =
+            chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type applicationType =
                 app->GetApplicationBasicDelegate()->HandleGetApplication();
 
             ChipLogError(Zcl, "ApplicationLauncher setting current app");
@@ -261,7 +261,8 @@ bool emberAfApplicationLauncherClusterLaunchAppRequestCallback(app::CommandHandl
         }
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-        chip::app::Clusters::ApplicationBasic::Structs::Application::Type applicationType = appBasic->HandleGetApplication();
+        chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type applicationType =
+            appBasic->HandleGetApplication();
 
         chip::AppPlatform::AppPlatform::GetInstance().SetCurrentApp(applicationType.catalogVendorId, applicationType.applicationId,
                                                                     endpoint);
@@ -294,7 +295,7 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
     EndpointId endpoint = commandPath.mEndpointId;
     auto & application  = commandData.application;
 
-    Application appInput;
+    ApplicationLauncherApplication appInput;
     appInput.catalogVendorId = application.catalogVendorId;
     appInput.applicationId   = application.applicationId;
 
@@ -321,7 +322,7 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
                 err             = command->AddResponseData(commandPath, response);
                 SuccessOrExit(err);
             }
-            chip::app::Clusters::ApplicationBasic::Structs::Application::Type applicationType =
+            chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type applicationType =
                 app->GetApplicationBasicDelegate()->HandleGetApplication();
 
             chip::AppPlatform::AppPlatform::GetInstance().UnsetIfCurrentApp(applicationType.catalogVendorId,
@@ -353,7 +354,8 @@ bool emberAfApplicationLauncherClusterStopAppRequestCallback(app::CommandHandler
         }
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-        chip::app::Clusters::ApplicationBasic::Structs::Application::Type applicationType = appBasic->HandleGetApplication();
+        chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type applicationType =
+            appBasic->HandleGetApplication();
 
         chip::AppPlatform::AppPlatform::GetInstance().UnsetIfCurrentApp(applicationType.catalogVendorId,
                                                                         applicationType.applicationId);
@@ -385,7 +387,7 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
     EndpointId endpoint = commandPath.mEndpointId;
     auto & application  = commandData.application;
 
-    Application appInput;
+    ApplicationLauncherApplication appInput;
     appInput.catalogVendorId = application.catalogVendorId;
     appInput.applicationId   = application.applicationId;
 
@@ -412,7 +414,7 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
                 err             = command->AddResponseData(commandPath, response);
                 SuccessOrExit(err);
             }
-            chip::app::Clusters::ApplicationBasic::Structs::Application::Type applicationType =
+            chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type applicationType =
                 app->GetApplicationBasicDelegate()->HandleGetApplication();
 
             chip::AppPlatform::AppPlatform::GetInstance().UnsetIfCurrentApp(applicationType.catalogVendorId,
@@ -444,7 +446,8 @@ bool emberAfApplicationLauncherClusterHideAppRequestCallback(app::CommandHandler
         }
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-        chip::app::Clusters::ApplicationBasic::Structs::Application::Type applicationType = appBasic->HandleGetApplication();
+        chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type applicationType =
+            appBasic->HandleGetApplication();
 
         chip::AppPlatform::AppPlatform::GetInstance().UnsetIfCurrentApp(applicationType.catalogVendorId,
                                                                         applicationType.applicationId);

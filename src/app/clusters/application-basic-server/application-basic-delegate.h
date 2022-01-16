@@ -35,7 +35,6 @@ namespace ApplicationBasic {
 class Delegate
 {
 public:
-<<<<<<< HEAD
     Delegate() : Delegate(123, "applicationId"){};
     Delegate(uint16_t szCatalogVendorId, const char * szApplicationId)
     {
@@ -53,7 +52,7 @@ public:
     virtual std::list<uint16_t> HandleGetAllowedVendorList() = 0;
 
     inline void SetApplicationStatus(ApplicationStatusEnum status) { mApplicationStatus = status; }
-    bool Matches(Application match);
+    bool Matches(ApplicationBasicApplication match);
 
     virtual ~Delegate() = default;
 

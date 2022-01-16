@@ -95,17 +95,17 @@ Delegate * GetDefaultDelegate(EndpointId endpoint)
     return GetDelegate(endpoint);
 }
 
-chip::app::Clusters::ApplicationBasic::Structs::Application::Type Delegate::HandleGetApplication()
+chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type Delegate::HandleGetApplication()
 {
-    chip::app::Clusters::ApplicationBasic::Structs::Application::Type application;
+    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type application;
     application.catalogVendorId = mCatalogVendorId;
     application.applicationId   = chip::CharSpan(mApplicationId, strlen(mApplicationId));
     return application;
 }
 
-bool Delegate::Matches(Application match)
+bool Delegate::Matches(ApplicationBasicApplication match)
 {
-    chip::app::Clusters::ApplicationBasic::Structs::Application::Type application = HandleGetApplication();
+    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type application = HandleGetApplication();
     return (application.catalogVendorId == match.catalogVendorId &&
             application.applicationId.size() == match.applicationId.size() &&
             strncmp(application.applicationId.data(), match.applicationId.data(), match.applicationId.size()) == 0);

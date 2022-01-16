@@ -154,7 +154,7 @@ uint16_t ContentAppFactoryImpl::GetPlatformCatalogVendorId()
     return kCatalogVendorId;
 }
 
-CharSpan ContentAppFactoryImpl::GetPlatformCatalogApplicationId(Application application)
+CharSpan ContentAppFactoryImpl::GetPlatformCatalogApplicationId(ApplicationLauncherApplication application)
 {
     // for now, just return the applicationId passed in
     return application.applicationId;

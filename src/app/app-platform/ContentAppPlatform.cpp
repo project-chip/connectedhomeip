@@ -238,10 +238,10 @@ ContentApp * AppPlatform::GetLoadContentAppByAppId(ApplicationLauncherApplicatio
     return NULL;
 }
 
-ContentApp * AppPlatform::GetContentAppByAppId(Application application)
+ContentApp * AppPlatform::GetContentAppByAppId(ApplicationLauncherApplication application)
 {
     ChipLogProgress(DeviceLayer, "GetContentAppByAppId()");
-    Application internalApplication;
+    ApplicationBasicApplication internalApplication;
     internalApplication.catalogVendorId = mContentAppFactory->GetPlatformCatalogVendorId();
     internalApplication.applicationId   = mContentAppFactory->GetPlatformCatalogApplicationId(application);
 
@@ -288,7 +288,7 @@ void AppPlatform::SetCurrentApp(uint16_t catalogVendorId, CharSpan appId, chip::
     if (HasCurrentApp())
     {
         ChipLogProgress(DeviceLayer, "AppPlatform::SetCurrentApp has a current app");
-        Application application;
+        ApplicationLauncherApplication application;
         application.catalogVendorId = mCurrentApp.application.catalogVendorId;
         application.applicationId   = mCurrentApp.application.applicationId;
 

@@ -108,19 +108,14 @@ public:
     ContentAppFactoryImpl();
     virtual ~ContentAppFactoryImpl() {}
 
-<<<<<<< HEAD
     ContentApp * LoadContentAppByVendorId(uint16_t vendorId) override;
-    ContentApp * LoadContentAppByAppId(Application application) override;
+    ContentApp * LoadContentAppByAppId(ApplicationLauncherApplication application) override;
 
     // Returns the ContentApp platform's internal catalog vendor ID
     uint16_t GetPlatformCatalogVendorId() override;
 
     // Gets the Application ID for the given Application in the platform catalog
-    chip::CharSpan GetPlatformCatalogApplicationId(Application application) override;
-=======
-    ContentApp * LoadContentAppByVendorId(uint16_t vendorId);
-    ContentApp * LoadContentAppByAppId(ApplicationLauncherApplication application);
->>>>>>> ff0bc9107ab096283ad87f42d07819990f98aca7
+    chip::CharSpan GetPlatformCatalogApplicationId(ApplicationLauncherApplication application) override;
 
 protected:
     ContentAppImpl mContentApps[APP_LIBRARY_SIZE] = { ContentAppImpl("Vendor1", 1, "App1", 11, "Version1", "34567890"),
