@@ -40,7 +40,7 @@ void ContentLauncherManager::NewManager(jint endpoint, jobject manager)
     ChipLogProgress(Zcl, "TV Android App: ContentLauncher::SetDefaultDelegate");
     ContentLauncherManager * mgr = new ContentLauncherManager();
     mgr->InitializeWithObjects(manager);
-    chip::app::Clusters::ContentLauncher::SetDelegate(static_cast<EndpointId>(endpoint), mgr);
+    chip::app::Clusters::ContentLauncher::SetDefaultDelegate(static_cast<EndpointId>(endpoint), mgr);
 }
 
 void ContentLauncherManager::HandleLaunchContent(
