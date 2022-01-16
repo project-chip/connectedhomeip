@@ -43,8 +43,8 @@ using namespace chip::AppPlatform;
 #define DEVICE_VERSION_DEFAULT 1
 
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                   uint8_t * buffer, uint16_t maxReadLength)
+                                                   EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -62,8 +62,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 }
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                    uint8_t * buffer)
+                                                    EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -229,7 +228,7 @@ ContentApp * AppPlatform::GetLoadContentAppByVendorId(uint16_t vendorId)
     return NULL;
 }
 
-ContentApp * AppPlatform::GetLoadContentAppByAppId(Application application)
+ContentApp * AppPlatform::GetLoadContentAppByAppId(ApplicationLauncherApplication application)
 {
     ChipLogProgress(DeviceLayer, "GetLoadContentAppByAppId()");
     if (mContentAppFactory != NULL)

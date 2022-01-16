@@ -145,18 +145,9 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void);
 void emberAfInit(chip::Messaging::ExchangeManager * exchangeContext);
 void emberAfTick(void);
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
-uint16_t emberAfFindClusterNameIndexWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 void emberAfStackDown(void);
 
 void emberAfDecodeAndPrintCluster(chip::ClusterId cluster);
-void emberAfDecodeAndPrintClusterWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
-
-bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           chip::Messaging::ExchangeContext * source, InterPanHeader * interPanHeader);
-
-bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, chip::Messaging::ExchangeContext * source,
-                                     InterPanHeader * interPanHeader, EmberAfClusterCommand * returnCmd);
 
 /**
  * Retrieves the difference between the two passed values.
@@ -211,9 +202,6 @@ extern uint8_t emberAfIncomingZclSequenceNumber;
 void emberAfSetNoReplyForNextMessage(bool set);
 
 #define isThisDataTypeSentLittleEndianOTA(dataType) (!(emberAfIsThisDataTypeAStringType(dataType)))
-
-bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd);
-bool emAfProcessClusterSpecificCommand(EmberAfClusterCommand * cmd);
 
 extern uint8_t emberAfResponseType;
 
@@ -288,6 +276,10 @@ uint8_t emberAfGetChannelFrom8bitEncodedChanPg(uint8_t chanPg);
  * @return 8-bit encoded channel-page, 0xFF if invalid
  */
 uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel);
+
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, bool asServer);
+bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                   bool asServer);
 
 namespace chip {
 chip::Messaging::ExchangeManager * ExchangeManager();

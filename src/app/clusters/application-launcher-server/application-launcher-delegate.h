@@ -52,13 +52,13 @@ public:
     // TODO: refactor this method signature to address memory issue (see PR 13398)
     virtual std::list<uint16_t> HandleGetCatalogList() = 0;
 
+    virtual Commands::LauncherResponse::Type HandleLaunchApp(
+        const chip::CharSpan & data,
+        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) = 0;
     virtual Commands::LauncherResponse::Type
-    HandleLaunchApp(const chip::CharSpan & data,
-                    const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) = 0;
+    HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) = 0;
     virtual Commands::LauncherResponse::Type
-    HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) = 0;
-    virtual Commands::LauncherResponse::Type
-    HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application) = 0;
+    HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) = 0;
 
     virtual ~Delegate() = default;
 

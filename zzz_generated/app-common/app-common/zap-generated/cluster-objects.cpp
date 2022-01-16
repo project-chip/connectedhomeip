@@ -6396,7 +6396,7 @@ namespace Events {
 } // namespace Events
 
 } // namespace LocalizationConfiguration
-namespace LocalizationTimeFormat {
+namespace TimeFormatLocalization {
 
 namespace Commands {
 } // namespace Commands
@@ -6435,41 +6435,7 @@ CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const Concre
 namespace Events {
 } // namespace Events
 
-} // namespace LocalizationTimeFormat
-namespace LocalizationUnit {
-
-namespace Commands {
-} // namespace Commands
-
-namespace Attributes {
-CHIP_ERROR TypeInfo::DecodableType::Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path)
-{
-    switch (path.mAttributeId)
-    {
-    case Attributes::TemperatureUnit::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, temperatureUnit));
-        break;
-    case Attributes::AttributeList::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, attributeList));
-        break;
-    case Attributes::FeatureMap::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, featureMap));
-        break;
-    case Attributes::ClusterRevision::TypeInfo::GetAttributeId():
-        ReturnErrorOnFailure(DataModel::Decode(reader, clusterRevision));
-        break;
-    default:
-        break;
-    }
-
-    return CHIP_NO_ERROR;
-}
-} // namespace Attributes
-
-namespace Events {
-} // namespace Events
-
-} // namespace LocalizationUnit
+} // namespace TimeFormatLocalization
 namespace PowerSourceConfiguration {
 
 namespace Commands {
@@ -21053,7 +21019,7 @@ namespace Events {
 } // namespace AudioOutput
 namespace ApplicationLauncher {
 namespace Structs {
-namespace Application {
+namespace ApplicationLauncherApplication {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21092,7 +21058,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace Application
+} // namespace ApplicationLauncherApplication
 namespace ApplicationEP {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
@@ -21316,7 +21282,7 @@ namespace Events {
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
 namespace Structs {
-namespace Application {
+namespace ApplicationBasicApplication {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -21355,7 +21321,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace Application
+} // namespace ApplicationBasicApplication
 } // namespace Structs
 
 namespace Commands {

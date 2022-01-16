@@ -35,6 +35,7 @@ namespace ApplicationBasic {
 class Delegate
 {
 public:
+<<<<<<< HEAD
     Delegate() : Delegate(123, "applicationId"){};
     Delegate(uint16_t szCatalogVendorId, const char * szApplicationId)
     {
@@ -46,7 +47,7 @@ public:
     virtual uint16_t HandleGetVendorId()              = 0;
     virtual chip::CharSpan HandleGetApplicationName() = 0;
     virtual uint16_t HandleGetProductId()             = 0;
-    chip::app::Clusters::ApplicationBasic::Structs::Application::Type HandleGetApplication();
+    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type HandleGetApplication();
     inline ApplicationStatusEnum HandleGetStatus() { return mApplicationStatus; }
     virtual chip::CharSpan HandleGetApplicationVersion()     = 0;
     virtual std::list<uint16_t> HandleGetAllowedVendorList() = 0;

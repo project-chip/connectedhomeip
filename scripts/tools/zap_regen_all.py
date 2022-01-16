@@ -25,6 +25,56 @@ CHIP_ROOT_DIR = os.path.realpath(
     os.path.join(os.path.dirname(__file__), '../..'))
 
 
+class ZAPGenerateTarget:
+    def __init__(self, zap_config, template=None, output_dir=None):
+        self.script = './scripts/tools/zap/generate.py'
+        self.zap_config = str(zap_config)
+        self.template = template
+
+        if output_dir:
+            # make sure we convert  any os.PathLike object to string
+            self.output_dir = str(output_dir)
+        else:
+            self.output_dir = None
+
+    def generate(self):
+        """Runs a ZAP generate command on the configured zap/template/outputs.
+        """
+        cmd = [self.script, self.zap_config]
+
+        if self.template:
+            cmd.append('-t')
+            cmd.append(self.template)
+
+        if self.output_dir:
+            cmd.append('-o')
+            cmd.append(self.output_dir)
+
+        logging.info("Generating target: %s" % " ".join(cmd))
+        subprocess.check_call(cmd)
+
+    def extractAnyGeneratedIDL(self):
+        """Searches for Clusters.matter in the output directory and if found,
+        will move it to stay along with the zap file config
+        """
+        if not self.output_dir:
+            # TODO: where do things get generated if no output dir?
+            # Assume here that IDL is not generated in such cases
+            return
+
+        idl_path = os.path.join(self.output_dir, "Clusters.matter")
+        if not os.path.exists(idl_path):
+            return
+
+        target_path = self.zap_config.replace(".zap", ".matter")
+        if not target_path.endswith(".matter"):
+            # We expect "something.zap" and don't handle corner cases of
+            # multiple extensions. This is to work with existing codebase only
+            raise Error("Unexpected input zap file  %s" % self.zap_config)
+
+        os.rename(idl_path, target_path)
+
+
 def checkPythonVersion():
     if sys.version_info[0] < 3:
         print('Must use Python 3. Current version is ' +
@@ -55,8 +105,10 @@ def getGlobalTemplatesTargets():
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
             template = 'examples/placeholder/templates/templates.json'
-            targets.append([str(filepath), '-o', output_dir])
-            targets.append([str(filepath), '-o', output_dir, '-t', template])
+
+            targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir))
+            targets.append(
+                ZAPGenerateTarget(filepath, output_dir=output_dir, template=template))
             continue
 
         logging.info("Found example %s (via %s)" %
@@ -69,13 +121,11 @@ def getGlobalTemplatesTargets():
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        targets.append([str(filepath), '-o', output_dir])
+        targets.append(ZAPGenerateTarget(filepath, output_dir=output_dir))
 
-    targets.extend([
-        [
-            './src/controller/data_model/controller-clusters.zap',
-            '-o',
-            os.path.join('zzz_generated/controller-clusters/zap-generated')]])
+    targets.append(ZAPGenerateTarget(
+        './src/controller/data_model/controller-clusters.zap',
+        output_dir=os.path.join('zzz_generated/controller-clusters/zap-generated')))
 
     return targets
 
@@ -94,12 +144,12 @@ def getSpecificTemplatesTargets():
     }
 
     for template, output_dir in templates.items():
-        target = [
-            'src/controller/data_model/controller-clusters.zap', '-t', template]
+        target = ZAPGenerateTarget(
+            'src/controller/data_model/controller-clusters.zap', template=template)
         if output_dir is not None:
             if not os.path.exists(output_dir):
                 os.makedirs(output_dir)
-            target.extend(['-o', output_dir])
+            target.output_dir = output_dir
 
         targets.append(target)
 
@@ -123,9 +173,8 @@ def main():
 
     targets = getTargets()
     for target in targets:
-        exec_list = ['./scripts/tools/zap/generate.py'] + target
-        logging.info("Generating target: %s" % " ".join(exec_list))
-        subprocess.check_call(exec_list)
+        target.generate()
+        target.extractAnyGeneratedIDL()
 
 
 if __name__ == '__main__':

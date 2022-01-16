@@ -47,10 +47,10 @@ limitations under the License.
             <featureBit tag="RID" bit="1">false</featureBit>
             <featureBit tag="FGP" bit="2">false</featureBit>
             <featureBit tag="LOG" bit="3">false</featureBit>
-            <featureBit tag="SCH" bit="4">false</featureBit>
+            <featureBit tag="SCH" bit="4">true</featureBit>
             <featureBit tag="DPS" bit="5">true</featureBit>
             <featureBit tag="FACE" bit="6">false</featureBit>
-            <featureBit tag="COTA" bit="7">false</featureBit>
+            <featureBit tag="COTA" bit="7">true</featureBit>
             <featureBit tag="USR" bit="8">true</featureBit> <!-- TODO: Depend on PIN | RID | FGP | FACE -->
             <featureBit tag="NOT" bit="9">false</featureBit>
         </globalAttribute>

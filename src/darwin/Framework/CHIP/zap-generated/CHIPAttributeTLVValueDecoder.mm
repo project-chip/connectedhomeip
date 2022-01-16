@@ -371,13 +371,9 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            CHIPApplicationBasicClusterApplication * _Nonnull value;
-            value = [CHIPApplicationBasicClusterApplication new];
+            CHIPApplicationBasicClusterApplicationBasicApplication * _Nonnull value;
+            value = [CHIPApplicationBasicClusterApplicationBasicApplication new];
             value.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorId];
-            value.catalogVendorId = [NSNumber numberWithUnsignedShort:cppValue.catalogVendorId];
-            value.applicationId = [[NSString alloc] initWithBytes:cppValue.applicationId.data()
-                                                           length:cppValue.applicationId.size()
-                                                         encoding:NSUTF8StringEncoding];
             value.applicationId = [[NSString alloc] initWithBytes:cppValue.applicationId.data()
                                                            length:cppValue.applicationId.size()
                                                          encoding:NSUTF8StringEncoding];
@@ -3947,8 +3943,12 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             if (*aError != CHIP_NO_ERROR) {
                 return nil;
             }
-            NSNumber * _Nonnull value;
-            value = [NSNumber numberWithUnsignedChar:cppValue];
+            NSNumber * _Nullable value;
+            if (cppValue.IsNull()) {
+                value = nil;
+            } else {
+                value = [NSNumber numberWithUnsignedChar:cppValue.Value()];
+            }
             return value;
         }
         case Attributes::AttributeList::Id: {
@@ -3975,6 +3975,17 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                 }
             }
             value = array_0;
+            return value;
+        }
+        case Attributes::FeatureMap::Id: {
+            using TypeInfo = Attributes::FeatureMap::TypeInfo;
+            TypeInfo::DecodableType cppValue;
+            *aError = DataModel::Decode(aReader, cppValue);
+            if (*aError != CHIP_NO_ERROR) {
+                return nil;
+            }
+            NSNumber * _Nonnull value;
+            value = [NSNumber numberWithUnsignedInt:cppValue];
             return value;
         }
         case Attributes::ClusterRevision::Id: {

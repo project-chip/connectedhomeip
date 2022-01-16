@@ -2496,6 +2496,11 @@ class ChipClusters:
                     "attributeId": 0x0000FFFB,
                     "type": "int",
                 },
+                0x0000FFFC: {
+                    "attributeName": "FeatureMap",
+                    "attributeId": 0x0000FFFC,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,
@@ -3959,6 +3964,15 @@ class ChipClusters:
                     "args": {
                         "arg1": "int",
                         "arg2": "int",
+                    },
+                },
+            0x00000014: {
+                    "commandId": 0x00000014,
+                    "commandName": "TestEmitTestEventRequest",
+                    "args": {
+                        "arg1": "int",
+                        "arg2": "int",
+                        "arg3": "bool",
                     },
                 },
             0x0000000E: {

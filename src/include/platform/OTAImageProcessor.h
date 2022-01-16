@@ -28,8 +28,8 @@ namespace chip {
 struct OTAImageProcessorParams
 {
     CharSpan imageFile;
-    uint64_t downloadedBytes;
-    uint64_t totalFileBytes;
+    uint64_t downloadedBytes = 0;
+    uint64_t totalFileBytes  = 0;
 };
 
 /**

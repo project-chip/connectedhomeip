@@ -105,6 +105,7 @@ public:
 
     const char * GetName(void) const { return mName; }
     const char * GetAttribute(void) const;
+    const char * GetEvent(void) const;
     const char * GetArgumentName(size_t index) const;
     bool GetArgumentIsOptional(size_t index) const { return mArgs[index].isOptional(); }
     size_t GetArgumentsCount(void) const { return mArgs.size(); }

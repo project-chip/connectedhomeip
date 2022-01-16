@@ -33,6 +33,7 @@
 
 using namespace chip;
 using namespace chip::TLV;
+using namespace chip::Protocols::InteractionModel;
 
 namespace chip {
 namespace app {
@@ -140,6 +141,46 @@ StatusIB::Builder & StatusIB::Builder::EncodeStatusIB(const StatusIB & aStatusIB
     EndOfContainer();
 exit:
     return *this;
+}
+
+CHIP_ERROR StatusIB::ToChipError() const
+{
+    if (mStatus == Status::Success)
+    {
+        return CHIP_NO_ERROR;
+    }
+
+    if (mClusterStatus.HasValue())
+    {
+        return ChipError(ChipError::SdkPart::kIMClusterStatus, mClusterStatus.Value());
+    }
+
+    return ChipError(ChipError::SdkPart::kIMGlobalStatus, to_underlying(mStatus));
+}
+
+void StatusIB::InitFromChipError(CHIP_ERROR aError)
+{
+    if (aError.IsPart(ChipError::SdkPart::kIMClusterStatus))
+    {
+        mStatus        = Status::Failure;
+        mClusterStatus = MakeOptional(aError.GetSdkCode());
+        return;
+    }
+
+    mClusterStatus = NullOptional;
+    if (aError == CHIP_NO_ERROR)
+    {
+        mStatus = Status::Success;
+        return;
+    }
+
+    if (aError.IsPart(ChipError::SdkPart::kIMGlobalStatus))
+    {
+        mStatus = static_cast<Status>(aError.GetSdkCode());
+        return;
+    }
+
+    mStatus = Status::Failure;
 }
 
 }; // namespace app

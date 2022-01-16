@@ -69,7 +69,7 @@ public:
     // load and unload by vendor id
     void UnloadContentAppByVendorId(uint16_t vendorId);
     ContentApp * GetLoadContentAppByVendorId(uint16_t vendorId);
-    ContentApp * GetLoadContentAppByAppId(Application application);
+    ContentApp * GetLoadContentAppByAppId(ApplicationLauncherApplication application);
 
     // helpful method to get a Content App by endpoint in order to perform attribute or command ops
     ContentApp * GetContentAppByEndpointId(chip::EndpointId id);

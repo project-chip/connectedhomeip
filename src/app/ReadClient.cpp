@@ -640,6 +640,8 @@ CHIP_ERROR ReadClient::ProcessSubscribeResponse(System::PacketBufferHandle && aP
 
     MoveToState(ClientState::SubscriptionActive);
 
+    RefreshLivenessCheckTimer();
+
     return CHIP_NO_ERROR;
 }
 

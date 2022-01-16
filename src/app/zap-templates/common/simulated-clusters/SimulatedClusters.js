@@ -50,6 +50,12 @@ function getAttributes(context, clusterName)
   return cluster ? Promise.resolve(cluster.attributes) : ensureClusters(context).getServerAttributes(clusterName);
 }
 
+function getEvents(context, clusterName)
+{
+  const cluster = getSimulatedCluster(clusterName);
+  return cluster ? Promise.resolve(cluster.events) : ensureClusters(context).getServerEvents(clusterName);
+}
+
 function isTestOnlyCluster(clusterName)
 {
   return !!getSimulatedCluster(clusterName);
@@ -61,4 +67,5 @@ function isTestOnlyCluster(clusterName)
 exports.getClusters       = getClusters;
 exports.getCommands       = getCommands;
 exports.getAttributes     = getAttributes;
+exports.getEvents         = getEvents;
 exports.isTestOnlyCluster = isTestOnlyCluster;

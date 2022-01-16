@@ -24,9 +24,9 @@ limitations under the License.
   </enum>
   <cluster>
     <domain>General</domain>
-    <name>Localization Unit</name>
+    <name>Unit Localization</name>
     <code>0x002d</code>
-    <define>LOCALIZATION_UNIT_CLUSTER</define>
+    <define>UNIT_LOCALIZATION_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>Nodes should be expected to be deployed to any and all regions of the world. These global regions

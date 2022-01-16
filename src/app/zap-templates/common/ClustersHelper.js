@@ -21,6 +21,7 @@ const queryConfig       = require(zapPath + 'db/query-config.js')
 const queryCommand      = require(zapPath + 'db/query-command.js')
 const queryEndpoint     = require(zapPath + 'db/query-endpoint.js')
 const queryEndpointType = require(zapPath + 'db/query-endpoint-type.js')
+const queryEvent        = require(zapPath + 'db/query-event.js')
 const templateUtil      = require(zapPath + 'generator/template-util.js')
 const zclHelper         = require(zapPath + 'generator/helper-zcl.js')
 const zclQuery          = require(zapPath + 'db/query-zcl.js')
@@ -146,6 +147,26 @@ function loadAttributes(packageId)
       .then(attributes => attributes.filter(attribute => attribute.isIncluded))
       .then(attributes => attributes.sort((a, b) => a.code - b.code));
   //.then(attributes => Promise.all(attributes.map(attribute => types.typeSizeAttribute(db, packageId, attribute))
+}
+
+function loadEvents(packageId)
+{
+  const { db, sessionId } = this.global;
+  return queryEvent.selectAllEvents(db, packageId)
+      .then(events => { return queryEndpointType.selectEndpointTypeIds(db, sessionId)
+                    .then(endpointTypes => Promise.all(
+                              endpointTypes.map(({ endpointTypeId }) => queryEndpoint.selectEndpointClusters(db, endpointTypeId))))
+                    .then(clusters => clusters.flat(3))
+                    .then(clusters => {
+                      events.forEach(event => {
+                        const cluster = clusters.find(cluster => cluster.code == event.clusterCode && cluster.side == 'client');
+                        if (cluster) {
+                          event.clusterId   = cluster.clusterId;
+                          event.clusterName = cluster.name;
+                        }
+                      });
+                      return events.filter(event => clusters.find(cluster => cluster.code == event.clusterCode));
+                    }) })
 }
 
 function loadGlobalAttributes(packageId)
@@ -404,6 +425,23 @@ function enhancedCommands(commands, types)
   return commands;
 }
 
+function enhancedEvents(events, types)
+{
+  events.forEach(event => {
+    const argument = {
+      name : event.name,
+      type : event.name,
+      isList : false,
+      isArray : false,
+      isEvent : true,
+      isNullable : false,
+      label : event.name,
+    };
+    event.response = { arguments : [ argument ] };
+  });
+  return events;
+}
+
 function enhancedAttributes(attributes, globalAttributes, types)
 {
   attributes.forEach(attribute => {
@@ -421,6 +459,7 @@ function enhancedAttributes(attributes, globalAttributes, types)
       size : attribute.size,
       isList : attribute.isList,
       isArray : attribute.isList,
+      isEvent : false,
       isNullable : attribute.isNullable,
       chipType : attribute.chipType,
       chipCallback : attribute.chipCallback,
@@ -438,8 +477,104 @@ function enhancedAttributes(attributes, globalAttributes, types)
 }
 
 const Clusters = {
-  ready : new Deferred()
+  ready : new Deferred(),
+  post_processing_ready : new Deferred()
 };
+
+class ClusterStructUsage {
+  constructor()
+  {
+    this.usedStructures       = new Map(); // Structure label -> structure
+    this.clustersForStructure = new Map(); // Structure label -> Set(Cluster name)
+    this.structuresForCluster = new Map(); // Cluster name -> Set(Structure label)
+  }
+
+  addUsedStructure(clusterName, structure)
+  {
+    // Record that generally this structure is used
+    this.usedStructures.set(structure.label, structure);
+
+    // Record that this structure is used by a
+    // particular cluster name
+    let clusterSet = this.clustersForStructure.get(structure.label);
+    if (!clusterSet) {
+      clusterSet = new Set();
+      this.clustersForStructure.set(structure.label, clusterSet);
+    }
+    clusterSet.add(clusterName);
+
+    let structureLabelSet = this.structuresForCluster.get(clusterName);
+    if (!structureLabelSet) {
+      structureLabelSet = new Set();
+      this.structuresForCluster.set(clusterName, structureLabelSet);
+    }
+    structureLabelSet.add(structure.label);
+  }
+
+  /**
+   * Finds structures that are specific to one cluster:
+   *   - they belong to the cluster
+   *   - only that cluster ever uses it
+   */
+  structuresSpecificToCluster(clusterName)
+  {
+    let clusterStructures = this.structuresForCluster.get(clusterName);
+    if (!clusterStructures) {
+      return [];
+    }
+
+    return Array.from(clusterStructures)
+        .filter(name => this.clustersForStructure.get(name).size == 1)
+        .map(name => this.usedStructures.get(name));
+  }
+
+  structuresUsedByMultipleClusters()
+  {
+    return Array.from(this.usedStructures.values()).filter(s => this.clustersForStructure.get(s.label).size > 1);
+  }
+}
+
+Clusters._addUsedStructureNames = async function(clusterName, startType, allKnownStructs) {
+  const struct = getStruct(allKnownStructs, startType.type);
+  if (!struct) {
+    return;
+  }
+
+  this._cluster_structures.addUsedStructure(clusterName, struct);
+
+  for (const item of struct.items) {
+    this._addUsedStructureNames(clusterName, item, allKnownStructs);
+  }
+}
+
+Clusters._computeUsedStructureNames = async function(structs) {
+  // NOTE: this MUST be called only after attribute promise is resolved
+  // as iteration of `get*ByClusterName` needs that data.
+  for (const cluster of this._clusters) {
+    const attributes = await this.getAttributesByClusterName(cluster.name);
+    for (const attribute of attributes) {
+      if (attribute.isStruct) {
+        this._addUsedStructureNames(cluster.name, attribute, structs);
+      }
+    }
+
+    const commands = await this.getCommandsByClusterName(cluster.name);
+    for (const command of commands) {
+      for (const argument of command.arguments) {
+        this._addUsedStructureNames(cluster.name, argument, structs);
+      }
+    }
+
+    const responses = await this.getResponsesByClusterName(cluster.name);
+    for (const response of responses) {
+      for (const argument of response.arguments) {
+        this._addUsedStructureNames(cluster.name, argument, structs);
+      }
+    }
+  }
+
+  this._used_structure_names = new Set(this._cluster_structures.usedStructures.keys())
+}
 
 Clusters.init = async function(context) {
   if (this.ready.running)
@@ -463,15 +598,23 @@ Clusters.init = async function(context) {
     loadCommands.call(context, packageId),
     loadAttributes.call(context, packageId),
     loadGlobalAttributes.call(context, packageId),
+    loadEvents.call(context, packageId),
   ];
 
-  return Promise.all(promises).then(([types, clusters, commands, attributes, globalAttributes]) => {
-    this._clusters = clusters;
-    this._commands = enhancedCommands(commands, types);
-    this._attributes = enhancedAttributes(attributes, globalAttributes, types);
+  let [types, clusters, commands, attributes, globalAttributes, events] = await Promise.all(promises);
 
-    return this.ready.resolve();
-  }, err => this.ready.reject(err));
+  this._clusters = clusters;
+  this._commands = enhancedCommands(commands, types);
+  this._attributes = enhancedAttributes(attributes, globalAttributes, types);
+  this._events = enhancedEvents(events, types);
+  this._cluster_structures = new ClusterStructUsage();
+
+  // data is ready, but not full post - processing
+  this.ready.resolve();
+
+  await this._computeUsedStructureNames(types[3]);
+
+  return this.post_processing_ready.resolve();
 }
 
 
@@ -504,6 +647,12 @@ Clusters.ensureReady = function()
     return this.ready;
 }
 
+Clusters.ensurePostProcessingDone = function()
+{
+    ensureState(this.ready.running);
+    return this.post_processing_ready;
+}
+
 Clusters.getClusters = function()
 {
     return this.ensureReady().then(() => this._clusters);
@@ -522,6 +671,11 @@ Clusters.getResponses = function()
 Clusters.getAttributes = function()
 {
     return this.ensureReady().then(() => this._attributes);
+}
+
+Clusters.getEvents = function()
+{
+    return this.ensureReady().then(() => this._events);
 }
 
 //
@@ -548,6 +702,11 @@ Clusters.getAttributesByClusterName = function(name)
     });
 }
 
+Clusters.getEventsByClusterName = function(name)
+{
+    return this.getEvents().then(items => items.filter(kNameFilter.bind(null, name)));
+}
+
 //
 // Helpers: Get by Cluster Side
 //
@@ -568,6 +727,12 @@ Clusters.getAttributesByClusterSide = function(side)
 {
     return this.getAttributes().then(items => items.filter(kSideFilter.bind(null, side)));
 }
+
+Clusters.getEventsByClusterSide = function(side)
+{
+    return this.getEvents().then(items => items.filter(kSideFilter.bind(null, side)));
+}
+
 
 //
 // Helpers: Client
@@ -594,6 +759,11 @@ Clusters.getClientAttributes = function(name)
     return this.getAttributesByClusterName(name).then(items => items.filter(kClientSideFilter));
 }
 
+Clusters.getClientEvents = function(name)
+{
+    return this.getEventsByClusterName(name).then(items => items.filter(kClientSideFilter));
+}
+
 //
 // Helpers: Server
 //
@@ -617,6 +787,26 @@ Clusters.getServerResponses = function(name)
 Clusters.getServerAttributes = function(name)
 {
     return this.getAttributesByClusterName(name).then(items => items.filter(kServerSideFilter));
+}
+
+Clusters.getUsedStructureNames = function()
+{
+    return this.ensurePostProcessingDone().then(() => this._used_structure_names);
+}
+
+Clusters.getStructuresByClusterName = function(name)
+{
+    return this.ensurePostProcessingDone().then(() => this._cluster_structures.structuresSpecificToCluster(name));
+}
+
+Clusters.getSharedStructs = function()
+{
+    return this.ensurePostProcessingDone().then(() => this._cluster_structures.structuresUsedByMultipleClusters());
+}
+
+Clusters.getServerEvents = function(name)
+{
+    return this.getEventsByClusterName(name).then(items => items.filter(kServerSideFilter));
 }
 
 //

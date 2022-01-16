@@ -27,7 +27,8 @@ std::list<uint16_t> ApplicationLauncherManager::HandleGetCatalogList()
 }
 
 Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(
-    const chip::CharSpan & data, const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
+    const chip::CharSpan & data,
+    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
 {
     ChipLogError(Zcl, "ApplicationLauncherManager::HandleLaunchApp");
 
@@ -38,8 +39,8 @@ Commands::LauncherResponse::Type ApplicationLauncherManager::HandleLaunchApp(
     return response;
 }
 
-Commands::LauncherResponse::Type
-ApplicationLauncherManager::HandleStopApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
+Commands::LauncherResponse::Type ApplicationLauncherManager::HandleStopApp(
+    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
 {
     ChipLogError(Zcl, "ApplicationLauncherManager::HandleStopApp");
 
@@ -50,8 +51,8 @@ ApplicationLauncherManager::HandleStopApp(const chip::app::Clusters::Application
     return response;
 }
 
-Commands::LauncherResponse::Type
-ApplicationLauncherManager::HandleHideApp(const chip::app::Clusters::ApplicationLauncher::Structs::Application::Type & application)
+Commands::LauncherResponse::Type ApplicationLauncherManager::HandleHideApp(
+    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application)
 {
     ChipLogError(Zcl, "ApplicationLauncherManager::HandleHideApp");
 

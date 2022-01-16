@@ -119,6 +119,13 @@ public:
         }
     }
 
+    /**
+     * @brief Deletes an entry from the object pool
+     *
+     * @param entry
+     */
+    void DeleteEntry(GroupSession * entry) { mEntries.ReleaseObject(entry); }
+
 private:
     BitMapObjectPool<GroupSession, kMaxSessionCount> mEntries;
 };

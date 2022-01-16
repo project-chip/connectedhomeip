@@ -175,7 +175,7 @@ ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
     return nullptr;
 }
 
-ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(Application application)
+ContentApp * ContentAppFactoryImpl::LoadContentAppByAppId(ApplicationLauncherApplication application)
 {
     std::string appId(application.applicationId.data(), application.applicationId.size());
     ChipLogProgress(DeviceLayer,

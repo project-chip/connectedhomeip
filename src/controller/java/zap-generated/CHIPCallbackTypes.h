@@ -581,6 +581,8 @@ typedef void (*CHIPLevelControlClusterStartUpCurrentLevelAttributeCallbackType)(
     void *, chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo::DecodableArgType);
 typedef void (*CHIPLevelControlClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPLevelControlClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::LevelControl::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPLevelControlClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -941,6 +943,8 @@ typedef void (*CHIPTestClusterClusterSimpleStructResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestAddArgumentsResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterTestEmitTestEventResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestEnumsResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestListInt8UReverseResponseCallbackType)(

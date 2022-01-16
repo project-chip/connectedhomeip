@@ -279,7 +279,17 @@ CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathPar
 
 FabricIndex WriteHandler::GetAccessingFabricIndex() const
 {
-    return mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
+    FabricIndex fabric = kUndefinedFabricIndex;
+    if (mpExchangeCtx->GetSessionHandle()->IsGroupSession())
+    {
+        fabric = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetFabricIndex();
+    }
+    else
+    {
+        fabric = mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
+    }
+
+    return fabric;
 }
 
 const char * WriteHandler::GetStateStr() const

@@ -1,0 +1,170 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 24.2.2. [TC-LVL-2.2] Write cluster attributes (DUT as Server)
+
+config:
+    cluster: "Level Control"
+    endpoint: 1
+
+tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "Reads the OnOffTransitionTime attribute from the DUT"
+      command: "readAttribute"
+      attribute: "on off transition time"
+      response:
+          value: 0
+          constraints:
+              type: uint16
+
+    - label: "writes the OnOffTransitionTime attribute on the DUT"
+      command: "writeAttribute"
+      attribute: "on off transition time"
+      arguments:
+          value: 10
+
+    - label: "Reads the OnOffTransitionTime attribute from the DUT"
+      command: "readAttribute"
+      attribute: "on off transition time"
+      response:
+          value: 10
+          constraints:
+              type: uint16
+
+    - label: "writes default value of OnOffTransitionTime attribute"
+      command: "writeAttribute"
+      attribute: "on off transition time"
+      arguments:
+          value: 0
+
+    #Disabled due to issue - #11670
+    - label: "Reads the OnLevel attribute from the DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "on level"
+      response:
+          value: null
+          constraints:
+              type: uint8
+
+    - label: "writes the OnLevel attribute on the DUT"
+      command: "writeAttribute"
+      attribute: "on level"
+      arguments:
+          value: 254
+
+    - label: "Reads the OnLevel attribute from the DUT"
+      command: "readAttribute"
+      attribute: "on level"
+      response:
+          value: 254
+          constraints:
+              type: uint8
+
+    #Disabled due to issue - #11670
+    - label: "Reads the OnTransitionTime attribute from the DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "on transition time"
+      response:
+          value: null
+          constraints:
+              type: uint16
+
+    - label: "Writes the OnTransitionTime attribute on the DUT"
+      command: "writeAttribute"
+      attribute: "on transition time"
+      arguments:
+          value: 100
+
+    - label: "Reads the OnTransitionTime attribute from the DUT"
+      command: "readAttribute"
+      attribute: "on transition time"
+      response:
+          value: 100
+          constraints:
+              type: uint16
+
+    #Disabled due to issue - #11670
+    - label: "Reads the OffTransitionTime attribute from the DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "off transition time"
+      response:
+          value: null
+          constraints:
+              type: uint16
+
+    - label: "Writes the OffTransitionTime attribute on the DUT"
+      command: "writeAttribute"
+      attribute: "off transition time"
+      arguments:
+          value: 100
+
+    - label: "Reads the OffTransitionTime attribute from the DUT"
+      command: "readAttribute"
+      attribute: "off transition time"
+      response:
+          value: 100
+          constraints:
+              type: uint16
+
+    - label: "Reads the DefaultMoveRate attribute from the DUT"
+      command: "readAttribute"
+      attribute: "default move rate"
+      response:
+          value: 0
+          constraints:
+              type: uint8
+
+    - label: "Writes the DefaultMoveRate attribute on the DUT"
+      command: "writeAttribute"
+      attribute: "default move rate"
+      arguments:
+          value: 100
+
+    - label: "Reads the DefaultMoveRate attribute from the DUT"
+      command: "readAttribute"
+      attribute: "default move rate"
+      response:
+          value: 100
+          constraints:
+              type: uint8
+
+    #Disabled due to issue - #11670
+    - label: "Reads the StartUpCurrentLevel attribute from the DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "start up current level"
+      response:
+          value: null
+          constraints:
+              type: uint8
+
+    - label: "writes the StartUpCurrentLevel attribute on the DUT"
+      command: "writeAttribute"
+      attribute: "start up current level"
+      arguments:
+          value: 254
+
+    - label: "reads the StartUpCurrentLevel attribute from the DUT"
+      command: "readAttribute"
+      attribute: "start up current level"
+      response:
+          value: 254
+          constraints:
+              type: uint8
