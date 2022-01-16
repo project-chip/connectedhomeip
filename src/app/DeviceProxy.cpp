@@ -43,14 +43,7 @@ CHIP_ERROR DeviceProxy::SendCommands(app::CommandSender * commandObj, Optional<S
 {
     VerifyOrReturnLogError(IsSecureConnected(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    if (timeout.HasValue())
-    {
-        return commandObj->SendCommandRequest(GetSecureSession().Value(), timeout.Value());
-    }
-    else
-    {
-        return commandObj->SendCommandRequest(GetSecureSession().Value());
-    }
+    return commandObj->SendCommandRequest(GetSecureSession().Value(), timeout);
 }
 
 void DeviceProxy::AddIMResponseHandler(void * commandObj, Callback::Cancelable * onSuccessCallback,

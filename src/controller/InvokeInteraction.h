@@ -48,7 +48,8 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
-                     const Optional<uint16_t> & timedInvokeTimeoutMs, const Optional<System::Clock::Timeout> & responseTimeout)
+                     const Optional<uint16_t> & timedInvokeTimeoutMs,
+                     const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
 {
     app::CommandPathParams commandPath = { endpointId, 0, RequestObjectT::GetClusterId(), RequestObjectT::GetCommandId(),
                                            (app::CommandPathFlags::kEndpointIdValid) };
@@ -75,14 +76,7 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
     ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData, timedInvokeTimeoutMs));
-    if (responseTimeout.HasValue())
-    {
-        ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle, responseTimeout.Value()));
-    }
-    else
-    {
-        ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle));
-    }
+    ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle, responseTimeout));
 
     //
     // We've effectively transferred ownership of the above allocated objects to CommandSender, and we need to wait for it to call
@@ -102,7 +96,7 @@ InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, const SessionHand
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
-                     uint16_t timedInvokeTimeoutMs, const Optional<System::Clock::Timeout> & responseTimeout)
+                     uint16_t timedInvokeTimeoutMs, const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
 {
     return InvokeCommandRequest(exchangeMgr, sessionHandle, endpointId, requestCommandData, onSuccessCb, onErrorCb,
                                 MakeOptional(timedInvokeTimeoutMs), responseTimeout);
@@ -114,7 +108,7 @@ InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, const SessionHand
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
-                     const Optional<System::Clock::Timeout> & responseTimeout)
+                     const Optional<System::Clock::Timeout> & responseTimeout = NullOptional)
 {
     return InvokeCommandRequest(exchangeMgr, sessionHandle, endpointId, requestCommandData, onSuccessCb, onErrorCb, NullOptional,
                                 responseTimeout);

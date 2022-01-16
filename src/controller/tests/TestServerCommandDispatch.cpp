@@ -229,7 +229,7 @@ void TestCommandInteraction::TestDataResponse(nlTestSuite * apSuite, void * apCo
     responseDirective = kSendDataResponse;
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb, Optional<System::Clock::Timeout>());
+                                           onFailureCb);
 
     ctx.DrainAndServiceIO();
 
