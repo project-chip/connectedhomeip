@@ -148,8 +148,18 @@ ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMod
 
 bool ConnectivityManagerImpl::_IsWiFiStationProvisioned (void)
 {
-    return wfx_is_sta_provisioned ();
+    char ssid [65];
+    size_t len = 0;
 
+    /* See if we have SSID in our Keys */
+    if ((Internal::EFR32Config::ReadConfigValueStr (Internal::EFR32Config::kConfigKey_WiFiSSID,
+                                                    ssid, sizeof (ssid) -1, len) == CHIP_NO_ERROR)
+        && (ssid [0] != 0))
+    {
+        return true;
+    }
+
+    return false;
 }
 
 bool ConnectivityManagerImpl::_IsWiFiStationEnabled(void)
@@ -294,7 +304,15 @@ void ConnectivityManagerImpl::DriveStationState()
             {
                 if (mWiFiStationState != kWiFiStationState_Connecting)
                 {
-                    ChipLogProgress(DeviceLayer, "Attempting to connect WiFi");
+                    wfx_wifi_provision_t wcfg;
+                    size_t sz;
+
+                    (void)Internal::EFR32Config::ReadConfigValueStr (Internal::EFR32Config::kConfigKey_WiFiSSID, wcfg.ssid, sizeof (wcfg.ssid), sz);
+                    (void)Internal::EFR32Config::ReadConfigValueStr (Internal::EFR32Config::kConfigKey_WiFiPSK, wcfg.passkey, sizeof (wcfg.passkey), sz);
+                    (void)Internal::EFR32Config::ReadConfigValueBin (Internal::EFR32Config::kConfigKey_WiFiSEC, &wcfg.security, sizeof (wcfg.security), sz);
+                    wfx_set_wifi_provision(&wcfg);
+
+                    ChipLogProgress(DeviceLayer, "Attempting to connect WiFi (%s)", wcfg.ssid);
                     if ((serr = wfx_connect_to_ap ()) != SL_STATUS_OK) {
                         ChipLogError(DeviceLayer, "wfx_connect_to_ap failed");
                     }

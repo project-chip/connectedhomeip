@@ -41,10 +41,11 @@ CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
 
     // Configure the WFX WiFi interface.
     wfx_set_wifi_provision(&wifiConfig);
-#if 0
-    (void)Internal::EFR32Config::WriteConfigValueStr (Internal::EFR32Config::kConfigKey_OperationalWiFiSSID, (char *)ssid);
-    (void)Internal::EFR32Config::WriteConfigValueStr (Internal::EFR32Config::kConfigKey_OperationalWiFiPSK, key);
-#endif
+    /* Save into internal Keys */
+    (void)Internal::EFR32Config::WriteConfigValueStr (Internal::EFR32Config::kConfigKey_WiFiSSID, (char *)ssid);
+    (void)Internal::EFR32Config::WriteConfigValueStr (Internal::EFR32Config::kConfigKey_WiFiPSK, key);
+    (void)Internal::EFR32Config::WriteConfigValueBin (Internal::EFR32Config::kConfigKey_WiFiSEC, &wifiConfig.security, sizeof (wifiConfig.security));
+
     ChipLogProgress(DeviceLayer, "SP WiFi STA provision set (SSID: %s)", wifiConfig.ssid);
 
     ConnectivityMgr().SetWiFiStationMode(ConnectivityManager::kWiFiStationMode_Disabled);
