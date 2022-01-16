@@ -37,10 +37,10 @@
 #include <support/CHIPMem.h>
 
 #if CONFIG_ENABLE_OTAR
-#include "platform/Ameba/AmebaOTAImageProcessor.h"
-#include "platform/GenericOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
+#include "platform/Ameba/AmebaOTAImageProcessor.h"
+#include "platform/GenericOTARequestorDriver.h"
 #endif
 
 #if CONFIG_ENABLE_PW_RPC
