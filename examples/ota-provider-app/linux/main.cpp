@@ -54,7 +54,7 @@ constexpr uint16_t kOptionQueryImageBehavior   = 'q';
 constexpr uint16_t kOptionDelayedActionTimeSec = 'd';
 
 // Global variables used for passing the CLI arguments to the OTAProviderExample object
-OTAProviderExample::queryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+OTAProviderExample::QueryImageBehaviorType gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
 uint32_t gDelayedActionTimeSec                                 = 0;
 const char * gOtaFilepath                                      = nullptr;
 
@@ -91,7 +91,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         else if (strcmp(aValue, "UpdateNotAvailable") == 0)
         {
-            gQueryImageBehavior = OTAProviderExample::kRespondWithUpdateAvailable;
+            gQueryImageBehavior = OTAProviderExample::kRespondWithNotAvailable;
         }
         else
         {

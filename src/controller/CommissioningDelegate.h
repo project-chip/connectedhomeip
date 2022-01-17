@@ -91,12 +91,15 @@ public:
         mThreadOperationalDataset.SetValue(threadOperationalDataset);
         return *this;
     }
+    void SetCompletionStatus(CHIP_ERROR err) { completionStatus = err; }
+    CHIP_ERROR GetCompletionStatus() { return completionStatus; }
 
 private:
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
     Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
     Optional<WiFiCredentials> mWiFiCreds;
     Optional<ByteSpan> mThreadOperationalDataset;
+    CHIP_ERROR completionStatus = CHIP_NO_ERROR;
 };
 
 class CommissioningDelegate

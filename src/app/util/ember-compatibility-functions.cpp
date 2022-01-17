@@ -894,7 +894,7 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
     }
 
     auto status = ToInteractionModelStatus(emberAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                                                                         CLUSTER_MASK_SERVER, 0, attributeData,
+                                                                         CLUSTER_MASK_SERVER, attributeData,
                                                                          attributeMetadata->attributeType));
     return apWriteHandler->AddStatus(attributePathParams, status);
 }
@@ -903,9 +903,8 @@ CHIP_ERROR WriteSingleClusterData(const SubjectDescriptor & aSubjectDescriptor, 
 } // namespace chip
 
 void MatterReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                            uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
+                                            EmberAfAttributeType type, uint8_t * data)
 {
-    IgnoreUnusedVariable(manufacturerCode);
     IgnoreUnusedVariable(type);
     IgnoreUnusedVariable(data);
     IgnoreUnusedVariable(mask);

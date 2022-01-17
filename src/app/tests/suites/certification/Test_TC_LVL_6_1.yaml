@@ -48,11 +48,14 @@ tests:
               - name: "ms"
                 value: 100
 
+    # For lighting Device type current level minimal value is 1
     - label: "Reads CurrentLevel attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 0
+          constraints:
+              minValue: 0
+              maxValue: 1
 
     - label: "Sends a move up command to DUT"
       command: "Move"
@@ -88,7 +91,9 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 2
+          constraints:
+              minValue: 2
+              maxValue: 3
 
     - label: "Reset level to 254"
       command: "MoveToLevel"
