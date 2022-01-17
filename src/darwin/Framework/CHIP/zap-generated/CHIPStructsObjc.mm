@@ -512,7 +512,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupKeyManagementClusterGroupInfo
+@implementation CHIPGroupKeyManagementClusterGroupInfoMapStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -529,7 +529,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupKeyManagementClusterGroupKey
+@implementation CHIPGroupKeyManagementClusterGroupKeyMapStruct
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -544,14 +544,14 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPGroupKeyManagementClusterGroupKeySet
+@implementation CHIPGroupKeyManagementClusterGroupKeySetStruct
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _groupKeySetID = @(0);
 
-        _securityPolicy = @(0);
+        _groupKeySecurityPolicy = @(0);
 
         _epochKey0 = [NSData data];
 

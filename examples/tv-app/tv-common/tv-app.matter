@@ -694,22 +694,22 @@ server cluster GroupKeyManagement = 63 {
     kLowLatency = 1;
   }
 
-  struct GroupKey {
+  struct GroupKeyMapStruct {
     fabric_idx fabricIndex = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT16U groupKeySetID = 2;
   }
 
-  struct GroupInfo {
-    INT16U fabricIndex = 0;
-    INT16U groupId = 1;
-    INT16U endpoints[] = 2;
-    CHAR_STRING<16> groupName = 3;
+  struct GroupInfoMapStruct {
+    fabric_idx fabricIndex = 0;
+    group_id groupId = 1;
+    endpoint_no endpoints[] = 2;
+    CHAR_STRING groupName = 3;
   }
 
-  readonly attribute GroupKey groupKeyMap[] = 0;
-  readonly attribute GroupInfo groupTable[] = 1;
-  readonly global attribute int16u clusterRevision = 65533;
+  attribute(writable) GroupKeyMapStruct groupKeyMap[] = 0;
+  attribute(readonly) GroupInfoMapStruct groupTable[] = 1;
+  attribute(readonly) int16u clusterRevision = 65533;
 }
 
 server cluster KeypadInput = 1289 {

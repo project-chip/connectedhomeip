@@ -10778,7 +10778,7 @@ namespace Events {
 } // namespace OperationalCredentials
 namespace GroupKeyManagement {
 namespace Structs {
-namespace GroupInfo {
+namespace GroupInfoMapStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -10826,8 +10826,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace GroupInfo
-namespace GroupKey {
+} // namespace GroupInfoMapStruct
+namespace GroupKeyMapStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
@@ -10871,14 +10871,15 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace GroupKey
-namespace GroupKeySet {
+} // namespace GroupKeyMapStruct
+namespace GroupKeySetStruct {
 CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetID)), groupKeySetID));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kSecurityPolicy)), securityPolicy));
+    ReturnErrorOnFailure(
+        DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySecurityPolicy)), groupKeySecurityPolicy));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEpochKey0)), epochKey0));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEpochStartTime0)), epochStartTime0));
     ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kEpochKey1)), epochKey1));
@@ -10904,8 +10905,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         case to_underlying(Fields::kGroupKeySetID):
             ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetID));
             break;
-        case to_underlying(Fields::kSecurityPolicy):
-            ReturnErrorOnFailure(DataModel::Decode(reader, securityPolicy));
+        case to_underlying(Fields::kGroupKeySecurityPolicy):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySecurityPolicy));
             break;
         case to_underlying(Fields::kEpochKey0):
             ReturnErrorOnFailure(DataModel::Decode(reader, epochKey0));
@@ -10936,7 +10937,7 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
     return CHIP_NO_ERROR;
 }
 
-} // namespace GroupKeySet
+} // namespace GroupKeySetStruct
 } // namespace Structs
 
 namespace Commands {
@@ -10945,7 +10946,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySet)), groupKeySet));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetStruct)), groupKeySetStruct));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -10961,8 +10962,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupKeySet):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySet));
+        case to_underlying(Fields::kGroupKeySetStruct):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetStruct));
             break;
         default:
             break;
@@ -11013,7 +11014,7 @@ CHIP_ERROR Type::Encode(TLV::TLVWriter & writer, TLV::Tag tag) const
 {
     TLV::TLVType outer;
     ReturnErrorOnFailure(writer.StartContainer(tag, TLV::kTLVType_Structure, outer));
-    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySet)), groupKeySet));
+    ReturnErrorOnFailure(DataModel::Encode(writer, TLV::ContextTag(to_underlying(Fields::kGroupKeySetStruct)), groupKeySetStruct));
     ReturnErrorOnFailure(writer.EndContainer(outer));
     return CHIP_NO_ERROR;
 }
@@ -11029,8 +11030,8 @@ CHIP_ERROR DecodableType::Decode(TLV::TLVReader & reader)
         VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
         switch (TLV::TagNumFromTag(reader.GetTag()))
         {
-        case to_underlying(Fields::kGroupKeySet):
-            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySet));
+        case to_underlying(Fields::kGroupKeySetStruct):
+            ReturnErrorOnFailure(DataModel::Decode(reader, groupKeySetStruct));
             break;
         default:
             break;

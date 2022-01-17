@@ -4866,8 +4866,8 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                CHIPGroupKeyManagementClusterGroupKey * newElement_0;
-                newElement_0 = [CHIPGroupKeyManagementClusterGroupKey new];
+                CHIPGroupKeyManagementClusterGroupKeyMapStruct * newElement_0;
+                newElement_0 = [CHIPGroupKeyManagementClusterGroupKeyMapStruct new];
                 newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
                 newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
@@ -4895,9 +4895,9 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
             auto iter_0 = cppValue.begin();
             while (iter_0.Next()) {
                 auto & entry_0 = iter_0.GetValue();
-                CHIPGroupKeyManagementClusterGroupInfo * newElement_0;
-                newElement_0 = [CHIPGroupKeyManagementClusterGroupInfo new];
-                newElement_0.fabricIndex = [NSNumber numberWithUnsignedShort:entry_0.fabricIndex];
+                CHIPGroupKeyManagementClusterGroupInfoMapStruct * newElement_0;
+                newElement_0 = [CHIPGroupKeyManagementClusterGroupInfoMapStruct new];
+                newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
                 newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
                 auto * array_2 = [NSMutableArray new];
                 auto iter_2 = entry_0.endpoints.begin();

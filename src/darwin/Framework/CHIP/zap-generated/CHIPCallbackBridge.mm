@@ -2557,16 +2557,20 @@ void CHIPBridgedDeviceBasicServerGeneratedCommandListListAttributeCallbackSubscr
     }
 }
 
-void CHIPBridgedDeviceBasicClientGeneratedCommandListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value)
+void CHIPGroupKeyManagementGroupKeyMapListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
+        value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        NSNumber * newElement_0;
-        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        CHIPGroupKeyManagementClusterGroupKeyMapStruct * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupKeyMapStruct new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+        newElement_0.groupKeySetID = [NSNumber numberWithUnsignedShort:entry_0.groupKeySetID];
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -2597,16 +2601,38 @@ void CHIPBridgedDeviceBasicClientGeneratedCommandListListAttributeCallbackSubscr
     }
 }
 
-void CHIPBridgedDeviceBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+void CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
+        value)
 {
     NSArray * _Nonnull objCValue;
     auto * array_0 = [NSMutableArray new];
     auto iter_0 = value.begin();
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
-        NSNumber * newElement_0;
-        newElement_0 = [NSNumber numberWithUnsignedInt:entry_0];
+        CHIPGroupKeyManagementClusterGroupInfoMapStruct * newElement_0;
+        newElement_0 = [CHIPGroupKeyManagementClusterGroupInfoMapStruct new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.groupId = [NSNumber numberWithUnsignedShort:entry_0.groupId];
+        auto * array_2 = [NSMutableArray new];
+        auto iter_2 = entry_0.endpoints.begin();
+        while (iter_2.Next()) {
+            auto & entry_2 = iter_2.GetValue();
+            NSNumber * newElement_2;
+            newElement_2 = [NSNumber numberWithUnsignedShort:entry_2];
+            [array_2 addObject:newElement_2];
+        }
+        { // Scope for the error so we will know what it's named
+            CHIP_ERROR err = iter_2.GetStatus();
+            if (err != CHIP_NO_ERROR) {
+                OnFailureFn(context, err);
+                return;
+            }
+        }
+        newElement_0.endpoints = array_2;
+        newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.data()
+                                                          length:entry_0.groupName.size()
+                                                        encoding:NSUTF8StringEncoding];
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -10120,19 +10146,19 @@ void CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPGroupKeyManagementClusterKeySetReadResponseParams new];
     {
-        response.groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
-        response.groupKeySet.groupKeySetID = [NSNumber numberWithUnsignedShort:data.groupKeySet.groupKeySetID];
-        response.groupKeySet.securityPolicy =
-            [NSNumber numberWithUnsignedChar:chip::to_underlying(data.groupKeySet.securityPolicy)];
-        response.groupKeySet.epochKey0 = [NSData dataWithBytes:data.groupKeySet.epochKey0.data()
-                                                        length:data.groupKeySet.epochKey0.size()];
-        response.groupKeySet.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime0];
-        response.groupKeySet.epochKey1 = [NSData dataWithBytes:data.groupKeySet.epochKey1.data()
-                                                        length:data.groupKeySet.epochKey1.size()];
-        response.groupKeySet.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime1];
-        response.groupKeySet.epochKey2 = [NSData dataWithBytes:data.groupKeySet.epochKey2.data()
-                                                        length:data.groupKeySet.epochKey2.size()];
-        response.groupKeySet.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime2];
+        response.groupKeySetStruct = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
+        response.groupKeySetStruct.groupKeySetID = [NSNumber numberWithUnsignedShort:data.groupKeySetStruct.groupKeySetID];
+        response.groupKeySetStruct.groupKeySecurityPolicy =
+            [NSNumber numberWithUnsignedChar:chip::to_underlying(data.groupKeySetStruct.groupKeySecurityPolicy)];
+        response.groupKeySetStruct.epochKey0 = [NSData dataWithBytes:data.groupKeySetStruct.epochKey0.data()
+                                                              length:data.groupKeySetStruct.epochKey0.size()];
+        response.groupKeySetStruct.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:data.groupKeySetStruct.epochStartTime0];
+        response.groupKeySetStruct.epochKey1 = [NSData dataWithBytes:data.groupKeySetStruct.epochKey1.data()
+                                                              length:data.groupKeySetStruct.epochKey1.size()];
+        response.groupKeySetStruct.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:data.groupKeySetStruct.epochStartTime1];
+        response.groupKeySetStruct.epochKey2 = [NSData dataWithBytes:data.groupKeySetStruct.epochKey2.data()
+                                                              length:data.groupKeySetStruct.epochKey2.size()];
+        response.groupKeySetStruct.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:data.groupKeySetStruct.epochStartTime2];
     }
     DispatchSuccess(context, response);
 };

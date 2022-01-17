@@ -4262,8 +4262,10 @@ CHIPBridgedDeviceBasicAttributeListAttributeCallback::~CHIPBridgedDeviceBasicAtt
     env->DeleteGlobalRef(javaCallbackRef);
 }
 
-void CHIPBridgedDeviceBasicAttributeListAttributeCallback::CallbackFn(
-    void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & list)
+void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
+        list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4284,19 +4286,72 @@ void CHIPBridgedDeviceBasicAttributeListAttributeCallback::CallbackFn(
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jobject arrayListObj;
-    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+    jclass attributeClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(
+        env, "chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupKeyMapAttribute", attributeClass);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        ChipLogError(Zcl,
+                     "Could not find class chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupKeyMapAttribute"));
+    chip::JniClass attributeJniClass(attributeClass);
+    jmethodID attributeCtor =
+        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/Integer;)V");
+    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find GroupKeyMapAttribute constructor"));
 
-    auto iter_arrayListObj_0 = list.begin();
-    while (iter_arrayListObj_0.Next())
+    auto iter = list.begin();
+    while (iter.Next())
     {
-        auto & entry_0 = iter_arrayListObj_0.GetValue();
-        jobject newElement_0;
-        std::string newElement_0ClassName     = "java/lang/Long";
-        std::string newElement_0CtorSignature = "(J)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint32_t>(newElement_0ClassName.c_str(),
-                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
+        auto & entry = iter.GetValue();
+        (void) entry;
+        bool fabricIndexNull     = false;
+        bool fabricIndexHasValue = true;
+
+        chip::FabricIndex fabricIndexValue = entry.fabricIndex;
+
+        jobject fabricIndex = nullptr;
+        if (!fabricIndexNull && fabricIndexHasValue)
+        {
+            jclass fabricIndexEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", fabricIndexEntryCls);
+            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
+            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(I)V");
+            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
+        }
+
+        bool groupIdNull     = false;
+        bool groupIdHasValue = true;
+
+        chip::GroupId groupIdValue = entry.groupId;
+
+        jobject groupId = nullptr;
+        if (!groupIdNull && groupIdHasValue)
+        {
+            jclass groupIdEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupIdEntryCls);
+            chip::JniClass groupIdJniClass(groupIdEntryCls);
+            jmethodID groupIdEntryTypeCtor = env->GetMethodID(groupIdEntryCls, "<init>", "(I)V");
+            groupId                        = env->NewObject(groupIdEntryCls, groupIdEntryTypeCtor, groupIdValue);
+        }
+
+        bool groupKeySetIDNull     = false;
+        bool groupKeySetIDHasValue = true;
+
+        uint16_t groupKeySetIDValue = entry.groupKeySetID;
+
+        jobject groupKeySetID = nullptr;
+        if (!groupKeySetIDNull && groupKeySetIDHasValue)
+        {
+            jclass groupKeySetIDEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupKeySetIDEntryCls);
+            chip::JniClass groupKeySetIDJniClass(groupKeySetIDEntryCls);
+            jmethodID groupKeySetIDEntryTypeCtor = env->GetMethodID(groupKeySetIDEntryCls, "<init>", "(I)V");
+            groupKeySetID = env->NewObject(groupKeySetIDEntryCls, groupKeySetIDEntryTypeCtor, groupKeySetIDValue);
+        }
+
+        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, groupId, groupKeySetID);
+        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create GroupKeyMapAttribute object"));
+
+        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
     }
 
     env->ExceptionClear();
@@ -4333,7 +4388,8 @@ CHIPChannelChannelListAttributeCallback::~CHIPChannelChannelListAttributeCallbac
 
 void CHIPChannelChannelListAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Channel::Structs::ChannelInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
+        list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -4354,49 +4410,68 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
     err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/List;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-    jobject arrayListObj;
-    chip::JniReferences::GetInstance().CreateArrayList(arrayListObj);
+    jclass attributeClass;
+    err = chip::JniReferences::GetInstance().GetClassRef(
+        env, "chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupTableAttribute", attributeClass);
+    VerifyOrReturn(
+        err == CHIP_NO_ERROR,
+        ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupTableAttribute"));
+    chip::JniClass attributeJniClass(attributeClass);
+    jmethodID attributeCtor =
+        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
+    VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find GroupTableAttribute constructor"));
 
-    auto iter_arrayListObj_0 = list.begin();
-    while (iter_arrayListObj_0.Next())
+    auto iter = list.begin();
+    while (iter.Next())
     {
-        auto & entry_0 = iter_arrayListObj_0.GetValue();
-        jobject newElement_0;
-        jobject newElement_0_majorNumber;
-        std::string newElement_0_majorNumberClassName     = "java/lang/Integer";
-        std::string newElement_0_majorNumberCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_majorNumberClassName.c_str(),
-                                                                       newElement_0_majorNumberCtorSignature.c_str(),
-                                                                       entry_0.majorNumber, newElement_0_majorNumber);
-        jobject newElement_0_minorNumber;
-        std::string newElement_0_minorNumberClassName     = "java/lang/Integer";
-        std::string newElement_0_minorNumberCtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0_minorNumberClassName.c_str(),
-                                                                       newElement_0_minorNumberCtorSignature.c_str(),
-                                                                       entry_0.minorNumber, newElement_0_minorNumber);
-        jobject newElement_0_name;
-        newElement_0_name = env->NewStringUTF(std::string(entry_0.name.data(), entry_0.name.size()).c_str());
-        jobject newElement_0_callSign;
-        newElement_0_callSign = env->NewStringUTF(std::string(entry_0.callSign.data(), entry_0.callSign.size()).c_str());
-        jobject newElement_0_affiliateCallSign;
-        newElement_0_affiliateCallSign =
-            env->NewStringUTF(std::string(entry_0.affiliateCallSign.data(), entry_0.affiliateCallSign.size()).c_str());
+        auto & entry = iter.GetValue();
+        (void) entry;
+        bool fabricIndexNull     = false;
+        bool fabricIndexHasValue = true;
 
-        jclass channelInfoStructClass;
-        err = chip::JniReferences::GetInstance().GetClassRef(env, "chip/devicecontroller/ChipStructs$ChannelClusterChannelInfo",
-                                                             channelInfoStructClass);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find class ChipStructs$ChannelClusterChannelInfo"));
-        chip::JniClass structJniClass(channelInfoStructClass);
-        jmethodID channelInfoStructCtor =
-            env->GetMethodID(channelInfoStructClass, "<init>",
-                             "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
-        VerifyOrReturn(channelInfoStructCtor != nullptr,
-                       ChipLogError(Zcl, "Could not find ChipStructs$ChannelClusterChannelInfo constructor"));
+        chip::FabricIndex fabricIndexValue = entry.fabricIndex;
 
-        newElement_0 =
-            env->NewObject(channelInfoStructClass, channelInfoStructCtor, newElement_0_majorNumber, newElement_0_minorNumber,
-                           newElement_0_name, newElement_0_callSign, newElement_0_affiliateCallSign);
-        chip::JniReferences::GetInstance().AddToArrayList(arrayListObj, newElement_0);
+        jobject fabricIndex = nullptr;
+        if (!fabricIndexNull && fabricIndexHasValue)
+        {
+            jclass fabricIndexEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", fabricIndexEntryCls);
+            chip::JniClass fabricIndexJniClass(fabricIndexEntryCls);
+            jmethodID fabricIndexEntryTypeCtor = env->GetMethodID(fabricIndexEntryCls, "<init>", "(I)V");
+            fabricIndex                        = env->NewObject(fabricIndexEntryCls, fabricIndexEntryTypeCtor, fabricIndexValue);
+        }
+
+        bool groupIdNull     = false;
+        bool groupIdHasValue = true;
+
+        chip::GroupId groupIdValue = entry.groupId;
+
+        jobject groupId = nullptr;
+        if (!groupIdNull && groupIdHasValue)
+        {
+            jclass groupIdEntryCls;
+            chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", groupIdEntryCls);
+            chip::JniClass groupIdJniClass(groupIdEntryCls);
+            jmethodID groupIdEntryTypeCtor = env->GetMethodID(groupIdEntryCls, "<init>", "(I)V");
+            groupId                        = env->NewObject(groupIdEntryCls, groupIdEntryTypeCtor, groupIdValue);
+        }
+
+        bool groupNameNull     = false;
+        bool groupNameHasValue = true;
+
+        chip::CharSpan groupNameValue = entry.groupName;
+
+        jstring groupName = nullptr;
+        chip::UtfString groupNameStr(env, groupNameValue);
+        if (!groupNameNull && groupNameHasValue)
+        {
+            groupName = jstring(groupNameStr.jniValue());
+        }
+
+        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, groupId, groupName);
+        VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create GroupTableAttribute object"));
+
+        env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
     }
 
     env->ExceptionClear();

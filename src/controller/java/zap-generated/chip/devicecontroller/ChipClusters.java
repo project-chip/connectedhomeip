@@ -8319,15 +8319,51 @@ public class ChipClusters {
 
     public void keySetWrite(
         DefaultClusterCallback callback,
-        ChipStructs.GroupKeyManagementClusterGroupKeySet groupKeySet) {
-      keySetWrite(chipClusterPtr, callback, groupKeySet, null);
+        Integer groupKeySetID,
+        Integer groupKeySecurityPolicy,
+        byte[] epochKey0,
+        Long epochStartTime0,
+        byte[] epochKey1,
+        Long epochStartTime1,
+        byte[] epochKey2,
+        Long epochStartTime2) {
+      keySetWrite(
+          chipClusterPtr,
+          callback,
+          groupKeySetID,
+          groupKeySecurityPolicy,
+          epochKey0,
+          epochStartTime0,
+          epochKey1,
+          epochStartTime1,
+          epochKey2,
+          epochStartTime2,
+          null);
     }
 
     public void keySetWrite(
         DefaultClusterCallback callback,
-        ChipStructs.GroupKeyManagementClusterGroupKeySet groupKeySet,
+        Integer groupKeySetID,
+        Integer groupKeySecurityPolicy,
+        byte[] epochKey0,
+        Long epochStartTime0,
+        byte[] epochKey1,
+        Long epochStartTime1,
+        byte[] epochKey2,
+        Long epochStartTime2,
         int timedInvokeTimeoutMs) {
-      keySetWrite(chipClusterPtr, callback, groupKeySet, timedInvokeTimeoutMs);
+      keySetWrite(
+          chipClusterPtr,
+          callback,
+          groupKeySetID,
+          groupKeySecurityPolicy,
+          epochKey0,
+          epochStartTime0,
+          epochKey1,
+          epochStartTime1,
+          epochKey2,
+          epochStartTime2,
+          timedInvokeTimeoutMs);
     }
 
     private native void keySetRead(
@@ -8351,17 +8387,28 @@ public class ChipClusters {
     private native void keySetWrite(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        ChipStructs.GroupKeyManagementClusterGroupKeySet groupKeySet,
+        Integer groupKeySetID,
+        Integer groupKeySecurityPolicy,
+        byte[] epochKey0,
+        Long epochStartTime0,
+        byte[] epochKey1,
+        Long epochStartTime1,
+        byte[] epochKey2,
+        Long epochStartTime2,
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface KeySetReadAllIndicesResponseCallback {
-      void onSuccess(ArrayList<Integer> groupKeySetIDs);
+      void onSuccess( // GroupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+          // Conversion from this type to Java is not properly implemented yet
+          );
 
       void onError(Exception error);
     }
 
     public interface KeySetReadResponseCallback {
-      void onSuccess(ChipStructs.GroupKeyManagementClusterGroupKeySet groupKeySet);
+      void onSuccess( // GroupKeySetStruct: Struct GroupKeySetStruct
+          // Conversion from this type to Java is not properly implemented yet
+          );
 
       void onError(Exception error);
     }
