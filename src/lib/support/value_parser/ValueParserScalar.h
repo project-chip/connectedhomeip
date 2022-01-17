@@ -28,6 +28,11 @@
 #pragma once
 
 namespace chip {
+namespace ValueParser {
+
+// All value parser functions assumes:
+// * Parsed strings are NULL-terminated
+// * Characters ',' '[' ']' '(' ')' are solely used as delimiters
 
 const char * SkipSpaces(const char * iter);
 
@@ -36,32 +41,29 @@ bool IsTokenEnd(char ch);
 template <typename X,
           typename std::enable_if_t<
               std::is_integral<X>::value && !std::is_same<std::remove_cv_t<std::remove_reference_t<X>>, bool>::value, int> = 0>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions);
+CHIP_ERROR ParseValue(const char *& iter, X & value, std::vector<std::function<void(void)>> & freeFunctions);
 
 template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value, int> = 0>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions);
+CHIP_ERROR ParseValue(const char *& iter, X & value, std::vector<std::function<void(void)>> & freeFunctions);
 
 template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::Nullable<T> & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::DataModel::Nullable<T> & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
 
 template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::BitFlags<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions);
+CHIP_ERROR ParseValue(const char *& iter, chip::BitFlags<T> & value, std::vector<std::function<void(void)>> & freeFunctions);
 
 template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int> = 0>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions);
+CHIP_ERROR ParseValue(const char *& iter, X & value, std::vector<std::function<void(void)>> & freeFunctions);
 
-CHIP_ERROR ParseValue(const char *& iter, const char * end, bool & value, std::vector<std::function<void(void)>> & freeFunctions);
+CHIP_ERROR ParseValue(const char *& iter, bool & value, std::vector<std::function<void(void)>> & freeFunctions);
 
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::CharSpan & value,
-                      std::vector<std::function<void(void)>> & freeFunctions);
+CHIP_ERROR ParseValue(const char *& iter, chip::CharSpan & value, std::vector<std::function<void(void)>> & freeFunctions);
 
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::ByteSpan & value,
-                      std::vector<std::function<void(void)>> & freeFunctions);
+CHIP_ERROR ParseValue(const char *& iter, chip::ByteSpan & value, std::vector<std::function<void(void)>> & freeFunctions);
 
 template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value, int>>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions)
+CHIP_ERROR ParseValue(const char *& iter, X & value, std::vector<std::function<void(void)>> & freeFunctions)
 {
     char * nextIter;
     double converted = strtod(iter, &nextIter);
@@ -77,12 +79,13 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vect
 template <typename X,
           typename std::enable_if_t<
               std::is_integral<X>::value && !std::is_same<std::remove_cv_t<std::remove_reference_t<X>>, bool>::value, int>>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions)
+CHIP_ERROR ParseValue(const char *& iter, X & value, std::vector<std::function<void(void)>> & freeFunctions)
 {
     while (isspace(*iter))
     {
         iter++;
     }
+    const char * end              = iter + strlen(iter);
     std::from_chars_result result = std::from_chars(iter, end, value);
     if (result.ec == std::errc())
     {
@@ -96,12 +99,12 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vect
 }
 
 template <typename X, typename std::enable_if_t<std::is_enum<X>::value, int>>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vector<std::function<void(void)>> & freeFunctions)
+CHIP_ERROR ParseValue(const char *& iter, X & value, std::vector<std::function<void(void)>> & freeFunctions)
 {
     using StorageType    = std::remove_cv_t<std::remove_reference_t<X>>;
     using UnderlyingType = std::underlying_type_t<StorageType>;
     UnderlyingType data;
-    CHIP_ERROR error = ParseValue(iter, end, data, freeFunctions);
+    CHIP_ERROR error = ParseValue(iter, data, freeFunctions);
     if (error == CHIP_NO_ERROR)
     {
         value = static_cast<StorageType>(data);
@@ -110,10 +113,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, X & value, std::vect
 }
 
 template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::BitFlags<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions)
+CHIP_ERROR ParseValue(const char *& iter, chip::BitFlags<T> & value, std::vector<std::function<void(void)>> & freeFunctions)
 {
-    return ParseValue(iter, end, *value.RawStorage(), freeFunctions);
+    return ParseValue(iter, *value.RawStorage(), freeFunctions);
 }
 
+} // namespace ValueParser
 } // namespace chip

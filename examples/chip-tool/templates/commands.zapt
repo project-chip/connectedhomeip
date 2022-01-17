@@ -18,21 +18,23 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
-#include <lib/support/value_parser/ValueParserIntegral.h>
+#include <lib/support/value_parser/ValueParserScalar.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
 namespace chip {
+namespace ValueParser {
 
 {{#zcl_clusters}}
 {{#unless (isStrEqual name "Fixed Label")}}
 {{#zcl_structs}}
-CHIP_ERROR ParseValue(const char *& iter, const char * end, {{zapTypeToEncodableClusterObjectType name ns=parent.name}} & value,
+CHIP_ERROR ParseValue(const char *& iter, {{zapTypeToEncodableClusterObjectType name ns=parent.name}} & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
 {{/zcl_structs}}
 {{/unless}}
 {{/zcl_clusters}}
 
+}
 } // namespace chip
 
 
@@ -41,16 +43,17 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, {{zapTypeToEncodable
 #include <lib/support/value_parser/ValueParserComplex.h>
 
 namespace chip {
+namespace ValueParser {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 {{#zcl_clusters}}
 {{#unless (isStrEqual name "Fixed Label")}}
 {{#zcl_structs}}
-CHIP_ERROR ParseValue(const char *& iter, const char * end, {{zapTypeToEncodableClusterObjectType name ns=parent.name}} & value,
+CHIP_ERROR ParseValue(const char *& iter, {{zapTypeToEncodableClusterObjectType name ns=parent.name}} & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -68,16 +71,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, {{zapTypeToEncodable
     CHIP_ERROR error;
 {{#zcl_struct_items}}
     iter = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.{{asLowerCamelCase label}}, freeFunctions);
+    error = ParseValue(iter, value.{{asLowerCamelCase label}}, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -106,6 +109,7 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, {{zapTypeToEncodable
 {{/zcl_clusters}}
 #pragma GCC diagnostic pop
 
+} // namespace ValueParser
 } // namespace chip
 
 // Value logging and parsing functions. The non-generated ones depend on the
@@ -537,9 +541,8 @@ public:
 
         {{#if isArray}}
         const char *iter = mValueString;
-        const char *end = iter + strlen(mValueString);
-        error = chip::ParseValue(iter, end, mValue, freeFunctions);
-        if (iter != end)
+        error = chip::ValueParser::ParseValue(iter, mValue, freeFunctions);
+        if (*iter != '\0')
         {
             error = CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -549,9 +552,8 @@ public:
         }
         {{else if isStruct}}
         const char *iter = mValueString;
-        const char *end = iter + strlen(mValueString);
-        error = chip::ParseValue(iter, end, mValue);
-        if (iter != end)
+        error = chip::ValueParser::ParseValue(iter, mValue);
+        if (*iter != '\0')
         {
             error = CHIP_ERROR_INVALID_ARGUMENT;
         }

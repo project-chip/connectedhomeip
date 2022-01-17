@@ -35,158 +35,125 @@
 #include <lib/support/BytesToHex.h>
 #include <lib/support/Span.h>
 #include <lib/support/TypeTraits.h>
-#include <lib/support/value_parser/ValueParserIntegral.h>
+#include <lib/support/value_parser/ValueParserScalar.h>
 #include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
 namespace chip {
+namespace ValueParser {
 
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::PowerProfile::Structs::TransferredPhase::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::PowerProfile::Structs::TransferredPhase::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Descriptor::Structs::DeviceType::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::Descriptor::Structs::DeviceType::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::AccessControl::Structs::Target::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::AccessControl::Structs::Target::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::BridgedActions::Structs::ActionStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::BridgedActions::Structs::ActionStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
+CHIP_ERROR ParseValue(const char *& iter,
                       chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
+CHIP_ERROR ParseValue(const char *& iter,
                       chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
+CHIP_ERROR ParseValue(const char *& iter,
                       chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::UserLabel::Structs::LabelStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::UserLabel::Structs::LabelStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ModeSelect::Structs::SemanticTag::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ModeSelect::Structs::SemanticTag::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::DoorLock::Structs::DlCredential::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::DoorLock::Structs::DlCredential::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Channel::Structs::ChannelInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::Channel::Structs::ChannelInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Channel::Structs::LineupInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::Channel::Structs::LineupInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::MediaInput::Structs::InputInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::MediaInput::Structs::InputInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ContentLauncher::Structs::Dimension::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::Dimension::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ContentLauncher::Structs::Parameter::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::Parameter::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
+CHIP_ERROR ParseValue(const char *& iter,
                       chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TestCluster::Structs::NestedStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::NestedStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::TestCluster::Structs::NestedStructList::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::NestedStructList::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
 
+} // namespace ValueParser
 } // namespace chip
 
 // The value parser header needs to be included after parser of generated type
@@ -194,14 +161,14 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
 #include <lib/support/value_parser/ValueParserComplex.h>
 
 namespace chip {
+namespace ValueParser {
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::Scenes::Structs::SceneExtensionFieldSet::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -218,16 +185,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.clusterId, freeFunctions);
+    error = ParseValue(iter, value.clusterId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -241,16 +208,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.length, freeFunctions);
+    error = ParseValue(iter, value.length, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -264,16 +231,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.value, freeFunctions);
+    error = ParseValue(iter, value.value, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -296,11 +263,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::PowerProfile::Structs::PowerProfileRecord::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -317,16 +283,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.powerProfileId, freeFunctions);
+    error = ParseValue(iter, value.powerProfileId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -340,16 +306,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.energyPhaseId, freeFunctions);
+    error = ParseValue(iter, value.energyPhaseId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -363,16 +329,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.powerProfileRemoteControl, freeFunctions);
+    error = ParseValue(iter, value.powerProfileRemoteControl, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -386,16 +352,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.powerProfileState, freeFunctions);
+    error = ParseValue(iter, value.powerProfileState, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -418,11 +384,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::PowerProfile::Structs::ScheduledPhase::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -439,16 +404,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.energyPhaseId, freeFunctions);
+    error = ParseValue(iter, value.energyPhaseId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -462,16 +427,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.scheduledTime, freeFunctions);
+    error = ParseValue(iter, value.scheduledTime, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -494,11 +459,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::PowerProfile::Structs::TransferredPhase::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::PowerProfile::Structs::TransferredPhase::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -515,16 +479,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.energyPhaseId, freeFunctions);
+    error = ParseValue(iter, value.energyPhaseId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -538,16 +502,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.macroPhaseId, freeFunctions);
+    error = ParseValue(iter, value.macroPhaseId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -561,16 +525,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.expectedDuration, freeFunctions);
+    error = ParseValue(iter, value.expectedDuration, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -584,16 +548,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.peakPower, freeFunctions);
+    error = ParseValue(iter, value.peakPower, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -607,16 +571,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.energy, freeFunctions);
+    error = ParseValue(iter, value.energy, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -630,16 +594,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.maxActivationDelay, freeFunctions);
+    error = ParseValue(iter, value.maxActivationDelay, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -662,10 +626,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Descriptor::Structs::DeviceType::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::Descriptor::Structs::DeviceType::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -682,16 +646,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.type, freeFunctions);
+    error = ParseValue(iter, value.type, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -705,16 +669,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.revision, freeFunctions);
+    error = ParseValue(iter, value.revision, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -737,10 +701,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::AccessControl::Structs::Target::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::AccessControl::Structs::Target::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -757,16 +721,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.cluster, freeFunctions);
+    error = ParseValue(iter, value.cluster, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -780,16 +744,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.endpoint, freeFunctions);
+    error = ParseValue(iter, value.endpoint, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -803,16 +767,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.deviceType, freeFunctions);
+    error = ParseValue(iter, value.deviceType, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -835,11 +799,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::AccessControl::Structs::AccessControlEntry::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -856,16 +819,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    error = ParseValue(iter, value.fabricIndex, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -879,16 +842,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.privilege, freeFunctions);
+    error = ParseValue(iter, value.privilege, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -902,16 +865,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.authMode, freeFunctions);
+    error = ParseValue(iter, value.authMode, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -925,16 +888,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.subjects, freeFunctions);
+    error = ParseValue(iter, value.subjects, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -948,16 +911,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.targets, freeFunctions);
+    error = ParseValue(iter, value.targets, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -980,11 +943,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::AccessControl::Structs::ExtensionEntry::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -1001,16 +963,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    error = ParseValue(iter, value.fabricIndex, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1024,16 +986,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.data, freeFunctions);
+    error = ParseValue(iter, value.data, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1056,11 +1018,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::BridgedActions::Structs::ActionStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::BridgedActions::Structs::ActionStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -1077,16 +1038,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.actionID, freeFunctions);
+    error = ParseValue(iter, value.actionID, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1100,16 +1061,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.name, freeFunctions);
+    error = ParseValue(iter, value.name, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1123,16 +1084,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.type, freeFunctions);
+    error = ParseValue(iter, value.type, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1146,16 +1107,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.endpointListID, freeFunctions);
+    error = ParseValue(iter, value.endpointListID, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1169,16 +1130,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.supportedCommands, freeFunctions);
+    error = ParseValue(iter, value.supportedCommands, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1192,16 +1153,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.status, freeFunctions);
+    error = ParseValue(iter, value.status, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1224,11 +1185,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -1245,16 +1205,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.endpointListID, freeFunctions);
+    error = ParseValue(iter, value.endpointListID, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1268,16 +1228,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.name, freeFunctions);
+    error = ParseValue(iter, value.name, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1291,16 +1251,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.type, freeFunctions);
+    error = ParseValue(iter, value.type, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1314,16 +1274,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.endpoints, freeFunctions);
+    error = ParseValue(iter, value.endpoints, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1346,11 +1306,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::OtaSoftwareUpdateRequestor::Structs::ProviderLocation::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -1367,16 +1326,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    error = ParseValue(iter, value.fabricIndex, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1390,16 +1349,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.providerNodeID, freeFunctions);
+    error = ParseValue(iter, value.providerNodeID, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1413,16 +1372,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.endpoint, freeFunctions);
+    error = ParseValue(iter, value.endpoint, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1445,11 +1404,11 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
+CHIP_ERROR ParseValue(const char *& iter,
                       chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -1466,16 +1425,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.failSafeExpiryLengthMs, freeFunctions);
+    error = ParseValue(iter, value.failSafeExpiryLengthMs, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1498,11 +1457,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -1519,16 +1477,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.networkID, freeFunctions);
+    error = ParseValue(iter, value.networkID, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1542,16 +1500,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.connected, freeFunctions);
+    error = ParseValue(iter, value.connected, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1574,11 +1532,11 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
+CHIP_ERROR ParseValue(const char *& iter,
                       chip::app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -1595,16 +1553,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.panId, freeFunctions);
+    error = ParseValue(iter, value.panId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1618,16 +1576,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.extendedPanId, freeFunctions);
+    error = ParseValue(iter, value.extendedPanId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1641,16 +1599,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.networkName, freeFunctions);
+    error = ParseValue(iter, value.networkName, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1664,16 +1622,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.channel, freeFunctions);
+    error = ParseValue(iter, value.channel, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1687,16 +1645,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.version, freeFunctions);
+    error = ParseValue(iter, value.version, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1710,16 +1668,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.extendedAddress, freeFunctions);
+    error = ParseValue(iter, value.extendedAddress, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1733,16 +1691,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.rssi, freeFunctions);
+    error = ParseValue(iter, value.rssi, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1756,16 +1714,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.lqi, freeFunctions);
+    error = ParseValue(iter, value.lqi, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1788,11 +1746,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -1809,16 +1766,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.security, freeFunctions);
+    error = ParseValue(iter, value.security, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1832,16 +1789,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.ssid, freeFunctions);
+    error = ParseValue(iter, value.ssid, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1855,16 +1812,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.bssid, freeFunctions);
+    error = ParseValue(iter, value.bssid, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1878,16 +1835,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.channel, freeFunctions);
+    error = ParseValue(iter, value.channel, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1901,16 +1858,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.wiFiBand, freeFunctions);
+    error = ParseValue(iter, value.wiFiBand, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1924,16 +1881,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.rssi, freeFunctions);
+    error = ParseValue(iter, value.rssi, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -1956,11 +1913,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -1977,16 +1933,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.name, freeFunctions);
+    error = ParseValue(iter, value.name, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2000,16 +1956,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fabricConnected, freeFunctions);
+    error = ParseValue(iter, value.fabricConnected, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2023,16 +1979,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.offPremiseServicesReachableIPv4, freeFunctions);
+    error = ParseValue(iter, value.offPremiseServicesReachableIPv4, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2046,16 +2002,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.offPremiseServicesReachableIPv6, freeFunctions);
+    error = ParseValue(iter, value.offPremiseServicesReachableIPv6, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2069,16 +2025,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.hardwareAddress, freeFunctions);
+    error = ParseValue(iter, value.hardwareAddress, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2092,16 +2048,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.type, freeFunctions);
+    error = ParseValue(iter, value.type, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2124,11 +2080,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -2145,16 +2100,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.id, freeFunctions);
+    error = ParseValue(iter, value.id, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2168,16 +2123,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.name, freeFunctions);
+    error = ParseValue(iter, value.name, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2191,16 +2146,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.faultRecording, freeFunctions);
+    error = ParseValue(iter, value.faultRecording, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2223,11 +2178,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -2244,16 +2198,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.id, freeFunctions);
+    error = ParseValue(iter, value.id, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2267,16 +2221,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.name, freeFunctions);
+    error = ParseValue(iter, value.name, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2290,16 +2244,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.stackFreeCurrent, freeFunctions);
+    error = ParseValue(iter, value.stackFreeCurrent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2313,16 +2267,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.stackFreeMinimum, freeFunctions);
+    error = ParseValue(iter, value.stackFreeMinimum, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2336,16 +2290,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.stackSize, freeFunctions);
+    error = ParseValue(iter, value.stackSize, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2368,11 +2322,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -2389,16 +2342,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.extAddress, freeFunctions);
+    error = ParseValue(iter, value.extAddress, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2412,16 +2365,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.age, freeFunctions);
+    error = ParseValue(iter, value.age, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2435,16 +2388,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.rloc16, freeFunctions);
+    error = ParseValue(iter, value.rloc16, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2458,16 +2411,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.linkFrameCounter, freeFunctions);
+    error = ParseValue(iter, value.linkFrameCounter, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2481,16 +2434,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.mleFrameCounter, freeFunctions);
+    error = ParseValue(iter, value.mleFrameCounter, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2504,16 +2457,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.lqi, freeFunctions);
+    error = ParseValue(iter, value.lqi, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2527,16 +2480,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.averageRssi, freeFunctions);
+    error = ParseValue(iter, value.averageRssi, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2550,16 +2503,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.lastRssi, freeFunctions);
+    error = ParseValue(iter, value.lastRssi, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2573,16 +2526,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.frameErrorRate, freeFunctions);
+    error = ParseValue(iter, value.frameErrorRate, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2596,16 +2549,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.messageErrorRate, freeFunctions);
+    error = ParseValue(iter, value.messageErrorRate, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2619,16 +2572,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.rxOnWhenIdle, freeFunctions);
+    error = ParseValue(iter, value.rxOnWhenIdle, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2642,16 +2595,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fullThreadDevice, freeFunctions);
+    error = ParseValue(iter, value.fullThreadDevice, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2665,16 +2618,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fullNetworkData, freeFunctions);
+    error = ParseValue(iter, value.fullNetworkData, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2688,16 +2641,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.isChild, freeFunctions);
+    error = ParseValue(iter, value.isChild, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2720,11 +2673,11 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
+CHIP_ERROR ParseValue(const char *& iter,
                       chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -2741,16 +2694,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.activeTimestampPresent, freeFunctions);
+    error = ParseValue(iter, value.activeTimestampPresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2764,16 +2717,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.pendingTimestampPresent, freeFunctions);
+    error = ParseValue(iter, value.pendingTimestampPresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2787,16 +2740,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.masterKeyPresent, freeFunctions);
+    error = ParseValue(iter, value.masterKeyPresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2810,16 +2763,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.networkNamePresent, freeFunctions);
+    error = ParseValue(iter, value.networkNamePresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2833,16 +2786,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.extendedPanIdPresent, freeFunctions);
+    error = ParseValue(iter, value.extendedPanIdPresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2856,16 +2809,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.meshLocalPrefixPresent, freeFunctions);
+    error = ParseValue(iter, value.meshLocalPrefixPresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2879,16 +2832,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.delayPresent, freeFunctions);
+    error = ParseValue(iter, value.delayPresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2902,16 +2855,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.panIdPresent, freeFunctions);
+    error = ParseValue(iter, value.panIdPresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2925,16 +2878,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.channelPresent, freeFunctions);
+    error = ParseValue(iter, value.channelPresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2948,16 +2901,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.pskcPresent, freeFunctions);
+    error = ParseValue(iter, value.pskcPresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2971,16 +2924,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.securityPolicyPresent, freeFunctions);
+    error = ParseValue(iter, value.securityPolicyPresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -2994,16 +2947,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.channelMaskPresent, freeFunctions);
+    error = ParseValue(iter, value.channelMaskPresent, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3026,11 +2979,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -3047,16 +2999,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.extAddress, freeFunctions);
+    error = ParseValue(iter, value.extAddress, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3070,16 +3022,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.rloc16, freeFunctions);
+    error = ParseValue(iter, value.rloc16, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3093,16 +3045,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.routerId, freeFunctions);
+    error = ParseValue(iter, value.routerId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3116,16 +3068,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.nextHop, freeFunctions);
+    error = ParseValue(iter, value.nextHop, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3139,16 +3091,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.pathCost, freeFunctions);
+    error = ParseValue(iter, value.pathCost, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3162,16 +3114,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.LQIIn, freeFunctions);
+    error = ParseValue(iter, value.LQIIn, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3185,16 +3137,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.LQIOut, freeFunctions);
+    error = ParseValue(iter, value.LQIOut, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3208,16 +3160,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.age, freeFunctions);
+    error = ParseValue(iter, value.age, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3231,16 +3183,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.allocated, freeFunctions);
+    error = ParseValue(iter, value.allocated, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3254,16 +3206,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.linkEstablished, freeFunctions);
+    error = ParseValue(iter, value.linkEstablished, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3286,11 +3238,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -3307,16 +3258,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.rotationTime, freeFunctions);
+    error = ParseValue(iter, value.rotationTime, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3330,16 +3281,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.flags, freeFunctions);
+    error = ParseValue(iter, value.flags, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3362,11 +3313,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -3383,16 +3333,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    error = ParseValue(iter, value.fabricIndex, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3406,16 +3356,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.rootPublicKey, freeFunctions);
+    error = ParseValue(iter, value.rootPublicKey, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3429,16 +3379,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.vendorId, freeFunctions);
+    error = ParseValue(iter, value.vendorId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3452,16 +3402,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fabricId, freeFunctions);
+    error = ParseValue(iter, value.fabricId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3475,16 +3425,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.nodeId, freeFunctions);
+    error = ParseValue(iter, value.nodeId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3498,16 +3448,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.label, freeFunctions);
+    error = ParseValue(iter, value.label, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3530,11 +3480,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -3551,16 +3500,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    error = ParseValue(iter, value.fabricIndex, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3574,16 +3523,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.noc, freeFunctions);
+    error = ParseValue(iter, value.noc, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3606,11 +3555,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -3627,16 +3575,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    error = ParseValue(iter, value.fabricIndex, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3650,16 +3598,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.groupId, freeFunctions);
+    error = ParseValue(iter, value.groupId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3673,16 +3621,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.endpoints, freeFunctions);
+    error = ParseValue(iter, value.endpoints, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3696,16 +3644,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.groupName, freeFunctions);
+    error = ParseValue(iter, value.groupName, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3728,11 +3676,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -3749,16 +3696,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    error = ParseValue(iter, value.fabricIndex, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3772,16 +3719,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.groupId, freeFunctions);
+    error = ParseValue(iter, value.groupId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3795,16 +3742,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.groupKeySetID, freeFunctions);
+    error = ParseValue(iter, value.groupKeySetID, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3827,11 +3774,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -3848,16 +3794,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.groupKeySetID, freeFunctions);
+    error = ParseValue(iter, value.groupKeySetID, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3871,16 +3817,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.securityPolicy, freeFunctions);
+    error = ParseValue(iter, value.securityPolicy, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3894,16 +3840,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.epochKey0, freeFunctions);
+    error = ParseValue(iter, value.epochKey0, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3917,16 +3863,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.epochStartTime0, freeFunctions);
+    error = ParseValue(iter, value.epochStartTime0, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3940,16 +3886,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.epochKey1, freeFunctions);
+    error = ParseValue(iter, value.epochKey1, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3963,16 +3909,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.epochStartTime1, freeFunctions);
+    error = ParseValue(iter, value.epochStartTime1, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -3986,16 +3932,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.epochKey2, freeFunctions);
+    error = ParseValue(iter, value.epochKey2, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4009,16 +3955,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.epochStartTime2, freeFunctions);
+    error = ParseValue(iter, value.epochStartTime2, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4041,10 +3987,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::UserLabel::Structs::LabelStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::UserLabel::Structs::LabelStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -4061,16 +4007,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.label, freeFunctions);
+    error = ParseValue(iter, value.label, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4084,16 +4030,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.value, freeFunctions);
+    error = ParseValue(iter, value.value, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4116,11 +4062,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -4137,16 +4082,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.label, freeFunctions);
+    error = ParseValue(iter, value.label, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4160,16 +4105,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.mode, freeFunctions);
+    error = ParseValue(iter, value.mode, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4183,16 +4128,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.semanticTag, freeFunctions);
+    error = ParseValue(iter, value.semanticTag, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4215,10 +4160,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ModeSelect::Structs::SemanticTag::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ModeSelect::Structs::SemanticTag::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -4235,16 +4180,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.mfgCode, freeFunctions);
+    error = ParseValue(iter, value.mfgCode, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4258,16 +4203,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.value, freeFunctions);
+    error = ParseValue(iter, value.value, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4290,10 +4235,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::DoorLock::Structs::DlCredential::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::DoorLock::Structs::DlCredential::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -4310,16 +4255,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.credentialType, freeFunctions);
+    error = ParseValue(iter, value.credentialType, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4333,16 +4278,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.credentialIndex, freeFunctions);
+    error = ParseValue(iter, value.credentialIndex, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4365,11 +4310,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::IasAce::Structs::IasAceZoneStatusResult::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -4386,16 +4330,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.zoneId, freeFunctions);
+    error = ParseValue(iter, value.zoneId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4409,16 +4353,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.zoneStatus, freeFunctions);
+    error = ParseValue(iter, value.zoneStatus, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4441,10 +4385,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Channel::Structs::ChannelInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::Channel::Structs::ChannelInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -4461,16 +4405,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.majorNumber, freeFunctions);
+    error = ParseValue(iter, value.majorNumber, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4484,16 +4428,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.minorNumber, freeFunctions);
+    error = ParseValue(iter, value.minorNumber, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4507,16 +4451,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.name, freeFunctions);
+    error = ParseValue(iter, value.name, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4530,16 +4474,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.callSign, freeFunctions);
+    error = ParseValue(iter, value.callSign, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4553,16 +4497,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.affiliateCallSign, freeFunctions);
+    error = ParseValue(iter, value.affiliateCallSign, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4585,10 +4529,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::Channel::Structs::LineupInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::Channel::Structs::LineupInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -4605,16 +4549,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.operatorName, freeFunctions);
+    error = ParseValue(iter, value.operatorName, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4628,16 +4572,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.lineupName, freeFunctions);
+    error = ParseValue(iter, value.lineupName, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4651,16 +4595,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.postalCode, freeFunctions);
+    error = ParseValue(iter, value.postalCode, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4674,16 +4618,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.lineupInfoType, freeFunctions);
+    error = ParseValue(iter, value.lineupInfoType, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4706,10 +4650,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TargetNavigator::Structs::TargetInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -4726,16 +4670,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.identifier, freeFunctions);
+    error = ParseValue(iter, value.identifier, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4749,16 +4693,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.name, freeFunctions);
+    error = ParseValue(iter, value.name, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4781,11 +4725,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::MediaPlayback::Structs::PlaybackPosition::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -4802,16 +4745,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.updatedAt, freeFunctions);
+    error = ParseValue(iter, value.updatedAt, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4825,16 +4768,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.position, freeFunctions);
+    error = ParseValue(iter, value.position, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4857,10 +4800,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::MediaInput::Structs::InputInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::MediaInput::Structs::InputInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -4877,16 +4820,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.index, freeFunctions);
+    error = ParseValue(iter, value.index, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4900,16 +4843,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.inputType, freeFunctions);
+    error = ParseValue(iter, value.inputType, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4923,16 +4866,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.name, freeFunctions);
+    error = ParseValue(iter, value.name, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4946,16 +4889,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.description, freeFunctions);
+    error = ParseValue(iter, value.description, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -4978,10 +4921,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ContentLauncher::Structs::Dimension::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::Dimension::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -4998,16 +4941,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.width, freeFunctions);
+    error = ParseValue(iter, value.width, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5021,16 +4964,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.height, freeFunctions);
+    error = ParseValue(iter, value.height, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5044,16 +4987,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.metric, freeFunctions);
+    error = ParseValue(iter, value.metric, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5076,11 +5019,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::AdditionalInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -5097,16 +5039,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.name, freeFunctions);
+    error = ParseValue(iter, value.name, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5120,16 +5062,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.value, freeFunctions);
+    error = ParseValue(iter, value.value, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5152,10 +5094,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::ContentLauncher::Structs::Parameter::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::Parameter::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -5172,16 +5114,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.type, freeFunctions);
+    error = ParseValue(iter, value.type, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5195,16 +5137,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.value, freeFunctions);
+    error = ParseValue(iter, value.value, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5218,16 +5160,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.externalIDList, freeFunctions);
+    error = ParseValue(iter, value.externalIDList, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5250,11 +5192,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::ContentSearch::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -5271,16 +5212,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.parameterList, freeFunctions);
+    error = ParseValue(iter, value.parameterList, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5303,11 +5244,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::StyleInformation::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -5324,16 +5264,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.imageUrl, freeFunctions);
+    error = ParseValue(iter, value.imageUrl, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5347,16 +5287,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.color, freeFunctions);
+    error = ParseValue(iter, value.color, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5370,16 +5310,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.size, freeFunctions);
+    error = ParseValue(iter, value.size, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5402,11 +5342,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ContentLauncher::Structs::BrandingInformation::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -5423,16 +5362,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.providerName, freeFunctions);
+    error = ParseValue(iter, value.providerName, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5446,16 +5385,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.background, freeFunctions);
+    error = ParseValue(iter, value.background, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5469,16 +5408,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.logo, freeFunctions);
+    error = ParseValue(iter, value.logo, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5492,16 +5431,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.progressBar, freeFunctions);
+    error = ParseValue(iter, value.progressBar, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5515,16 +5454,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.splash, freeFunctions);
+    error = ParseValue(iter, value.splash, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5538,16 +5477,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.waterMark, freeFunctions);
+    error = ParseValue(iter, value.waterMark, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5570,10 +5509,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::AudioOutput::Structs::OutputInfo::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -5590,16 +5529,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.index, freeFunctions);
+    error = ParseValue(iter, value.index, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5613,16 +5552,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.outputType, freeFunctions);
+    error = ParseValue(iter, value.outputType, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5636,16 +5575,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.name, freeFunctions);
+    error = ParseValue(iter, value.name, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5668,11 +5607,11 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
+CHIP_ERROR ParseValue(const char *& iter,
                       chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -5689,16 +5628,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.catalogVendorId, freeFunctions);
+    error = ParseValue(iter, value.catalogVendorId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5712,16 +5651,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.applicationId, freeFunctions);
+    error = ParseValue(iter, value.applicationId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5744,11 +5683,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -5765,16 +5703,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.application, freeFunctions);
+    error = ParseValue(iter, value.application, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5788,16 +5726,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.endpoint, freeFunctions);
+    error = ParseValue(iter, value.endpoint, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5820,11 +5758,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -5841,16 +5778,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.catalogVendorId, freeFunctions);
+    error = ParseValue(iter, value.catalogVendorId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5864,16 +5801,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.applicationId, freeFunctions);
+    error = ParseValue(iter, value.applicationId, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5896,10 +5833,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -5916,16 +5853,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.a, freeFunctions);
+    error = ParseValue(iter, value.a, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5939,16 +5876,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.b, freeFunctions);
+    error = ParseValue(iter, value.b, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5962,16 +5899,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.c, freeFunctions);
+    error = ParseValue(iter, value.c, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -5985,16 +5922,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.d, freeFunctions);
+    error = ParseValue(iter, value.d, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6008,16 +5945,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.e, freeFunctions);
+    error = ParseValue(iter, value.e, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6031,16 +5968,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.f, freeFunctions);
+    error = ParseValue(iter, value.f, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6054,16 +5991,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.g, freeFunctions);
+    error = ParseValue(iter, value.g, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6077,16 +6014,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.h, freeFunctions);
+    error = ParseValue(iter, value.h, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6109,11 +6046,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -6130,16 +6066,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.nullableInt, freeFunctions);
+    error = ParseValue(iter, value.nullableInt, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6153,16 +6089,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.optionalInt, freeFunctions);
+    error = ParseValue(iter, value.optionalInt, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6176,16 +6112,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.nullableOptionalInt, freeFunctions);
+    error = ParseValue(iter, value.nullableOptionalInt, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6199,16 +6135,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.nullableString, freeFunctions);
+    error = ParseValue(iter, value.nullableString, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6222,16 +6158,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.optionalString, freeFunctions);
+    error = ParseValue(iter, value.optionalString, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6245,16 +6181,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.nullableOptionalString, freeFunctions);
+    error = ParseValue(iter, value.nullableOptionalString, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6268,16 +6204,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.nullableStruct, freeFunctions);
+    error = ParseValue(iter, value.nullableStruct, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6291,16 +6227,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.optionalStruct, freeFunctions);
+    error = ParseValue(iter, value.optionalStruct, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6314,16 +6250,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.nullableOptionalStruct, freeFunctions);
+    error = ParseValue(iter, value.nullableOptionalStruct, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6337,16 +6273,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.nullableList, freeFunctions);
+    error = ParseValue(iter, value.nullableList, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6360,16 +6296,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.optionalList, freeFunctions);
+    error = ParseValue(iter, value.optionalList, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6383,16 +6319,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.nullableOptionalList, freeFunctions);
+    error = ParseValue(iter, value.nullableOptionalList, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6415,10 +6351,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters::TestCluster::Structs::NestedStruct::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::NestedStruct::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -6435,16 +6371,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.a, freeFunctions);
+    error = ParseValue(iter, value.a, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6458,16 +6394,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.b, freeFunctions);
+    error = ParseValue(iter, value.b, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6481,16 +6417,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.c, freeFunctions);
+    error = ParseValue(iter, value.c, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6513,11 +6449,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::Clusters:
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::TestCluster::Structs::NestedStructList::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::NestedStructList::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -6534,16 +6469,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.a, freeFunctions);
+    error = ParseValue(iter, value.a, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6557,16 +6492,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.b, freeFunctions);
+    error = ParseValue(iter, value.b, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6580,16 +6515,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.c, freeFunctions);
+    error = ParseValue(iter, value.c, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6603,16 +6538,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.d, freeFunctions);
+    error = ParseValue(iter, value.d, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6626,16 +6561,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.e, freeFunctions);
+    error = ParseValue(iter, value.e, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6649,16 +6584,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.f, freeFunctions);
+    error = ParseValue(iter, value.f, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6672,16 +6607,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.g, freeFunctions);
+    error = ParseValue(iter, value.g, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6704,11 +6639,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -6725,16 +6659,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.a, freeFunctions);
+    error = ParseValue(iter, value.a, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6757,11 +6691,10 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 }
-CHIP_ERROR ParseValue(const char *& iter, const char * end,
-                      chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -6778,16 +6711,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
     }
     CHIP_ERROR error;
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.fabricIndex, freeFunctions);
+    error = ParseValue(iter, value.fabricIndex, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6801,16 +6734,16 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     iter  = SkipSpaces(iter);
-    error = ParseValue(iter, end, value.operationalCert, freeFunctions);
+    error = ParseValue(iter, value.operationalCert, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
     }
-    if (iter >= end)
+    if (*iter == '\0')
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    if (*iter == ')')
+    else if (*iter == ')')
     {
         iter++;
         return CHIP_NO_ERROR;
@@ -6835,6 +6768,7 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end,
 }
 #pragma GCC diagnostic pop
 
+} // namespace ValueParser
 } // namespace chip
 
 // Value logging and parsing functions. The non-generated ones depend on the
@@ -11372,9 +11306,8 @@ public:
         CHIP_ERROR error;
 
         const char * iter = mValueString;
-        const char * end  = iter + strlen(mValueString);
-        error             = chip::ParseValue(iter, end, mValue, freeFunctions);
-        if (iter != end)
+        error             = chip::ValueParser::ParseValue(iter, mValue, freeFunctions);
+        if (*iter != '\0')
         {
             error = CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -11498,9 +11431,8 @@ public:
         CHIP_ERROR error;
 
         const char * iter = mValueString;
-        const char * end  = iter + strlen(mValueString);
-        error             = chip::ParseValue(iter, end, mValue, freeFunctions);
-        if (iter != end)
+        error             = chip::ValueParser::ParseValue(iter, mValue, freeFunctions);
+        if (*iter != '\0')
         {
             error = CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -34852,9 +34784,8 @@ public:
         CHIP_ERROR error;
 
         const char * iter = mValueString;
-        const char * end  = iter + strlen(mValueString);
-        error             = chip::ParseValue(iter, end, mValue, freeFunctions);
-        if (iter != end)
+        error             = chip::ValueParser::ParseValue(iter, mValue, freeFunctions);
+        if (*iter != '\0')
         {
             error = CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -48380,9 +48311,8 @@ public:
         CHIP_ERROR error;
 
         const char * iter = mValueString;
-        const char * end  = iter + strlen(mValueString);
-        error             = chip::ParseValue(iter, end, mValue, freeFunctions);
-        if (iter != end)
+        error             = chip::ValueParser::ParseValue(iter, mValue, freeFunctions);
+        if (*iter != '\0')
         {
             error = CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -48498,9 +48428,8 @@ public:
         CHIP_ERROR error;
 
         const char * iter = mValueString;
-        const char * end  = iter + strlen(mValueString);
-        error             = chip::ParseValue(iter, end, mValue, freeFunctions);
-        if (iter != end)
+        error             = chip::ValueParser::ParseValue(iter, mValue, freeFunctions);
+        if (*iter != '\0')
         {
             error = CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -48619,9 +48548,8 @@ public:
         CHIP_ERROR error;
 
         const char * iter = mValueString;
-        const char * end  = iter + strlen(mValueString);
-        error             = chip::ParseValue(iter, end, mValue, freeFunctions);
-        if (iter != end)
+        error             = chip::ValueParser::ParseValue(iter, mValue, freeFunctions);
+        if (*iter != '\0')
         {
             error = CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -49357,9 +49285,8 @@ public:
         CHIP_ERROR error;
 
         const char * iter = mValueString;
-        const char * end  = iter + strlen(mValueString);
-        error             = chip::ParseValue(iter, end, mValue, freeFunctions);
-        if (iter != end)
+        error             = chip::ValueParser::ParseValue(iter, mValue, freeFunctions);
+        if (*iter != '\0')
         {
             error = CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -60760,9 +60687,8 @@ public:
         CHIP_ERROR error;
 
         const char * iter = mValueString;
-        const char * end  = iter + strlen(mValueString);
-        error             = chip::ParseValue(iter, end, mValue, freeFunctions);
-        if (iter != end)
+        error             = chip::ValueParser::ParseValue(iter, mValue, freeFunctions);
+        if (*iter != '\0')
         {
             error = CHIP_ERROR_INVALID_ARGUMENT;
         }

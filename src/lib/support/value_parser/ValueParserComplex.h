@@ -23,23 +23,22 @@
 #include <app/data-model/List.h>
 #include <app/data-model/Nullable.h>
 #include <lib/core/CHIPError.h>
-#include <lib/support/value_parser/ValueParserIntegral.h>
+#include <lib/support/value_parser/ValueParserScalar.h>
 
 namespace chip {
+namespace ValueParser {
 
 template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::Optional<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions);
+CHIP_ERROR ParseValue(const char *& iter, chip::Optional<T> & value, std::vector<std::function<void(void)>> & freeFunctions);
 template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::Nullable<T> & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::DataModel::Nullable<T> & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
 template <typename ListEntryType>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::List<ListEntryType> & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::DataModel::List<ListEntryType> & value,
                       std::vector<std::function<void(void)>> & freeFunctions);
 
 template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::Optional<T> & value,
-                      std::vector<std::function<void(void)>> & freeFunctions)
+CHIP_ERROR ParseValue(const char *& iter, chip::Optional<T> & value, std::vector<std::function<void(void)>> & freeFunctions)
 {
     iter = SkipSpaces(iter);
     if (IsTokenEnd(*iter))
@@ -49,7 +48,7 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::Optional<T> & 
     }
     using StorageType = std::remove_cv_t<std::remove_reference_t<T>>;
     StorageType entry;
-    CHIP_ERROR error = ParseValue(iter, end, entry, freeFunctions);
+    CHIP_ERROR error = ParseValue(iter, entry, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
@@ -59,7 +58,7 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::Optional<T> & 
 }
 
 template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::Nullable<T> & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::DataModel::Nullable<T> & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
     iter = SkipSpaces(iter);
@@ -71,7 +70,7 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel
     }
     using StorageType = std::remove_cv_t<std::remove_reference_t<T>>;
     StorageType entry;
-    CHIP_ERROR error = ParseValue(iter, end, entry, freeFunctions);
+    CHIP_ERROR error = ParseValue(iter, entry, freeFunctions);
     if (error != CHIP_NO_ERROR)
     {
         return error;
@@ -81,11 +80,11 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel
 }
 
 template <typename T>
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel::List<T> & value,
+CHIP_ERROR ParseValue(const char *& iter, chip::app::DataModel::List<T> & value,
                       std::vector<std::function<void(void)>> & freeFunctions)
 {
     using StorageType = std::remove_cv_t<std::remove_reference_t<T>>;
-    if (end - iter < 2)
+    if (strlen(iter) < 2)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -97,7 +96,7 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel
     std::vector<StorageType> entries;
     entries.clear();
     bool foundClose = false;
-    while (iter < end)
+    while (*iter)
     {
         if (*iter == ']')
         {
@@ -107,13 +106,13 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel
         }
         StorageType entryValue;
         iter             = SkipSpaces(iter);
-        CHIP_ERROR error = ParseValue(iter, end, entryValue, freeFunctions);
+        CHIP_ERROR error = ParseValue(iter, entryValue, freeFunctions);
         iter             = SkipSpaces(iter);
         if (error != CHIP_NO_ERROR)
         {
             return error;
         }
-        if (iter >= end || (*iter != ']' && *iter != ','))
+        if (*iter != ']' && *iter != ',')
         {
             return CHIP_ERROR_INVALID_ARGUMENT;
         }
@@ -144,4 +143,5 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::app::DataModel
     return CHIP_NO_ERROR;
 }
 
+} // namespace ValueParser
 } // namespace chip

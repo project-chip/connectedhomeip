@@ -18,9 +18,15 @@
 #include <cctype>
 
 #include <lib/support/BytesToHex.h>
-#include <lib/support/value_parser/ValueParserIntegral.h>
+#include <lib/support/value_parser/ValueParserScalar.h>
 
 namespace chip {
+namespace ValueParser {
+
+bool IsSplitter(char ch)
+{
+    return ch == ',' || ch == ')' || ch == ']';
+}
 
 bool IsTokenEnd(char ch)
 {
@@ -36,7 +42,7 @@ const char * SkipSpaces(const char * iter)
     return iter;
 }
 
-CHIP_ERROR ParseValue(const char *& iter, const char * end, bool & value, std::vector<std::function<void(void)>> & freeFunctions)
+CHIP_ERROR ParseValue(const char *& iter, bool & value, std::vector<std::function<void(void)>> & freeFunctions)
 {
     if (strncmp("true", iter, 4) == 0)
     {
@@ -53,20 +59,24 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, bool & value, std::v
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::CharSpan & value,
-                      std::vector<std::function<void(void)>> & freeFunctions)
+CHIP_ERROR ParseValue(const char *& iter, chip::CharSpan & value, std::vector<std::function<void(void)>> & freeFunctions)
 {
     const char * begin = iter;
-    for (; iter != end && !IsTokenEnd(*iter); iter++)
+    for (; *iter && !IsSplitter(*iter); iter++)
         ;
     value = chip::CharSpan(begin, static_cast<size_t>(iter - begin));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::ByteSpan & value,
-                      std::vector<std::function<void(void)>> & freeFunctions)
+CHIP_ERROR ParseValue(const char *& iter, chip::ByteSpan & value, std::vector<std::function<void(void)>> & freeFunctions)
 {
     std::vector<uint8_t> data;
+    if (strncmp(iter, "hex:", 4) != 0)
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    iter += 4;
+    const char * end = iter + strlen(iter);
     for (; iter + 1 < end && !IsTokenEnd(*iter); iter += 2)
     {
         uint8_t converted;
@@ -98,4 +108,5 @@ CHIP_ERROR ParseValue(const char *& iter, const char * end, chip::ByteSpan & val
     }
 }
 
+} // namespace ValueParser
 } // namespace chip

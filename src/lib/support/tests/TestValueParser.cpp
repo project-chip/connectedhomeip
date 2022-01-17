@@ -21,18 +21,16 @@
 
 #include <lib/support/UnitTestRegistration.h>
 #include <lib/support/value_parser/ValueParserComplex.h>
-#include <lib/support/value_parser/ValueParserIntegral.h>
+#include <lib/support/value_parser/ValueParserScalar.h>
 
 #include <nlunit-test.h>
 
 using chip::ByteSpan;
 using chip::CharSpan;
 using chip::Optional;
-using chip::ParseValue;
 using chip::app::DataModel::List;
 using chip::app::DataModel::Nullable;
-
-static constexpr size_t kMaxStringLen = 500;
+using chip::ValueParser::ParseValue;
 
 enum class TestEnum
 {
@@ -49,19 +47,12 @@ enum class TestBitFlag
 };
 
 template <typename T>
-bool operator==(const Nullable<T> & lhs, const Nullable<T> & rhs)
-{
-    return (lhs.IsNull() && rhs.IsNull()) || (lhs.IsNull() == rhs.IsNull() && lhs.Value() == rhs.Value());
-}
-
-template <typename T>
 static void AssertValueParseFail(nlTestSuite * inSuite, const char * valueString)
 {
     T parsedValue;
     std::vector<std::function<void(void)>> freeFunctions;
-    const char * end = valueString + strnlen(valueString, kMaxStringLen);
 
-    CHIP_ERROR error = ParseValue(valueString, end, parsedValue, freeFunctions);
+    CHIP_ERROR error = ParseValue(valueString, parsedValue, freeFunctions);
     NL_TEST_ASSERT(inSuite, error == CHIP_ERROR_INVALID_ARGUMENT);
     for (auto && f : freeFunctions)
     {
@@ -74,9 +65,8 @@ static void AssertValueParseEquals(nlTestSuite * inSuite, const char * valueStri
 {
     T parsedValue;
     std::vector<std::function<void(void)>> freeFunctions;
-    const char * end = valueString + strnlen(valueString, kMaxStringLen);
 
-    CHIP_ERROR error = ParseValue(valueString, end, parsedValue, freeFunctions);
+    CHIP_ERROR error = ParseValue(valueString, parsedValue, freeFunctions);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, parsedValue == expectedValue);
     for (auto && f : freeFunctions)
@@ -90,9 +80,8 @@ static void AssertValueParseSpanEquals(nlTestSuite * inSuite, const char * value
 {
     T parsedValue;
     std::vector<std::function<void(void)>> freeFunctions;
-    const char * end = valueString + strnlen(valueString, kMaxStringLen);
 
-    CHIP_ERROR error = ParseValue(valueString, end, parsedValue, freeFunctions);
+    CHIP_ERROR error = ParseValue(valueString, parsedValue, freeFunctions);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, parsedValue.data_equal(expectedValue));
     for (auto && f : freeFunctions)
@@ -105,9 +94,8 @@ static void AssertValueParseEquals(nlTestSuite * inSuite, const char * valueStri
 {
     float parsedValue;
     std::vector<std::function<void(void)>> freeFunctions;
-    const char * end = valueString + strnlen(valueString, kMaxStringLen);
 
-    CHIP_ERROR error = ParseValue(valueString, end, parsedValue, freeFunctions);
+    CHIP_ERROR error = ParseValue(valueString, parsedValue, freeFunctions);
     NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, fabs(expectedValue - parsedValue) < 1e-5);
     for (auto && f : freeFunctions)
@@ -181,10 +169,11 @@ static void TestParseCharSpan(nlTestSuite * inSuite, void * inContext)
 static void TestParseByteSpan(nlTestSuite * inSuite, void * inContext)
 {
     AssertValueParseFail<chip::ByteSpan>(inSuite, "xx");
-    AssertValueParseFail<chip::ByteSpan>(inSuite, "00112");
-    AssertValueParseSpanEquals(inSuite, "", ByteSpan());
+    AssertValueParseFail<chip::ByteSpan>(inSuite, "hex:00112");
+    AssertValueParseFail<chip::ByteSpan>(inSuite, "001122");
+    AssertValueParseSpanEquals(inSuite, "hex:", ByteSpan());
     uint8_t expected[] = { 0x00, 0x11, 0x22 };
-    AssertValueParseSpanEquals(inSuite, "001122", ByteSpan(expected));
+    AssertValueParseSpanEquals(inSuite, "hex:001122", ByteSpan(expected));
 }
 
 static void TestParseOptional(nlTestSuite * inSuite, void * inContext)

@@ -73,6 +73,11 @@ struct Nullable : protected Optional<T>
     {
         return true;
     }
+
+    bool operator==(const Nullable<T> & rhs)
+    {
+        return (IsNull() && rhs.IsNull()) || (IsNull() == rhs.IsNull() && Value() == rhs.Value());
+    }
 };
 
 } // namespace DataModel
