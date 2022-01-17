@@ -22,10 +22,10 @@
 #include <cinttypes>
 
 #include <app-common/zap-generated/enums.h>
-#include <app/util/CHIPDeviceCallbacksMgr.h>
-#include <app/util/af-enums.h>
 #include <app/util/af.h>
+#include <app/util/af-enums.h>
 #include <app/util/basic-types.h>
+#include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/TypeTraits.h>
@@ -35,10 +35,11 @@ using namespace ::chip;
 using namespace ::chip::app::DataModel;
 
 namespace {
-[[maybe_unused]] constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
+  [[maybe_unused]] constexpr uint16_t kByteSpanSizeLengthInBytes = 2;
 } // namespace
 
-#define CHECK_STATUS_WITH_RETVAL(error, retval)                                                                                    \
+
+#define CHECK_STATUS_WITH_RETVAL(error, retval) \
     if (CHIP_NO_ERROR != error)                                                                                                    \
     {                                                                                                                              \
         ChipLogError(Zcl, "CHECK_STATUS %s", ErrorStr(error));                                                                     \
@@ -54,8 +55,8 @@ namespace {
 #define CHECK_STATUS(error) CHECK_STATUS_WITH_RETVAL(error, true)
 #define CHECK_STATUS_VOID(error) CHECK_STATUS_WITH_RETVAL(error, )
 
-#define CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, retval)                                                                            \
-    if (!CanCastTo<uint16_t>(value))                                                                                               \
+#define CHECK_MESSAGE_LENGTH_WITH_RETVAL(value, retval)                                                                                                \
+    if (!CanCastTo<uint16_t>(value))                                                                                         \
     {                                                                                                                              \
         ChipLogError(Zcl, "CHECK_MESSAGE_LENGTH expects a uint16_t value, got: %d", value);                                        \
         if (onFailureCallback != nullptr)                                                                                          \
@@ -106,6 +107,7 @@ namespace {
         return true;                                                                                                               \
     }
 
+
 #define GET_CLUSTER_RESPONSE_CALLBACKS(name)                                                                                       \
     Callback::Cancelable * onSuccessCallback = nullptr;                                                                            \
     Callback::Cancelable * onFailureCallback = nullptr;                                                                            \
@@ -128,20 +130,22 @@ namespace {
         return true;                                                                                                               \
     }
 
+
+
 // Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                        uint8_t action, uint32_t delayedActionTime)
+
+bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t action, uint32_t delayedActionTime)
 {
     ChipLogProgress(Zcl, "ApplyUpdateResponse:");
-    ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
-    ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
-
+      ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
+          ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
+    
     GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback");
 
-    Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback> * cb =
-        Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback> * cb = Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, action, delayedActionTime);
     return true;
 }
+
