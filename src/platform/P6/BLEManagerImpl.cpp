@@ -792,6 +792,8 @@ void BLEManagerImpl::SetAdvertisingData(void)
     uint8_t service_data[BLE_SERVICE_DATA_SIZE];
     uint8_t * p = service_data;
 
+    static_assert(BLE_SERVICE_DATA_SIZE == sizeof(ChipBLEDeviceIdentificationInfo) + 2, "BLE Service Data Size is incorrect");
+
     // Initialize the CHIP BLE Device Identification Information block that will be sent as payload
     // within the BLE service advertisement data.
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(mDeviceIdInfo);
