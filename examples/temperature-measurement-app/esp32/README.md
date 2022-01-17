@@ -171,7 +171,7 @@ remote device, as well as the network credentials to use.
 The command below uses the default values hard-coded into the debug versions of
 the ESP32 all-clusters-app to commission it onto a Wi-Fi network:
 
-    $ .out/debug/chip-tool pairing ble-wifi 12344321 ${SSID} ${PASSWORD} 20202021 3840
+    $ ./out/debug/chip-tool pairing ble-wifi 12344321 ${SSID} ${PASSWORD} 20202021 3840
 
 Parameters:
 

@@ -64,6 +64,9 @@ public:
     // Send ApplyImage command
     virtual void ApplyUpdate() = 0;
 
+    // Send NotifyUpdateApplied command
+    virtual void NotifyUpdateApplied() = 0;
+
     // Manually set OTA Provider parameters
     virtual void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex, EndpointId endpointId) = 0;
 };

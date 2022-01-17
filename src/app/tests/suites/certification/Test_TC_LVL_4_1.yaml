@@ -33,7 +33,7 @@ tests:
       command: "readAttribute"
       attribute: "max level"
       response:
-          value: 255
+          value: 254
 
     - label: "sends a Move up command"
       command: "Move"
@@ -60,7 +60,7 @@ tests:
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 255
+          value: 254
 
     - label: "reads min level attribute from DUT"
       command: "readAttribute"
@@ -89,11 +89,14 @@ tests:
               - name: "ms"
                 value: 3000
 
+    # For lighting Device type current level minimal value is 1
     - label: "reads CurrentLevel attribute from DUT"
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 0
+          constraints:
+              minValue: 0
+              maxValue: 1
 
     - label: "Write default move rate attribute from DUT"
       command: "writeAttribute"

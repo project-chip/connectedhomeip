@@ -145,11 +145,9 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void);
 void emberAfInit(chip::Messaging::ExchangeManager * exchangeContext);
 void emberAfTick(void);
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
-uint16_t emberAfFindClusterNameIndexWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 void emberAfStackDown(void);
 
 void emberAfDecodeAndPrintCluster(chip::ClusterId cluster);
-void emberAfDecodeAndPrintClusterWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 
 /**
  * Retrieves the difference between the two passed values.
@@ -278,6 +276,10 @@ uint8_t emberAfGetChannelFrom8bitEncodedChanPg(uint8_t chanPg);
  * @return 8-bit encoded channel-page, 0xFF if invalid
  */
 uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel);
+
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, bool asServer);
+bool emberAfIsNonVolatileAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                   bool asServer);
 
 namespace chip {
 chip::Messaging::ExchangeManager * ExchangeManager();
