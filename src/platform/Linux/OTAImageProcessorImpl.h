@@ -42,6 +42,7 @@ private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
     static void HandlePrepareDownload(intptr_t context);
     static void HandleFinalize(intptr_t context);
+    static void HandleApply(intptr_t context);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
 
