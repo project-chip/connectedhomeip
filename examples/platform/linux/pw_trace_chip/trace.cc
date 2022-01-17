@@ -58,7 +58,7 @@ void TraceEvent(const char * module, const char * label, TraceEventType eventTyp
 void RegisterTraceHandler(TraceHandlerCallback callback, void * context)
 {
     std::lock_guard<std::mutex> guard(handlerLock);
-    traceHandlers.push_back(TraceHandlerEntry{callback, context});
+    traceHandlers.push_back(TraceHandlerEntry{ callback, context });
 }
 
 void UnregisterAllTraceHandlers()

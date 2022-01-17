@@ -39,7 +39,7 @@ class TraceStreamLog : public TraceStream
 public:
     void StartEvent(const std::string & label) override
     {
-        mStreamLine = ">>>" + label + "<<<\t";
+        mStreamLine   = ">>>" + label + "<<<\t";
         mIsFirstField = true;
     }
 
@@ -49,10 +49,8 @@ public:
         mIsFirstField = false;
     }
 
-    void FinishEvent() override
-    {
-        ChipLogAutomation("TraceStream:%s", mStreamLine.c_str());
-    }
+    void FinishEvent() override { ChipLogAutomation("TraceStream:%s", mStreamLine.c_str()); }
+
 protected:
     std::string mStreamLine;
     bool mIsFirstField = true;
@@ -84,10 +82,7 @@ public:
         }
     }
 
-    void FinishEvent() override
-    {
-
-    }
+    void FinishEvent() override {}
 
 private:
     std::ofstream mFile;

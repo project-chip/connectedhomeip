@@ -37,8 +37,8 @@
 #define CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, session, peerAddress, data, dataLen)                              \
     do                                                                                                                             \
     {                                                                                                                              \
-        const ::chip::trace::TraceSecureMessageReceivedData _trace_data {                                                          \
-            &payloadHeader, &packetHeader, session, &peerAddress, data, dataLen };                                                  \
+        const ::chip::trace::TraceSecureMessageReceivedData _trace_data{ &payloadHeader, &packetHeader, session,                   \
+                                                                         &peerAddress,   data,          dataLen };                 \
         PW_TRACE_INSTANT_DATA("SecureMsg", ::chip::trace::kTraceMessageReceivedDataFormat,                                         \
                               reinterpret_cast<const void *>(&_trace_data), sizeof(_trace_data));                                  \
     } while (0)
@@ -59,8 +59,8 @@
 namespace chip {
 namespace trace {
 
-constexpr const char * kTraceMessageEvent = "SecureMsg";
-constexpr const char * kTraceMessageSentDataFormat = "SecMsgSent";
+constexpr const char * kTraceMessageEvent              = "SecureMsg";
+constexpr const char * kTraceMessageSentDataFormat     = "SecMsgSent";
 constexpr const char * kTraceMessageReceivedDataFormat = "SecMsgReceived";
 
 struct TraceSecureMessageSentData

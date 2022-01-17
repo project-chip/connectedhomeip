@@ -29,6 +29,7 @@
 #include <inttypes.h>
 #include <string.h>
 
+#include "transport/TraceMessage.h"
 #include <app/util/basic-types.h>
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPKeyIds.h>
@@ -40,7 +41,6 @@
 #include <transport/GroupSession.h>
 #include <transport/PairingSession.h>
 #include <transport/SecureMessageCodec.h>
-#include "transport/TraceMessage.h"
 #include <transport/TransportMgr.h>
 
 #include <inttypes.h>
