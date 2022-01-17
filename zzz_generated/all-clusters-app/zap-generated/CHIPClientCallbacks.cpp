@@ -141,11 +141,10 @@ bool emberAfOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback(Endpoint
     ChipLogProgress(Zcl, "ApplyUpdateResponse:");
       ChipLogProgress(Zcl, "  action: %" PRIu8 "", action);
           ChipLogProgress(Zcl, "  delayedActionTime: %" PRIu32 "", delayedActionTime);
-    
+
     GET_CLUSTER_RESPONSE_CALLBACKS("OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback");
 
     Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback> * cb = Callback::Callback<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, action, delayedActionTime);
     return true;
 }
-
