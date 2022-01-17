@@ -92,6 +92,7 @@ def runArgumentsParser():
 
     return (zap_file, zcl_file, templates_file, output_dir)
 
+
 def extractGeneratedIdl(output_dir, zap_config_path):
     """Find a file Clusters.matter in the output directory and
        place it along with the input zap file.
