@@ -53,27 +53,6 @@ class ZAPGenerateTarget:
         logging.info("Generating target: %s" % " ".join(cmd))
         subprocess.check_call(cmd)
 
-    def extractAnyGeneratedIDL(self):
-        """Searches for Clusters.matter in the output directory and if found,
-        will move it to stay along with the zap file config
-        """
-        if not self.output_dir:
-            # TODO: where do things get generated if no output dir?
-            # Assume here that IDL is not generated in such cases
-            return
-
-        idl_path = os.path.join(self.output_dir, "Clusters.matter")
-        if not os.path.exists(idl_path):
-            return
-
-        target_path = self.zap_config.replace(".zap", ".matter")
-        if not target_path.endswith(".matter"):
-            # We expect "something.zap" and don't handle corner cases of
-            # multiple extensions. This is to work with existing codebase only
-            raise Error("Unexpected input zap file  %s" % self.zap_config)
-
-        os.rename(idl_path, target_path)
-
 
 def checkPythonVersion():
     if sys.version_info[0] < 3:
@@ -174,7 +153,6 @@ def main():
     targets = getTargets()
     for target in targets:
         target.generate()
-        target.extractAnyGeneratedIDL()
 
 
 if __name__ == '__main__':

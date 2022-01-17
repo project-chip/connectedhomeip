@@ -420,6 +420,18 @@ async function chip_shared_structs(options)
   return templateUtil.collectBlocks(structs, options, this);
 }
 
+async function chip_endpoints(options)
+{
+  const endpoints = await ensureClusters(this).getEndPoints();
+  return templateUtil.collectBlocks(endpoints, options, this);
+}
+
+async function chip_endpoint_clusters(options)
+{
+  const clusters = this.clusters;
+  return templateUtil.collectBlocks(clusters, options, this);
+}
+
 /**
  * Checks whether a type is an enum for purposes of its chipType.  That includes
  * both spec-defined enum types and types that we map to enum types in our code.
@@ -461,6 +473,8 @@ exports.chip_server_cluster_attributes                       = chip_server_clust
 exports.chip_server_cluster_events                           = chip_server_cluster_events;
 exports.chip_server_has_list_attributes                      = chip_server_has_list_attributes;
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
+exports.chip_endpoints                                       = chip_endpoints;
+exports.chip_endpoint_clusters                               = chip_endpoint_clusters;
 exports.if_chip_enum                                         = if_chip_enum;
 exports.if_in_global_responses                               = if_in_global_responses;
 exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;

@@ -30,7 +30,7 @@ namespace chip {
 namespace DeviceLayer {
 
 /**
- * Concrete implementation of the PlatformManager singleton object for Linux platforms.
+ * Concrete implementation of the PlatformManager singleton object for ESP32 platforms.
  */
 class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 {

@@ -1808,7 +1808,7 @@ server cluster NetworkCommissioning = 49 {
   attribute(readonly) NetworkCommissioningStatus lastNetworkingStatus = 5;
   attribute(readonly) octet_string lastNetworkID = 6;
   attribute(readonly) int32u lastConnectErrorValue = 7;
-  attribute(readonly, reportable) bitmap32 featureMap = 65532;
+  attribute(readonly) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
@@ -2999,11 +2999,86 @@ server cluster WindowCovering = 258 {
 
 
 endpoint 0 {
+  instantiate cluster AccessControl;
+  instantiate cluster AdministratorCommissioning;
+  instantiate cluster Basic;
+  instantiate cluster Binding;
+  instantiate cluster Descriptor;
+  instantiate cluster DiagnosticLogs;
+  instantiate cluster EthernetNetworkDiagnostics;
+  instantiate cluster FixedLabel;
+  instantiate cluster GeneralCommissioning;
+  instantiate cluster GeneralDiagnostics;
+  instantiate cluster GroupKeyManagement;
+  instantiate cluster Groups;
+  instantiate cluster Identify;
+  instantiate cluster LocalizationConfiguration;
+  instantiate cluster NetworkCommissioning;
+  instantiate cluster OtaSoftwareUpdateProvider;
+  instantiate cluster OtaSoftwareUpdateRequestor;
+  instantiate cluster OperationalCredentials;
+  instantiate cluster PowerSourceConfiguration;
+  instantiate cluster RelativeHumidityMeasurement;
+  instantiate cluster SoftwareDiagnostics;
+  instantiate cluster ThreadNetworkDiagnostics;
+  instantiate cluster UserLabel;
+  instantiate cluster WiFiNetworkDiagnostics;
 }
 
 endpoint 1 {
+  instantiate cluster AccountLogin;
+  instantiate cluster ApplicationBasic;
+  instantiate cluster ApplicationLauncher;
+  instantiate cluster AudioOutput;
+  instantiate cluster BarrierControl;
+  instantiate cluster BinaryInputBasic;
+  instantiate cluster Binding;
+  instantiate cluster BooleanState;
+  instantiate cluster BridgedActions;
+  instantiate cluster BridgedDeviceBasic;
+  instantiate cluster Channel;
+  instantiate cluster ColorControl;
+  instantiate cluster ContentLauncher;
+  instantiate cluster Descriptor;
+  instantiate cluster DoorLock;
+  instantiate cluster ElectricalMeasurement;
+  instantiate cluster FixedLabel;
+  instantiate cluster FlowMeasurement;
+  instantiate cluster Groups;
+  instantiate cluster IasZone;
+  instantiate cluster Identify;
+  instantiate cluster IlluminanceMeasurement;
+  instantiate cluster KeypadInput;
+  instantiate cluster LevelControl;
+  instantiate cluster LocalizationConfiguration;
+  instantiate cluster LowPower;
+  instantiate cluster MediaInput;
+  instantiate cluster MediaPlayback;
+  instantiate cluster ModeSelect;
+  instantiate cluster NetworkCommissioning;
+  instantiate cluster OccupancySensing;
+  instantiate cluster OnOff;
+  instantiate cluster OnOffSwitchConfiguration;
+  instantiate cluster PowerSource;
+  instantiate cluster PressureMeasurement;
+  instantiate cluster PumpConfigurationAndControl;
+  instantiate cluster RelativeHumidityMeasurement;
+  instantiate cluster Scenes;
+  instantiate cluster Switch;
+  instantiate cluster TargetNavigator;
+  instantiate cluster TemperatureMeasurement;
+  instantiate cluster TestCluster;
+  instantiate cluster Thermostat;
+  instantiate cluster ThermostatUserInterfaceConfiguration;
+  instantiate cluster UserLabel;
+  instantiate cluster WakeOnLan;
+  instantiate cluster WindowCovering;
 }
 
 endpoint 2 {
+  instantiate cluster Descriptor;
+  instantiate cluster Groups;
+  instantiate cluster OccupancySensing;
+  instantiate cluster OnOff;
 }
 
