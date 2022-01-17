@@ -439,6 +439,9 @@ public:
     /** Get the secure msg type from this header. */
     uint8_t GetMessageType() const { return mMessageType; }
 
+    /** Get the raw exchange flags from this header. */
+    uint8_t GetExhangeFlags() const { return mExchangeFlags.Raw(); }
+
     /** Check whether the header has a given secure message type */
     bool HasMessageType(uint8_t type) const { return mMessageType == type; }
     template <typename MessageType, typename = std::enable_if_t<std::is_enum<MessageType>::value>>
