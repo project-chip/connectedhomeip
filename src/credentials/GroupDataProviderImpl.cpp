@@ -15,13 +15,13 @@
  *    limitations under the License.
  */
 #include <credentials/GroupDataProviderImpl.h>
-#include <transport/raw/MessageSecurity.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Pool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <transport/raw/MessageSecurity.h>
 
 namespace chip {
 namespace Credentials {
