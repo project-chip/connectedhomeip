@@ -21,6 +21,8 @@ import("${chip_root}/third_party/simw-top-mini/simw_config.gni")
 import("${k32w0_sdk_build_root}/k32w0_executable.gni")
 import("${k32w0_sdk_build_root}/k32w0_sdk.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
+
 assert(current_os == "freertos")
 
 k32w0_platform_dir = "${chip_root}/examples/platform/nxp/k32w/k32w0"
@@ -43,6 +45,10 @@ k32w0_sdk("sdk") {
     "${k32w0_platform_dir}/app/support",
     "${k32w0_platform_dir}/util/include",
   ]
+
+  if (chip_with_se05x == 1) {
+    include_dirs += [ "${chip_root}/examples/platform/nxp/se05x" ]
+  }
 
   defines = []
   if (is_debug) {
