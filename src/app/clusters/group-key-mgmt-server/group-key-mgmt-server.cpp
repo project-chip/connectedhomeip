@@ -44,19 +44,19 @@ struct GroupTableCodec
 {
     static constexpr TLV::Tag TagFabric()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kFabricIndex));
+        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kFabricIndex));
     }
     static constexpr TLV::Tag TagGroup()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kGroupId));
+        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kGroupId));
     }
     static constexpr TLV::Tag TagEndpoints()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kEndpoints));
+        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kEndpoints));
     }
     static constexpr TLV::Tag TagGroupName()
     {
-        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfo::Fields::kGroupName));
+        return TLV::ContextTag(to_underlying(GroupKeyManagement::Structs::GroupInfoMapStruct::Fields::kGroupName));
     }
 
     GroupDataProvider * mProvider = nullptr;
@@ -160,7 +160,7 @@ private:
             GroupDataProvider::GroupKey mapping;
             while (iter->Next(mapping))
             {
-                GroupKeyManagement::Structs::GroupKey::Type key = { .fabricIndex   = fabric_index,
+                GroupKeyManagement::Structs::GroupKeyMapStruct::Type key = { .fabricIndex   = fabric_index,
                                                                     .groupId       = mapping.group_id,
                                                                     .groupKeySetID = mapping.keyset_id };
                 encoder.Encode(key);
@@ -271,7 +271,7 @@ bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
         return true;
     }
 
-    GroupDataProvider::KeySet keyset(commandData.groupKeySet.groupKeySetID, commandData.groupKeySet.securityPolicy, 0);
+    GroupDataProvider::KeySet keyset(commandData.groupKeySet.groupKeySetID, commandData.groupKeySet.groupKeySecurityPolicy, 0);
 
     // Epoch Key 0
     keyset.epoch_keys[0].start_time = commandData.groupKeySet.epochStartTime0;
@@ -353,7 +353,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
 
     GroupKeyManagement::Commands::KeySetReadResponse::Type response;
     response.groupKeySet.groupKeySetID  = keyset.keyset_id;
-    response.groupKeySet.securityPolicy = keyset.policy;
+    response.groupKeySet.groupKeySecurityPolicy = keyset.policy;
     // Keyset 0
     if (keyset.num_keys_used > 0)
     {

@@ -6300,7 +6300,7 @@ public class ChipClusters {
     public void keySetWrite(
         DefaultClusterCallback callback,
         Integer groupKeySetID,
-        Integer securityPolicy,
+        Integer groupKeySecurityPolicy,
         byte[] epochKey0,
         Long epochStartTime0,
         byte[] epochKey1,
@@ -6311,7 +6311,7 @@ public class ChipClusters {
           chipClusterPtr,
           callback,
           groupKeySetID,
-          securityPolicy,
+          groupKeySecurityPolicy,
           epochKey0,
           epochStartTime0,
           epochKey1,
@@ -6324,7 +6324,7 @@ public class ChipClusters {
     public void keySetWrite(
         DefaultClusterCallback callback,
         Integer groupKeySetID,
-        Integer securityPolicy,
+        Integer groupKeySecurityPolicy,
         byte[] epochKey0,
         Long epochStartTime0,
         byte[] epochKey1,
@@ -6336,7 +6336,7 @@ public class ChipClusters {
           chipClusterPtr,
           callback,
           groupKeySetID,
-          securityPolicy,
+          groupKeySecurityPolicy,
           epochKey0,
           epochStartTime0,
           epochKey1,
@@ -6368,7 +6368,7 @@ public class ChipClusters {
         long chipClusterPtr,
         DefaultClusterCallback Callback,
         Integer groupKeySetID,
-        Integer securityPolicy,
+        Integer groupKeySecurityPolicy,
         byte[] epochKey0,
         Long epochStartTime0,
         byte[] epochKey1,
@@ -6378,7 +6378,7 @@ public class ChipClusters {
         @Nullable Integer timedInvokeTimeoutMs);
 
     public interface KeySetReadAllIndicesResponseCallback {
-      void onSuccess( // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+      void onSuccess( // GroupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
           // Conversion from this type to Java is not properly implemented yet
           );
 
@@ -6386,7 +6386,7 @@ public class ChipClusters {
     }
 
     public interface KeySetReadResponseCallback {
-      void onSuccess( // groupKeySet: Struct GroupKeySet
+      void onSuccess( // GroupKeySet: Struct GroupKeySetStruct
           // Conversion from this type to Java is not properly implemented yet
           );
 

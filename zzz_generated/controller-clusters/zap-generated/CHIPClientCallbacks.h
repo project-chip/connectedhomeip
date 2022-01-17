@@ -57,8 +57,8 @@ typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)
 typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(void * context, uint8_t errorCode,
                                                                                chip::CharSpan debugText);
 typedef void (*GroupKeyManagementClusterKeySetReadAllIndicesResponseCallback)(
-    void * context, /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs);
-typedef void (*GroupKeyManagementClusterKeySetReadResponseCallback)(void * context, GroupKeySet groupKeySet);
+    void * context, /* TYPE WARNING: array array defaults to */ uint8_t * GroupKeySetIDs);
+typedef void (*GroupKeyManagementClusterKeySetReadResponseCallback)(void * context, GroupKeySetStruct GroupKeySet);
 typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId);
 typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity,
                                                                 /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
@@ -339,13 +339,15 @@ void GroupKeyManagementClusterGroupKeyMapListAttributeFilter(chip::TLV::TLVReade
                                                              chip::Callback::Cancelable * onFailureCallback);
 typedef void (*GroupKeyManagementGroupKeyMapListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
+        data);
 void GroupKeyManagementClusterGroupTableListAttributeFilter(chip::TLV::TLVReader * data,
                                                             chip::Callback::Cancelable * onSuccessCallback,
                                                             chip::Callback::Cancelable * onFailureCallback);
 typedef void (*GroupKeyManagementGroupTableListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
+        data);
 void GroupKeyManagementClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                chip::Callback::Cancelable * onSuccessCallback,
                                                                chip::Callback::Cancelable * onFailureCallback);

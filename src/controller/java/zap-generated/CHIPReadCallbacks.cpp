@@ -5364,7 +5364,8 @@ CHIPGroupKeyManagementGroupKeyMapAttributeCallback::~CHIPGroupKeyManagementGroup
 
 void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
+        list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5431,7 +5432,7 @@ void CHIPGroupKeyManagementGroupKeyMapAttributeCallback::CallbackFn(
         bool groupIdNull     = false;
         bool groupIdHasValue = true;
 
-        uint16_t groupIdValue = entry.groupId;
+        chip::GroupId groupIdValue = entry.groupId;
 
         jobject groupId = nullptr;
         if (!groupIdNull && groupIdHasValue)
@@ -5502,7 +5503,8 @@ CHIPGroupKeyManagementGroupTableAttributeCallback::~CHIPGroupKeyManagementGroupT
 
 void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
+        list)
 {
     chip::DeviceLayer::StackUnlock unlock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -5553,7 +5555,7 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
         bool fabricIndexNull     = false;
         bool fabricIndexHasValue = true;
 
-        uint16_t fabricIndexValue = entry.fabricIndex;
+        chip::FabricIndex fabricIndexValue = entry.fabricIndex;
 
         jobject fabricIndex = nullptr;
         if (!fabricIndexNull && fabricIndexHasValue)
@@ -5568,7 +5570,7 @@ void CHIPGroupKeyManagementGroupTableAttributeCallback::CallbackFn(
         bool groupIdNull     = false;
         bool groupIdHasValue = true;
 
-        uint16_t groupIdValue = entry.groupId;
+        chip::GroupId groupIdValue = entry.groupId;
 
         jobject groupId = nullptr;
         if (!groupIdNull && groupIdHasValue)

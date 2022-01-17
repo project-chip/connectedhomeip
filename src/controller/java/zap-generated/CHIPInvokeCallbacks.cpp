@@ -887,11 +887,11 @@ void CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback::Callback
     err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject groupKeySetIDs;
+    jobject GroupKeySetIDs;
 
-    groupKeySetIDs = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+    GroupKeySetIDs = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, groupKeySetIDs);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySetIDs);
 }
 CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CHIPGroupKeyManagementClusterKeySetReadResponseCallback(
     jobject javaCallback) :
@@ -946,11 +946,11 @@ void CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CallbackFn(
     err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject groupKeySet;
+    jobject GroupKeySet;
 
-    groupKeySet = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
+    GroupKeySet = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, groupKeySet);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySet);
 }
 CHIPGroupsClusterAddGroupResponseCallback::CHIPGroupsClusterAddGroupResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPGroupsClusterAddGroupResponseCallbackType>(CallbackFn, this)

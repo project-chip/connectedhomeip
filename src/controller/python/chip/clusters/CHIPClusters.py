@@ -2122,7 +2122,7 @@ class ChipClusters:
                     "commandName": "KeySetWrite",
                     "args": {
                         "groupKeySetID": "int",
-                        "securityPolicy": "int",
+                        "groupKeySecurityPolicy": "int",
                         "epochKey0": "bytes",
                         "epochStartTime0": "int",
                         "epochKey1": "bytes",
@@ -2138,6 +2138,7 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
+                    "writable": True,
                 },
                 0x00000001: {
                     "attributeName": "GroupTable",

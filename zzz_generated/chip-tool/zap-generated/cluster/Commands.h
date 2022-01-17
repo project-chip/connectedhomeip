@@ -92,11 +92,11 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType & value);
+                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType & value);
+                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType & value);
+                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -1514,7 +1514,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType & value)
+                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1553,7 +1553,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType & value)
+                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1584,7 +1584,7 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType & value)
+                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -1596,10 +1596,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         }
     }
     {
-        CHIP_ERROR err = LogValue("SecurityPolicy", indent + 1, value.securityPolicy);
+        CHIP_ERROR err = LogValue("GroupKeySecurityPolicy", indent + 1, value.groupKeySecurityPolicy);
         if (err != CHIP_NO_ERROR)
         {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'SecurityPolicy'",
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeySecurityPolicy'",
                             IndentStr(indent + 1).c_str());
             return err;
         }
@@ -23233,7 +23233,7 @@ class GroupKeyManagementKeySetWrite : public ModelCommand
 public:
     GroupKeyManagementKeySetWrite() : ModelCommand("key-set-write")
     {
-        // groupKeySet Struct parsing is not supported yet
+        // GroupKeySet Struct parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
@@ -23273,10 +23273,9 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
-            value)
+    static void OnAttributeResponse(void * context,
+                                    const chip::app::DataModel::DecodableList<
+                                        chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> & value)
     {
         OnGeneralAttributeEventResponse(context, "GroupKeyManagement.GroupKeyMap response", value);
     }
@@ -23313,10 +23312,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
-            value)
+    static void OnValueReport(void * context,
+                              const chip::app::DataModel::DecodableList<
+                                  chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> & value)
     {
         LogValue("GroupKeyManagement.GroupKeyMap report", 0, value);
     }
@@ -23351,10 +23349,10 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &
-            value)
+    static void
+    OnAttributeResponse(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> & value)
     {
         OnGeneralAttributeEventResponse(context, "GroupKeyManagement.GroupTable response", value);
     }
@@ -23391,10 +23389,9 @@ public:
         return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
     }
 
-    static void OnValueReport(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &
-            value)
+    static void OnValueReport(void * context,
+                              const chip::app::DataModel::DecodableList<
+                                  chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> & value)
     {
         LogValue("GroupKeyManagement.GroupTable report", 0, value);
     }

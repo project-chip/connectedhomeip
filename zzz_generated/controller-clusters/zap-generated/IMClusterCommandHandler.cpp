@@ -1066,7 +1066,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
         {
         case Commands::KeySetReadAllIndicesResponse::Id: {
             expectArgumentCount = 1;
-            /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs;
+            /* TYPE WARNING: array array defaults to */ uint8_t * GroupKeySetIDs;
             bool argExists[1];
 
             memset(argExists, 0, sizeof argExists);
@@ -1098,7 +1098,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 {
                 case 0:
                     // Just for compatibility, we will add array type support in IM later.
-                    TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>(groupKeySetIDs));
+                    TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>(GroupKeySetIDs));
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1120,13 +1120,13 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 wasHandled = emberAfGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback(aCommandPath.mEndpointId,
-                                                                                                  apCommandObj, groupKeySetIDs);
+                                                                                                  apCommandObj, GroupKeySetIDs);
             }
             break;
         }
         case Commands::KeySetReadResponse::Id: {
             expectArgumentCount = 1;
-            chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType groupKeySet;
+            chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::DecodableType GroupKeySet;
             bool argExists[1];
 
             memset(argExists, 0, sizeof argExists);
@@ -1180,7 +1180,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 1 == validArgumentCount)
             {
                 wasHandled =
-                    emberAfGroupKeyManagementClusterKeySetReadResponseCallback(aCommandPath.mEndpointId, apCommandObj, groupKeySet);
+                    emberAfGroupKeyManagementClusterKeySetReadResponseCallback(aCommandPath.mEndpointId, apCommandObj, GroupKeySet);
             }
             break;
         }

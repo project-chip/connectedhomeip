@@ -1700,11 +1700,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess( // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+    public void onSuccess( // GroupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
         // Conversion from this type to Java is not properly implemented yet
         ) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+      // GroupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
       // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
     }
@@ -1726,11 +1726,11 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess( // groupKeySet: Struct GroupKeySet
+    public void onSuccess( // GroupKeySet: Struct GroupKeySetStruct
         // Conversion from this type to Java is not properly implemented yet
         ) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      // groupKeySet: Struct GroupKeySet
+      // GroupKeySet: Struct GroupKeySetStruct
       // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
     }
@@ -6774,10 +6774,11 @@ public class ClusterInfoMapping {
     groupKeyManagementkeySetWriteCommandParams.put(
         "groupKeySetID", groupKeyManagementkeySetWritegroupKeySetIDCommandParameterInfo);
 
-    CommandParameterInfo groupKeyManagementkeySetWritesecurityPolicyCommandParameterInfo =
-        new CommandParameterInfo("securityPolicy", int.class);
+    CommandParameterInfo groupKeyManagementkeySetWritegroupKeySecurityPolicyCommandParameterInfo =
+        new CommandParameterInfo("groupKeySecurityPolicy", int.class);
     groupKeyManagementkeySetWriteCommandParams.put(
-        "securityPolicy", groupKeyManagementkeySetWritesecurityPolicyCommandParameterInfo);
+        "groupKeySecurityPolicy",
+        groupKeyManagementkeySetWritegroupKeySecurityPolicyCommandParameterInfo);
 
     CommandParameterInfo groupKeyManagementkeySetWriteepochKey0CommandParameterInfo =
         new CommandParameterInfo("epochKey0", byte[].class);
@@ -6817,7 +6818,7 @@ public class ClusterInfoMapping {
                   .keySetWrite(
                       (DefaultClusterCallback) callback,
                       (Integer) commandArguments.get("groupKeySetID"),
-                      (Integer) commandArguments.get("securityPolicy"),
+                      (Integer) commandArguments.get("groupKeySecurityPolicy"),
                       (byte[]) commandArguments.get("epochKey0"),
                       (Long) commandArguments.get("epochStartTime0"),
                       (byte[]) commandArguments.get("epochKey1"),

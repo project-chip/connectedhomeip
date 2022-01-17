@@ -11032,7 +11032,7 @@ JNI_METHOD(void, GroupKeyManagementCluster, keySetRemove)
     onFailure.release();
 }
 JNI_METHOD(void, GroupKeyManagementCluster, keySetWrite)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetID, jobject securityPolicy,
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetID, jobject groupKeySecurityPolicy,
  jbyteArray epochKey0, jobject epochStartTime0, jbyteArray epochKey1, jobject epochStartTime1, jbyteArray epochKey2,
  jobject epochStartTime2, jobject timedInvokeTimeoutMs)
 {
@@ -11042,7 +11042,7 @@ JNI_METHOD(void, GroupKeyManagementCluster, keySetWrite)
 
     chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::Type request;
 
-    request.groupKeySet = chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::Type();
+    request.groupKeySet = chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);
