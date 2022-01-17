@@ -2826,7 +2826,9 @@ public:
         CHIPCallbackBridge<ContentLauncherServerGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> & value);
 };
 
 class CHIPContentLauncherServerGeneratedCommandListListAttributeCallbackSubscriptionBridge
@@ -2855,7 +2857,9 @@ public:
         CHIPCallbackBridge<ContentLauncherClientGeneratedCommandListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::DecodableList<
+                                chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> & value);
 };
 
 class CHIPContentLauncherClientGeneratedCommandListListAttributeCallbackSubscriptionBridge

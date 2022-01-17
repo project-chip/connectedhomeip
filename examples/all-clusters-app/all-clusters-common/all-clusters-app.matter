@@ -1499,35 +1499,35 @@ server cluster GroupKeyManagement = 63 {
     kLowLatency = 1;
   }
 
-  struct GroupKey {
+  struct GroupKeyMapStruct {
     fabric_idx fabricIndex = 0;
-    INT16U groupId = 1;
+    group_id groupId = 1;
     INT16U groupKeySetID = 2;
   }
 
-  struct GroupInfo {
-    INT16U fabricIndex = 0;
-    INT16U groupId = 1;
-    INT16U endpoints[] = 2;
-    CHAR_STRING<16> groupName = 3;
+  struct GroupInfoMapStruct {
+    fabric_idx fabricIndex = 0;
+    group_id groupId = 1;
+    endpoint_no endpoints[] = 2;
+    CHAR_STRING groupName = 3;
   }
 
-  struct GroupKeySet {
+  struct GroupKeySetStruct {
     INT16U groupKeySetID = 0;
-    GroupKeySecurityPolicy securityPolicy = 1;
-    OCTET_STRING<16> epochKey0 = 2;
-    INT64U epochStartTime0 = 3;
-    OCTET_STRING<16> epochKey1 = 4;
-    INT64U epochStartTime1 = 5;
-    OCTET_STRING<16> epochKey2 = 6;
-    INT64U epochStartTime2 = 7;
+    GroupKeySecurityPolicy groupKeySecurityPolicy = 1;
+    OCTET_STRING epochKey0 = 2;
+    epoch_us epochStartTime0 = 3;
+    OCTET_STRING epochKey1 = 4;
+    epoch_us epochStartTime1 = 5;
+    OCTET_STRING epochKey2 = 6;
+    epoch_us epochStartTime2 = 7;
   }
 
-  attribute GroupKey groupKeyMap[] = 0;
-  readonly attribute GroupInfo groupTable[] = 1;
-  readonly attribute int16u maxGroupsPerFabric = 2;
-  readonly attribute int16u maxGroupKeysPerFabric = 3;
-  readonly global attribute int16u clusterRevision = 65533;
+  attribute(writable) GroupKeyMapStruct groupKeyMap[] = 0;
+  attribute(readonly) GroupInfoMapStruct groupTable[] = 1;
+  attribute(readonly) int16u maxGroupsPerFabric = 2;
+  attribute(readonly) int16u maxGroupKeysPerFabric = 3;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct KeySetReadRequest {
     INT16U groupKeySetID = 0;
@@ -1542,7 +1542,7 @@ server cluster GroupKeyManagement = 63 {
   }
 
   request struct KeySetWriteRequest {
-    GroupKeySet groupKeySet = 0;
+    GroupKeySetStruct groupKeySetStruct = 0;
   }
 
   response struct KeySetReadAllIndicesResponse {
@@ -1550,7 +1550,7 @@ server cluster GroupKeyManagement = 63 {
   }
 
   response struct KeySetReadResponse {
-    GroupKeySet groupKeySet = 0;
+    GroupKeySetStruct groupKeySetStruct = 0;
   }
 
   command KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;

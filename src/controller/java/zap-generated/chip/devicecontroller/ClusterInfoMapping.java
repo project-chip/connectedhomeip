@@ -1649,10 +1649,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Long> valueList) {
+    public void onSuccess( // GroupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+        // Conversion from this type to Java is not properly implemented yet
+        ) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
+      // GroupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+      // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
     }
 
@@ -1673,10 +1675,12 @@ public class ClusterInfoMapping {
     }
 
     @Override
-    public void onSuccess(List<Long> valueList) {
+    public void onSuccess( // GroupKeySetStruct: Struct GroupKeySetStruct
+        // Conversion from this type to Java is not properly implemented yet
+        ) {
       Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<Long>");
-      responseValues.put(commandResponseInfo, valueList);
+      // GroupKeySetStruct: Struct GroupKeySetStruct
+      // Conversion from this type to Java is not properly implemented yet
       callback.onSuccess(responseValues);
     }
 
@@ -9687,14 +9691,62 @@ public class ClusterInfoMapping {
         "keySetRemove", groupKeyManagementkeySetRemoveInteractionInfo);
     Map<String, CommandParameterInfo> groupKeyManagementkeySetWriteCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo groupKeyManagementkeySetWritegroupKeySetIDCommandParameterInfo =
+        new CommandParameterInfo("groupKeySetID", int.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "groupKeySetID", groupKeyManagementkeySetWritegroupKeySetIDCommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWritegroupKeySecurityPolicyCommandParameterInfo =
+        new CommandParameterInfo("groupKeySecurityPolicy", int.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "groupKeySecurityPolicy",
+        groupKeyManagementkeySetWritegroupKeySecurityPolicyCommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochKey0CommandParameterInfo =
+        new CommandParameterInfo("epochKey0", byte[].class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochKey0", groupKeyManagementkeySetWriteepochKey0CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime0CommandParameterInfo =
+        new CommandParameterInfo("epochStartTime0", long.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochStartTime0", groupKeyManagementkeySetWriteepochStartTime0CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochKey1CommandParameterInfo =
+        new CommandParameterInfo("epochKey1", byte[].class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochKey1", groupKeyManagementkeySetWriteepochKey1CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime1CommandParameterInfo =
+        new CommandParameterInfo("epochStartTime1", long.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochStartTime1", groupKeyManagementkeySetWriteepochStartTime1CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochKey2CommandParameterInfo =
+        new CommandParameterInfo("epochKey2", byte[].class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochKey2", groupKeyManagementkeySetWriteepochKey2CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime2CommandParameterInfo =
+        new CommandParameterInfo("epochStartTime2", long.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochStartTime2", groupKeyManagementkeySetWriteepochStartTime2CommandParameterInfo);
+
+    // Populate commands
     InteractionInfo groupKeyManagementkeySetWriteInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.GroupKeyManagementCluster) cluster)
                   .keySetWrite(
                       (DefaultClusterCallback) callback,
-                      (ChipStructs.GroupKeyManagementClusterGroupKeySet)
-                          commandArguments.get("groupKeySet"));
+                      (Integer) commandArguments.get("groupKeySetID"),
+                      (Integer) commandArguments.get("groupKeySecurityPolicy"),
+                      (byte[]) commandArguments.get("epochKey0"),
+                      (Long) commandArguments.get("epochStartTime0"),
+                      (byte[]) commandArguments.get("epochKey1"),
+                      (Long) commandArguments.get("epochStartTime1"),
+                      (byte[]) commandArguments.get("epochKey2"),
+                      (Long) commandArguments.get("epochStartTime2"));
             },
             () -> new DelegatedDefaultClusterCallback(),
             groupKeyManagementkeySetWriteCommandParams);

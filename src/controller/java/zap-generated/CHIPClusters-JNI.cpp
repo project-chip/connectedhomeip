@@ -16261,9 +16261,10 @@ JNI_METHOD(void, IdentifyCluster, identifyQuery)
     onSuccess.release();
     onFailure.release();
 }
-JNI_METHOD(void, IdentifyCluster, triggerEffect)
-(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject effectIdentifier, jobject effectVariant,
- jobject timedInvokeTimeoutMs)
+JNI_METHOD(void, GroupKeyManagementCluster, keySetWrite)
+(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback, jobject groupKeySetID, jobject groupKeySecurityPolicy,
+ jbyteArray epochKey0, jobject epochStartTime0, jbyteArray epochKey1, jobject epochStartTime1, jbyteArray epochKey2,
+ jobject epochStartTime2, jobject timedInvokeTimeoutMs)
 {
     chip::DeviceLayer::StackLock lock;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -16272,12 +16273,7 @@ JNI_METHOD(void, IdentifyCluster, triggerEffect)
     ListFreer listFreer;
     chip::app::Clusters::Identify::Commands::TriggerEffect::Type request;
 
-    std::vector<Platform::UniquePtr<JniByteArray>> cleanupByteArrays;
-    std::vector<Platform::UniquePtr<JniUtfString>> cleanupStrings;
-    request.effectIdentifier = static_cast<std::remove_reference_t<decltype(request.effectIdentifier)>>(
-        chip::JniReferences::GetInstance().IntegerToPrimitive(effectIdentifier));
-    request.effectVariant = static_cast<std::remove_reference_t<decltype(request.effectVariant)>>(
-        chip::JniReferences::GetInstance().IntegerToPrimitive(effectVariant));
+    request.groupKeySetStruct = chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySetStruct::Type();
 
     std::unique_ptr<CHIPDefaultSuccessCallback, void (*)(CHIPDefaultSuccessCallback *)> onSuccess(
         Platform::New<CHIPDefaultSuccessCallback>(callback), Platform::Delete<CHIPDefaultSuccessCallback>);

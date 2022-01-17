@@ -30,6 +30,96 @@
 #include <lib/support/FunctionTraits.h>
 #include <lib/support/Span.h>
 
+// Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
+// instead of IM status code.
+// #6308 should handle IM error code on the application side, either modify this function or remove this.
+
+// Cluster Specific Response Callbacks
+typedef void (*AccountLoginClusterGetSetupPINResponseCallback)(void * context, chip::CharSpan setupPIN);
+typedef void (*ApplicationLauncherClusterLauncherResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
+typedef void (*ChannelClusterChangeChannelResponseCallback)(void * context, ChannelInfo channelMatch, uint8_t errorType);
+typedef void (*ContentLauncherClusterLaunchResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
+typedef void (*DiagnosticLogsClusterRetrieveLogsResponseCallback)(void * context, uint8_t status, chip::ByteSpan content,
+                                                                  uint32_t timeStamp, uint32_t timeSinceBoot);
+typedef void (*DoorLockClusterGetCredentialStatusResponseCallback)(void * context, bool credentialExists, uint16_t userIndex,
+                                                                   uint16_t nextCredentialIndex);
+typedef void (*DoorLockClusterGetUserResponseCallback)(void * context, uint16_t userIndex, chip::CharSpan userName,
+                                                       uint32_t userUniqueId, uint8_t userStatus, uint8_t userType,
+                                                       uint8_t credentialRule,
+                                                       /* TYPE WARNING: array array defaults to */ uint8_t * credentials,
+                                                       chip::FabricIndex creatorFabricIndex,
+                                                       chip::FabricIndex lastModifiedFabricIndex, uint16_t nextUserIndex);
+typedef void (*DoorLockClusterGetWeekDayScheduleResponseCallback)(void * context, uint8_t weekDayIndex, uint16_t userIndex,
+                                                                  uint8_t status, uint8_t daysMask, uint8_t startHour,
+                                                                  uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+typedef void (*DoorLockClusterGetYearDayScheduleResponseCallback)(void * context, uint8_t yearDayIndex, uint16_t userIndex,
+                                                                  uint8_t status, uint32_t localStartTime, uint32_t localEndTime);
+typedef void (*DoorLockClusterSetCredentialResponseCallback)(void * context, uint8_t status, uint16_t userIndex,
+                                                             uint16_t nextCredentialIndex);
+typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, chip::CharSpan debugText);
+typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)(void * context, uint8_t errorCode,
+                                                                                 chip::CharSpan debugText);
+typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(void * context, uint8_t errorCode,
+                                                                               chip::CharSpan debugText);
+typedef void (*GroupKeyManagementClusterKeySetReadAllIndicesResponseCallback)(
+    void * context, /* TYPE WARNING: array array defaults to */ uint8_t * GroupKeySetIDs);
+typedef void (*GroupKeyManagementClusterKeySetReadResponseCallback)(void * context, GroupKeySetStruct GroupKeySetStruct);
+typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId);
+typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity,
+                                                                /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
+typedef void (*GroupsClusterRemoveGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId);
+typedef void (*GroupsClusterViewGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId, chip::CharSpan groupName);
+typedef void (*IdentifyClusterIdentifyQueryResponseCallback)(void * context, uint16_t timeout);
+typedef void (*KeypadInputClusterSendKeyResponseCallback)(void * context, uint8_t status);
+typedef void (*MediaPlaybackClusterPlaybackResponseCallback)(void * context, uint8_t status);
+typedef void (*NetworkCommissioningClusterConnectNetworkResponseCallback)(void * context, uint8_t NetworkingStatus,
+                                                                          chip::CharSpan DebugText, int32_t ErrorValue);
+typedef void (*NetworkCommissioningClusterNetworkConfigResponseCallback)(void * context, uint8_t NetworkingStatus,
+                                                                         chip::CharSpan DebugText);
+typedef void (*NetworkCommissioningClusterScanNetworksResponseCallback)(
+    void * context, uint8_t NetworkingStatus, chip::CharSpan DebugText,
+    /* TYPE WARNING: array array defaults to */ uint8_t * WiFiScanResults,
+    /* TYPE WARNING: array array defaults to */ uint8_t * ThreadScanResults);
+typedef void (*OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback)(void * context, uint8_t action,
+                                                                            uint32_t delayedActionTime);
+typedef void (*OtaSoftwareUpdateProviderClusterQueryImageResponseCallback)(
+    void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI, uint32_t softwareVersion,
+    chip::CharSpan softwareVersionString, chip::ByteSpan updateToken, bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
+typedef void (*OperationalCredentialsClusterAttestationResponseCallback)(void * context, chip::ByteSpan AttestationElements,
+                                                                         chip::ByteSpan Signature);
+typedef void (*OperationalCredentialsClusterCertificateChainResponseCallback)(void * context, chip::ByteSpan Certificate);
+typedef void (*OperationalCredentialsClusterNOCResponseCallback)(void * context, uint8_t StatusCode, uint8_t FabricIndex,
+                                                                 chip::CharSpan DebugText);
+typedef void (*OperationalCredentialsClusterOpCSRResponseCallback)(void * context, chip::ByteSpan NOCSRElements,
+                                                                   chip::ByteSpan AttestationSignature);
+typedef void (*ScenesClusterAddSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+typedef void (*ScenesClusterGetSceneMembershipResponseCallback)(void * context, uint8_t status, uint8_t capacity, uint16_t groupId,
+                                                                uint8_t sceneCount,
+                                                                /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
+typedef void (*ScenesClusterRemoveAllScenesResponseCallback)(void * context, uint8_t status, uint16_t groupId);
+typedef void (*ScenesClusterRemoveSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+typedef void (*ScenesClusterStoreSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+typedef void (*ScenesClusterViewSceneResponseCallback)(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId,
+                                                       uint16_t transitionTime, chip::CharSpan sceneName,
+                                                       /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
+typedef void (*TestClusterClusterBooleanResponseCallback)(void * context, bool value);
+typedef void (*TestClusterClusterSimpleStructResponseCallback)(void * context, SimpleStruct arg1);
+typedef void (*TestClusterClusterTestAddArgumentsResponseCallback)(void * context, uint8_t returnValue);
+typedef void (*TestClusterClusterTestEmitTestEventResponseCallback)(void * context, uint64_t value);
+typedef void (*TestClusterClusterTestEnumsResponseCallback)(void * context, chip::VendorId arg1, uint8_t arg2);
+typedef void (*TestClusterClusterTestListInt8UReverseResponseCallback)(void * context,
+                                                                       /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+typedef void (*TestClusterClusterTestNullableOptionalResponseCallback)(void * context, bool wasPresent, bool wasNull, uint8_t value,
+                                                                       uint8_t originalValue);
+typedef void (*TestClusterClusterTestSpecificResponseCallback)(void * context, uint8_t returnValue);
+typedef void (*ThermostatClusterGetRelayStatusLogResponseCallback)(void * context, uint16_t timeOfDay, uint16_t relayStatus,
+                                                                   int16_t localTemperature, uint8_t humidityInPercentage,
+                                                                   int16_t setpoint, uint16_t unreadEntries);
+typedef void (*ThermostatClusterGetWeeklyScheduleResponseCallback)(void * context, uint8_t numberOfTransitionsForSequence,
+                                                                   uint8_t dayOfWeekForSequence, uint8_t modeForSequence,
+                                                                   /* TYPE WARNING: array array defaults to */ uint8_t * payload);
+
 // List specific responses
 void AccessControlClusterAclListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                 chip::Callback::Cancelable * onFailureCallback);
@@ -497,23 +587,15 @@ void GroupKeyManagementClusterGroupKeyMapListAttributeFilter(chip::TLV::TLVReade
                                                              chip::Callback::Cancelable * onFailureCallback);
 typedef void (*GroupKeyManagementGroupKeyMapListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &
+        data);
 void GroupKeyManagementClusterGroupTableListAttributeFilter(chip::TLV::TLVReader * data,
                                                             chip::Callback::Cancelable * onSuccessCallback,
                                                             chip::Callback::Cancelable * onFailureCallback);
 typedef void (*GroupKeyManagementGroupTableListAttributeCallback)(
     void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> & data);
-void GroupKeyManagementClusterServerGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                                            chip::Callback::Cancelable * onSuccessCallback,
-                                                                            chip::Callback::Cancelable * onFailureCallback);
-typedef void (*GroupKeyManagementServerGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
-void GroupKeyManagementClusterClientGeneratedCommandListListAttributeFilter(chip::TLV::TLVReader * data,
-                                                                            chip::Callback::Cancelable * onSuccessCallback,
-                                                                            chip::Callback::Cancelable * onFailureCallback);
-typedef void (*GroupKeyManagementClientGeneratedCommandListListAttributeCallback)(
-    void * context, const chip::app::DataModel::DecodableList<chip::CommandId> & data);
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &
+        data);
 void GroupKeyManagementClusterAttributeListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                chip::Callback::Cancelable * onSuccessCallback,
                                                                chip::Callback::Cancelable * onFailureCallback);
