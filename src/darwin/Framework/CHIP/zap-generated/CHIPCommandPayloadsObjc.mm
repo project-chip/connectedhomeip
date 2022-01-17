@@ -1749,7 +1749,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+        _groupKeySetStruct = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
     }
     return self;
 }
@@ -1771,7 +1771,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+        _groupKeySetStruct = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
     }
     return self;
 }

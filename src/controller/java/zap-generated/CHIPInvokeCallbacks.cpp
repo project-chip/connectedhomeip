@@ -1246,22 +1246,11 @@ void CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback::Callback
     err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/util/ArrayList;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject groupKeySetIDs;
-    chip::JniReferences::GetInstance().CreateArrayList(groupKeySetIDs);
+    jobject GroupKeySetIDs;
 
-    auto iter_groupKeySetIDs_0 = dataResponse.groupKeySetIDs.begin();
-    while (iter_groupKeySetIDs_0.Next())
-    {
-        auto & entry_0 = iter_groupKeySetIDs_0.GetValue();
-        jobject newElement_0;
-        std::string newElement_0ClassName     = "java/lang/Integer";
-        std::string newElement_0CtorSignature = "(I)V";
-        chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(newElement_0ClassName.c_str(),
-                                                                       newElement_0CtorSignature.c_str(), entry_0, newElement_0);
-        chip::JniReferences::GetInstance().AddToArrayList(groupKeySetIDs, newElement_0);
-    }
+    GroupKeySetIDs = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, groupKeySetIDs);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySetIDs);
 }
 CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CHIPGroupKeyManagementClusterKeySetReadResponseCallback(
     jobject javaCallback) :
@@ -1318,71 +1307,11 @@ void CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject groupKeySet;
-    jobject groupKeySet_groupKeySetID;
-    std::string groupKeySet_groupKeySetIDClassName     = "java/lang/Integer";
-    std::string groupKeySet_groupKeySetIDCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint16_t>(
-        groupKeySet_groupKeySetIDClassName.c_str(), groupKeySet_groupKeySetIDCtorSignature.c_str(),
-        dataResponse.groupKeySet.groupKeySetID, groupKeySet_groupKeySetID);
-    jobject groupKeySet_securityPolicy;
-    std::string groupKeySet_securityPolicyClassName     = "java/lang/Integer";
-    std::string groupKeySet_securityPolicyCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(
-        groupKeySet_securityPolicyClassName.c_str(), groupKeySet_securityPolicyCtorSignature.c_str(),
-        static_cast<uint8_t>(dataResponse.groupKeySet.securityPolicy), groupKeySet_securityPolicy);
-    jobject groupKeySet_epochKey0;
-    jbyteArray groupKeySet_epochKey0ByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.groupKeySet.epochKey0.size()));
-    env->SetByteArrayRegion(groupKeySet_epochKey0ByteArray, 0, static_cast<jsize>(dataResponse.groupKeySet.epochKey0.size()),
-                            reinterpret_cast<const jbyte *>(dataResponse.groupKeySet.epochKey0.data()));
-    groupKeySet_epochKey0 = groupKeySet_epochKey0ByteArray;
-    jobject groupKeySet_epochStartTime0;
-    std::string groupKeySet_epochStartTime0ClassName     = "java/lang/Long";
-    std::string groupKeySet_epochStartTime0CtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
-        groupKeySet_epochStartTime0ClassName.c_str(), groupKeySet_epochStartTime0CtorSignature.c_str(),
-        dataResponse.groupKeySet.epochStartTime0, groupKeySet_epochStartTime0);
-    jobject groupKeySet_epochKey1;
-    jbyteArray groupKeySet_epochKey1ByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.groupKeySet.epochKey1.size()));
-    env->SetByteArrayRegion(groupKeySet_epochKey1ByteArray, 0, static_cast<jsize>(dataResponse.groupKeySet.epochKey1.size()),
-                            reinterpret_cast<const jbyte *>(dataResponse.groupKeySet.epochKey1.data()));
-    groupKeySet_epochKey1 = groupKeySet_epochKey1ByteArray;
-    jobject groupKeySet_epochStartTime1;
-    std::string groupKeySet_epochStartTime1ClassName     = "java/lang/Long";
-    std::string groupKeySet_epochStartTime1CtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
-        groupKeySet_epochStartTime1ClassName.c_str(), groupKeySet_epochStartTime1CtorSignature.c_str(),
-        dataResponse.groupKeySet.epochStartTime1, groupKeySet_epochStartTime1);
-    jobject groupKeySet_epochKey2;
-    jbyteArray groupKeySet_epochKey2ByteArray = env->NewByteArray(static_cast<jsize>(dataResponse.groupKeySet.epochKey2.size()));
-    env->SetByteArrayRegion(groupKeySet_epochKey2ByteArray, 0, static_cast<jsize>(dataResponse.groupKeySet.epochKey2.size()),
-                            reinterpret_cast<const jbyte *>(dataResponse.groupKeySet.epochKey2.data()));
-    groupKeySet_epochKey2 = groupKeySet_epochKey2ByteArray;
-    jobject groupKeySet_epochStartTime2;
-    std::string groupKeySet_epochStartTime2ClassName     = "java/lang/Long";
-    std::string groupKeySet_epochStartTime2CtorSignature = "(J)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint64_t>(
-        groupKeySet_epochStartTime2ClassName.c_str(), groupKeySet_epochStartTime2CtorSignature.c_str(),
-        dataResponse.groupKeySet.epochStartTime2, groupKeySet_epochStartTime2);
+    jobject GroupKeySetStruct;
 
-    jclass groupKeySetStructClass;
-    err = chip::JniReferences::GetInstance().GetClassRef(
-        env, "chip/devicecontroller/ChipStructs$GroupKeyManagementClusterGroupKeySet", groupKeySetStructClass);
-    VerifyOrReturn(err == CHIP_NO_ERROR,
-                   ChipLogError(Zcl, "Could not find class ChipStructs$GroupKeyManagementClusterGroupKeySet"));
-    chip::JniClass structJniClass(groupKeySetStructClass);
-    jmethodID groupKeySetStructCtor =
-        env->GetMethodID(groupKeySetStructClass, "<init>",
-                         "(Ljava/lang/Integer;Ljava/lang/Integer;[BLjava/lang/Long;[BLjava/lang/Long;[BLjava/lang/Long;)V");
-    VerifyOrReturn(groupKeySetStructCtor != nullptr,
-                   ChipLogError(Zcl, "Could not find ChipStructs$GroupKeyManagementClusterGroupKeySet constructor"));
+    GroupKeySetStruct = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
 
-    groupKeySet =
-        env->NewObject(groupKeySetStructClass, groupKeySetStructCtor, groupKeySet_groupKeySetID, groupKeySet_securityPolicy,
-                       groupKeySet_epochKey0, groupKeySet_epochStartTime0, groupKeySet_epochKey1, groupKeySet_epochStartTime1,
-                       groupKeySet_epochKey2, groupKeySet_epochStartTime2);
-
-    env->CallVoidMethod(javaCallbackRef, javaMethod, groupKeySet);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySetStruct);
 }
 CHIPGroupsClusterAddGroupResponseCallback::CHIPGroupsClusterAddGroupResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPGroupsClusterAddGroupResponseCallbackType>(CallbackFn, this)

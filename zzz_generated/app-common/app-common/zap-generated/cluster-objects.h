@@ -16509,7 +16509,7 @@ enum class GroupKeySecurityPolicy : uint8_t
 };
 
 namespace Structs {
-namespace GroupInfo {
+namespace GroupInfoMapStruct {
 enum class Fields
 {
     kFabricIndex = 0,
@@ -16521,22 +16521,21 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t fabricIndex = static_cast<uint16_t>(0);
-    uint16_t groupId     = static_cast<uint16_t>(0);
-    DataModel::List<const uint16_t> endpoints;
+    chip::FabricIndex fabricIndex;
+    chip::GroupId groupId;
+    DataModel::List<const chip::EndpointId> endpoints;
     chip::CharSpan groupName;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    static constexpr bool kIsFabricScoped = false;
+    bool MatchesFabricIndex(FabricIndex fabricIndex_) const { return fabricIndex == fabricIndex_; }
 };
 
 struct DecodableType
 {
 public:
-    uint16_t fabricIndex = static_cast<uint16_t>(0);
-    uint16_t groupId     = static_cast<uint16_t>(0);
-    DataModel::DecodableList<uint16_t> endpoints;
+    chip::FabricIndex fabricIndex;
+    chip::GroupId groupId;
+    DataModel::DecodableList<chip::EndpointId> endpoints;
     chip::CharSpan groupName;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -16544,8 +16543,8 @@ public:
     static constexpr bool kIsFabricScoped = false;
 };
 
-} // namespace GroupInfo
-namespace GroupKey {
+} // namespace GroupInfoMapStruct
+namespace GroupKeyMapStruct {
 enum class Fields
 {
     kFabricIndex   = 0,
@@ -16556,9 +16555,9 @@ enum class Fields
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
-    uint16_t groupId              = static_cast<uint16_t>(0);
-    uint16_t groupKeySetID        = static_cast<uint16_t>(0);
+    chip::FabricIndex fabricIndex;
+    chip::GroupId groupId;
+    uint16_t groupKeySetID;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -16572,25 +16571,25 @@ public:
 
 using DecodableType = Type;
 
-} // namespace GroupKey
-namespace GroupKeySet {
+} // namespace GroupKeyMapStruct
+namespace GroupKeySetStruct {
 enum class Fields
 {
-    kGroupKeySetID   = 0,
-    kSecurityPolicy  = 1,
-    kEpochKey0       = 2,
-    kEpochStartTime0 = 3,
-    kEpochKey1       = 4,
-    kEpochStartTime1 = 5,
-    kEpochKey2       = 6,
-    kEpochStartTime2 = 7,
+    kGroupKeySetID          = 0,
+    kGroupKeySecurityPolicy = 1,
+    kEpochKey0              = 2,
+    kEpochStartTime0        = 3,
+    kEpochKey1              = 4,
+    kEpochStartTime1        = 5,
+    kEpochKey2              = 6,
+    kEpochStartTime2        = 7,
 };
 
 struct Type
 {
 public:
-    uint16_t groupKeySetID                = static_cast<uint16_t>(0);
-    GroupKeySecurityPolicy securityPolicy = static_cast<GroupKeySecurityPolicy>(0);
+    uint16_t groupKeySetID;
+    GroupKeySecurityPolicy groupKeySecurityPolicy;
     chip::ByteSpan epochKey0;
     uint64_t epochStartTime0 = static_cast<uint64_t>(0);
     chip::ByteSpan epochKey1;
@@ -16606,7 +16605,7 @@ public:
 
 using DecodableType = Type;
 
-} // namespace GroupKeySet
+} // namespace GroupKeySetStruct
 } // namespace Structs
 
 namespace Commands {
@@ -16648,7 +16647,7 @@ namespace Commands {
 namespace KeySetWrite {
 enum class Fields
 {
-    kGroupKeySet = 0,
+    kGroupKeySetStruct = 0,
 };
 
 struct Type
@@ -16658,7 +16657,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::Type groupKeySet;
+    Structs::GroupKeySetStruct::Type groupKeySetStruct;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -16673,7 +16672,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::DecodableType groupKeySet;
+    Structs::GroupKeySetStruct::DecodableType groupKeySetStruct;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeySetWrite
@@ -16712,7 +16711,7 @@ public:
 namespace KeySetReadResponse {
 enum class Fields
 {
-    kGroupKeySet = 0,
+    kGroupKeySetStruct = 0,
 };
 
 struct Type
@@ -16722,7 +16721,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::Type groupKeySet;
+    Structs::GroupKeySetStruct::Type groupKeySetStruct;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -16737,7 +16736,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
 
-    Structs::GroupKeySet::DecodableType groupKeySet;
+    Structs::GroupKeySetStruct::DecodableType groupKeySetStruct;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace KeySetReadResponse
@@ -16844,11 +16843,11 @@ namespace Attributes {
 namespace GroupKeyMap {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupKeyMapStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeyMap::Id; }
@@ -16858,11 +16857,11 @@ struct TypeInfo
 namespace GroupTable {
 struct TypeInfo
 {
-    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::Type>;
+    using Type = chip::app::DataModel::List<const chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::Type>;
     using DecodableType =
-        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType>;
-    using DecodableArgType =
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfo::DecodableType> &;
+        chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType>;
+    using DecodableArgType = const chip::app::DataModel::DecodableList<
+        chip::app::Clusters::GroupKeyManagement::Structs::GroupInfoMapStruct::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::GroupTable::Id; }

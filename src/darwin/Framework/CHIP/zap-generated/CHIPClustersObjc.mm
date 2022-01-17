@@ -10805,15 +10805,16 @@ using namespace chip::app::Clusters;
 {
     ListFreer listFreer;
     GroupKeyManagement::Commands::KeySetWrite::Type request;
-    request.groupKeySet.groupKeySetID = params.groupKeySet.groupKeySetID.unsignedShortValue;
-    request.groupKeySet.securityPolicy = static_cast<std::remove_reference_t<decltype(request.groupKeySet.securityPolicy)>>(
-        params.groupKeySet.securityPolicy.unsignedCharValue);
-    request.groupKeySet.epochKey0 = [self asByteSpan:params.groupKeySet.epochKey0];
-    request.groupKeySet.epochStartTime0 = params.groupKeySet.epochStartTime0.unsignedLongLongValue;
-    request.groupKeySet.epochKey1 = [self asByteSpan:params.groupKeySet.epochKey1];
-    request.groupKeySet.epochStartTime1 = params.groupKeySet.epochStartTime1.unsignedLongLongValue;
-    request.groupKeySet.epochKey2 = [self asByteSpan:params.groupKeySet.epochKey2];
-    request.groupKeySet.epochStartTime2 = params.groupKeySet.epochStartTime2.unsignedLongLongValue;
+    request.groupKeySetStruct.groupKeySetID = params.groupKeySetStruct.groupKeySetID.unsignedShortValue;
+    request.groupKeySetStruct.groupKeySecurityPolicy
+        = static_cast<std::remove_reference_t<decltype(request.groupKeySetStruct.groupKeySecurityPolicy)>>(
+            params.groupKeySetStruct.groupKeySecurityPolicy.unsignedCharValue);
+    request.groupKeySetStruct.epochKey0 = [self asByteSpan:params.groupKeySetStruct.epochKey0];
+    request.groupKeySetStruct.epochStartTime0 = params.groupKeySetStruct.epochStartTime0.unsignedLongLongValue;
+    request.groupKeySetStruct.epochKey1 = [self asByteSpan:params.groupKeySetStruct.epochKey1];
+    request.groupKeySetStruct.epochStartTime1 = params.groupKeySetStruct.epochStartTime1.unsignedLongLongValue;
+    request.groupKeySetStruct.epochKey2 = [self asByteSpan:params.groupKeySetStruct.epochKey2];
+    request.groupKeySetStruct.epochStartTime2 = params.groupKeySetStruct.epochStartTime2.unsignedLongLongValue;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -10860,11 +10861,11 @@ using namespace chip::app::Clusters;
                     }
                     listFreer.add(listHolder_0);
                     for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[CHIPGroupKeyManagementClusterGroupKey class]]) {
+                        if (![value[i_0] isKindOfClass:[CHIPGroupKeyManagementClusterGroupKeyMapStruct class]]) {
                             // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (CHIPGroupKeyManagementClusterGroupKey *) value[i_0];
+                        auto element_0 = (CHIPGroupKeyManagementClusterGroupKeyMapStruct *) value[i_0];
                         listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedCharValue;
                         listHolder_0->mList[i_0].groupId = element_0.groupId.unsignedShortValue;
                         listHolder_0->mList[i_0].groupKeySetID = element_0.groupKeySetID.unsignedShortValue;
