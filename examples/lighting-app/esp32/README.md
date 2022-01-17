@@ -157,12 +157,6 @@ type below query.
 >matter ota query 1 12346 0
 ```
 
-Alternate way to query an OTA image using chip-tool
-
-```
-./out/debug/chip-tool otasoftwareupdaterequestor announce-ota-provider 12346 0 0 0 12345 0
-```
-
 ## Apply update
 
 Once the transfer is complete OTA requestor sends ApplyUpdateRequest command to

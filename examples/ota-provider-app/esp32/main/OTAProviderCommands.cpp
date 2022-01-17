@@ -71,7 +71,7 @@ void OTAProviderCommands::Register()
 
     sSubShell.RegisterCommands(subCommands, ArraySize(subCommands));
 
-    // Register the root `ota` command in the top-level shell.
+    // Register the root `OTA Provider` command in the top-level shell.
     static const shell_command_t otaProviderCommand = { &OTAProviderHandler, "OTAProvider", "OTA Provider commands" };
 
     Engine::Root().RegisterCommands(&otaProviderCommand, 1);
