@@ -453,6 +453,11 @@ async function if_chip_enum(type, options)
   return templateUtil.templatePromise(this.global, result);
 }
 
+function if_server_side(options)
+{
+  return (this.side == "server") ? options.fn(this) : options.inverse(this);
+}
+
 //
 // Module exports
 //
@@ -479,3 +484,4 @@ exports.if_chip_enum                                         = if_chip_enum;
 exports.if_in_global_responses                               = if_in_global_responses;
 exports.chip_cluster_specific_structs                        = chip_cluster_specific_structs;
 exports.chip_shared_structs                                  = chip_shared_structs;
+exports.if_server_side                                       = if_server_side;

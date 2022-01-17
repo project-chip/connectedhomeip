@@ -472,9 +472,12 @@ endpoint 0 {
   instantiate cluster GeneralCommissioning;
   instantiate cluster LocalizationConfiguration;
   instantiate cluster NetworkCommissioning;
-  instantiate cluster OtaSoftwareUpdateProvider;
   instantiate cluster OtaSoftwareUpdateRequestor;
   instantiate cluster OperationalCredentials;
   instantiate cluster UserLabel;
 }
 
+
+client clusters {
+  uses cluster OtaSoftwareUpdateProvider;
+}

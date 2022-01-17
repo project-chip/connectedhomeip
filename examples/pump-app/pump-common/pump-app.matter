@@ -913,13 +913,16 @@ endpoint 0 {
 endpoint 1 {
   instantiate cluster Descriptor;
   instantiate cluster FlowMeasurement;
-  instantiate cluster FlowMeasurement;
   instantiate cluster LevelControl;
   instantiate cluster OnOff;
   instantiate cluster PressureMeasurement;
-  instantiate cluster PressureMeasurement;
   instantiate cluster PumpConfigurationAndControl;
-  instantiate cluster TemperatureMeasurement;
   instantiate cluster TemperatureMeasurement;
 }
 
+
+client clusters {
+  uses cluster FlowMeasurement;
+  uses cluster PressureMeasurement;
+  uses cluster TemperatureMeasurement;
+}

@@ -716,7 +716,6 @@ endpoint 0 {
   instantiate cluster NetworkCommissioning;
   instantiate cluster OperationalCredentials;
   instantiate cluster TemperatureMeasurement;
-  instantiate cluster TemperatureMeasurement;
 }
 
 endpoint 1 {
@@ -729,3 +728,7 @@ endpoint 1 {
   instantiate cluster Scenes;
 }
 
+
+client clusters {
+  uses cluster TemperatureMeasurement;
+}

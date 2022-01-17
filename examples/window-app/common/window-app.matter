@@ -865,3 +865,6 @@ endpoint 2 {
   instantiate cluster WindowCovering;
 }
 
+
+client clusters {
+}

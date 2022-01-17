@@ -82,8 +82,16 @@
 {{#chip_endpoints}}
 endpoint {{endpointId}} {
   {{#chip_endpoint_clusters}}
+  {{#if_server_side}}
   instantiate cluster {{asUpperCamelCase name}};
+  {{/if_server_side}}
   {{/chip_endpoint_clusters}}
 }
 
 {{/chip_endpoints}}
+
+client clusters {
+{{#chip_client_clusters}}
+  uses cluster {{asUpperCamelCase name}};
+{{/chip_client_clusters}}
+}

@@ -619,3 +619,6 @@ endpoint 1 {
   instantiate cluster TemperatureMeasurement;
 }
 
+
+client clusters {
+}

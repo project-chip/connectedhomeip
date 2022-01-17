@@ -1128,3 +1128,6 @@ endpoint 1 {
   instantiate cluster PowerSource;
 }
 
+
+client clusters {
+}

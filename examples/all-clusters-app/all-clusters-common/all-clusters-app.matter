@@ -3014,7 +3014,6 @@ endpoint 0 {
   instantiate cluster Identify;
   instantiate cluster LocalizationConfiguration;
   instantiate cluster NetworkCommissioning;
-  instantiate cluster OtaSoftwareUpdateProvider;
   instantiate cluster OtaSoftwareUpdateRequestor;
   instantiate cluster OperationalCredentials;
   instantiate cluster PowerSourceConfiguration;
@@ -3082,3 +3081,7 @@ endpoint 2 {
   instantiate cluster OnOff;
 }
 
+
+client clusters {
+  uses cluster OtaSoftwareUpdateProvider;
+}

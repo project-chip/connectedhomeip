@@ -952,7 +952,6 @@ endpoint 0 {
   instantiate cluster FixedLabel;
   instantiate cluster GeneralCommissioning;
   instantiate cluster GeneralDiagnostics;
-  instantiate cluster LevelControl;
   instantiate cluster LocalizationConfiguration;
   instantiate cluster NetworkCommissioning;
   instantiate cluster OperationalCredentials;
@@ -964,10 +963,14 @@ endpoint 0 {
 
 endpoint 1 {
   instantiate cluster Descriptor;
-  instantiate cluster FlowMeasurement;
-  instantiate cluster OnOff;
-  instantiate cluster PressureMeasurement;
-  instantiate cluster PumpConfigurationAndControl;
-  instantiate cluster TemperatureMeasurement;
 }
 
+
+client clusters {
+  uses cluster FlowMeasurement;
+  uses cluster LevelControl;
+  uses cluster OnOff;
+  uses cluster PressureMeasurement;
+  uses cluster PumpConfigurationAndControl;
+  uses cluster TemperatureMeasurement;
+}

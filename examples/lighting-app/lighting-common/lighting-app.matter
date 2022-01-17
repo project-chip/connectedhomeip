@@ -1391,7 +1391,6 @@ endpoint 0 {
   instantiate cluster GeneralDiagnostics;
   instantiate cluster LocalizationConfiguration;
   instantiate cluster NetworkCommissioning;
-  instantiate cluster OtaSoftwareUpdateProvider;
   instantiate cluster OtaSoftwareUpdateRequestor;
   instantiate cluster OperationalCredentials;
   instantiate cluster SoftwareDiagnostics;
@@ -1411,7 +1410,11 @@ endpoint 1 {
 }
 
 endpoint 2 {
-  instantiate cluster OnOff;
   instantiate cluster OnOffSwitchConfiguration;
 }
 
+
+client clusters {
+  uses cluster OtaSoftwareUpdateProvider;
+  uses cluster OnOff;
+}

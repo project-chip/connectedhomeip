@@ -365,3 +365,6 @@ endpoint 0 {
   instantiate cluster UserLabel;
 }
 
+
+client clusters {
+}

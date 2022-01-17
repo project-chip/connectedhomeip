@@ -1786,20 +1786,16 @@ endpoint 0 {
   instantiate cluster AdministratorCommissioning;
   instantiate cluster Basic;
   instantiate cluster Binding;
-  instantiate cluster Binding;
   instantiate cluster Descriptor;
   instantiate cluster DiagnosticLogs;
   instantiate cluster EthernetNetworkDiagnostics;
   instantiate cluster FixedLabel;
   instantiate cluster GeneralCommissioning;
-  instantiate cluster GeneralCommissioning;
   instantiate cluster GeneralDiagnostics;
   instantiate cluster GroupKeyManagement;
   instantiate cluster LocalizationConfiguration;
   instantiate cluster NetworkCommissioning;
-  instantiate cluster NetworkCommissioning;
   instantiate cluster OtaSoftwareUpdateProvider;
-  instantiate cluster OperationalCredentials;
   instantiate cluster OperationalCredentials;
   instantiate cluster RelativeHumidityMeasurement;
   instantiate cluster SoftwareDiagnostics;
@@ -1847,3 +1843,10 @@ endpoint 5 {
   instantiate cluster Descriptor;
 }
 
+
+client clusters {
+  uses cluster Binding;
+  uses cluster GeneralCommissioning;
+  uses cluster NetworkCommissioning;
+  uses cluster OperationalCredentials;
+}

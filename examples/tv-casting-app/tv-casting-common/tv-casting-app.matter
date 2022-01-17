@@ -2481,17 +2481,11 @@ endpoint 0 {
 }
 
 endpoint 1 {
-  instantiate cluster AccountLogin;
-  instantiate cluster ApplicationBasic;
-  instantiate cluster ApplicationLauncher;
-  instantiate cluster AudioOutput;
   instantiate cluster BarrierControl;
   instantiate cluster BinaryInputBasic;
   instantiate cluster Binding;
   instantiate cluster BridgedDeviceBasic;
-  instantiate cluster Channel;
   instantiate cluster ColorControl;
-  instantiate cluster ContentLauncher;
   instantiate cluster Descriptor;
   instantiate cluster DoorLock;
   instantiate cluster FixedLabel;
@@ -2499,16 +2493,12 @@ endpoint 1 {
   instantiate cluster Groups;
   instantiate cluster IasZone;
   instantiate cluster Identify;
-  instantiate cluster KeypadInput;
   instantiate cluster LevelControl;
-  instantiate cluster MediaInput;
-  instantiate cluster MediaPlayback;
   instantiate cluster OnOff;
   instantiate cluster PressureMeasurement;
   instantiate cluster RelativeHumidityMeasurement;
   instantiate cluster Scenes;
   instantiate cluster Switch;
-  instantiate cluster TargetNavigator;
   instantiate cluster TemperatureMeasurement;
   instantiate cluster TestCluster;
   instantiate cluster Thermostat;
@@ -2522,3 +2512,16 @@ endpoint 2 {
   instantiate cluster OnOff;
 }
 
+
+client clusters {
+  uses cluster AccountLogin;
+  uses cluster ApplicationBasic;
+  uses cluster ApplicationLauncher;
+  uses cluster AudioOutput;
+  uses cluster Channel;
+  uses cluster ContentLauncher;
+  uses cluster KeypadInput;
+  uses cluster MediaInput;
+  uses cluster MediaPlayback;
+  uses cluster TargetNavigator;
+}
