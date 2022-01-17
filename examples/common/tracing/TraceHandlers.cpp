@@ -101,12 +101,12 @@ std::string AsJsonKey(const std::string & key, const std::string & value, bool p
 
 std::string AsFirstJsonKey(const std::string & key, const std::string & value)
 {
-    return AsJsonKey(key, value, /* prepend_comma = */false);
+    return AsJsonKey(key, value, /* prepend_comma = */ false);
 }
 
 std::string AsNextJsonKey(const std::string & key, const std::string & value)
 {
-    return AsJsonKey(key, value, /* prepend_comma = */true);
+    return AsJsonKey(key, value, /* prepend_comma = */ true);
 }
 
 std::string AsJsonString(const std::string & value)
@@ -116,7 +116,7 @@ std::string AsJsonString(const std::string & value)
 
 std::string AsJsonString(const Transport::PeerAddress * peerAddress)
 {
-    char convBuf[Transport::PeerAddress::kMaxToStringSize] = {0};
+    char convBuf[Transport::PeerAddress::kMaxToStringSize] = { 0 };
 
     peerAddress->ToString(convBuf);
     return convBuf;
@@ -141,13 +141,13 @@ std::string PacketHeaderToJson(const PacketHeader * packetHeader)
 {
     std::string jsonBody;
 
-    uint32_t messageCounter = packetHeader->GetMessageCounter();
+    uint32_t messageCounter               = packetHeader->GetMessageCounter();
     const Optional<NodeId> & sourceNodeId = packetHeader->GetSourceNodeId();
-    const Optional<NodeId> & destNodeId = packetHeader->GetDestinationNodeId();
-    const Optional<GroupId> & groupId = packetHeader->GetDestinationGroupId();
-    uint16_t sessionId = packetHeader->GetSessionId();
-    uint8_t messageFlags = packetHeader->GetMessageFlags();
-    uint8_t securityFlags = packetHeader->GetSecurityFlags();
+    const Optional<NodeId> & destNodeId   = packetHeader->GetDestinationNodeId();
+    const Optional<GroupId> & groupId     = packetHeader->GetDestinationGroupId();
+    uint16_t sessionId                    = packetHeader->GetSessionId();
+    uint8_t messageFlags                  = packetHeader->GetMessageFlags();
+    uint8_t securityFlags                 = packetHeader->GetSecurityFlags();
 
     jsonBody += AsFirstJsonKey("msg_counter", std::to_string(messageCounter));
 
@@ -175,13 +175,13 @@ std::string PacketHeaderToJson(const PacketHeader * packetHeader)
 
 std::string PayloadHeaderToJson(const PayloadHeader * payloadHeader)
 {
-    uint16_t exchangeId = payloadHeader->GetExchangeID();
-    uint32_t protocolId = payloadHeader->GetProtocolID().ToFullyQualifiedSpecForm();
-    uint8_t protocolOpcode = payloadHeader->GetMessageType();
+    uint16_t exchangeId                                   = payloadHeader->GetExchangeID();
+    uint32_t protocolId                                   = payloadHeader->GetProtocolID().ToFullyQualifiedSpecForm();
+    uint8_t protocolOpcode                                = payloadHeader->GetMessageType();
     const Optional<uint32_t> & acknowledgedMessageCounter = payloadHeader->GetAckMessageCounter();
-    bool isInitiator = payloadHeader->IsInitiator();
-    bool needsAck = payloadHeader->NeedsAck();
-    uint8_t exchangeFlags = payloadHeader->GetExhangeFlags();
+    bool isInitiator                                      = payloadHeader->IsInitiator();
+    bool needsAck                                         = payloadHeader->NeedsAck();
+    uint8_t exchangeFlags                                 = payloadHeader->GetExhangeFlags();
 
     std::string jsonBody;
 
@@ -208,7 +208,7 @@ bool SecureMessageSentHandler(const TraceEventFields & eventFields, TraceHandler
     }
 
     const auto * eventData = reinterpret_cast<const TraceSecureMessageSentData *>(eventFields.dataBuffer);
-    std::string jsonBody = "{";
+    std::string jsonBody   = "{";
     jsonBody += PacketHeaderToJson(eventData->packetHeader);
     jsonBody += ", ";
     jsonBody += PayloadHeaderToJson(eventData->payloadHeader);
@@ -219,7 +219,7 @@ bool SecureMessageSentHandler(const TraceEventFields & eventFields, TraceHandler
     jsonBody += "}";
 
     TraceOutput * sink = context->sink;
-    sink->StartEvent(std::string{kTraceMessageEvent} + "." + kTraceMessageSentDataFormat);
+    sink->StartEvent(std::string{ kTraceMessageEvent } + "." + kTraceMessageSentDataFormat);
     sink->AddField("json", jsonBody);
     sink->FinishEvent();
 
@@ -248,7 +248,7 @@ bool SecureMessageReceivedHandler(const TraceEventFields & eventFields, TraceHan
     jsonBody += "}";
 
     TraceOutput * sink = context->sink;
-    sink->StartEvent(std::string{kTraceMessageEvent} + "." + kTraceMessageReceivedDataFormat);
+    sink->StartEvent(std::string{ kTraceMessageEvent } + "." + kTraceMessageReceivedDataFormat);
     sink->AddField("json", jsonBody);
     sink->FinishEvent();
 
@@ -266,11 +266,11 @@ bool TraceDefaultHandler(const TraceEventFields & eventFields, void * context)
         return false;
     }
 
-    if (std::string{eventFields.dataFormat} == kTraceMessageSentDataFormat)
+    if (std::string{ eventFields.dataFormat } == kTraceMessageSentDataFormat)
     {
         return SecureMessageSentHandler(eventFields, ourContext);
     }
-    else if (std::string{eventFields.dataFormat} == kTraceMessageReceivedDataFormat)
+    else if (std::string{ eventFields.dataFormat } == kTraceMessageReceivedDataFormat)
     {
         return SecureMessageReceivedHandler(eventFields, ourContext);
     }
