@@ -29,6 +29,9 @@ namespace chip {
  * The connection is managed by the stack and peer_device is guaranteed to be available.
  * The application shall decide the content to be sent to the peer.
  *
+ * For unicast bindings peer_device will be a connected peer and group will be empty.
+ * For multicast bindings peer_device will be nullptr.
+ *
  * E.g. The application will send on/off commands to peer for the OnOff cluster.
  *
  */
