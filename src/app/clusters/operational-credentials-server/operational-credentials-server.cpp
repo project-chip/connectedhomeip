@@ -46,6 +46,9 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <string.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 using namespace chip;
 using namespace ::chip::DeviceLayer;
@@ -58,6 +61,17 @@ namespace {
 
 constexpr uint8_t kDACCertificate = 1;
 constexpr uint8_t kPAICertificate = 2;
+
+#ifdef ENABLE_HSM_EC_KEY
+class OpCred_P256Keypair : public Crypto::P256KeypairHSM
+{
+public:
+    OpCred_P256Keypair() { SetKeyId(CASE_OPS_KEY); provisioned_key = true;}
+};
+#else
+using OpCred_P256Keypair = Crypto::P256Keypair;
+#endif
+
 
 class OperationalCredentialsAttrAccess : public AttributeAccessInterface
 {
@@ -642,7 +656,7 @@ bool emberAfOperationalCredentialsClusterOpCSRRequestCallback(app::CommandHandle
 
     // Prepare NOCSRElements structure
     {
-        Crypto::P256Keypair keypair;
+        OpCred_P256Keypair keypair;
         size_t csrLength           = Crypto::kMAX_CSR_Length;
         size_t nocsrLengthEstimate = 0;
         ByteSpan kNoVendorReserved;

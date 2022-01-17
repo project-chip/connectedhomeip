@@ -43,6 +43,9 @@
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/TimeUtils.h>
 #include <protocols/Protocols.h>
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
 
 namespace chip {
 namespace Credentials {
@@ -54,6 +57,12 @@ using namespace chip::Crypto;
 
 extern CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData);
 extern CHIP_ERROR DecodeECDSASignature(TLVReader & reader, ChipCertificateData & certData);
+
+#ifdef ENABLE_HSM_EC_KEY
+using chipCert_P256PublicKey = P256PublicKeyHSM;
+#else
+using chipCert_P256PublicKey = P256PublicKey;
+#endif
 
 ChipCertificateSet::ChipCertificateSet()
 {
@@ -282,7 +291,7 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
 
 CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert)
 {
-    P256PublicKey caPublicKey;
+    chipCert_P256PublicKey caPublicKey;
     P256ECDSASignature signature;
 
     VerifyOrReturnError((cert != nullptr) && (caCert != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
