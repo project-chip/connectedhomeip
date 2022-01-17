@@ -12,9 +12,10 @@
 #include <lib/support/BitFlags.h>
 #include <protocols/interaction_model/Constants.h>
 #include <app-common/zap-generated/enums.h>
-#include <app-common/zap-generated/ids/Commands.h>
-#include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app-common/zap-generated/ids/Commands.h>
+#include <app-common/zap-generated/ids/Events.h>
 
 namespace chip {
 namespace app {
@@ -187,7 +188,6 @@ namespace Events {
 {{/first}}
 namespace {{asUpperCamelCase name}} {
 static constexpr PriorityLevel kPriorityLevel = PriorityLevel::{{asUpperCamelCase priority}};
-static constexpr EventId kEventId = {{asMEI manufacturerCode code}};
 
 enum class Fields {
     {{#zcl_event_fields}}
@@ -199,7 +199,7 @@ struct Type
 {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::{{asUpperCamelCase name}}::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_event_fields}}
@@ -212,7 +212,7 @@ public:
 struct DecodableType {
 public:
     static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
-    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr EventId GetEventId() { return Events::{{asUpperCamelCase name}}::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_event_fields}}
