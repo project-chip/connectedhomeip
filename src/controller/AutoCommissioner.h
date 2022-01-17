@@ -35,8 +35,9 @@ public:
     void CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
 private:
-    CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage);
+    CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR lastErr);
     Optional<System::Clock::Timeout> GetCommandTimeout(CommissioningStage stage);
+
     DeviceCommissioner * mCommissioner;
     CommissioneeDeviceProxy * mCommissioneeDeviceProxy = nullptr;
     OperationalDeviceProxy * mOperationalDeviceProxy   = nullptr;

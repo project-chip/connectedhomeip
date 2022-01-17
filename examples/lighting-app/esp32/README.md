@@ -9,6 +9,7 @@ This example demonstrates the Matter Lighting application on ESP platforms.
     -   [Building the Example Application](#building-the-example-application)
     -   [Commissioning over BLE using chip-tool](#commissioning-over-ble-using-chip-tool)
     -   [Cluster Control](#cluster-control)
+-   [Steps to Try Lighting app OTA Requestor](#steps-to-try-lighting-app-ota-requestor)
 
 ---
 
@@ -122,3 +123,41 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
     control the color attributes:
 
         $ ./out/debug/chip-tool colorcontrol move-to-hue-and-saturation 240 100 0 0 0 12345 1
+
+# Steps to Try Lighting app OTA Requestor
+
+Before moving ahead, make sure your device is commissioned and running.
+
+-   Build the Linux OTA Provider
+
+```
+scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
+```
+
+-   Run the Linux OTA Provider with OTA image.
+
+```
+./out/debug/chip-ota-provider-app -f hello-world.bin
+```
+
+hello-world.bin can be obtained from compiling the hello-world ESP-IDF example.
+
+-   Provision the Linux OTA Provider using chip-tool
+
+```
+./out/debug/chip-tool pairing onnetwork 12345 20202021
+```
+
+## Query for an OTA Image
+
+After commissioning is successful, press Enter in requestor device console and
+type below query.
+
+```
+>matter ota query 1 12345 0
+```
+
+## Apply update
+
+Once transfer is complete, reboot the device manually to boot from upgraded OTA
+image.

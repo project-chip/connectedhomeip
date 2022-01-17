@@ -43,6 +43,7 @@
 #include <app-common/zap-generated/attributes/Accessors.h>
 #include <app/util/af-event.h>
 #include <app/util/af.h>
+#include <app/util/util.h>
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
@@ -155,11 +156,29 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
             emberAfOnOffClusterPrintln("ERR: writing on/off %x", status);
             return status;
         }
+
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+        // If initiatedByLevelChange is false, then we assume that the level change
+        // ZCL stuff has not happened and we do it here
+        if (!initiatedByLevelChange && emberAfContainsServer(endpoint, LevelControl::Id))
+        {
+            emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
+        }
+#endif
     }
     else // Set Off
     {
         emberAfOnOffClusterPrintln("Off Command - OnTime :  0");
         Attributes::OnTime::Set(endpoint, 0); // Reset onTime
+
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
+        // If initiatedByLevelChange is false, then we assume that the level change
+        // ZCL stuff has not happened and we do it here
+        if (!initiatedByLevelChange && emberAfContainsServer(endpoint, LevelControl::Id))
+        {
+            emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
+        }
+#endif
 
         // write the new on/off value
         status = Attributes::OnOff::Set(endpoint, newValue);
@@ -194,7 +213,7 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
 
 void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
 {
-#ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
     // StartUp behavior relies on OnOff and StartUpOnOff attributes being non-volatile.
     if (areStartUpOnOffServerAttributesNonVolatile(endpoint))
     {
@@ -222,7 +241,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
         {
             // Initialise updated value to 0
             bool updatedOnOff = 0;
-            status            = Attributes::OnOff::Get(endpoint, &udpateOnOff);
+            status            = Attributes::OnOff::Get(endpoint, &updatedOnOff);
             if (status == EMBER_ZCL_STATUS_SUCCESS)
             {
                 switch (startUpOnOff)
@@ -247,7 +266,7 @@ void OnOffServer::initOnOffServer(chip::EndpointId endpoint)
             }
         }
     }
-#endif
+#endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
     emberAfPluginOnOffClusterServerPostInitCallback(endpoint);
 }
 
@@ -481,28 +500,17 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
     }
 }
 
-#ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
 bool OnOffServer::areStartUpOnOffServerAttributesNonVolatile(EndpointId endpoint)
 {
-    EmberAfAttributeMetadata * metadata;
-
-    metadata = emberAfLocateAttributeMetadata(endpoint, OnOff::Id, Attributes::OnOff::Id, CLUSTER_MASK_SERVER,
-                                              EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!metadata->IsNonVolatile())
+    if (emberAfIsNonVolatileAttribute(endpoint, OnOff::Id, Attributes::OnOff::Id, true))
     {
-        return false;
+        return emberAfIsNonVolatileAttribute(endpoint, LevelControl::Id, Attributes::StartUpOnOff::Id, true);
     }
 
-    metadata = emberAfLocateAttributeMetadata(endpoint, OnOff::Id, Attributes::StartUpOnOff::Id, CLUSTER_MASK_SERVER,
-                                              EMBER_AF_NULL_MANUFACTURER_CODE);
-    if (!metadata->IsNonVolatile())
-    {
-        return false;
-    }
-
-    return true;
+    return false;
 }
-#endif // ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#endif // IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
 
 /**
  * @brief event control object for an endpoint

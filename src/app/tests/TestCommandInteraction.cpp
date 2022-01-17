@@ -542,12 +542,18 @@ void TestCommandInteraction::TestCommandHandlerWithSendSimpleStatusCode(nlTestSu
 
 void TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+    CHIP_ERROR err    = CHIP_NO_ERROR;
     app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
+    TestExchangeDelegate delegate;
+    commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
+
     GenerateInvokeRequest(apSuite, apContext, commandDatabuf, true /*aNeedCommandData*/, /* aIsTimedRequest = */ false);
     err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
+
+    ChipLogDetail(DataManagement, "###################################### %s", err.AsString());
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -570,6 +576,7 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistComman
 
 void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(nlTestSuite * apSuite, void * apContext)
 {
+    TestContext & ctx  = *static_cast<TestContext *>(apContext);
     bool allBooleans[] = { true, false };
     for (auto messageIsTimed : allBooleans)
     {
@@ -579,19 +586,13 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(n
             app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
             System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
+            TestExchangeDelegate delegate;
+            commandHandler.mpExchangeCtx = ctx.NewExchangeToAlice(&delegate);
+
             chip::isCommandDispatched = false;
-
             GenerateInvokeRequest(apSuite, apContext, commandDatabuf, false /*aNeedCommandData*/, messageIsTimed);
-
             err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), transactionIsTimed);
-            if (messageIsTimed == transactionIsTimed)
-            {
-                NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && chip::isCommandDispatched);
-            }
-            else
-            {
-                NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR && !chip::isCommandDispatched);
-            }
+            NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && chip::isCommandDispatched == (messageIsTimed == transactionIsTimed));
         }
     }
 }
