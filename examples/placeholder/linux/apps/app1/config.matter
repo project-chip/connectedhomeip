@@ -710,8 +710,22 @@ server cluster TemperatureMeasurement = 1026 {
 
 
 endpoint 0 {
+  instantiate cluster Basic;
+  instantiate cluster Descriptor;
+  instantiate cluster GeneralCommissioning;
+  instantiate cluster NetworkCommissioning;
+  instantiate cluster OperationalCredentials;
+  instantiate cluster TemperatureMeasurement;
+  instantiate cluster TemperatureMeasurement;
 }
 
 endpoint 1 {
+  instantiate cluster Basic;
+  instantiate cluster ColorControl;
+  instantiate cluster Groups;
+  instantiate cluster Identify;
+  instantiate cluster LevelControl;
+  instantiate cluster OnOff;
+  instantiate cluster Scenes;
 }
 

@@ -79,9 +79,11 @@
 
 {{/all_user_clusters}}
 
-{{#user_endpoints}}
+{{#chip_endpoints}}
 endpoint {{endpointId}} {
-    {{!TODO: report device types and cluster instantionation. }}
+  {{#chip_endpoint_clusters}}
+  instantiate cluster {{asUpperCamelCase name}};
+  {{/chip_endpoint_clusters}}
 }
 
-{{/user_endpoints}}
+{{/chip_endpoints}}

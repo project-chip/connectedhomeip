@@ -1783,20 +1783,67 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 
 endpoint 0 {
+  instantiate cluster AdministratorCommissioning;
+  instantiate cluster Basic;
+  instantiate cluster Binding;
+  instantiate cluster Binding;
+  instantiate cluster Descriptor;
+  instantiate cluster DiagnosticLogs;
+  instantiate cluster EthernetNetworkDiagnostics;
+  instantiate cluster FixedLabel;
+  instantiate cluster GeneralCommissioning;
+  instantiate cluster GeneralCommissioning;
+  instantiate cluster GeneralDiagnostics;
+  instantiate cluster GroupKeyManagement;
+  instantiate cluster LocalizationConfiguration;
+  instantiate cluster NetworkCommissioning;
+  instantiate cluster NetworkCommissioning;
+  instantiate cluster OtaSoftwareUpdateProvider;
+  instantiate cluster OperationalCredentials;
+  instantiate cluster OperationalCredentials;
+  instantiate cluster RelativeHumidityMeasurement;
+  instantiate cluster SoftwareDiagnostics;
+  instantiate cluster ThreadNetworkDiagnostics;
+  instantiate cluster UserLabel;
+  instantiate cluster WiFiNetworkDiagnostics;
 }
 
 endpoint 1 {
+  instantiate cluster ApplicationLauncher;
+  instantiate cluster Channel;
+  instantiate cluster ContentLauncher;
+  instantiate cluster Descriptor;
+  instantiate cluster KeypadInput;
+  instantiate cluster LowPower;
+  instantiate cluster MediaInput;
+  instantiate cluster OnOff;
+  instantiate cluster TargetNavigator;
+  instantiate cluster WakeOnLan;
 }
 
 endpoint 2 {
+  instantiate cluster AudioOutput;
+  instantiate cluster Descriptor;
+  instantiate cluster LevelControl;
+  instantiate cluster OnOff;
 }
 
 endpoint 3 {
+  instantiate cluster AccountLogin;
+  instantiate cluster ApplicationBasic;
+  instantiate cluster ContentLauncher;
+  instantiate cluster Descriptor;
+  instantiate cluster MediaPlayback;
 }
 
 endpoint 4 {
+  instantiate cluster ApplicationBasic;
+  instantiate cluster ContentLauncher;
+  instantiate cluster Descriptor;
 }
 
 endpoint 5 {
+  instantiate cluster ApplicationBasic;
+  instantiate cluster Descriptor;
 }
 
