@@ -25,6 +25,7 @@
 #include "pw_trace_chip/trace_chip.h"
 #include "transport/TraceMessage.h"
 #include <lib/support/BytesToHex.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 // For `s` std::string literal suffix
@@ -119,7 +120,7 @@ std::string AsJsonString(const Transport::PeerAddress * peerAddress)
     char convBuf[Transport::PeerAddress::kMaxToStringSize] = { 0 };
 
     peerAddress->ToString(convBuf);
-    return convBuf;
+    return AsJsonString(convBuf);
 }
 
 std::string AsJsonBool(bool isTrue)
@@ -132,7 +133,10 @@ std::string AsJsonHexString(const uint8_t * buf, size_t bufLen)
     // Fill a string long enough for the hex conversion, that will be overwritten
     std::string hexBuf(2 * bufLen, '0');
 
-    Encoding::BytesToLowercaseHexBuffer(buf, bufLen, hexBuf.data(), hexBuf.size());
+    CHIP_ERROR status = Encoding::BytesToLowercaseHexBuffer(buf, bufLen, hexBuf.data(), hexBuf.size());
+
+    // Static conditions exist that should ensure never failing. Catch failure in an assert.
+    VerifyOrDie(status == CHIP_NO_ERROR);
 
     return AsJsonString(hexBuf);
 }
@@ -141,24 +145,25 @@ std::string PacketHeaderToJson(const PacketHeader * packetHeader)
 {
     std::string jsonBody;
 
-    uint32_t messageCounter               = packetHeader->GetMessageCounter();
-    const Optional<NodeId> & sourceNodeId = packetHeader->GetSourceNodeId();
-    const Optional<NodeId> & destNodeId   = packetHeader->GetDestinationNodeId();
-    const Optional<GroupId> & groupId     = packetHeader->GetDestinationGroupId();
-    uint16_t sessionId                    = packetHeader->GetSessionId();
-    uint8_t messageFlags                  = packetHeader->GetMessageFlags();
-    uint8_t securityFlags                 = packetHeader->GetSecurityFlags();
-
+    uint32_t messageCounter = packetHeader->GetMessageCounter();
     jsonBody += AsFirstJsonKey("msg_counter", std::to_string(messageCounter));
 
+    const Optional<NodeId> & sourceNodeId = packetHeader->GetSourceNodeId();
     if (sourceNodeId.HasValue())
     {
         jsonBody += AsNextJsonKey("source_node_id", std::to_string(sourceNodeId.Value()));
     }
 
-    if (packetHeader->IsValidGroupMsg() && groupId.HasValue())
+    uint16_t sessionId                  = packetHeader->GetSessionId();
+    const Optional<GroupId> & groupId   = packetHeader->GetDestinationGroupId();
+    const Optional<NodeId> & destNodeId = packetHeader->GetDestinationNodeId();
+    if (packetHeader->IsValidGroupMsg())
     {
-        jsonBody += AsNextJsonKey("group_id", std::to_string(groupId.Value()));
+        if (groupId.HasValue())
+        {
+            jsonBody += AsNextJsonKey("group_id", std::to_string(groupId.Value()));
+        }
+
         jsonBody += AsNextJsonKey("group_key_hash", std::to_string(sessionId));
     }
     else if (destNodeId.HasValue())
@@ -167,7 +172,11 @@ std::string PacketHeaderToJson(const PacketHeader * packetHeader)
     }
 
     jsonBody += AsNextJsonKey("session_id", std::to_string(sessionId));
+
+    uint8_t messageFlags = packetHeader->GetMessageFlags();
     jsonBody += AsNextJsonKey("msg_flags", std::to_string(messageFlags));
+
+    uint8_t securityFlags = packetHeader->GetSecurityFlags();
     jsonBody += AsNextJsonKey("security_flags", std::to_string(securityFlags));
 
     return jsonBody;
@@ -175,23 +184,28 @@ std::string PacketHeaderToJson(const PacketHeader * packetHeader)
 
 std::string PayloadHeaderToJson(const PayloadHeader * payloadHeader)
 {
-    uint16_t exchangeId                                   = payloadHeader->GetExchangeID();
-    uint32_t protocolId                                   = payloadHeader->GetProtocolID().ToFullyQualifiedSpecForm();
-    uint8_t protocolOpcode                                = payloadHeader->GetMessageType();
-    const Optional<uint32_t> & acknowledgedMessageCounter = payloadHeader->GetAckMessageCounter();
-    bool isInitiator                                      = payloadHeader->IsInitiator();
-    bool needsAck                                         = payloadHeader->NeedsAck();
-    uint8_t exchangeFlags                                 = payloadHeader->GetExhangeFlags();
 
     std::string jsonBody;
 
+    uint8_t exchangeFlags = payloadHeader->GetExhangeFlags();
     jsonBody += AsFirstJsonKey("exchange_flags", std::to_string(exchangeFlags));
+
+    uint16_t exchangeId = payloadHeader->GetExchangeID();
     jsonBody += AsNextJsonKey("exchange_id", std::to_string(exchangeId));
+
+    uint32_t protocolId = payloadHeader->GetProtocolID().ToFullyQualifiedSpecForm();
     jsonBody += AsNextJsonKey("protocol_id", std::to_string(protocolId));
+
+    uint8_t protocolOpcode = payloadHeader->GetMessageType();
     jsonBody += AsNextJsonKey("protocol_opcode", std::to_string(protocolOpcode));
+
+    bool isInitiator = payloadHeader->IsInitiator();
     jsonBody += AsNextJsonKey("is_initiator", AsJsonBool(isInitiator));
+
+    bool needsAck = payloadHeader->NeedsAck();
     jsonBody += AsNextJsonKey("is_ack_requested", AsJsonBool(needsAck));
 
+    const Optional<uint32_t> & acknowledgedMessageCounter = payloadHeader->GetAckMessageCounter();
     if (acknowledgedMessageCounter.HasValue())
     {
         jsonBody += AsNextJsonKey("acknowledged_msg_counter", std::to_string(acknowledgedMessageCounter.Value()));
