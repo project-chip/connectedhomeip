@@ -708,7 +708,6 @@ server cluster TemperatureMeasurement = 1026 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
   instantiate cluster Basic;
   instantiate cluster Descriptor;
@@ -727,7 +726,6 @@ endpoint 1 {
   instantiate cluster OnOff;
   instantiate cluster Scenes;
 }
-
 
 client clusters {
   uses cluster TemperatureMeasurement;

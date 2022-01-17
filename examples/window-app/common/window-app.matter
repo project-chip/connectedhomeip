@@ -835,7 +835,6 @@ server cluster WindowCovering = 258 {
   command UpOrOpen(): DefaultSuccess = 0;
 }
 
-
 endpoint 0 {
   instantiate cluster AdministratorCommissioning;
   instantiate cluster Basic;
@@ -864,7 +863,6 @@ endpoint 2 {
   instantiate cluster Descriptor;
   instantiate cluster WindowCovering;
 }
-
 
 client clusters {
 }

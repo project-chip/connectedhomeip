@@ -1781,7 +1781,6 @@ server cluster WiFiNetworkDiagnostics = 54 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
   instantiate cluster AdministratorCommissioning;
   instantiate cluster Basic;
@@ -1842,7 +1841,6 @@ endpoint 5 {
   instantiate cluster ApplicationBasic;
   instantiate cluster Descriptor;
 }
-
 
 client clusters {
   uses cluster Binding;

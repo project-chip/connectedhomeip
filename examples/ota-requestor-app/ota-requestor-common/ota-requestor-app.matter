@@ -465,7 +465,6 @@ server cluster UserLabel = 65 {
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
   instantiate cluster Basic;
   instantiate cluster FixedLabel;
@@ -476,7 +475,6 @@ endpoint 0 {
   instantiate cluster OperationalCredentials;
   instantiate cluster UserLabel;
 }
-
 
 client clusters {
   uses cluster OtaSoftwareUpdateProvider;

@@ -354,7 +354,6 @@ server cluster UserLabel = 65 {
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
   instantiate cluster FixedLabel;
   instantiate cluster GeneralCommissioning;
@@ -364,7 +363,6 @@ endpoint 0 {
   instantiate cluster OperationalCredentials;
   instantiate cluster UserLabel;
 }
-
 
 client clusters {
 }

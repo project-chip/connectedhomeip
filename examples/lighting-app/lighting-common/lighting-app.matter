@@ -1379,7 +1379,6 @@ server cluster WiFiNetworkDiagnostics = 54 {
   command ResetCounts(): DefaultSuccess = 0;
 }
 
-
 endpoint 0 {
   instantiate cluster AdministratorCommissioning;
   instantiate cluster Basic;
@@ -1412,7 +1411,6 @@ endpoint 1 {
 endpoint 2 {
   instantiate cluster OnOffSwitchConfiguration;
 }
-
 
 client clusters {
   uses cluster OtaSoftwareUpdateProvider;

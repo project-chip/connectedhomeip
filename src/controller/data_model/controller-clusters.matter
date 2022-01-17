@@ -3314,10 +3314,8 @@ client cluster WindowCovering = 258 {
   command UpOrOpen(): DefaultSuccess = 0;
 }
 
-
 endpoint 1 {
 }
-
 
 client clusters {
   uses cluster AccessControl;

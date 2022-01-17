@@ -2457,7 +2457,6 @@ server cluster WindowCovering = 258 {
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
   instantiate cluster AdministratorCommissioning;
   instantiate cluster Basic;
@@ -2511,7 +2510,6 @@ endpoint 2 {
   instantiate cluster OccupancySensing;
   instantiate cluster OnOff;
 }
-
 
 client clusters {
   uses cluster AccountLogin;

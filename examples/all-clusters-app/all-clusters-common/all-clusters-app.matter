@@ -2997,7 +2997,6 @@ server cluster WindowCovering = 258 {
   command UpOrOpen(): DefaultSuccess = 0;
 }
 
-
 endpoint 0 {
   instantiate cluster AccessControl;
   instantiate cluster AdministratorCommissioning;
@@ -3080,7 +3079,6 @@ endpoint 2 {
   instantiate cluster OccupancySensing;
   instantiate cluster OnOff;
 }
-
 
 client clusters {
   uses cluster OtaSoftwareUpdateProvider;

@@ -893,7 +893,6 @@ server cluster UserLabel = 65 {
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
-
 endpoint 0 {
   instantiate cluster AdministratorCommissioning;
   instantiate cluster Basic;
@@ -919,7 +918,6 @@ endpoint 1 {
   instantiate cluster PumpConfigurationAndControl;
   instantiate cluster TemperatureMeasurement;
 }
-
 
 client clusters {
   uses cluster FlowMeasurement;

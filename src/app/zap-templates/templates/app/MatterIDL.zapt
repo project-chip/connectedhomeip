@@ -78,7 +78,6 @@
 }
 
 {{/all_user_clusters}}
-
 {{#chip_endpoints}}
 endpoint {{endpointId}} {
   {{#chip_endpoint_clusters}}
@@ -89,7 +88,6 @@ endpoint {{endpointId}} {
 }
 
 {{/chip_endpoints}}
-
 client clusters {
 {{#chip_client_clusters}}
   uses cluster {{asUpperCamelCase name}};
