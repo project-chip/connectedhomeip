@@ -21,17 +21,16 @@
 
 namespace chip {
 
-CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+CHIP_ERROR CASESessionManager::RetainSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                                             Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
     Dnssd::ResolvedNodeData resolutionData;
 
     bool nodeIDWasResolved = (mConfig.dnsCache != nullptr && mConfig.dnsCache->Lookup(peerId, resolutionData) == CHIP_NO_ERROR);
 
-    OperationalDeviceProxy * session = FindExistingSession(peerId);
+    OperationalDeviceProxy * session = mConfig.devicePool->Retain(peerId);
     if (session == nullptr)
     {
-        // TODO - Implement LRU to evict least recently used session to handle mActiveSessions pool exhaustion
         if (nodeIDWasResolved)
         {
             session = mConfig.devicePool->Allocate(mConfig.sessionInitParams, peerId, resolutionData);
@@ -63,7 +62,15 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(PeerId peerId, Callback::C
 
 void CASESessionManager::ReleaseSession(PeerId peerId)
 {
-    ReleaseSession(FindExistingSession(peerId));
+    mConfig.devicePool->Release(peerId);
+}
+
+void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session)
+{
+    if (session)
+    {
+        ReleaseSession(session->GetPeerId());
+    }
 }
 
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId)
@@ -119,12 +126,9 @@ OperationalDeviceProxy * CASESessionManager::FindExistingSession(PeerId peerId)
     return mConfig.devicePool->FindDevice(peerId);
 }
 
-void CASESessionManager::ReleaseSession(OperationalDeviceProxy * session)
+void CASESessionManager::Shutdown()
 {
-    if (session != nullptr)
-    {
-        mConfig.devicePool->Release(session);
-    }
+    mConfig.devicePool->ReleaseAll();
 }
 
 } // namespace chip

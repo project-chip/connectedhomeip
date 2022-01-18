@@ -245,6 +245,7 @@ CHIP_ERROR DeviceController::Shutdown()
     mDeviceDiscoveryDelegate     = nullptr;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
+    mCASESessionManager->Shutdown();
     chip::Platform::Delete(mCASESessionManager);
     mCASESessionManager = nullptr;
 
@@ -1637,7 +1638,7 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
 
     mDNSCache.Insert(nodeData);
 
-    mCASESessionManager->FindOrEstablishSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    mCASESessionManager->RetainSession(nodeData.mPeerId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     DeviceController::OnNodeIdResolved(nodeData);
 }
 

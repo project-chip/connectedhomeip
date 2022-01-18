@@ -278,8 +278,8 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
-    CHIP_ERROR err = mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderNodeId),
-                                                                 &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    CHIP_ERROR err = mCASESessionManager->RetainSession(fabricInfo->GetPeerIdForNode(mProviderNodeId), &mOnConnectedCallback,
+                                                        &mOnConnectionFailureCallback);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format()));
 }

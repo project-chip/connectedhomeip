@@ -257,6 +257,7 @@ void Server::Shutdown()
     mExchangeMgr.Shutdown();
     mSessions.Shutdown();
     mTransports.Close();
+    mCASESessionManager.Shutdown();
     mCommissioningWindowManager.Shutdown();
     chip::Platform::MemoryShutdown();
 }

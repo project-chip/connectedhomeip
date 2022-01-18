@@ -74,17 +74,42 @@ public:
     virtual ~CASESessionManager() { mDNSResolver.Shutdown(); }
 
     /**
-     * Find an existing session for the given node ID, or trigger a new session request.
+     * Retain an existing session for the given node ID, or trigger a new session request.
      * The caller can optionally provide `onConnection` and `onFailure` callback objects. If provided,
      * these will be used to inform the caller about successful or failed connection establishment.
      * If the connection is already established, the `onConnection` callback will be immediately called.
+     *
+     * The reference count of the session will be incremented and shall be released by ReleaseSession when
+     * no longer used.
+     *
      */
-    CHIP_ERROR FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+    CHIP_ERROR RetainSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                             Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
+    /**
+     * Finds an existing session for the given node ID.
+     * The reference count of the session won't be modified and the session can be closed by other clients
+     * if not retained explicitly.
+     *
+     */
     OperationalDeviceProxy * FindExistingSession(PeerId peerId);
 
+    /*
+     * Releases a session for the given node ID.
+     *
+     * Decrements the reference count of the session. The session will be closed when the referece count
+     * becomes zero.
+     *
+     */
     void ReleaseSession(PeerId peerId);
+
+    /*
+     * Shutdown the object.
+     *
+     * All the sessions will be closed regardless of their current reference count.
+     *
+     */
+    void Shutdown();
 
     /**
      * This API triggers the DNS-SD resolution for the given node ID. The node ID will be looked up
