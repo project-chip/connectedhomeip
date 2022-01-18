@@ -78,6 +78,8 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Syst
 
     if (mTimedInvokeTimeoutMs.HasValue())
     {
+        VerifyOrExit(!isGroupCommand, err = CHIP_ERROR_INCORRECT_STATE);
+
         err = TimedRequest::Send(mpExchangeCtx, mTimedInvokeTimeoutMs.Value());
         SuccessOrExit(err);
         MoveToState(State::AwaitingTimedStatus);
