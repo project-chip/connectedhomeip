@@ -115,6 +115,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         //
         // Commands
         //
+        make_unique<ClusterCommand>(Id), //
         {{#chip_cluster_commands}}
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
         {{/chip_cluster_commands}}
@@ -125,6 +126,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#chip_server_cluster_attributes}}
         make_unique<ReadAttribute>(Id, "{{asDelimitedCommand (asUpperCamelCase name)}}", Attributes::{{asUpperCamelCase name}}::Id), //
         {{/chip_server_cluster_attributes}}
+        make_unique<WriteAttribute>(Id), //
         {{#chip_server_cluster_attributes}}
         {{! TODO: Various types (floats, structs) not supported here. }}
         {{#unless (isStrEqual chipCallback.name "Unsupported")}}
@@ -161,7 +163,9 @@ void registerClusterAny(Commands & commands)
     const char * clusterName = "Any";
 
     commands_list clusterCommands = {
+        make_unique<ClusterCommand>(),  //
         make_unique<ReadAttribute>(),   //
+        make_unique<WriteAttribute>(),  //
         make_unique<SubscribeAttribute>(), //
         make_unique<ReadEvent>(),       //
         make_unique<SubscribeEvent>(),     //
