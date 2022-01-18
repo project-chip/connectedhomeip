@@ -143,11 +143,54 @@ following command to scan all advertised Matter devices:
 chip-device-ctrl > ble-scan
 ```
 
-### Step 4: Connect to Matter accessory device over Bluetooth LE
+### Step 4: Set network pairing credentials
+
+You must provide the controller with network credentials that will be further used in the device commissioning procedure to configure the device with a network interface, such as Thread or Wi-Fi.
+
+#### Setting Thread network credentials
+
+1. Fetch and store the current Active Operational Dataset from the Thread Border Router. Depending on if the Thread Border Router is running on Docker or natively on Raspberry Pi, execute the following commands:
+
+    - For Docker:
+
+        ```
+        sudo docker exec -it otbr sh -c "sudo ot-ctl dataset active -x"
+        0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
+        Done
+        ```
+
+    - For native installation:
+
+        ```
+        sudo ot-ctl dataset active -x
+        0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
+        Done
+        ```
+
+    Matter specification does not define how the Thread or Wi-Fi credentials are
+    obtained by Controller. For example, for Thread, instead of fetching
+    datasets directly from the Thread Border Router, you might also use a
+    different out-of-band method.
+
+2. Set the previously obtained Active Operational Dataset as a hex-encoded value using the following command:
+
+    ```
+    chip-device-ctrl > set-pairing-thread-credential 0e080000000000010000000300001135060004001fffe0020811111111222222220708fd910d7c195b2158051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212550410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8
+    ```
+
+#### Setting Wi-Fi network credentials
+
+Assuming your Wi-Fi SSID is _TESTSSID_, and your Wi-Fi password is _P455W4RD_, set the credentials to the controller by executing the following command:
+
+```
+chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
+```
+
+### Step 5: Commission the Matter accessory device over Bluetooth LE
 
 The controller uses a 12-bit value called **discriminator** to discern between
-multiple commissionable device advertisements. Moreover, a 27-bit **PIN code**
-is used by the controller to authenticate in the device. You can find those
+multiple commissionable device advertisements, as well as a 27-bit **setup PIN code**
+to authenticate the device. You can find these
 values in the logging terminal of the device (for example, UART). For example:
 
 ```
@@ -173,128 +216,23 @@ with the following assumptions for the Matter accessory device:
 chip-device-ctrl > connect -ble 3840 20202021 1234
 ```
 
-You can skip the last parameter, that is the Node ID. If you skip it, the
-controller will assign it randomly. However, note the Node ID down, because it
+You can skip the last parameter, the Node ID, in the command. If you skip it, the
+controller will assign it randomly. In that case, note down the Node ID, because it
 is required later in the configuration process.
 
-At the end of the secure connection establishment, the Python controller prints
-the following log:
-
-```
-Secure Session to Device Established
-```
-
-This means that the PASE (Password-Authenticated Session Establishment) session
-using SPAKE2+ protocol is completed.
-
-### Step 5: Commission Matter accessory to the underlying network
-
-The main goal of the network commissioning step is to configure the device with
-a network interface, such as Thread or Wi-Fi. This process provides the device
-with network credentials.
-
-#### Commissioning a Thread device
-
-1. Fetch and store the current Active Operational Dataset and Extended PAN ID
-   from the Thread Border Router. Depending if Thread Border Router is running
-   on Docker or natively on Raspberry Pi, execute the following commands:
-
-    - For Docker:
-
-        ```
-        sudo docker exec -it otbr sh -c "sudo ot-ctl dataset active -x"
-        0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
-        Done
-
-        sudo docker exec -it otbr sh -c "sudo ot-ctl dataset extpanid”
-        4fe76e9a8b5edaf5
-        Done
-        ```
-
-    - For native installation:
-
-        ```
-        sudo ot-ctl dataset active -x
-        0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8
-        Done
-
-        sudo ot-ctl dataset extpanid
-        4fe76e9a8b5edaf5
-        Done
-        ```
-
-    Matter specification does not define how the Thread or Wi-Fi credentials are
-    obtained by Controller. For example, for Thread, instead of fetching
-    datasets directly from the Thread Border Router, you might also use a
-    different out-of-band method.
-
-2. Inject the previously obtained Active Operational Dataset as hex-encoded
-   value using ZCL Network Commissioning cluster:
-
-    > Each ZCL command has a following format:
-    > `zcl <Cluster> <Command> <Node Id> <Endpoint Id> <Group Id> [arguments]`
+After connecting the device over Bluetooth LE, the controller will go through the following stages:
+- Establishing a secure connection that completes the PASE (Password-Authenticated Session Establishment) session
+using SPAKE2+ protocol and results in printing the following log:
 
     ```
-    chip-device-ctrl > zcl NetworkCommissioning AddOrUpdateThreadNetwork 1234 0 0 operationalDataset=hex:0e080000000000010000000300001335060004001fffe002084fe76e9a8b5edaf50708fde46f999f0698e20510d47f5027a414ffeebaefa92285cc84fa030f4f70656e5468726561642d653439630102e49c0410b92f8c7fbb4f9f3e08492ee3915fbd2f0c0402a0fff8 breadcrumb=0
+    Secure Session to Device Established
     ```
+- Providing the device with a network interface using ZCL Network Commissioning cluster commands, and the network pairing credentials set in the previous step.
+- Discovering the IPv6 address of the Matter accessory using the SRP (Service Registration Protocol) for Thread devices, or the mDNS (Multicast
+Domain Name System) protocol for Wi-Fi or Ethernet devices. It results in printing log that indicates that the node address has been updated. The IPv6 address of the device is cached in the controller for later usage.
+- Closing the Bluetooth LE connection, as the commissioning process is finished and the Python CHIP controller is now using only the IPv6 traffic to reach the device.
 
-3. Enable Thread interface on the device by executing the following command with
-   `networkID` equal to Extended PAN Id of the Thread network:
-
-    ```
-    chip-device-ctrl > zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=hex:4fe76e9a8b5edaf5 breadcrumb=0
-    ```
-
-#### Commissioning a Wi-Fi device
-
-1. Assuming your Wi-Fi SSID is _TESTSSID_, and your Wi-Fi password is
-   _P455W4RD_, inject the credentials to the device by executing the following
-   command:
-
-    ```
-    chip-device-ctrl > zcl NetworkCommissioning AddOrUpdateWiFiNetwork 1234 0 0 ssid=str:TESTSSID credentials=str:P455W4RD breadcrumb=0
-    ```
-
-2. Enable the Wi-Fi interface on the device by executing the following command:
-
-    ```
-    chip-device-ctrl > zcl NetworkCommissioning ConnectNetwork 1234 0 0 networkID=str:TESTSSID breadcrumb=0
-    ```
-
-### Step 6: Close Bluetooth LE connection.
-
-After the Matter accessory device was provisioned with Thread or Wi-Fi
-credentials (or both), the commissioning process is finished. The Python CHIP
-controller is now using only the IPv6 traffic to reach the device, so you can
-close the Bluetooth LE connection. To close the connection, run the following
-command:
-
-```
-chip-device-ctrl > close-ble
-```
-
-### Step 7: Discover IPv6 address of the Matter accessory.
-
-The Matter controller must discover the IPv6 address of the node that it
-previously commissioned. Depending on the network type:
-
--   For Thread, the Matter accessory uses SRP (Service Registration Protocol) to
-    register its presence on the Thread Border Router’s SRP Server.
--   For Wi-Fi or Ethernet devices, the Matter accessory uses the mDNS (Multicast
-    Domain Name System) protocol.
-
-Assuming your Node ID is _1234_ (use the Node ID you noted down when you
-established the secure connection over Bluetooth LE)), run the following
-command:
-
-```
-chip-device-ctrl > resolve 1234
-```
-
-A notification in the log indicates that the node address has been updated. The
-IPv6 address of the device is cached in the controller for later usage.
-
-### Step 8: Control application ZCL clusters.
+### Step 6: Control application ZCL clusters.
 
 For the light bulb example, execute the following command to toggle the LED
 state:
@@ -310,7 +248,7 @@ value somewhere between 0 and 255.
 chip-device-ctrl > zcl LevelControl MoveToLevel 1234 1 0 level=50
 ```
 
-### Step 9: Read basic information out of the accessory.
+### Step 7: Read basic information out of the accessory.
 
 Every Matter accessory device supports a Basic Cluster, which maintains
 collection of attributes that a controller can obtain from a device, such as the
@@ -370,6 +308,22 @@ chip-device-ctrl > ble-scan
 2021-05-29 22:28:07,210 ChipBLEMgr   INFO     Adv Data        = 00000f5a234c4e
 2021-05-29 22:28:07,210 ChipBLEMgr   INFO
 2021-05-29 22:28:16,246 ChipBLEMgr   INFO     scanning stopped
+```
+
+### `set-pairing-thread-credential <threadOperationalDataset>`
+
+Provides the controller with Thread network credentials that will be used in the device commissioning procedure to configure the device with a Thread interface.
+
+```
+chip-device-ctrl > set-pairing-thread-credential 0e080000000000010000000300001135060004001fffe0020811111111222222220708fd910d7c195b2158051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212550410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8
+```
+
+### `set-pairing-wifi-credential <ssid> <credentials>`
+
+Provides the controller with Wi-Fi network credentials that will be used in the device commissioning procedure to configure the device with a Wi-Fi interface.
+
+```
+chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
 ```
 
 ### `connect -ip <address> <SetUpPinCode> [<nodeid>]`
