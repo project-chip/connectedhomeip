@@ -141,7 +141,7 @@ public class ChipDeviceController {
    * @param deviceId the ID of the node to be commissioned
    * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
    */
-  public void commissionDevice(long deviceId, NetworkCredentials networkCredentials) {
+  public void commissionDevice(long deviceId, @Nullable NetworkCredentials networkCredentials) {
     commissionDevice(deviceControllerPtr, deviceId, /* csrNonce= */ null, networkCredentials);
   }
 
@@ -155,7 +155,7 @@ public class ChipDeviceController {
    * @param networkCredentials the credentials (Wi-Fi or Thread) to be provisioned
    */
   public void commissionDevice(
-      long deviceId, @Nullable byte[] csrNonce, NetworkCredentials networkCredentials) {
+      long deviceId, @Nullable byte[] csrNonce, @Nullable NetworkCredentials networkCredentials) {
     commissionDevice(deviceControllerPtr, deviceId, csrNonce, networkCredentials);
   }
 
@@ -331,7 +331,7 @@ public class ChipDeviceController {
       long deviceControllerPtr,
       long deviceId,
       @Nullable byte[] csrNonce,
-      NetworkCredentials networkCredentials);
+      @Nullable NetworkCredentials networkCredentials);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
 

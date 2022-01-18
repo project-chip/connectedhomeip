@@ -187,8 +187,11 @@ JNI_METHOD(void, commissionDevice)
     ChipLogProgress(Controller, "commissionDevice() called");
 
     CommissioningParameters commissioningParams = CommissioningParameters();
-    err                                         = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
-    VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+    if (networkCredentials != nullptr)
+    {
+        err = wrapper->ApplyNetworkCredentials(commissioningParams, networkCredentials);
+        VerifyOrExit(err == CHIP_NO_ERROR, err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     if (csrNonce != nullptr)
     {
