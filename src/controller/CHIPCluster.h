@@ -59,6 +59,8 @@ public:
     CHIP_ERROR AssociateWithGroup(DeviceProxy * device, GroupId groupId);
 
     void Dissociate();
+    // Temporary function to set command timeout before we move over to InvokeCommand
+    // TODO: remove when we start using InvokeCommand everywhere
     void SetCommandTimeout(Optional<System::Clock::Timeout> timeout) { mTimeout = timeout; }
 
     ClusterId GetClusterId() const { return mClusterId; }
