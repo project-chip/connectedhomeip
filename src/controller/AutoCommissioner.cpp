@@ -43,7 +43,7 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     if (params.HasThreadOperationalDataset())
     {
         ByteSpan dataset = params.GetThreadOperationalDataset().Value();
-        if (dataset.size() > CommissioningParameters::kMaxCredentialsLen)
+        if (dataset.size() > CommissioningParameters::kMaxThreadDatasetLen)
         {
             ChipLogError(Controller, "Thread operational data set is too large");
             return CHIP_ERROR_INVALID_ARGUMENT;
