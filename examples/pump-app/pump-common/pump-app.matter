@@ -1114,6 +1114,7 @@ server cluster UserLabel = 65 {
 
 
 endpoint 0 {
+  instantiate cluster AccessControl;
   instantiate cluster AdministratorCommissioning;
   instantiate cluster Basic;
   instantiate cluster Descriptor;
@@ -1121,6 +1122,7 @@ endpoint 0 {
   instantiate cluster FixedLabel;
   instantiate cluster GeneralCommissioning;
   instantiate cluster GeneralDiagnostics;
+  instantiate cluster GroupKeyManagement;
   instantiate cluster LocalizationConfiguration;
   instantiate cluster NetworkCommissioning;
   instantiate cluster OperationalCredentials;
@@ -1133,11 +1135,15 @@ endpoint 1 {
   instantiate cluster Descriptor;
   instantiate cluster FlowMeasurement;
   instantiate cluster FlowMeasurement;
+  instantiate cluster Groups;
+  instantiate cluster Identify;
   instantiate cluster LevelControl;
+  instantiate cluster OccupancySensing;
   instantiate cluster OnOff;
   instantiate cluster PressureMeasurement;
   instantiate cluster PressureMeasurement;
   instantiate cluster PumpConfigurationAndControl;
+  instantiate cluster Scenes;
   instantiate cluster TemperatureMeasurement;
   instantiate cluster TemperatureMeasurement;
 }
