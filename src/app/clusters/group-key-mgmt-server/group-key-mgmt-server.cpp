@@ -161,8 +161,8 @@ private:
             while (iter->Next(mapping))
             {
                 GroupKeyManagement::Structs::GroupKeyMapStruct::Type key = { .fabricIndex   = fabric_index,
-                                                                    .groupId       = mapping.group_id,
-                                                                    .groupKeySetID = mapping.keyset_id };
+                                                                             .groupId       = mapping.group_id,
+                                                                             .groupKeySetID = mapping.keyset_id };
                 encoder.Encode(key);
             }
             iter->Release();
@@ -352,7 +352,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadCallback(
     }
 
     GroupKeyManagement::Commands::KeySetReadResponse::Type response;
-    response.groupKeySet.groupKeySetID  = keyset.keyset_id;
+    response.groupKeySet.groupKeySetID          = keyset.keyset_id;
     response.groupKeySet.groupKeySecurityPolicy = keyset.policy;
     // Keyset 0
     if (keyset.num_keys_used > 0)
