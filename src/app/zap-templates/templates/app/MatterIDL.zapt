@@ -37,9 +37,6 @@
     {{~else~}}
       readonly
     {{~/if~}}
-    {{~#if isReportableAttribute~}}
-      , reportable
-    {{~/if~}}
     ) {{type}} {{asLowerCamelCase name~}}
     {{~#if isList~}}
       []
