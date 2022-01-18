@@ -581,6 +581,8 @@ typedef void (*CHIPLevelControlClusterStartUpCurrentLevelAttributeCallbackType)(
     void *, chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo::DecodableArgType);
 typedef void (*CHIPLevelControlClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo::DecodableType &);
+typedef void (*CHIPLevelControlClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::LevelControl::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPLevelControlClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
