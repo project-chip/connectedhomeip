@@ -200,6 +200,10 @@ CHIP_ERROR WriteClient::CreateNewChunk()
     VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(writer->ReserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfRequestMessage));
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    ReturnErrorOnFailure(writer->ReserveBuffer(mReservedSize));
+#endif
+
     return CHIP_NO_ERROR;
 }
 

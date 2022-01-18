@@ -224,6 +224,10 @@ public:
     CHIP_ERROR FinishAttribute();
     TLV::TLVWriter * GetAttributeDataIBTLVWriter();
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    void SetWriterReserved(uint32_t aReservedSize) { mReservedSize = aReservedSize; }
+#endif
+
     /*
      * Destructor - as part of destruction, it will abort the exchange context
      * if a valid one still exists.
@@ -320,6 +324,7 @@ private:
 
     // A list of buffers, one buffer for each chunk.
     System::PacketBufferHandle mChunks;
+    uint32_t mReservedSize = 0;
 };
 
 } // namespace app
