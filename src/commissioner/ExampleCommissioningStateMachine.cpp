@@ -40,171 +40,173 @@ void StateFactory::SetCallbacks(OnSuccess onSuccess, OnFailure onFailure)
 
 chip::StateMachine::Optional<State> Transitions::operator()(const State & state, const Event & event)
 {
-    if (state.Is<Idle>() && event.Is<OnboardingPayload>())
+    if (state.Is<AppStates::Idle>() && event.Is<SdkEvents::RawOnboardingPayload>())
     {
-        return mFactory.CreateParsingOnboardingPayload(event.Get<OnboardingPayload>());
+        return mFactory.CreateParsingOnboardingPayload(event.Get<SdkEvents::RawOnboardingPayload>());
     }
-    else if ((state.Is<Idle>() || state.Is<ParsingOnboardingPayload>()) && event.Is<ParsedPayload>())
+    else if ((state.Is<AppStates::Idle>() || state.Is<SdkStates::ParsingOnboardingPayload>()) &&
+             event.Is<SdkEvents::OnboardingPayload>())
     {
         CHIP_ERROR err = mCtx.ScheduleTimeout(kCommissionableDiscoveryTimeout);
-        return err == CHIP_NO_ERROR ? mFactory.CreateCommissionableNodeDiscovery(event.Get<ParsedPayload>())
+        return err == CHIP_NO_ERROR ? mFactory.CreateCommissionableNodeDiscovery(event.Get<SdkEvents::OnboardingPayload>())
                                     : mFactory.CreateFailed();
     }
-    else if (state.Is<CommissionableNodeDiscovery>() && event.Is<Timeout>())
+    else if (state.Is<SdkStates::CommissionableNodeDiscovery>() && event.Is<AppEvents::Timeout>())
     {
-        return mFactory.CreateAbortingCommissionableDiscovery(state.Get<CommissionableNodeDiscovery>());
+        return mFactory.CreateAbortingCommissionableDiscovery(state.Get<SdkStates::CommissionableNodeDiscovery>());
     }
-    else if (state.Is<CommissionableNodeDiscovery>() && event.Is<Success>())
+    else if (state.Is<SdkStates::CommissionableNodeDiscovery>() && event.Is<SdkEvents::Success>())
     {
-        return mFactory.CreateInitiatingPase(state.Get<CommissionableNodeDiscovery>());
+        return mFactory.CreateInitiatingPase(state.Get<SdkStates::CommissionableNodeDiscovery>());
     }
-    else if (state.Is<AbortingCommissionableDiscovery>() && event.Is<Success>())
+    else if (state.Is<AppStates::AbortingCommissionableDiscovery>() && event.Is<SdkEvents::Success>())
     {
         return mFactory.CreateFailed();
     }
-    else if (state.Is<InitiatingPase>() && event.Is<Await>())
+    else if (state.Is<SdkStates::InitiatingPase>() && event.Is<SdkEvents::Await>())
     {
-        return mFactory.CreateAwaitingCommissionableDiscovery(state.Get<InitiatingPase>());
+        return mFactory.CreateAwaitingCommissionableDiscovery(state.Get<SdkStates::InitiatingPase>());
     }
-    else if (state.Is<InitiatingPase>() && event.Is<Timeout>())
+    else if (state.Is<SdkStates::InitiatingPase>() && event.Is<AppEvents::Timeout>())
     {
-        return mFactory.CreateFinishingPase(state.Get<InitiatingPase>());
+        return mFactory.CreateFinishingPase(state.Get<SdkStates::InitiatingPase>());
     }
-    else if (state.Is<InitiatingPase>() && event.Is<Success>())
+    else if (state.Is<SdkStates::InitiatingPase>() && event.Is<SdkEvents::Success>())
     {
         return mFactory.CreatePaseComplete();
     }
-    else if (state.Is<AwaitingCommissionableDiscovery>() && event.Is<Timeout>())
+    else if (state.Is<SdkStates::AwaitingCommissionableDiscovery>() && event.Is<AppEvents::Timeout>())
     {
-        return mFactory.CreateAbortingCommissionableDiscovery(state.Get<AwaitingCommissionableDiscovery>());
+        return mFactory.CreateAbortingCommissionableDiscovery(state.Get<SdkStates::AwaitingCommissionableDiscovery>());
     }
-    else if (state.Is<AwaitingCommissionableDiscovery>() && event.Is<Success>())
+    else if (state.Is<SdkStates::AwaitingCommissionableDiscovery>() && event.Is<SdkEvents::Success>())
     {
-        return mFactory.CreateInitiatingPase(state.Get<AwaitingCommissionableDiscovery>());
+        return mFactory.CreateInitiatingPase(state.Get<SdkStates::AwaitingCommissionableDiscovery>());
     }
-    else if (state.Is<FinishingPase>() && event.Is<Success>())
+    else if (state.Is<AppStates::FinishingPase>() && event.Is<SdkEvents::Success>())
     {
         this->mCtx.CancelTimeout();
         return mFactory.CreatePaseComplete();
     }
-    else if (state.Is<PaseComplete>() && event.Is<ArmFailSafe>())
+    else if (state.Is<AppStates::PaseComplete>() && event.Is<SdkEvents::ArmFailSafe>())
     {
-        return mFactory.CreateInvokingArmFailSafe(event.Get<ArmFailSafe>());
+        return mFactory.CreateInvokingArmFailSafe(event.Get<SdkEvents::ArmFailSafe>());
     }
-    else if (state.Is<InvokingArmFailSafe>() && event.Is<Success>())
+    else if (state.Is<SdkStates::InvokingArmFailSafe>() && event.Is<SdkEvents::Success>())
     {
         return mFactory.CreateFailSafeArmed();
     }
-    else if (state.Is<FailSafeArmed>() && event.Is<AttestationInformation>())
+    else if (state.Is<AppStates::FailSafeArmed>() && event.Is<SdkEvents::AttestationInformation>())
     {
-        return mFactory.CreateInvokingAttestationRequest(event.Get<AttestationInformation>());
+        return mFactory.CreateInvokingAttestationRequest(event.Get<SdkEvents::AttestationInformation>());
     }
-    else if (state.Is<InvokingAttestationRequest>() && event.Is<AttestationInformation>())
+    else if (state.Is<SdkStates::InvokingAttestationRequest>() && event.Is<SdkEvents::AttestationInformation>())
     {
-        return mFactory.CreateInvokingDacCertificateChainRequest(event.Get<AttestationInformation>());
+        return mFactory.CreateInvokingDacCertificateChainRequest(event.Get<SdkEvents::AttestationInformation>());
     }
-    else if (state.Is<InvokingDacCertificateChainRequest>() && event.Is<AttestationInformation>())
+    else if (state.Is<SdkStates::InvokingDacCertificateChainRequest>() && event.Is<SdkEvents::AttestationInformation>())
     {
-        return mFactory.CreateInvokingPaiCertificateChainRequest(event.Get<AttestationInformation>());
+        return mFactory.CreateInvokingPaiCertificateChainRequest(event.Get<SdkEvents::AttestationInformation>());
     }
-    else if (state.Is<InvokingPaiCertificateChainRequest>() && event.Is<AttestationInformation>())
+    else if (state.Is<SdkStates::InvokingPaiCertificateChainRequest>() && event.Is<SdkEvents::AttestationInformation>())
     {
-        return mFactory.CreateCapturingAttestationChallenge(event.Get<AttestationInformation>());
+        return mFactory.CreateCapturingAttestationChallenge(event.Get<SdkEvents::AttestationInformation>());
     }
-    else if (state.Is<CapturingAttestationChallenge>() && event.Is<AttestationInformation>())
+    else if (state.Is<SdkStates::CapturingAttestationChallenge>() && event.Is<SdkEvents::AttestationInformation>())
     {
-        return mFactory.CreateAttestationVerification(event.Get<AttestationInformation>());
+        return mFactory.CreateAttestationVerification(event.Get<SdkEvents::AttestationInformation>());
     }
-    else if (state.Is<AttestationVerification>() && event.Is<AttestationInformation>())
+    else if (state.Is<AppStates::AttestationVerification>() && event.Is<SdkEvents::AttestationInformation>())
     {
-        return mFactory.CreateAttestationVerified(event.Get<AttestationInformation>());
+        return mFactory.CreateAttestationVerified(event.Get<SdkEvents::AttestationInformation>());
     }
-    else if (state.Is<AttestationVerified>() && event.Is<NocsrInformation>())
+    else if (state.Is<AppStates::AttestationVerified>() && event.Is<SdkEvents::NocsrInformation>())
     {
-        return mFactory.CreateInvokingOpCSRRequest(event.Get<NocsrInformation>());
+        return mFactory.CreateInvokingOpCSRRequest(event.Get<SdkEvents::NocsrInformation>());
     }
-    else if (state.Is<InvokingOpCSRRequest>() && event.Is<NocsrInformation>())
+    else if (state.Is<SdkStates::InvokingOpCSRRequest>() && event.Is<SdkEvents::NocsrInformation>())
     {
-        return mFactory.CreateOpCSRResponseReceived(event.Get<NocsrInformation>());
+        return mFactory.CreateOpCSRResponseReceived(event.Get<SdkEvents::NocsrInformation>());
     }
-    else if (state.Is<OpCSRResponseReceived>() && event.Is<NocsrInformation>())
+    else if (state.Is<AppStates::OpCSRResponseReceived>() && event.Is<SdkEvents::NocsrInformation>())
     {
-        return mFactory.CreateSigningCertificates(event.Get<NocsrInformation>());
+        return mFactory.CreateSigningCertificates(event.Get<SdkEvents::NocsrInformation>());
     }
-    else if (state.Is<SigningCertificates>() && event.Is<OperationalCredentials>())
+    else if (state.Is<AppStates::SigningCertificates>() && event.Is<SdkEvents::OperationalCredentials>())
     {
-        return mFactory.CreateCertificatesSigned(event.Get<OperationalCredentials>());
+        return mFactory.CreateCertificatesSigned(event.Get<SdkEvents::OperationalCredentials>());
     }
-    else if (state.Is<CertificatesSigned>() && event.Is<OperationalCredentials>())
+    else if (state.Is<AppStates::CertificatesSigned>() && event.Is<SdkEvents::OperationalCredentials>())
     {
-        return mFactory.CreateInvokingAddTrustedRootCertificate(event.Get<OperationalCredentials>());
+        return mFactory.CreateInvokingAddTrustedRootCertificate(event.Get<SdkEvents::OperationalCredentials>());
     }
-    else if (state.Is<InvokingAddTrustedRootCertificate>() && event.Is<OperationalCredentials>())
+    else if (state.Is<SdkStates::InvokingAddTrustedRootCertificate>() && event.Is<SdkEvents::OperationalCredentials>())
     {
-        return mFactory.CreateInvokingAddNOC(event.Get<OperationalCredentials>());
+        return mFactory.CreateInvokingAddNOC(event.Get<SdkEvents::OperationalCredentials>());
     }
-    else if (state.Is<InvokingAddNOC>() && event.Is<OperationalCredentials>())
+    else if (state.Is<SdkStates::InvokingAddNOC>() && event.Is<SdkEvents::OperationalCredentials>())
     {
         return mFactory.CreateOpCredsWritten();
     }
-    else if (state.Is<OpCredsWritten>() && event.Is<InitiateNetworkConfiguration>())
+    else if (state.Is<AppStates::OpCredsWritten>() && event.Is<AppEvents::InitiateNetworkConfiguration>())
     {
         return mFactory.CreateReadingNetworkFeatureMap();
     }
-    else if (state.Is<OpCredsWritten>() && event.Is<SkipNetworkConfiguration>())
+    else if (state.Is<AppStates::OpCredsWritten>() && event.Is<AppEvents::SkipNetworkConfiguration>())
     {
         return mFactory.CreateNetworkEnabled();
     }
-    else if (state.Is<ReadingNetworkFeatureMap>() && event.Is<NetworkFeatureMap>())
+    else if (state.Is<SdkStates::ReadingNetworkFeatureMap>() && event.Is<SdkEvents::NetworkFeatureMap>())
     {
-        return mFactory.CreateNetworkFeatureMapRead(event.Get<NetworkFeatureMap>());
+        return mFactory.CreateNetworkFeatureMapRead(event.Get<SdkEvents::NetworkFeatureMap>());
     }
-    else if (state.Is<NetworkFeatureMapRead>() && event.Is<AddOrUpdateWiFiNetwork>())
+    else if (state.Is<AppStates::NetworkFeatureMapRead>() && event.Is<SdkEvents::AddOrUpdateWiFiNetwork>())
     {
-        return mFactory.CreateInvokingAddOrUpdateWiFiNetwork(event.Get<AddOrUpdateWiFiNetwork>());
+        return mFactory.CreateInvokingAddOrUpdateWiFiNetwork(event.Get<SdkEvents::AddOrUpdateWiFiNetwork>());
     }
-    else if (state.Is<NetworkFeatureMapRead>() && event.Is<AddOrUpdateThreadNetwork>())
+    else if (state.Is<AppStates::NetworkFeatureMapRead>() && event.Is<SdkEvents::AddOrUpdateThreadNetwork>())
     {
-        return mFactory.CreateInvokingAddOrUpdateThreadNetwork(event.Get<AddOrUpdateThreadNetwork>());
+        return mFactory.CreateInvokingAddOrUpdateThreadNetwork(event.Get<SdkEvents::AddOrUpdateThreadNetwork>());
     }
-    else if ((state.Is<InvokingAddOrUpdateWiFiNetwork>() || state.Is<InvokingAddOrUpdateThreadNetwork>()) && event.Is<NetworkId>())
+    else if ((state.Is<SdkStates::InvokingAddOrUpdateWiFiNetwork>() || state.Is<SdkStates::InvokingAddOrUpdateThreadNetwork>()) &&
+             event.Is<SdkEvents::NetworkId>())
     {
-        return mFactory.CreateNetworkAdded(event.Get<NetworkId>());
+        return mFactory.CreateNetworkAdded(event.Get<SdkEvents::NetworkId>());
     }
-    else if (state.Is<NetworkAdded>() && event.Is<NetworkId>())
+    else if (state.Is<AppStates::NetworkAdded>() && event.Is<SdkEvents::NetworkId>())
     {
-        return mFactory.CreateInvokingConnectNetwork(event.Get<NetworkId>());
+        return mFactory.CreateInvokingConnectNetwork(event.Get<SdkEvents::NetworkId>());
     }
-    else if (state.Is<InvokingConnectNetwork>() && event.Is<Success>())
+    else if (state.Is<SdkStates::InvokingConnectNetwork>() && event.Is<SdkEvents::Success>())
     {
         return mFactory.CreateNetworkEnabled();
     }
-    else if (state.Is<NetworkEnabled>() && event.Is<InitiateOperationalDiscovery>())
+    else if (state.Is<AppStates::NetworkEnabled>() && event.Is<AppEvents::InitiateOperationalDiscovery>())
     {
         return mFactory.CreateOperationalDiscovery();
     }
-    else if (state.Is<OperationalDiscovery>() && event.Is<OperationalRecord>())
+    else if (state.Is<SdkStates::OperationalDiscovery>() && event.Is<SdkEvents::OperationalRecord>())
     {
-        return mFactory.CreateInitiatingCase(event.Get<OperationalRecord>());
+        return mFactory.CreateInitiatingCase(event.Get<SdkEvents::OperationalRecord>());
     }
-    else if (state.Is<InitiatingCase>() && event.Is<Success>())
+    else if (state.Is<SdkStates::InitiatingCase>() && event.Is<SdkEvents::Success>())
     {
         return mFactory.CreateCaseComplete();
     }
-    else if (state.Is<CaseComplete>() && event.Is<InvokeCommissioningComplete>())
+    else if (state.Is<AppStates::CaseComplete>() && event.Is<AppEvents::InvokeCommissioningComplete>())
     {
         return mFactory.CreateInvokingCommissioningComplete();
     }
-    else if (state.Is<InvokingCommissioningComplete>() && event.Is<Success>())
+    else if (state.Is<SdkStates::InvokingCommissioningComplete>() && event.Is<SdkEvents::Success>())
     {
         return mFactory.CreateCommissioningComplete();
     }
-    else if (event.Is<Failure>())
+    else if (event.Is<SdkEvents::Failure>())
     {
         this->mCtx.CancelTimeout();
         return mFactory.CreateFailed();
     }
-    else if (event.Is<Shutdown>())
+    else if (event.Is<AppEvents::Shutdown>())
     {
         this->mCtx.CancelTimeout();
         return mFactory.CreateIdle();
@@ -230,24 +232,25 @@ void ExampleCommissioningStateMachine::Init(SystemState * systemState, OpCredsIs
 
 void ExampleCommissioningStateMachine::Shutdown()
 {
-    this->Dispatch(Event::Create<chip::Commissioner::ExampleCommissioningStateMachine::Shutdown>());
+    this->Dispatch(Event::Create<AppEvents::Shutdown>());
     mCommissionee.Shutdown();
 }
 
 CHIP_ERROR ExampleCommissioningStateMachine::Commission(Event event, OnSuccess onSuccess, OnFailure onFailure)
 {
-    if (!GetState().Is<Idle>())
+    if (!GetState().Is<AppStates::Idle>())
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
     mTransitions.mFactory.SetCallbacks(onSuccess, onFailure);
     this->Dispatch(event);
-    return GetState().Is<Idle>() ? CHIP_ERROR_INCORRECT_STATE : CHIP_NO_ERROR;
+    return GetState().Is<AppStates::Idle>() ? CHIP_ERROR_INCORRECT_STATE : CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ExampleCommissioningStateMachine::Commission(const char * onboardingPayload, OnSuccess onSuccess, OnFailure onFailure)
 {
-    return Commission(Event::Create<OnboardingPayload>(OnboardingPayload{ onboardingPayload }), onSuccess, onFailure);
+    return Commission(Event::Create<SdkEvents::RawOnboardingPayload>(SdkEvents::RawOnboardingPayload{ onboardingPayload }),
+                      onSuccess, onFailure);
 }
 
 CHIP_ERROR ExampleCommissioningStateMachine::Commission(chip::SetupPayload & onboardingPayload, OnSuccess onSuccess,
@@ -284,7 +287,7 @@ CHIP_ERROR ExampleCommissioningStateMachine::GrabCommissionee(chip::Controller::
 void ExampleCommissioningStateMachine::DispatchTimeout(System::Layer * aLayer, void * appState)
 {
     ExampleCommissioningStateMachine * instance = static_cast<ExampleCommissioningStateMachine *>(appState);
-    instance->Dispatch(Event::Create<Timeout>());
+    instance->Dispatch(Event::Create<AppEvents::Timeout>());
 }
 
 CHIP_ERROR ExampleCommissioningStateMachine::ScheduleTimeout(System::Clock::Timeout aDelay)

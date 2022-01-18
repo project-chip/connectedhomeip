@@ -35,29 +35,15 @@ public:
     virtual CHIP_ERROR CancelTimeout()                                = 0;
 };
 
-using SystemState   = chip::Controller::DeviceControllerSystemState;
-using Commissionee  = chip::Commissioner::Commissionee;
-using OpCredsIssuer = chip::Controller::OperationalCredentialsDelegate;
+using SystemState   = Controller::DeviceControllerSystemState;
+using OpCredsIssuer = Controller::OperationalCredentialsDelegate;
 using OnSuccess     = std::function<void(Commissionee &)>;
 using OnFailure     = std::function<void(Commissionee &)>;
 
-// SDK Events
-using Success                  = chip::Commissioner::Events::Success;
-using Failure                  = chip::Commissioner::Events::Failure;
-using Await                    = chip::Commissioner::Events::Await;
-using OnboardingPayload        = chip::Commissioner::Events::OnboardingPayload;
-using ParsedPayload            = chip::Platform::SharedPtr<chip::SetupPayload>;
-using ArmFailSafe              = chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type;
-using AttestationInformation   = chip::Commissioner::Events::AttestationInformation;
-using NocsrInformation         = chip::Commissioner::Events::NocsrInformation;
-using OperationalCredentials   = chip::Commissioner::Events::OperationalCredentials;
-using NetworkFeatureMap        = app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo::DecodableType;
-using AddOrUpdateWiFiNetwork   = app::Clusters::NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type;
-using AddOrUpdateThreadNetwork = app::Clusters::NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type;
-using NetworkId                = chip::Commissioner::Events::NetworkId;
-using OperationalRecord        = chip::Platform::SharedPtr<Dnssd::ResolvedNodeData>;
+namespace SdkEvents = Events;
 
-// App Events
+namespace AppEvents {
+
 struct Timeout
 {
 };
@@ -77,47 +63,57 @@ struct Shutdown
 {
 };
 
+} // namespace AppEvents
+
 // Variant Event definition
-using Event = chip::Variant<Success, Failure, Await, Timeout, OnboardingPayload, ParsedPayload, ArmFailSafe, AttestationInformation,
-                            NocsrInformation, OperationalCredentials, InitiateNetworkConfiguration, SkipNetworkConfiguration,
-                            NetworkFeatureMap, AddOrUpdateWiFiNetwork, AddOrUpdateThreadNetwork, NetworkId,
-                            InitiateOperationalDiscovery, OperationalRecord, InvokeCommissioningComplete, Shutdown>;
+using Event = chip::Variant<SdkEvents::Success, SdkEvents::Failure, SdkEvents::Await, SdkEvents::RawOnboardingPayload,
+                            SdkEvents::OnboardingPayload, SdkEvents::ArmFailSafe, SdkEvents::AttestationInformation,
+                            SdkEvents::NocsrInformation, SdkEvents::OperationalCredentials, SdkEvents::NetworkFeatureMap,
+                            SdkEvents::AddOrUpdateWiFiNetwork, SdkEvents::AddOrUpdateThreadNetwork, SdkEvents::NetworkId,
+                            SdkEvents::OperationalRecord,
+
+                            AppEvents::Timeout, AppEvents::InitiateNetworkConfiguration, AppEvents::SkipNetworkConfiguration,
+                            AppEvents::InitiateOperationalDiscovery, AppEvents::InvokeCommissioningComplete, AppEvents::Shutdown>;
 
 class Context : public chip::StateMachine::Context<Event>, public Timer
 {
 };
 
-// SDK States
-using ParsingOnboardingPayload           = chip::Commissioner::States::ParsingOnboardingPayload<Context>;
-using CommissionableNodeDiscovery        = chip::Commissioner::States::CommissionableNodeDiscovery<Context>;
-using AwaitingCommissionableDiscovery    = chip::Commissioner::States::AwaitingCommissionableDiscovery<Context>;
-using InitiatingPase                     = chip::Commissioner::States::PasscodeAuthenticatedSessionEstablishment<Context>;
-using InvokingArmFailSafe                = chip::Commissioner::States::InvokingArmFailSafe<Context>;
-using InvokingAttestationRequest         = chip::Commissioner::States::InvokingAttestationRequest<Context>;
-using InvokingDacCertificateChainRequest = chip::Commissioner::States::InvokingDacCertificateChainRequest<Context>;
-using InvokingPaiCertificateChainRequest = chip::Commissioner::States::InvokingPaiCertificateChainRequest<Context>;
-using CapturingAttestationChallenge      = chip::Commissioner::States::CapturingAttestationChallenge<Context>;
-using InvokingOpCSRRequest               = chip::Commissioner::States::InvokingOpCSRRequest<Context>;
-using InvokingAddTrustedRootCertificate  = chip::Commissioner::States::InvokingAddTrustedRootCertificate<Context>;
-using InvokingAddNOC                     = chip::Commissioner::States::InvokingAddNOC<Context>;
-using ReadingNetworkFeatureMap           = chip::Commissioner::States::ReadingNetworkCommissioningClusterFeatureMap<Context>;
-using InvokingAddOrUpdateWiFiNetwork     = chip::Commissioner::States::InvokingAddOrUpdateWiFiNetwork<Context>;
-using InvokingAddOrUpdateThreadNetwork   = chip::Commissioner::States::InvokingAddOrUpdateThreadNetwork<Context>;
-using InvokingConnectNetwork             = chip::Commissioner::States::InvokingConnectNetwork<Context>;
-using OperationalDiscovery               = chip::Commissioner::States::OperationalDiscovery<Context>;
-using InitiatingCase                     = chip::Commissioner::States::CertificateAuthenticatedSessionEstablishment<Context>;
-using InvokingCommissioningComplete      = chip::Commissioner::States::InvokingCommissioningComplete<Context>;
+namespace SdkStates {
 
-// App-Specific States
+using Base                               = States::Base<Context>;
+using ParsingOnboardingPayload           = States::ParsingOnboardingPayload<Context>;
+using CommissionableNodeDiscovery        = States::CommissionableNodeDiscovery<Context>;
+using AwaitingCommissionableDiscovery    = States::AwaitingCommissionableDiscovery<Context>;
+using InitiatingPase                     = States::PasscodeAuthenticatedSessionEstablishment<Context>;
+using InvokingArmFailSafe                = States::InvokingArmFailSafe<Context>;
+using InvokingAttestationRequest         = States::InvokingAttestationRequest<Context>;
+using InvokingDacCertificateChainRequest = States::InvokingDacCertificateChainRequest<Context>;
+using InvokingPaiCertificateChainRequest = States::InvokingPaiCertificateChainRequest<Context>;
+using CapturingAttestationChallenge      = States::CapturingAttestationChallenge<Context>;
+using InvokingOpCSRRequest               = States::InvokingOpCSRRequest<Context>;
+using InvokingAddTrustedRootCertificate  = States::InvokingAddTrustedRootCertificate<Context>;
+using InvokingAddNOC                     = States::InvokingAddNOC<Context>;
+using ReadingNetworkFeatureMap           = States::ReadingNetworkCommissioningClusterFeatureMap<Context>;
+using InvokingAddOrUpdateWiFiNetwork     = States::InvokingAddOrUpdateWiFiNetwork<Context>;
+using InvokingAddOrUpdateThreadNetwork   = States::InvokingAddOrUpdateThreadNetwork<Context>;
+using InvokingConnectNetwork             = States::InvokingConnectNetwork<Context>;
+using OperationalDiscovery               = States::OperationalDiscovery<Context>;
+using InitiatingCase                     = States::CertificateAuthenticatedSessionEstablishment<Context>;
+using InvokingCommissioningComplete      = States::InvokingCommissioningComplete<Context>;
 
-struct Idle : chip::Commissioner::States::Base<Context>
+} // namespace SdkStates
+
+namespace AppStates {
+
+struct Idle : SdkStates::Base
 {
-    Idle(Context & ctx, Commissionee & commissionee) : Base<Context>(ctx, commissionee, "Idle") {}
+    Idle(Context & ctx, Commissionee & commissionee) : Base(ctx, commissionee, "Idle") {}
 };
 
-struct AbortingCommissionableDiscovery : CommissionableNodeDiscovery
+struct AbortingCommissionableDiscovery : SdkStates::CommissionableNodeDiscovery
 {
-    AbortingCommissionableDiscovery(const CommissionableNodeDiscovery & previous) : CommissionableNodeDiscovery(previous)
+    AbortingCommissionableDiscovery(const SdkStates::CommissionableNodeDiscovery & previous) : CommissionableNodeDiscovery(previous)
     {
         this->mName = "AbortingCommissionableDiscovery";
     }
@@ -129,12 +125,15 @@ struct AbortingCommissionableDiscovery : CommissionableNodeDiscovery
 
 private:
     void OnDiscovery() {}
-    void OnDiscovererShutdown() { this->mCtx.Dispatch(Event::Create<Success>()); }
+    void OnDiscovererShutdown() { this->mCtx.Dispatch(Event::Create<SdkEvents::Success>()); }
 };
 
-struct FinishingPase : InitiatingPase
+struct FinishingPase : SdkStates::InitiatingPase
 {
-    FinishingPase(const InitiatingPase & previous) : InitiatingPase(previous) { this->mName = "FinishingPase"; }
+    FinishingPase(const SdkStates::InitiatingPase & previous) : SdkStates::InitiatingPase(previous)
+    {
+        this->mName = "FinishingPase";
+    }
 
     void Enter() { this->mPairing.get()->SetDelegate(this); }
     void OnSessionEstablishmentError(CHIP_ERROR error) override
@@ -142,31 +141,33 @@ struct FinishingPase : InitiatingPase
 #if CONFIG_NETWORK_LAYER_BLE
         this->mCommissionee.CloseBle();
 #endif
-        this->mCtx.Dispatch(Event::Create<Failure>());
+        this->mCtx.Dispatch(Event::Create<SdkEvents::Failure>());
     }
 };
 
-struct PaseComplete : chip::Commissioner::States::Base<Context>
+struct PaseComplete : SdkStates::Base
 {
-    PaseComplete(Context & ctx, Commissionee & commissionee) : Base<Context>(ctx, commissionee, "PaseComplete") {}
-    void Enter() { this->mCtx.Dispatch(Event::Create<ArmFailSafe>(ArmFailSafe{ 60 })); }
+    PaseComplete(Context & ctx, Commissionee & commissionee) : Base(ctx, commissionee, "PaseComplete") {}
+    void Enter() { this->mCtx.Dispatch(Event::Create<SdkEvents::ArmFailSafe>(SdkEvents::ArmFailSafe{ 60 })); }
 };
 
-struct FailSafeArmed : chip::Commissioner::States::Base<Context>
+struct FailSafeArmed : SdkStates::Base
 {
-    FailSafeArmed(Context & ctx, Commissionee & commissionee) : Base<Context>(ctx, commissionee, "FailSafeArmed") {}
+    FailSafeArmed(Context & ctx, Commissionee & commissionee) : Base(ctx, commissionee, "FailSafeArmed") {}
     void Enter()
     {
         uint8_t attestationNonce[chip::kAttestationNonceLength];
         chip::Crypto::DRBG_get_bytes(attestationNonce, sizeof(attestationNonce));
-        this->mCtx.Dispatch(Event::Create<AttestationInformation>(chip::ByteSpan(attestationNonce)));
+        this->mCtx.Dispatch(Event::Create<SdkEvents::AttestationInformation>(chip::ByteSpan(attestationNonce)));
     }
 };
 
-struct AttestationVerification : chip::Commissioner::States::Base<Context>
+struct AttestationVerification : SdkStates::Base
 {
-    AttestationVerification(Context & ctx, Commissionee & commissionee, AttestationInformation & attestationInformation) :
-        Base<Context>(ctx, commissionee, "AttestationVerification"), mAttestationInformation(attestationInformation)
+    AttestationVerification(Context & ctx, Commissionee & commissionee,
+                            SdkEvents::AttestationInformation & attestationInformation) :
+        Base(ctx, commissionee, "AttestationVerification"),
+        mAttestationInformation(attestationInformation)
     {}
     void Enter()
     {
@@ -179,8 +180,8 @@ struct AttestationVerification : chip::Commissioner::States::Base<Context>
             mAttestationInformation.Nonce()->Get(), &callback);
     }
 
-    void DispatchSuccess() { this->mCtx.Dispatch(Event::Create<AttestationInformation>(mAttestationInformation)); }
-    void DispatchFailure() { this->mCtx.Dispatch(Event::Create<Failure>()); }
+    void DispatchSuccess() { this->mCtx.Dispatch(Event::Create<SdkEvents::AttestationInformation>(mAttestationInformation)); }
+    void DispatchFailure() { this->mCtx.Dispatch(Event::Create<SdkEvents::Failure>()); }
 
 private:
     static void OnVerification(void * context, Credentials::AttestationVerificationResult result)
@@ -202,41 +203,41 @@ private:
         }
     }
 
-    AttestationInformation mAttestationInformation;
+    SdkEvents::AttestationInformation mAttestationInformation;
 };
 
-struct AttestationVerified : chip::Commissioner::States::Base<Context>
+struct AttestationVerified : SdkStates::Base
 {
-    AttestationVerified(Context & ctx, Commissionee & commissionee, AttestationInformation & attestationInformation) :
-        Base<Context>(ctx, commissionee, "AttestationVerified"), mAttestationInformation(attestationInformation)
+    AttestationVerified(Context & ctx, Commissionee & commissionee, SdkEvents::AttestationInformation & attestationInformation) :
+        Base(ctx, commissionee, "AttestationVerified"), mAttestationInformation(attestationInformation)
     {}
     void Enter()
     {
         uint8_t csrNonce[kOpCSRNonceLength];
         chip::Crypto::DRBG_get_bytes(csrNonce, sizeof(csrNonce));
-        this->mCtx.Dispatch(Event::Create<NocsrInformation>(mAttestationInformation, chip::ByteSpan(csrNonce)));
+        this->mCtx.Dispatch(Event::Create<SdkEvents::NocsrInformation>(mAttestationInformation, chip::ByteSpan(csrNonce)));
     }
 
 private:
-    AttestationInformation mAttestationInformation;
+    SdkEvents::AttestationInformation mAttestationInformation;
 };
 
-struct OpCSRResponseReceived : chip::Commissioner::States::Base<Context>
+struct OpCSRResponseReceived : SdkStates::Base
 {
-    OpCSRResponseReceived(Context & ctx, Commissionee & commissionee, NocsrInformation & nocsrInformation) :
-        Base<Context>(ctx, commissionee, "OpCSRResponseReceived"), mNocsrInformation(nocsrInformation)
+    OpCSRResponseReceived(Context & ctx, Commissionee & commissionee, SdkEvents::NocsrInformation & nocsrInformation) :
+        Base(ctx, commissionee, "OpCSRResponseReceived"), mNocsrInformation(nocsrInformation)
     {}
-    void Enter() { this->mCtx.Dispatch(Event::Create<NocsrInformation>(mNocsrInformation)); }
+    void Enter() { this->mCtx.Dispatch(Event::Create<SdkEvents::NocsrInformation>(mNocsrInformation)); }
 
 private:
-    NocsrInformation mNocsrInformation;
+    SdkEvents::NocsrInformation mNocsrInformation;
 };
 
-struct SigningCertificates : chip::Commissioner::States::Base<Context>
+struct SigningCertificates : SdkStates::Base
 {
-    SigningCertificates(Context & ctx, Commissionee & commissionee, NocsrInformation & nocsrInformation, OpCredsIssuer * issuer,
-                        FabricIndex fabricIndex, NodeId nodeId) :
-        Base<Context>(ctx, commissionee, "SigningCertificates"),
+    SigningCertificates(Context & ctx, Commissionee & commissionee, SdkEvents::NocsrInformation & nocsrInformation,
+                        OpCredsIssuer * issuer, FabricIndex fabricIndex, NodeId nodeId) :
+        Base(ctx, commissionee, "SigningCertificates"),
         mNocsrInformation(nocsrInformation), mIssuer(issuer), mFabricIndex(fabricIndex), mNodeId(nodeId)
     {}
     void Enter()
@@ -250,7 +251,7 @@ struct SigningCertificates : chip::Commissioner::States::Base<Context>
         FabricInfo * fabric = this->mCommissionee.mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
         if (fabric == nullptr)
         {
-            this->mCtx.Dispatch(Event::Create<Failure>());
+            this->mCtx.Dispatch(Event::Create<SdkEvents::Failure>());
             return;
         }
         mIssuer->SetFabricIdForNextNOCRequest(fabric->GetFabricId());
@@ -260,7 +261,7 @@ struct SigningCertificates : chip::Commissioner::States::Base<Context>
                                       mNocsrInformation.Dac()->Get(), mNocsrInformation.Pai()->Get(), chip::ByteSpan(), &callback);
         if (err != CHIP_NO_ERROR)
         {
-            this->mCtx.Dispatch(Event::Create<Failure>());
+            this->mCtx.Dispatch(Event::Create<SdkEvents::Failure>());
         }
     }
     void Dispatch(Event event) { this->mCtx.Dispatch(event); }
@@ -272,7 +273,7 @@ private:
 
         ChipLogProgress(Controller, "Received callback from the CA for NOC Chain generation. Status %s", ErrorStr(err));
         SigningCertificates * state = static_cast<SigningCertificates *>(context);
-        OperationalCredentials opCreds;
+        SdkEvents::OperationalCredentials opCreds;
         SuccessOrExit(err);
 
         {
@@ -301,57 +302,57 @@ private:
         if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Failed in generating device's operational credentials. Error %s", ErrorStr(err));
-            state->Dispatch(Event::Create<Failure>());
+            state->Dispatch(Event::Create<SdkEvents::Failure>());
         }
         else
         {
-            state->Dispatch(Event::Create<OperationalCredentials>(opCreds));
+            state->Dispatch(Event::Create<SdkEvents::OperationalCredentials>(opCreds));
         }
     }
 
-    NocsrInformation mNocsrInformation;
+    SdkEvents::NocsrInformation mNocsrInformation;
     OpCredsIssuer * mIssuer;
     FabricIndex mFabricIndex;
     NodeId mNodeId;
 };
 
-struct CertificatesSigned : chip::Commissioner::States::Base<Context>
+struct CertificatesSigned : SdkStates::Base
 {
-    CertificatesSigned(Context & ctx, Commissionee & commissionee, OperationalCredentials & opCreds) :
-        Base<Context>(ctx, commissionee, "CertificatesSigned"), mOpCreds(opCreds)
+    CertificatesSigned(Context & ctx, Commissionee & commissionee, SdkEvents::OperationalCredentials & opCreds) :
+        Base(ctx, commissionee, "CertificatesSigned"), mOpCreds(opCreds)
     {}
-    void Enter() { this->mCtx.Dispatch(Event::Create<OperationalCredentials>(mOpCreds)); }
+    void Enter() { this->mCtx.Dispatch(Event::Create<SdkEvents::OperationalCredentials>(mOpCreds)); }
 
 private:
-    OperationalCredentials mOpCreds;
+    SdkEvents::OperationalCredentials mOpCreds;
 };
 
-struct OpCredsWritten : chip::Commissioner::States::Base<Context>
+struct OpCredsWritten : SdkStates::Base
 {
-    OpCredsWritten(Context & ctx, Commissionee & commissionee) : Base<Context>(ctx, commissionee, "OpCredsWritten") {}
+    OpCredsWritten(Context & ctx, Commissionee & commissionee) : Base(ctx, commissionee, "OpCredsWritten") {}
     void Enter()
     {
         if (!this->mCommissionee.mCommissionableNodeAddress.HasValue())
         {
-            this->mCtx.Dispatch(Event::Create<Failure>());
+            this->mCtx.Dispatch(Event::Create<SdkEvents::Failure>());
         }
         else if (this->mCommissionee.mCommissionableNodeAddress.Value().GetTransportType() == Transport::Type::kTcp ||
                  this->mCommissionee.mCommissionableNodeAddress.Value().GetTransportType() == Transport::Type::kUdp)
         {
-            this->mCtx.Dispatch(Event::Create<SkipNetworkConfiguration>());
+            this->mCtx.Dispatch(Event::Create<AppEvents::SkipNetworkConfiguration>());
         }
         else
         {
-            this->mCtx.Dispatch(Event::Create<InitiateNetworkConfiguration>());
+            this->mCtx.Dispatch(Event::Create<AppEvents::InitiateNetworkConfiguration>());
         }
     };
 };
 
-struct NetworkFeatureMapRead : chip::Commissioner::States::Base<Context>
+struct NetworkFeatureMapRead : SdkStates::Base
 {
-    NetworkFeatureMapRead(Context & ctx, Commissionee & commissionee, NetworkFeatureMap featureMap, ByteSpan operationalDataset,
-                          ByteSpan ssid, ByteSpan wiFiCredentials) :
-        Base<Context>(ctx, commissionee, "NetworkFeatureMapRead"),
+    NetworkFeatureMapRead(Context & ctx, Commissionee & commissionee, SdkEvents::NetworkFeatureMap featureMap,
+                          ByteSpan operationalDataset, ByteSpan ssid, ByteSpan wiFiCredentials) :
+        Base(ctx, commissionee, "NetworkFeatureMapRead"),
         mFeatureMap(featureMap), mOperationalDataset(operationalDataset), mSsid(ssid), mWiFiCredentials(wiFiCredentials)
     {}
     void Enter()
@@ -365,56 +366,58 @@ struct NetworkFeatureMapRead : chip::Commissioner::States::Base<Context>
         ChipLogDetail(Controller, "Network Feature Map = 0x%08" PRIX32, mFeatureMap);
         if (mSsid.size())
         {
-            this->mCtx.Dispatch(Event::Create<AddOrUpdateWiFiNetwork>(AddOrUpdateWiFiNetwork{ mSsid, mWiFiCredentials }));
+            this->mCtx.Dispatch(
+                Event::Create<SdkEvents::AddOrUpdateWiFiNetwork>(SdkEvents::AddOrUpdateWiFiNetwork{ mSsid, mWiFiCredentials }));
         }
         else if (mOperationalDataset.size())
         {
-            this->mCtx.Dispatch(Event::Create<AddOrUpdateThreadNetwork>(AddOrUpdateThreadNetwork{ mOperationalDataset }));
+            this->mCtx.Dispatch(
+                Event::Create<SdkEvents::AddOrUpdateThreadNetwork>(SdkEvents::AddOrUpdateThreadNetwork{ mOperationalDataset }));
         }
         else
         {
             // We should only arrive in this state if the commissionee was not
             // located on an IP network.  In such cases, we need to configure a
             // WiFi or Thread network.  If we can't, that's a failure.
-            this->mCtx.Dispatch(Event::Create<Failure>());
+            this->mCtx.Dispatch(Event::Create<SdkEvents::Failure>());
         }
     };
 
 private:
-    NetworkFeatureMap mFeatureMap;
+    SdkEvents::NetworkFeatureMap mFeatureMap;
     ByteSpan mOperationalDataset;
     ByteSpan mSsid;
     ByteSpan mWiFiCredentials;
 };
 
-struct NetworkAdded : chip::Commissioner::States::Base<Context>
+struct NetworkAdded : SdkStates::Base
 {
-    NetworkAdded(Context & ctx, Commissionee & commissionee, NetworkId networkId) :
-        Base<Context>(ctx, commissionee, "NetworkAdded"), mNetworkId(networkId)
+    NetworkAdded(Context & ctx, Commissionee & commissionee, SdkEvents::NetworkId networkId) :
+        Base(ctx, commissionee, "NetworkAdded"), mNetworkId(networkId)
     {}
-    void Enter() { this->mCtx.Dispatch(Event::Create<NetworkId>(mNetworkId)); }
+    void Enter() { this->mCtx.Dispatch(Event::Create<SdkEvents::NetworkId>(mNetworkId)); }
 
 private:
-    NetworkId mNetworkId;
+    SdkEvents::NetworkId mNetworkId;
 };
 
-struct NetworkEnabled : chip::Commissioner::States::Base<Context>
+struct NetworkEnabled : SdkStates::Base
 
 {
     NetworkEnabled(Context & ctx, Commissionee & commissionee) : Base<Context>(ctx, commissionee, "NetworkEnabled") {}
-    void Enter() { this->mCtx.Dispatch(Event::Create<InitiateOperationalDiscovery>()); }
+    void Enter() { this->mCtx.Dispatch(Event::Create<AppEvents::InitiateOperationalDiscovery>()); }
 };
 
-struct CaseComplete : chip::Commissioner::States::Base<Context>
+struct CaseComplete : SdkStates::Base
 {
     CaseComplete(Context & ctx, Commissionee & commissionee) : Base<Context>(ctx, commissionee, "CaseComplete") {}
-    void Enter() { this->mCtx.Dispatch(Event::Create<InvokeCommissioningComplete>()); }
+    void Enter() { this->mCtx.Dispatch(Event::Create<AppEvents::InvokeCommissioningComplete>()); }
 };
 
-struct CommissioningComplete : chip::Commissioner::States::Base<Context>
+struct CommissioningComplete : SdkStates::Base
 {
     CommissioningComplete(Context & ctx, Commissionee & commissionee, OnSuccess onSuccess) :
-        Base<Context>(ctx, commissionee, "CommissioningComplete"), mOnSuccess(onSuccess)
+        Base(ctx, commissionee, "CommissioningComplete"), mOnSuccess(onSuccess)
     {}
     void Enter()
     {
@@ -428,11 +431,11 @@ private:
     OnSuccess mOnSuccess;
 };
 
-struct Failed : chip::Commissioner::States::Base<Context>
+struct Failed : SdkStates::Base
 
 {
     Failed(Context & ctx, Commissionee & commissionee, OnFailure onFailure) :
-        Base<Context>(ctx, commissionee, "Failed"), mOnFailure(onFailure)
+        Base(ctx, commissionee, "Failed"), mOnFailure(onFailure)
     {}
     void Enter()
     {
@@ -446,15 +449,23 @@ private:
     OnFailure mOnFailure;
 };
 
+} // namespace AppStates
+
 // Variant State definition
 using State = chip::StateMachine::VariantState<
-    Idle, ParsingOnboardingPayload, CommissionableNodeDiscovery, AwaitingCommissionableDiscovery, AbortingCommissionableDiscovery,
-    InitiatingPase, FinishingPase, PaseComplete, InvokingArmFailSafe, FailSafeArmed, InvokingAttestationRequest,
-    InvokingDacCertificateChainRequest, InvokingPaiCertificateChainRequest, CapturingAttestationChallenge, AttestationVerification,
-    AttestationVerified, InvokingOpCSRRequest, OpCSRResponseReceived, SigningCertificates, CertificatesSigned,
-    InvokingAddTrustedRootCertificate, InvokingAddNOC, OpCredsWritten, ReadingNetworkFeatureMap, NetworkFeatureMapRead,
-    InvokingAddOrUpdateWiFiNetwork, InvokingAddOrUpdateThreadNetwork, NetworkAdded, InvokingConnectNetwork, NetworkEnabled,
-    OperationalDiscovery, InitiatingCase, CaseComplete, InvokingCommissioningComplete, CommissioningComplete, Failed>;
+    SdkStates::ParsingOnboardingPayload, SdkStates::CommissionableNodeDiscovery, SdkStates::AwaitingCommissionableDiscovery,
+    SdkStates::InitiatingPase, SdkStates::InvokingArmFailSafe, SdkStates::InvokingAttestationRequest,
+    SdkStates::InvokingDacCertificateChainRequest, SdkStates::InvokingPaiCertificateChainRequest,
+    SdkStates::CapturingAttestationChallenge, SdkStates::InvokingOpCSRRequest, SdkStates::InvokingAddTrustedRootCertificate,
+    SdkStates::InvokingAddNOC, SdkStates::ReadingNetworkFeatureMap, SdkStates::InvokingAddOrUpdateWiFiNetwork,
+    SdkStates::InvokingAddOrUpdateThreadNetwork, SdkStates::InvokingConnectNetwork, SdkStates::OperationalDiscovery,
+    SdkStates::InitiatingCase, SdkStates::InvokingCommissioningComplete,
+
+    AppStates::Idle, AppStates::AbortingCommissionableDiscovery, AppStates::FinishingPase, AppStates::PaseComplete,
+    AppStates::FailSafeArmed, AppStates::AttestationVerification, AppStates::AttestationVerified, AppStates::OpCSRResponseReceived,
+    AppStates::SigningCertificates, AppStates::CertificatesSigned, AppStates::OpCredsWritten, AppStates::NetworkFeatureMapRead,
+    AppStates::NetworkAdded, AppStates::NetworkEnabled, AppStates::CaseComplete, AppStates::CommissioningComplete,
+    AppStates::Failed>;
 
 class StateFactory
 {
@@ -465,149 +476,149 @@ public:
     void SetCallbacks(OnSuccess onSuccess, OnFailure onFailure);
 
     // clang-format off
-    auto CreateIdle()
+    auto CreateParsingOnboardingPayload(SdkEvents::RawOnboardingPayload payload)
     {
-        return State::Create<Idle>(mCtx, mCommissionee);
+        return State::Create<SdkStates::ParsingOnboardingPayload>(mCtx, mCommissionee, payload);
     }
-    auto CreateParsingOnboardingPayload(OnboardingPayload payload)
+    auto CreateCommissionableNodeDiscovery(SdkEvents::OnboardingPayload payload)
     {
-        return State::Create<ParsingOnboardingPayload>(mCtx, mCommissionee, payload);
+        return State::Create<SdkStates::CommissionableNodeDiscovery>(mCtx, mCommissionee, payload);
     }
-    auto CreateCommissionableNodeDiscovery(ParsedPayload payload)
+    auto CreateAwaitingCommissionableDiscovery(const SdkStates::CommissionableNodeDiscovery & previous)
     {
-        return State::Create<CommissionableNodeDiscovery>(mCtx, mCommissionee, payload);
+        return State::Create<SdkStates::AwaitingCommissionableDiscovery>(previous);
     }
-    auto CreateAwaitingCommissionableDiscovery(const CommissionableNodeDiscovery & previous)
+    auto CreateInitiatingPase(const SdkStates::CommissionableNodeDiscovery & previous)
     {
-        return State::Create<AwaitingCommissionableDiscovery>(previous);
+        return State::Create<SdkStates::InitiatingPase>(previous);
     }
-    auto CreateAbortingCommissionableDiscovery(const CommissionableNodeDiscovery & previous)
+    auto CreateInvokingArmFailSafe(SdkEvents::ArmFailSafe request)
     {
-        return State::Create<AbortingCommissionableDiscovery>(previous);
+        return State::Create<SdkStates::InvokingArmFailSafe>(mCtx, mCommissionee, request);
     }
-    auto CreateInitiatingPase(const CommissionableNodeDiscovery & previous)
+    auto CreateInvokingAttestationRequest(SdkEvents::AttestationInformation attestationInformation)
     {
-        return State::Create<InitiatingPase>(previous);
+        return State::Create<SdkStates::InvokingAttestationRequest>(mCtx, mCommissionee, attestationInformation);
     }
-    auto CreateFinishingPase(const InitiatingPase & previous)
+    auto CreateInvokingDacCertificateChainRequest(SdkEvents::AttestationInformation attestationInformation)
     {
-        return State::Create<FinishingPase>(previous);
+        return State::Create<SdkStates::InvokingDacCertificateChainRequest>(mCtx, mCommissionee, attestationInformation);
     }
-    auto CreatePaseComplete()
+    auto CreateInvokingPaiCertificateChainRequest(SdkEvents::AttestationInformation attestationInformation)
     {
-        return State::Create<PaseComplete>(mCtx, mCommissionee);
+        return State::Create<SdkStates::InvokingPaiCertificateChainRequest>(mCtx, mCommissionee, attestationInformation);
     }
-    auto CreateInvokingArmFailSafe(ArmFailSafe request)
+    auto CreateCapturingAttestationChallenge(SdkEvents::AttestationInformation attestationInformation)
     {
-        return State::Create<InvokingArmFailSafe>(mCtx, mCommissionee, request);
+        return State::Create<SdkStates::CapturingAttestationChallenge>(mCtx, mCommissionee, attestationInformation);
     }
-    auto CreateFailSafeArmed()
+    auto CreateInvokingOpCSRRequest(SdkEvents::NocsrInformation nocsrInformation)
     {
-        return State::Create<FailSafeArmed>(mCtx, mCommissionee);
+        return State::Create<SdkStates::InvokingOpCSRRequest>(mCtx, mCommissionee, nocsrInformation);
     }
-    auto CreateInvokingAttestationRequest(AttestationInformation attestationInformation)
+    auto CreateInvokingAddTrustedRootCertificate(SdkEvents::OperationalCredentials opCreds)
     {
-        return State::Create<InvokingAttestationRequest>(mCtx, mCommissionee, attestationInformation);
+        return State::Create<SdkStates::InvokingAddTrustedRootCertificate>(mCtx, mCommissionee, opCreds);
     }
-    auto CreateInvokingDacCertificateChainRequest(AttestationInformation attestationInformation)
+    auto CreateInvokingAddNOC(SdkEvents::OperationalCredentials opCreds)
     {
-        return State::Create<InvokingDacCertificateChainRequest>(mCtx, mCommissionee, attestationInformation);
-    }
-    auto CreateInvokingPaiCertificateChainRequest(AttestationInformation attestationInformation)
-    {
-        return State::Create<InvokingPaiCertificateChainRequest>(mCtx, mCommissionee, attestationInformation);
-    }
-    auto CreateCapturingAttestationChallenge(AttestationInformation attestationInformation)
-    {
-        return State::Create<CapturingAttestationChallenge>(mCtx, mCommissionee, attestationInformation);
-    }
-    auto CreateAttestationVerification(AttestationInformation attestationInformation)
-    {
-        return State::Create<AttestationVerification>(mCtx, mCommissionee, attestationInformation);
-    }
-    auto CreateAttestationVerified(AttestationInformation attestationInformation)
-    {
-        return State::Create<AttestationVerified>(mCtx, mCommissionee, attestationInformation);
-    }
-    auto CreateInvokingOpCSRRequest(NocsrInformation nocsrInformation)
-    {
-        return State::Create<InvokingOpCSRRequest>(mCtx, mCommissionee, nocsrInformation);
-    }
-    auto CreateOpCSRResponseReceived(NocsrInformation nocsrInformation)
-    {
-        return State::Create<OpCSRResponseReceived>(mCtx, mCommissionee, nocsrInformation);
-    }
-    auto CreateSigningCertificates(NocsrInformation nocsrInformation)
-    {
-        return State::Create<SigningCertificates>(mCtx, mCommissionee, nocsrInformation, mIssuer, mFabricIndex, mNodeId);
-    }
-    auto CreateCertificatesSigned(OperationalCredentials opCreds)
-    {
-        return State::Create<CertificatesSigned>(mCtx, mCommissionee, opCreds);
-    }
-    auto CreateInvokingAddTrustedRootCertificate(OperationalCredentials opCreds)
-    {
-        return State::Create<InvokingAddTrustedRootCertificate>(mCtx, mCommissionee, opCreds);
-    }
-    auto CreateInvokingAddNOC(OperationalCredentials opCreds)
-    {
-        return State::Create<InvokingAddNOC>(mCtx, mCommissionee, opCreds);
-    }
-    auto CreateOpCredsWritten()
-    {
-        return State::Create<OpCredsWritten>(mCtx, mCommissionee);
+        return State::Create<SdkStates::InvokingAddNOC>(mCtx, mCommissionee, opCreds);
     }
     auto CreateReadingNetworkFeatureMap()
     {
-        return State::Create<ReadingNetworkFeatureMap>(mCtx, mCommissionee);
+        return State::Create<SdkStates::ReadingNetworkFeatureMap>(mCtx, mCommissionee);
     }
-    auto CreateNetworkFeatureMapRead(NetworkFeatureMap featureMap)
+    auto CreateInvokingAddOrUpdateWiFiNetwork(SdkEvents::AddOrUpdateWiFiNetwork request)
     {
-        return State::Create<NetworkFeatureMapRead>(mCtx, mCommissionee, featureMap, mOperationalDataset, mSsid, mWiFiCredentials);
+        return State::Create<SdkStates::InvokingAddOrUpdateWiFiNetwork>(mCtx, mCommissionee, request);
     }
-    auto CreateInvokingAddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetwork request)
+    auto CreateInvokingAddOrUpdateThreadNetwork(SdkEvents::AddOrUpdateThreadNetwork request)
     {
-        return State::Create<InvokingAddOrUpdateWiFiNetwork>(mCtx, mCommissionee, request);
+        return State::Create<SdkStates::InvokingAddOrUpdateThreadNetwork>(mCtx, mCommissionee, request);
     }
-    auto CreateInvokingAddOrUpdateThreadNetwork(AddOrUpdateThreadNetwork request)
+    auto CreateInvokingConnectNetwork(SdkEvents::NetworkId networkId)
     {
-        return State::Create<InvokingAddOrUpdateThreadNetwork>(mCtx, mCommissionee, request);
-    }
-    auto CreateNetworkAdded(NetworkId networkId)
-    {
-        return State::Create<NetworkAdded>(mCtx, mCommissionee, networkId);
-    }
-    auto CreateInvokingConnectNetwork(NetworkId networkId)
-    {
-        return State::Create<InvokingConnectNetwork>(mCtx, mCommissionee, networkId);
-    }
-    auto CreateNetworkEnabled()
-    {
-        return State::Create<NetworkEnabled>(mCtx, mCommissionee);
+        return State::Create<SdkStates::InvokingConnectNetwork>(mCtx, mCommissionee, networkId);
     }
     auto CreateOperationalDiscovery()
     {
-        return State::Create<OperationalDiscovery>(mCtx, mCommissionee);
+        return State::Create<SdkStates::OperationalDiscovery>(mCtx, mCommissionee);
     }
-    auto CreateInitiatingCase(OperationalRecord record)
+    auto CreateInitiatingCase(SdkEvents::OperationalRecord record)
     {
-        return State::Create<InitiatingCase>(mCtx, mCommissionee, record);
-    }
-    auto CreateCaseComplete()
-    {
-        return State::Create<CaseComplete>(mCtx, mCommissionee);
+        return State::Create<SdkStates::InitiatingCase>(mCtx, mCommissionee, record);
     }
     auto CreateInvokingCommissioningComplete()
     {
-        return State::Create<InvokingCommissioningComplete>(mCtx, mCommissionee);
+        return State::Create<SdkStates::InvokingCommissioningComplete>(mCtx, mCommissionee);
+    }
+    auto CreateIdle()
+    {
+        return State::Create<AppStates::Idle>(mCtx, mCommissionee);
+    }
+    auto CreateAbortingCommissionableDiscovery(const SdkStates::CommissionableNodeDiscovery & previous)
+    {
+        return State::Create<AppStates::AbortingCommissionableDiscovery>(previous);
+    }
+    auto CreateFinishingPase(const SdkStates::InitiatingPase & previous)
+    {
+        return State::Create<AppStates::FinishingPase>(previous);
+    }
+    auto CreatePaseComplete()
+    {
+        return State::Create<AppStates::PaseComplete>(mCtx, mCommissionee);
+    }
+    auto CreateFailSafeArmed()
+    {
+        return State::Create<AppStates::FailSafeArmed>(mCtx, mCommissionee);
+    }
+    auto CreateAttestationVerification(SdkEvents::AttestationInformation attestationInformation)
+    {
+        return State::Create<AppStates::AttestationVerification>(mCtx, mCommissionee, attestationInformation);
+    }
+    auto CreateAttestationVerified(SdkEvents::AttestationInformation attestationInformation)
+    {
+        return State::Create<AppStates::AttestationVerified>(mCtx, mCommissionee, attestationInformation);
+    }
+    auto CreateOpCSRResponseReceived(SdkEvents::NocsrInformation nocsrInformation)
+    {
+        return State::Create<AppStates::OpCSRResponseReceived>(mCtx, mCommissionee, nocsrInformation);
+    }
+    auto CreateSigningCertificates(SdkEvents::NocsrInformation nocsrInformation)
+    {
+        return State::Create<AppStates::SigningCertificates>(mCtx, mCommissionee, nocsrInformation, mIssuer, mFabricIndex, mNodeId);
+    }
+    auto CreateCertificatesSigned(SdkEvents::OperationalCredentials opCreds)
+    {
+        return State::Create<AppStates::CertificatesSigned>(mCtx, mCommissionee, opCreds);
+    }
+    auto CreateOpCredsWritten()
+    {
+        return State::Create<AppStates::OpCredsWritten>(mCtx, mCommissionee);
+    }
+    auto CreateNetworkFeatureMapRead(SdkEvents::NetworkFeatureMap featureMap)
+    {
+        return State::Create<AppStates::NetworkFeatureMapRead>(mCtx, mCommissionee, featureMap, mOperationalDataset, mSsid, mWiFiCredentials);
+    }
+    auto CreateNetworkAdded(SdkEvents::NetworkId networkId)
+    {
+        return State::Create<AppStates::NetworkAdded>(mCtx, mCommissionee, networkId);
+    }
+    auto CreateNetworkEnabled()
+    {
+        return State::Create<AppStates::NetworkEnabled>(mCtx, mCommissionee);
+    }
+    auto CreateCaseComplete()
+    {
+        return State::Create<AppStates::CaseComplete>(mCtx, mCommissionee);
     }
     auto CreateCommissioningComplete()
     {
-        return State::Create<CommissioningComplete>(mCtx, mCommissionee, mOnSuccess);
+        return State::Create<AppStates::CommissioningComplete>(mCtx, mCommissionee, mOnSuccess);
     }
     auto CreateFailed()
     {
-        return State::Create<Failed>(mCtx, mCommissionee, mOnFailure);
+        return State::Create<AppStates::Failed>(mCtx, mCommissionee, mOnFailure);
     }
     // clang-format on
 

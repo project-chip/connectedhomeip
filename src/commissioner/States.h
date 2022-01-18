@@ -50,15 +50,15 @@ protected:
 template <typename TContext>
 struct ParsingOnboardingPayload : Base<TContext>
 {
-    ParsingOnboardingPayload(TContext & ctx, Commissionee & commissionee, Events::OnboardingPayload & payload) :
+    ParsingOnboardingPayload(TContext & ctx, Commissionee & commissionee, Events::RawOnboardingPayload & payload) :
         Base<TContext>(ctx, commissionee, "ParsingOnboardingPayload"), mPayload(payload)
     {}
 
     void Enter()
     {
         CHIP_ERROR err;
-        bool isQRCode                            = strncmp(mPayload.mPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
-        Platform::SharedPtr<SetupPayload> parsed = Platform::MakeShared<SetupPayload>();
+        bool isQRCode = strncmp(mPayload.mPayload, kQRCodePrefix, strlen(kQRCodePrefix)) == 0;
+        auto parsed   = Platform::MakeShared<SetupPayload>();
         VerifyOrExit(parsed.get() != nullptr, err = CHIP_ERROR_NO_MEMORY);
         if (isQRCode)
         {
@@ -71,7 +71,7 @@ struct ParsingOnboardingPayload : Base<TContext>
     exit:
         if (err == CHIP_NO_ERROR)
         {
-            this->mCtx.Dispatch(TContext::Event::template Create<Platform::SharedPtr<SetupPayload>>(parsed));
+            this->mCtx.Dispatch(TContext::Event::template Create<decltype(parsed)>(parsed));
         }
         else
         {
@@ -80,13 +80,13 @@ struct ParsingOnboardingPayload : Base<TContext>
     }
 
 protected:
-    Events::OnboardingPayload mPayload;
+    Events::RawOnboardingPayload mPayload;
 };
 
 template <typename TContext>
 struct CommissionableNodeDiscovery : Base<TContext>, CommissionableNodeDiscoverer::Delegate
 {
-    CommissionableNodeDiscovery(TContext & ctx, Commissionee & commissionee, Platform::SharedPtr<SetupPayload> payload) :
+    CommissionableNodeDiscovery(TContext & ctx, Commissionee & commissionee, Events::OnboardingPayload payload) :
         Base<TContext>(ctx, commissionee, "CommissionableNodeDiscovery"), mPayload(payload)
     {}
 
@@ -108,7 +108,7 @@ protected:
     void OnDiscovery() override { this->mCtx.Dispatch(TContext::Event::template Create<Events::Success>()); }
     void OnShutdownComplete() override {}
 
-    Platform::SharedPtr<SetupPayload> mPayload;
+    Events::OnboardingPayload mPayload;
     Platform::SharedPtr<CommissionableNodeDiscoverer::Discoverer> mDiscoverer;
 };
 
