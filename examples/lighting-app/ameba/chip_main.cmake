@@ -10,15 +10,15 @@ set(list_chip_main_sources chip_main_sources)
 
 include(${prj_root}/GCC-RELEASE/project_hp/asdk/includepath.cmake)
 
-if (matter_enable_otar)
+if (matter_enable_ota_requestor)
 list(
     APPEND ${list_chip_main_sources}
-    #otar
+    #OTARequestor
     ${chip_dir}/src/app/clusters/ota-requestor/BDXDownloader.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/OTARequestor.cpp
     ${chip_dir}/src/app/clusters/ota-requestor/ota-requestor-server.cpp
 )
-endif (matter_enable_otar)
+endif (matter_enable_ota_requestor)
 
 list(
     APPEND ${list_chip_main_sources}
@@ -83,13 +83,13 @@ list(
     -DMBEDTLS_CONFIG_FILE=<mbedtls_config.h>
 )
 
-if (matter_enable_otar)
+if (matter_enable_ota_requestor)
 list(
     APPEND chip_main_flags
 
-    -DCONFIG_ENABLE_OTAR=1
+    -DCONFIG_ENABLE_OTA_REQUESTOR=1
 )
-endif (matter_enable_otar)
+endif (matter_enable_ota_requestor)
 
 list(
     APPEND chip_main_cpp_flags

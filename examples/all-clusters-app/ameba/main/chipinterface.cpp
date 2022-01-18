@@ -36,7 +36,7 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
 
-#if CONFIG_ENABLE_OTAR
+#if CONFIG_ENABLE_OTA_REQUESTOR
 #include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
 #include "platform/Ameba/AmebaOTAImageProcessor.h"
@@ -80,7 +80,7 @@ Identify gIdentify1 = {
 
 static DeviceCallbacks EchoCallbacks;
 
-#if CONFIG_ENABLE_OTAR
+#if CONFIG_ENABLE_OTA_REQUESTOR
 OTARequestor gRequestorCore;
 GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
@@ -200,7 +200,7 @@ std::string createSetupPayload()
     return result;
 };
 
-#if CONFIG_ENABLE_OTAR
+#if CONFIG_ENABLE_OTA_REQUESTOR
 void QueryImageTimerHandler(Layer * systemLayer, void * appState)
 {
     ChipLogProgress(DeviceLayer, "QueryImageTimerHandler");
@@ -253,7 +253,7 @@ static void InitOTARequestor(void)
 
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 }
-#endif // CONFIG_ENABLE_OTAR
+#endif // CONFIG_ENABLE_OTA_REQUESTOR
 
 extern "C" void ChipTest(void)
 {
@@ -299,7 +299,7 @@ extern "C" void ChipTest(void)
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
 
-#if CONFIG_ENABLE_OTAR
+#if CONFIG_ENABLE_OTA_REQUESTOR
     InitOTARequestor();
 #endif
 }

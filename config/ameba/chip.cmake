@@ -114,9 +114,9 @@ string(APPEND CHIP_GN_ARGS "pw_build_LINK_DEPS = [\"//third_party/connectedhomei
 endif (matter_enable_rpc)
 
 # Build ota-requestor
-if (matter_enable_otar)
+if (matter_enable_ota_requestor)
 string(APPEND CHIP_GN_ARGS "chip_enable_ota_requestor = true\n")
-endif (matter_enable_otar)
+endif (matter_enable_ota_requestor)
 
 file(GENERATE OUTPUT ${CHIP_OUTPUT}/args.gn CONTENT ${CHIP_GN_ARGS})
 
