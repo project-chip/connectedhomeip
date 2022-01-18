@@ -37,9 +37,9 @@
     {{~else~}}
       readonly
     {{~/if~}}
-    {{~#if isReportableAttribute~}}
-      , reportable
-    {{~/if~}}
+    {{~#unless isReportableAttribute~}}
+      , nosubscribe
+    {{~/unless~}}
     ) {{type}} {{asLowerCamelCase name~}}
     {{~#if isList~}}
       []
