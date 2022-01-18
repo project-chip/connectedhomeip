@@ -40,17 +40,24 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-#define APP_EVENT_QUEUE_SIZE 10
+#define FACTORY_RESET_TRIGGER_TIMEOUT 3000
+#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
-#define APP_WAIT_LOOP 1000
-
-LEDWidget sStatusLED;
-LEDWidget sLightLED;
+#define APP_TASK_PRIORITY 2
+#define APP_EVENT_QUEUE_SIZE 10
 
 namespace {
+TimerHandle_t sFunctionTimer; // FreeRTOS app sw timer.
 
 TaskHandle_t sAppTaskHandle;
 QueueHandle_t sAppEventQueue;
+
+LEDWidget sStatusLED;
+
+bool sIsWiFiStationProvisioned = false;
+bool sIsWiFiStationEnabled     = false;
+bool sIsWiFiStationConnected   = false;
+bool sHaveBLEConnections       = false;
 
 uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
 StaticQueue_t sAppEventQueueStruct;
@@ -74,6 +81,7 @@ CHIP_ERROR AppTask::StartAppTask()
         P6_LOG("Failed to allocate app event queue");
         appError(APP_ERROR_EVENT_QUEUE_FAILED);
     }
+
     // Start App task.
     sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
     return (sAppTaskHandle == nullptr) ? APP_ERROR_CREATE_TASK_FAILED : CHIP_NO_ERROR;
@@ -106,11 +114,24 @@ CHIP_ERROR AppTask::Init()
     // Initialise WSTK buttons PB0 and PB1 (including debounce).
     ButtonHandler::Init();
 
-    P6_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
+    // Create FreeRTOS sw timer for Function Selection.
+    sFunctionTimer = xTimerCreate("FnTmr",          // Just a text name, not used by the RTOS kernel
+                                  1,                // == default timer period (mS)
+                                  false,            // no timer reload (==one-shot)
+                                  (void *) this,    // init timer id = app task obj context
+                                  TimerEventHandler // timer callback handler
+    );
+    if (sFunctionTimer == NULL)
+    {
+        P6_LOG("funct timer create failed");
+        appError(APP_ERROR_CREATE_TIMER_FAILED);
+    }
+
+    P6_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
 
     // Initialize LEDs
     sStatusLED.Init(SYSTEM_STATE_LED);
-    sLightLED.Init(LIGHT_LED);
+    UpdateClusterState();
 
     ConfigurationMgr().LogDeviceConfig();
 
@@ -134,24 +155,61 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     while (true)
     {
-        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
-        while (eventReceived == pdTRUE)
+        BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, portMAX_DELAY);
+        if (eventReceived == pdTRUE)
         {
             sAppTask.DispatchEvent(&event);
-            eventReceived = xQueueReceive(sAppEventQueue, &event, 0);
         }
-    }
-}
 
-void AppTask::LightActionEventHandler(AppEvent * aEvent)
-{
-    /* ON/OFF Light Led based on Button interrupt */
-    sLightLED.Invert();
+        // Collect connectivity and configuration state from the CHIP stack. Because
+        // the CHIP event loop is being run in a separate task, the stack must be
+        // locked while these values are queried.  However we use a non-blocking
+        // lock request (TryLockCHIPStack()) to avoid blocking other UI activities
+        // when the CHIP task is busy (e.g. with a long crypto operation).
+        if (PlatformMgr().TryLockChipStack())
+        {
+            sIsWiFiStationEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+            sIsWiFiStationConnected   = ConnectivityMgr().IsWiFiStationConnected();
+            sIsWiFiStationProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+            sHaveBLEConnections       = (ConnectivityMgr().NumBLEConnections() != 0);
+            PlatformMgr().UnlockChipStack();
+        }
+
+        // Update the status LED if factory reset has not been initiated.
+        //
+        // If system has "full connectivity", keep the LED On constantly.
+        //
+        // If thread and service provisioned, but not attached to the thread network
+        // yet OR no connectivity to the service OR subscriptions are not fully
+        // established THEN blink the LED Off for a short period of time.
+        //
+        // If the system has ble connection(s) uptill the stage above, THEN blink
+        // the LEDs at an even rate of 100ms.
+        //
+        // Otherwise, blink the LED ON for a very short time.
+        if (sAppTask.mFunction != Function::kFactoryReset)
+        {
+            if (sIsWiFiStationEnabled && sIsWiFiStationProvisioned && !sIsWiFiStationConnected)
+            {
+                sStatusLED.Blink(950, 50);
+            }
+            else if (sHaveBLEConnections)
+            {
+                sStatusLED.Blink(100, 100);
+            }
+            else
+            {
+                sStatusLED.Blink(50, 950);
+            }
+        }
+
+        sStatusLED.Animate();
+    }
 }
 
 void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
 {
-    if (btnIdx != APP_LIGHT_BUTTON_IDX)
+    if (btnIdx != APP_LIGHT_BUTTON_IDX && btnIdx != APP_FUNCTION_BUTTON_IDX)
     {
         return;
     }
@@ -161,12 +219,125 @@ void AppTask::ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction)
     button_event.ButtonEvent.ButtonIdx = btnIdx;
     button_event.ButtonEvent.Action    = btnAction;
 
-    if ((btnIdx == APP_LIGHT_BUTTON_IDX) && (btnAction == APP_BUTTON_RELEASED))
+    if (btnIdx == APP_FUNCTION_BUTTON_IDX)
     {
-        button_event.Handler = LightActionEventHandler;
+        button_event.Handler = FunctionHandler;
         sAppTask.PostEvent(&button_event);
     }
 }
+
+void AppTask::TimerEventHandler(TimerHandle_t xTimer)
+{
+    AppEvent event;
+    event.Type               = AppEvent::kEventType_Timer;
+    event.TimerEvent.Context = (void *) xTimer;
+    event.Handler            = FunctionTimerEventHandler;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type != AppEvent::kEventType_Timer)
+    {
+        return;
+    }
+
+    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
+    // initiate factory reset
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kStartBleAdv)
+    {
+        P6_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+
+        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
+        // cancel, if required.
+        sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+
+        sAppTask.mFunction = Function::kFactoryReset;
+
+        // Turn off all LEDs before starting blink to make sure blink is
+        // co-ordinated.
+        sStatusLED.Set(false);
+
+        sStatusLED.Blink(500);
+    }
+    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFactoryReset)
+    {
+        // Actually trigger Factory Reset
+        sAppTask.mFunction = Function::kNoneSelected;
+        ConfigurationMgr().InitiateFactoryReset();
+    }
+}
+
+void AppTask::FunctionHandler(AppEvent * aEvent)
+{
+    // To trigger software update: press the APP_FUNCTION_BUTTON button briefly (<
+    // FACTORY_RESET_TRIGGER_TIMEOUT) To initiate factory reset: press the
+    // APP_FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT +
+    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT All LEDs start blinking after
+    // FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
+    // To cancel factory reset: release the APP_FUNCTION_BUTTON once all LEDs
+    // start blinking within the FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
+    if (aEvent->ButtonEvent.Action == APP_BUTTON_RELEASED)
+    {
+        if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kNoneSelected)
+        {
+            sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+            sAppTask.mFunction = Function::kStartBleAdv;
+        }
+    }
+    else
+    {
+        // If the button was released before factory reset got initiated, start Thread Network
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kStartBleAdv)
+        {
+            sAppTask.CancelTimer();
+            sAppTask.mFunction = Function::kNoneSelected;
+        }
+        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == Function::kFactoryReset)
+        {
+
+            sAppTask.CancelTimer();
+
+            // Change the function to none selected since factory reset has been
+            // canceled.
+            sAppTask.mFunction = Function::kNoneSelected;
+
+            P6_LOG("Factory Reset has been Canceled");
+        }
+    }
+}
+
+void AppTask::CancelTimer()
+{
+    if (xTimerStop(sFunctionTimer, 0) == pdFAIL)
+    {
+        P6_LOG("app timer stop() failed");
+        appError(APP_ERROR_STOP_TIMER_FAILED);
+    }
+
+    mFunctionTimerActive = false;
+}
+
+void AppTask::StartTimer(uint32_t aTimeoutInMs)
+{
+    if (xTimerIsTimerActive(sFunctionTimer))
+    {
+        P6_LOG("app timer already started!");
+        CancelTimer();
+    }
+
+    // timer is not active, change its period to required value (== restart).
+    // FreeRTOS- Block for a maximum of 100 ticks if the change period command
+    // cannot immediately be sent to the timer command queue.
+    if (xTimerChangePeriod(sFunctionTimer, aTimeoutInMs / portTICK_PERIOD_MS, 100) != pdPASS)
+    {
+        P6_LOG("app timer start() failed");
+        appError(APP_ERROR_START_TIMER_FAILED);
+    }
+
+    mFunctionTimerActive = true;
+}
+
 
 void AppTask::PostEvent(const AppEvent * aEvent)
 {
@@ -210,4 +381,14 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     {
         P6_LOG("Event received with no handler. Dropping event.");
     }
+}
+
+void AppTask::UpdateClusterState(void)
+{
+    // TODO: Write ota cluster attributes as necessary
+    //EmberAfStatus status = emberAfWriteAttribute(
+    //if (status != EMBER_ZCL_STATUS_SUCCESS)
+    //{
+        //P6_LOG("ERR: updating on/off %x", status);
+    //}
 }

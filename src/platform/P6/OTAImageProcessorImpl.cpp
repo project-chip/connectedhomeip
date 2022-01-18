@@ -20,18 +20,10 @@
 
 #include "OTAImageProcessorImpl.h"
 
-// TODO: Integrate psoc ota code here
-
 namespace chip {
 
 CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
 {
-    if (mParams.imageFile.empty())
-    {
-        ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
-        return CHIP_ERROR_INTERNAL;
-    }
-
     DeviceLayer::PlatformMgr().ScheduleWork(HandlePrepareDownload, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
@@ -44,29 +36,18 @@ CHIP_ERROR OTAImageProcessorImpl::Finalize()
 
 CHIP_ERROR OTAImageProcessorImpl::Apply()
 {
-    // TODO: Apply OTA image
+    DeviceLayer::PlatformMgr().ScheduleWork(HandleApply, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::Abort()
 {
-    if (mParams.imageFile.empty())
-    {
-        ChipLogError(SoftwareUpdate, "Invalid output image file supplied");
-        return CHIP_ERROR_INTERNAL;
-    }
-
     DeviceLayer::PlatformMgr().ScheduleWork(HandleAbort, reinterpret_cast<intptr_t>(this));
     return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(ByteSpan & block)
 {
-    if (!mOfs.is_open() || !mOfs.good())
-    {
-        return CHIP_ERROR_INTERNAL;
-    }
-
     if ((block.data() == nullptr) || block.empty())
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
@@ -97,15 +78,11 @@ void OTAImageProcessorImpl::HandlePrepareDownload(intptr_t context)
         return;
     }
 
-    imageProcessor->mOfs.open(imageProcessor->mParams.imageFile.data(),
-                              std::ofstream::out | std::ofstream::ate | std::ofstream::app);
-    if (!imageProcessor->mOfs.good())
+    if (flash_area_open(FLASH_AREA_IMAGE_SECONDARY(0), &(imageProcessor->mFlashArea)) != 0)
     {
         imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
         return;
     }
-
-    // TODO: if file already exists and is not empty, erase previous contents
 
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
@@ -118,10 +95,15 @@ void OTAImageProcessorImpl::HandleFinalize(intptr_t context)
         return;
     }
 
-    imageProcessor->mOfs.close();
-    imageProcessor->ReleaseBlock();
+    int ret = boot_set_pending(0, 1); // Will close flash area
 
-    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mParams.imageFile.data());
+    if (ret != 0)
+    {
+        // TODO: Handle error
+        return;
+    }
+
+    imageProcessor->ReleaseBlock();
 }
 
 void OTAImageProcessorImpl::HandleAbort(intptr_t context)
@@ -132,8 +114,7 @@ void OTAImageProcessorImpl::HandleAbort(intptr_t context)
         return;
     }
 
-    imageProcessor->mOfs.close();
-    remove(imageProcessor->mParams.imageFile.data());
+    // TODO: Handle abort flash area updates (clear flash area?)
     imageProcessor->ReleaseBlock();
 }
 
@@ -151,10 +132,8 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
         return;
     }
 
-    // TODO: Process block header if any
-
-    if (!imageProcessor->mOfs.write(reinterpret_cast<const char *>(imageProcessor->mBlock.data()),
-                                    static_cast<std::streamsize>(imageProcessor->mBlock.size())))
+    int rc = flash_area_write(imageProcessor->mFlashArea, imageProcessor->mParams.downloadedBytes, imageProcessor->mBlock.data(), imageProcessor->mBlock.size());
+    if(rc != 0)
     {
         imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return;
@@ -164,31 +143,46 @@ void OTAImageProcessorImpl::HandleProcessBlock(intptr_t context)
     imageProcessor->mDownloader->FetchNextData();
 }
 
-CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
+void OTAImageProcessorImpl::HandleApply(intptr_t context)
 {
-    if ((block.data() == nullptr) || block.empty())
+    //auto * imageProcessor = reinterpret_cast<OTAImageProcessorImpl *>(context);
+    int16_t ret = boot_set_confirmed();
+
+    if (ret != 0)
     {
-        return CHIP_NO_ERROR;
+        // TODO: Handle error
+        return;
     }
 
-    // Allocate memory for block data if it has not been done yet
-    if (mBlock.empty())
+    return;
+}
+
+CHIP_ERROR OTAImageProcessorImpl::SetBlock(ByteSpan & block)
+{
+    if (!IsSpanUsable(block))
     {
-        mBlock = MutableByteSpan(static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size())), block.size());
-        if (mBlock.data() == nullptr)
+        ReleaseBlock();
+        return CHIP_NO_ERROR;
+    }
+    if (mBlock.size() < block.size())
+    {
+        if (!mBlock.empty())
+        {
+            ReleaseBlock();
+        }
+        uint8_t * mBlock_ptr = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(block.size()));
+        if (mBlock_ptr == nullptr)
         {
             return CHIP_ERROR_NO_MEMORY;
         }
+        mBlock = MutableByteSpan(mBlock_ptr, block.size());
     }
-
-    // Store the actual block data
     CHIP_ERROR err = CopySpanToMutableSpan(block, mBlock);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot copy block data: %" CHIP_ERROR_FORMAT, err.Format());
         return err;
     }
-
     return CHIP_NO_ERROR;
 }
 

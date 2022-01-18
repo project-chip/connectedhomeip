@@ -43,17 +43,43 @@ class AppTask
 public:
     CHIP_ERROR StartAppTask();
     static void AppTaskMain(void * pvParameter);
-    static void LightActionEventHandler(AppEvent * aEvent);
-    void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
+
     void PostEvent(const AppEvent * event);
+
+    void ButtonEventHandler(uint8_t btnIdx, uint8_t btnAction);
 
 private:
     friend AppTask & GetAppTask(void);
 
     CHIP_ERROR Init();
 
-    static AppTask sAppTask;
+    void CancelTimer(void);
+
     void DispatchEvent(AppEvent * event);
+
+    static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void FunctionHandler(AppEvent * aEvent);
+    static void TimerEventHandler(TimerHandle_t xTimer);
+
+    static void UpdateClusterState(void);
+
+    void StartTimer(uint32_t aTimeoutMs);
+
+    enum class Function
+    {
+        kNoneSelected   = 0,
+        kSoftwareUpdate = 0,
+        kStartBleAdv    = 1,
+        kFactoryReset   = 2,
+
+        kInvalid
+    };
+
+    Function mFunction              = Function::kNoneSelected;
+    bool mFunctionTimerActive       = false;
+    bool mSyncClusterToButtonAction = false;
+
+    static AppTask sAppTask;
 };
 
 inline AppTask & GetAppTask(void)
