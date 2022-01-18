@@ -197,7 +197,7 @@ void emberAfResetAttributes(chip::EndpointId endpoint);
 // Loads the attributes from built-in default and / or storage.  If
 // ignoreStorage is true, only defaults will be read, and the storage for
 // non-volatile attributes will be overwritten with those defaults.
-void emAfLoadAttributeDefaults(chip::EndpointId endpoint, bool ignoreStorage);
+void emAfLoadAttributeDefaults(chip::EndpointId endpoint, bool ignoreStorage, chip::Optional<chip::ClusterId> = chip::NullOptional);
 
 // After the RAM value has changed, code should call this function. If this
 // attribute has been tagged as non-volatile, its value will be stored.
