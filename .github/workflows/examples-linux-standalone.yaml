@@ -134,7 +134,6 @@ jobs:
             - name: Uploading OTA logs
               if: always()
               uses: actions/upload-artifact@v2
-              if: ${{ !env.ACT }}
               with:
                   name: OTA,Linux-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
                   path: |
