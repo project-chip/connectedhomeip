@@ -30,6 +30,16 @@ class PersistentStorage;
 constexpr const char kIdentityAlpha[] = "alpha";
 constexpr const char kIdentityBeta[]  = "beta";
 constexpr const char kIdentityGamma[] = "gamma";
+// The null fabric commissioner is a commissioner that isn't on a fabric.
+// This is a legal configuration in which the commissioner delegates
+// operational communication and invocation of the commssioning complete
+// command to a separate on-fabric administrator node.
+//
+// The null-fabric-commissioner identity is provided here to demonstrate the
+// commissioner portion of such an architecture.  The null-fabric-commissioner
+// can carry a commissioning flow up until the point of operational channel
+// (CASE) communcation.
+constexpr const char kIdentityNull[]  = "null-fabric-commissioner";
 
 class CHIPCommand : public Command
 {
@@ -96,9 +106,9 @@ protected:
     ChipDeviceCommissioner & CurrentCommissioner();
 
 private:
-    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
+    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricIndex fabricIndex);
     CHIP_ERROR ShutdownCommissioner(std::string key);
-    uint16_t CurrentCommissionerIndex();
+    chip::FabricIndex CurrentCommissionerIndex();
     std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     chip::Optional<char *> mCommissionerName;
 

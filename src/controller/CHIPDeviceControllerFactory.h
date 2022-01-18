@@ -55,7 +55,7 @@ struct SetupParams
     ByteSpan controllerICAC;
     ByteSpan controllerRCAC;
 
-    FabricIndex fabricIndex = kMinValidFabricIndex;
+    FabricIndex fabricIndex = kUndefinedFabricIndex;
     FabricId fabricId       = kUndefinedFabricId;
 
     uint16_t controllerVendorId;

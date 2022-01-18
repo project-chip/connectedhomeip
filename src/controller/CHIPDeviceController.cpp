@@ -142,10 +142,13 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
     mFabricIndex = params.fabricIndex;
-    ReturnErrorOnFailure(ProcessControllerNOCChain(params));
-
-    mFabricInfo = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
-    VerifyOrReturnError(mFabricInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    mVendorId    = params.controllerVendorId;
+    if (mFabricIndex != kUndefinedFabricIndex)
+    {
+        ReturnErrorOnFailure(ProcessControllerNOCChain(params));
+        mFabricInfo = params.systemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
+        VerifyOrReturnError(mFabricInfo != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
     DeviceProxyInitParams deviceInitParams = {
         .sessionManager = params.systemState->SessionMgr(),
@@ -215,8 +218,6 @@ CHIP_ERROR DeviceController::ProcessControllerNOCChain(const ControllerInitParam
 
     ReturnErrorOnFailure(fabric->SetFabricInfo(newFabric));
     mLocalId  = fabric->GetPeerId();
-    mVendorId = fabric->GetVendorId();
-
     mFabricId = fabric->GetFabricId();
 
     ChipLogProgress(Controller, "Joined the fabric at index %d. Compressed fabric ID is: 0x" ChipLogFormatX64, mFabricIndex,
@@ -273,7 +274,11 @@ void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & sessio
     VerifyOrReturn(mState == State::Initialized,
                    ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
     VerifyOrReturn(session->GetSessionType() == Transport::Session::SessionType::kSecure);
-    UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
+    CHIP_ERROR err = UpdateDevice(session->AsSecureSession()->GetPeerNodeId());
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called, but UpdateDevice did not succeed (%s)", ErrorStr(err));
+    }
 }
 
 CHIP_ERROR DeviceController::InitializePairedDeviceList()
@@ -773,11 +778,8 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     uint16_t keyID = 0;
 
-    FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
-
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingCommissioned == nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(fabric != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = InitializePairedDeviceList();
     SuccessOrExit(err);
@@ -808,7 +810,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     mIsIPRendezvous = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
 
-    device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, fabric->GetFabricIndex());
+    device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, mFabricIndex);
 
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
@@ -1214,8 +1216,11 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(DeviceProxy * proxy, const ByteSpan 
 
     mOperationalCredentialsDelegate->SetNodeIdForNextNOCRequest(proxy->GetDeviceId());
 
-    FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
-    mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(fabric->GetFabricId());
+    if (mFabricIndex != kUndefinedFabricIndex)
+    {
+        FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
+        mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(fabric->GetFabricId());
+    }
 
     return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, AttestationSignature, dac, ByteSpan(), ByteSpan(),
                                                              &mDeviceNOCChainCallback);
@@ -1797,7 +1802,13 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     }
     break;
     case CommissioningStage::kFindOperational: {
-        UpdateDevice(proxy->GetDeviceId());
+        CHIP_ERROR err = UpdateDevice(proxy->GetDeviceId());
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(Controller, "Unable to proceed to operational discovery\n");
+            CommissioningStageComplete(err);
+            return;
+        }
     }
     break;
     case CommissioningStage::kSendComplete: {
