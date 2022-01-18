@@ -100,27 +100,6 @@ int AppTask::Init()
     sRejectButton.fall(mbed::callback(this, &AppTask::OnRejectButtonPressEventHandler));
 #endif
 
-#ifdef MBED_CONF_APP_BLE_DEVICE_NAME
-    error = ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_BLE_DEVICE_NAME);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Set BLE device name failed: %s", error.AsString());
-        return EXIT_FAILURE;
-    }
-#endif
-
-    // Start BLE advertising if needed
-    if (!CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART)
-    {
-        ChipLogProgress(NotSpecified, "Enabling BLE advertising.");
-        error = ConnectivityMgr().SetBLEAdvertisingEnabled(true);
-        if (error != CHIP_NO_ERROR)
-        {
-            ChipLogError(NotSpecified, "Set BLE advertising enabled failed: %s", error.AsString());
-            return EXIT_FAILURE;
-        }
-    }
-
     ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
@@ -147,14 +126,6 @@ int AppTask::Init()
     }
     SetRequestorInstance(requestor);
 
-    Server * server = &(Server::GetInstance());
-    if (server == nullptr)
-    {
-        ChipLogError(NotSpecified, "Get server instance failed");
-        return EXIT_FAILURE;
-    }
-    requestor->SetServerInstance(server);
-
     // Initialize an instance of the Requestor Driver
     GenericOTARequestorDriver * requestorDriver = new GenericOTARequestorDriver;
     if (requestorDriver == nullptr)
@@ -162,9 +133,6 @@ int AppTask::Init()
         ChipLogError(NotSpecified, "Create OTA Requestor driver failed");
         return EXIT_FAILURE;
     }
-
-    // Connect the Requestor and Requestor Driver objects
-    requestor->SetOtaRequestorDriver(requestorDriver);
 
     // Initialize  the Downloader object
     BDXDownloader * downloader = new BDXDownloader();
@@ -182,11 +150,9 @@ int AppTask::Init()
         return EXIT_FAILURE;
     }
 
+    requestor->Init(&(chip::Server::GetInstance()), requestorDriver, downloader);
     imageProcessor->SetOTADownloader(downloader);
     downloader->SetImageProcessorDelegate(imageProcessor);
-
-    requestor->SetBDXDownloader(downloader);
-
     requestorDriver->Init(requestor, imageProcessor);
 #endif // CHIP_OTA_REQUESTOR
 

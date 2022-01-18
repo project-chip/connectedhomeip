@@ -81,7 +81,7 @@
 	url = https://github.com/openthread/ot-efr32.git
 [submodule "third_party/mbed-os/repo"]
 	path = third_party/mbed-os/repo
-	url = https://github.com/ATmobica/mbed-os.git
+	url = https://github.com/ARMmbed/mbed-os.git
 	branch = master
 [submodule "third_party/mbed-os-posix-socket/repo"]
 	path = third_party/mbed-os-posix-socket/repo

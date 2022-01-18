@@ -78,6 +78,16 @@ int main()
         goto exit;
     }
 
+#ifdef MBED_CONF_APP_BLE_DEVICE_NAME
+    err = ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_BLE_DEVICE_NAME);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(SoftwareUpdate, "Set BLE device name failed: %s", err.AsString());
+        ret = EXIT_FAILURE;
+        goto exit;
+    }
+#endif
+
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {

@@ -45,16 +45,15 @@ add_subdirectory(${CHIP_ROOT}/config/mbed ./chip_build)
 mbed_configure_app_target(${APP_TARGET})
 
 target_include_directories(${APP_TARGET} PRIVATE
-                           ${CMAKE_CURRENT_SOURCE_DIR}
-                           ${CMAKE_CURRENT_SOURCE_DIR}/main/include/
-                           ${NLIO_DIR}
+                           main/include/
                            ${GEN_DIR}/app-common
                            ${MBED_COMMON}/util/include
+                           ${NLIO_DIR}
 )
 
 target_sources(${APP_TARGET} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
+    main/main.cpp
+    main/AppTask.cpp
     ${MBED_COMMON}/util/LEDWidget.cpp
 )
 
