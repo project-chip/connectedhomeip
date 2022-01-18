@@ -511,7 +511,7 @@
         if (_useWiFi) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self->_deviceList refreshDeviceList];
-                [self retrieveAndSendWifiCredentials];
+                [self retrieveAndSendWiFiCredentials];
             });
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
