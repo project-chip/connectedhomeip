@@ -44,7 +44,8 @@
 
 @implementation NSData (HexRepresentation)
 
-- (NSString *)hexString {
+- (NSString *)hexString
+{
     const unsigned char *bytes = (const unsigned char *)self.bytes;
     NSMutableString *hex = [NSMutableString new];
     for (NSInteger i = 0; i < self.length; i++) {
@@ -159,7 +160,7 @@
     [stackView addArrangedSubview:selectNetworkTypeView];
     selectNetworkTypeView.translatesAutoresizingMaskIntoConstraints = false;
     [selectNetworkTypeView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
-    
+
     // Manual entry view
     _manualCodeTextField = [UITextField new];
     _doneManualCodeButton = [UIButton new];
@@ -671,12 +672,12 @@
 
 - (NSData *)convertString:(NSString *)string
 {
-    NSMutableData *data= [[NSMutableData alloc] init];
+    NSMutableData * data = [[NSMutableData alloc] init];
     unsigned char whole_byte;
-    char byte_chars[3] = {0,0,0};
+    char byte_chars[3] = { 0, 0, 0 };
     for (int i = 0; i < ([string length] / 2); i++) {
-        byte_chars[0] = [string characterAtIndex:i*2];
-        byte_chars[1] = [string characterAtIndex:i*2+1];
+        byte_chars[0] = [string characterAtIndex:i * 2];
+        byte_chars[1] = [string characterAtIndex:i * 2 + 1];
         whole_byte = strtol(byte_chars, NULL, 16);
         [data appendBytes:&whole_byte length:1];
     }
@@ -686,24 +687,24 @@
 
 - (void)retrieveAndSendThreadCredentials
 {
-    NSString *PanID;
-    NSString *ExtPanID;
-    NSString *MasterKey;
-    NSString *Channel;
-    
+    NSString * PanID;
+    NSString * ExtPanID;
+    NSString * MasterKey;
+    NSString * Channel;
+
     PanID = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kThreadNetworkPanIDDefaultsKey);
     ExtPanID = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kThreadNetworkExtPanIDDefaultsKey);
     MasterKey = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kThreadNetworkKeyDefaultsKey);
     Channel = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kThreadNetworkChannelDefaultsKey);
 
-    CHIPThreadOperationalDataset *threadDataSet = [[CHIPThreadOperationalDataset alloc]
-        initWithNetworkName:nil
-              extendedPANID:[self convertString:ExtPanID]
-                  masterKey:[self convertString:MasterKey]
-                       PSKc:nil
-                    channel:[Channel intValue]
-                      panID:[self convertString:PanID]];
-    
+    CHIPThreadOperationalDataset *threadDataSet =
+        [[CHIPThreadOperationalDataset alloc] initWithNetworkName:nil
+                                                    extendedPANID:[self convertString:ExtPanID]
+                                                        masterKey:[self convertString:MasterKey]
+                                                             PSKc:nil
+                                                          channel:[Channel intValue]
+                                                            panID:[self convertString:PanID]];
+
     [self addOrUpdateThreadNetwork:threadDataSet.asData];
 }
 
@@ -760,7 +761,7 @@
 {
     if (error != nil) {
         NSLog(@"Error adding network: %@", error);
-        //return;
+        // return;
     }
 
     __auto_type * params = [[CHIPNetworkCommissioningClusterConnectNetworkParams alloc] init];

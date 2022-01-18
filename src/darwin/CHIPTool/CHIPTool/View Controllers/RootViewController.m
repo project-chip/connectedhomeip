@@ -23,9 +23,9 @@
 #import "OnOffViewController.h"
 #import "QRCodeViewController.h"
 #import "TemperatureSensorViewController.h"
+#import "ThreadViewController.h"
 #import "UnpairDevicesViewController.h"
 #import "WifiViewController.h"
-#import "ThreadViewController.h"
 
 @implementation RootViewController
 
