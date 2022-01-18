@@ -1783,67 +1783,67 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 
 endpoint 0 {
-  server cluster AdministratorCommissioning;
-  server cluster Basic;
+  server  cluster AdministratorCommissioning;
+  server  cluster Basic;
   binding cluster Binding;
-  server cluster Binding;
-  server cluster Descriptor;
-  server cluster DiagnosticLogs;
-  server cluster EthernetNetworkDiagnostics;
-  server cluster FixedLabel;
+  server  cluster Binding;
+  server  cluster Descriptor;
+  server  cluster DiagnosticLogs;
+  server  cluster EthernetNetworkDiagnostics;
+  server  cluster FixedLabel;
   binding cluster GeneralCommissioning;
-  server cluster GeneralCommissioning;
-  server cluster GeneralDiagnostics;
-  server cluster GroupKeyManagement;
-  server cluster LocalizationConfiguration;
+  server  cluster GeneralCommissioning;
+  server  cluster GeneralDiagnostics;
+  server  cluster GroupKeyManagement;
+  server  cluster LocalizationConfiguration;
   binding cluster NetworkCommissioning;
-  server cluster NetworkCommissioning;
-  server cluster OtaSoftwareUpdateProvider;
+  server  cluster NetworkCommissioning;
+  server  cluster OtaSoftwareUpdateProvider;
   binding cluster OperationalCredentials;
-  server cluster OperationalCredentials;
-  server cluster RelativeHumidityMeasurement;
-  server cluster SoftwareDiagnostics;
-  server cluster ThreadNetworkDiagnostics;
-  server cluster UserLabel;
-  server cluster WiFiNetworkDiagnostics;
+  server  cluster OperationalCredentials;
+  server  cluster RelativeHumidityMeasurement;
+  server  cluster SoftwareDiagnostics;
+  server  cluster ThreadNetworkDiagnostics;
+  server  cluster UserLabel;
+  server  cluster WiFiNetworkDiagnostics;
 }
 
 endpoint 1 {
-  server cluster ApplicationLauncher;
-  server cluster Channel;
-  server cluster ContentLauncher;
-  server cluster Descriptor;
-  server cluster KeypadInput;
-  server cluster LowPower;
-  server cluster MediaInput;
-  server cluster OnOff;
-  server cluster TargetNavigator;
-  server cluster WakeOnLan;
+  server  cluster ApplicationLauncher;
+  server  cluster Channel;
+  server  cluster ContentLauncher;
+  server  cluster Descriptor;
+  server  cluster KeypadInput;
+  server  cluster LowPower;
+  server  cluster MediaInput;
+  server  cluster OnOff;
+  server  cluster TargetNavigator;
+  server  cluster WakeOnLan;
 }
 
 endpoint 2 {
-  server cluster AudioOutput;
-  server cluster Descriptor;
-  server cluster LevelControl;
-  server cluster OnOff;
+  server  cluster AudioOutput;
+  server  cluster Descriptor;
+  server  cluster LevelControl;
+  server  cluster OnOff;
 }
 
 endpoint 3 {
-  server cluster AccountLogin;
-  server cluster ApplicationBasic;
-  server cluster ContentLauncher;
-  server cluster Descriptor;
-  server cluster MediaPlayback;
+  server  cluster AccountLogin;
+  server  cluster ApplicationBasic;
+  server  cluster ContentLauncher;
+  server  cluster Descriptor;
+  server  cluster MediaPlayback;
 }
 
 endpoint 4 {
-  server cluster ApplicationBasic;
-  server cluster ContentLauncher;
-  server cluster Descriptor;
+  server  cluster ApplicationBasic;
+  server  cluster ContentLauncher;
+  server  cluster Descriptor;
 }
 
 endpoint 5 {
-  server cluster ApplicationBasic;
-  server cluster Descriptor;
+  server  cluster ApplicationBasic;
+  server  cluster Descriptor;
 }
 

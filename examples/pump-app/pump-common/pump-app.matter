@@ -895,31 +895,31 @@ server cluster UserLabel = 65 {
 
 
 endpoint 0 {
-  server cluster AdministratorCommissioning;
-  server cluster Basic;
-  server cluster Descriptor;
-  server cluster DiagnosticLogs;
-  server cluster FixedLabel;
-  server cluster GeneralCommissioning;
-  server cluster GeneralDiagnostics;
-  server cluster LocalizationConfiguration;
-  server cluster NetworkCommissioning;
-  server cluster OperationalCredentials;
-  server cluster SoftwareDiagnostics;
-  server cluster ThreadNetworkDiagnostics;
-  server cluster UserLabel;
+  server  cluster AdministratorCommissioning;
+  server  cluster Basic;
+  server  cluster Descriptor;
+  server  cluster DiagnosticLogs;
+  server  cluster FixedLabel;
+  server  cluster GeneralCommissioning;
+  server  cluster GeneralDiagnostics;
+  server  cluster LocalizationConfiguration;
+  server  cluster NetworkCommissioning;
+  server  cluster OperationalCredentials;
+  server  cluster SoftwareDiagnostics;
+  server  cluster ThreadNetworkDiagnostics;
+  server  cluster UserLabel;
 }
 
 endpoint 1 {
-  server cluster Descriptor;
+  server  cluster Descriptor;
   binding cluster FlowMeasurement;
-  server cluster FlowMeasurement;
-  server cluster LevelControl;
-  server cluster OnOff;
+  server  cluster FlowMeasurement;
+  server  cluster LevelControl;
+  server  cluster OnOff;
   binding cluster PressureMeasurement;
-  server cluster PressureMeasurement;
-  server cluster PumpConfigurationAndControl;
+  server  cluster PressureMeasurement;
+  server  cluster PumpConfigurationAndControl;
   binding cluster TemperatureMeasurement;
-  server cluster TemperatureMeasurement;
+  server  cluster TemperatureMeasurement;
 }
 

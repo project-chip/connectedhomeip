@@ -356,12 +356,12 @@ server cluster UserLabel = 65 {
 
 
 endpoint 0 {
-  server cluster FixedLabel;
-  server cluster GeneralCommissioning;
-  server cluster LocalizationConfiguration;
-  server cluster NetworkCommissioning;
-  server cluster OtaSoftwareUpdateProvider;
-  server cluster OperationalCredentials;
-  server cluster UserLabel;
+  server  cluster FixedLabel;
+  server  cluster GeneralCommissioning;
+  server  cluster LocalizationConfiguration;
+  server  cluster NetworkCommissioning;
+  server  cluster OtaSoftwareUpdateProvider;
+  server  cluster OperationalCredentials;
+  server  cluster UserLabel;
 }
 

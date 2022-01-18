@@ -1103,28 +1103,28 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 
 endpoint 0 {
-  server cluster AdministratorCommissioning;
-  server cluster Basic;
-  server cluster Descriptor;
-  server cluster DiagnosticLogs;
-  server cluster EthernetNetworkDiagnostics;
-  server cluster FixedLabel;
-  server cluster GeneralCommissioning;
-  server cluster GeneralDiagnostics;
-  server cluster LocalizationConfiguration;
-  server cluster NetworkCommissioning;
-  server cluster OperationalCredentials;
-  server cluster PowerSource;
-  server cluster PowerSourceConfiguration;
-  server cluster SoftwareDiagnostics;
-  server cluster ThreadNetworkDiagnostics;
-  server cluster UserLabel;
-  server cluster WiFiNetworkDiagnostics;
+  server  cluster AdministratorCommissioning;
+  server  cluster Basic;
+  server  cluster Descriptor;
+  server  cluster DiagnosticLogs;
+  server  cluster EthernetNetworkDiagnostics;
+  server  cluster FixedLabel;
+  server  cluster GeneralCommissioning;
+  server  cluster GeneralDiagnostics;
+  server  cluster LocalizationConfiguration;
+  server  cluster NetworkCommissioning;
+  server  cluster OperationalCredentials;
+  server  cluster PowerSource;
+  server  cluster PowerSourceConfiguration;
+  server  cluster SoftwareDiagnostics;
+  server  cluster ThreadNetworkDiagnostics;
+  server  cluster UserLabel;
+  server  cluster WiFiNetworkDiagnostics;
 }
 
 endpoint 1 {
-  server cluster Descriptor;
-  server cluster DoorLock;
-  server cluster PowerSource;
+  server  cluster Descriptor;
+  server  cluster DoorLock;
+  server  cluster PowerSource;
 }
 

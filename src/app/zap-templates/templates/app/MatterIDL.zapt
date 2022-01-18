@@ -82,12 +82,8 @@
 {{#chip_endpoints}}
 endpoint {{endpointId}} {
   {{#chip_endpoint_clusters}}
-  {{!}} {{~#if (isServer side)~}}
-  server
-  {{~else~}}
-  binding
-  {{~/if~}}
-  {{!}} cluster {{asUpperCamelCase name}};
+  {{#if (isServer side)~}} server  {{else~}} binding {{/if~}}
+  cluster {{asUpperCamelCase name}};
   {{/chip_endpoint_clusters}}
 }
 

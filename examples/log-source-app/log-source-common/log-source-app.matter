@@ -313,9 +313,9 @@ server cluster OperationalCredentials = 62 {
 
 endpoint 0 {
   binding cluster DiagnosticLogs;
-  server cluster DiagnosticLogs;
-  server cluster GeneralCommissioning;
-  server cluster NetworkCommissioning;
-  server cluster OperationalCredentials;
+  server  cluster DiagnosticLogs;
+  server  cluster GeneralCommissioning;
+  server  cluster NetworkCommissioning;
+  server  cluster OperationalCredentials;
 }
 

@@ -1381,37 +1381,37 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 
 endpoint 0 {
-  server cluster AdministratorCommissioning;
-  server cluster Basic;
-  server cluster Descriptor;
-  server cluster DiagnosticLogs;
-  server cluster EthernetNetworkDiagnostics;
-  server cluster FixedLabel;
-  server cluster GeneralCommissioning;
-  server cluster GeneralDiagnostics;
-  server cluster LocalizationConfiguration;
-  server cluster NetworkCommissioning;
+  server  cluster AdministratorCommissioning;
+  server  cluster Basic;
+  server  cluster Descriptor;
+  server  cluster DiagnosticLogs;
+  server  cluster EthernetNetworkDiagnostics;
+  server  cluster FixedLabel;
+  server  cluster GeneralCommissioning;
+  server  cluster GeneralDiagnostics;
+  server  cluster LocalizationConfiguration;
+  server  cluster NetworkCommissioning;
   binding cluster OtaSoftwareUpdateProvider;
-  server cluster OtaSoftwareUpdateRequestor;
-  server cluster OperationalCredentials;
-  server cluster SoftwareDiagnostics;
-  server cluster Switch;
-  server cluster ThreadNetworkDiagnostics;
-  server cluster UserLabel;
-  server cluster WiFiNetworkDiagnostics;
+  server  cluster OtaSoftwareUpdateRequestor;
+  server  cluster OperationalCredentials;
+  server  cluster SoftwareDiagnostics;
+  server  cluster Switch;
+  server  cluster ThreadNetworkDiagnostics;
+  server  cluster UserLabel;
+  server  cluster WiFiNetworkDiagnostics;
 }
 
 endpoint 1 {
-  server cluster ColorControl;
-  server cluster Descriptor;
-  server cluster Identify;
-  server cluster LevelControl;
-  server cluster OccupancySensing;
-  server cluster OnOff;
+  server  cluster ColorControl;
+  server  cluster Descriptor;
+  server  cluster Identify;
+  server  cluster LevelControl;
+  server  cluster OccupancySensing;
+  server  cluster OnOff;
 }
 
 endpoint 2 {
   binding cluster OnOff;
-  server cluster OnOffSwitchConfiguration;
+  server  cluster OnOffSwitchConfiguration;
 }
 

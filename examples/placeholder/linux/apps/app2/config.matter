@@ -710,22 +710,22 @@ server cluster TemperatureMeasurement = 1026 {
 
 
 endpoint 0 {
-  server cluster Basic;
-  server cluster Descriptor;
-  server cluster GeneralCommissioning;
-  server cluster NetworkCommissioning;
-  server cluster OperationalCredentials;
+  server  cluster Basic;
+  server  cluster Descriptor;
+  server  cluster GeneralCommissioning;
+  server  cluster NetworkCommissioning;
+  server  cluster OperationalCredentials;
   binding cluster TemperatureMeasurement;
-  server cluster TemperatureMeasurement;
+  server  cluster TemperatureMeasurement;
 }
 
 endpoint 1 {
-  server cluster Basic;
-  server cluster ColorControl;
-  server cluster Groups;
-  server cluster Identify;
-  server cluster LevelControl;
-  server cluster OnOff;
-  server cluster Scenes;
+  server  cluster Basic;
+  server  cluster ColorControl;
+  server  cluster Groups;
+  server  cluster Identify;
+  server  cluster LevelControl;
+  server  cluster OnOff;
+  server  cluster Scenes;
 }
 
