@@ -38,7 +38,7 @@ struct Event5
 {
 };
 
-using Event = chip::Variant<Event1, Event2, Event3, Event4, Event5>;
+using Event   = chip::Variant<Event1, Event2, Event3, Event4, Event5>;
 using Context = chip::StateMachine::Context<Event>;
 
 struct MockState
