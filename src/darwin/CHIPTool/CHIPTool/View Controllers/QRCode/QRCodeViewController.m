@@ -1056,6 +1056,8 @@
     } else {
         _useWiFi = NO;
     }
+}
+
 // Ledger
 
 - (IBAction)readFromLedgerApi:(id)sender
