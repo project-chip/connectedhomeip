@@ -54,6 +54,16 @@
             "output": "cluster/logging/DataModelLogger.cpp"
         },
         {
+            "path": "ComplexArgumentParser.zapt",
+            "name": "Complex Argument Parser header",
+            "output": "cluster/ComplexArgumentParser.h"
+        },
+        {
+            "path": "ComplexArgumentParser-src.zapt",
+            "name": "Complex Argument Parser",
+            "output": "cluster/ComplexArgumentParser.cpp"
+        },
+        {
             "path": "tests-commands.zapt",
             "name": "Tests Commands header",
             "output": "test/Commands.h"

@@ -9,6 +9,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/DecodableList.h>
 #include <app/data-model/Nullable.h>
+#include <commands/clusters/ComplexArgument.h>
 #include <commands/clusters/DataModelLogger.h>
 #include <commands/clusters/ModelCommand.h>
 #include <commands/common/CommandInvoker.h>
@@ -86,14 +87,12 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Success(v
 class {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
-    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ModelCommand("{{asDelimitedCommand name}}")
+    {{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}(): ModelCommand("{{asDelimitedCommand name}}"){{#chip_cluster_command_arguments}}{{#if isComplex}}, mComplex_{{asUpperCamelCase label}}(&mRequest.{{asLowerCamelCase label}}){{/if}}{{/chip_cluster_command_arguments}}
     {
         {{#chip_cluster_command_arguments}}
         {{~#*inline "field"}}mRequest.{{asLowerCamelCase label}}{{/inline~}}
-        {{#if isArray}}
-        // {{label}} Array parsing is not supported yet
-        {{else if isStruct}}
-        // {{label}} Struct parsing is not supported yet
+        {{#if isComplex}}
+        AddArgument("{{asUpperCamelCase label}}", &mComplex_{{asUpperCamelCase label}});
         {{else if (isString type)}}
         AddArgument("{{asUpperCamelCase label}}", &{{>field}});
         {{else}}
@@ -112,18 +111,16 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster ({{asHex parent.code 8}}) command ({{asHex code 8}}) on endpoint %" PRIu16, endpointId);
 
-        {{#chip_cluster_command_non_expanded_arguments}}
-        {{#if isArray}}
-        {{! TODO Implement complex types parsing in order to properly set the request parameters }}
-        mRequest.{{asLowerCamelCase label}} = {{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}();
-        {{/if}}
-        {{/chip_cluster_command_non_expanded_arguments}}
-
         return chip::Controller::InvokeCommand(device, this, {{#if hasSpecificResponse}}On{{asUpperCamelCase parent.name}}{{asUpperCamelCase response.name}}Success{{else}}OnDefaultSuccess{{/if}}, OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
     chip::app::Clusters::{{asUpperCamelCase parent.name}}::Commands::{{asUpperCamelCase name}}::Type mRequest;
+    {{#chip_cluster_command_arguments}}
+    {{#if isComplex}}
+    TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}> mComplex_{{asUpperCamelCase label}};
+    {{/if}}
+    {{/chip_cluster_command_arguments}}
 };
 
 {{/chip_cluster_commands}}
@@ -248,19 +245,14 @@ public:
 };
 
 {{#if isWritableAttribute}}
-{{! No list support for writing yet.  Need to figure out how to represent the
-    values. }}
-{{#unless isList}}
 class Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
-    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("write")
+    Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("write"){{#if isComplex}}, mComplex(&mValue){{/if}}
     {
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
-        {{#if isArray}}
-        // {{label}} Array parsing is not supported yet
-        {{else if isStruct}}
-        // {{label}} Struct parsing is not supported yet
+        {{#if isComplex}}
+        AddArgument("attr-value", &mComplex);
         {{else if (isString type)}}
         AddArgument("attr-value", &mValue);
         {{else}}
@@ -269,9 +261,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}()
-    {
-    }
+    ~Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, chip::EndpointId endpointId) override
     {
@@ -284,9 +274,11 @@ public:
 
 private:
     {{zapTypeToEncodableClusterObjectType type ns=parent.name}} mValue;
+{{#if isComplex}}
+    TypedComplexArgument<{{zapTypeToEncodableClusterObjectType type ns=parent.name}}> mComplex;
+{{/if}}
 };
 
-{{/unless}}
 {{/if}}
 {{#if isReportableAttribute}}
 class Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
@@ -354,11 +346,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{#unless (isStrEqual chipCallback.name "Unsupported")}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{#if isWritableAttribute}}
-        {{! No list support for writing yet.  Need to figure out how to
-            represent the values. }}
-        {{#unless isList}}
         make_unique<Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
-        {{/unless}}
         {{/if}}
         {{#if isReportableAttribute}}
         make_unique<Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
