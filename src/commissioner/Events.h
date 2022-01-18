@@ -110,7 +110,13 @@ private:
     Crypto::CapacityBoundBuffer<MaxSize> mBuffer;
 };
 
-// Events
+using OnboardingPayload        = chip::Platform::SharedPtr<chip::SetupPayload>;
+using ArmFailSafe              = chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafe::Type;
+using NetworkFeatureMap        = app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo::DecodableType;
+using AddOrUpdateWiFiNetwork   = app::Clusters::NetworkCommissioning::Commands::AddOrUpdateWiFiNetwork::Type;
+using AddOrUpdateThreadNetwork = app::Clusters::NetworkCommissioning::Commands::AddOrUpdateThreadNetwork::Type;
+using OperationalRecord        = chip::Platform::SharedPtr<Dnssd::ResolvedNodeData>;
+
 struct Success
 {
 };
@@ -123,7 +129,7 @@ struct Await
 {
 };
 
-struct OnboardingPayload
+struct RawOnboardingPayload
 {
     const char * mPayload;
 };
