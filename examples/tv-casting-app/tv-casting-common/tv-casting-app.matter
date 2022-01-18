@@ -2459,66 +2459,66 @@ server cluster WindowCovering = 258 {
 
 
 endpoint 0 {
-  instantiate cluster AdministratorCommissioning;
-  instantiate cluster Basic;
-  instantiate cluster Binding;
-  instantiate cluster Descriptor;
-  instantiate cluster DiagnosticLogs;
-  instantiate cluster EthernetNetworkDiagnostics;
-  instantiate cluster FixedLabel;
-  instantiate cluster GeneralCommissioning;
-  instantiate cluster GeneralDiagnostics;
-  instantiate cluster GroupKeyManagement;
-  instantiate cluster LocalizationConfiguration;
-  instantiate cluster NetworkCommissioning;
-  instantiate cluster OtaSoftwareUpdateProvider;
-  instantiate cluster OperationalCredentials;
-  instantiate cluster RelativeHumidityMeasurement;
-  instantiate cluster SoftwareDiagnostics;
-  instantiate cluster ThreadNetworkDiagnostics;
-  instantiate cluster UserLabel;
-  instantiate cluster WiFiNetworkDiagnostics;
+  server  cluster AdministratorCommissioning;
+  server  cluster Basic;
+  server  cluster Binding;
+  server  cluster Descriptor;
+  server  cluster DiagnosticLogs;
+  server  cluster EthernetNetworkDiagnostics;
+  server  cluster FixedLabel;
+  server  cluster GeneralCommissioning;
+  server  cluster GeneralDiagnostics;
+  server  cluster GroupKeyManagement;
+  server  cluster LocalizationConfiguration;
+  server  cluster NetworkCommissioning;
+  server  cluster OtaSoftwareUpdateProvider;
+  server  cluster OperationalCredentials;
+  server  cluster RelativeHumidityMeasurement;
+  server  cluster SoftwareDiagnostics;
+  server  cluster ThreadNetworkDiagnostics;
+  server  cluster UserLabel;
+  server  cluster WiFiNetworkDiagnostics;
 }
 
 endpoint 1 {
-  instantiate cluster AccountLogin;
-  instantiate cluster ApplicationBasic;
-  instantiate cluster ApplicationLauncher;
-  instantiate cluster AudioOutput;
-  instantiate cluster BarrierControl;
-  instantiate cluster BinaryInputBasic;
-  instantiate cluster Binding;
-  instantiate cluster BridgedDeviceBasic;
-  instantiate cluster Channel;
-  instantiate cluster ColorControl;
-  instantiate cluster ContentLauncher;
-  instantiate cluster Descriptor;
-  instantiate cluster DoorLock;
-  instantiate cluster FixedLabel;
-  instantiate cluster FlowMeasurement;
-  instantiate cluster Groups;
-  instantiate cluster IasZone;
-  instantiate cluster Identify;
-  instantiate cluster KeypadInput;
-  instantiate cluster LevelControl;
-  instantiate cluster MediaInput;
-  instantiate cluster MediaPlayback;
-  instantiate cluster OnOff;
-  instantiate cluster PressureMeasurement;
-  instantiate cluster RelativeHumidityMeasurement;
-  instantiate cluster Scenes;
-  instantiate cluster Switch;
-  instantiate cluster TargetNavigator;
-  instantiate cluster TemperatureMeasurement;
-  instantiate cluster TestCluster;
-  instantiate cluster Thermostat;
-  instantiate cluster WakeOnLan;
-  instantiate cluster WindowCovering;
+  binding cluster AccountLogin;
+  binding cluster ApplicationBasic;
+  binding cluster ApplicationLauncher;
+  binding cluster AudioOutput;
+  server  cluster BarrierControl;
+  server  cluster BinaryInputBasic;
+  server  cluster Binding;
+  server  cluster BridgedDeviceBasic;
+  binding cluster Channel;
+  server  cluster ColorControl;
+  binding cluster ContentLauncher;
+  server  cluster Descriptor;
+  server  cluster DoorLock;
+  server  cluster FixedLabel;
+  server  cluster FlowMeasurement;
+  server  cluster Groups;
+  server  cluster IasZone;
+  server  cluster Identify;
+  binding cluster KeypadInput;
+  server  cluster LevelControl;
+  binding cluster MediaInput;
+  binding cluster MediaPlayback;
+  server  cluster OnOff;
+  server  cluster PressureMeasurement;
+  server  cluster RelativeHumidityMeasurement;
+  server  cluster Scenes;
+  server  cluster Switch;
+  binding cluster TargetNavigator;
+  server  cluster TemperatureMeasurement;
+  server  cluster TestCluster;
+  server  cluster Thermostat;
+  server  cluster WakeOnLan;
+  server  cluster WindowCovering;
 }
 
 endpoint 2 {
-  instantiate cluster Descriptor;
-  instantiate cluster OccupancySensing;
-  instantiate cluster OnOff;
+  server  cluster Descriptor;
+  server  cluster OccupancySensing;
+  server  cluster OnOff;
 }
 
