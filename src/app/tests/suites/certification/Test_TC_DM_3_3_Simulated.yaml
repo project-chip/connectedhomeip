@@ -11,7 +11,7 @@ tests:
 
     - label: "Wait for Scan Network Command"
       wait: "ScanNetworks"
-      
+
     - label: "Wait for Add Wifi Network Command"
       wait: "AddOrUpdateWiFiNetwork"
       PICS: WIFI
@@ -22,9 +22,7 @@ tests:
 
     - label: "Wait for Enable Network Command"
       wait: "ConnectNetwork"
-    
+
     - label: "Wait for Remove Network Command"
       wait: "RemoveNetwork"
       PICS: WIFI | THREAD
-
-      
