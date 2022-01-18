@@ -76,6 +76,7 @@ p6_sdk_sources("ota_requestor_app_sdk_sources") {
     "${chip_root}/src/platform/P6",
     "${p6_project_dir}/include",
     "${examples_plat_dir}",
+    "${p6_project_dir}/bootloader_cm0p/config",
   ]
 
   defines = [
