@@ -61,8 +61,6 @@ public interface ConfigurationManager {
   String kConfigKey_CountryCode = "country-code";
   String kConfigKey_ActiveLocale = "active-locale";
   String kConfigKey_Breadcrumb = "breadcrumb";
-  String kConfigKey_HourFormat = "hour-format";
-  String kConfigKey_CalendarType = "calendar-type";
 
   // Prefix used for NVS keys that contain Chip group encryption keys.
   String kGroupKeyNamePrefix = "gk-";
