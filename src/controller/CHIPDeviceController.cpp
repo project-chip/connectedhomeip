@@ -878,7 +878,7 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
                                             OnSessionEstablishmentTimeoutCallback, this);
 
     mAutoCommissioner.SetOperationalCredentialsDelegate(mOperationalCredentialsDelegate);
-    mAutoCommissioner.SetCommissioningParameters(params);
+    ReturnErrorOnFailure(mAutoCommissioner.SetCommissioningParameters(params));
     if (device->IsSecureConnected())
     {
         mAutoCommissioner.StartCommissioning(device);
