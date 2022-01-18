@@ -24,6 +24,14 @@
 
 #include <fstream>
 
+extern "C"
+{
+#include "cy_smif_psoc6.h"
+#include "cy_flash_psoc6.h"
+#include "sysflash/sysflash.h"
+#include "bootutil/bootutil.h"
+}
+
 namespace chip {
 
 class OTAImageProcessorImpl : public OTAImageProcessorInterface
@@ -44,6 +52,7 @@ private:
     static void HandleFinalize(intptr_t context);
     static void HandleAbort(intptr_t context);
     static void HandleProcessBlock(intptr_t context);
+    static void HandleApply(intptr_t context);
 
     /**
      * Called to allocate memory for mBlock if necessary and set it to block
@@ -55,9 +64,10 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
-    std::ofstream mOfs;
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
+
+    const struct flash_area *mFlashArea;
 };
 
 } // namespace chip

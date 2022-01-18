@@ -162,7 +162,15 @@
         "-I./libs/wifi-host-driver/WiFi_Host_Driver/src/bus_protocols",
         "-I./libs/wifi-host-driver/WiFi_Host_Driver/src/include",
         "-I./libs/wifi-mw-core",
-        "-I./libs/wifi-mw-core/lwip-whd-port"
+        "-I./libs/wifi-mw-core/lwip-whd-port",
+        "-I./libs/anycloud-ota/source/mcuboot/cy_flash_pal/",
+        "-I./libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/",
+        "-I./libs/anycloud-ota/source/mcuboot/cy_flash_pal/include/",
+        "-I./libs/anycloud-ota/source/mcuboot/cy_flash_pal/include/flash_map_backend/",
+        "-I./libs/anycloud-ota/source/mcuboot/",
+        "-I./libs/anycloud-ota/source/mcuboot/sysflash/",
+        "-I./libs/anycloud-ota/source/mcuboot/bootutil/include",
+        "-I./libs/serial-flash/"
     ],
     "defines": [
         "-DMBEDTLS_USER_CONFIG_FILE=<mbedtls_user_config.h>",
@@ -557,7 +565,14 @@
         "./libs/wifi-host-driver/WiFi_Host_Driver/resources/firmware/COMPONENT_43012/43012C0-mfgtest_clm_blob.c",
         "./libs/wifi-host-driver/WiFi_Host_Driver/resources/firmware/COMPONENT_43012/43012C0_bin.c",
         "./libs/wifi-host-driver/WiFi_Host_Driver/resources/firmware/COMPONENT_43012/43012C0_clm_blob.c",
-        "./arch/sys_arch.c"
+        "./arch/sys_arch.c",
+        "./libs/anycloud-ota/source/mcuboot/cy_flash_pal/mem_config/mem_config_sfdp.c",
+        "./libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_smif_psoc6.c",
+        "./libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_psoc6.c",
+        "./libs/anycloud-ota/source/mcuboot/cy_flash_pal/cy_flash_map.c",
+        "./libs/anycloud-ota/source/mcuboot/bootutil/src/bootutil_misc.c",
+        "./libs/serial-flash/cy_serial_flash_prog.c",
+        "./libs/serial-flash/cy_serial_flash_qspi.c"
     ],
     "cxx_source": [],
     "asm_source": [
