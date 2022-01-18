@@ -78,9 +78,9 @@ server cluster GeneralCommissioning = 48 {
     INT32U failSafeExpiryLengthMs = 1;
   }
 
-  attribute(writable, reportable) int64u breadcrumb = 0;
-  attribute(readonly, reportable) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(writable) int64u breadcrumb = 0;
+  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
@@ -160,7 +160,7 @@ server cluster NetworkCommissioning = 49 {
     INT8U lqi = 8;
   }
 
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
     OCTET_STRING operationalDataset = 0;
@@ -243,11 +243,11 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING label = 6;
   }
 
-  attribute(readonly, reportable) FabricDescriptor fabricsList[] = 1;
-  attribute(readonly, reportable) int8u supportedFabrics = 2;
-  attribute(readonly, reportable) int8u commissionedFabrics = 3;
-  attribute(readonly, reportable) OCTET_STRING trustedRootCertificates[] = 4;
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(readonly) FabricDescriptor fabricsList[] = 1;
+  attribute(readonly) int8u supportedFabrics = 2;
+  attribute(readonly) int8u commissionedFabrics = 3;
+  attribute(readonly) OCTET_STRING trustedRootCertificates[] = 4;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
