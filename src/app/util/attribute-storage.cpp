@@ -548,7 +548,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     src = buffer;
                                     dst = attributeLocation;
                                     if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                             EMBER_AF_NULL_MANUFACTURER_CODE, am->attributeId))
+                                                                             am->attributeId))
                                     {
                                         return EMBER_ZCL_STATUS_NOT_AUTHORIZED;
                                     }
@@ -563,7 +563,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     src = attributeLocation;
                                     dst = buffer;
                                     if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                            EMBER_AF_NULL_MANUFACTURER_CODE, am->attributeId))
+                                                                            am->attributeId))
                                     {
                                         return EMBER_ZCL_STATUS_NOT_AUTHORIZED;
                                     }
@@ -572,12 +572,10 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 // Is the attribute externally stored?
                                 if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
                                 {
-                                    return (write
-                                                ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                        am, EMBER_AF_NULL_MANUFACTURER_CODE, buffer)
-                                                : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                       am, EMBER_AF_NULL_MANUFACTURER_CODE, buffer,
-                                                                                       emberAfAttributeSize(am)));
+                                    return (write ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                          am, buffer)
+                                                  : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                         am, buffer, emberAfAttributeSize(am)));
                                 }
                                 else
                                 {

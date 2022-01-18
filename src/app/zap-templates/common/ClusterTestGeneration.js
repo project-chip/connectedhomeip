@@ -288,14 +288,19 @@ function setDefaultResponse(test)
     throwError(test, errorStr);
   }
 
-  const name = test.isAttribute ? test.attribute : test.event;
+  const name     = test.isAttribute ? test.attribute : test.event;
+  const response = test[kResponseName];
   if (hasResponseValue) {
-    test[kResponseName].values.push({ name : name, value : test[kResponseName].value, saveAs : test[kResponseName].saveAs });
+    const value = { name, value : response.value, saveAs : response.saveAs };
+    response.values.push(value);
   }
 
   if (hasResponseConstraints) {
-    test[kResponseName].values.push(
-        { name : name, constraints : test[kResponseName].constraints, saveAs : test[kResponseName].saveAs });
+    let constraints = { name : name, constraints : response.constraints };
+    if ('saveAs' in response && !hasResponseValue) {
+      constraints.saveAs = response.saveAs;
+    }
+    response.values.push(constraints);
   }
 
   delete test[kResponseName].value;
@@ -503,12 +508,7 @@ function chip_tests_items(options)
   return templateUtil.collectBlocks(this.tests, options, this);
 }
 
-function chip_tests_config(options)
-{
-  return templateUtil.collectBlocks(this.variables.config, options, this);
-}
-
-function getConfigVariable(context, name)
+function getVariable(context, key, name)
 {
   while (!('variables' in context) && context.parent) {
     context = context.parent;
@@ -518,33 +518,55 @@ function getConfigVariable(context, name)
     return null;
   }
 
-  return context.variables.config.find(variable => variable.name == name);
+  return context.variables[key].find(variable => variable.name == name);
 }
 
-function getConfigVariableOrThrow(context, name)
+function getVariableOrThrow(context, key, name)
 {
-  const variable = getConfigVariable(context, name);
+  const variable = getVariable(context, key, name);
   if (variable == null) {
     throw new Error(`Variable ${name} can not be found`);
   }
   return variable;
 }
 
+function chip_tests_variables(options)
+{
+  return templateUtil.collectBlocks(this.variables.tests, options, this);
+}
+
+function chip_tests_variables_has(name, options)
+{
+  const variable = getVariable(this, 'tests', name);
+  return !!variable;
+}
+
+function chip_tests_variables_get_type(name, options)
+{
+  const variable = getVariableOrThrow(this, 'tests', name);
+  return variable.type;
+}
+
+function chip_tests_config(options)
+{
+  return templateUtil.collectBlocks(this.variables.config, options, this);
+}
+
 function chip_tests_config_has(name, options)
 {
-  const variable = getConfigVariable(this, name);
+  const variable = getVariable(this, 'config', name);
   return !!variable;
 }
 
 function chip_tests_config_get_default_value(name, options)
 {
-  const variable = getConfigVariableOrThrow(this, name);
+  const variable = getVariableOrThrow(this, 'config', name);
   return variable.defaultValue;
 }
 
 function chip_tests_config_get_type(name, options)
 {
-  const variable = getConfigVariableOrThrow(this, name);
+  const variable = getVariableOrThrow(this, 'config', name);
   return variable.type;
 }
 
@@ -717,6 +739,9 @@ exports.chip_tests_config                   = chip_tests_config;
 exports.chip_tests_config_has               = chip_tests_config_has;
 exports.chip_tests_config_get_default_value = chip_tests_config_get_default_value;
 exports.chip_tests_config_get_type          = chip_tests_config_get_type;
+exports.chip_tests_variables                = chip_tests_variables;
+exports.chip_tests_variables_has            = chip_tests_variables_has;
+exports.chip_tests_variables_get_type       = chip_tests_variables_get_type;
 exports.isTestOnlyCluster                   = isTestOnlyCluster;
 exports.isLiteralNull                       = isLiteralNull;
 exports.octetStringEscapedForCLiteral       = octetStringEscapedForCLiteral;

@@ -27,7 +27,13 @@
     {{! Maybe we should add a check for properties in the expected object (other
         than "global") that are not present in the struct ? }}
   {{else}}
-    {{#if (isOctetString type)}}
+    {{#if (chip_tests_variables_has expected)}}
+      {{#if (isString type)}}
+      XCTAssertEqualObjects({{actual}}, {{expected}});
+      {{else}}
+      XCTAssertEqual([{{actual}} {{asObjectiveCNumberType "" type true}}Value], {{expected}});
+      {{/if}}
+    {{else if (isOctetString type)}}
       XCTAssertTrue([{{actual}} isEqualToData:[[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral expected}}" length:{{expected.length}}]]);
     {{else if (isCharString type)}}
       XCTAssertTrue([{{actual}} isEqualToString:@"{{expected}}"]);

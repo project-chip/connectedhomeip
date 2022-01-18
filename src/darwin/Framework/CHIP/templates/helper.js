@@ -66,12 +66,12 @@ function asTestValue()
   }
 }
 
-function asObjectiveCBasicType(type)
+function asObjectiveCBasicType(type, options)
 {
   if (StringHelper.isOctetString(type)) {
-    return 'NSData *';
+    return options.hash.is_mutable ? 'NSMutableData *' : 'NSData *';
   } else if (StringHelper.isCharString(type)) {
-    return 'NSString *';
+    return options.hash.is_mutable ? 'NSMutableString *' : 'NSString *';
   } else {
     return ChipTypesHelper.asBasicType(this.chipType);
   }
