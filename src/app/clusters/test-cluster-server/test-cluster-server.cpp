@@ -77,6 +77,7 @@ private:
     CHIP_ERROR ReadListOctetStringAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteListOctetStringAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListLongOctetStringAttribute(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteListLongOctetStringAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListStructOctetStringAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteListStructOctetStringAttribute(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder);
@@ -96,9 +97,20 @@ OctetStringData gListOctetStringData[kAttributeListLength];
 size_t gListOctetStringDataLen = kAttributeListLength;
 OctetStringData gListOperationalCert[kAttributeListLength];
 size_t gListOperationalCertLen = kAttributeListLength;
+size_t gListLongOctetStringLen = kAttributeListLength;
 Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
 Structs::SimpleStruct::Type gStructAttributeValue;
 NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
+
+//                                                     /16             /32             /48             /64
+const char sLongOctetStringBuf[513] = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"  // 64
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"  // 128
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"  // 192
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"  // 256
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"  // 320
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"  // 384
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"  // 448
+                                      "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"; // 512
 
 // We don't actually support any interesting bits in the struct for now, except
 // for a non-null nullableList member.
@@ -151,6 +163,9 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     }
     case ListOctetString::Id: {
         return WriteListOctetStringAttribute(aPath, aDecoder);
+    }
+    case ListLongOctetString::Id: {
+        return WriteListLongOctetStringAttribute(aPath, aDecoder);
     }
     case ListStructOctetString::Id: {
         return WriteListStructOctetStringAttribute(aPath, aDecoder);
@@ -295,45 +310,50 @@ CHIP_ERROR TestAttrAccess::ReadListLongOctetStringAttribute(AttributeValueEncode
 {
     // The ListOctetStringAttribute takes 512 bytes, and the whole attribute will exceed the IPv6 MTU, so we can test list chunking
     // feature with this attribute.
-    char buf[513] = "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef" // 5
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef" // 10
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef" // 15
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef" // 20
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef" // 25
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef"
-                    "0123456789abcdef" // 30
-                    "0123456789abcdef"
-                    "0123456789abcdef"; // 32 * 16 = 512
-    return aEncoder.EncodeList([buf](const auto & encoder) -> CHIP_ERROR {
-        for (uint8_t index = 0; index < kAttributeListLength; index++)
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
+        for (uint8_t index = 0; index < gListLongOctetStringLen; index++)
         {
-            ReturnErrorOnFailure(encoder.Encode(ByteSpan(chip::Uint8::from_const_char(buf), 512)));
+            ReturnErrorOnFailure(encoder.Encode(ByteSpan(chip::Uint8::from_const_char(sLongOctetStringBuf), 512)));
         }
         return CHIP_NO_ERROR;
     });
+}
+
+CHIP_ERROR TestAttrAccess::WriteListLongOctetStringAttribute(const ConcreteDataAttributePath & aPath,
+                                                             AttributeValueDecoder & aDecoder)
+{
+    if (!aPath.IsListOperation() || aPath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll)
+    {
+        ListLongOctetString::TypeInfo::DecodableType list;
+
+        ReturnErrorOnFailure(aDecoder.Decode(list));
+
+        auto iter               = list.begin();
+        gListLongOctetStringLen = 0;
+        while (iter.Next())
+        {
+            const auto & entry = iter.GetValue();
+            VerifyOrReturnError(entry.size() == sizeof(sLongOctetStringBuf) - 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(memcmp(entry.data(), sLongOctetStringBuf, entry.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
+            gListLongOctetStringLen++;
+        }
+
+        return iter.GetStatus();
+    }
+    else if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
+    {
+        ByteSpan entry;
+        ReturnErrorOnFailure(aDecoder.Decode(entry));
+
+        VerifyOrReturnError(entry.size() == sizeof(sLongOctetStringBuf) - 1, CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrReturnError(memcmp(entry.data(), sLongOctetStringBuf, entry.size()) == 0, CHIP_ERROR_INVALID_ARGUMENT);
+        gListLongOctetStringLen++;
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    }
 }
 
 CHIP_ERROR TestAttrAccess::ReadListStructOctetStringAttribute(AttributeValueEncoder & aEncoder)
