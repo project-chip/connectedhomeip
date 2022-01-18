@@ -1172,33 +1172,33 @@ server cluster WiFiNetworkDiagnostics = 54 {
 
 
 endpoint 0 {
-  instantiate cluster AdministratorCommissioning;
-  instantiate cluster Basic;
-  instantiate cluster Binding;
-  instantiate cluster Descriptor;
-  instantiate cluster DiagnosticLogs;
-  instantiate cluster EthernetNetworkDiagnostics;
-  instantiate cluster FixedLabel;
-  instantiate cluster GeneralCommissioning;
-  instantiate cluster GeneralDiagnostics;
-  instantiate cluster GroupKeyManagement;
-  instantiate cluster Identify;
-  instantiate cluster LocalizationConfiguration;
-  instantiate cluster NetworkCommissioning;
-  instantiate cluster OtaSoftwareUpdateProvider;
-  instantiate cluster OperationalCredentials;
-  instantiate cluster SoftwareDiagnostics;
-  instantiate cluster ThreadNetworkDiagnostics;
-  instantiate cluster UserLabel;
-  instantiate cluster WiFiNetworkDiagnostics;
+  server cluster AdministratorCommissioning;
+  server cluster Basic;
+  server cluster Binding;
+  server cluster Descriptor;
+  server cluster DiagnosticLogs;
+  server cluster EthernetNetworkDiagnostics;
+  server cluster FixedLabel;
+  server cluster GeneralCommissioning;
+  server cluster GeneralDiagnostics;
+  server cluster GroupKeyManagement;
+  server cluster Identify;
+  server cluster LocalizationConfiguration;
+  server cluster NetworkCommissioning;
+  server cluster OtaSoftwareUpdateProvider;
+  server cluster OperationalCredentials;
+  server cluster SoftwareDiagnostics;
+  server cluster ThreadNetworkDiagnostics;
+  server cluster UserLabel;
+  server cluster WiFiNetworkDiagnostics;
 }
 
 endpoint 1 {
-  instantiate cluster Basic;
-  instantiate cluster Groups;
-  instantiate cluster Identify;
-  instantiate cluster Identify;
-  instantiate cluster Scenes;
-  instantiate cluster Thermostat;
+  server cluster Basic;
+  server cluster Groups;
+  binding cluster Identify;
+  server cluster Identify;
+  server cluster Scenes;
+  server cluster Thermostat;
 }
 

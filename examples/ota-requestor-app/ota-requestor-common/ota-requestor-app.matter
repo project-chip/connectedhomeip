@@ -467,14 +467,14 @@ server cluster UserLabel = 65 {
 
 
 endpoint 0 {
-  instantiate cluster Basic;
-  instantiate cluster FixedLabel;
-  instantiate cluster GeneralCommissioning;
-  instantiate cluster LocalizationConfiguration;
-  instantiate cluster NetworkCommissioning;
-  instantiate cluster OtaSoftwareUpdateProvider;
-  instantiate cluster OtaSoftwareUpdateRequestor;
-  instantiate cluster OperationalCredentials;
-  instantiate cluster UserLabel;
+  server cluster Basic;
+  server cluster FixedLabel;
+  server cluster GeneralCommissioning;
+  server cluster LocalizationConfiguration;
+  server cluster NetworkCommissioning;
+  binding cluster OtaSoftwareUpdateProvider;
+  server cluster OtaSoftwareUpdateRequestor;
+  server cluster OperationalCredentials;
+  server cluster UserLabel;
 }
 
