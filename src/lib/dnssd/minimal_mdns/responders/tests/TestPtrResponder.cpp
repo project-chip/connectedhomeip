@@ -53,11 +53,12 @@ public:
             uint8_t buffer[128];
 
             BigEndian::BufferWriter out(buffer, sizeof(buffer));
+            RecordWriter writer(&out);
 
             HeaderRef hdr(headerBuffer);
             hdr.Clear();
 
-            NL_TEST_ASSERT(mSuite, record.Append(hdr, ResourceType::kAnswer, out));
+            NL_TEST_ASSERT(mSuite, record.Append(hdr, ResourceType::kAnswer, writer));
 
             ResourceData data;
             SerializedQNameIterator target;

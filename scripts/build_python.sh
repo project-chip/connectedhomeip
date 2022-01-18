@@ -117,7 +117,7 @@ fi
 # Create a virtual environment that has access to the built python tools
 virtualenv --clear "$ENVIRONMENT_ROOT"
 
-# Activate the new enviroment to register the python WHL
+# Activate the new environment to register the python WHL
 
 if [ "$enable_pybindings" == true ]; then
     WHEEL=$(ls "$OUTPUT_ROOT"/pybindings/pycontroller/pychip-*.whl | head -n 1)

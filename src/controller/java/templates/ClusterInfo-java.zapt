@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import androidx.annotation.Nullable;
 import chip.clusterinfo.ClusterInfo;
 import chip.clusterinfo.InteractionInfo;
 import chip.clusterinfo.CommandParameterInfo;
@@ -133,6 +134,50 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedFloatAttributeCallback implements ChipClusters.FloatAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(float value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "float");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedDoubleAttributeCallback implements ChipClusters.DoubleAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(double value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "double");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedDefaultClusterCallback implements DefaultClusterCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -195,7 +240,7 @@ public class ClusterInfoMapping {
 
       {{/if}}
 
-      public static class Delegated{{asUpperCamelCase name}}AttributeCallback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback, DelegatedClusterCallback {
+      public static class Delegated{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback implements ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase name}}AttributeCallback, DelegatedClusterCallback {
         private ClusterCommandCallback callback;
         @Override
         public void setCallbackDelegate(ClusterCommandCallback callback) {
@@ -210,7 +255,7 @@ public class ClusterInfoMapping {
             {{#if (isOctetString type)}}
             CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<byte[]>");
             {{else if (isCharString type)}}
-            // Add String field here after ByteSpan is properly emitted in C++ layer
+            CommandResponseInfo commandResponseInfo = new CommandResponseInfo("valueList", "List<String>");
             {{else}}
             {{! NOTE: asJavaBasicTypeForZclType does not handle isArray well, so
                 add an inline partial to force isArray to false when we want the
@@ -271,9 +316,12 @@ public class ClusterInfoMapping {
      {{! TODO: fill out parameter types }}
      {{#if (zcl_command_arguments_count this.id)}}
      {{#chip_cluster_command_arguments_with_structs_expanded}}
+     {{#if_is_struct type}}
+     {{else}}
        CommandParameterInfo {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo = new CommandParameterInfo("{{asLowerCamelCase label}}", {{asJavaBasicType type}}.class);
        {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}CommandParams.put("{{asLowerCamelCase label}}",{{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo);
      {{#not_last}} {{/not_last}}
+     {{/if_is_struct}}
      {{/chip_cluster_command_arguments_with_structs_expanded}}
      {{else}}
      {{/if}}
@@ -283,10 +331,13 @@ public class ClusterInfoMapping {
          (cluster, callback, commandArguments) -> {
            ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
            .{{asLowerCamelCase name}}((ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback) callback
-           {{#chip_cluster_command_arguments_with_structs_expanded}},
+           {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}},
            ({{#if isOptional}}Optional<{{/if}}{{asJavaBoxedType type}}{{#if isOptional}}>{{/if}})
            commandArguments.get("{{asLowerCamelCase label}}")
+           {{/if_is_struct}}
            {{/chip_cluster_command_arguments_with_structs_expanded}}
+           {{! TODO: Allow timeout to be passed from client for this and timed write. }}
+           {{#if mustUseTimedInvoke}}, 10000{{/if}}
            );
          },
          () -> new Delegated{{asUpperCamelCase responseName}}Callback(),
@@ -301,6 +352,7 @@ public class ClusterInfoMapping {
            ({{#if isOptional}}Optional<{{/if}}{{asJavaBoxedType type}}{{#if isOptional}}>{{/if}})
            commandArguments.get("{{asLowerCamelCase label}}")
            {{/chip_cluster_command_arguments_with_structs_expanded}}
+           {{#if mustUseTimedInvoke}}, 10000{{/if}}
            );
          },
          () -> new DelegatedDefaultClusterCallback(),

@@ -33,6 +33,7 @@
 #include <app/util/basic-types.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
 #include <controller/CHIPDeviceControllerSystemState.h>
+#include <controller/OperationalCredentialsDelegate.h>
 #include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/DLLUtil.h>
@@ -41,6 +42,7 @@
 #include <messaging/Flags.h>
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
+#include <transport/SessionHolder.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -53,7 +55,6 @@
 
 namespace chip {
 
-constexpr size_t kOpCSRNonceLength       = 32;
 constexpr size_t kAttestationNonceLength = 32;
 
 using DeviceIPTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
@@ -65,12 +66,12 @@ using DeviceIPTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 
 struct ControllerDeviceInitParams
 {
-    DeviceTransportMgr * transportMgr           = nullptr;
-    SessionManager * sessionManager             = nullptr;
-    Messaging::ExchangeManager * exchangeMgr    = nullptr;
-    Inet::InetLayer * inetLayer                 = nullptr;
-    PersistentStorageDelegate * storageDelegate = nullptr;
-    SessionIDAllocator * idAllocator            = nullptr;
+    DeviceTransportMgr * transportMgr                             = nullptr;
+    SessionManager * sessionManager                               = nullptr;
+    Messaging::ExchangeManager * exchangeMgr                      = nullptr;
+    Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager = nullptr;
+    PersistentStorageDelegate * storageDelegate                   = nullptr;
+    SessionIDAllocator * idAllocator                              = nullptr;
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * bleLayer = nullptr;
 #endif
@@ -83,7 +84,7 @@ class CommissioneeDeviceProxy : public DeviceProxy, public SessionReleaseDelegat
 {
 public:
     ~CommissioneeDeviceProxy();
-    CommissioneeDeviceProxy() {}
+    CommissioneeDeviceProxy() : mSecureSession(*this) {}
     CommissioneeDeviceProxy(const CommissioneeDeviceProxy &) = delete;
 
     /**
@@ -119,12 +120,12 @@ public:
      */
     void Init(ControllerDeviceInitParams params, FabricIndex fabric)
     {
-        mSessionManager = params.sessionManager;
-        mExchangeMgr    = params.exchangeMgr;
-        mInetLayer      = params.inetLayer;
-        mFabricIndex    = fabric;
-        mIDAllocator    = params.idAllocator;
-        mpIMDelegate    = params.imDelegate;
+        mSessionManager     = params.sessionManager;
+        mExchangeMgr        = params.exchangeMgr;
+        mUDPEndPointManager = params.udpEndPointManager;
+        mFabricIndex        = fabric;
+        mIDAllocator        = params.idAllocator;
+        mpIMDelegate        = params.imDelegate;
 #if CONFIG_NETWORK_LAYER_BLE
         mBleLayer = params.bleLayer;
 #endif
@@ -157,21 +158,13 @@ public:
 
     /**
      * @brief
-     *   Called when a new pairing is being established
-     *
-     * @param session A handle to the secure session
-     */
-    void OnNewConnection(SessionHandle session);
-
-    /**
-     * @brief
      *   Called when the associated session is released
      *
      *   The receiver should release all resources associated with the connection.
      *
      * @param session A handle to the secure session
      */
-    void OnSessionReleased(SessionHandle session) override;
+    void OnSessionReleased() override;
 
     /**
      *  In case there exists an open session to the device, mark it as expired.
@@ -203,6 +196,14 @@ public:
 
     void SetActive(bool active) { mActive = active; }
 
+    /**
+     * @brief
+     * Called to indicate this proxy has been paired successfully.
+     *
+     * This causes the secure session parameters to be loaded and stores the session details in the session manager.
+     */
+    CHIP_ERROR SetConnected();
+
     bool IsSecureConnected() const override { return IsActive() && mState == ConnectionState::SecureConnected; }
 
     bool IsSessionSetupInProgress() const { return IsActive() && mState == ConnectionState::Connecting; }
@@ -211,9 +212,10 @@ public:
 
     NodeId GetDeviceId() const override { return mDeviceId; }
 
-    bool MatchesSession(SessionHandle session) const { return mSecureSession.HasValue() && mSecureSession.Value() == session; }
+    bool MatchesSession(const SessionHandle & session) const { return mSecureSession.Contains(session); }
 
-    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession; }
+    SessionHolder & GetSecureSessionHolder() { return mSecureSession; }
+    chip::Optional<SessionHandle> GetSecureSession() const override { return mSecureSession.ToOptional(); }
 
     Messaging::ExchangeManager * GetExchangeManager() const override { return mExchangeMgr; }
 
@@ -289,7 +291,7 @@ private:
      */
     Transport::PeerAddress mDeviceAddress = Transport::PeerAddress::UDP(Inet::IPAddress::Any);
 
-    Inet::InetLayer * mInetLayer = nullptr;
+    Inet::EndPointManager<Inet::UDPEndPoint> * mUDPEndPointManager = nullptr;
 
     bool mActive           = false;
     ConnectionState mState = ConnectionState::NotConnected;
@@ -304,7 +306,7 @@ private:
 
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
 
-    Optional<SessionHandle> mSecureSession = Optional<SessionHandle>::Missing();
+    SessionHolderWithDelegate mSecureSession;
 
     Controller::DeviceControllerInteractionModelDelegate * mpIMDelegate = nullptr;
 
@@ -334,7 +336,7 @@ private:
     FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
     // TODO: Offload Nonces and DAC/PAI into a new struct
-    uint8_t mCSRNonce[kOpCSRNonceLength];
+    uint8_t mCSRNonce[Controller::kOpCSRNonceLength];
     uint8_t mAttestationNonce[kAttestationNonceLength];
 
     uint8_t * mDAC   = nullptr;

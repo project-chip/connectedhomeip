@@ -26,13 +26,6 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-enum class Features
-{
-    Lift          = 0x01,
-    Tilt          = 0x02,
-    PositionAware = 0x04
-};
-
 struct Mode
 {
     uint8_t motorDirReversed : 1; // bit 0
@@ -88,8 +81,11 @@ struct SafetyStatus
 };
 static_assert(sizeof(SafetyStatus) == sizeof(uint16_t), "SafetyStatus Size is not correct");
 
-bool IsOpen(chip::EndpointId endpoint);
-bool IsClosed(chip::EndpointId endpoint);
+bool IsLiftOpen(chip::EndpointId endpoint);
+bool IsLiftClosed(chip::EndpointId endpoint);
+
+bool IsTiltOpen(chip::EndpointId endpoint);
+bool IsTiltClosed(chip::EndpointId endpoint);
 
 void TypeSet(chip::EndpointId endpoint, EmberAfWcType type);
 EmberAfWcType TypeGet(chip::EndpointId endpoint);

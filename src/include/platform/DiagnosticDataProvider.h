@@ -50,12 +50,12 @@ struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::Net
 };
 
 /**
- * Defines the delegate class of Platform Manager to notify platform updates.
+ * Defines the General Diagnostics Delegate class to notify platform events.
  */
-class DiagnosticsDelegate
+class GeneralDiagnosticsDelegate
 {
 public:
-    virtual ~DiagnosticsDelegate() {}
+    virtual ~GeneralDiagnosticsDelegate() {}
 
     /**
      * @brief
@@ -67,19 +67,62 @@ public:
      * @brief
      *   Called when the Node detects a hardware fault has been raised.
      */
-    virtual void OnHardwareFaultsDetected() {}
+    virtual void OnHardwareFaultsDetected(GeneralFaults<kMaxHardwareFaults> & previous, GeneralFaults<kMaxHardwareFaults> & current)
+    {}
 
     /**
      * @brief
      *   Called when the Node detects a radio fault has been raised.
      */
-    virtual void OnRadioFaultsDetected() {}
+    virtual void OnRadioFaultsDetected(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current) {}
 
     /**
      * @brief
      *   Called when the Node detects a network fault has been raised.
      */
-    virtual void OnNetworkFaultsDetected() {}
+    virtual void OnNetworkFaultsDetected(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current) {}
+};
+
+/**
+ * Defines the Software Diagnostics Delegate class to notify software events.
+ */
+class SoftwareDiagnosticsDelegate
+{
+public:
+    virtual ~SoftwareDiagnosticsDelegate() {}
+
+    /**
+     * @brief
+     *   Called when a software fault that has taken place on the Node.
+     */
+    virtual void OnSoftwareFaultDetected(chip::app::Clusters::SoftwareDiagnostics::Structs::SoftwareFault::Type & softwareFault) {}
+};
+
+/**
+ * Defines the WiFi Diagnostics Delegate class to notify WiFi network events.
+ */
+class WiFiDiagnosticsDelegate
+{
+public:
+    virtual ~WiFiDiagnosticsDelegate() {}
+
+    /**
+     * @brief
+     *   Called when the Node detects Node’s Wi-Fi connection has been disconnected.
+     */
+    virtual void OnDisconnectionDetected(uint16_t reasonCode) {}
+
+    /**
+     * @brief
+     *   Called when the Node fails to associate or authenticate an access point.
+     */
+    virtual void OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status) {}
+
+    /**
+     * @brief
+     *   Called when the Node’s connection status to a Wi-Fi network has changed.
+     */
+    virtual void OnConnectionStatusChanged(uint8_t connectionStatus) {}
 };
 
 /**
@@ -88,8 +131,25 @@ public:
 class DiagnosticDataProvider
 {
 public:
-    void SetDelegate(DiagnosticsDelegate * delegate) { mDelegate = delegate; }
-    DiagnosticsDelegate * GetDelegate() const { return mDelegate; }
+    enum BootReasonType : uint8_t
+    {
+        Unspecified             = 0,
+        PowerOnReboot           = 1,
+        BrownOutReset           = 2,
+        SoftwareWatchdogReset   = 3,
+        HardwareWatchdogReset   = 4,
+        SoftwareUpdateCompleted = 5,
+        SoftwareReset           = 6,
+    };
+
+    void SetGeneralDiagnosticsDelegate(GeneralDiagnosticsDelegate * delegate) { mGeneralDiagnosticsDelegate = delegate; }
+    GeneralDiagnosticsDelegate * GetGeneralDiagnosticsDelegate() const { return mGeneralDiagnosticsDelegate; }
+
+    void SetSoftwareDiagnosticsDelegate(SoftwareDiagnosticsDelegate * delegate) { mSoftwareDiagnosticsDelegate = delegate; }
+    SoftwareDiagnosticsDelegate * GetSoftwareDiagnosticsDelegate() const { return mSoftwareDiagnosticsDelegate; }
+
+    void SetWiFiDiagnosticsDelegate(WiFiDiagnosticsDelegate * delegate) { mWiFiDiagnosticsDelegate = delegate; }
+    WiFiDiagnosticsDelegate * GetWiFiDiagnosticsDelegate() const { return mWiFiDiagnosticsDelegate; }
 
     /**
      * General Diagnostics methods.
@@ -163,7 +223,9 @@ protected:
     virtual ~DiagnosticDataProvider() = default;
 
 private:
-    DiagnosticsDelegate * mDelegate = nullptr;
+    GeneralDiagnosticsDelegate * mGeneralDiagnosticsDelegate   = nullptr;
+    SoftwareDiagnosticsDelegate * mSoftwareDiagnosticsDelegate = nullptr;
+    WiFiDiagnosticsDelegate * mWiFiDiagnosticsDelegate         = nullptr;
 
     // No copy, move or assignment.
     DiagnosticDataProvider(const DiagnosticDataProvider &)  = delete;

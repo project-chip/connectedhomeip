@@ -119,7 +119,7 @@ CHIP_ERROR InvokeRequestMessage::Parser::GetSuppressResponse(bool * const apSupp
 
 CHIP_ERROR InvokeRequestMessage::Parser::GetTimedRequest(bool * const apTimedRequest) const
 {
-    return GetSimpleValue(to_underlying(Tag::kSuppressResponse), TLV::kTLVType_Boolean, apTimedRequest);
+    return GetSimpleValue(to_underlying(Tag::kTimedRequest), TLV::kTLVType_Boolean, apTimedRequest);
 }
 
 CHIP_ERROR InvokeRequestMessage::Parser::GetInvokeRequests(InvokeRequests::Parser * const apInvokeRequests) const

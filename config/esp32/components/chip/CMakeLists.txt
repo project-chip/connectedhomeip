@@ -29,15 +29,7 @@ if(NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../.. REALPATH)
 endif()
 
-set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs)
-
-if (CONFIG_ENABLE_CHIP_SHELL)
-    list(APPEND CHIP_REQURIE_COMPONENTS console)
-endif()
-
-if (CONFIG_OPENTHREAD_ENABLED)
-    list(APPEND CHIP_REQURIE_COMPONENTS openthread)
-endif()
+set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs app_update console openthread)
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_DEFAULT OR CONFIG_COMPILER_OPTIMIZATION_NONE)
@@ -88,9 +80,11 @@ if(CONFIG_ENABLE_PW_RPC)
     string(APPEND chip_gn_args "import(\"//build_overrides/pigweed.gni\")\n")
     chip_gn_arg_append("remove_default_configs"             "[\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_build:cpp17\"]")
     chip_gn_arg_append("chip_build_pw_rpc_lib"              "true")
+    chip_gn_arg_append("chip_build_pw_trace_lib"            "true")
     chip_gn_arg_append("pw_log_BACKEND"                     "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_log_basic\"")
     chip_gn_arg_append("pw_assert_BACKEND"                  "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_assert_log\"")
     chip_gn_arg_append("pw_sys_io_BACKEND"                  "\"//third_party/connectedhomeip/examples/platform/esp32/pw_sys_io:pw_sys_io_esp32\"")
+    chip_gn_arg_append("pw_trace_BACKEND"                   "\"//third_party/connectedhomeip/third_party/pigweed/repo/pw_trace_tokenized\"")
     chip_gn_arg_append("dir_pw_third_party_nanopb"          "\"//third_party/connectedhomeip/third_party/nanopb/repo\"")
     chip_gn_arg_append("pw_build_LINK_DEPS"                 "[\"\$dir_pw_assert:impl\", \"\$dir_pw_log:impl\"]")
 endif()
@@ -105,6 +99,19 @@ endif()
 
 if (CONFIG_OPENTHREAD_ENABLED)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
+endif()
+
+if (CONFIG_OPENTHREAD_FTD)
+    chip_gn_arg_append("chip_openthread_ftd"                    "true")
+endif()
+
+if (CONFIG_ENABLE_OTA_REQUESTOR)
+    chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
+endif()
+
+if (CONFIG_ENABLE_ROTATING_DEVICE_ID)
+    chip_gn_arg_append("chip_enable_additional_data_advertising"   "true")
+    chip_gn_arg_append("chip_enable_rotating_device_id"            "true")
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")

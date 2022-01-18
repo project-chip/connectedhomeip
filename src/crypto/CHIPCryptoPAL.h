@@ -46,6 +46,8 @@ constexpr size_t kP256_ECDSA_Signature_Length_Raw = (2 * kP256_FE_Length);
 constexpr size_t kP256_Point_Length               = (2 * kP256_FE_Length + 1);
 constexpr size_t kSHA256_Hash_Length              = 32;
 constexpr size_t kSHA1_Hash_Length                = 20;
+constexpr size_t kSubjectKeyIdentifierLength      = kSHA1_Hash_Length;
+constexpr size_t kAuthorityKeyIdentifierLength    = kSHA1_Hash_Length;
 
 constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
@@ -818,7 +820,7 @@ public:
                                      size_t Lin_len);
 
     /**
-     * @brief Start the Spake2+ process as a prover (i.e. a commisioner).
+     * @brief Start the Spake2+ process as a prover (i.e. a commissioner).
      *
      * @param my_identity       The prover identity. May be NULL if identities are not established.
      * @param my_identity_len   The prover identity length.
@@ -1206,8 +1208,59 @@ CHIP_ERROR LoadCertFromPKCS7(const char * pkcs7, X509DerCertificate * x509list, 
 
 CHIP_ERROR GetNumberOfCertsFromPKCS7(const char * pkcs7, uint32_t * n_certs);
 
+enum class CertificateChainValidationResult
+{
+    kSuccess = 0,
+
+    kRootFormatInvalid   = 100,
+    kRootArgumentInvalid = 101,
+
+    kICAFormatInvalid   = 200,
+    kICAArgumentInvalid = 201,
+
+    kLeafFormatInvalid   = 300,
+    kLeafArgumentInvalid = 301,
+
+    kChainInvalid = 400,
+
+    kNoMemory = 500,
+
+    kInternalFrameworkError = 600,
+};
+
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
-                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen);
+                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
+                                    CertificateChainValidationResult & result);
+
+/**
+ * @brief Validate timestamp of a certificate (toBeEvaluatedCertificate) in comparison with other certificate's
+ *        (referenceCertificate) issuing timestamp.
+ *
+ * Errors are:
+ *   - CHIP_ERROR_CERT_EXPIRED if the certificate timestamp does not satisfy the reference certificate's issuing timestamp.
+ *   - CHIP_ERROR_INVALID_ARGUMENT when passing an invalid argument.
+ *   - CHIP_ERROR_INTERNAL on any unexpected crypto or data conversion errors.
+ *
+ *  @param referenceCertificate     A DER Certificate ByteSpan used as the issuing timestamp reference.
+ *  @param toBeEvaluatedCertificate A DER Certificate ByteSpan used to evaluate issuance against the referenceCertificate.
+ *
+ *  @returns a CHIP_ERROR (see above) on failure or CHIP_NO_ERROR otherwise.
+ **/
+CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate);
+
+/**
+ * @brief Validate a certificate's validity date against current time.
+ *
+ * Errors are:
+ *   - CHIP_ERROR_CERT_EXPIRED if the certificate has expired.
+ *   - CHIP_ERROR_INVALID_ARGUMENT when passing an invalid argument.
+ *   - CHIP_ERROR_INTERNAL on any unexpected crypto or data conversion errors.
+ *
+ *  @param certificate A DER Certificate ByteSpan used as the validity reference to be checked against current time.
+ *
+ *  @returns a CHIP_ERROR (see above) on failure or CHIP_NO_ERROR otherwise.
+ **/
+CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate);
 
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey);
 

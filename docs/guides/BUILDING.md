@@ -91,7 +91,7 @@ Boot the SD card, login with the default user account "ubuntu" and password
 Finally, install some Raspberry Pi specific dependencies:
 
 ```
-sudo apt-get install pi-bluetooth
+sudo apt-get install pi-bluetooth avahi-utils
 ```
 
 You need to reboot your RPi after install `pi-bluetooth`.
@@ -280,7 +280,7 @@ all of the target instances. For example:
 gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 ```
 
-Note: Some platforms that can be build as part of the unified build require
+Note: Some platforms that can be built as part of the unified build require
 downloading additional SDKs. To add these to the build, the location of the SDK
 installation must be provided as a build argument. For example, to add the
 Simplelink cc13x2_26x2 examples to the unified build, install the

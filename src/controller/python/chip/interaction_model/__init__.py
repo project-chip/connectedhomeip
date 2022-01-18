@@ -22,11 +22,11 @@
 
 """Provides Python APIs for CHIP."""
 import enum
-from .delegate import OnSubscriptionReport, SetAttributeReportCallback, AttributePath, AttributePathIBstruct
+from .delegate import AttributePath, AttributePathIBstruct, EventPath, EventPathIBstruct
 
 from chip.exceptions import ChipStackException
 
-__all__ = ["IMDelegate", "Status", "InteractionModelError"]
+__all__ = ["Status", "InteractionModelError"]
 
 
 class Status(enum.IntEnum):

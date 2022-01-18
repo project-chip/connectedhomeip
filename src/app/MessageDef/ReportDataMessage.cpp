@@ -40,10 +40,10 @@ namespace app {
 CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint16_t TagPresenceMask = 0;
+    uint16_t tagPresenceMask = 0;
     chip::TLV::TLVReader reader;
-    AttributeReportIBs::Parser AttributeReportIBs;
-    EventReports::Parser EventReports;
+    AttributeReportIBs::Parser attributeReportIBs;
+    EventReportIBs::Parser eventReportIBs;
 
     PRETTY_PRINT("ReportDataMessage =");
     PRETTY_PRINT("{");
@@ -58,8 +58,8 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
         switch (chip::TLV::TagNumFromTag(reader.GetTag()))
         {
         case kCsTag_SuppressResponse:
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_SuppressResponse)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_SuppressResponse);
+            VerifyOrExit(!(tagPresenceMask & (1 << kCsTag_SuppressResponse)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << kCsTag_SuppressResponse);
             VerifyOrExit(chip::TLV::kTLVType_Boolean == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -71,8 +71,8 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
 #endif // CHIP_DETAIL_LOGGING
             break;
         case kCsTag_SubscriptionId:
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_SubscriptionId)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_SubscriptionId);
+            VerifyOrExit(!(tagPresenceMask & (1 << kCsTag_SubscriptionId)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << kCsTag_SubscriptionId);
             VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -85,15 +85,15 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
             break;
         case kCsTag_AttributeReportIBs:
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributeReportIBs)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_AttributeReportIBs);
+            VerifyOrExit(!(tagPresenceMask & (1 << kCsTag_AttributeReportIBs)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << kCsTag_AttributeReportIBs);
             VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                AttributeReportIBs.Init(reader);
+                attributeReportIBs.Init(reader);
 
                 PRETTY_PRINT_INCDEPTH();
-                err = AttributeReportIBs.CheckSchemaValidity();
+                err = attributeReportIBs.CheckSchemaValidity();
                 SuccessOrExit(err);
                 PRETTY_PRINT_DECDEPTH();
             }
@@ -101,23 +101,23 @@ CHIP_ERROR ReportDataMessage::Parser::CheckSchemaValidity() const
             break;
         case kCsTag_EventReports:
             // check if this tag has appeared before
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventReports)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_EventReports);
+            VerifyOrExit(!(tagPresenceMask & (1 << kCsTag_EventReports)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << kCsTag_EventReports);
             VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
-                EventReports.Init(reader);
+                eventReportIBs.Init(reader);
 
                 PRETTY_PRINT_INCDEPTH();
-                err = EventReports.CheckSchemaValidity();
+                err = eventReportIBs.CheckSchemaValidity();
                 SuccessOrExit(err);
                 PRETTY_PRINT_DECDEPTH();
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
         case kCsTag_MoreChunkedMessages:
-            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_MoreChunkedMessages)), err = CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_MoreChunkedMessages);
+            VerifyOrExit(!(tagPresenceMask & (1 << kCsTag_MoreChunkedMessages)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << kCsTag_MoreChunkedMessages);
             VerifyOrExit(chip::TLV::kTLVType_Boolean == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
@@ -178,7 +178,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReportDataMessage::Parser::GetEventReports(EventReports::Parser * const apEventReports) const
+CHIP_ERROR ReportDataMessage::Parser::GetEventReports(EventReportIBs::Parser * const apEventReports) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -236,7 +236,7 @@ AttributeReportIBs::Builder & ReportDataMessage::Builder::CreateAttributeReportI
     return mAttributeReportIBsBuilder;
 }
 
-EventReports::Builder & ReportDataMessage::Builder::CreateEventReports()
+EventReportIBs::Builder & ReportDataMessage::Builder::CreateEventReports()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)

@@ -32,15 +32,12 @@ jobs:
             BUILD_TYPE: mbedos
             APP_PROFILE: release
             APP_TARGET: CY8CPROTO_062_4343W
-            GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
-            GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-            GH_EVENT_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build-mbed-os:0.5.28
+            image: connectedhomeip/chip-build-mbed-os:0.5.48
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -50,14 +47,11 @@ jobs:
               with:
                   submodules: true
 
-            - name: Get parent for size reports
-              run: |
-                MERGE_PARENT="$(git --no-pager log -1 --pretty=tformat:%s | sed -n -e 's/Merge [0-9a-f]\+ into //p')"
-                if test -z "${MERGE_PARENT}" || test "${GH_EVENT_PARENT}" = 0
-                then
-                  MERGE_PARENT=$GH_EVENT_BASE
-                fi
-                echo "GH_EVENT_PARENT=$MERGE_PARENT" >>$GITHUB_ENV
+            - name: Set up environment for size reports
+              if: ${{ !env.ACT }}
+              env:
+                  GH_CONTEXT: ${{ toJson(github) }}
+              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
             - name: Bootstrap
               timeout-minutes: 10
@@ -125,6 +119,6 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
-                  name: Size,Mbed-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
+                  name: Size,Mbed-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
                   path: |
                       /tmp/bloat_reports/

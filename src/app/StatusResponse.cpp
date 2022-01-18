@@ -21,8 +21,8 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR StatusResponse::SendStatusResponse(Protocols::InteractionModel::Status aStatus,
-                                              Messaging::ExchangeContext * apExchangeContext, bool aExpectResponse)
+CHIP_ERROR StatusResponse::Send(Protocols::InteractionModel::Status aStatus, Messaging::ExchangeContext * apExchangeContext,
+                                bool aExpectResponse)
 {
     VerifyOrReturnError(apExchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
@@ -54,7 +54,7 @@ CHIP_ERROR StatusResponse::ProcessStatusResponse(System::PacketBufferHandle && a
     ReturnErrorOnFailure(response.CheckSchemaValidity());
 #endif
     ReturnErrorOnFailure(response.GetStatus(aStatus.mStatus));
-    ChipLogProgress(InteractionModel, "Received status response, status is %" PRIu16, to_underlying(aStatus.mStatus));
+    ChipLogProgress(InteractionModel, "Received status response, status is %" PRIu8, to_underlying(aStatus.mStatus));
 
     if (aStatus.mStatus == Protocols::InteractionModel::Status::Success)
     {

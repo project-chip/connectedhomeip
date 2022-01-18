@@ -10,6 +10,7 @@
 {{#zcl_enums}}
 {{#unless (isStrEqual label "Status")}}
 {{#unless (isStrEqual label "ReportingDirection")}}
+{{#if (isWeaklyTypedEnum label)}}
 
 // Enum for {{label}}
 enum EmberAf{{asType label}} : {{asUnderlyingZclType type}} {
@@ -17,6 +18,7 @@ enum EmberAf{{asType label}} : {{asUnderlyingZclType type}} {
 {{ident}}EMBER_ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} = {{value}},
 {{/zcl_enum_items}}
 };
+{{/if}}
 {{/unless}}
 {{/unless}}
 {{/zcl_enums}}

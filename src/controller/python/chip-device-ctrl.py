@@ -200,6 +200,8 @@ class DeviceMgrCmd(Cmd):
         "close-ble",
         "close-session",
         "resolve",
+        "paseonly",
+        "commission",
         "zcl",
         "zclread",
         "zclsubscribe",
@@ -491,6 +493,58 @@ class DeviceMgrCmd(Cmd):
                 print(f"Unable to connect: {ex}")
         return -1
 
+    def do_paseonly(self, line):
+        """
+        paseonly -ip <ip address> <setup pin code> [<nodeid>]
+
+        TODO: Add more methods to connect to device (like cert for auth, and IP
+              for connection)
+        """
+
+        try:
+            args = shlex.split(line)
+            if len(args) <= 1:
+                print("Usage:")
+                self.do_help("paseonly")
+                return
+
+            nodeid = random.randint(1, 1000000)  # Just a random number
+            if len(args) == 4:
+                nodeid = int(args[3])
+            print("Device is assigned with nodeid = {}".format(nodeid))
+
+            if args[0] == "-ip" and len(args) >= 3:
+                self.devCtrl.EstablishPASESessionIP(args[1].encode(
+                    "utf-8"), int(args[2]), nodeid)
+            else:
+                print("Usage:")
+                self.do_help("paseonly")
+                return
+            print(
+                "Device temporary node id (**this does not match spec**): {}".format(nodeid))
+        except Exception as ex:
+            print(str(ex))
+            return
+
+    def do_commission(self, line):
+        """
+        commission nodeid
+
+        Runs commissioning on a device that has been connected with paseonly
+        """
+        try:
+            args = shlex.split(line)
+            if len(args) != 1:
+                print("Usage:")
+                self.do_help("commission")
+                return
+
+            nodeid = int(args[0])
+            self.devCtrl.Commission(nodeid)
+        except Exception as ex:
+            print(str(ex))
+            return
+
     def do_connect(self, line):
         """
         connect -ip <ip address> <setup pin code> [<nodeid>]
@@ -636,7 +690,7 @@ class DeviceMgrCmd(Cmd):
             group.add_argument(
                 '-s', help='discover commissionable nodes with given short discriminator', type=int)
             group.add_argument(
-                '-v', help='discover commissionable nodes wtih given vendor ID', type=int)
+                '-v', help='discover commissionable nodes with given vendor ID', type=int)
             group.add_argument(
                 '-t', help='discover commissionable nodes with given device type', type=int)
             group.add_argument(
@@ -824,8 +878,10 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 6:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
+                res = self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), int(args[5]))
+                print(res.GetAllValues())
+                print(f"Subscription Established: {res}")
             elif len(args) == 2 and args[0] == '-shutdown':
                 subscriptionId = int(args[1], base=0)
                 self.devCtrl.ZCLShutdownSubscription(subscriptionId)
@@ -840,19 +896,34 @@ class DeviceMgrCmd(Cmd):
 
     def do_setpairingwificredential(self, line):
         """
-        set-pairing-wifi-credential
-
-        Removed, use network commissioning cluster instead.
+        set-pairing-wifi-credential ssid credentials
         """
-        print("Pairing WiFi Credential is nolonger available, use NetworkCommissioning cluster instead.")
+        try:
+            args = shlex.split(line)
+            if len(args) < 2:
+                print("Usage:")
+                self.do_help("set-pairing-wifi-credential")
+                return
+            self.devCtrl.SetWiFiCredentials(
+                args[0].encode("utf-8"), args[1].encode("utf-8"))
+        except Exception as ex:
+            print(str(ex))
+            return
 
     def do_setpairingthreadcredential(self, line):
         """
-        set-pairing-thread-credential
-
-        Removed, use network commissioning cluster instead.
+        set-pairing-thread-credential threadOperationalDataset
         """
-        print("Pairing Thread Credential is nolonger available, use NetworkCommissioning cluster instead.")
+        try:
+            args = shlex.split(line)
+            if len(args) < 1:
+                print("Usage:")
+                self.do_help("set-pairing-thread-credential")
+                return
+            self.devCtrl.SetThreadOperationalDataset(bytes.fromhex(args[0]))
+        except Exception as ex:
+            print(str(ex))
+            return
 
     def do_opencommissioningwindow(self, line):
         """

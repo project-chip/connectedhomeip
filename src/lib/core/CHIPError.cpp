@@ -593,8 +593,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
     case CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION.AsInteger():
         desc = "Unsupported wireless operating location";
         break;
-    case CHIP_ERROR_MDNS_COLLISSION.AsInteger():
-        desc = "mDNS collission";
+    case CHIP_ERROR_MDNS_COLLISION.AsInteger():
+        desc = "mDNS collision";
         break;
     case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH.AsInteger():
         desc = "Malformed Interacton Model Attribute Path";
@@ -685,6 +685,12 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         break;
     case CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB.AsInteger():
         desc = "Malformed Interaction Model Event Report IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB.AsInteger():
+        desc = "Malformed Interaction Model Cluster Path IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB.AsInteger():
+        desc = "Malformed Interaction Model Data Version Filter IB";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

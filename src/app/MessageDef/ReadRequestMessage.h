@@ -1,7 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,8 +18,9 @@
 #pragma once
 
 #include "AttributePathIBs.h"
-#include "EventFilters.h"
-#include "EventPaths.h"
+#include "DataVersionFilterIBs.h"
+#include "EventFilterIBs.h"
+#include "EventPathIBs.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -35,8 +35,8 @@ namespace ReadRequestMessage {
 enum class Tag : uint8_t
 {
     kAttributeRequests  = 0,
-    kEventRequests      = 1,
-    kDataVersionFilters = 2,
+    kDataVersionFilters = 1,
+    kEventRequests      = 2,
     kEventFilters       = 3,
     kIsFabricFiltered   = 4,
 };
@@ -72,6 +72,14 @@ public:
     CHIP_ERROR GetAttributeRequests(AttributePathIBs::Parser * const apAttributeRequests) const;
 
     /**
+     *  @brief Get a TLVReader for the DataVersionFilterIBs. Next() must be called before accessing them.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetDataVersionFilters(DataVersionFilterIBs::Parser * const apDataVersionFilters) const;
+
+    /**
      *  @brief Get a TLVReader for the EventRequests. Next() must be called before accessing them.
      *
      *  @param [in] apEventPaths    A pointer to apEventPaths
@@ -79,15 +87,15 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventRequests(EventPaths::Parser * const apEventRequests) const;
+    CHIP_ERROR GetEventRequests(EventPathIBs::Parser * const apEventRequests) const;
 
     /**
-     *  @brief Get a TLVReader for the EventFilters. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the EventFilterIBs. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventFilters(EventFilters::Parser * const apEventFilters) const;
+    CHIP_ERROR GetEventFilters(EventFilterIBs::Parser * const apEventFilters) const;
 
     /**
      *  @brief Get IsFabricFiltered boolean
@@ -111,18 +119,25 @@ public:
     AttributePathIBs::Builder & CreateAttributeRequests();
 
     /**
-     *  @brief Initialize a EventPaths::Builder for writing into the TLV stream
+     *  @brief Initialize a DataVersionFilterIBs::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventPaths::Builder
+     *  @return A reference to DataVersionFilterIBs::Builder
      */
-    EventPaths::Builder & CreateEventRequests();
+    DataVersionFilterIBs::Builder & CreateDataVersionFilters();
 
     /**
-     *  @brief Initialize a EventFilters::Builder for writing into the TLV stream
+     *  @brief Initialize a EventPathIBs::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventFilters::Builder
+     *  @return A reference to EventPathIBs::Builder
      */
-    EventFilters::Builder & CreateEventFilters();
+    EventPathIBs::Builder & CreateEventRequests();
+
+    /**
+     *  @brief Initialize a EventFilterIBs::Builder for writing into the TLV stream
+     *
+     *  @return A reference to EventFilterIBs::Builder
+     */
+    EventFilterIBs::Builder & CreateEventFilters();
 
     /**
      *  @brief  limits the data written within fabric-scoped lists to the accessing fabric
@@ -139,8 +154,9 @@ public:
 
 private:
     AttributePathIBs::Builder mAttributeRequests;
-    EventPaths::Builder mEventRequests;
-    EventFilters::Builder mEventFilters;
+    DataVersionFilterIBs::Builder mDataVersionFilters;
+    EventPathIBs::Builder mEventRequests;
+    EventFilterIBs::Builder mEventFilters;
 };
 } // namespace ReadRequestMessage
 } // namespace app

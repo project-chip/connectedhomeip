@@ -26,13 +26,8 @@ include(${CHIP_ROOT}/config/nrfconnect/app/check-nrfconnect-version.cmake)
 # Load NCS/Zephyr build system
 set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 
-if (EXISTS boards/${BOARD}.conf)
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/boards/${BOARD}.conf)
   list(APPEND CONF_FILE boards/${BOARD}.conf)
-endif()
-
-# TODO: temporary fix to remove after solving static addressing problem on nrf5340
-if(BOARD STREQUAL "nrf5340dk_nrf5340_cpuapp")
-    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-bt_private_addresses.conf)
 endif()
 
 option(BUILD_WITH_DFU "Build target with Device Firmware Upgrade support" OFF)
@@ -74,12 +69,13 @@ target_sources(app PRIVATE
                main/LightingManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/attribute-size.cpp
                ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lighting-app/zap-generated/CHIPClusters.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
-               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
+               ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/OTARequestor.cpp
+               ${CHIP_ROOT}/src/app/clusters/ota-requestor/BDXDownloader.cpp)
 
 chip_configure_data_model(app
     INCLUDE_CLIENT_CALLBACKS
@@ -105,6 +101,7 @@ include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
 pw_set_backend(pw_log pw_log_basic)
 pw_set_backend(pw_assert pw_assert_log)
 pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
+pw_set_backend(pw_trace pw_trace_tokenized)
 set(dir_pw_third_party_nanopb "${CHIP_ROOT}/third_party/nanopb/repo" CACHE STRING "" FORCE)
 
 add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys_io)
@@ -160,9 +157,9 @@ pw_proto_library(lighting_service
 )
 
 target_sources(app PRIVATE
-  main/Rpc.cpp
   ../../common/pigweed/RpcService.cpp
   ../../common/pigweed/nrfconnect/PigweedLoggerMutex.cpp
+  ${NRFCONNECT_COMMON}/Rpc.cpp
   ${NRFCONNECT_COMMON}/util/PigweedLogger.cpp
 )
 
@@ -170,9 +167,17 @@ target_include_directories(app PRIVATE
   ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
+  ${NRFCONNECT_COMMON}
   ../../common
   ../../common/pigweed
   ../../common/pigweed/nrfconnect)
+
+target_compile_options(app PRIVATE
+                       "-DPW_RPC_ATTRIBUTE_SERVICE=1"
+                       "-DPW_RPC_BUTTON_SERVICE=1"
+                       "-DPW_RPC_DEVICE_SERVICE=1"
+                       "-DPW_RPC_LIGHTING_SERVICE=1"
+                       "-DPW_RPC_TRACING_SERVICE=1")
 
 target_link_libraries(app PRIVATE
   attributes_service.nanopb_rpc
@@ -183,6 +188,15 @@ target_link_libraries(app PRIVATE
   pw_hdlc
   pw_log
   pw_rpc.server
+  pw_trace_tokenized
+  pw_trace_tokenized.trace_buffer
+  pw_trace_tokenized.rpc_service
+  pw_trace_tokenized.protos.nanopb_rpc
+)
+
+target_link_options(app
+  PUBLIC
+    "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
 )
 
 target_link_libraries(pw_build INTERFACE zephyr_interface)

@@ -20,6 +20,6 @@
 
 CHIP_ERROR DiscoverCommand::RunCommand()
 {
-    mController.RegisterDeviceAddressUpdateDelegate(this);
+    CurrentCommissioner().RegisterDeviceAddressUpdateDelegate(this);
     return RunCommand(mNodeId, mFabricId);
 }

@@ -36,9 +36,9 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
 
-extern "C" {
-void * __dso_handle = 0;
-}
+#if CONFIG_ENABLE_PW_RPC
+#include "Rpc.h"
+#endif
 
 using namespace ::chip;
 using namespace ::chip::Credentials;
@@ -98,7 +98,7 @@ std::string createSetupPayload()
         ChipLogError(DeviceLayer, "Couldn't get discriminator: %s\r\n", ErrorStr(err));
         return result;
     }
-    ChipLogProgress(DeviceLayer, "Setup discriminator: %u (0x%x)\r\n", discriminator, discriminator);
+    ChipLogProgress(DeviceLayer, "Setup discriminator: %d (0x%x)\r\n", discriminator, discriminator);
 
     uint32_t setupPINCode;
     err = ConfigurationMgr().GetSetupPinCode(setupPINCode);
@@ -107,7 +107,7 @@ std::string createSetupPayload()
         ChipLogError(DeviceLayer, "Couldn't get setupPINCode: %s\r\n", ErrorStr(err));
         return result;
     }
-    ChipLogProgress(DeviceLayer, "Setup PIN code: %u (0x%x)\r\n", setupPINCode, setupPINCode);
+    ChipLogProgress(DeviceLayer, "Setup PIN code: %lu (0x%lx)\r\n", setupPINCode, setupPINCode);
 
     uint16_t vendorId;
     err = ConfigurationMgr().GetVendorId(vendorId);
@@ -180,7 +180,7 @@ std::string createSetupPayload()
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "Couldn't get payload string %\r\n" CHIP_ERROR_FORMAT, err.Format());
+        ChipLogError(DeviceLayer, "Couldn't get payload string %lu\r\n" CHIP_ERROR_FORMAT, err.Format());
     }
     return result;
 };
@@ -189,6 +189,10 @@ extern "C" void ChipTest(void)
 {
     ChipLogProgress(DeviceLayer, "All Clusters Demo!");
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CONFIG_ENABLE_PW_RPC
+    chip::rpc::Init();
+#endif
 
     initPref();
 
@@ -209,10 +213,11 @@ extern "C" void ChipTest(void)
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
-    std::string qrCodeText = createSetupPayload();
-    ChipLogProgress(DeviceLayer, "QR CODE Text: '%s'\r\n", qrCodeText.c_str());
-
+    if (RTW_SUCCESS != wifi_is_connected_to_ap())
     {
+        std::string qrCodeText = createSetupPayload();
+        ChipLogProgress(DeviceLayer, "QR CODE Text: '%s'\r\n", qrCodeText.c_str());
+
         std::vector<char> qrCode(3 * qrCodeText.size() + 1);
         err = EncodeQRCodeToUrl(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
         if (err == CHIP_NO_ERROR)

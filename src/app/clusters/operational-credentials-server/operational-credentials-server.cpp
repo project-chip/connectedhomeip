@@ -28,6 +28,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/EventLogging.h>
 #include <app/reporting/reporting.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
@@ -89,7 +90,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadCommissionedFabrics(EndpointId 
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
         {
             if (!fabricInfo.IsInitialized())
@@ -114,7 +115,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
         {
             ByteSpan cert;
@@ -172,12 +173,8 @@ CHIP_ERROR ComputeAttestationSignature(app::CommandHandler * commandObj,
 
     // TODO: Create an alternative way to retrieve the Attestation Challenge without this huge amount of calls.
     // Retrieve attestation challenge
-    ByteSpan attestationChallenge = commandObj->GetExchangeContext()
-                                        ->GetExchangeMgr()
-                                        ->GetSessionManager()
-                                        ->GetSecureSession(commandObj->GetExchangeContext()->GetSessionHandle())
-                                        ->GetCryptoContext()
-                                        .GetAttestationChallenge();
+    ByteSpan attestationChallenge =
+        commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetCryptoContext().GetAttestationChallenge();
 
     Hash_SHA256_stream hashStream;
     ReturnErrorOnFailure(hashStream.Begin());
@@ -228,6 +225,20 @@ class OpCredsFabricTableDelegate : public FabricTableDelegate
     {
         emberAfPrintln(EMBER_AF_PRINT_DEBUG, "OpCreds: Fabric 0x%" PRIu8 " was deleted from fabric storage.", fabricId);
         fabricListChanged();
+
+        // The Leave event SHOULD be emitted by a Node prior to permanently
+        // leaving the Fabric.
+        for (auto endpoint : EnabledEndpointsWithServerCluster(Basic::Id))
+        {
+            // If Basic cluster is implemented on this endpoint
+            Basic::Events::Leave::Type event;
+            EventNumber eventNumber;
+
+            if (CHIP_NO_ERROR != LogEvent(event, endpoint, eventNumber))
+            {
+                ChipLogError(Zcl, "OpCredsFabricTableDelegate: Failed to record Leave event");
+            }
+        }
     }
 
     // Gets called when a fabric is loaded into the FabricTable from KVS store.
@@ -276,7 +287,7 @@ public:
     void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override {}
     void OnExchangeClosing(chip::Messaging::ExchangeContext * ec) override
     {
-        FabricIndex currentFabricIndex = ec->GetSessionHandle().GetFabricIndex();
+        FabricIndex currentFabricIndex = ec->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
         ec->GetExchangeMgr()->GetSessionManager()->ExpireAllPairingsForFabric(currentFabricIndex);
     }
 };
@@ -362,13 +373,12 @@ FabricInfo gFabricBeingCommissioned;
 CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, EmberAfNodeOperationalCertStatus status, uint8_t index,
                            CharSpan debug_text)
 {
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, OperationalCredentials::Id,
-                                         Commands::NOCResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), OperationalCredentials::Id, Commands::NOCResponse::Id };
+    TLV::TLVWriter * writer       = nullptr;
 
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(commandObj->PrepareCommand(cmdParams));
+    ReturnErrorOnFailure(commandObj->PrepareCommand(path));
     writer = commandObj->GetCommandDataIBTLVWriter();
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(0), status));
     if (status == EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS)

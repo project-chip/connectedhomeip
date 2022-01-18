@@ -42,6 +42,7 @@ static_library("qpg") {
     "DiagnosticDataProviderImpl.h",
     "InetPlatformConfig.h",
     "Logging.cpp",
+    "OTAImageProcessorImpl.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "SystemPlatformConfig.h",
@@ -61,7 +62,11 @@ static_library("qpg") {
   ]
 
   if (chip_enable_openthread) {
-    public_deps += [ "${openthread_root}:libopenthread-mtd" ]
+    if (chip_openthread_ftd) {
+      public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+    } else {
+      public_deps += [ "${openthread_root}:libopenthread-mtd" ]
+    }
 
     public_configs += [
       "${chip_root}/third_party/openthread/platforms/qpg:openthread_qpg_config",

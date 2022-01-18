@@ -21,3 +21,17 @@ std::unique_ptr<TestCommand>GetTestCommand(std::string testName)
 
   return nullptr;
 }
+
+void PrintTestCommands()
+{
+  {{#if (getTests)}}
+  {{#chip_tests (getTests)}}
+  {{#first}}
+  ChipLogError(chipTool, "Supported commands:");
+  {{/first}}
+  ChipLogError(chipTool, "\t* {{filename}}");
+  {{else}}
+  ChipLogError("\t No available commands.");
+  {{/chip_tests}}
+  {{/if}}
+}

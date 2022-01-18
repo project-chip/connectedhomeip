@@ -20,11 +20,9 @@
 #include <cinttypes>
 
 #include <app-common/zap-generated/enums.h>
-#include <app/Command.h>
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
-#include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/SafeInt.h>
@@ -32,7 +30,6 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 using namespace ::chip;
-using namespace ::chip::app::List;
 
 void LogStatus(uint8_t status)
 {
@@ -148,130 +145,130 @@ static void LogIMStatus(Protocols::InteractionModel::Status status)
     switch (status)
     {
     case Protocols::InteractionModel::Status::Success:
-        ChipLogProgress(Zcl, "  status: Success                (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Success                (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Failure:
-        ChipLogProgress(Zcl, "  status: Failure                (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Failure                (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::InvalidSubscription:
-        ChipLogProgress(Zcl, "  status: InvalidSubscription    (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: InvalidSubscription    (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::UnsupportedAccess:
-        ChipLogProgress(Zcl, "  status: UnsupportedAccess      (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: UnsupportedAccess      (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::UnsupportedEndpoint:
-        ChipLogProgress(Zcl, "  status: UnsupportedEndpoint    (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: UnsupportedEndpoint    (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::InvalidAction:
-        ChipLogProgress(Zcl, "  status: InvalidAction          (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: InvalidAction          (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::UnsupportedCommand:
-        ChipLogProgress(Zcl, "  status: UnsupportedCommand     (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: UnsupportedCommand     (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecated82:
-        ChipLogProgress(Zcl, "  status: Deprecated82           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecated82           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecated83:
-        ChipLogProgress(Zcl, "  status: Deprecated83           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecated83           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecated84:
-        ChipLogProgress(Zcl, "  status: Deprecated84           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecated84           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::InvalidCommand:
-        ChipLogProgress(Zcl, "  status: InvalidCommand         (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: InvalidCommand         (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::UnsupportedAttribute:
-        ChipLogProgress(Zcl, "  status: UnsupportedAttribute   (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: UnsupportedAttribute   (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::InvalidValue:
-        ChipLogProgress(Zcl, "  status: InvalidValue           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: InvalidValue           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::UnsupportedWrite:
-        ChipLogProgress(Zcl, "  status: UnsupportedWrite       (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: UnsupportedWrite       (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::ResourceExhausted:
-        ChipLogProgress(Zcl, "  status: ResourceExhausted      (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: ResourceExhausted      (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecated8a:
-        ChipLogProgress(Zcl, "  status: Deprecated8a           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecated8a           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::NotFound:
-        ChipLogProgress(Zcl, "  status: NotFound               (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: NotFound               (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::UnreportableAttribute:
-        ChipLogProgress(Zcl, "  status: UnreportableAttribute  (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: UnreportableAttribute  (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::InvalidDataType:
-        ChipLogProgress(Zcl, "  status: InvalidDataType        (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: InvalidDataType        (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecated8e:
-        ChipLogProgress(Zcl, "  status: Deprecated8e           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecated8e           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::UnsupportedRead:
-        ChipLogProgress(Zcl, "  status: UnsupportedRead        (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: UnsupportedRead        (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecated90:
-        ChipLogProgress(Zcl, "  status: Deprecated90           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecated90           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecated91:
-        ChipLogProgress(Zcl, "  status: Deprecated91           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecated91           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Reserved92:
-        ChipLogProgress(Zcl, "  status: Reserved92             (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Reserved92             (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecated93:
-        ChipLogProgress(Zcl, "  status: Deprecated93           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecated93           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Timeout:
-        ChipLogProgress(Zcl, "  status: Timeout                (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Timeout                (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Reserved95:
-        ChipLogProgress(Zcl, "  status: Reserved95             (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Reserved95             (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Reserved96:
-        ChipLogProgress(Zcl, "  status: Reserved96             (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Reserved96             (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Reserved97:
-        ChipLogProgress(Zcl, "  status: Reserved97             (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Reserved97             (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Reserved98:
-        ChipLogProgress(Zcl, "  status: Reserved98             (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Reserved98             (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Reserved99:
-        ChipLogProgress(Zcl, "  status: Reserved99             (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Reserved99             (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Reserved9a:
-        ChipLogProgress(Zcl, "  status: Reserved9a             (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Reserved9a             (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::ConstraintError:
-        ChipLogProgress(Zcl, "  status: ConstraintError        (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: ConstraintError        (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Busy:
-        ChipLogProgress(Zcl, "  status: Busy                   (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Busy                   (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecatedc0:
-        ChipLogProgress(Zcl, "  status: Deprecatedc0           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecatedc0           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecatedc1:
-        ChipLogProgress(Zcl, "  status: Deprecatedc1           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecatedc1           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecatedc2:
-        ChipLogProgress(Zcl, "  status: Deprecatedc2           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecatedc2           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::UnsupportedCluster:
-        ChipLogProgress(Zcl, "  status: UnsupportedCluster     (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: UnsupportedCluster     (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::Deprecatedc4:
-        ChipLogProgress(Zcl, "  status: Deprecatedc4           (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: Deprecatedc4           (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::NoUpstreamSubscription:
-        ChipLogProgress(Zcl, "  status: NoUpstreamSubscription (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: NoUpstreamSubscription (0x%02" PRIx8 ")", to_underlying(status));
         break;
     case Protocols::InteractionModel::Status::NeedsTimedInteraction:
-        ChipLogProgress(Zcl, "  status: NeedsTimedInteraction  (0x%04" PRIx16 ")", to_underlying(status));
+        ChipLogProgress(Zcl, "  status: NeedsTimedInteraction  (0x%02" PRIx8 ")", to_underlying(status));
         break;
     default:
-        ChipLogError(Zcl, "Unknown status: 0x%04" PRIx16, to_underlying(status));
+        ChipLogError(Zcl, "Unknown status: 0x%02" PRIx8, to_underlying(status));
         break;
     }
 }
@@ -279,7 +276,7 @@ static void LogIMStatus(Protocols::InteractionModel::Status status)
 // Singleton instance of the callbacks manager
 static app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
-bool IMDefaultResponseCallback(const app::Command * commandObj, EmberAfStatus status)
+bool IMDefaultResponseCallback(const app::CommandSender * commandObj, EmberAfStatus status)
 {
     ChipLogProgress(Zcl, "DefaultResponse:");
     ChipLogProgress(Zcl, "  Transaction: %p", commandObj);
@@ -360,125 +357,6 @@ bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, chip::P
         Callback::Callback<DefaultFailureCallback> * cb =
             Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
         cb->mCall(cb->mContext, static_cast<uint8_t>(to_underlying(status)));
-    }
-
-    return true;
-}
-
-bool IMReadReportAttributesResponseCallback(const app::ReadClient * apReadClient, const app::ConcreteAttributePath * aPath,
-                                            TLV::TLVReader * apData, Protocols::InteractionModel::Status status)
-{
-    ChipLogProgress(Zcl, "ReadAttributesResponse:");
-    if (aPath != nullptr)
-    {
-        ChipLogProgress(Zcl, "  ClusterId: " ChipLogFormatMEI, ChipLogValueMEI(aPath->mClusterId));
-    }
-
-    Callback::Cancelable * onSuccessCallback = nullptr;
-    Callback::Cancelable * onFailureCallback = nullptr;
-    app::TLVDataFilter tlvFilter             = nullptr;
-    // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (apReadClient->IsSubscriptionType())
-    {
-        if (aPath != nullptr)
-        {
-            err = gCallbacks.GetReportCallback(apReadClient->GetPeerNodeId(), aPath->mEndpointId, aPath->mClusterId,
-                                               aPath->mAttributeId, &onSuccessCallback, &tlvFilter);
-        }
-    }
-    else
-    {
-        err = gCallbacks.GetResponseCallback(reinterpret_cast<uint64_t>(apReadClient), 0, &onSuccessCallback, &onFailureCallback,
-                                             &tlvFilter);
-    }
-
-    if (CHIP_NO_ERROR != err)
-    {
-        if (onSuccessCallback == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing success callback", __FUNCTION__);
-        }
-
-        if (onFailureCallback == nullptr && !apReadClient->IsSubscriptionType())
-        {
-            ChipLogDetail(Zcl, "%s: Missing failure callback", __FUNCTION__);
-        }
-
-        if (tlvFilter == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing TLV Data Filter", __FUNCTION__);
-        }
-        return true;
-    }
-
-    if (aPath != nullptr)
-    {
-        ChipLogProgress(Zcl, "  attributeId: " ChipLogFormatMEI, ChipLogValueMEI(aPath->mAttributeId));
-    }
-    LogIMStatus(status);
-
-    if (status == Protocols::InteractionModel::Status::Success && apData != nullptr)
-    {
-        ChipLogProgress(Zcl, "  attribute TLV Type: 0x%02x", apData->GetType());
-        tlvFilter(apData, onSuccessCallback, onFailureCallback);
-    }
-    else if (onFailureCallback != nullptr)
-    {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        // TODO: Should change failure callbacks to accept uint16 status code.
-        cb->mCall(cb->mContext, static_cast<uint8_t>(to_underlying(status)));
-    }
-
-    return true;
-}
-
-bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient, EmberAfStatus status)
-{
-    auto subscriptionId = apSubscribeClient->GetSubscriptionId();
-    ChipLogProgress(Zcl, "SubscribeResponse:");
-    if (subscriptionId.HasValue())
-    {
-        ChipLogProgress(Zcl, "  SubscriptionId:        0x%" PRIx64, subscriptionId.Value());
-    }
-    else
-    {
-        ChipLogProgress(Zcl, "  SubscriptionId:        <missing>");
-    }
-    LogStatus(status);
-
-    // In CHIPClusters.cpp, we are using sequenceNumber as application identifier.
-    CHIP_ERROR err                           = CHIP_NO_ERROR;
-    Callback::Cancelable * onSuccessCallback = nullptr;
-    Callback::Cancelable * onFailureCallback = nullptr;
-    err = gCallbacks.GetResponseCallback(reinterpret_cast<uint64_t>(apSubscribeClient), 0, &onSuccessCallback, &onFailureCallback);
-
-    if (CHIP_NO_ERROR != err)
-    {
-        if (onSuccessCallback == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing success callback", __FUNCTION__);
-        }
-
-        if (onFailureCallback == nullptr)
-        {
-            ChipLogDetail(Zcl, "%s: Missing failure callback", __FUNCTION__);
-        }
-        return true;
-    }
-
-    if (status == EMBER_ZCL_STATUS_SUCCESS)
-    {
-        Callback::Callback<DefaultSuccessCallback> * cb =
-            Callback::Callback<DefaultSuccessCallback>::FromCancelable(onSuccessCallback);
-        cb->mCall(cb->mContext);
-    }
-    else
-    {
-        Callback::Callback<DefaultFailureCallback> * cb =
-            Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
-        cb->mCall(cb->mContext, static_cast<uint8_t>(status));
     }
 
     return true;

@@ -2,23 +2,14 @@ package com.tcl.chip.chiptvserver;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import chip.appserver.ChipAppServer;
-import chip.platform.AndroidBleManager;
-import chip.platform.AndroidChipPlatform;
-import chip.platform.ChipMdnsCallbackImpl;
-import chip.platform.NsdManagerServiceResolver;
-import chip.platform.PreferencesConfigurationManager;
-import chip.platform.PreferencesKeyValueStoreManager;
 import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
-import com.tcl.chip.tvapp.KeypadInputManagerStub;
-import com.tcl.chip.tvapp.MediaInputManagerStub;
-import com.tcl.chip.tvapp.TvApp;
-import com.tcl.chip.tvapp.WakeOnLanManagerStub;
+import com.tcl.chip.chiptvserver.service.MatterServant;
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,18 +25,14 @@ public class MainActivity extends AppCompatActivity {
     mQrCodeImg = findViewById(R.id.qrCodeImg);
     mQrCodeTxt = findViewById(R.id.qrCodeTxt);
     mManualPairingCodeTxt = findViewById(R.id.manualPairingCodeTxt);
-    TvApp tvApp = new TvApp();
-    tvApp.setKeypadInputManager(new KeypadInputManagerStub());
-    tvApp.setWakeOnLanManager(new WakeOnLanManagerStub());
-    tvApp.setMediaInputManager(new MediaInputManagerStub());
-
-    AndroidChipPlatform chipPlatform =
-        new AndroidChipPlatform(
-            new AndroidBleManager(),
-            new PreferencesKeyValueStoreManager(this),
-            new PreferencesConfigurationManager(this),
-            new NsdManagerServiceResolver(this),
-            new ChipMdnsCallbackImpl());
+    findViewById(R.id.resetBtn)
+        .setOnClickListener(
+            new View.OnClickListener() {
+              @Override
+              public void onClick(View view) {
+                MatterServant.get().restart();
+              }
+            });
 
     // TODO: Get these parameters from PreferencesConfigurationManager
     HashSet<DiscoveryCapability> discoveryCapabilities = new HashSet<>();
@@ -70,8 +57,5 @@ public class MainActivity extends AppCompatActivity {
     } catch (SetupPayloadParser.SetupPayloadException e) {
       e.printStackTrace();
     }
-
-    ChipAppServer chipAppServer = new ChipAppServer();
-    chipAppServer.startApp();
   }
 }

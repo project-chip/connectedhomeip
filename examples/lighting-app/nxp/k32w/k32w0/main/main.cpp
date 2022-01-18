@@ -62,6 +62,8 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
+    SHA_ClkInit(SHA_INSTANCE);
+
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     /* Used for HW initializations */

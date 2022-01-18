@@ -18,24 +18,15 @@
 
 #pragma once
 
-#include <app/util/af-types.h>
-#include <lib/core/CHIPError.h>
-#include <map>
-#include <string>
+#include <app/clusters/account-login-server/account-login-server.h>
 
-class AccountLoginManager
+#include <app/util/af-types.h>
+
+class AccountLoginManager : public chip::app::Clusters::AccountLogin::Delegate
 {
 public:
-    bool isUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin);
-    std::string proxySetupPinRequest(std::string requestTempAccountIdentifier, chip::EndpointId endpoint);
-    void setTempAccountIdentifierForPin(std::string requestTempAccountIdentifier, std::string requestSetupPin);
-
-    static AccountLoginManager & GetInstance()
-    {
-        static AccountLoginManager instance;
-        return instance;
-    }
-
-private:
-    std::map<std::string, std::string> accounts;
+    bool HandleLogin(const chip::CharSpan & tempAccountIdentifierString, const chip::CharSpan & setupPinString) override;
+    bool HandleLogout() override;
+    chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::Type
+    HandleGetSetupPin(const chip::CharSpan & tempAccountIdentifierString) override;
 };

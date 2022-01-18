@@ -26,7 +26,7 @@
 class PersistentStorage : public chip::PersistentStorageDelegate
 {
 public:
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(const char * name = nullptr);
 
     /////////// PersistentStorageDelegate Interface /////////
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
@@ -42,26 +42,8 @@ public:
     // Store local node id.
     CHIP_ERROR SetLocalNodeId(chip::NodeId nodeId);
 
-    /**
-     * @brief
-     *  Configure the fabric used for pairing and sending commands.
-     *
-     * @param[in] fabricName  The name of the fabric. It must be one of the following strings:
-     *                         - alpha
-     *                         - beta
-     *                         - gamma
-     *
-     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
-     */
-    CHIP_ERROR SetFabric(const char * fabricName);
-
-    /**
-     * @brief
-     *  Return the stored fabric id, or the one for the "alpha" fabric if nothing is stored.
-     */
-    chip::FabricId GetFabricId();
-
 private:
-    CHIP_ERROR CommitConfig();
+    CHIP_ERROR CommitConfig(const char * name);
     inipp::Ini<char> mConfig;
+    const char * mName;
 };

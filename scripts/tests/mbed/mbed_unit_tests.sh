@@ -18,7 +18,7 @@
 
 cd "$(dirname "$0")"/../../..
 CHIP_ROOT=$PWD
-cd "$CHIP_ROOT"/src/test_driver/mbed/
+cd "$CHIP_ROOT"/src/test_driver/mbed/unit_tests/
 
 SUPPORTED_TOOLCHAIN=(GCC_ARM ARM)
 SUPPORTED_TARGET_BOARD=(CY8CPROTO_062_4343W)

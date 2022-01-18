@@ -27,10 +27,9 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "InetInterface.h"
+#include <inet/InetInterface.h>
 
-#include "InetLayer.h"
-
+#include <inet/IPPrefix.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -49,13 +48,9 @@
 #ifdef HAVE_SYS_SOCKIO_H
 #include <sys/sockio.h>
 #endif /* HAVE_SYS_SOCKIO_H */
+#include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
-#ifdef __ANDROID__
-#include "ifaddrs-android.h"
-#else // !defined(__ANDROID__)
-#include <ifaddrs.h>
-#endif // !defined(__ANDROID__)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
@@ -101,7 +96,7 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
         return INET_ERROR_UNKNOWN_INTERFACE;
     }
     struct netif * intf;
-#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+#if defined(NETIF_FOREACH)
     NETIF_FOREACH(intf)
 #else
     for (intf = netif_list; intf != NULL; intf = intf->next)
@@ -125,7 +120,7 @@ bool InterfaceIterator::Next()
     // Verify the previous netif is still on the list if netifs.  If so,
     // advance to the next nextif.
     struct netif * prevNetif = mCurNetif;
-#if LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 0 && defined(NETIF_FOREACH)
+#if defined(NETIF_FOREACH)
     NETIF_FOREACH(mCurNetif)
 #else
     for (mCurNetif = netif_list; mCurNetif != NULL; mCurNetif = mCurNetif->next)
@@ -157,17 +152,27 @@ bool InterfaceIterator::IsUp()
 
 bool InterfaceIterator::SupportsMulticast()
 {
-    return HasCurrent() &&
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-        (mCurNetif->flags & (NETIF_FLAG_IGMP | NETIF_FLAG_MLD6 | NETIF_FLAG_BROADCAST)) != 0;
-#else
-        (mCurNetif->flags & NETIF_FLAG_POINTTOPOINT) == 0;
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
+    return HasCurrent() && (mCurNetif->flags & (NETIF_FLAG_IGMP | NETIF_FLAG_MLD6 | NETIF_FLAG_BROADCAST)) != 0;
 }
 
 bool InterfaceIterator::HasBroadcastAddress()
 {
     return HasCurrent() && (mCurNetif->flags & NETIF_FLAG_BROADCAST) != 0;
+}
+
+CHIP_ERROR InterfaceIterator::GetInterfaceType(InterfaceType & type)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize)
+{
+    VerifyOrReturnError(addressBuffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(addressBufferSize >= mCurNetif->hwaddr_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    addressSize = mCurNetif->hwaddr_len;
+    memcpy(addressBuffer, mCurNetif->hwaddr, addressSize);
+    return CHIP_NO_ERROR;
 }
 
 bool InterfaceAddressIterator::HasCurrent()
@@ -209,25 +214,28 @@ bool InterfaceAddressIterator::Next()
     return false;
 }
 
-IPAddress InterfaceAddressIterator::GetAddress()
+CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
 {
-    if (HasCurrent())
+    if (!HasCurrent())
     {
-        struct netif * curIntf = mIntfIter.GetInterfaceId().GetPlatformInterface();
-
-        if (mCurAddrIndex < LWIP_IPV6_NUM_ADDRESSES)
-        {
-            return IPAddress(*netif_ip6_addr(curIntf, mCurAddrIndex));
-        }
-#if INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
-        else
-        {
-            return IPAddress(*netif_ip4_addr(curIntf));
-        }
-#endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
+        return CHIP_ERROR_SENTINEL;
     }
 
-    return IPAddress::Any;
+    struct netif * curIntf = mIntfIter.GetInterfaceId().GetPlatformInterface();
+
+    if (mCurAddrIndex < LWIP_IPV6_NUM_ADDRESSES)
+    {
+        outIPAddress = IPAddress(*netif_ip6_addr(curIntf, mCurAddrIndex));
+        return CHIP_NO_ERROR;
+    }
+#if INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
+    else
+    {
+        outIPAddress = IPAddress(*netif_ip4_addr(curIntf));
+        return CHIP_NO_ERROR;
+    }
+#endif // INET_CONFIG_ENABLE_IPV4 && LWIP_IPV4
+    return CHIP_ERROR_INTERNAL;
 }
 
 uint8_t InterfaceAddressIterator::GetPrefixLength()
@@ -624,6 +632,16 @@ short InterfaceIterator::GetFlags()
     return mIntfFlags;
 }
 
+CHIP_ERROR InterfaceIterator::GetInterfaceType(InterfaceType & type)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 InterfaceAddressIterator::InterfaceAddressIterator()
 {
     mAddrsList = nullptr;
@@ -679,9 +697,9 @@ bool InterfaceAddressIterator::Next()
     }
 }
 
-IPAddress InterfaceAddressIterator::GetAddress()
+CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
 {
-    return HasCurrent() ? IPAddress::FromSockAddr(*mCurAddr->ifa_addr) : IPAddress::Any;
+    return HasCurrent() ? IPAddress::GetIPAddressFromSockAddr(*mCurAddr->ifa_addr, outIPAddress) : CHIP_ERROR_SENTINEL;
 }
 
 uint8_t InterfaceAddressIterator::GetPrefixLength()
@@ -855,6 +873,52 @@ bool InterfaceIterator::HasBroadcastAddress()
     return HasCurrent() && INET_CONFIG_ENABLE_IPV4;
 }
 
+CHIP_ERROR InterfaceIterator::GetInterfaceType(InterfaceType & type)
+{
+    VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
+
+    const net_linkaddr * linkAddr = net_if_get_link_addr(mCurrentInterface);
+    if (!linkAddr)
+        return CHIP_ERROR_INCORRECT_STATE;
+
+    // Do not consider other than WiFi and Thread for now.
+    if (linkAddr->type == NET_LINK_IEEE802154)
+    {
+        type = InterfaceType::Thread;
+    }
+    // Zephyr doesn't define WiFi address type, so it shares the same type as Ethernet.
+    else if (linkAddr->type == NET_LINK_ETHERNET)
+    {
+        type = InterfaceType::WiFi;
+    }
+    else
+    {
+        type = InterfaceType::Unknown;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize)
+{
+    VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
+
+    if (!addressBuffer)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    const net_linkaddr * linkAddr = net_if_get_link_addr(mCurrentInterface);
+    if (!linkAddr)
+        return CHIP_ERROR_INCORRECT_STATE;
+
+    if (linkAddr->len > addressBufferSize)
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+
+    addressSize = linkAddr->len;
+    memcpy(addressBuffer, linkAddr->addr, linkAddr->len);
+
+    return CHIP_NO_ERROR;
+}
+
 InterfaceAddressIterator::InterfaceAddressIterator() = default;
 
 bool InterfaceAddressIterator::HasCurrent()
@@ -884,9 +948,14 @@ bool InterfaceAddressIterator::Next()
     return false;
 }
 
-IPAddress InterfaceAddressIterator::GetAddress()
+CHIP_ERROR InterfaceAddressIterator::GetAddress(IPAddress & outIPAddress)
 {
-    return HasCurrent() ? IPAddress(mIpv6->unicast[mCurAddrIndex].address.in6_addr) : IPAddress::Any;
+    if (HasCurrent())
+    {
+        outIPAddress = IPAddress(mIpv6->unicast[mCurAddrIndex].address.in6_addr);
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_SENTINEL;
 }
 
 uint8_t InterfaceAddressIterator::GetPrefixLength()
@@ -950,8 +1019,8 @@ InterfaceId InterfaceId::FromIPAddress(const IPAddress & addr)
 
     for (; addrIter.HasCurrent(); addrIter.Next())
     {
-        IPAddress curAddr = addrIter.GetAddress();
-        if (addr == curAddr)
+        IPAddress curAddr;
+        if ((addrIter.GetAddress(curAddr) == CHIP_NO_ERROR) && (addr == curAddr))
         {
             return addrIter.GetInterfaceId();
         }
@@ -970,7 +1039,8 @@ bool InterfaceId::MatchLocalIPv6Subnet(const IPAddress & addr)
     for (; ifAddrIter.HasCurrent(); ifAddrIter.Next())
     {
         IPPrefix addrPrefix;
-        addrPrefix.IPAddr = ifAddrIter.GetAddress();
+        if (ifAddrIter.GetAddress(addrPrefix.IPAddr) != CHIP_NO_ERROR)
+            continue;
 #if INET_CONFIG_ENABLE_IPV4
         if (addrPrefix.IPAddr.IsIPv4())
             continue;
@@ -983,19 +1053,6 @@ bool InterfaceId::MatchLocalIPv6Subnet(const IPAddress & addr)
     }
 
     return false;
-}
-
-void InterfaceAddressIterator::GetAddressWithPrefix(IPPrefix & addrWithPrefix)
-{
-    if (HasCurrent())
-    {
-        addrWithPrefix.IPAddr = GetAddress();
-        addrWithPrefix.Length = GetPrefixLength();
-    }
-    else
-    {
-        addrWithPrefix = IPPrefix::Zero;
-    }
 }
 
 uint8_t NetmaskToPrefixLength(const uint8_t * netmask, uint16_t netmaskLen)

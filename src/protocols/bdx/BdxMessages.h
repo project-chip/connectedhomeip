@@ -34,15 +34,16 @@ namespace bdx {
 
 enum class MessageType : uint8_t
 {
-    SendInit      = 0x01,
-    SendAccept    = 0x02,
-    ReceiveInit   = 0x04,
-    ReceiveAccept = 0x05,
-    BlockQuery    = 0x10,
-    Block         = 0x11,
-    BlockEOF      = 0x12,
-    BlockAck      = 0x13,
-    BlockAckEOF   = 0x14,
+    SendInit           = 0x01,
+    SendAccept         = 0x02,
+    ReceiveInit        = 0x04,
+    ReceiveAccept      = 0x05,
+    BlockQuery         = 0x10,
+    Block              = 0x11,
+    BlockEOF           = 0x12,
+    BlockAck           = 0x13,
+    BlockAckEOF        = 0x14,
+    BlockQueryWithSkip = 0x15,
 };
 
 enum class StatusCode : uint16_t
@@ -94,7 +95,7 @@ struct BdxMessage
      *  so it is essential that the underlying PacketBuffer is not modified until after this
      *  struct is no longer needed.
      *
-     * @param[in] aBuffer A PacketBufferHandle with a refernce to the PacketBuffer containing the data.
+     * @param[in] aBuffer A PacketBufferHandle with a reference to the PacketBuffer containing the data.
      *
      * @return CHIP_ERROR Return an error if the message format is invalid and/or can't be parsed
      */
@@ -137,10 +138,6 @@ struct BdxMessage
  */
 struct TransferInit : public BdxMessage
 {
-    /**
-     * @brief
-     *  Equality check method.
-     */
     bool operator==(const TransferInit &) const;
 
     // Proposed Transfer Control (required)
@@ -182,10 +179,6 @@ using ReceiveInit = TransferInit;
  */
 struct SendAccept : public BdxMessage
 {
-    /**
-     * @brief
-     *  Equality check method.
-     */
     bool operator==(const SendAccept &) const;
 
     // Transfer Control (required, only one should be set)
@@ -216,10 +209,6 @@ struct SendAccept : public BdxMessage
  */
 struct ReceiveAccept : public BdxMessage
 {
-    /**
-     * @brief
-     *  Equality check method.
-     */
     bool operator==(const ReceiveAccept &) const;
 
     // Transfer Control (required, only one should be set)
@@ -257,10 +246,6 @@ struct ReceiveAccept : public BdxMessage
  */
 struct CounterMessage : public BdxMessage
 {
-    /**
-     * @brief
-     *  Equality check method.
-     */
     bool operator==(const CounterMessage &) const;
 
     uint32_t BlockCounter = 0;
@@ -282,10 +267,6 @@ using BlockAckEOF = CounterMessage;
  */
 struct DataBlock : public BdxMessage
 {
-    /**
-     * @brief
-     *  Equality check method.
-     */
     bool operator==(const DataBlock &) const;
 
     uint32_t BlockCounter = 0;
@@ -308,6 +289,21 @@ struct DataBlock : public BdxMessage
 
 using Block    = DataBlock;
 using BlockEOF = DataBlock;
+
+struct BlockQueryWithSkip : public BdxMessage
+{
+    bool operator==(const BlockQueryWithSkip &) const;
+
+    uint32_t BlockCounter = 0;
+    uint64_t BytesToSkip  = 0;
+
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer) override;
+    Encoding::LittleEndian::BufferWriter & WriteToBuffer(Encoding::LittleEndian::BufferWriter & aBuffer) const override;
+    size_t MessageSize() const override;
+#if CHIP_AUTOMATION_LOGGING
+    void LogMessage(bdx::MessageType messageType) const override;
+#endif // CHIP_AUTOMATION_LOGGING
+};
 
 } // namespace bdx
 

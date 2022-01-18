@@ -19,11 +19,16 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label:
           "Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies
           that the value is within range"
       command: "readAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       response:
           value: 2600
           constraints:
@@ -36,6 +41,7 @@ tests:
           OccupiedCoolingSetpoint attribute"
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 2000
 
@@ -44,26 +50,29 @@ tests:
           OccupiedCoolingSetpoint attribute"
       command: "readAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       response:
           value: 2000
 
-    #issue #11718 Write command above max and below min value returns Sucess Response
+    #issue #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes OccupiedCoolingSetpoint to value below the
           MinCoolSetpointLimit"
       disabled: true
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 30
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes OccupiedCoolingSetpoint to value above the
           MaxCoolSetpointLimit"
       disabled: true
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 4000
 
@@ -72,6 +81,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 1600
 
@@ -80,6 +90,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 2600
 
@@ -88,6 +99,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       response:
           value: 2000
           constraints:
@@ -100,6 +112,7 @@ tests:
           OccupiedHeatingSetpoint attribute"
       command: "writeAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 2100
 
@@ -108,26 +121,29 @@ tests:
           OccupiedHeatingSetpoint attribute"
       command: "readAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       response:
           value: 2100
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes OccupiedHeatingSetpoint to value below the
           MinHeatSetpointLimit"
       disabled: true
       command: "writeAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 1002
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes OccupiedHeatingSetpoint to value above the
           MaxHeatSetpointLimit"
       disabled: true
       command: "writeAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 4010
 
@@ -136,6 +152,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 700
 
@@ -144,6 +161,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 3000
 
@@ -152,6 +170,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "min heat setpoint limit"
+      PICS: A_MINHEATSETPOINTLIMIT
       response:
           value: 700
           constraints:
@@ -164,6 +183,7 @@ tests:
           MinHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "min heat setpoint limit"
+      PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 2000
 
@@ -172,26 +192,29 @@ tests:
           MinHeatSetpointLimit attribute"
       command: "readAttribute"
       attribute: "min heat setpoint limit"
+      PICS: A_MINHEATSETPOINTLIMIT
       response:
           value: 2000
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
       disabled: true
       command: "writeAttribute"
       attribute: "min heat setpoint limit"
+      PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 650
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
       disabled: true
       command: "writeAttribute"
       attribute: "min heat setpoint limit"
+      PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 4050
 
@@ -200,6 +223,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "min heat setpoint limit"
+      PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 700
 
@@ -208,6 +232,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "min heat setpoint limit"
+      PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 3000
 
@@ -216,6 +241,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "max heat setpoint limit"
+      PICS: A_MAXHEATSETPOINTLIMIT
       response:
           value: 3000
           constraints:
@@ -228,6 +254,7 @@ tests:
           MaxHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "max heat setpoint limit"
+      PICS: A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 2000
 
@@ -236,26 +263,29 @@ tests:
           MaxHeatSetpointLimit attribute"
       command: "readAttribute"
       attribute: "max heat setpoint limit"
+      PICS: A_MAXHEATSETPOINTLIMIT
       response:
           value: 2000
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxHeatSetpointLimit to value below the
           AbsMinHeatSetpointLimit "
       disabled: true
       command: "writeAttribute"
       attribute: "max heat setpoint limit"
+      PICS: A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 500
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxHeatSetpointLimit to value above the
           AbsMaxHeatSetpointLimit "
       disabled: true
       command: "writeAttribute"
       attribute: "max heat setpoint limit"
+      PICS: A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 4000
 
@@ -264,6 +294,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "max heat setpoint limit"
+      PICS: A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 700
 
@@ -272,6 +303,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "max heat setpoint limit"
+      PICS: A_MAXHEATSETPOINTLIMIT
       arguments:
           value: 3000
 
@@ -280,6 +312,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "min cool setpoint limit"
+      PICS: A_MINCOOLSETPOINTLIMIT
       response:
           value: 1600
           constraints:
@@ -292,6 +325,7 @@ tests:
           MinCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
+      PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 2000
 
@@ -300,25 +334,28 @@ tests:
           MinCoolSetpointLimit attribute"
       command: "readAttribute"
       attribute: "min cool setpoint limit"
+      PICS: A_MINCOOLSETPOINTLIMIT
       response:
           value: 2000
 
-    #issue #11718 Write command above max and below min value returns Sucess Response
+    #issue #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
       disabled: true
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
+      PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 1000
 
-    #issue #11718 Write command above max and below min value returns Sucess Response
+    #issue #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MinCoolSetpointLimit to value above the MaxCoolSetpointLimit "
       disabled: true
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
+      PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 4000
 
@@ -327,6 +364,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
+      PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 1600
 
@@ -335,6 +373,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
+      PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 3200
 
@@ -343,6 +382,7 @@ tests:
           that the value is within range"
       command: "readAttribute"
       attribute: "max cool setpoint limit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
       response:
           value: 3200
           constraints:
@@ -355,6 +395,7 @@ tests:
           MaxCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 2000
 
@@ -363,25 +404,28 @@ tests:
           MaxCoolSetpointLimit attribute"
       command: "readAttribute"
       attribute: "max cool setpoint limit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
       response:
           value: 2000
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxCoolSetpointLimit to value below the
           AbsMinCoolSetpointLimit "
       disabled: true
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 1000
 
-    #issue  #11718 Write command above max and below min value returns Sucess Response
+    #issue  #11718 Write command above max and below min value returns Success Response
     - label:
           "Writes MaxCoolSetpointLimit to value above the MaxCoolSetpointLimit "
       disabled: true
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 4000
 
@@ -390,6 +434,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 1600
 
@@ -398,6 +443,7 @@ tests:
           attribute"
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 3200
 
@@ -406,6 +452,7 @@ tests:
           MinHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "min heat setpoint limit"
+      PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 700
 
@@ -414,6 +461,7 @@ tests:
           MinHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "min heat setpoint limit"
+      PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 3000
 
@@ -422,6 +470,7 @@ tests:
           MaxHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "max heat setpoint limit"
+      PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 700
 
@@ -430,6 +479,7 @@ tests:
           MaxHeatSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "max heat setpoint limit"
+      PICS: A_MINHEATSETPOINTLIMIT
       arguments:
           value: 3000
 
@@ -438,6 +488,7 @@ tests:
           MinCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
+      PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 1600
 
@@ -446,6 +497,7 @@ tests:
           MinCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "min cool setpoint limit"
+      PICS: A_MINCOOLSETPOINTLIMIT
       arguments:
           value: 3200
 
@@ -454,6 +506,7 @@ tests:
           MaxCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 1600
 
@@ -462,6 +515,7 @@ tests:
           MaxCoolSetpointLimit attribute"
       command: "writeAttribute"
       attribute: "max cool setpoint limit"
+      PICS: A_MAXCOOLSETPOINTLIMIT
       arguments:
           value: 3200
 
@@ -470,6 +524,7 @@ tests:
           the value is valid"
       command: "readAttribute"
       attribute: "control sequence of operation"
+      PICS: A_CONTROLSEQUENCEOFOPERATION
       response:
           value: 4
           constraints:
@@ -482,18 +537,21 @@ tests:
           valid value"
       command: "writeAttribute"
       attribute: "control sequence of operation"
+      PICS: A_CONTROLSEQUENCEOFOPERATION
       arguments:
           value: 2
 
     - label: "Read it back again to confirm the successful write"
       command: "readAttribute"
       attribute: "control sequence of operation"
+      PICS: A_CONTROLSEQUENCEOFOPERATION
       response:
           value: 2
 
     - label: "Sets OccupiedHeatingSetpoint to default value"
       command: "writeAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 2000
 
@@ -501,6 +559,7 @@ tests:
     - label: "Sends SetpointRaise Command"
       disabled: true
       command: "SetpointRaiseLower"
+      PICS: CR_SetpointRaiseLower
       arguments:
           values:
               - name: "Mode"
@@ -514,12 +573,14 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       response:
           value: -30
 
     - label: "Sets OccupiedHeatingSetpoint to default value"
       command: "writeAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 2000
 
@@ -527,6 +588,7 @@ tests:
     - label: "Sends SetpointRaise Command"
       disabled: true
       command: "SetpointRaiseLower"
+      PICS: CR_SetpointRaiseLower
       arguments:
           values:
               - name: "Mode"
@@ -540,12 +602,14 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       response:
           value: 30
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 2600
 
@@ -553,6 +617,7 @@ tests:
     - label: "Sends SetpointRaise Command"
       disabled: true
       command: "SetpointRaiseLower"
+      PICS: CR_SetpointRaiseLower
       arguments:
           values:
               - name: "Mode"
@@ -566,12 +631,14 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       response:
           value: -30
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 2600
 
@@ -579,6 +646,7 @@ tests:
     - label: "Sends SetpointRaise Command"
       disabled: true
       command: "SetpointRaiseLower"
+      PICS: CR_SetpointRaiseLower
       arguments:
           values:
               - name: "Mode"
@@ -592,18 +660,21 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       response:
           value: 30
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 2600
 
     - label: "Sets OccupiedHeatingSetpoint to default value"
       command: "writeAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 2000
 
@@ -611,6 +682,7 @@ tests:
     - label: "Sends SetpointRaise Command"
       disabled: true
       command: "SetpointRaiseLower"
+      PICS: CR_SetpointRaiseLower
       arguments:
           values:
               - name: "Mode"
@@ -624,6 +696,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       response:
           value: -30
 
@@ -633,18 +706,21 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       response:
           value: -30
 
     - label: "Sets OccupiedCoolingSetpoint to default value"
       command: "writeAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       arguments:
           value: 2600
 
     - label: "Sets OccupiedHeatingSetpoint to default value"
       command: "writeAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       arguments:
           value: 2000
 
@@ -652,6 +728,7 @@ tests:
     - label: "Sends SetpointRaise Command"
       disabled: true
       command: "SetpointRaiseLower"
+      PICS: CR_SetpointRaiseLower
       arguments:
           values:
               - name: "Mode"
@@ -665,6 +742,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "occupied cooling setpoint"
+      PICS: A_OCCUPIEDCOOLINGSETPOINT
       response:
           value: 30
 
@@ -674,5 +752,6 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "occupied heating setpoint"
+      PICS: A_OCCUPIEDHEATINGSETPOINT
       response:
           value: 30

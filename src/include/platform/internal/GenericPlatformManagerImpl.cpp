@@ -80,11 +80,11 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     }
     SuccessOrExit(err);
 
-    // Initialize the CHIP Inet layer.
-    err = InetLayer().Init(SystemLayer(), nullptr);
+    // Initialize the CHIP UDP layer.
+    err = UDPEndPointManager()->Init(SystemLayer());
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "UDP initialization failed: %s", ErrorStr(err));
     }
     SuccessOrExit(err);
 
@@ -131,7 +131,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_Shutdown()
 {
     CHIP_ERROR err;
     ChipLogError(DeviceLayer, "Inet Layer shutdown");
-    err = InetLayer().Shutdown();
+    err = UDPEndPointManager()->Shutdown();
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     ChipLogError(DeviceLayer, "BLE shutdown");

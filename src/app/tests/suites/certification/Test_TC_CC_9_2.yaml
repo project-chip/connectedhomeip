@@ -20,6 +20,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Precondition: Turn on light for color control tests"
       cluster: "On/Off"
       command: "on"
@@ -34,6 +38,7 @@ tests:
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -54,29 +59,34 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 0
 
     - label: "Read ColorLoopDirection attribute from DUT."
       command: "readAttribute"
       attribute: "color loop direction"
+      PICS: A_COLORLOOPDIRECTION
       response:
           value: 0
 
     - label: "Read ColorLoopTime attribute from DUT."
       command: "readAttribute"
       attribute: "color loop time"
+      PICS: A_COLORLOOPTIME
       response:
           value: 30
 
     - label: "Read ColorLoopStartEnhancedHue attribute from DUT."
       command: "readAttribute"
       attribute: "color loop start enhanced hue"
+      PICS: A_COLORLOOPSTARTENHANCEDHUE
       response:
           value: 160
 
     - label: "Color Loop Set Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -97,6 +107,7 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT."
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 1
 
@@ -105,13 +116,15 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 0
 
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
       disabled: true
       command: "readAttribute"
-      attribute: "color loop start enhanced hue"
+      attribute: "color loop stored enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
       response:
           value: 500
 
@@ -121,6 +134,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
@@ -130,11 +144,13 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
     - label: "Color Loop Set Command - Start Color Loop"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -155,6 +171,7 @@ tests:
     - label: "Read ColorLoopDirection attribute from DUT."
       command: "readAttribute"
       attribute: "color loop direction"
+      PICS: A_COLORLOOPDIRECTION
       response:
           value: 1
 
@@ -164,6 +181,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
@@ -173,11 +191,13 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
     - label: "Color Loop Set Command - Start Color Loop"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -198,6 +218,7 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 0
 
@@ -205,7 +226,8 @@ tests:
     - label: "Read ColorLoopStoredEnhancedHue attribute from DUT."
       disabled: true
       command: "readAttribute"
-      attribute: "color loop start enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
+      attribute: "color loop stored enhanced hue"
       response:
           value: 0
 
@@ -213,6 +235,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 0
 

@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <access/AccessControl.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
@@ -51,6 +53,8 @@ namespace app {
 class ReadHandler : public Messaging::ExchangeDelegate
 {
 public:
+    using SubjectDescriptor = Access::SubjectDescriptor;
+
     enum class ShutdownOptions
     {
         KeepCurrentExchange,
@@ -107,24 +111,20 @@ public:
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool mMoreChunks);
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
-    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport; }
+    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (mDirty || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
     virtual ~ReadHandler() = default;
 
     ClusterInfo * GetAttributeClusterInfolist() { return mpAttributeClusterInfoList; }
     ClusterInfo * GetEventClusterInfolist() { return mpEventClusterInfoList; }
-    EventNumber * GetVendedEventNumberList() { return mSelfProcessedEvents; }
+    EventNumber & GetEventMin() { return mEventMin; }
     PriorityLevel GetCurrentPriority() { return mCurrentPriority; }
 
     // if current priority is in the middle, it has valid snapshoted last event number, it check cleaness via comparing
     // with snapshotted last event number. if current priority  is in the end, no valid
     // sanpshotted last event, check with latest last event number, re-setup snapshoted checkpoint, and compare again.
     bool CheckEventClean(EventManagement & aEventManager);
-
-    // Move to the next dirty priority from critical high priority to debug low priority, where last schedule event number
-    // is larger than current self vended event number
-    void MoveToNextScheduledDirtyPriority();
 
     bool IsReadType() { return mInteractionType == InteractionType::Read; }
     bool IsSubscriptionType() { return mInteractionType == InteractionType::Subscribe; }
@@ -140,11 +140,24 @@ public:
         // If the contents of the global dirty set have changed, we need to reset the iterator since the paths
         // we've sent up till now are no longer valid and need to be invalidated.
         mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
+        mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
     }
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
-    FabricIndex GetAccessingFabricIndex() const { return mFabricIndex; }
+    FabricIndex GetAccessingFabricIndex() const { return mSubjectDescriptor.fabricIndex; }
+
+    const SubjectDescriptor & GetSubjectDescriptor() const { return mSubjectDescriptor; }
+
+    void UnblockUrgentEventDelivery()
+    {
+        mHoldReport = false;
+        mDirty      = true;
+    }
+
+    const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
+    void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
+    uint32_t GetLastWrittenEventsBytes() { return mLastWrittenEventsBytes; }
 
 private:
     friend class TestReadInteraction;
@@ -164,7 +177,8 @@ private:
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser);
-    CHIP_ERROR ProcessEventPaths(EventPaths::Parser & aEventPathsParser);
+    CHIP_ERROR ProcessEventPaths(EventPathIBs::Parser & aEventPathsParser);
+    CHIP_ERROR ProcessEventFilters(EventFilterIBs::Parser & aEventFiltersParser);
     CHIP_ERROR OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
@@ -187,11 +201,10 @@ private:
 
     PriorityLevel mCurrentPriority = PriorityLevel::Invalid;
 
-    // The event number of the last processed event for each priority level
-    EventNumber mSelfProcessedEvents[kNumPriorityLevel];
+    EventNumber mEventMin = 0;
 
     // The last schedule event number snapshoted in the beginning when preparing to fill new events to reports
-    EventNumber mLastScheduledEventNumber[kNumPriorityLevel];
+    EventNumber mLastScheduledEventNumber      = 0;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
 
@@ -203,7 +216,11 @@ private:
     uint64_t mSubscriptionId            = 0;
     uint16_t mMinIntervalFloorSeconds   = 0;
     uint16_t mMaxIntervalCeilingSeconds = 0;
-    Optional<SessionHandle> mSessionHandle;
+    SessionHolder mSessionHandle;
+    // mHoldReport is used to prevent subscription data delivery while we are
+    // waiting for the min reporting interval to elapse.  If we have to send a
+    // report immediately due to an urgent event being queued,
+    // UnblockUrgentEventDelivery can be used to force mHoldReport to false.
     bool mHoldReport         = false;
     bool mDirty              = false;
     bool mActiveSubscription = false;
@@ -211,9 +228,17 @@ private:
     // last chunked message.
     bool mIsChunkedReport                                    = false;
     NodeId mInitiatorNodeId                                  = kUndefinedNodeId;
-    FabricIndex mFabricIndex                                 = 0;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
     bool mIsFabricFiltered                                   = false;
+    // mHoldSync is used to prevent subscription empty report delivery while we
+    // are waiting for the max reporting interval to elaps.  When mHoldSync
+    // becomes false, we are allowed to send an empty report to keep the
+    // subscription alive on the client.
+    bool mHoldSync                   = false;
+    uint32_t mLastWrittenEventsBytes = 0;
+    SubjectDescriptor mSubjectDescriptor;
+    // The detailed encoding state for a single attribute, used by list chunking feature.
+    AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;
 };
 } // namespace app
 } // namespace chip

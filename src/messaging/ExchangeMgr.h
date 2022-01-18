@@ -49,7 +49,7 @@ static constexpr int16_t kAnyMessageType = -1;
  *    It works on be behalf of higher layers, creating ExchangeContexts and
  *    handling the registration/unregistration of unsolicited message handlers.
  */
-class DLL_EXPORT ExchangeManager : public SessionMessageDelegate, public SessionReleaseDelegate
+class DLL_EXPORT ExchangeManager : public SessionMessageDelegate
 {
     friend class ExchangeContext;
 
@@ -99,7 +99,7 @@ public:
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(SessionHandle session, ExchangeDelegate * delegate);
+    ExchangeContext * NewContext(const SessionHandle & session, ExchangeDelegate * delegate);
 
     void ReleaseContext(ExchangeContext * ec) { mContextPool.ReleaseObject(ec); }
 
@@ -193,10 +193,6 @@ public:
 
     size_t GetNumActiveExchanges() { return mContextPool.Allocated(); }
 
-    // TODO: this should be test only, after OnSessionReleased is move to SessionHandle within the exchange context
-    // Expire all exchanges associated with the given session
-    void ExpireExchangesForSession(SessionHandle session);
-
 private:
     enum class State
     {
@@ -232,8 +228,6 @@ private:
     SessionManager * mSessionManager;
     ReliableMessageMgr mReliableMessageMgr;
 
-    ApplicationExchangeDispatch mDefaultExchangeDispatch;
-
     FabricIndex mFabricIndex = 0;
 
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
@@ -243,11 +237,9 @@ private:
     CHIP_ERROR RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(Protocols::Id protocolId, int16_t msgType);
 
-    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SessionHandle session,
+    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, const SessionHandle & session,
                            const Transport::PeerAddress & source, DuplicateMessage isDuplicate,
                            System::PacketBufferHandle && msgBuf) override;
-
-    void OnSessionReleased(SessionHandle session) override;
 };
 
 } // namespace Messaging

@@ -55,9 +55,9 @@
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/dns.h>
-#if !(LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
+#if (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 #include <lwip/ip6_route_table.h>
-#endif // !(LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
+#endif // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 #include <lwip/init.h>
 #include <lwip/netif.h>
 #include <lwip/sys.h>
@@ -80,7 +80,8 @@ using namespace chip::Inet;
 
 System::LayerImpl gSystemLayer;
 
-Inet::InetLayer gInet;
+Inet::UDPEndPointManagerImpl gUDP;
+Inet::TCPEndPointManagerImpl gTCP;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static sys_mbox_t * sLwIPEventQueue   = NULL;
@@ -96,7 +97,7 @@ static void AcquireLwIP(void)
 
 static void ReleaseLwIP(void)
 {
-#if !(LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
+#if (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
     if (sLwIPAcquireCount > 0 && --sLwIPAcquireCount == 0)
     {
 #if defined(INCLUDE_vTaskDelete) && INCLUDE_vTaskDelete
@@ -106,7 +107,7 @@ static void ReleaseLwIP(void)
         tcpip_finish(NULL, NULL);
 #endif // defined(INCLUDE_vTaskDelete) && INCLUDE_vTaskDelete
     }
-#endif
+#endif // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 }
 
 #if CHIP_TARGET_STYLE_UNIX
@@ -220,8 +221,6 @@ static void PrintNetworkState()
 
 void InitNetwork()
 {
-    void * lContext = nullptr;
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // If an tap device name hasn't been specified, derive one from the IPv6 interface id.
@@ -326,11 +325,7 @@ void InitNetwork()
         IPAddress ip4Gateway = (j < gNetworkOptions.IPv4GatewayAddr.size()) ? gNetworkOptions.IPv4GatewayAddr[j] : IPAddress::Any;
 
         {
-#if LWIP_VERSION_MAJOR > 1
             ip4_addr_t ip4AddrLwIP, ip4NetmaskLwIP, ip4GatewayLwIP;
-#else  // LWIP_VERSION_MAJOR <= 1
-            ip_addr_t ip4AddrLwIP, ip4NetmaskLwIP, ip4GatewayLwIP;
-#endif // LWIP_VERSION_MAJOR <= 1
 
             ip4AddrLwIP = ip4Addr.ToIPv4();
             IP4_ADDR(&ip4NetmaskLwIP, 255, 255, 255, 0);
@@ -344,7 +339,7 @@ void InitNetwork()
 
         netif_create_ip6_linklocal_address(&(sNetIFs[j]), 1);
 
-#if !(LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
+#if (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
         if (j < gNetworkOptions.LocalIPv6Addr.size())
         {
             ip6_addr_t ip6addr = gNetworkOptions.LocalIPv6Addr[j].ToIPv6();
@@ -382,7 +377,7 @@ void InitNetwork()
                 }
             }
         }
-#endif
+#endif // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 
         netif_set_up(&(sNetIFs[j]));
         netif_set_link_up(&(sNetIFs[j]));
@@ -417,11 +412,11 @@ void InitNetwork()
     PrintNetworkState();
 
     AcquireLwIP();
-    lContext = sLwIPEventQueue;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    gInet.Init(gSystemLayer, lContext);
+    gTCP.Init(gSystemLayer);
+    gUDP.Init(gSystemLayer);
 }
 
 void ServiceEvents(uint32_t aSleepTimeMilliseconds)
@@ -504,7 +499,8 @@ static void OnLwIPInitComplete(void * arg)
 
 void ShutdownNetwork()
 {
-    gInet.Shutdown();
+    gTCP.Shutdown();
+    gUDP.Shutdown();
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     ReleaseLwIP();
 #endif

@@ -17,6 +17,7 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/core/CHIPCallback.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/Span.h>
@@ -34,21 +35,24 @@ enum class AttestationVerificationResult : uint16_t
     kPaaSignatureInvalid = 103,
     kPaaRevoked          = 104,
     kPaaFormatInvalid    = 105,
+    kPaaArgumentInvalid  = 106,
 
     kPaiExpired           = 200,
     kPaiSignatureInvalid  = 201,
     kPaiRevoked           = 202,
     kPaiFormatInvalid     = 203,
-    kPaiVendorIdMismatch  = 204,
-    kPaiAuthorityNotFound = 205,
+    kPaiArgumentInvalid   = 204,
+    kPaiVendorIdMismatch  = 205,
+    kPaiAuthorityNotFound = 206,
 
     kDacExpired           = 300,
     kDacSignatureInvalid  = 301,
     kDacRevoked           = 302,
     kDacFormatInvalid     = 303,
-    kDacVendorIdMismatch  = 304,
-    kDacProductIdMismatch = 305,
-    kDacAuthorityNotFound = 306,
+    kDacArgumentInvalid   = 304,
+    kDacVendorIdMismatch  = 305,
+    kDacProductIdMismatch = 306,
+    kDacAuthorityNotFound = 307,
 
     kFirmwareInformationMismatch = 400,
     kFirmwareInformationMissing  = 401,
@@ -68,6 +72,8 @@ enum class AttestationVerificationResult : uint16_t
     kNoMemory = 700,
 
     kInvalidArgument = 800,
+
+    kInternalError = 900,
 
     kNotImplemented = 0xFFFFU,
 
@@ -99,6 +105,89 @@ struct DeviceInfoForAttestation
     uint16_t paaVendorId = VendorId::NotSpecified;
 };
 
+typedef void (*OnAttestationInformationVerification)(void * context, AttestationVerificationResult result);
+
+/**
+ * @brief Helper utility to model a basic trust store usable for device attestation verifiers.
+ *
+ * API is synchronous. Real commissioner implementations may entirely
+ * hide Product Attestation Authority cert lookup behind the DeviceAttestationVerifier and
+ * never use this interface at all. It is provided as a utility to help build DeviceAttestationVerifier
+ * implementations suitable for testing or examples.
+ */
+class AttestationTrustStore
+{
+public:
+    AttestationTrustStore()          = default;
+    virtual ~AttestationTrustStore() = default;
+
+    // Not copyable
+    AttestationTrustStore(const AttestationTrustStore &) = delete;
+    AttestationTrustStore & operator=(const AttestationTrustStore &) = delete;
+
+    /**
+     * @brief Look-up a PAA cert by SKID
+     *
+     * The implementations of this interface must have access to a set of PAAs to trust.
+     *
+     * Interface is synchronous, and therefore this should not be used unless to expose a PAA
+     * store that is both fully local and quick to access.
+     *
+     * @param[in] skid Buffer containing the subject key identifier (SKID) of the PAA to look-up
+     * @param[inout] outPaaDerBuffer Buffer to receive the contents of the PAA root cert, if found.
+     *                                  Size will be updated to match actual size.
+     *
+     * @returns CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT if `skid` or `outPaaDerBuffer` arguments
+     *          are not usable, CHIP_BUFFER_TOO_SMALL if certificate doesn't fit in `outPaaDerBuffer`
+     *          span, CHIP_ERROR_CA_CERT_NOT_FOUND if no PAA found that matches `skid.
+     *
+     */
+    virtual CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const = 0;
+};
+
+/**
+ * @brief Basic AttestationTrustStore that holds all data within caller-owned memory.
+ *
+ * This is useful to wrap a fixed constant array of certificates into a trust store
+ * implementation.
+ */
+
+class ArrayAttestationTrustStore : public AttestationTrustStore
+{
+public:
+    ArrayAttestationTrustStore(const ByteSpan * derCerts, size_t numCerts) : mDerCerts(derCerts), mNumCerts(numCerts) {}
+
+    CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const override
+    {
+        VerifyOrReturnError(!skid.empty() && (skid.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(skid.size() == Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+        size_t paaIdx;
+        ByteSpan candidate;
+
+        for (paaIdx = 0; paaIdx < mNumCerts; ++paaIdx)
+        {
+            uint8_t skidBuf[Crypto::kSubjectKeyIdentifierLength] = { 0 };
+            candidate                                            = mDerCerts[paaIdx];
+            MutableByteSpan candidateSkidSpan{ skidBuf };
+            VerifyOrReturnError(CHIP_NO_ERROR == Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan),
+                                CHIP_ERROR_INTERNAL);
+
+            if (skid.data_equal(candidateSkidSpan))
+            {
+                // Found a match
+                return CopySpanToMutableSpan(candidate, outPaaDerBuffer);
+            }
+        }
+
+        return CHIP_ERROR_CA_CERT_NOT_FOUND;
+    }
+
+protected:
+    const ByteSpan * mDerCerts;
+    const size_t mNumCerts;
+};
+
 class DeviceAttestationVerifier
 {
 public:
@@ -115,18 +204,17 @@ public:
      * @param[in] attestationInfoBuffer Buffer containing attestation information portion of Attestation Response (raw TLV)
      * @param[in] attestationChallengeBuffer Buffer containing the attestation challenge from the secure session
      * @param[in] attestationSignatureBuffer Buffer the signature portion of Attestation Response
-     * @param[in] paiCertDerBuffer Buffer containing the PAI certificate from device in DER format.
+     * @param[in] paiDerBuffer Buffer containing the PAI certificate from device in DER format.
      *                                If length zero, there was no PAI certificate.
-     * @param[in] dacCertDerBuffer Buffer containing the DAC certificate from device in DER format.
+     * @param[in] dacDerBuffer Buffer containing the DAC certificate from device in DER format.
      * @param[in] attestationNonce Buffer containing attestation nonce.
-     *
-     * @returns AttestationVerificationResult::kSuccess on success or another specific
-     *          value from AttestationVerificationResult enum on failure.
+     * @param[in] onCompletion Callback handler to provide Attestation Information Verification result to the caller of
+     *                         VerifyAttestationInformation()
      */
-    virtual AttestationVerificationResult
-    VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
-                                 const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiCertDerBuffer,
-                                 const ByteSpan & dacCertDerBuffer, const ByteSpan & attestationNonce) = 0;
+    virtual void VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
+                                              const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiDerBuffer,
+                                              const ByteSpan & dacDerBuffer, const ByteSpan & attestationNonce,
+                                              Callback::Callback<OnAttestationInformationVerification> * onCompletion) = 0;
 
     /**
      * @brief Verify a CMS Signed Data signature against the CSA certificate of Subject Key Identifier that matches
@@ -157,10 +245,24 @@ public:
 
     // TODO: Validate Firmware Information
 
+    /**
+     * @brief Verify an operational certificate signing request payload against the DAC's public key.
+     *
+     * @param[in]  nocsrElementsBuffer Buffer containing CSR elements as per specifications section 11.22.5.6. NOCSR Elements.
+     * @param[in]  attestationChallengeBuffer Buffer containing the attestation challenge from the secure session
+     * @param[in]  attestationSignatureBuffer Buffer containing the signature portion of CSR Response
+     * @param[in]  dacPublicKey Public Key from the DAC's certificate received from device.
+     * @param[in]  csrNonce Buffer containing CSR nonce.
+     */
+    virtual CHIP_ERROR VerifyNodeOperationalCSRInformation(const ByteSpan & nocsrElementsBuffer,
+                                                           const ByteSpan & attestationChallengeBuffer,
+                                                           const ByteSpan & attestationSignatureBuffer,
+                                                           const Crypto::P256PublicKey & dacPublicKey,
+                                                           const ByteSpan & csrNonce) = 0;
+
 protected:
-    CHIP_ERROR ValidateAttestationSignature(const chip::Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
-                                            const ByteSpan & attestationChallenge,
-                                            const chip::Crypto::P256ECDSASignature & signature);
+    CHIP_ERROR ValidateAttestationSignature(const Crypto::P256PublicKey & pubkey, const ByteSpan & attestationElements,
+                                            const ByteSpan & attestationChallenge, const Crypto::P256ECDSASignature & signature);
 };
 
 /**

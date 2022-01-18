@@ -133,20 +133,6 @@
 #define CHIP_CONFIG_EVENT_LOGGING_WDM_OFFLOAD 1
 
 /**
- * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
- *
- * Enable recording UTC timestamps.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
-
-/**
- * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
- *
- * A size, in bytes, of the individual debug event logging buffer.
- */
-#define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
-
-/**
  * CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_TIMEOUT
  *
  * The amount of time in miliseconds after which BLE should change his advertisements
@@ -175,13 +161,6 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_NFC 1
 
 /**
- * CHIP_DEVICE_CONFIG_THREAD_FTD
- *
- * E-Lock Demo Application is a Thread SED (Sleepy End Device)
- */
-#define CHIP_DEVICE_CONFIG_THREAD_FTD 0
-
-/**
  *  @def CHIP_CONFIG_MAX_DEVICE_ADMINS
  *
  *  @brief
@@ -192,8 +171,8 @@
 #define CHIP_CONFIG_MAX_DEVICE_ADMINS 4 // 3 fabrics + 1 for rotation slack
 
 #define CHIP_DEVICE_CONFIG_ENABLE_SED 1
-#define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 1000
-#define CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL 100
+#define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 1000_ms32
+#define CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL 100_ms32
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE

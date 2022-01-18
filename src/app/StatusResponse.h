@@ -30,8 +30,8 @@ static constexpr size_t kMaxSecureSduLengthBytes = 1024;
 class StatusResponse
 {
 public:
-    static CHIP_ERROR SendStatusResponse(Protocols::InteractionModel::Status aStatus,
-                                         Messaging::ExchangeContext * apExchangeContext, bool aExpectResponse);
+    static CHIP_ERROR Send(Protocols::InteractionModel::Status aStatus, Messaging::ExchangeContext * apExchangeContext,
+                           bool aExpectResponse);
     static CHIP_ERROR ProcessStatusResponse(System::PacketBufferHandle && aPayload, StatusIB & aStatus);
 };
 } // namespace app

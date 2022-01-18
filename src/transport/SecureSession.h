@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,8 +22,10 @@
 #pragma once
 
 #include <app/util/basic-types.h>
+#include <credentials/CHIPCert.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <transport/CryptoContext.h>
+#include <transport/Session.h>
 #include <transport/SessionMessageCounter.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
@@ -38,47 +40,82 @@ static constexpr uint32_t kUndefinedMessageIndex = UINT32_MAX;
  * Defines state of a peer connection at a transport layer.
  *
  * Information contained within the state:
+ *   - SecureSessionType represents CASE or PASE session
  *   - PeerAddress represents how to talk to the peer
  *   - PeerNodeId is the unique ID of the peer
+ *   - PeerCATs represents CASE Authenticated Tags
  *   - SendMessageIndex is an ever increasing index for sending messages
  *   - LastActivityTime is a monotonic timestamp of when this connection was
  *     last used. Inactive connections can expire.
  *   - CryptoContext contains the encryption context of a connection
- *
- * TODO: to add any message ACK information
  */
-class SecureSession
+class SecureSession : public Session
 {
 public:
-    SecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric,
-                  const ReliableMessageProtocolConfig & config, System::Clock::Timestamp currentTime) :
-        mPeerNodeId(peerNodeId),
-        mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId), mFabric(fabric), mMRPConfig(config)
+    /**
+     *  @brief
+     *    Defines SecureSession Type. Currently supported types are PASE and CASE.
+     */
+    enum class Type : uint8_t
     {
-        SetLastActivityTime(currentTime);
-    }
+        kUndefined = 0,
+        kPASE      = 1,
+        kCASE      = 2,
+    };
+
+    SecureSession(Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
+                  FabricIndex fabric, const ReliableMessageProtocolConfig & config) :
+        mSecureSessionType(secureSessionType),
+        mPeerNodeId(peerNodeId), mPeerCATs(peerCATs), mLocalSessionId(localSessionId), mPeerSessionId(peerSessionId),
+        mFabric(fabric), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
+    {}
+    ~SecureSession() { NotifySessionReleased(); }
 
     SecureSession(SecureSession &&)      = delete;
     SecureSession(const SecureSession &) = delete;
     SecureSession & operator=(const SecureSession &) = delete;
     SecureSession & operator=(SecureSession &&) = delete;
 
+    Session::SessionType GetSessionType() const override { return Session::SessionType::kSecure; }
+#if CHIP_PROGRESS_LOGGING
+    const char * GetSessionTypeString() const override { return "secure"; };
+#endif
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const override;
+
+    bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
+
+    System::Clock::Milliseconds32 GetAckTimeout() const override
+    {
+        switch (mPeerAddress.GetTransportType())
+        {
+        case Transport::Type::kUdp:
+            return GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+        case Transport::Type::kTcp:
+            return System::Clock::Seconds16(30);
+        default:
+            break;
+        }
+        return System::Clock::Timeout();
+    }
+
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
-    PeerAddress & GetPeerAddress() { return mPeerAddress; }
     void SetPeerAddress(const PeerAddress & address) { mPeerAddress = address; }
 
+    Type GetSecureSessionType() const { return mSecureSessionType; }
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
+    CATValues GetPeerCATs() const { return mPeerCATs; }
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
-    const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
+    const ReliableMessageProtocolConfig & GetMRPConfig() const override { return mMRPConfig; }
 
     uint16_t GetLocalSessionId() const { return mLocalSessionId; }
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
-    void SetLastActivityTime(System::Clock::Timestamp value) { mLastActivityTime = value; }
+    void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
 
     CryptoContext & GetCryptoContext() { return mCryptoContext; }
 
@@ -97,7 +134,9 @@ public:
     SessionMessageCounter & GetSessionMessageCounter() { return mSessionMessageCounter; }
 
 private:
+    const Type mSecureSessionType;
     const NodeId mPeerNodeId;
+    const CATValues mPeerCATs;
     const uint16_t mLocalSessionId;
     const uint16_t mPeerSessionId;
     const FabricIndex mFabric;

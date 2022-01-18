@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <platform/AttributeList.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceEvent.h>
 #include <system/PlatformEventSupport.h>
@@ -36,17 +37,19 @@ class DiscoveryImplPlatform;
 
 namespace DeviceLayer {
 
+static constexpr size_t kMaxFixedLabels  = 10;
+static constexpr size_t kMaxUserLabels   = 10;
+static constexpr size_t kMaxLanguageTags = 254; // Maximum number of entry type 'ARRAY' supports
+
 class PlatformManagerImpl;
 class ConnectivityManagerImpl;
 class ConfigurationManagerImpl;
+class DeviceControlServer;
 class TraitManager;
 class ThreadStackManagerImpl;
 class TimeSyncManager;
 
 namespace Internal {
-class DeviceControlServer;
-class FabricProvisioningServer;
-class ServiceProvisioningServer;
 class BLEManagerImpl;
 template <class>
 class GenericConfigurationManagerImpl;
@@ -65,6 +68,28 @@ class GenericThreadStackManagerImpl_OpenThread;
 template <class>
 class GenericThreadStackManagerImpl_OpenThread_LwIP;
 } // namespace Internal
+
+/**
+ * Defines the delegate class of Platform Manager to notify platform updates.
+ */
+class PlatformManagerDelegate
+{
+public:
+    virtual ~PlatformManagerDelegate() {}
+
+    /**
+     * @brief
+     *   Called by the current Node after completing a boot or reboot process.
+     */
+    virtual void OnStartUp(uint32_t softwareVersion) {}
+
+    /**
+     * @brief
+     *   Called by the current Node prior to any orderly shutdown sequence on a
+     *   best-effort basis.
+     */
+    virtual void OnShutDown() {}
+};
 
 /**
  * Provides features for initializing and interacting with the chip network
@@ -88,6 +113,8 @@ public:
     CHIP_ERROR InitChipStack();
     CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
+    void SetDelegate(PlatformManagerDelegate * delegate) { mDelegate = delegate; }
+    PlatformManagerDelegate * GetDelegate() const { return mDelegate; }
 
     /**
      * ScheduleWork can be called after InitChipStack has been called.  Calls
@@ -155,21 +182,28 @@ public:
     bool IsChipStackLockedByCurrentThread() const;
 #endif
 
+    CHIP_ERROR GetFixedLabelList(EndpointId endpoint,
+                                 AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+    CHIP_ERROR SetUserLabelList(EndpointId endpoint,
+                                AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR GetUserLabelList(EndpointId endpoint,
+                                AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
+
 private:
-    bool mInitialized = false;
+    bool mInitialized                   = false;
+    PlatformManagerDelegate * mDelegate = nullptr;
 
     // ===== Members for internal use by the following friends.
 
     friend class PlatformManagerImpl;
     friend class ConnectivityManagerImpl;
     friend class ConfigurationManagerImpl;
+    friend class DeviceControlServer;
     friend class Dnssd::DiscoveryImplPlatform;
     friend class TraitManager;
     friend class ThreadStackManagerImpl;
     friend class TimeSyncManager;
-    friend class Internal::DeviceControlServer;
-    friend class Internal::FabricProvisioningServer;
-    friend class Internal::ServiceProvisioningServer;
     friend class Internal::BLEManagerImpl;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
@@ -394,6 +428,31 @@ inline void PlatformManager::DispatchEvent(const ChipDeviceEvent * event)
 inline CHIP_ERROR PlatformManager::StartChipTimer(System::Clock::Timeout duration)
 {
     return static_cast<ImplClass *>(this)->_StartChipTimer(duration);
+}
+
+inline CHIP_ERROR PlatformManager::GetFixedLabelList(
+    EndpointId endpoint, AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList)
+{
+    return static_cast<ImplClass *>(this)->_GetFixedLabelList(endpoint, labelList);
+}
+
+inline CHIP_ERROR
+PlatformManager::SetUserLabelList(EndpointId endpoint,
+                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    return static_cast<ImplClass *>(this)->_SetUserLabelList(endpoint, labelList);
+}
+
+inline CHIP_ERROR
+PlatformManager::GetUserLabelList(EndpointId endpoint,
+                                  AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList)
+{
+    return static_cast<ImplClass *>(this)->_GetUserLabelList(endpoint, labelList);
+}
+
+inline CHIP_ERROR PlatformManager::GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales)
+{
+    return static_cast<ImplClass *>(this)->_GetSupportedLocales(supportedLocales);
 }
 
 } // namespace DeviceLayer

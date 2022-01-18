@@ -43,8 +43,12 @@ template class GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>;
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_FreeRTOS<ImplClass>::DoInit(void)
 {
-    CHIP_ERROR err   = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE) && CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
+    mThreadStackLock = xSemaphoreCreateMutexStatic(&mThreadStackLockMutex);
+#else
     mThreadStackLock = xSemaphoreCreateMutex();
+#endif // CHIP_CONFIG_FREERTOS_USE_STATIC_SEMAPHORE
 
     if (mThreadStackLock == NULL)
     {

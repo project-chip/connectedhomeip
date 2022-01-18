@@ -439,8 +439,8 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
         ChipLogProgress(DeviceLayer, "Avahi group established");
         break;
     case AVAHI_ENTRY_GROUP_COLLISION:
-        ChipLogError(DeviceLayer, "Avahi group collission");
-        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_MDNS_COLLISSION);
+        ChipLogError(DeviceLayer, "Avahi group collision");
+        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_MDNS_COLLISION);
         break;
     case AVAHI_ENTRY_GROUP_FAILURE:
         ChipLogError(DeviceLayer, "Avahi group internal failure %s",
@@ -659,13 +659,20 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, DnssdService
     resolveContext->mInstance = this;
     resolveContext->mCallback = callback;
     resolveContext->mContext  = context;
+
     if (!interface.IsPresent())
     {
         avahiInterface = AVAHI_IF_UNSPEC;
     }
 
-    resolver = avahi_service_resolver_new(mClient, avahiInterface, ToAvahiProtocol(transportType), name,
-                                          GetFullType(type, protocol).c_str(), nullptr, ToAvahiProtocol(addressType),
+    Platform::CopyString(resolveContext->mName, name);
+    resolveContext->mInterface   = avahiInterface;
+    resolveContext->mTransport   = ToAvahiProtocol(transportType);
+    resolveContext->mAddressType = ToAvahiProtocol(addressType);
+    resolveContext->mFullType    = GetFullType(type, protocol);
+
+    resolver = avahi_service_resolver_new(mClient, avahiInterface, resolveContext->mTransport, name,
+                                          resolveContext->mFullType.c_str(), nullptr, resolveContext->mAddressType,
                                           static_cast<AvahiLookupFlags>(0), HandleResolve, resolveContext);
     // Otherwise the resolver will be freed in the callback
     if (resolver == nullptr)
@@ -688,6 +695,21 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
     switch (event)
     {
     case AVAHI_RESOLVER_FAILURE:
+        if (context->mAttempts++ < 3)
+        {
+            ChipLogProgress(DeviceLayer, "Re-trying resolve");
+            avahi_service_resolver_free(resolver);
+            resolver = avahi_service_resolver_new(context->mInstance->mClient, context->mInterface, context->mTransport,
+                                                  context->mName, context->mFullType.c_str(), nullptr, context->mAddressType,
+                                                  static_cast<AvahiLookupFlags>(0), HandleResolve, context);
+            if (resolver == nullptr)
+            {
+                ChipLogError(DeviceLayer, "Avahi resolve failed on retry");
+                context->mCallback(context->mContext, nullptr, CHIP_ERROR_INTERNAL);
+                chip::Platform::Delete(context);
+            }
+            return;
+        }
         ChipLogError(DeviceLayer, "Avahi resolve failed");
         context->mCallback(context->mContext, nullptr, CHIP_ERROR_INTERNAL);
         break;

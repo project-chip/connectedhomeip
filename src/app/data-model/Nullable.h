@@ -18,7 +18,10 @@
 
 #pragma once
 
+#include <app/util/attribute-storage-null-handling.h>
 #include <lib/core/Optional.h>
+
+#include <type_traits>
 
 namespace chip {
 namespace app {
@@ -41,6 +44,9 @@ struct Nullable : protected Optional<T>
     // Optional.
     using Optional<T>::Value;
 
+    // Some consumers need an easy way to determine our underlying type.
+    using UnderlyingType = T;
+
     constexpr void SetNull() { Optional<T>::ClearValue(); }
     constexpr bool IsNull() const { return !Optional<T>::HasValue(); }
 
@@ -48,6 +54,24 @@ struct Nullable : protected Optional<T>
     constexpr T & SetNonNull(Args &&... args)
     {
         return Optional<T>::Emplace(std::forward<Args>(args)...);
+    }
+
+    // For integer types, being nullable involves a range restriction.
+    template <
+        typename U = std::decay_t<T>,
+        typename std::enable_if_t<(std::is_integral<U>::value && !std::is_same<U, bool>::value) || std::is_enum<U>::value, int> = 0>
+    constexpr bool HasValidValue() const
+    {
+        return NumericAttributeTraits<T>::CanRepresentValue(/* isNullable = */ true, Value());
+    }
+
+    // For all other types, all values are valid.
+    template <typename U                     = std::decay_t<T>,
+              typename std::enable_if_t<(!std::is_integral<U>::value || std::is_same<U, bool>::value) && !std::is_enum<U>::value,
+                                        int> = 0>
+    constexpr bool HasValidValue() const
+    {
+        return true;
     }
 };
 

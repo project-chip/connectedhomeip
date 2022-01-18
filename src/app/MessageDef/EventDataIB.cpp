@@ -455,10 +455,7 @@ CHIP_ERROR EventDataIB::Parser::ProcessEventTimestamp(EventHeader & aEventHeader
         hasEpochTimestamp              = true;
     }
 
-    if ((hasSystemTimestamp && !hasEpochTimestamp && !hasDeltaSystemTimestamp && !hasDeltaEpochTimestamp) ||
-        (!hasSystemTimestamp && hasEpochTimestamp && !hasDeltaSystemTimestamp && !hasDeltaEpochTimestamp) ||
-        (!hasSystemTimestamp && !hasEpochTimestamp && hasDeltaSystemTimestamp && !hasDeltaEpochTimestamp) ||
-        (!hasSystemTimestamp && !hasEpochTimestamp && !hasDeltaSystemTimestamp && hasDeltaEpochTimestamp))
+    if (hasSystemTimestamp + hasEpochTimestamp + hasDeltaSystemTimestamp + hasDeltaEpochTimestamp == 1)
     {
         return CHIP_NO_ERROR;
     }
@@ -488,7 +485,7 @@ EventPathIB::Builder & EventDataIB::Builder::CreatePath()
     return mPath;
 }
 
-EventDataIB::Builder EventDataIB::Builder::Priority(const uint8_t aPriority)
+EventDataIB::Builder & EventDataIB::Builder::Priority(const uint8_t aPriority)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -498,7 +495,7 @@ EventDataIB::Builder EventDataIB::Builder::Priority(const uint8_t aPriority)
     return *this;
 }
 
-EventDataIB::Builder EventDataIB::Builder::EventNumber(const uint64_t aEventNumber)
+EventDataIB::Builder & EventDataIB::Builder::EventNumber(const uint64_t aEventNumber)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -508,7 +505,7 @@ EventDataIB::Builder EventDataIB::Builder::EventNumber(const uint64_t aEventNumb
     return *this;
 }
 
-EventDataIB::Builder EventDataIB::Builder::EpochTimestamp(const uint64_t aEpochTimestamp)
+EventDataIB::Builder & EventDataIB::Builder::EpochTimestamp(const uint64_t aEpochTimestamp)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -518,7 +515,7 @@ EventDataIB::Builder EventDataIB::Builder::EpochTimestamp(const uint64_t aEpochT
     return *this;
 }
 
-EventDataIB::Builder EventDataIB::Builder::SystemTimestamp(const uint64_t aSystemTimestamp)
+EventDataIB::Builder & EventDataIB::Builder::SystemTimestamp(const uint64_t aSystemTimestamp)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -528,7 +525,7 @@ EventDataIB::Builder EventDataIB::Builder::SystemTimestamp(const uint64_t aSyste
     return *this;
 }
 
-EventDataIB::Builder EventDataIB::Builder::DeltaEpochTimestamp(const uint64_t aDeltaEpochTimestamp)
+EventDataIB::Builder & EventDataIB::Builder::DeltaEpochTimestamp(const uint64_t aDeltaEpochTimestamp)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -538,7 +535,7 @@ EventDataIB::Builder EventDataIB::Builder::DeltaEpochTimestamp(const uint64_t aD
     return *this;
 }
 
-EventDataIB::Builder EventDataIB::Builder::DeltaSystemTimestamp(const uint64_t aDeltaSystemTimestamp)
+EventDataIB::Builder & EventDataIB::Builder::DeltaSystemTimestamp(const uint64_t aDeltaSystemTimestamp)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)

@@ -19,24 +19,23 @@
 #pragma once
 
 #include <app/AttributeAccessInterface.h>
+#include <app/clusters/media-input-server/media-input-server.h>
 #include <jni.h>
-#include <lib/core/CHIPError.h>
 
-class MediaInputManager
+class MediaInputManager : public chip::app::Clusters::MediaInput::Delegate
 {
 public:
+    static void NewManager(jint endpoint, jobject manager);
     void InitializeWithObjects(jobject managerObject);
-    CHIP_ERROR GetInputList(chip::app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR GetCurrentInput(chip::app::AttributeValueEncoder & aEncoder);
-    bool SelectInput(uint8_t index);
-    bool ShowInputStatus();
-    bool HideInputStatus();
-    bool RenameInput(uint8_t index, std::string name);
+
+    CHIP_ERROR HandleGetInputList(chip::app::AttributeValueEncoder & aEncoder) override;
+    uint8_t HandleGetCurrentInput() override;
+    bool HandleSelectInput(const uint8_t index) override;
+    bool HandleShowInputStatus() override;
+    bool HandleHideInputStatus() override;
+    bool HandleRenameInput(const uint8_t index, const chip::CharSpan & name) override;
 
 private:
-    friend MediaInputManager & MediaInputMgr();
-
-    static MediaInputManager sInstance;
     jobject mMediaInputManagerObject = nullptr;
     jmethodID mGetInputListMethod    = nullptr;
     jmethodID mGetCurrentInputMethod = nullptr;
@@ -45,8 +44,3 @@ private:
     jmethodID mHideInputStatusMethod = nullptr;
     jmethodID mRenameInputMethod     = nullptr;
 };
-
-inline class MediaInputManager & MediaInputMgr()
-{
-    return MediaInputManager::sInstance;
-}

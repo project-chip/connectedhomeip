@@ -33,22 +33,11 @@ namespace app {
  * so it can be used as a linked list.
  */
 // TODO: The cluster info should be separated into AttributeInfo and EventInfo.
+// Note: The user of ClusterInfo today is ReadHandler and ReportEngine, both of them do not accept Null list index (means list
+//       append operations)
 // Note: The change will happen after #11171 with a better linked list.
 struct ClusterInfo
 {
-private:
-    // Allow AttributePathParams access these constants.
-    friend struct AttributePathParams;
-    friend struct EventPathParams;
-
-    // The ClusterId, AttributeId and EventId are MEIs,
-    // 0xFFFF is not a valid manufacturer code, thus 0xFFFF'FFFF is not a valid MEI
-    static constexpr ClusterId kInvalidClusterId     = 0xFFFF'FFFF;
-    static constexpr AttributeId kInvalidAttributeId = 0xFFFF'FFFF;
-    static constexpr EventId kInvalidEventId         = 0xFFFF'FFFF;
-    // ListIndex is a uint16 number, thus 0xFFFF is not a valid list index.
-    static constexpr ListIndex kInvalidListIndex = 0xFFFF;
-
 public:
     bool IsAttributePathSupersetOf(const ClusterInfo & other) const
     {

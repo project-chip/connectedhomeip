@@ -41,13 +41,12 @@ namespace Internal {
     (key);                                                                                                                         \
     static_assert(sizeof(key) <= SETTINGS_MAX_NAME_LEN, "Config key too long: " key)
 
-// Define the configuration keys to be part of the CHIP_DEVICE_CONFIG_SETTINGS_KEY subtree
-// so that they get erased when KeyValueStoreManagerImpl::DoFactoryReset() is called.
-// clang-format off
-#define NAMESPACE_FACTORY  CHIP_DEVICE_CONFIG_SETTINGS_KEY "/fct/"
-#define NAMESPACE_CONFIG   CHIP_DEVICE_CONFIG_SETTINGS_KEY "/cfg/"
+// Define the configuration keys (except the factory keys) to be part of the
+// CHIP_DEVICE_CONFIG_SETTINGS_KEY subtree so that they get erased when
+// KeyValueStoreManagerImpl::DoFactoryReset() is called.
+#define NAMESPACE_FACTORY CHIP_DEVICE_CONFIG_SETTINGS_KEY "-fct/"
+#define NAMESPACE_CONFIG CHIP_DEVICE_CONFIG_SETTINGS_KEY "/cfg/"
 #define NAMESPACE_COUNTERS CHIP_DEVICE_CONFIG_SETTINGS_KEY "/ctr/"
-// clang-format on
 
 // Keys stored in the chip factory nam
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_SerialNum           = CONFIG_KEY(NAMESPACE_FACTORY "serial-num");
@@ -71,7 +70,16 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_LastUsedEpochKeyId = CONFIG_KEY
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_FailSafeArmed      = CONFIG_KEY(NAMESPACE_CONFIG "fail-safe-armed");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_RegulatoryLocation = CONFIG_KEY(NAMESPACE_CONFIG "regulatory-location");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_CountryCode        = CONFIG_KEY(NAMESPACE_CONFIG "country-code");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_ActiveLocale       = CONFIG_KEY(NAMESPACE_CONFIG "active-locale");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_Breadcrumb         = CONFIG_KEY(NAMESPACE_CONFIG "breadcrumb");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_HourFormat         = CONFIG_KEY(NAMESPACE_CONFIG "hour-format");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_CalendarType       = CONFIG_KEY(NAMESPACE_CONFIG "calendar-type");
+
+// Keys stored in the counters namespace
+const ZephyrConfig::Key ZephyrConfig::kCounterKey_RebootCount           = CONFIG_KEY(NAMESPACE_COUNTERS "reboot-count");
+const ZephyrConfig::Key ZephyrConfig::kCounterKey_BootReason            = CONFIG_KEY(NAMESPACE_COUNTERS "boot-reason");
+const ZephyrConfig::Key ZephyrConfig::kCounterKey_TotalOperationalHours = CONFIG_KEY(NAMESPACE_COUNTERS "total-operational-hours");
+
 namespace {
 
 constexpr const char * sAllResettableConfigKeys[] = {
@@ -80,7 +88,8 @@ constexpr const char * sAllResettableConfigKeys[] = {
     ZephyrConfig::kConfigKey_FabricSecret,       ZephyrConfig::kConfigKey_GroupKeyIndex,
     ZephyrConfig::kConfigKey_LastUsedEpochKeyId, ZephyrConfig::kConfigKey_FailSafeArmed,
     ZephyrConfig::kConfigKey_RegulatoryLocation, ZephyrConfig::kConfigKey_CountryCode,
-    ZephyrConfig::kConfigKey_Breadcrumb
+    ZephyrConfig::kConfigKey_ActiveLocale,       ZephyrConfig::kConfigKey_Breadcrumb,
+    ZephyrConfig::kConfigKey_HourFormat,         ZephyrConfig::kConfigKey_CalendarType,
 };
 
 // Data structure to be passed as a parameter of Zephyr's settings_load_subtree_direct() function

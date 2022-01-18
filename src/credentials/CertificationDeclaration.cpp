@@ -22,8 +22,9 @@
  *      working with Certification Declaration elements.
  */
 
-#include <inttypes.h>
-#include <stddef.h>
+#include <algorithm>
+#include <cinttypes>
+#include <cstddef>
 
 #include <credentials/CertificationDeclaration.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -68,7 +69,7 @@ CHIP_ERROR EncodeCertificationElements(const CertificationElements & certElement
 
     writer.Init(encodedCertElements);
 
-    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag, kTLVType_Structure, outerContainer1));
+    ReturnErrorOnFailure(writer.StartContainer(AnonymousTag(), kTLVType_Structure, outerContainer1));
 
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_FormatVersion), certElements.FormatVersion));
     ReturnErrorOnFailure(writer.Put(ContextTag(kTag_VendorId), certElements.VendorId));
@@ -79,7 +80,7 @@ CHIP_ERROR EncodeCertificationElements(const CertificationElements & certElement
     ReturnErrorOnFailure(writer.StartContainer(ContextTag(kTag_ProductIdArray), kTLVType_Array, outerContainer2));
     for (uint8_t i = 0; i < certElements.ProductIdsCount; i++)
     {
-        ReturnErrorOnFailure(writer.Put(AnonymousTag, certElements.ProductIds[i]));
+        ReturnErrorOnFailure(writer.Put(AnonymousTag(), certElements.ProductIds[i]));
     }
     ReturnErrorOnFailure(writer.EndContainer(outerContainer2));
 
@@ -113,7 +114,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
 
     reader.Init(encodedCertElements);
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag));
+    ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag()));
 
     ReturnErrorOnFailure(reader.EnterContainer(outerContainer1));
 
@@ -127,7 +128,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
     ReturnErrorOnFailure(reader.EnterContainer(outerContainer2));
 
     certElements.ProductIdsCount = 0;
-    while ((err = reader.Next(AnonymousTag)) == CHIP_NO_ERROR)
+    while ((err = reader.Next(AnonymousTag())) == CHIP_NO_ERROR)
     {
         ReturnErrorOnFailure(reader.Get(certElements.ProductIds[certElements.ProductIdsCount++]));
     }
@@ -186,7 +187,7 @@ CHIP_ERROR DecodeCertificationElements(const ByteSpan & encodedCertElements, Cer
 
     reader.Init(encodedCertElements);
 
-    ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag));
+    ReturnErrorOnFailure(reader.Next(kTLVType_Structure, AnonymousTag()));
 
     ReturnErrorOnFailure(reader.EnterContainer(outerContainer));
 
@@ -266,7 +267,7 @@ CHIP_ERROR CertificationElementsDecoder::PrepareToReadProductIdList(const ByteSp
     mCertificationDeclarationData = encodedCertElements;
 
     mReader.Init(mCertificationDeclarationData);
-    ReturnErrorOnFailure(mReader.Next(kTLVType_Structure, AnonymousTag));
+    ReturnErrorOnFailure(mReader.Next(kTLVType_Structure, AnonymousTag()));
     ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType1));
 
     // position to ProductId Array
@@ -290,7 +291,7 @@ CHIP_ERROR CertificationElementsDecoder::PrepareToReadProductIdList(const ByteSp
 CHIP_ERROR CertificationElementsDecoder::GetNextProductId(uint16_t & productId)
 {
     VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorOnFailure(mReader.Next(AnonymousTag));
+    ReturnErrorOnFailure(mReader.Next(AnonymousTag()));
     ReturnErrorOnFailure(mReader.Get(productId));
     return CHIP_NO_ERROR;
 }

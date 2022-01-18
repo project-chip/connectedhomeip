@@ -47,8 +47,7 @@ void Builder::ResetError()
 
 void Builder::ResetError(CHIP_ERROR aErr)
 {
-    mError              = aErr;
-    mOuterContainerType = chip::TLV::kTLVType_NotSpecified;
+    mError = aErr;
 }
 
 void Builder::EndOfContainer()

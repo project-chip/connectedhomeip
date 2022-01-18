@@ -31,11 +31,13 @@ template("p6_executable") {
   #or in different containers.
 
   flashing_runtime_target = target_name + ".flashing_runtime"
+  flashing_script_inputs = [
+    "${chip_root}/scripts/flashing/firmware_utils.py",
+    "${chip_root}/scripts/flashing/p6_firmware_utils.py",
+  ]
+
   copy(flashing_runtime_target) {
-    sources = [
-      "${chip_root}/scripts/flashing/firmware_utils.py",
-      "${chip_root}/scripts/flashing/p6_firmware_utils.py",
-    ]
+    sources = flashing_script_inputs
     outputs = [ "${root_out_dir}/{{source_file_part}}" ]
   }
 

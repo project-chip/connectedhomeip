@@ -19,11 +19,15 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     # TDOD: Enable when SDK supports command
     - label: "Hide Input Status Command"
       disabled: true
-      command: "HideInputStatus"
+      command: "HideInputStatusRequest"
     # TDOD: Enable when SDK supports command
     - label: "Show Input Status Command"
       disabled: true
-      command: "ShowInputStatus"
+      command: "ShowInputStatusRequest"

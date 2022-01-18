@@ -30,23 +30,11 @@
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
-#include <lib/core/ReferenceCounted.h>
-#include <lib/support/Pool.h>
+#include <inet/InetLayer.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <utility>
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-#include <inet/EndPointStateLwIP.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-#include <inet/EndPointStateSockets.h>
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-#include <dispatch/dispatch.h>
-#endif
 
 namespace chip {
 
@@ -56,15 +44,7 @@ class TCPTest;
 
 namespace Inet {
 
-class InetLayer;
 class TCPTest;
-
-class TCPEndPoint;
-class TCPEndPointDeletor
-{
-public:
-    static void Release(TCPEndPoint * obj);
-};
 
 /**
  * @brief   Objects of this class represent TCP transport endpoints.
@@ -74,28 +54,9 @@ public:
  *  endpoints (SOCK_STREAM sockets on Linux and BSD-derived systems) or LwIP
  *  TCP protocol control blocks, as the system is configured accordingly.
  */
-class DLL_EXPORT TCPEndPoint : public EndPointBase, public ReferenceCounted<TCPEndPoint, TCPEndPointDeletor>
+class DLL_EXPORT TCPEndPoint : public EndPointBasis<TCPEndPoint>
 {
 public:
-    TCPEndPoint(InetLayer & inetLayer, void * appState = nullptr) :
-        EndPointBase(inetLayer, appState), OnConnectComplete(nullptr), OnDataReceived(nullptr), OnDataSent(nullptr),
-        OnConnectionClosed(nullptr), OnPeerClose(nullptr), OnConnectionReceived(nullptr), OnAcceptError(nullptr),
-        mState(State::kReady), mReceiveEnabled(true), mConnectTimeoutMsecs(0) // Initialize to zero for using system defaults.
-#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-        ,
-        mUserTimeoutMillis(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC), mUserTimeoutTimerRunning(false)
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-        ,
-        mIsTCPSendIdle(true), mTCPSendQueuePollPeriodMillis(INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC),
-        mTCPSendQueueRemainingPollCount(
-            MaxTCPSendQueuePolls(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC, INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC)),
-        OnTCPSendIdleChanged(nullptr)
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    {}
-
-    virtual ~TCPEndPoint() = default;
-
     /**
      * @brief   Bind the endpoint to an interface IP address.
      *
@@ -572,37 +533,26 @@ public:
      */
     OnAcceptErrorFunct OnAcceptError;
 
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    /**
-     * @brief   Type of TCP SendIdle changed signal handling function.
-     *
-     * @param[in]   endPoint    The TCP endpoint associated with the event.
-     *
-     * @param[in]   isIdle      True if the send channel of the TCP endpoint
-     *                          is Idle, otherwise false.
-     * @details
-     *  Provide a function of this type to the \c OnTCPSendIdleChanged delegate
-     *  member to process the event of the send channel of the TCPEndPoint
-     *  changing state between being idle and not idle.
-     */
-    typedef void (*OnTCPSendIdleChangedFunct)(TCPEndPoint * endPoint, bool isIdle);
-
-    /** The event handling function delegate of the endpoint signaling when the
-     *  idleness of the TCP connection's send channel changes. This is utilized
-     *  by upper layers to take appropriate actions based on whether sent data
-     *  has been reliably delivered to the peer. */
-    OnTCPSendIdleChangedFunct OnTCPSendIdleChanged;
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
     /**
      * Size of the largest TCP packet that can be received.
      */
     constexpr static size_t kMaxReceiveMessageSize = System::PacketBuffer::kMaxSizeWithoutReserve;
 
 protected:
-    friend class InetLayer;
     friend class ::chip::Transport::TCPTest;
     friend class TCPTest;
+
+    TCPEndPoint(EndPointManager<TCPEndPoint> & endPointManager) :
+        EndPointBasis(endPointManager), OnConnectComplete(nullptr), OnDataReceived(nullptr), OnDataSent(nullptr),
+        OnConnectionClosed(nullptr), OnPeerClose(nullptr), OnConnectionReceived(nullptr), OnAcceptError(nullptr),
+        mState(State::kReady), mReceiveEnabled(true), mConnectTimeoutMsecs(0) // Initialize to zero for using system defaults.
+#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+        ,
+        mUserTimeoutMillis(INET_CONFIG_DEFAULT_TCP_USER_TIMEOUT_MSEC), mUserTimeoutTimerRunning(false)
+#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+    {}
+
+    virtual ~TCPEndPoint() = default;
 
     /**
      * Basic dynamic state of the underlying endpoint.
@@ -630,6 +580,8 @@ protected:
     chip::System::PacketBufferHandle mRcvQueue;
     chip::System::PacketBufferHandle mSendQueue;
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
+    static void HandleIdleTimer(System::Layer * aSystemLayer, void * aAppState);
+    static bool IsIdleTimerRunning(EndPointManager<TCPEndPoint> & endPointManager);
     uint16_t mIdleTimeout;       // in units of INET_TCP_IDLE_CHECK_INTERVAL; zero means no timeout
     uint16_t mRemainingIdleTime; // in units of INET_TCP_IDLE_CHECK_INTERVAL
 #endif                           // INET_TCP_IDLE_CHECK_INTERVAL > 0
@@ -638,44 +590,17 @@ protected:
                                    // return an error; zero means use system defaults.
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    uint32_t mUserTimeoutMillis; // The configured TCP user timeout value in milliseconds.
-                                 // If 0, assume not set.
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    bool mIsTCPSendIdle; // Indicates whether the send channel of the TCPEndPoint is Idle.
-
-    uint16_t mTCPSendQueueRemainingPollCount; // The current remaining number of TCP SendQueue polls before
-                                              // the TCP User timeout period is reached.
-
-    uint32_t mTCPSendQueuePollPeriodMillis; // The configured period of active polling of the TCP
-                                            // SendQueue. If 0, assume not set.
-    void SetTCPSendIdleAndNotifyChange(bool aIsSendIdle);
-
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
+    uint32_t mUserTimeoutMillis;   // The configured TCP user timeout value in milliseconds.
+                                   // If 0, assume not set.
     bool mUserTimeoutTimerRunning; // Indicates whether the TCP UserTimeout timer has been started.
 
     static void TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState);
     virtual void TCPUserTimeoutHandler() = 0;
 
     void StartTCPUserTimeoutTimer();
-
     void StopTCPUserTimeoutTimer();
-
     void RestartTCPUserTimeoutTimer();
-
     void ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut);
-
-#if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-    static constexpr uint16_t MaxTCPSendQueuePolls(uint16_t userTimeout, uint16_t pollPeriod)
-    {
-        // If the UserTimeout is configured less than or equal to the poll interval,
-        // return 1 to poll at least once instead of returning zero and timing out
-        // immediately.
-        return (userTimeout > pollPeriod) ? (userTimeout / pollPeriod) : 1;
-    }
-    uint16_t MaxTCPSendQueuePolls(void) { return MaxTCPSendQueuePolls(mUserTimeoutMillis, mTCPSendQueuePollPeriodMillis); }
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
     TCPEndPoint(const TCPEndPoint &) = delete;
@@ -693,7 +618,6 @@ protected:
     void StopConnectTimer();
 
     friend class TCPEndPointDeletor;
-    virtual void Delete() = 0;
 
     /*
      * Implementation helpers for shared methods.
@@ -708,148 +632,13 @@ protected:
     virtual void DoCloseImpl(CHIP_ERROR err, State oldState)                                                   = 0;
 };
 
-inline void TCPEndPointDeletor::Release(TCPEndPoint * obj)
+template <>
+struct EndPointProperties<TCPEndPoint>
 {
-    obj->Delete();
-}
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-
-class TCPEndPointImplLwIP : public TCPEndPoint, public EndPointStateLwIP
-{
-public:
-    TCPEndPointImplLwIP(InetLayer & inetLayer, void * appState = nullptr) : TCPEndPoint(inetLayer, appState), mUnackedLength(0) {}
-
-    // TCPEndPoint overrides.
-    CHIP_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const override;
-    CHIP_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const override;
-    CHIP_ERROR GetInterfaceId(InterfaceId * retInterface) override;
-    CHIP_ERROR EnableNoDelay() override;
-    CHIP_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount) override;
-    CHIP_ERROR DisableKeepAlive() override;
-    CHIP_ERROR AckReceive(uint16_t len) override;
-#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    void TCPUserTimeoutHandler() override;
-#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-
-private:
-    friend class InetLayer;
-    friend class BitMapObjectPool<TCPEndPointImplLwIP, INET_CONFIG_NUM_TCP_ENDPOINTS>;
-    static BitMapObjectPool<TCPEndPointImplLwIP, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
-    void Delete() override { sPool.ReleaseObject(this); }
-
-    // TCPEndPoint overrides.
-    CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr) override;
-    CHIP_ERROR ListenImpl(uint16_t backlog) override;
-    CHIP_ERROR ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId) override;
-    CHIP_ERROR SendQueuedImpl(bool queueWasEmpty) override;
-    CHIP_ERROR SetUserTimeoutImpl(uint32_t userTimeoutMillis) override;
-    CHIP_ERROR DriveSendingImpl() override;
-    void HandleConnectCompleteImpl() override;
-    void DoCloseImpl(CHIP_ERROR err, State oldState) override;
-
-    struct BufferOffset
-    {
-        BufferOffset(System::PacketBufferHandle && aBuffer) : buffer(std::move(aBuffer)), offset(0) {}
-        BufferOffset(BufferOffset && aOther)
-        {
-            buffer = std::move(aOther.buffer);
-            offset = aOther.offset;
-        }
-        chip::System::PacketBufferHandle buffer;
-        uint16_t offset;
-    };
-
-    uint16_t mUnackedLength; // Amount sent but awaiting ACK. Used as a form of reference count
-                             // to hang-on to backing packet buffers until they are no longer needed.
-
-    uint16_t RemainingToSend();
-    BufferOffset FindStartOfUnsent();
-    CHIP_ERROR GetPCB(IPAddressType addrType);
-    void HandleDataSent(uint16_t len);
-    void HandleDataReceived(chip::System::PacketBufferHandle && buf);
-    void HandleIncomingConnection(TCPEndPoint * pcb);
-    void HandleError(CHIP_ERROR err);
-
-    static err_t LwIPHandleConnectComplete(void * arg, struct tcp_pcb * tpcb, err_t lwipErr);
-    static err_t LwIPHandleIncomingConnection(void * arg, struct tcp_pcb * tcpConPCB, err_t lwipErr);
-    static err_t LwIPHandleDataReceived(void * arg, struct tcp_pcb * tpcb, struct pbuf * p, err_t err);
-    static err_t LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb, u16_t len);
-    static void LwIPHandleError(void * arg, err_t err);
+    static constexpr const char * kName   = "TCP";
+    static constexpr size_t kNumEndPoints = INET_CONFIG_NUM_TCP_ENDPOINTS;
+    static constexpr int kSystemStatsKey  = System::Stats::kInetLayer_NumTCPEps;
 };
-
-using TCPEndPointImpl = TCPEndPointImplLwIP;
-
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-class TCPEndPointImplSockets : public TCPEndPoint, public EndPointStateSockets
-{
-public:
-    TCPEndPointImplSockets(InetLayer & inetLayer, void * appState = nullptr) :
-        TCPEndPoint(inetLayer, appState)
-#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-        ,
-        mBytesWrittenSinceLastProbe(0), mLastTCPKernelSendQueueLen(0)
-#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    {}
-
-    // TCPEndPoint overrides.
-    CHIP_ERROR GetPeerInfo(IPAddress * retAddr, uint16_t * retPort) const override;
-    CHIP_ERROR GetLocalInfo(IPAddress * retAddr, uint16_t * retPort) const override;
-    CHIP_ERROR GetInterfaceId(InterfaceId * retInterface) override;
-    CHIP_ERROR EnableNoDelay() override;
-    CHIP_ERROR EnableKeepAlive(uint16_t interval, uint16_t timeoutCount) override;
-    CHIP_ERROR DisableKeepAlive() override;
-    CHIP_ERROR AckReceive(uint16_t len) override;
-#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    void TCPUserTimeoutHandler() override;
-#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-
-private:
-    friend class InetLayer;
-    friend class BitMapObjectPool<TCPEndPointImplSockets, INET_CONFIG_NUM_TCP_ENDPOINTS>;
-    static BitMapObjectPool<TCPEndPointImplSockets, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
-    void Delete() override { sPool.ReleaseObject(this); }
-
-    // TCPEndPoint overrides.
-    CHIP_ERROR BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr) override;
-    CHIP_ERROR ListenImpl(uint16_t backlog) override;
-    CHIP_ERROR ConnectImpl(const IPAddress & addr, uint16_t port, InterfaceId intfId) override;
-    CHIP_ERROR SendQueuedImpl(bool queueWasEmpty) override;
-    CHIP_ERROR SetUserTimeoutImpl(uint32_t userTimeoutMillis) override;
-    CHIP_ERROR DriveSendingImpl() override;
-    void HandleConnectCompleteImpl() override;
-    void DoCloseImpl(CHIP_ERROR err, State oldState) override;
-
-    CHIP_ERROR GetSocketInfo(int getname(int, sockaddr *, socklen_t *), IPAddress * retAddr, uint16_t * retPort) const;
-    CHIP_ERROR GetSocket(IPAddressType addrType);
-    void HandlePendingIO(System::SocketEvents events);
-    void ReceiveData();
-    void HandleIncomingConnection();
-    CHIP_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
-    static void HandlePendingIO(System::SocketEvents events, intptr_t data);
-
-#if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_source_t mReadableSource  = nullptr;
-    dispatch_source_t mWriteableSource = nullptr;
-#endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
-
-#if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-    /// This counts the number of bytes written on the TCP socket since thelast probe into the TCP outqueue was made.
-    uint32_t mBytesWrittenSinceLastProbe;
-
-    /// This is the measured size(in bytes) of the kernel TCP send queue at the end of the last user timeout window.
-    uint32_t mLastTCPKernelSendQueueLen;
-
-    CHIP_ERROR CheckConnectionProgress(bool & IsProgressing);
-#endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-};
-
-using TCPEndPointImpl = TCPEndPointImplSockets;
-
-#endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 } // namespace Inet
 } // namespace chip

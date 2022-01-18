@@ -74,7 +74,11 @@ public:
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
+    static const Key kConfigKey_ActiveLocale;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_LocationCapability;
+    static const Key kConfigKey_HourFormat;
+    static const Key kConfigKey_CalendarType;
 
     static const Key kCounterKey_RebootCount;
     static const Key kCounterKey_UpTime;

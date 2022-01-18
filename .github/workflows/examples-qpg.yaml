@@ -29,15 +29,12 @@ jobs:
 
         env:
             BUILD_TYPE: gn_qpg
-            GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
-            GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-            GH_EVENT_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.28
+            image: connectedhomeip/chip-build:0.5.48
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
         steps:
@@ -46,14 +43,11 @@ jobs:
               with:
                   submodules: true
 
-            - name: Get parent for size reports
-              run: |
-                MERGE_PARENT="$(git --no-pager log -1 --pretty=tformat:%s | sed -n -e 's/Merge [0-9a-f]\+ into //p')"
-                if test -z "${MERGE_PARENT}" || test "${GH_EVENT_PARENT}" = 0
-                then
-                  MERGE_PARENT=$GH_EVENT_BASE
-                fi
-                echo "GH_EVENT_PARENT=$MERGE_PARENT" >>$GITHUB_ENV
+            - name: Set up environment for size reports
+              if: ${{ !env.ACT }}
+              env:
+                  GH_CONTEXT: ${{ toJson(github) }}
+              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
             - name: Bootstrap
               timeout-minutes: 25
@@ -66,30 +60,30 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build example QPG6100 Lock App
+            - name: Build example QPG6105 Lock App
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/lock-app/qpg out/lock_app_debug qpg_target_ic=\"qpg6100\"
+                  scripts/examples/gn_build_example.sh examples/lock-app/qpg out/lock_app_debug qpg_target_ic=\"qpg6105\"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    qpg qpg6100+debug lock-app \
-                    out/lock_app_debug/chip-qpg6100-lock-example.out \
+                    qpg qpg6105+debug lock-app \
+                    out/lock_app_debug/chip-qpg6105-lock-example.out \
                     /tmp/bloat_reports/
-            - name: Build example QPG6100 Lighting App
+            - name: Build example QPG6105 Lighting App
               timeout-minutes: 5
               run: |
-                  scripts/examples/gn_build_example.sh examples/lighting-app/qpg out/lighting_app_debug qpg_target_ic=\"qpg6100\"
+                  scripts/examples/gn_build_example.sh examples/lighting-app/qpg out/lighting_app_debug qpg_target_ic=\"qpg6105\"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    qpg qpg6100+debug lighting-app \
-                    out/lighting_app_debug/chip-qpg6100-lighting-example.out \
+                    qpg qpg6105+debug lighting-app \
+                    out/lighting_app_debug/chip-qpg6105-lighting-example.out \
                     /tmp/bloat_reports/
-            - name: Build example QPG6100 persistent-storage
+            - name: Build example QPG6105 persistent-storage
               timeout-minutes: 5
               run: |
                   scripts/examples/gn_build_example.sh examples/persistent-storage/qpg out/persistent-storage_app_debug \
-                    qpg_target_ic=\"qpg6100\"
+                    qpg_target_ic=\"qpg6105\"
                   .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
-                    qpg qpg6100+debug persistent-storage-app \
-                    out/persistent-storage_app_debug/chip-qpg6100-persistent_storage-example.out \
+                    qpg qpg6105+debug persistent-storage-app \
+                    out/persistent-storage_app_debug/chip-qpg6105-persistent_storage-example.out \
                     /tmp/bloat_reports/
             - name: Build Matter SDK library
               timeout-minutes: 5
@@ -100,6 +94,6 @@ jobs:
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
               with:
-                  name: Size,QPG-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }}
+                  name: Size,QPG-Examples,${{ env.GH_EVENT_PR }},${{ env.GH_EVENT_HASH }},${{ env.GH_EVENT_PARENT }},${{ github.event_name }}
                   path: |
                       /tmp/bloat_reports/

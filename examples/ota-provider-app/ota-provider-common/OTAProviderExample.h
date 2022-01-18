@@ -18,8 +18,9 @@
 
 #pragma once
 
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/clusters/ota-provider/ota-provider-delegate.h>
+#include <ota-provider-common/BdxOtaSender.h>
 
 /**
  * A reference implementation for an OTA Provider. Includes a method for providing a path to a local OTA file to serve.
@@ -30,6 +31,7 @@ public:
     OTAProviderExample();
 
     void SetOTAFilePath(const char * path);
+    BdxOtaSender * GetBdxOtaSender() { return &mBdxOtaSender; }
 
     // Inherited from OTAProviderDelegate
     EmberAfStatus HandleQueryImage(
@@ -42,18 +44,19 @@ public:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
 
-    enum queryImageBehaviorType
+    enum QueryImageBehaviorType
     {
         kRespondWithUpdateAvailable,
         kRespondWithBusy,
         kRespondWithNotAvailable
     };
-    void SetQueryImageBehavior(queryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
+    void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
 
 private:
+    BdxOtaSender mBdxOtaSender;
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
-    queryImageBehaviorType mQueryImageBehavior;
+    QueryImageBehaviorType mQueryImageBehavior;
     uint32_t mDelayedActionTimeSec;
 };

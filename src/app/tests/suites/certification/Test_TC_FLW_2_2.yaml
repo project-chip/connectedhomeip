@@ -12,13 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 33.2.1. [TC-FLW-2.1] Attributes with server as DUT
+name: 33.2.2. [TC-FLW-2.2] Primary functionality with server as DUT
 
 config:
     cluster: "Flow Measurement"
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
       attribute: "MeasuredValue"

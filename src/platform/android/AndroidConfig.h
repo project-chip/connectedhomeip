@@ -59,6 +59,7 @@ public:
     static const Key kConfigKey_MfrDeviceICACerts;
     static const Key kConfigKey_MfrDevicePrivateKey;
     static const Key kConfigKey_HardwareVersion;
+    static const Key kConfigKey_HardwareVersionString;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
     static const Key kConfigKey_FabricId;
@@ -73,7 +74,21 @@ public:
     static const Key kConfigKey_SetupDiscriminator;
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
+    static const Key kConfigKey_ActiveLocale;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_HourFormat;
+    static const Key kConfigKey_CalendarType;
+    static const Key kConfigKey_ProductId;
+    static const Key kConfigKey_ProductName;
+    static const Key kConfigKey_SoftwareVersion;
+    static const Key kConfigKey_SoftwareVersionString;
+    static const Key kConfigKey_NodeLabel;
+    static const Key kConfigKey_PartNumber;
+    static const Key kConfigKey_ProductURL;
+    static const Key kConfigKey_ProductLabel;
+    static const Key kConfigKey_LocalConfigDisabled;
+    static const Key kConfigKey_Reachable;
+    static const Key kConfigKey_UniqueId;
 
     static const char kGroupKeyNamePrefix[];
 

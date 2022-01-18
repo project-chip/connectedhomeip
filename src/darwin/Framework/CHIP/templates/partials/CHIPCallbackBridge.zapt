@@ -33,6 +33,23 @@ public:
       {{/if}}
     );
 };
+
+{{#unless partial-type}}
+class CHIP{{> @partial-block}}SubscriptionBridge : public CHIP{{> @partial-block}}Bridge
+{
+public:
+    CHIP{{> @partial-block}}SubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action, SubscriptionEstablishedHandler establishedHandler)
+      : CHIP{{> @partial-block}}Bridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+      {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+{{/unless}}
+
 {{else}}
 void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
   {{#if partial-type}}
@@ -57,9 +74,7 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
       auto * response = [CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Params new];
       {{#chip_cluster_response_arguments}}
       {
-        {{asObjectiveCMutableClass type parent.parent.name}} * value;
-        {{>decode_value target="value" source=(concat "data." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;" depth=0}}
-        response.{{asStructPropertyName label}} = value;
+        {{>decode_value target=(concat "response." (asStructPropertyName label)) source=(concat "data." (asLowerCamelCase label)) cluster=parent.parent.name errorCode="OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE); return;" depth=0}}
       }
       {{/chip_cluster_response_arguments}}
       DispatchSuccess(context, response);
@@ -74,4 +89,22 @@ void CHIP{{> @partial-block}}Bridge::OnSuccessFn(void * context
     DispatchSuccess(context, objCValue);
     {{/if}}
 };
+
+{{#unless partial-type}}
+void CHIP{{> @partial-block}}SubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+     auto * self = static_cast<CHIP{{> @partial-block}}SubscriptionBridge *>(context);
+     if (!self->mQueue) {
+         return;
+     }
+
+     if (self->mEstablishedHandler != nil) {
+         dispatch_async(self->mQueue, self->mEstablishedHandler);
+         // On failure, mEstablishedHandler will be cleaned up by our destructor,
+         // but we can clean it up earlier on successful subscription
+         // establishment.
+         self->mEstablishedHandler = nil;
+     }
+}
+{{/unless}}
 {{/if}}

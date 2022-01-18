@@ -33,8 +33,7 @@
 
 #include <nlbyteorder.hpp>
 
-#include <inet/InetLayer.h>
-
+#include <inet/IPPacketInfo.h>
 #include <lib/support/CodeUtils.h>
 
 #include "TestInetCommon.h"

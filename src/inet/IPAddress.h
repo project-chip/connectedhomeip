@@ -33,10 +33,12 @@
 #include <string.h>
 #include <type_traits>
 
+#include <lib/core/CHIPError.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
 
 #include <inet/InetConfig.h>
+#include <inet/InetError.h>
 
 #include "inet/IANAConstants.h"
 
@@ -60,24 +62,6 @@
 
 #define NL_INET_IPV6_ADDR_LEN_IN_BYTES (16)
 #define NL_INET_IPV6_MCAST_GROUP_LEN_IN_BYTES (14)
-
-/**
- * @brief   Adaptation for LwIP ip4_addr_t type.
- *
- * @details
- *  Before LwIP 2.0.0, the \c ip_addr_t type alias referred to a structure comprising
- *  an IPv4 address. At LwIP 2.0.0 and thereafter, this type alias is renamed \c ip4_addr_t
- *  and \c ip_addr_t is replaced with an alias to a union of both. Here, the \c ip4_addr_t
- *  type alias is provided even when the LwIP version is earlier than 2.0.0 so as to prepare
- *  for the import of the new logic.
- */
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && INET_CONFIG_ENABLE_IPV4 && LWIP_VERSION_MAJOR < 2 && LWIP_VERSION_MINOR < 5
-typedef ip_addr_t ip4_addr_t;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && INET_CONFIG_ENABLE_IPV4 && LWIP_VERSION_MAJOR < 2 && LWIP_VERSION_MINOR < 5
-
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 1 && LWIP_VERSION_MINOR >= 5
-typedef u8_t lwip_ip_addr_type;
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_VERSION_MAJOR == 1 && LWIP_VERSION_MINOR >= 5
 
 namespace chip {
 namespace Inet {
@@ -489,7 +473,6 @@ public:
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-#if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
     /**
      * @fn      ToLwIPAddr() const
      *
@@ -504,14 +487,22 @@ public:
     ip_addr_t ToLwIPAddr(void) const;
 
     /**
+     * Extract the IP address as a LwIP ip_addr_t structure.
+     *
+     * If the IP address is Any, the result is IP6_ADDR_ANY unless the requested addressType is kIPv4.
+     * If the requested addressType is IPAddressType::kAny, extracts the IP address as an LwIP ip_addr_t structure.
+     * Otherwise, returns INET_ERROR_WRONG_ADDRESS_TYPE if the requested addressType does not match the IP address.
+     */
+    CHIP_ERROR ToLwIPAddr(IPAddressType addressType, ip_addr_t & outAddress) const;
+
+    /**
      * @brief   Convert the INET layer address type to its underlying LwIP type.
      *
      * @details
      *  Use <tt>ToLwIPAddrType(IPAddressType)</tt> to convert the IP address type
-     *  to its underlying LwIP address type code. (LWIP_VERSION_MAJOR > 1 only).
+     *  to its underlying LwIP address type code.
      */
     static lwip_ip_addr_type ToLwIPAddrType(IPAddressType);
-#endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 
     ip6_addr_t ToIPv6(void) const;
 
@@ -532,8 +523,11 @@ public:
     /**
      * Get the IP address from a SockAddr.
      */
-    static IPAddress FromSockAddr(const SockAddr & sockaddr);
-    static IPAddress FromSockAddr(const sockaddr & sockaddr) { return FromSockAddr(reinterpret_cast<const SockAddr &>(sockaddr)); }
+    static CHIP_ERROR GetIPAddressFromSockAddr(const SockAddr & sockaddr, IPAddress & outIPAddress);
+    static CHIP_ERROR GetIPAddressFromSockAddr(const sockaddr & sockaddr, IPAddress & outIPAddress)
+    {
+        return GetIPAddressFromSockAddr(reinterpret_cast<const SockAddr &>(sockaddr), outIPAddress);
+    }
     static IPAddress FromSockAddr(const sockaddr_in6 & sockaddr) { return IPAddress(sockaddr.sin6_addr); }
 #if INET_CONFIG_ENABLE_IPV4
     static IPAddress FromSockAddr(const sockaddr_in & sockaddr) { return IPAddress(sockaddr.sin_addr); }

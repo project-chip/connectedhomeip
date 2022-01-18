@@ -45,11 +45,14 @@ public:
     using OnErrorCallbackType = std::function<void(const app::ConcreteAttributePath * aPath,
                                                    Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
     using OnDoneCallbackType  = std::function<void(app::ReadClient * client, TypedReadAttributeCallback * callback)>;
+    using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
     TypedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
-                               OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
+                               OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
+                               OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr) :
         mClusterId(aClusterId),
-        mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone), mBufferedReadAdapter(*this)
+        mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone),
+        mOnSubscriptionEstablished(aOnSubscriptionEstablished), mBufferedReadAdapter(*this)
     {}
 
     app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
@@ -99,27 +102,37 @@ private:
 
     void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
 
+    void OnSubscriptionEstablished(const app::ReadClient * apReadClient) override
+    {
+        if (mOnSubscriptionEstablished)
+        {
+            mOnSubscriptionEstablished();
+        }
+    }
+
     ClusterId mClusterId;
     AttributeId mAttributeId;
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
+    OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablished;
     app::BufferedReadCallback mBufferedReadAdapter;
 };
 
-template <typename DecodableEventTypeInfo>
+template <typename DecodableEventType>
 class TypedReadEventCallback final : public app::ReadClient::Callback
 {
 public:
-    using OnSuccessCallbackType = std::function<void(const app::EventHeader & aEventHeader, const DecodableEventTypeInfo & aData)>;
+    using OnSuccessCallbackType = std::function<void(const app::EventHeader & aEventHeader, const DecodableEventType & aData)>;
     using OnErrorCallbackType   = std::function<void(const app::EventHeader * apEventHeader,
                                                    Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
     using OnDoneCallbackType    = std::function<void(app::ReadClient * client, TypedReadEventCallback * callback)>;
+    using OnSubscriptionEstablishedCallbackType = std::function<void()>;
 
-    TypedReadEventCallback(ClusterId aClusterId, EventId aEventId, OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError,
-                           OnDoneCallbackType aOnDone) :
-        mClusterId(aClusterId),
-        mEventId(aEventId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
+    TypedReadEventCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone,
+                           OnSubscriptionEstablishedCallbackType aOnSubscriptionEstablished = nullptr) :
+        mOnSuccess(aOnSuccess),
+        mOnError(aOnError), mOnDone(aOnDone), mOnSubscriptionEstablished(aOnSubscriptionEstablished)
     {}
 
 private:
@@ -127,12 +140,12 @@ private:
                      const app::StatusIB * apStatus) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        DecodableEventTypeInfo value;
-        VerifyOrExit(aEventHeader.mPath.mClusterId == DecodableEventTypeInfo::GetClusterId() &&
-                         aEventHeader.mPath.mEventId == DecodableEventTypeInfo::GetEventId(),
-                     CHIP_ERROR_SCHEMA_MISMATCH);
+        DecodableEventType value;
+
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
+        VerifyOrExit((aEventHeader.mPath.mEventId == value.GetEventId()) && (aEventHeader.mPath.mClusterId == value.GetClusterId()),
+                     CHIP_ERROR_SCHEMA_MISMATCH);
         err = app::DataModel::Decode(*apData, value);
         SuccessOrExit(err);
 
@@ -152,11 +165,18 @@ private:
 
     void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
 
-    ClusterId mClusterId;
-    EventId mEventId;
+    void OnSubscriptionEstablished(const app::ReadClient * apReadClient) override
+    {
+        if (mOnSubscriptionEstablished)
+        {
+            mOnSubscriptionEstablished();
+        }
+    }
+
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
+    OnSubscriptionEstablishedCallbackType mOnSubscriptionEstablished;
 };
 
 } // namespace Controller

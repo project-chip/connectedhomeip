@@ -19,13 +19,17 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Send Test Command"
       command: "test"
 
     - label: "Send Test Not Handled Command"
       command: "testNotHandled"
       response:
-          error: 1
+          error: INVALID_COMMAND
 
     - label: "Send Test Specific Command"
       command: "testSpecific"
@@ -56,7 +60,7 @@ tests:
               - name: "arg2"
                 value: 6
       response:
-          error: 1
+          error: INVALID_COMMAND
 
     # Tests for Boolean attribute
 
@@ -522,6 +526,118 @@ tests:
       response:
           value: 0
 
+    # Tests for float attribute
+
+    - label: "Read attribute SINGLE Default Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 0
+
+    - label: "Write attribute SINGLE medium Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 0.1
+
+    - label: "Read attribute SINGLE medium Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 0.1
+
+    - label: "Write attribute SINGLE large Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 1.7e10
+
+    - label: "Read attribute SINGLE large Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 1.7e10
+
+    - label: "Write attribute SINGLE small Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 1.7e-10
+
+    - label: "Read attribute SINGLE small Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 1.7e-10
+
+    - label: "Write attribute SINGLE Default Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 0
+
+    - label: "Read attribute SINGLE Default Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 0
+
+    # Tests for double attribute
+
+    - label: "Read attribute DOUBLE Default Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 0
+
+    - label: "Write attribute DOUBLE medium Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 0.1234567890123
+
+    - label: "Read attribute DOUBLE medium Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 0.1234567890123
+
+    - label: "Write attribute DOUBLE large Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 1.7e200
+
+    - label: "Read attribute DOUBLE large Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 1.7e200
+
+    - label: "Write attribute DOUBLE small Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 1.7e-200
+
+    - label: "Read attribute DOUBLE small Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 1.7e-200
+
+    - label: "Write attribute DOUBLE Default Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 0
+
+    - label: "Read attribute DOUBLE Default Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 0
+
     # Tests for Enum8 attribute
 
     - label: "Read attribute ENUM8 Default Value"
@@ -606,6 +722,18 @@ tests:
       response:
           value: "Tes\x00ti\x00ng"
 
+    - label: "Write attribute OCTET_STRING with weird chars"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "\r\n\xff\"\xa0"
+
+    - label: "Read attribute OCTET_STRING with weird chars"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "\r\n\xff\"\xa0"
+
     - label: "Write attribute OCTET_STRING"
       command: "writeAttribute"
       attribute: "octet_string"
@@ -624,7 +752,7 @@ tests:
       arguments:
           value: "TestValueLongerThan10"
       response:
-          error: true
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute OCTET_STRING"
       command: "readAttribute"
@@ -681,7 +809,6 @@ tests:
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
       attribute: "char_string"
-      disabled: true
       response:
           value: "☉T☉"
 
@@ -691,14 +818,13 @@ tests:
       arguments:
           value: "☉TestValueLongerThan10☉"
       response:
-          error: true
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
       attribute: "char_string"
-      disabled: true
       response:
-          value: "☉TestVal"
+          value: "☉T☉"
 
     - label: "Write attribute CHAR_STRING - Empty"
       command: "writeAttribute"
@@ -731,6 +857,18 @@ tests:
       attribute: "long_char_string"
       arguments:
           value: ""
+
+    - label: "Read attribute LIST_LONG_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "list_long_octet_string"
+      response:
+          value:
+              [
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+              ]
 
     # Tests for Epoch Microseconds
 
@@ -816,8 +954,17 @@ tests:
       command: "test"
       endpoint: 200
       response:
-          # No cluster on that endpoint, so expect an error.
-          error: 1
+          # No such endpoint, so expect an error.
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_ENDPOINT
+
+    - label: "Send Test Command to unsupported cluster"
+      command: "test"
+      endpoint: 0
+      response:
+          # No TestCluster on that, so expect an error.
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_CLUSTER
 
     # Tests for vendor id
 
@@ -859,6 +1006,7 @@ tests:
                 value: 20003
               - name: "arg2"
                 value: 101
+
     # Tests for Struct
 
     - label: "Send Test Command With Struct Argument and arg1.b is true"
@@ -905,7 +1053,6 @@ tests:
 
     - label:
           "Send Test Command With Nested Struct Argument and arg1.c.b is true"
-      disabled: true
       command: "testNestedStructArgumentRequest"
       arguments:
           values:
@@ -932,7 +1079,6 @@ tests:
                 value: true
 
     - label: "Send Test Command With Nested Struct Argument arg1.c.b is false"
-      disabled: true
       command: "testNestedStructArgumentRequest"
       arguments:
           values:
@@ -961,7 +1107,6 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and all fields b
           of arg1.d are true"
-      disabled: true
       command: "testNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1016,12 +1161,11 @@ tests:
       response:
           values:
               - name: "value"
-                value: false
+                value: true
 
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
           of arg1.d are false"
-      disabled: true
       command: "testNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1229,7 +1373,6 @@ tests:
     - label:
           "Send Test Command With List of Nested Struct List Argument and all
           fields b of elements of arg1.d are true"
-      disabled: true
       command: "testListNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1291,7 +1434,6 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
           of elements of arg1.d are false"
-      disabled: true
       command: "testListNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1425,6 +1567,50 @@ tests:
               - name: "wasPresent"
                 value: false
 
+    - label: "Read list of structs containing nullables and optionals"
+      command: "readAttribute"
+      attribute: "list_nullables_and_optionals_struct"
+      response:
+          # By default, just one item, with everything default-initialized
+          value:
+              [
+                  {
+                      NullableInt: null,
+                      NullableString: null,
+                      NullableStruct: null,
+                      NullableList: null,
+                  },
+              ]
+
+    - label: "Write list of structs containing nullables and optionals"
+      command: "writeAttribute"
+      attribute: "list_nullables_and_optionals_struct"
+      arguments:
+          value:
+              [
+                  {
+                      NullableInt: null,
+                      NullableString: null,
+                      NullableStruct: null,
+                      NullableList: [1, 2],
+                  },
+              ]
+
+    - label:
+          "Read list of structs containing nullables and optionals after writing"
+      command: "readAttribute"
+      attribute: "list_nullables_and_optionals_struct"
+      response:
+          value:
+              [
+                  {
+                      NullableInt: null,
+                      NullableString: null,
+                      NullableStruct: null,
+                      NullableList: [1, 2],
+                  },
+              ]
+
     # Nullable attributes
 
     # Tests for nullable Boolean attribute
@@ -1473,7 +1659,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP8 unchanged Value"
       command: "readAttribute"
@@ -1513,7 +1699,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP16 unchanged Value"
       command: "readAttribute"
@@ -1553,7 +1739,7 @@ tests:
       arguments:
           value: 4294967295
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP32 unchanged Value"
       command: "readAttribute"
@@ -1593,7 +1779,7 @@ tests:
       arguments:
           value: "18446744073709551615"
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP64 unchanged Value"
       command: "readAttribute"
@@ -1613,7 +1799,19 @@ tests:
       response:
           value: null
 
-    # Tests for UInt8 attribute
+    # Tests for nullable UInt8 attribute
+
+    - label: "Write attribute NULLABLE_INT8U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT8U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          value: 0
 
     - label: "Write attribute NULLABLE_INT8U Max Value"
       command: "writeAttribute"
@@ -1633,13 +1831,20 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT8U unchanged Value"
       command: "readAttribute"
       attribute: "nullable_int8u"
       response:
           value: 254
+
+    - label: "Read attribute NULLABLE_INT8U unchanged Value with constraint"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              notValue: null
 
     - label: "Write attribute NULLABLE_INT8U null Value"
       command: "writeAttribute"
@@ -1653,7 +1858,55 @@ tests:
       response:
           value: null
 
-    # Tests for UInt16 attribute
+    - label: "Read attribute NULLABLE_INT8U null Value & range"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 254
+
+    - label: "Read attribute NULLABLE_INT8U null Value & not"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              notValue: 254
+
+    - label: "Write attribute NULLABLE_INT8U Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 128
+
+    - label: "Read attribute NULLABLE_INT8U Value in range"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 254
+
+    - label: "Read attribute NULLABLE_INT8U notValue OK"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          constraints:
+              notValue: 129
+
+    # Tests for nullable UInt16 attribute
+
+    - label: "Write attribute NULLABLE_INT16U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int16u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT16U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int16u"
+      response:
+          value: 0
 
     - label: "Write attribute NULLABLE_INT16U Max Value"
       command: "writeAttribute"
@@ -1673,7 +1926,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT16U unchanged Value"
       command: "readAttribute"
@@ -1693,7 +1946,55 @@ tests:
       response:
           value: null
 
-    # Tests for UInt32 attribute
+    - label: "Read attribute NULLABLE_INT16U null Value & range"
+      command: "readAttribute"
+      attribute: "nullable_int16u"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 65534
+
+    - label: "Read attribute NULLABLE_INT16U null Value & not"
+      command: "readAttribute"
+      attribute: "nullable_int16u"
+      response:
+          constraints:
+              notValue: 65534
+
+    - label: "Write attribute NULLABLE_INT16U Value"
+      command: "writeAttribute"
+      attribute: "nullable_int16u"
+      arguments:
+          value: 32000
+
+    - label: "Read attribute NULLABLE_INT16U Value in range"
+      command: "readAttribute"
+      attribute: "nullable_int16u"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 65534
+
+    - label: "Read attribute NULLABLE_INT16U notValue OK"
+      command: "readAttribute"
+      attribute: "nullable_int16u"
+      response:
+          constraints:
+              notValue: 32001
+
+    # Tests for nullable UInt32 attribute
+
+    - label: "Write attribute NULLABLE_INT32U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int32u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT32U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int32u"
+      response:
+          value: 0
 
     - label: "Write attribute NULLABLE_INT32U Max Value"
       command: "writeAttribute"
@@ -1713,7 +2014,7 @@ tests:
       arguments:
           value: 4294967295
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT32U unchanged Value"
       command: "readAttribute"
@@ -1733,7 +2034,55 @@ tests:
       response:
           value: null
 
-    # Tests for UInt64 attribute
+    - label: "Read attribute NULLABLE_INT32U null Value & range"
+      command: "readAttribute"
+      attribute: "nullable_int32u"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 4294967294
+
+    - label: "Read attribute NULLABLE_INT32U null Value & not"
+      command: "readAttribute"
+      attribute: "nullable_int32u"
+      response:
+          constraints:
+              notValue: 4294967294
+
+    - label: "Write attribute NULLABLE_INT32U Value"
+      command: "writeAttribute"
+      attribute: "nullable_int32u"
+      arguments:
+          value: 2147483647
+
+    - label: "Read attribute NULLABLE_INT32U Value in range"
+      command: "readAttribute"
+      attribute: "nullable_int32u"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: 4294967294
+
+    - label: "Read attribute NULLABLE_INT32U notValue OK"
+      command: "readAttribute"
+      attribute: "nullable_int32u"
+      response:
+          constraints:
+              notValue: 2147483648
+
+    # Tests for nullable UInt64 attribute
+
+    - label: "Write attribute NULLABLE_INT64U Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int64u"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_INT64U Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int64u"
+      response:
+          value: 0
 
     - label: "Write attribute NULLABLE_INT64U Max Value"
       command: "writeAttribute"
@@ -1753,7 +2102,7 @@ tests:
       arguments:
           value: "18446744073709551615"
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT64U unchanged Value"
       command: "readAttribute"
@@ -1773,7 +2122,43 @@ tests:
       response:
           value: null
 
-    # Tests for Int8 attribute
+    - label: "Read attribute NULLABLE_INT64U null Value & range"
+      command: "readAttribute"
+      attribute: "nullable_int64u"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: "18446744073709551614"
+
+    - label: "Read attribute NULLABLE_INT64U null Value & not"
+      command: "readAttribute"
+      attribute: "nullable_int64u"
+      response:
+          constraints:
+              notValue: "18446744073709551614"
+
+    - label: "Write attribute NULLABLE_INT64U Value"
+      command: "writeAttribute"
+      attribute: "nullable_int64u"
+      arguments:
+          value: "18000000000000000000"
+
+    - label: "Read attribute NULLABLE_INT64U Value in range"
+      command: "readAttribute"
+      attribute: "nullable_int64u"
+      response:
+          constraints:
+              minValue: 0
+              maxValue: "18446744073709551614"
+
+    - label: "Read attribute NULLABLE_INT64U notValue OK"
+      command: "readAttribute"
+      attribute: "nullable_int64u"
+      response:
+          constraints:
+              notValue: "18000000000000000001"
+
+    # Tests for nullable Int8 attribute
 
     - label: "Write attribute NULLABLE_INT8S Min Value"
       command: "writeAttribute"
@@ -1793,7 +2178,7 @@ tests:
       arguments:
           value: -128
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT8S unchanged Value"
       command: "readAttribute"
@@ -1813,7 +2198,43 @@ tests:
       response:
           value: null
 
-    # Tests for Int16 attribute
+    - label: "Read attribute NULLABLE_INT8S null Value & range"
+      command: "readAttribute"
+      attribute: "nullable_int8s"
+      response:
+          constraints:
+              minValue: -127
+              maxValue: 127
+
+    - label: "Read attribute NULLABLE_INT8S null Value & not"
+      command: "readAttribute"
+      attribute: "nullable_int8s"
+      response:
+          constraints:
+              notValue: -127
+
+    - label: "Write attribute NULLABLE_INT8S Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8s"
+      arguments:
+          value: -127
+
+    - label: "Read attribute NULLABLE_INT8S Value in range"
+      command: "readAttribute"
+      attribute: "nullable_int8s"
+      response:
+          constraints:
+              minValue: -127
+              maxValue: 127
+
+    - label: "Read attribute NULLABLE_INT8S notValue OK"
+      command: "readAttribute"
+      attribute: "nullable_int8s"
+      response:
+          constraints:
+              notValue: -126
+
+    # Tests for nullable Int16 attribute
 
     - label: "Write attribute NULLABLE_INT16S Min Value"
       command: "writeAttribute"
@@ -1833,7 +2254,7 @@ tests:
       arguments:
           value: -32768
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT16S unchanged Value"
       command: "readAttribute"
@@ -1852,6 +2273,42 @@ tests:
       attribute: "nullable_int16s"
       response:
           value: null
+
+    - label: "Read attribute NULLABLE_INT16S null Value & range"
+      command: "readAttribute"
+      attribute: "nullable_int16s"
+      response:
+          constraints:
+              minValue: -32767
+              maxValue: 32767
+
+    - label: "Read attribute NULLABLE_INT16S null Value & not"
+      command: "readAttribute"
+      attribute: "nullable_int16s"
+      response:
+          constraints:
+              notValue: -32767
+
+    - label: "Write attribute NULLABLE_INT16S Value"
+      command: "writeAttribute"
+      attribute: "nullable_int16s"
+      arguments:
+          value: -32767
+
+    - label: "Read attribute NULLABLE_INT16S Value in range"
+      command: "readAttribute"
+      attribute: "nullable_int16s"
+      response:
+          constraints:
+              minValue: -32767
+              maxValue: 32767
+
+    - label: "Read attribute NULLABLE_INT16S notValue OK"
+      command: "readAttribute"
+      attribute: "nullable_int16s"
+      response:
+          constraints:
+              notValue: -32766
 
     # Tests for Int32 attribute
 
@@ -1873,7 +2330,7 @@ tests:
       arguments:
           value: -2147483648
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT32S unchanged Value"
       command: "readAttribute"
@@ -1892,6 +2349,42 @@ tests:
       attribute: "nullable_int32s"
       response:
           value: null
+
+    - label: "Read attribute NULLABLE_INT32S null Value & range"
+      command: "readAttribute"
+      attribute: "nullable_int32s"
+      response:
+          constraints:
+              minValue: -2147483647
+              maxValue: 2147483647
+
+    - label: "Read attribute NULLABLE_INT32S null Value & not"
+      command: "readAttribute"
+      attribute: "nullable_int32s"
+      response:
+          constraints:
+              notValue: -2147483647
+
+    - label: "Write attribute NULLABLE_INT32S Value"
+      command: "writeAttribute"
+      attribute: "nullable_int32s"
+      arguments:
+          value: -2147483647
+
+    - label: "Read attribute NULLABLE_INT32S Value in range"
+      command: "readAttribute"
+      attribute: "nullable_int32s"
+      response:
+          constraints:
+              minValue: -2147483647
+              maxValue: 2147483647
+
+    - label: "Read attribute NULLABLE_INT32S notValue OK"
+      command: "readAttribute"
+      attribute: "nullable_int32s"
+      response:
+          constraints:
+              notValue: -2147483646
 
     # Tests for Int64 attribute
 
@@ -1916,7 +2409,7 @@ tests:
           # work around that.
           value: "-9223372036854775807LL - 1"
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT64S unchanged Value"
       command: "readAttribute"
@@ -1936,7 +2429,179 @@ tests:
       response:
           value: null
 
+    - label: "Read attribute NULLABLE_INT64S null Value & range"
+      command: "readAttribute"
+      attribute: "nullable_int64s"
+      response:
+          constraints:
+              minValue: "-9223372036854775807"
+              maxValue: "9223372036854775807"
+
+    - label: "Read attribute NULLABLE_INT64S null Value & not"
+      command: "readAttribute"
+      attribute: "nullable_int64s"
+      response:
+          constraints:
+              notValue: "-9223372036854775807"
+
+    - label: "Write attribute NULLABLE_INT64S Value"
+      command: "writeAttribute"
+      attribute: "nullable_int64s"
+      arguments:
+          value: "-9223372036854775807"
+
+    - label: "Read attribute NULLABLE_INT64S Value in range"
+      command: "readAttribute"
+      attribute: "nullable_int64s"
+      response:
+          constraints:
+              minValue: "-9223372036854775807"
+              maxValue: "9223372036854775807"
+
+    - label: "Read attribute NULLABLE_INT64S notValue OK"
+      command: "readAttribute"
+      attribute: "nullable_int64s"
+      response:
+          constraints:
+              notValue: "-9223372036854775806"
+
+    # Tests for float attribute
+
+    - label: "Write attribute NULLABLE_SINGLE medium Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: 0.1
+
+    - label: "Read attribute NULLABLE_SINGLE medium Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: 0.1
+
+    - label: "Write attribute NULLABLE_SINGLE largest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: Infinity
+
+    - label: "Read attribute NULLABLE_SINGLE largest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: Infinity
+
+    - label: "Write attribute NULLABLE_SINGLE smallest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: -Infinity
+
+    - label: "Read attribute NULLABLE_SINGLE smallest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: -Infinity
+
+    - label: "Write attribute NULLABLE_SINGLE null Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_SINGLE null Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: null
+
+    - label: "Write attribute NULLABLE_SINGLE 0 Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_SINGLE 0 Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: 0
+
+    # Tests for double attribute
+
+    - label: "Write attribute NULLABLE_DOUBLE medium Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: 0.1234567890123
+
+    - label: "Read attribute NULLABLE_DOUBLE medium Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: 0.1234567890123
+
+    - label: "Write attribute NULLABLE_DOUBLE largest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: Infinity
+
+    - label: "Read attribute NULLABLE_DOUBLE largest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: Infinity
+
+    - label: "Write attribute NULLABLE_DOUBLE smallest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: -Infinity
+
+    - label: "Read attribute NULLABLE_DOUBLE smallest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: -Infinity
+
+    - label: "Write attribute NULLABLE_DOUBLE null Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_DOUBLE null Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: null
+
+    - label: "Write attribute NULLABLE_DOUBLE 0 Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_DOUBLE 0 Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: 0
+
     # Tests for Enum8 attribute
+
+    - label: "Write attribute NULLABLE_ENUM8 Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum8"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_ENUM8 Min Value"
+      command: "readAttribute"
+      attribute: "nullable_enum8"
+      response:
+          value: 0
 
     - label: "Write attribute NULLABLE_ENUM8 Max Value"
       command: "writeAttribute"
@@ -1956,7 +2621,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_ENUM8 unchanged Value"
       command: "readAttribute"
@@ -1978,6 +2643,18 @@ tests:
 
     # Tests for Enum16 attribute
 
+    - label: "Write attribute NULLABLE_ENUM16 Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum16"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_ENUM16 Min Value"
+      command: "readAttribute"
+      attribute: "nullable_enum16"
+      response:
+          value: 0
+
     - label: "Write attribute NULLABLE_ENUM16 Max Value"
       command: "writeAttribute"
       attribute: "nullable_enum16"
@@ -1996,7 +2673,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_ENUM16 unchanged Value"
       command: "readAttribute"
@@ -2013,6 +2690,58 @@ tests:
     - label: "Read attribute NULLABLE_ENUM16 null Value"
       command: "readAttribute"
       attribute: "nullable_enum16"
+      response:
+          value: null
+
+    # Tests for named enum attribute
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM Min Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          value: 0
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: 254
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM Max Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: 255
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_SIMPLE_ENUM null Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum_attr"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_SIMPLE_ENUM null Value"
+      command: "readAttribute"
+      attribute: "nullable_enum_attr"
       response:
           value: null
 
@@ -2077,7 +2806,6 @@ tests:
     - label: "Read attribute NULLABLE_CHAR_STRING"
       command: "readAttribute"
       attribute: "nullable_char_string"
-      disabled: true
       response:
           value: "☉T☉"
 
@@ -2105,9 +2833,879 @@ tests:
       response:
           value: ""
 
-    - label: "Read nonexistent attribute."
+    - label: "Read attribute from nonexistent endpoint."
       endpoint: 200
       command: "readAttribute"
       attribute: "list_int8u"
       response:
-          error: 0x86 # UNSUPPORTED_ATTRIBUTE
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_ENDPOINT
+
+    - label: "Read attribute from nonexistent cluster."
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_CLUSTER
+
+    # Tests for command with optional arguments
+    - label:
+          "Send a command that takes an optional parameter but do not set it."
+      command: "TestSimpleOptionalArgumentRequest"
+      response:
+          error: INVALID_VALUE
+
+    - label:
+          "Send a command that takes an optional parameter but do not set it."
+      command: "TestSimpleOptionalArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 1
+
+    # Tests for subscription to a complex attribute
+    - label: "Subscribe to list attribute"
+      command: "subscribeAttribute"
+      attribute: "list_int8u"
+      minInterval: 2
+      maxInterval: 10
+      response:
+          value: [1, 2, 3, 4]
+
+    - label: "Write subscribed-to list attribute"
+      command: "writeAttribute"
+      attribute: "list_int8u"
+      arguments:
+          value: [5, 6, 7, 8]
+
+    - label: "Check for list attribute report"
+      command: "waitForReport"
+      attribute: "list_int8u"
+      response:
+          value: [5, 6, 7, 8]
+
+    # Tests for range-checking on the server.
+    - label: "Read range-restricted unsigned 8-bit integer"
+      command: "readAttribute"
+      attribute: "range_restricted_int8u"
+      response:
+          value: 70 # That's the default.
+
+    - label: "Write min value to a range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a range-restricted unsigned 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 19
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a range-restricted unsigned 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 101
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Write max value to a range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 255
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify range-restricted unsigned 8-bit integer value has not changed"
+      command: "readAttribute"
+      attribute: "range_restricted_int8u"
+      response:
+          value: 70
+
+    - label:
+          "Write min valid value to a range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 20
+
+    - label:
+          "Verify range-restricted unsigned 8-bit integer value is at min valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8u"
+      response:
+          value: 20
+
+    - label:
+          "Write max valid value to a range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 100
+
+    - label:
+          "Verify range-restricted unsigned 8-bit integer value is at max valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8u"
+      response:
+          value: 100
+
+    - label:
+          "Write middle valid value to a range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8u"
+      arguments:
+          value: 50
+
+    - label:
+          "Verify range-restricted unsigned 8-bit integer value is at mid valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8u"
+      response:
+          value: 50
+
+    - label: "Read range-restricted unsigned 16-bit integer"
+      command: "readAttribute"
+      attribute: "range_restricted_int16u"
+      response:
+          value: 200 # That's the default.
+
+    - label: "Write min value to a range-restricted unsigned 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 99
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 1001
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Write max value to a range-restricted unsigned 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 65535
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify range-restricted unsigned 16-bit integer value has not changed"
+      command: "readAttribute"
+      attribute: "range_restricted_int16u"
+      response:
+          value: 200
+
+    - label:
+          "Write min valid value to a range-restricted unsigned 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 100
+
+    - label:
+          "Verify range-restricted unsigned 16-bit integer value is at min valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16u"
+      response:
+          value: 100
+
+    - label:
+          "Write max valid value to a range-restricted unsigned 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 1000
+
+    - label:
+          "Verify range-restricted unsigned 16-bit integer value is at max valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16u"
+      response:
+          value: 1000
+
+    - label:
+          "Write middle valid value to a range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16u"
+      arguments:
+          value: 500
+
+    - label:
+          "Verify range-restricted unsigned 16-bit integer value is at mid valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16u"
+      response:
+          value: 500
+
+    - label: "Read range-restricted signed 8-bit integer"
+      command: "readAttribute"
+      attribute: "range_restricted_int8s"
+      response:
+          value: -20
+
+    - label: "Write min value to a range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: -128
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a range-restricted signed 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: -41
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a range-restricted signed 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: 51
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Write max value to a range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: 127
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify range-restricted signed 8-bit integer value has not changed"
+      command: "readAttribute"
+      attribute: "range_restricted_int8s"
+      response:
+          value: -20
+
+    - label: "Write min valid value to a range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: -40
+
+    - label:
+          "Verify range-restricted signed 8-bit integer value is at min valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8s"
+      response:
+          value: -40
+
+    - label: "Write max valid value to a range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: 50
+
+    - label:
+          "Verify range-restricted signed 8-bit integer value is at max valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8s"
+      response:
+          value: 50
+
+    - label:
+          "Write middle valid value to a range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int8s"
+      arguments:
+          value: 6
+
+    - label:
+          "Verify range-restricted signed 8-bit integer value is at mid valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int8s"
+      response:
+          value: 6
+
+    - label: "Read range-restricted signed 16-bit integer"
+      command: "readAttribute"
+      attribute: "range_restricted_int16s"
+      response:
+          value: -100
+
+    - label: "Write min value to a range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: -32768
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a range-restricted signed 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: -151
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a range-restricted signed 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: 201
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Write max value to a range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: 32767
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify range-restricted signed 16-bit integer value has not changed"
+      command: "readAttribute"
+      attribute: "range_restricted_int16s"
+      response:
+          value: -100
+
+    - label: "Write min valid value to a range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: -150
+
+    - label:
+          "Verify range-restricted signed 16-bit integer value is at min valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16s"
+      response:
+          value: -150
+
+    - label: "Write max valid value to a range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: 200
+
+    - label:
+          "Verify range-restricted signed 16-bit integer value is at max valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16s"
+      response:
+          value: 200
+
+    - label:
+          "Write middle valid value to a range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "range_restricted_int16s"
+      arguments:
+          value: 7
+
+    - label:
+          "Verify range-restricted signed 16-bit integer value is at mid valid"
+      command: "readAttribute"
+      attribute: "range_restricted_int16s"
+      response:
+          value: 7
+
+    # Tests for range-checking for nullable attributes on the server.
+    - label: "Read nullable range-restricted unsigned 8-bit integer"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: 70 # That's the default.
+
+    - label:
+          "Write min value to a nullable range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a nullable range-restricted unsigned
+          8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 19
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a nullable range-restricted unsigned
+          8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 101
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write max value to a nullable range-restricted unsigned 8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 254
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify nullable range-restricted unsigned 8-bit integer value has not
+          changed"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: 70
+
+    - label:
+          "Write min valid value to a nullable range-restricted unsigned 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 20
+
+    - label:
+          "Verify nullable range-restricted unsigned 8-bit integer value is at
+          min valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: 20
+
+    - label:
+          "Write max valid value to a nullable range-restricted unsigned 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 100
+
+    - label:
+          "Verify nullable range-restricted unsigned 8-bit integer value is at
+          max valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: 100
+
+    - label:
+          "Write middle valid value to a nullable range-restricted unsigned
+          8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: 50
+
+    - label:
+          "Verify nullable range-restricted unsigned 8-bit integer value is at
+          mid valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: 50
+
+    - label:
+          "Write null value to a nullable range-restricted unsigned 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      arguments:
+          value: null
+
+    - label:
+          "Verify nullable range-restricted unsigned 8-bit integer value is null"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8u"
+      response:
+          value: null
+
+    - label: "Read nullable range-restricted unsigned 16-bit integer"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: 200 # That's the default.
+
+    - label:
+          "Write min value to a nullable range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 0
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a nullable range-restricted unsigned
+          16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 99
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a nullable range-restricted unsigned
+          16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 1001
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write max value to a nullable range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 65534
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify nullable range-restricted unsigned 16-bit integer value has
+          not changed"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: 200
+
+    - label:
+          "Write min valid value to a nullable range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 100
+
+    - label:
+          "Verify nullable range-restricted unsigned 16-bit integer value is at
+          min valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: 100
+
+    - label:
+          "Write max valid value to a nullable range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 1000
+
+    - label:
+          "Verify nullable range-restricted unsigned 16-bit integer value is at
+          max valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: 1000
+
+    - label:
+          "Write middle valid value to a nullable range-restricted unsigned
+          16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: 500
+
+    - label:
+          "Verify nullable range-restricted unsigned 16-bit integer value is at
+          mid valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: 500
+
+    - label:
+          "Write null value to a nullable range-restricted unsigned 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      arguments:
+          value: null
+
+    - label:
+          "Verify nullable range-restricted unsigned 16-bit integer value is
+          null"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16u"
+      response:
+          value: null
+
+    - label: "Read nullable range-restricted signed 8-bit integer"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: -20
+
+    - label:
+          "Write min value to a nullable range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: -127
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a nullable range-restricted signed
+          8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: -41
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a nullable range-restricted signed
+          8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: 51
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write max value to a nullable range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: 127
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify nullable range-restricted signed 8-bit integer value has not
+          changed"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: -20
+
+    - label:
+          "Write min valid value to a nullable range-restricted signed 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: -40
+
+    - label:
+          "Verify nullable range-restricted signed 8-bit integer value is at min
+          valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: -40
+
+    - label:
+          "Write max valid value to a nullable range-restricted signed 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: 50
+
+    - label:
+          "Verify nullable range-restricted signed 8-bit integer value is at max
+          valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: 50
+
+    - label:
+          "Write middle valid value to a nullable range-restricted signed 8-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: 6
+
+    - label:
+          "Verify nullable range-restricted signed 8-bit integer value is at mid
+          valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: 6
+
+    - label:
+          "Write null value to a nullable range-restricted signed 8-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      arguments:
+          value: null
+
+    - label:
+          "Verify nullable range-restricted signed 8-bit integer value is at
+          null"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int8s"
+      response:
+          value: null
+
+    - label: "Read nullable range-restricted signed 16-bit integer"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: -100
+
+    - label:
+          "Write min value to a nullable range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: -32767
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-below-range value to a nullable range-restricted signed
+          16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: -151
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write just-above-range value to a nullable range-restricted signed
+          16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: 201
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Write max value to a nullable range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: 32767
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label:
+          "Verify nullable range-restricted signed 16-bit integer value has not
+          changed"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: -100
+
+    - label:
+          "Write min valid value to a nullable range-restricted signed 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: -150
+
+    - label:
+          "Verify nullable range-restricted signed 16-bit integer value is at
+          min valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: -150
+
+    - label:
+          "Write max valid value to a nullable range-restricted signed 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: 200
+
+    - label:
+          "Verify nullable range-restricted signed 16-bit integer value is at
+          max valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: 200
+
+    - label:
+          "Write middle valid value to a nullable range-restricted signed 16-bit
+          integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: 7
+
+    - label:
+          "Verify nullable range-restricted signed 16-bit integer value is at
+          mid valid"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: 7
+
+    - label:
+          "Write null value to a nullable range-restricted signed 16-bit integer"
+      command: "writeAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      arguments:
+          value: null
+
+    - label:
+          "Verify nullable range-restricted signed 16-bit integer value is null"
+      command: "readAttribute"
+      attribute: "nullable_range_restricted_int16s"
+      response:
+          value: null

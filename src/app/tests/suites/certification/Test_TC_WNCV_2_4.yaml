@@ -19,16 +19,22 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     #Issue #10811 if condition is required, need YAML support for this
     - label: "Reads Type attribute from DUT"
       command: "readAttribute"
       attribute: "Type"
+      PICS: A_TYPE
       response:
           value: 0
 
     - label: "Reads Type attribute constraints"
       command: "readAttribute"
       attribute: "Type"
+      PICS: A_TYPE
       response:
           constraints:
               type: enum8

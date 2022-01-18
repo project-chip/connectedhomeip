@@ -25,13 +25,14 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <ifaddrs.h>
 #include <lib/core/CHIPVendorIdentifiers.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <netpacket/packet.h>
 #include <platform/ConfigurationManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
@@ -87,7 +88,27 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
+        err = StoreBootReason(DiagnosticDataProvider::BootReasonType::Unspecified);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_RegulatoryLocation))
+    {
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        err               = WriteConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, location);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_LocationCapability))
+    {
+        uint32_t location = to_underlying(chip::app::Clusters::GeneralCommissioning::RegulatoryLocationType::kIndoor);
+        err               = WriteConfigValue(PosixConfig::kConfigKey_LocationCapability, location);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kConfigKey_ActiveLocale))
+    {
+        err = WriteConfigValueStr(PosixConfig::kConfigKey_ActiveLocale, "en-US", strlen("en-US"));
         SuccessOrExit(err);
     }
 
@@ -318,6 +339,36 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 {
     return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRegulatoryLocation(uint8_t & location)
+{
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(PosixConfig::kConfigKey_RegulatoryLocation, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
+{
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(PosixConfig::kConfigKey_LocationCapability, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
 }
 
 } // namespace DeviceLayer

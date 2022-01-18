@@ -125,7 +125,7 @@
 
 - (void)pushNetworkConfiguration
 {
-    WifiViewController * controller = [WifiViewController new];
+    WiFiViewController * controller = [WiFiViewController new];
     [self.navigationController pushViewController:controller animated:YES];
 }
 

@@ -167,7 +167,7 @@ public:
     CHIP_ERROR SetWiFiStationReconnectInterval(System::Clock::Timeout val);
     bool IsWiFiStationProvisioned();
     void ClearWiFiStationProvision();
-    CHIP_ERROR GetAndLogWifiStatsCounters();
+    CHIP_ERROR GetAndLogWiFiStatsCounters();
 
     // WiFi AP methods
     WiFiAPMode GetWiFiAPMode();
@@ -275,15 +275,13 @@ protected:
  */
 struct ConnectivityManager::SEDPollingConfig
 {
-    uint32_t FastPollingIntervalMS; /**< Interval at which the device polls its parent
-                                           when there are active chip exchanges in progress. Only meaningful
-                                           when the device is acting as a sleepy end node. */
+    /** Interval at which the device polls its parent when there are active chip exchanges in progress. Only meaningful when the
+     * device is acting as a sleepy end node.  */
+    System::Clock::Milliseconds32 FastPollingIntervalMS;
 
-    uint32_t SlowPollingIntervalMS; /**< Interval at which the device polls its parent
-                                             when there are NO active chip exchanges in progress. Only meaningful
-                                             when the device is acting as a sleepy end node. */
-
-    void Clear() { memset(this, 0, sizeof(*this)); }
+    /** Interval at which the device polls its parent when there are NO active chip exchanges in progress. Only meaningful when the
+     * device is acting as a sleepy end node. */
+    System::Clock::Milliseconds32 SlowPollingIntervalMS;
 };
 
 /**
@@ -408,9 +406,9 @@ inline void ConnectivityManager::SetWiFiAPIdleTimeout(System::Clock::Timeout val
     static_cast<ImplClass *>(this)->_SetWiFiAPIdleTimeout(val);
 }
 
-inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
+inline CHIP_ERROR ConnectivityManager::GetAndLogWiFiStatsCounters()
 {
-    return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
+    return static_cast<ImplClass *>(this)->_GetAndLogWiFiStatsCounters();
 }
 
 inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode()

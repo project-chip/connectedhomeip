@@ -15,8 +15,8 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
 
-import("$dir_pw_build/mirror_tree.gni")
 import("$dir_pw_build/python.gni")
+import("$dir_pw_build/python_dist.gni")
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 
 pw_python_package("chip_rpc") {
@@ -46,8 +46,7 @@ pw_python_package("chip_rpc") {
   ]
 }
 
-pw_mirror_tree("chip_rpc_wheel") {
-  path_data_keys = [ "pw_python_package_wheels" ]
-  deps = [ ":chip_rpc.wheel" ]
+pw_python_wheels("chip_rpc_wheel") {
+  packages = [ ":chip_rpc" ]
   directory = "$root_out_dir/chip_rpc_console_wheels"
 }

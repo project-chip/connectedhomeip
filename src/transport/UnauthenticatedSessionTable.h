@@ -26,13 +26,11 @@
 #include <system/TimeSource.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
+#include <transport/Session.h>
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace Transport {
-
-class UnauthenticatedSession;
-using UnauthenticatedSessionHandle = ReferenceCountedHandle<UnauthenticatedSession>;
 
 class UnauthenticatedSessionDeleter
 {
@@ -45,12 +43,13 @@ public:
  * @brief
  *   An UnauthenticatedSession stores the binding of TransportAddress, and message counters.
  */
-class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
+class UnauthenticatedSession : public Session, public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
     UnauthenticatedSession(const PeerAddress & address, const ReliableMessageProtocolConfig & config) :
-        mPeerAddress(address), mMRPConfig(config)
+        mPeerAddress(address), mLastActivityTime(System::SystemClock().GetMonotonicTimestamp()), mMRPConfig(config)
     {}
+    ~UnauthenticatedSession() { NotifySessionReleased(); }
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession & operator=(const UnauthenticatedSession &) = delete;
@@ -58,20 +57,49 @@ public:
     UnauthenticatedSession & operator=(UnauthenticatedSession &&) = delete;
 
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
-    void SetLastActivityTime(System::Clock::Timestamp value) { mLastActivityTime = value; }
+    void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
 
+    Session::SessionType GetSessionType() const override { return Session::SessionType::kUnauthenticated; }
+#if CHIP_PROGRESS_LOGGING
+    const char * GetSessionTypeString() const override { return "unauthenticated"; };
+#endif
+
+    void Retain() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Retain(); }
+    void Release() override { ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>::Release(); }
+
+    Access::SubjectDescriptor GetSubjectDescriptor() const override
+    {
+        return Access::SubjectDescriptor(); // return an empty ISD for unauthenticated session.
+    }
+
+    bool RequireMRP() const override { return GetPeerAddress().GetTransportType() == Transport::Type::kUdp; }
+
+    System::Clock::Milliseconds32 GetAckTimeout() const override
+    {
+        switch (mPeerAddress.GetTransportType())
+        {
+        case Transport::Type::kUdp:
+            return GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+        case Transport::Type::kTcp:
+            return System::Clock::Seconds16(30);
+        default:
+            break;
+        }
+        return System::Clock::Timeout();
+    }
+
+    NodeId GetPeerNodeId() const { return kUndefinedNodeId; }
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
-    const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
+    const ReliableMessageProtocolConfig & GetMRPConfig() const override { return mMRPConfig; }
 
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
 private:
-    System::Clock::Timestamp mLastActivityTime = System::Clock::kZero;
-
     const PeerAddress mPeerAddress;
+    System::Clock::Timestamp mLastActivityTime;
     ReliableMessageProtocolConfig mMRPConfig;
     PeerMessageCounter mPeerMessageCounter;
 };
@@ -80,46 +108,37 @@ private:
  * @brief
  *   An table which manages UnauthenticatedSessions
  *
- *   The UnauthenticatedSession entries are rotated using LRU, but entry can be
- *   hold by using UnauthenticatedSessionHandle, which increase the reference
- *   count by 1. If the reference count is not 0, the entry won't be pruned.
+ *   The UnauthenticatedSession entries are rotated using LRU, but entry can be hold by using SessionHandle or
+ *   SessionHolder, which increase the reference count by 1. If the reference count is not 0, the entry won't be pruned.
  */
-template <size_t kMaxSessionCount, Time::Source kTimeSource = Time::Source::kSystem>
+template <size_t kMaxSessionCount>
 class UnauthenticatedSessionTable
 {
 public:
+    ~UnauthenticatedSessionTable() { mEntries.ReleaseAll(); }
+
     /**
      * Get a session given the peer address. If the session doesn't exist in the cache, allocate a new entry for it.
      *
      * @return the session found or allocated, nullptr if not found and allocation failed.
      */
     CHECK_RETURN_VALUE
-    Optional<UnauthenticatedSessionHandle> FindOrAllocateEntry(const PeerAddress & address,
-                                                               const ReliableMessageProtocolConfig & config)
+    Optional<SessionHandle> FindOrAllocateEntry(const PeerAddress & address, const ReliableMessageProtocolConfig & config)
     {
         UnauthenticatedSession * result = FindEntry(address);
         if (result != nullptr)
-            return MakeOptional<UnauthenticatedSessionHandle>(*result);
+            return MakeOptional<SessionHandle>(*result);
 
         CHIP_ERROR err = AllocEntry(address, config, result);
         if (err == CHIP_NO_ERROR)
         {
-            return MakeOptional<UnauthenticatedSessionHandle>(*result);
+            return MakeOptional<SessionHandle>(*result);
         }
         else
         {
-            return Optional<UnauthenticatedSessionHandle>::Missing();
+            return Optional<SessionHandle>::Missing();
         }
     }
-
-    /// Mark a session as active
-    void MarkSessionActive(UnauthenticatedSessionHandle session)
-    {
-        session->SetLastActivityTime(mTimeSource.GetMonotonicTimestamp());
-    }
-
-    /// Allows access to the underlying time source used for keeping track of session active time
-    Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
 
 private:
     /**
@@ -159,9 +178,9 @@ private:
             if (MatchPeerAddress(entry->GetPeerAddress(), address))
             {
                 result = entry;
-                return false;
+                return Loop::Break;
             }
-            return true;
+            return Loop::Continue;
         });
         return result;
     }
@@ -177,7 +196,7 @@ private:
                 result     = entry;
                 oldestTime = entry->GetLastActivityTime();
             }
-            return true;
+            return Loop::Continue;
         });
 
         return result;
@@ -222,7 +241,6 @@ private:
         return false;
     }
 
-    Time::TimeSource<Time::Source::kSystem> mTimeSource;
     BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount> mEntries;
 };
 

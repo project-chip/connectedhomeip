@@ -19,40 +19,61 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Read attribute Application Launcher list"
       command: "readAttribute"
       attribute: "Application Launcher List"
       response:
           value: [123, 456]
 
+    # TODO: Enable once attribute struct is supported
+    - label: "Read attribute application launcher app"
+      disabled: true
+      command: "readAttribute"
+      attribute: "application launcher app"
+      response:
+          value: { catalogVendorId: 123, applicationId: "applicationId" }
+
     - label: "Launch App Command"
-      command: "LaunchApp"
+      command: "launchAppRequest"
       arguments:
           values:
               - name: "data"
-                value: "exampleData"
-              - name: "catalogVendorId"
-                value: 1
-              - name: "applicationId"
-                value: "appId"
-
-      # TODO: Enable this once struct as response type is supported
-      # response:
-      #     values:
-      #         - name: "status"
-      #           value: 0
-      #         - name: "data"
-      #           value: "data"
-    # TODO: Read attribute catalog vendor id and Read attribute catalog vendor id
-    # TODO: shoudl be one test, but currently struct as attribute is not supported
-    - label: "Read attribute catalog vendor id"
-      command: "readAttribute"
-      attribute: "catalog vendor id"
+                value: "data"
+              - name: "application"
+                value: { catalogVendorId: 123, applicationId: "applicationId" }
       response:
-          value: 0
+          values:
+              - name: "data"
+                value: "data"
+              - name: "status"
+                value: 0
 
-    - label: "Read attribute application id"
-      command: "readAttribute"
-      attribute: "application id"
+    - label: "Stop App Command"
+      command: "stopAppRequest"
+      arguments:
+          values:
+              - name: "application"
+                value: { catalogVendorId: 123, applicationId: "applicationId" }
       response:
-          value: 0
+          values:
+              - name: "data"
+                value: "data"
+              - name: "status"
+                value: 0
+
+    - label: "Hide App Command"
+      command: "hideAppRequest"
+      arguments:
+          values:
+              - name: "application"
+                value: { catalogVendorId: 123, applicationId: "applicationId" }
+      response:
+          values:
+              - name: "data"
+                value: "data"
+              - name: "status"
+                value: 0

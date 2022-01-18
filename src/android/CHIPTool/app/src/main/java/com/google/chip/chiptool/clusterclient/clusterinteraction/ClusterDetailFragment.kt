@@ -7,12 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import chip.clusterinfo.ClusterCommandCallback
 import chip.clusterinfo.ClusterInfo
 import chip.clusterinfo.InteractionInfo
@@ -22,8 +24,11 @@ import chip.devicecontroller.ChipClusters
 import chip.devicecontroller.ChipDeviceController
 import chip.devicecontroller.ClusterInfoMapping
 import com.google.chip.chiptool.ChipClient
+import com.google.chip.chiptool.ChipClient.getConnectedDevicePointer
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
+import com.google.chip.chiptool.clusterclient.clusterinteraction.ClusterInteractionHistoryFragment.Companion.clusterInteractionHistoryList
+import kotlin.properties.Delegates
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackDataTv
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackNameTv
 import kotlinx.android.synthetic.main.cluster_callback_item.view.clusterCallbackTypeTv
@@ -39,6 +44,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 
 /**
  * ClusterDetailFragment allows user to pick cluster, command, specify parameters and see
@@ -48,46 +54,134 @@ class ClusterDetailFragment : Fragment() {
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController(requireContext())
 
-  private val scope = CoroutineScope(Dispatchers.Main + Job())
-  private lateinit var clusterMap: Map<String, ClusterInfo>
+  private lateinit var scope: CoroutineScope
+  private var clusterMap: Map<String, ClusterInfo> = ClusterInfoMapping().clusterMap
   private lateinit var selectedClusterInfo: ClusterInfo
   private lateinit var selectedCluster: ChipClusters.BaseChipCluster
   private lateinit var selectedCommandCallback: DelegatedClusterCallback
   private lateinit var selectedInteractionInfo: InteractionInfo
-  private var devicePtr = 0L
-  private var endpointId = 0
+  private var devicePtr by Delegates.notNull<Long>()
+  private var deviceId by Delegates.notNull<Long>()
+  private var endpointId by Delegates.notNull<Int>()
+
+  // when user opens detail page from home page of cluster interaction, historyCommand will be
+  // null, and nothing will be autocompleted. If the detail page is opened from history page,
+  // cluster name, command name and potential parameter list will be filled out based on historyCommand
+  private var historyCommand: HistoryCommand? = null
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?
   ): View {
-    clusterMap = ClusterInfoMapping().clusterMap
-    devicePtr = checkNotNull(requireArguments().getLong(DEVICE_PTR_KEY))
+    scope = viewLifecycleOwner.lifecycleScope
+    deviceId = checkNotNull(requireArguments().getLong(DEVICE_ID))
+    scope.launch {
+      devicePtr = getConnectedDevicePointer(requireContext(), deviceId)
+    }
     endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID_KEY))
+    historyCommand = requireArguments().getSerializable(HISTORY_COMMAND) as HistoryCommand?
     return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
       deviceController.setCompletionListener(GenericChipDeviceListener())
-      commandAutoCompleteTv.visibility = View.GONE
-      clusterAutoCompleteSetup(
+      if (historyCommand != null) {
+        autoCompleteBasedOnHistoryCommand(
+          historyCommand!!,
+          clusterAutoCompleteTv,
+          commandAutoCompleteTv,
+          parameterList,
+          inflater,
+          callbackList
+        )
+      } else {
+        commandAutoCompleteTv.visibility = View.GONE
+        clusterAutoCompleteSetup(
+          clusterAutoCompleteTv,
+          commandAutoCompleteTv,
+          parameterList,
+          callbackList
+        )
+        commandAutoCompleteSetup(commandAutoCompleteTv, inflater, parameterList, callbackList)
+      }
+      setInvokeCommandOnClickListener(
+        invokeCommand,
+        callbackList,
         clusterAutoCompleteTv,
         commandAutoCompleteTv,
-        parameterList,
-        callbackList
+        parameterList
       )
-      commandAutoCompleteSetup(commandAutoCompleteTv, inflater, parameterList, callbackList)
-      invokeCommand.setOnClickListener {
-        callbackList.removeAllViews()
-        val commandArguments = HashMap<String, Any>()
-        parameterList.forEach {
-          val type =
-            selectedInteractionInfo.commandParameters[it.clusterParameterNameTv.text.toString()]!!.type
-          val data = castStringToType(it.clusterParameterData.text.toString(), type)!!
+    }
+  }
 
-          commandArguments[it.clusterParameterNameTv.text.toString()] = data
-        }
-        selectedInteractionInfo.getCommandFunction()
-          .invokeCommand(selectedCluster, selectedCommandCallback, commandArguments)
+  private fun setInvokeCommandOnClickListener(
+    invokeCommand: Button,
+    callbackList: LinearLayout,
+    clusterAutoCompleteTv: AutoCompleteTextView,
+    commandAutoCompleteTv: AutoCompleteTextView,
+    parameterList: LinearLayout
+  ) {
+    invokeCommand.setOnClickListener {
+      callbackList.removeAllViews()
+      val commandArguments = HashMap<String, Any>()
+      clusterInteractionHistoryList.addFirst(
+        HistoryCommand(
+          clusterAutoCompleteTv.text.toString(),
+          commandAutoCompleteTv.text.toString(),
+          mutableListOf(),
+          null,
+          null,
+          endpointId,
+          deviceId
+        )
+      )
+      parameterList.forEach {
+        val parameterName = it.clusterParameterNameTv.text.toString()
+        val castType =
+          selectedInteractionInfo.commandParameters[parameterName]!!.type
+        val data = castStringToType(it.clusterParameterData.text.toString(), castType)!!
+        commandArguments[it.clusterParameterNameTv.text.toString()] = data
+        clusterInteractionHistoryList[0].parameterList.add(
+          HistoryParameterInfo(
+            parameterName,
+            data.toString(),
+            castType
+          )
+        )
       }
+      selectedInteractionInfo.getCommandFunction()
+        .invokeCommand(selectedCluster, selectedCommandCallback, commandArguments)
+    }
+  }
+
+  // Cluster name, command name and parameter list will be autofill based on the given historyCommand
+  private fun autoCompleteBasedOnHistoryCommand(
+    historyCommand: HistoryCommand,
+    clusterAutoComplete: AutoCompleteTextView,
+    commandAutoComplete: AutoCompleteTextView,
+    parameterList: LinearLayout, inflater: LayoutInflater,
+    callbackList: LinearLayout
+  ) {
+    clusterAutoComplete.setText(historyCommand.clusterName)
+    commandAutoComplete.visibility = View.VISIBLE
+    commandAutoComplete.setText(historyCommand.commandName)
+    selectedClusterInfo = clusterMap[historyCommand.clusterName]!!
+    selectedCluster = selectedClusterInfo.createClusterFunction.create(devicePtr, endpointId)
+    selectedInteractionInfo = selectedClusterInfo.commands[historyCommand.commandName]!!
+    selectedCommandCallback = selectedInteractionInfo.commandCallbackSupplier.get()
+    setCallbackDelegate(inflater, callbackList)
+    historyCommand.parameterList.forEach {
+      val param = inflater.inflate(R.layout.cluster_parameter_item, null, false) as ConstraintLayout
+      param.clusterParameterNameTv.text = "${it.parameterName}"
+      param.clusterParameterTypeTv.text = formatParameterType(it.parameterType)
+      param.clusterParameterData.setText(it.parameterData)
+      parameterList.addView(param)
+    }
+  }
+
+  private fun formatParameterType(castType: Class<*>): String {
+    return if (castType == ByteArray::class.java) {
+      "Byte[]"
+    } else {
+      castType.toString()
     }
   }
 
@@ -145,26 +239,35 @@ class ClusterDetailFragment : Fragment() {
       selectedInteractionInfo = selectedClusterInfo.commands[selectedCommand]!!
       selectedCommandCallback = selectedInteractionInfo.commandCallbackSupplier.get()
       populateCommandParameter(inflater, parameterList)
-      selectedCommandCallback.setCallbackDelegate(object : ClusterCommandCallback {
-        override fun onSuccess(responseValues: Map<CommandResponseInfo, Any>) {
-          showMessage("Command success")
-          // Populate UI based on response values. We know the types from CommandInfo.getCommandResponses().
-          requireActivity().runOnUiThread {
-            populateCallbackResult(
-              responseValues,
-              inflater,
-              callbackList
-            )
-          }
-          responseValues.forEach { Log.d(TAG, it.toString()) }
-        }
-
-        override fun onFailure(exception: Exception) {
-          showMessage("Command failed")
-          Log.e(TAG, exception.toString())
-        }
-      })
+      setCallbackDelegate(inflater, callbackList)
     }
+  }
+
+  private fun setCallbackDelegate(inflater: LayoutInflater, callbackList: LinearLayout) {
+    selectedCommandCallback.setCallbackDelegate(object : ClusterCommandCallback {
+      override fun onSuccess(responseValues: Map<CommandResponseInfo, Any>) {
+        showMessage("Command success")
+        // Populate UI based on response values. We know the types from CommandInfo.getCommandResponses().
+        requireActivity().runOnUiThread {
+          populateCallbackResult(
+            responseValues,
+            inflater,
+            callbackList,
+          )
+        }
+        clusterInteractionHistoryList[0].responseValue = responseValues
+        clusterInteractionHistoryList[0].status = "Success"
+        responseValues.forEach { Log.d(TAG, it.toString()) }
+      }
+
+      override fun onFailure(exception: Exception) {
+        showMessage("Command failed")
+        var errorStatus = exception.toString().split(':')
+        clusterInteractionHistoryList[0].status =
+          errorStatus[errorStatus.size - 2] + " " + errorStatus[errorStatus.size - 1]
+        Log.e(TAG, exception.toString())
+      }
+    })
   }
 
   private fun populateCommandParameter(inflater: LayoutInflater, parameterList: LinearLayout) {
@@ -174,11 +277,7 @@ class ClusterDetailFragment : Fragment() {
       // byte[].class will be output as class [B, which is not readable, so dynamically change it
       // to Byte[]. If more custom logic is required, should add a className field in
       // commandParameterInfo
-      if (paramInfo.type == ByteArray::class.java) {
-        param.clusterParameterTypeTv.text = "Byte[]"
-      } else {
-        param.clusterParameterTypeTv.text = "${paramInfo.type}"
-      }
+      param.clusterParameterTypeTv.text = formatParameterType(paramInfo.type)
       parameterList.addView(param)
     }
   }
@@ -274,16 +373,19 @@ class ClusterDetailFragment : Fragment() {
 
   companion object {
     private const val TAG = "ClusterDetailFragment"
-    private const val ENDPOINT_ID_KEY = "endpoint_id"
-    private const val DEVICE_PTR_KEY = "device_ptr"
+    private const val ENDPOINT_ID_KEY = "endpointId"
+    private const val HISTORY_COMMAND = "historyCommand"
+    private const val DEVICE_ID = "deviceId"
 
     fun newInstance(
       deviceId: Long,
-      endpointId: Int
+      endpointId: Int,
+      historyCommand: HistoryCommand?
     ): ClusterDetailFragment {
       return ClusterDetailFragment().apply {
-        arguments = Bundle(2).apply {
-          putLong(DEVICE_PTR_KEY, deviceId)
+        arguments = Bundle(4).apply {
+          putLong(DEVICE_ID, deviceId)
+          putSerializable(HISTORY_COMMAND, historyCommand)
           putInt(ENDPOINT_ID_KEY, endpointId)
         }
       }

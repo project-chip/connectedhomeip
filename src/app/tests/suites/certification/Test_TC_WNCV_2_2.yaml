@@ -19,11 +19,16 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     #Issue #10811 if condition is required, need YAML support for this
     - label: "Reads ConfigStatus attribute from DUT"
       disabled: true
       command: "readAttribute"
       attribute: "ConfigStatus"
+      PICS: A_CONFIGSTATUS
       response:
           value: 4
 
@@ -31,5 +36,6 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "ConfigStatus"
+      PICS: A_CONFIGSTATUS
       response:
           value: 8

@@ -153,20 +153,6 @@ static void TestConfigurationMgr_SetupDiscriminator(nlTestSuite * inSuite, void 
     NL_TEST_ASSERT(inSuite, getSetupDiscriminator == setSetupDiscriminator);
 }
 
-static void TestConfigurationMgr_RegulatoryLocation(nlTestSuite * inSuite, void * inContext)
-{
-    CHIP_ERROR err    = CHIP_NO_ERROR;
-    uint32_t location = 0;
-
-    err = ConfigurationMgr().StoreRegulatoryLocation(12345);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    err = ConfigurationMgr().GetRegulatoryLocation(location);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, location == 12345);
-}
-
 static void TestConfigurationMgr_CountryCode(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -241,6 +227,52 @@ static void TestConfigurationMgr_GetPrimaryMACAddress(nlTestSuite * inSuite, voi
     }
 }
 
+static void TestConfigurationMgr_ActiveLocale(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    char buf[8];
+    size_t activeLocaleLen    = 0;
+    const char * activeLocale = "en-US";
+
+    err = ConfigurationMgr().StoreActiveLocale(activeLocale, strlen(activeLocale));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetActiveLocale(buf, 8, activeLocaleLen);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, activeLocaleLen == strlen(activeLocale));
+    NL_TEST_ASSERT(inSuite, strcmp(buf, activeLocale) == 0);
+}
+
+static void TestConfigurationMgr_HourFormat(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t format = 0;
+
+    err = ConfigurationMgr().StoreHourFormat(3);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetHourFormat(format);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, format == 3);
+}
+
+static void TestConfigurationMgr_CalendarType(nlTestSuite * inSuite, void * inContext)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t type   = 0;
+
+    err = ConfigurationMgr().StoreCalendarType(3);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = ConfigurationMgr().GetCalendarType(type);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, type == 3);
+}
+
 /**
  *   Test Suite. It lists all the test functions.
  */
@@ -255,10 +287,12 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test ConfigurationMgr::HardwareVersion", TestConfigurationMgr_HardwareVersion),
     NL_TEST_DEF("Test ConfigurationMgr::SetupPinCode", TestConfigurationMgr_SetupPinCode),
     NL_TEST_DEF("Test ConfigurationMgr::SetupDiscriminator", TestConfigurationMgr_SetupDiscriminator),
-    NL_TEST_DEF("Test ConfigurationMgr::RegulatoryLocation", TestConfigurationMgr_RegulatoryLocation),
     NL_TEST_DEF("Test ConfigurationMgr::CountryCode", TestConfigurationMgr_CountryCode),
     NL_TEST_DEF("Test ConfigurationMgr::Breadcrumb", TestConfigurationMgr_Breadcrumb),
     NL_TEST_DEF("Test ConfigurationMgr::GetPrimaryMACAddress", TestConfigurationMgr_GetPrimaryMACAddress),
+    NL_TEST_DEF("Test ConfigurationMgr::ActiveLocale", TestConfigurationMgr_ActiveLocale),
+    NL_TEST_DEF("Test ConfigurationMgr::HourFormat", TestConfigurationMgr_HourFormat),
+    NL_TEST_DEF("Test ConfigurationMgr::CalendarType", TestConfigurationMgr_CalendarType),
     NL_TEST_SENTINEL()
 };
 

@@ -57,6 +57,13 @@ static_library("EFR32") {
     "gatt_db.h",
   ]
 
+  if (chip_enable_ota_requestor) {
+    sources += [
+      "OTAImageProcessorImpl.cpp",
+      "OTAImageProcessorImpl.h",
+    ]
+  }
+
   public_deps = [ "${chip_root}/src/platform:platform_base" ]
 
   # Add pigweed KVS
@@ -70,7 +77,13 @@ static_library("EFR32") {
   ]
 
   if (chip_enable_openthread) {
-    public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+    if (chip_openthread_ftd) {
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-ftd" ]
+    } else {
+      public_deps +=
+          [ "${chip_root}/third_party/openthread/repo:libopenthread-mtd" ]
+    }
 
     sources += [
       "../OpenThread/OpenThreadUtils.cpp",

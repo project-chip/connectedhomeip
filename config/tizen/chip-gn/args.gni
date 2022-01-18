@@ -24,3 +24,5 @@ chip_device_platform = "tizen"
 chip_build_tests = false
 
 chip_inet_config_enable_raw_endpoint = false
+
+pw_build_PIP_CONSTRAINTS = [ "//scripts/constraints.txt" ]

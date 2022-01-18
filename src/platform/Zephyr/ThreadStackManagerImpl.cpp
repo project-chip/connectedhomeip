@@ -27,7 +27,7 @@
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 #include <platform/Zephyr/ThreadStackManagerImpl.h>
 
-#include <inet/UDPEndPoint.h>
+#include <inet/UDPEndPointImpl.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>

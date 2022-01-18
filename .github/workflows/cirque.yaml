@@ -29,7 +29,7 @@ jobs:
         timeout-minutes: 60
         
         env:
-            DOCKER_RUN_VERSION: 0.5.28
+            DOCKER_RUN_VERSION: 0.5.48
             GITHUB_CACHE_PATH: /tmp/cirque-cache/
 
         runs-on: ubuntu-latest
@@ -38,7 +38,7 @@ jobs:
 # need to run with privilege, which isn't supported by job.XXX.contaner
 #  https://github.com/actions/container-action/issues/2
 #         container:
-#             image: connectedhomeip/chip-build-cirque:0.5.28
+#             image: connectedhomeip/chip-build-cirque:0.5.48
 #             volumes:
 #                 - "/tmp:/tmp"
 #                 - "/dev/pts:/dev/pts"
@@ -94,7 +94,7 @@ jobs:
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Build Binaries
-              timeout-minutes: 15
+              timeout-minutes: 30
               run: |
                   integrations/docker/images/chip-build-cirque/run.sh \
                     --env GITHUB_ACTION_RUN=1 \
@@ -102,6 +102,7 @@ jobs:
                     --volume /tmp:/tmp \
                     -- ./gn_build.sh \
                     chip_build_tests=false \
+                    chip_enable_wifi=false \
                     enable_host_gcc_build=true \
                     enable_host_gcc_mbedtls_build=false \
                     enable_host_clang_build=false \

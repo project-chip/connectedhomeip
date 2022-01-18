@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -37,17 +37,22 @@ constexpr const uint16_t kAnyKeyId = 0xffff;
  *   - handle session active time and expiration
  *   - allocate and free space for sessions.
  */
-template <size_t kMaxSessionCount, Time::Source kTimeSource = Time::Source::kSystem>
+template <size_t kMaxSessionCount>
 class SecureSessionTable
 {
 public:
+    ~SecureSessionTable() { mEntries.ReleaseAll(); }
+
     /**
      * Allocates a new secure session out of the internal resource pool.
      *
+     * @param secureSessionType secure session type
      * @param localSessionId represents the encryption key ID assigned by local node
      * @param peerNodeId represents peer Node's ID
+     * @param peerCATs represents peer CASE Authenticated Tags
      * @param peerSessionId represents the encryption key ID assigned by peer node
      * @param fabric represents fabric ID for the session
+     * @param config represents the reliable message protocol configuration
      *
      * @note the newly created state will have an 'active' time set based on the current time source.
      *
@@ -55,17 +60,19 @@ public:
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    SecureSession * CreateNewSecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric,
-                                           const ReliableMessageProtocolConfig & config)
+    Optional<SessionHandle> CreateNewSecureSession(SecureSession::Type secureSessionType, uint16_t localSessionId,
+                                                   NodeId peerNodeId, CATValues peerCATs, uint16_t peerSessionId,
+                                                   FabricIndex fabric, const ReliableMessageProtocolConfig & config)
     {
-        return mEntries.CreateObject(localSessionId, peerNodeId, peerSessionId, fabric, config,
-                                     mTimeSource.GetMonotonicTimestamp());
+        SecureSession * result =
+            mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric, config);
+        return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
 
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
 
     template <typename Function>
-    bool ForEachSession(Function && function)
+    Loop ForEachSession(Function && function)
     {
         return mEntries.ForEachActiveObject(std::forward<Function>(function));
     }
@@ -78,22 +85,19 @@ public:
      * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    SecureSession * FindSecureSessionByLocalKey(uint16_t localSessionId)
+    Optional<SessionHandle> FindSecureSessionByLocalKey(uint16_t localSessionId)
     {
         SecureSession * result = nullptr;
         mEntries.ForEachActiveObject([&](auto session) {
             if (session->GetLocalSessionId() == localSessionId)
             {
                 result = session;
-                return false;
+                return Loop::Break;
             }
-            return true;
+            return Loop::Continue;
         });
-        return result;
+        return result != nullptr ? MakeOptional<SessionHandle>(*result) : Optional<SessionHandle>::Missing();
     }
-
-    /// Convenience method to mark a session as active
-    void MarkSessionActive(SecureSession * state) { state->SetLastActivityTime(mTimeSource.GetMonotonicTimestamp()); }
 
     /**
      * Iterates through all active sessions and expires any sessions with an idle time
@@ -104,22 +108,17 @@ public:
     template <typename Callback>
     void ExpireInactiveSessions(System::Clock::Timestamp maxIdleTime, Callback callback)
     {
-        const System::Clock::Timestamp currentTime = mTimeSource.GetMonotonicTimestamp();
         mEntries.ForEachActiveObject([&](auto session) {
-            if (session->GetLastActivityTime() + maxIdleTime < currentTime)
+            if (session->GetLastActivityTime() + maxIdleTime < System::SystemClock().GetMonotonicTimestamp())
             {
                 callback(*session);
                 ReleaseSession(session);
             }
-            return true;
+            return Loop::Continue;
         });
     }
 
-    /// Allows access to the underlying time source used for keeping track of session active time
-    Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
-
 private:
-    Time::TimeSource<kTimeSource> mTimeSource;
     BitMapObjectPool<SecureSession, kMaxSessionCount> mEntries;
 };
 

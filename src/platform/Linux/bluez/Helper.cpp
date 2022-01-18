@@ -45,9 +45,8 @@
 
 /**
  *    @file
- *          Provides Bluez dbus implementatioon for BLE
+ *          Provides Bluez dbus implementation for BLE
  */
-
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
 #include <lib/support/BitFlags.h>
@@ -1520,6 +1519,10 @@ CHIP_ERROR ConfigureBluezAdv(BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEnd
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(apEndpoint->mDeviceIdInfo);
     SuccessOrExit(err);
 
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    apEndpoint->mDeviceIdInfo.SetAdditionalDataFlag(true);
+#endif
+
 exit:
     if (nullptr != msg)
     {
@@ -1657,8 +1660,6 @@ static void SubscribeCharacteristicDone(GObject * aObject, GAsyncResult * aResul
 
     VerifyOrExit(success == TRUE, ChipLogError(DeviceLayer, "FAIL: BluezSubscribeCharacteristic : %s", error->message));
 
-    // Get notifications on the TX characteristic change (e.g. indication is received)
-    g_signal_connect(c2, "g-properties-changed", G_CALLBACK(OnCharacteristicChanged), apConnection);
     BLEManagerImpl::HandleSubscribeOpComplete(static_cast<BLE_CONNECTION_OBJECT>(apConnection), true);
 
 exit:
@@ -1668,9 +1669,13 @@ exit:
 
 static gboolean SubscribeCharacteristicImpl(BluezConnection * connection)
 {
+    BluezGattCharacteristic1 * c2 = nullptr;
     VerifyOrExit(connection != nullptr, ChipLogError(DeviceLayer, "BluezConnection is NULL in %s", __func__));
     VerifyOrExit(connection->mpC2 != nullptr, ChipLogError(DeviceLayer, "C2 is NULL in %s", __func__));
+    c2 = BLUEZ_GATT_CHARACTERISTIC1(connection->mpC2);
 
+    // Get notifications on the TX characteristic change (e.g. indication is received)
+    g_signal_connect(c2, "g-properties-changed", G_CALLBACK(OnCharacteristicChanged), connection);
     bluez_gatt_characteristic1_call_start_notify(connection->mpC2, nullptr, SubscribeCharacteristicDone, connection);
 
 exit:

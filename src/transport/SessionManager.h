@@ -34,10 +34,12 @@
 #include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/CryptoContext.h>
+#include <transport/GroupSession.h>
 #include <transport/MessageCounterManagerInterface.h>
 #include <transport/SecureSessionTable.h>
 #include <transport/SessionDelegate.h>
 #include <transport/SessionHandle.h>
+#include <transport/SessionHolder.h>
 #include <transport/SessionMessageDelegate.h>
 #include <transport/TransportMgr.h>
 #include <transport/UnauthenticatedSessionTable.h>
@@ -133,70 +135,22 @@ public:
      *    3. Encode the packet header and prepend it to message.
      *   Returns a encrypted message in encryptedMessage.
      */
-    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
+    CHIP_ERROR PrepareMessage(const SessionHandle & session, PayloadHeader & payloadHeader, System::PacketBufferHandle && msgBuf,
                               EncryptedPacketBufferHandle & encryptedMessage);
 
     /**
      * @brief
      *   Send a prepared message to a currently connected peer.
      */
-    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage);
-
-    Transport::SecureSession * GetSecureSession(SessionHandle session);
+    CHIP_ERROR SendPreparedMessage(const SessionHandle & session, const EncryptedPacketBufferHandle & preparedMessage);
 
     /// @brief Set the delegate for handling incoming messages. There can be only one message delegate (probably the
     /// ExchangeManager)
     void SetMessageDelegate(SessionMessageDelegate * cb) { mCB = cb; }
 
-    /// @brief Set the delegate for handling session creation.
-    void RegisterCreationDelegate(SessionCreationDelegate & cb)
-    {
-#ifndef NDEBUG
-        mSessionCreationDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionCreationDelegate> * i) {
-            VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
-            return true;
-        });
-#endif
-        std::reference_wrapper<SessionCreationDelegate> * slot = mSessionCreationDelegates.CreateObject(cb);
-        VerifyOrDie(slot != nullptr);
-    }
-
-    void UnregisterCreationDelegate(SessionCreationDelegate & cb)
-    {
-        mSessionCreationDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionCreationDelegate> * i) {
-            if (std::addressof(cb) == std::addressof(i->get()))
-            {
-                mSessionCreationDelegates.ReleaseObject(i);
-                return false;
-            }
-            return true;
-        });
-    }
-
-    /// @brief Set the delegate for handling session release.
-    void RegisterReleaseDelegate(SessionReleaseDelegate & cb)
-    {
-#ifndef NDEBUG
-        mSessionReleaseDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionReleaseDelegate> * i) {
-            VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
-            return true;
-        });
-#endif
-        std::reference_wrapper<SessionReleaseDelegate> * slot = mSessionReleaseDelegates.CreateObject(cb);
-        VerifyOrDie(slot != nullptr);
-    }
-
-    void UnregisterReleaseDelegate(SessionReleaseDelegate & cb)
-    {
-        mSessionReleaseDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionReleaseDelegate> * i) {
-            if (std::addressof(cb) == std::addressof(i->get()))
-            {
-                mSessionReleaseDelegates.ReleaseObject(i);
-                return false;
-            }
-            return true;
-        });
-    }
+    void RegisterRecoveryDelegate(SessionRecoveryDelegate & cb);
+    void UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb);
+    void RefreshSessionOperationalData(const SessionHandle & sessionHandle);
 
     /**
      * @brief
@@ -207,10 +161,10 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, PairingSession * pairing,
-                          CryptoContext::SessionRole direction, FabricIndex fabric);
+    CHIP_ERROR NewPairing(SessionHolder & sessionHolder, const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
+                          PairingSession * pairing, CryptoContext::SessionRole direction, FabricIndex fabric);
 
-    void ExpirePairing(SessionHandle session);
+    void ExpirePairing(const SessionHandle & session);
     void ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric);
     void ExpireAllPairingsForFabric(FabricIndex fabric);
 
@@ -252,13 +206,20 @@ public:
     Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress,
                                                          const ReliableMessageProtocolConfig & config)
     {
-        Optional<Transport::UnauthenticatedSessionHandle> session =
-            mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, config);
-        return session.HasValue() ? MakeOptional<SessionHandle>(session.Value()) : NullOptional;
+        return mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, config);
     }
 
+    // TODO: implements group sessions
+    Optional<SessionHandle> CreateGroupSession(GroupId group) { return mGroupSessions.AllocEntry(group, kUndefinedFabricIndex); }
+    Optional<SessionHandle> FindGroupSession(GroupId group) { return mGroupSessions.FindEntry(group, kUndefinedFabricIndex); }
+    void RemoveGroupSession(Transport::GroupSession * session) { mGroupSessions.DeleteEntry(session); }
+
     // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
+    // and tv-casting-app that uses the TV's node ID to find the associated secure session
     SessionHandle FindSecureSessionForNode(NodeId peerNodeId);
+
+    using SessionHandleCallback = bool (*)(void * context, SessionHandle & sessionHandle);
+    CHIP_ERROR ForEachSessionHandle(void * context, SessionHandleCallback callback);
 
 private:
     /**
@@ -278,18 +239,14 @@ private:
 
     System::Layer * mSystemLayer = nullptr;
     Transport::UnauthenticatedSessionTable<CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE> mUnauthenticatedSessions;
-    Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions; // < Active connections to other peers
-    State mState;                                                                         // < Initialization state of the object
+    Transport::SecureSessionTable<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mSecureSessions;
+    Transport::GroupSessionTable<CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE> mGroupSessions;
+    State mState; // < Initialization state of the object
 
     SessionMessageDelegate * mCB = nullptr;
-    BitMapObjectPool<std::reference_wrapper<SessionCreationDelegate>, CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES>
-        mSessionCreationDelegates;
 
-    // TODO: This is a temporary solution to release sessions, in the near future, SessionReleaseDelegate will be
-    //       directly associated with the every SessionHandle. Then the callback function is called on over the handle
-    //       delegate directly, in order to prevent dangling handles.
-    BitMapObjectPool<std::reference_wrapper<SessionReleaseDelegate>, CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES>
-        mSessionReleaseDelegates;
+    BitMapObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES>
+        mSessionRecoveryDelegates;
 
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
@@ -297,16 +254,13 @@ private:
     GlobalUnencryptedMessageCounter mGlobalUnencryptedMessageCounter;
     GlobalEncryptedMessageCounter mGlobalEncryptedMessageCounter;
 
+    friend class SessionHandle;
+
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();
 
     /** Cancels any active timers for connection expiry checks. */
     void CancelExpiryTimer();
-
-    /**
-     * Called when a specific connection expires.
-     */
-    void HandleConnectionExpired(const Transport::SecureSession & state);
 
     /**
      * Callback for timer expiry check

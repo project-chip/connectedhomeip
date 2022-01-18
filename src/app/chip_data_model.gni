@@ -14,6 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/python.gni")
 
 import("${chip_root}/src/lib/core/core.gni")
 
@@ -87,7 +88,7 @@ template("chip_data_model") {
       "${_app_root}/clusters/level-control/level-control.h",
       "${_app_root}/clusters/messaging-client/messaging-client.h",
       "${_app_root}/clusters/messaging-server/messaging-server.h",
-      "${_app_root}/clusters/network-commissioning/network-commissioning.h",
+      "${_app_root}/clusters/network-commissioning-old/network-commissioning.h",
       "${_app_root}/clusters/on-off-server/on-off-server.h",
       "${_app_root}/clusters/scenes/scenes-tokens.h",
       "${_app_root}/clusters/scenes/scenes.h",
@@ -99,7 +100,6 @@ template("chip_data_model") {
       "${_app_root}/util/DataModelHandler.cpp",
       "${_app_root}/util/af-event.cpp",
       "${_app_root}/util/af-main-common.cpp",
-      "${_app_root}/util/attribute-list-byte-span.cpp",
       "${_app_root}/util/attribute-size-util.cpp",
       "${_app_root}/util/attribute-storage.cpp",
       "${_app_root}/util/attribute-table.cpp",
@@ -110,8 +110,6 @@ template("chip_data_model") {
       "${_app_root}/util/ember-print.cpp",
       "${_app_root}/util/error-mapping.cpp",
       "${_app_root}/util/message.cpp",
-      "${_app_root}/util/process-cluster-message.cpp",
-      "${_app_root}/util/process-global-message.cpp",
       "${_app_root}/util/util.cpp",
       "${chip_root}/zzz_generated/app-common/app-common/zap-generated/attributes/Accessors.cpp",
     ]
@@ -131,21 +129,30 @@ template("chip_data_model") {
 
     foreach(cluster, _cluster_sources) {
       if (cluster == "door-lock-server") {
+        sources += [ "${_app_root}/clusters/${cluster}/door-lock-server.cpp" ]
+      } else if (cluster == "network-commissioning-old") {
         sources += [
-          "${_app_root}/clusters/${cluster}/door-lock-server-core.cpp",
-          "${_app_root}/clusters/${cluster}/door-lock-server-logging.cpp",
-          "${_app_root}/clusters/${cluster}/door-lock-server-schedule.cpp",
-          "${_app_root}/clusters/${cluster}/door-lock-server-user.cpp",
-        ]
-      } else if (cluster == "network-commissioning") {
-        sources += [
-          "${_app_root}/clusters/${cluster}/${cluster}-ember.cpp",
-          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/clusters/${cluster}/network-commissioning-ember.cpp",
+          "${_app_root}/clusters/${cluster}/network-commissioning-old.cpp",
         ]
       } else if (cluster == "mode-select-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/supported-modes-manager.h",
+        ]
+      } else if (cluster == "application-launcher-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/util/ContentApp.cpp",
+          "${_app_root}/util/ContentAppPlatform.cpp",
+        ]
+      } else if (cluster == "ota-requestor") {
+        sources += [
+          # TODO - align name of folder ?
+          "${_app_root}/clusters/${cluster}/${cluster}-server.cpp",
+          "${_app_root}/clusters/${cluster}/BDXDownloader.cpp",
+          "${_app_root}/clusters/${cluster}/BDXDownloader.h",
+          "${_app_root}/clusters/${cluster}/OTARequestor.cpp",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
@@ -153,12 +160,14 @@ template("chip_data_model") {
     }
 
     if (defined(invoker.zap_pregenerated_dir)) {
-      sources += [
-        "${invoker.zap_pregenerated_dir}/CHIPClusters.cpp",
-        "${invoker.zap_pregenerated_dir}/CHIPClusters.h",
-        "${invoker.zap_pregenerated_dir}/attribute-size.cpp",
-        "${invoker.zap_pregenerated_dir}/callback-stub.cpp",
-      ]
+      sources += [ "${invoker.zap_pregenerated_dir}/callback-stub.cpp" ]
+
+      if (chip_controller) {
+        sources += [
+          "${invoker.zap_pregenerated_dir}/CHIPClusters.cpp",
+          "${invoker.zap_pregenerated_dir}/CHIPClusters.h",
+        ]
+      }
 
       if (_use_default_client_callbacks) {
         sources += [
@@ -173,10 +182,8 @@ template("chip_data_model") {
       }
 
       if (_use_tests_apis) {
-        sources += [
-          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.cpp",
-          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h",
-        ]
+        sources +=
+            [ "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h" ]
       }
     }
 

@@ -33,8 +33,8 @@
 #define CHIP_CONFIG_REQUIRE_AUTH 1
 
 #if BUILD_RELEASE // release build
-
-#else // development build
+// Note: Default Pairing/PIN/Serial Numbers being used. These should not be enabled for production builds
+#endif // BUILD_RELEASE
 
 // Use a default pairing code if one hasn't been provisioned in flash.
 #define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
@@ -50,15 +50,6 @@
  * is found in CHIP NV storage.
  */
 #define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "TEST_SN"
-
-#endif // BUILD_RELEASE
-
-/**
- * CHIP_DEVICE_CONFIG_THREAD_FTD
- *
- * Disable Full Thread Device features
- */
-#define CHIP_DEVICE_CONFIG_THREAD_FTD 1
 
 /**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
@@ -110,13 +101,6 @@
 //#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
 
 /**
- * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
- *
- * Enable recording UTC timestamps.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
-
-/**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE
  *
  * A size, in bytes, of the individual debug event logging buffer.
@@ -131,8 +115,8 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD_SRP_CLIENT 1
 
 #define CHIP_DEVICE_CONFIG_ENABLE_SED 1
-#define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 5000
-#define CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL 5000
+#define CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL 5000_ms32
+#define CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL 5000_ms32
 
 /**
  * CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE

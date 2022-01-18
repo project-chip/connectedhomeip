@@ -82,7 +82,6 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/../../zzz_generated/app-common/app-common/zap-generated/cluster-objects.cpp
         ${CHIP_APP_BASE_DIR}/util/af-event.cpp
         ${CHIP_APP_BASE_DIR}/util/af-main-common.cpp
-        ${CHIP_APP_BASE_DIR}/util/attribute-list-byte-span.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-size-util.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-storage.cpp
         ${CHIP_APP_BASE_DIR}/util/attribute-table.cpp
@@ -94,8 +93,6 @@ function(chip_configure_data_model APP_TARGET)
         ${CHIP_APP_BASE_DIR}/util/ember-print.cpp
         ${CHIP_APP_BASE_DIR}/util/error-mapping.cpp
         ${CHIP_APP_BASE_DIR}/util/message.cpp
-        ${CHIP_APP_BASE_DIR}/util/process-cluster-message.cpp
-        ${CHIP_APP_BASE_DIR}/util/process-global-message.cpp
         ${CHIP_APP_BASE_DIR}/util/util.cpp
     )
 endfunction()

@@ -20,10 +20,16 @@
 
 #include "../../config/PersistentStorage.h"
 #include "Command.h"
+#include <commands/common/CredentialIssuerCommands.h>
+#include <commands/example/ExampleCredentialIssuerCommands.h>
 
 #pragma once
 
 class PersistentStorage;
+
+constexpr const char kIdentityAlpha[] = "alpha";
+constexpr const char kIdentityBeta[]  = "beta";
+constexpr const char kIdentityGamma[] = "gamma";
 
 class CHIPCommand : public Command
 {
@@ -33,9 +39,22 @@ public:
     using ChipDeviceController   = ::chip::Controller::DeviceController;
     using IPAddress              = ::chip::Inet::IPAddress;
     using NodeId                 = ::chip::NodeId;
+    using PeerId                 = ::chip::PeerId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
-    CHIPCommand(const char * commandName) : Command(commandName) {}
+    CHIPCommand(const char * commandName) : Command(commandName)
+    {
+        AddArgument("commissioner-name", &mCommissionerName);
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+        AddArgument("trace_file", &mTraceFile);
+        AddArgument("trace_log", 0, 1, &mTraceLog);
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    }
+
+    CHIPCommand(const char * commandName, CredentialIssuerCommands * credIssuerCmds) : CHIPCommand(commandName)
+    {
+        mCredIssuerCmds = credIssuerCmds;
+    }
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
@@ -62,15 +81,30 @@ protected:
     // loop has been stopped.
     virtual void Shutdown() {}
 
-    ChipDeviceCommissioner mController;
-    PersistentStorage mStorage;
+    PersistentStorage mDefaultStorage;
+    PersistentStorage mCommissionerStorage;
     chip::SimpleFabricStorage mFabricStorage;
+    ExampleCredentialIssuerCommands mExampleCredentialIssuerCmds;
+    CredentialIssuerCommands * mCredIssuerCmds = &mExampleCredentialIssuerCmds;
+
+    std::string GetIdentity();
+    void SetIdentity(const char * name);
+
+    // This method returns the commissioner instance to be used for running the command.
+    // The default commissioner instance name is "alpha", but it can be overridden by passing
+    // --identity "instance name" when running a command.
+    ChipDeviceCommissioner & CurrentCommissioner();
 
 private:
+    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
+    CHIP_ERROR ShutdownCommissioner(std::string key);
+    uint16_t CurrentCommissionerIndex();
+    std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
+    chip::Optional<char *> mCommissionerName;
+
     static void RunQueuedCommand(intptr_t commandArg);
 
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
     CHIP_ERROR StartWaiting(chip::System::Clock::Timeout seconds);
     void StopWaiting();
@@ -80,4 +114,12 @@ private:
     std::mutex cvWaitingForResponseMutex;
     bool mWaitingForResponse{ true };
 #endif // CONFIG_USE_SEPARATE_EVENTLOOP
+
+    void StartTracing();
+    void StopTracing();
+
+#if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
+    chip::Optional<char *> mTraceFile;
+    chip::Optional<bool> mTraceLog;
+#endif // CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 };

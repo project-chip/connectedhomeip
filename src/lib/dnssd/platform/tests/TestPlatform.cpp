@@ -46,23 +46,21 @@ test::ExpectedCall operationalCall1 = test::ExpectedCall()
                                           .SetInstanceName("BEEFBEEFF00DF00D-1111222233334444")
                                           .SetHostName(host)
                                           .AddSubtype("_IBEEFBEEFF00DF00D");
-OperationalAdvertisingParameters operationalParams2 =
-    OperationalAdvertisingParameters()
-        .SetPeerId(kPeerId2)
-        .SetMac(ByteSpan(kMac))
-        .SetPort(CHIP_PORT)
-        .EnableIpV4(true)
-        .SetMRPConfig(ReliableMessageProtocolConfig(64 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
-                                                    128 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT))
-        .SetTcpSupported(Optional<bool>(true));
+OperationalAdvertisingParameters operationalParams2 = OperationalAdvertisingParameters()
+                                                          .SetPeerId(kPeerId2)
+                                                          .SetMac(ByteSpan(kMac))
+                                                          .SetPort(CHIP_PORT)
+                                                          .EnableIpV4(true)
+                                                          .SetMRPConfig({ 32_ms32, 33_ms32 })
+                                                          .SetTcpSupported(Optional<bool>(true));
 test::ExpectedCall operationalCall2 = test::ExpectedCall()
                                           .SetProtocol(DnssdServiceProtocol::kDnssdProtocolTcp)
                                           .SetServiceName("_matter")
                                           .SetInstanceName("5555666677778888-1212343456567878")
                                           .SetHostName(host)
                                           .AddSubtype("_I5555666677778888")
-                                          .AddTxt("CRI", "64")
-                                          .AddTxt("CRA", "128")
+                                          .AddTxt("CRI", "32")
+                                          .AddTxt("CRA", "33")
                                           .AddTxt("T", "1");
 
 CommissionAdvertisingParameters commissionableNodeParamsSmall =
@@ -92,13 +90,12 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeBasic =
         .SetCommissioningMode(CommissioningMode::kEnabledBasic)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
-        .SetPairingInstr(chip::Optional<const char *>("Pair me"))
+        .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingId(chip::Optional<const char *>("id_that_spins"))
+        .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"))
         .SetTcpSupported(chip::Optional<bool>(true))
         // 3600005 is over the max, so this should be adjusted by the platform
-        .SetMRPConfig(ReliableMessageProtocolConfig(3600000 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT,
-                                                    3600064 >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT));
+        .SetMRPConfig({ 3600000_ms32, 3600005_ms32 });
 
 test::ExpectedCall commissionableLargeBasic = test::ExpectedCall()
                                                   .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)
@@ -131,9 +128,9 @@ CommissionAdvertisingParameters commissionableNodeParamsLargeEnhanced =
         .SetCommissioningMode(CommissioningMode::kEnabledEnhanced)
         .SetDeviceName(chip::Optional<const char *>("testy-test"))
         .SetPairingHint(chip::Optional<uint16_t>(3))
-        .SetPairingInstr(chip::Optional<const char *>("Pair me"))
+        .SetPairingInstruction(chip::Optional<const char *>("Pair me"))
         .SetProductId(chip::Optional<uint16_t>(897))
-        .SetRotatingId(chip::Optional<const char *>("id_that_spins"));
+        .SetRotatingDeviceId(chip::Optional<const char *>("id_that_spins"));
 
 test::ExpectedCall commissionableLargeEnhanced = test::ExpectedCall()
                                                      .SetProtocol(DnssdServiceProtocol::kDnssdProtocolUdp)
@@ -159,7 +156,7 @@ void TestStub(nlTestSuite * inSuite, void * inContext)
     // without an expected event.
     ChipLogError(Discovery, "Test platform returns error correctly");
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
     OperationalAdvertisingParameters params;
     NL_TEST_ASSERT(inSuite, mdnsPlatform.Advertise(params) == CHIP_ERROR_UNEXPECTED_EVENT);
@@ -170,7 +167,7 @@ void TestOperational(nlTestSuite * inSuite, void * inContext)
     ChipLogError(Discovery, "Test operational");
     test::Reset();
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
 
     operationalCall1.callType = test::CallType::kStart;
@@ -191,7 +188,7 @@ void TestCommissionableNode(nlTestSuite * inSuite, void * inContext)
     ChipLogError(Discovery, "Test commissionable");
     test::Reset();
     DiscoveryImplPlatform & mdnsPlatform = DiscoveryImplPlatform::GetInstance();
-    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(&DeviceLayer::InetLayer()) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, mdnsPlatform.Init(DeviceLayer::UDPEndPointManager()) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mdnsPlatform.RemoveServices() == CHIP_NO_ERROR);
 
     commissionableSmall.callType = test::CallType::kStart;

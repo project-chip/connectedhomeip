@@ -19,7 +19,7 @@
 #include "AppMain.h"
 #include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/clusters/identify-server/identify-server.h>
 #include <app/util/af.h>
 
@@ -27,7 +27,7 @@ using namespace chip;
 using namespace chip::app;
 // using namespace chip::app::Clusters;
 
-bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
+bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::CommandHandler * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -86,6 +86,8 @@ static Identify gIdentify0 = {
 static Identify gIdentify1 = {
     chip::EndpointId{ 1 }, OnIdentifyStart, OnIdentifyStop, EMBER_ZCL_IDENTIFY_IDENTIFY_TYPE_VISIBLE_LED, OnTriggerEffect,
 };
+
+void ApplicationInit() {}
 
 int main(int argc, char * argv[])
 {

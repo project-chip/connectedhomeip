@@ -54,6 +54,14 @@ function getTests()
     'Test_TC_CC_9_3',
   ];
 
+  const DeviceDiscovery = [
+    'Test_TC_DD_1_5',
+    'Test_TC_DD_1_6',
+    'Test_TC_DD_1_7',
+    'Test_TC_DD_1_8',
+    'Test_TC_DD_1_9',
+  ];
+
   const DeviceManagement = [
     'Test_TC_DM_1_1',
     'Test_TC_DM_3_1',
@@ -83,9 +91,11 @@ function getTests()
   const LevelControl = [
     'Test_TC_LVL_1_1',
     'Test_TC_LVL_2_1',
+    'Test_TC_LVL_2_2',
     'Test_TC_LVL_3_1',
     'Test_TC_LVL_4_1',
     'Test_TC_LVL_5_1',
+    'Test_TC_LVL_6_1',
   ];
 
   const MediaControl = [
@@ -102,6 +112,17 @@ function getTests()
     'Test_TC_MC_3_9',
     'Test_TC_MC_3_10',
     'Test_TC_MC_3_11',
+    'Test_TC_MC_5_1',
+    'Test_TC_MC_5_2',
+    'Test_TC_MC_5_3',
+    'Test_TC_MC_6_1',
+    'Test_TC_MC_6_2',
+    'Test_TC_MC_6_3',
+    'Test_TC_MC_6_4',
+    'Test_TC_MC_7_1',
+    'Test_TC_MC_7_2',
+    'Test_TC_MC_8_1',
+    'Test_TC_MC_9_1',
   ];
 
   const OnOff = [
@@ -171,8 +192,9 @@ function getTests()
     'TV_WakeOnLanCluster',
     'TV_ApplicationBasicCluster',
     'TV_MediaPlaybackCluster',
-    'TV_TvChannelCluster',
+    'TV_ChannelCluster',
     'TV_LowPowerCluster',
+    'TV_ContentLauncherCluster',
     'TV_MediaInputCluster',
   ];
 
@@ -183,19 +205,21 @@ function getTests()
     'TestDelayCommands',
     'TestLogCommands',
     'TestSaveAs',
+    'TestConfigVariables',
     'TestDescriptorCluster',
     'TestBasicInformation',
     'TestIdentifyCluster',
     'TestGroupsCluster',
+    'TestGroupKeyManagementCluster',
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
     'TestGroupMessaging',
   ];
 
   const SoftwareDiagnostics = [
-    'Test_TC_DIAGSW_1_1',
-    'Test_TC_DIAGSW_2_1',
-    'Test_TC_DIAGSW_3_2',
+    'Test_TC_SWDIAG_1_1',
+    'Test_TC_SWDIAG_2_1',
+    'Test_TC_SWDIAG_3_1',
   ];
 
   const Subscriptions = [
@@ -206,6 +230,7 @@ function getTests()
     BinaryInput, //
     BooleanState, //
     ColorControl, //
+    DeviceDiscovery, //
     DeviceManagement, //
     ElectricalMeasurement, //
     FlowMeasurement, //

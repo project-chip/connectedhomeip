@@ -23,7 +23,6 @@
 #if !CHIP_DEVICE_LAYER_NONE
 
 #include <ble/BleLayer.h>
-#include <inet/InetLayer.h>
 #include <lib/core/CHIPCore.h>
 #include <platform/CHIPDeviceError.h>
 #include <platform/ConfigurationManager.h>
@@ -46,7 +45,8 @@ namespace DeviceLayer {
 void SetSystemLayerForTesting(System::LayerImpl * layer);
 
 // These functions are defined in src/platform/Globals.cpp
-chip::Inet::InetLayer & InetLayer();
+chip::Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager();
+chip::Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager();
 chip::System::Layer & SystemLayer();
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

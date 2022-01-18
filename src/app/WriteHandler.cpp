@@ -26,19 +26,22 @@
 
 namespace chip {
 namespace app {
+
+using namespace Protocols::InteractionModel;
+
 CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
 {
     IgnoreUnusedVariable(apDelegate);
-    VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-    VerifyOrReturnLogError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     mMessageWriter.Init(std::move(packet));
-    ReturnLogErrorOnFailure(mWriteResponseBuilder.Init(&mMessageWriter));
+    ReturnErrorOnFailure(mWriteResponseBuilder.Init(&mMessageWriter));
 
-    AttributeStatuses::Builder attributeStatusesBuilder = mWriteResponseBuilder.CreateWriteResponses();
-    ReturnLogErrorOnFailure(attributeStatusesBuilder.GetError());
+    mWriteResponseBuilder.CreateWriteResponses();
+    ReturnErrorOnFailure(mWriteResponseBuilder.GetError());
 
     MoveToState(State::Initialized);
 
@@ -53,43 +56,36 @@ void WriteHandler::Shutdown()
     ClearState();
 }
 
-CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
+Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
+                                    bool aIsTimedWrite)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    mpExchangeCtx  = apExchangeContext;
+    mpExchangeCtx = apExchangeContext;
 
-    err = ProcessWriteRequest(std::move(aPayload));
-    SuccessOrExit(err);
+    Status status = ProcessWriteRequest(std::move(aPayload), aIsTimedWrite);
 
     // Do not send response on Group Write
-    if (!apExchangeContext->IsGroupExchangeContext())
+    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
-        err = SendWriteResponse();
+        CHIP_ERROR err = SendWriteResponse();
+        if (err != CHIP_NO_ERROR)
+        {
+            status = Status::Failure;
+        }
     }
 
-exit:
     Shutdown();
-    return err;
+    return status;
 }
 
 CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributeStatuses::Builder attributeStatuses;
-    VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
-    attributeStatuses = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
-    err               = attributeStatuses.GetError();
-    SuccessOrExit(err);
-
+    VerifyOrReturnError(mState == State::AddStatus, CHIP_ERROR_INCORRECT_STATE);
+    AttributeStatusIBs::Builder & attributeStatusIBs = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
+    ReturnErrorOnFailure(attributeStatusIBs.GetError());
     mWriteResponseBuilder.EndOfWriteResponseMessage();
-    err = mWriteResponseBuilder.GetError();
-    SuccessOrExit(err);
-
-    err = mMessageWriter.Finalize(&packet);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    ReturnErrorOnFailure(mWriteResponseBuilder.GetError());
+    ReturnErrorOnFailure(mMessageWriter.Finalize(&packet));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WriteHandler::SendWriteResponse()
@@ -115,7 +111,9 @@ exit:
 CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INTERNAL);
+
+    ReturnErrorCodeIf(mpExchangeCtx == nullptr, CHIP_ERROR_INTERNAL);
+    const Access::SubjectDescriptor subjectDescriptor = mpExchangeCtx->GetSessionHandle()->GetSubjectDescriptor();
 
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
     {
@@ -175,7 +173,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
             const ConcreteAttributePath concretePath =
                 ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
             MatterPreAttributeWriteCallback(concretePath);
-            err = WriteSingleClusterData(clusterInfo, dataReader, this);
+            err = WriteSingleClusterData(subjectDescriptor, clusterInfo, dataReader, this);
             MatterPostAttributeWriteCallback(concretePath);
         }
         SuccessOrExit(err);
@@ -190,7 +188,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload)
+Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
@@ -199,6 +197,14 @@ CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayl
     AttributeDataIBs::Parser AttributeDataIBsParser;
     TLV::TLVReader AttributeDataIBsReader;
     bool needSuppressResponse = false;
+    // Default to InvalidAction for our status; that's what we want if any of
+    // the parsing of our overall structure or paths fails.  Once we have a
+    // successfully parsed path, the only way we will get a failure return is if
+    // our path handling fails to AddStatus on us.
+    //
+    // TODO: That's not technically InvalidAction, and we should probably make
+    // our callees hand out Status as well.
+    Status status = Status::InvalidAction;
 
     reader.Init(std::move(aPayload));
 
@@ -228,44 +234,62 @@ CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayl
     err = writeRequestParser.GetWriteRequests(&AttributeDataIBsParser);
     SuccessOrExit(err);
 
+    if (mIsTimedRequest != aIsTimedWrite)
+    {
+        // The message thinks it should be part of a timed interaction but it's
+        // not, or vice versa.  Spec says to Respond with UNSUPPORTED_ACCESS.
+        status = Status::UnsupportedAccess;
+        goto exit;
+    }
+
     AttributeDataIBsParser.GetReader(&AttributeDataIBsReader);
     err = ProcessAttributeDataIBs(AttributeDataIBsReader);
+    if (err == CHIP_NO_ERROR)
+    {
+        status = Status::Success;
+    }
 
 exit:
-    return err;
+    return status;
 }
 
 CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathParams,
                                    const Protocols::InteractionModel::Status aStatus)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusIB::Builder statusIBBuilder;
+    AttributeStatusIBs::Builder & writeResponses   = mWriteResponseBuilder.GetWriteResponses();
+    AttributeStatusIB::Builder & attributeStatusIB = writeResponses.CreateAttributeStatus();
+    ReturnErrorOnFailure(writeResponses.GetError());
+
+    AttributePathIB::Builder & path = attributeStatusIB.CreatePath();
+    ReturnErrorOnFailure(attributeStatusIB.GetError());
+    ReturnErrorOnFailure(path.Encode(aAttributePathParams));
+
     StatusIB statusIB;
-    AttributeStatusIB::Builder attributeStatusIB = mWriteResponseBuilder.GetWriteResponses().CreateAttributeStatus();
-    err                                          = attributeStatusIB.GetError();
-    SuccessOrExit(err);
-
-    err = attributeStatusIB.CreatePath().Encode(aAttributePathParams);
-    SuccessOrExit(err);
-
-    statusIB.mStatus = aStatus;
-    statusIBBuilder  = attributeStatusIB.CreateErrorStatus();
+    statusIB.mStatus                    = aStatus;
+    StatusIB::Builder & statusIBBuilder = attributeStatusIB.CreateErrorStatus();
+    ReturnErrorOnFailure(attributeStatusIB.GetError());
     statusIBBuilder.EncodeStatusIB(statusIB);
-    err = statusIBBuilder.GetError();
-    SuccessOrExit(err);
-
+    ReturnErrorOnFailure(statusIBBuilder.GetError());
     attributeStatusIB.EndOfAttributeStatusIB();
-    err = attributeStatusIB.GetError();
-    SuccessOrExit(err);
-    MoveToState(State::AddStatus);
+    ReturnErrorOnFailure(attributeStatusIB.GetError());
 
-exit:
-    return err;
+    MoveToState(State::AddStatus);
+    return CHIP_NO_ERROR;
 }
 
 FabricIndex WriteHandler::GetAccessingFabricIndex() const
 {
-    return mpExchangeCtx->GetSessionHandle().GetFabricIndex();
+    FabricIndex fabric = kUndefinedFabricIndex;
+    if (mpExchangeCtx->GetSessionHandle()->IsGroupSession())
+    {
+        fabric = mpExchangeCtx->GetSessionHandle()->AsGroupSession()->GetFabricIndex();
+    }
+    else
+    {
+        fabric = mpExchangeCtx->GetSessionHandle()->AsSecureSession()->GetFabricIndex();
+    }
+
+    return fabric;
 }
 
 const char * WriteHandler::GetStateStr() const

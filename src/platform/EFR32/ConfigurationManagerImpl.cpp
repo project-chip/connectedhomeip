@@ -27,7 +27,10 @@
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
 #include <platform/ConfigurationManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/EFR32/EFR32Config.h>
+
+#include "em_rmu.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -51,6 +54,12 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     // TODO: Initialize the global GroupKeyStore object here (#1626)
 
+    IncreaseBootCount();
+    // It is possible to configure the possible reset sources with RMU_ResetControl
+    // In this case, we keep Reset control at default setting
+    rebootCause = RMU_ResetCauseGet();
+    RMU_ResetCauseClear();
+
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
@@ -72,6 +81,95 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_BootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
+{
+    uint32_t bootCount = 0;
+
+    if (EFR32Config::ConfigValueExists(EFR32Config::kConfigKey_BootCount))
+    {
+        GetRebootCount(bootCount);
+    }
+
+    return EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_BootCount, bootCount + 1);
+}
+
+uint32_t ConfigurationManagerImpl::GetBootReason(void)
+{
+    // rebootCause is obtained at bootup.
+    uint32_t matterBootCause;
+#if defined(_SILICON_LABS_32B_SERIES_1)
+    if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
+    {
+        matterBootCause = DiagnosticDataProvider::BootReasonType::PowerOnReboot;
+    }
+    else if (rebootCause & RMU_RSTCAUSE_AVDDBOD || rebootCause & RMU_RSTCAUSE_DVDDBOD || rebootCause & RMU_RSTCAUSE_DECBOD)
+    {
+        matterBootCause = DiagnosticDataProvider::BootReasonType::BrownOutReset;
+    }
+    else if (rebootCause & RMU_RSTCAUSE_SYSREQRST)
+    {
+        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareReset;
+    }
+    else if (rebootCause & RMU_RSTCAUSE_WDOGRST)
+    {
+        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset;
+    }
+    else
+    {
+        matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
+    }
+    // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
+#elif defined(_SILICON_LABS_32B_SERIES_2)
+    if (rebootCause & EMU_RSTCAUSE_POR || rebootCause & EMU_RSTCAUSE_PIN) // PowerOn or External pin reset
+    {
+        matterBootCause = DiagnosticDataProvider::BootReasonType::PowerOnReboot;
+    }
+    else if (rebootCause & EMU_RSTCAUSE_AVDDBOD || rebootCause & EMU_RSTCAUSE_DVDDBOD || rebootCause & EMU_RSTCAUSE_DECBOD ||
+             rebootCause & EMU_RSTCAUSE_VREGIN || rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
+    {
+        matterBootCause = DiagnosticDataProvider::BootReasonType::BrownOutReset;
+    }
+    else if (rebootCause & EMU_RSTCAUSE_SYSREQ)
+    {
+        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareReset;
+    }
+    else if (rebootCause & EMU_RSTCAUSE_WDOG0 || rebootCause & EMU_RSTCAUSE_WDOG1)
+    {
+        matterBootCause = DiagnosticDataProvider::BootReasonType::SoftwareWatchdogReset;
+    }
+    else
+    {
+        matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
+    }
+    // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
+#else
+    matterBootCause = DiagnosticDataProvider::BootReasonType::Unspecified;
+#endif
+
+    return matterBootCause;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    if (!EFR32Config::ConfigValueExists(EFR32Config::kConfigKey_TotalOperationalHours))
+    {
+        totalOperationalHours = 0;
+        return CHIP_NO_ERROR;
+    }
+
+    return EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
@@ -188,6 +286,10 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
     ThreadStackMgr().ErasePersistentInfo();
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+
+#if CHIP_KVS_AVAILABLE
+    PersistedStorage::KeyValueStoreMgrImpl().ErasePartition();
+#endif // CHIP_KVS_AVAILABLE
 
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");

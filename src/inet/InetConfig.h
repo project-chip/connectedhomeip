@@ -88,32 +88,6 @@
 #endif // INET_CONFIG_MAX_IP_AND_UDP_HEADER_SIZE
 
 /**
- *  @def INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS
- *
- *  @brief
- *    This defines whether (1) or not (0) your platform will override
- *    the platform- and system-specific INET_MapOSError,
- *    INET_DescribeOSError, and INET_IsOSError functions.
- *
- */
-#ifndef INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS
-#define INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS            0
-#endif // INET_CONFIG_WILL_OVERRIDE_OS_ERROR_FUNCS
-
-/**
- *  @def INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
- *
- *  @brief
- *    This defines whether (1) or not (0) your platform will override
- *    the platform- and system-specific INET_MapLwIPError,
- *    INET_DescribeLwIPError, and INET_IsLwIPError functions.
- *
- */
-#ifndef INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
-#define INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS          0
-#endif // INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
-
-/**
  *  @def INET_CONFIG_NUM_TCP_ENDPOINTS
  *
  *  @brief
@@ -178,32 +152,6 @@
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 /**
- *  @def INET_CONFIG_EVENT_RESERVED
- *
- *  @brief
- *      This defines the first number in the default chip System Layer event code space reserved for use by the Inet Layer.
- *      Event codes used by each layer must not overlap.
- */
-#ifndef INET_CONFIG_EVENT_RESERVED
-#define INET_CONFIG_EVENT_RESERVED                          1000
-#endif /* INET_CONFIG_EVENT_RESERVED */
-
-/**
- *  @def _INET_CONFIG_EVENT
- *
- *  @brief
- *    This defines a mapping function for InetLayer event types that allows
- *    mapping such event types into a platform- or system-specific range.
- *
- *  @note
- *    By default, this definition is a copy of _CHIP_SYSTEM_CONFIG_LWIP_EVENT.
- *
- */
-#ifndef _INET_CONFIG_EVENT
-#define _INET_CONFIG_EVENT(e)                               _CHIP_SYSTEM_CONFIG_LWIP_EVENT(INET_CONFIG_EVENT_RESERVED + (e))
-#endif // _INET_CONFIG_EVENT
-
-/**
  *  @def INET_CONFIG_TEST
  *
  *  @brief
@@ -243,25 +191,6 @@
 #ifndef INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 #define INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT       1
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
-
-/**
- *  @def INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
- *
- *  @brief
- *    When this flag is set, the InetLayer enables
- *    callbacks to the upper layer notifying it when
- *    the send channel of the TCP connection changes
- *    between being idle or not idle.
- *
- *  @note
- *    When enabled, the TCP send queue is actively
- *    polled to determine if sent data has been
- *    acknowledged.
- *
- */
-#ifndef INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
-#define INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS         0
-#endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
 
 /**
  *  @def INET_CONFIG_TCP_SEND_QUEUE_POLL_INTERVAL_MSEC

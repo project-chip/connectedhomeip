@@ -17,7 +17,6 @@
  */
 
 #include "AppTask.h"
-#include "Rpc.h"
 
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -25,7 +24,11 @@
 
 #include <kernel.h>
 
-#ifdef CONFIG_USB
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
+#ifdef CONFIG_USB_DEVICE_STACK
 #include <usb/usb_device.h>
 #endif
 
@@ -44,7 +47,7 @@ int main(void)
     int ret        = 0;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-#ifdef CONFIG_USB
+#ifdef CONFIG_USB_DEVICE_STACK
     ret = usb_enable(nullptr);
     if (ret)
     {

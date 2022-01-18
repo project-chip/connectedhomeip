@@ -20,6 +20,7 @@
 
 #include <controller/CommandSenderAllocator.h>
 #include <controller/TypedCommandCallback.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace Controller {
@@ -43,10 +44,11 @@ namespace Controller {
  */
 template <typename RequestObjectT>
 CHIP_ERROR
-InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, const SessionHandle & sessionHandle, chip::EndpointId endpointId,
                      const RequestObjectT & requestCommandData,
                      typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
-                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb)
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
+                     const Optional<uint16_t> & timedInvokeTimeoutMs)
 {
     app::CommandPathParams commandPath = { endpointId, 0, RequestObjectT::GetClusterId(), RequestObjectT::GetCommandId(),
                                            (app::CommandPathFlags::kEndpointIdValid) };
@@ -68,15 +70,16 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle se
 
     decoder->SetOnDoneCallback(onDone);
 
-    auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), aExchangeMgr);
+    auto commandSender =
+        chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), aExchangeMgr, timedInvokeTimeoutMs.HasValue());
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData));
+    ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData, timedInvokeTimeoutMs));
     ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle));
 
     //
-    // We've effectively transfered ownership of the above allocated objects to CommandSender, and we need to wait for it to call us
-    // back when processing is completed (through OnDone) to eventually free up resources.
+    // We've effectively transferred ownership of the above allocated objects to CommandSender, and we need to wait for it to call
+    // us back when processing is completed (through OnDone) to eventually free up resources.
     //
     // So signal that by releasing the smart pointer.
     //
@@ -84,6 +87,28 @@ InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle se
     commandSender.release();
 
     return CHIP_NO_ERROR;
+}
+
+template <typename RequestObjectT>
+CHIP_ERROR
+InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, chip::EndpointId endpointId,
+                     const RequestObjectT & requestCommandData,
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
+                     uint16_t timedInvokeTimeoutMs)
+{
+    return InvokeCommandRequest(exchangeMgr, sessionHandle, endpointId, requestCommandData, onSuccessCb, onErrorCb,
+                                MakeOptional(timedInvokeTimeoutMs));
+}
+
+template <typename RequestObjectT, typename std::enable_if_t<!RequestObjectT::MustUseTimedInvoke(), int> = 0>
+CHIP_ERROR
+InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, const SessionHandle & sessionHandle, chip::EndpointId endpointId,
+                     const RequestObjectT & requestCommandData,
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb)
+{
+    return InvokeCommandRequest(exchangeMgr, sessionHandle, endpointId, requestCommandData, onSuccessCb, onErrorCb, NullOptional);
 }
 
 } // namespace Controller

@@ -25,10 +25,7 @@ namespace Test {
 
 CHIP_ERROR AppContext::Init()
 {
-    ReturnErrorOnFailure(chip::Platform::MemoryInit());
-    ReturnErrorOnFailure(mIOContext.Init());
-    ReturnErrorOnFailure(mTransportManager.Init("LOOPBACK"));
-    ReturnErrorOnFailure(MessagingContext::Init(&mTransportManager, &mIOContext));
+    ReturnErrorOnFailure(Super::Init());
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->Init(&GetExchangeManager(), nullptr));
 
     return CHIP_NO_ERROR;
@@ -36,9 +33,8 @@ CHIP_ERROR AppContext::Init()
 
 CHIP_ERROR AppContext::Shutdown()
 {
-    ReturnErrorOnFailure(MessagingContext::Shutdown());
-    ReturnErrorOnFailure(mIOContext.Shutdown());
-    chip::Platform::MemoryShutdown();
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    ReturnErrorOnFailure(Super::Shutdown());
 
     return CHIP_NO_ERROR;
 }

@@ -5,6 +5,8 @@
 #import "CHIPStructsObjc.h"
 #import "CHIPCommandPayloadsObjc.h"
 
+#include <lib/support/TypeTraits.h>
+
 {{#>CHIPCallbackBridge partial-type="Status"                         }}DefaultSuccessCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge partial-type="CommandStatus"                  }}CommandSuccessCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge type="Octet_String" isNullable=false ns="chip"}}OctetStringAttributeCallback{{/CHIPCallbackBridge}}
@@ -29,6 +31,10 @@
 {{#>CHIPCallbackBridge type="Int64u"       isNullable=true  ns="chip"}}NullableInt64uAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge type="Int64s"       isNullable=false ns="chip"}}Int64sAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge type="Int64s"       isNullable=true  ns="chip"}}NullableInt64sAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge type="Single"       isNullable=false ns="chip"}}FloatAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge type="Single"       isNullable=true  ns="chip"}}NullableFloatAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge type="Double"       isNullable=false ns="chip"}}DoubleAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge type="Double"       isNullable=true  ns="chip"}}NullableDoubleAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge type="vendor_id"    isNullable=false ns="chip"}}VendorIdAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge type="vendor_id"    isNullable=true  ns="chip"}}NullableVendorIdAttributeCallback{{/CHIPCallbackBridge}}
 
@@ -45,5 +51,12 @@
 {{#>CHIPCallbackBridge partial-type="Command"                        }}{{asUpperCamelCase ../../name}}Cluster{{asUpperCamelCase ../name}}Callback{{/CHIPCallbackBridge}}
 {{/chip_cluster_responses}}
 {{/chip_client_clusters}}
+
+{{#zcl_clusters}}
+{{#zcl_enums}}
+{{#>CHIPCallbackBridge type=(asType label) isNullable=false ns=parent.name}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge type=(asType label) isNullable=true  ns=parent.name}}Nullable{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallback{{/CHIPCallbackBridge}}
+{{/zcl_enums}}
+{{/zcl_clusters}}
 
 {{/if}}

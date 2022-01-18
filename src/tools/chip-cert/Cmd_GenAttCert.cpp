@@ -33,6 +33,7 @@
 
 namespace {
 
+using namespace chip;
 using namespace chip::ArgParser;
 using namespace chip::Credentials;
 using namespace chip::ASN1;
@@ -138,7 +139,7 @@ OptionSet *gCmdOptionSets[] =
 
 AttCertType gAttCertType      = kAttCertType_NotSpecified;
 const char * gSubjectCN       = nullptr;
-uint16_t gSubjectVID          = 0;
+uint16_t gSubjectVID          = VendorId::NotSpecified;
 uint16_t gSubjectPID          = 0;
 const char * gCACertFileName  = nullptr;
 const char * gCAKeyFileName   = nullptr;
@@ -261,7 +262,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
     }
     else if (gAttCertType == kAttCertType_DAC)
     {
-        if (gSubjectVID == 0 || gSubjectPID == 0)
+        if (gSubjectVID == VendorId::NotSpecified || gSubjectPID == 0)
         {
             fprintf(stderr, "Please specify VID and PID subject DN attributes.\n");
             return false;
@@ -269,7 +270,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
     }
     else if (gAttCertType == kAttCertType_PAI)
     {
-        if (gSubjectVID == 0)
+        if (gSubjectVID == VendorId::NotSpecified)
         {
             fprintf(stderr, "Please specify VID subject DN attributes.\n");
             return false;
@@ -277,7 +278,7 @@ bool Cmd_GenAttCert(int argc, char * argv[])
     }
     else if (gAttCertType == kAttCertType_PAA)
     {
-        if (gSubjectVID != 0 || gSubjectPID != 0)
+        if (gSubjectPID != 0)
         {
             fprintf(stderr, "VID & PID SHALL NOT specify subject DN attributes.\n");
             return false;

@@ -978,6 +978,40 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPBindingClusterBindParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _nodeId = @(0);
+
+        _groupId = @(0);
+
+        _endpointId = @(0);
+
+        _clusterId = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPBindingClusterUnbindParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _nodeId = @(0);
+
+        _groupId = @(0);
+
+        _endpointId = @(0);
+
+        _clusterId = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPPollControlClusterCheckInResponseParams
 - (instancetype)init
 {
@@ -1204,32 +1238,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _updateToken = [NSData data];
-
-        _newVersion = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _updateToken = [NSData data];
-
-        _softwareVersion = @(0);
-    }
-    return self;
-}
-@end
-
 @implementation CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams
 - (instancetype)init
 {
@@ -1255,6 +1263,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _updateToken = [NSData data];
+
+        _newVersion = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams
 - (instancetype)init
 {
@@ -1268,18 +1289,33 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPOtaSoftwareUpdateProviderClusterNotifyUpdateAppliedParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _updateToken = [NSData data];
+
+        _softwareVersion = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _providerLocation = @(0);
+        _providerNodeId = @(0);
 
         _vendorId = @(0);
 
         _announcementReason = @(0);
 
         _metadataForNode = nil;
+
+        _endpoint = @(0);
     }
     return self;
 }
@@ -1364,8 +1400,6 @@ NS_ASSUME_NONNULL_BEGIN
         _ssid = [NSData data];
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
@@ -1376,19 +1410,19 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _errorCode = @(0);
+        _networkingStatus = @(0);
 
         _debugText = @"";
 
-        _wifiScanResults = [NSArray array];
+        _wiFiScanResults = nil;
 
-        _threadScanResults = [NSArray array];
+        _threadScanResults = nil;
     }
     return self;
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkParams
+@implementation CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1398,57 +1432,12 @@ NS_ASSUME_NONNULL_BEGIN
         _credentials = [NSData data];
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorCode = @(0);
-
-        _debugText = @"";
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _ssid = [NSData data];
-
-        _credentials = [NSData data];
-
-        _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorCode = @(0);
-
-        _debugText = @"";
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterAddThreadNetworkParams
+@implementation CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1456,49 +1445,6 @@ NS_ASSUME_NONNULL_BEGIN
         _operationalDataset = [NSData data];
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorCode = @(0);
-
-        _debugText = @"";
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _operationalDataset = [NSData data];
-
-        _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorCode = @(0);
-
-        _debugText = @"";
     }
     return self;
 }
@@ -1512,19 +1458,17 @@ NS_ASSUME_NONNULL_BEGIN
         _networkID = [NSData data];
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterRemoveNetworkResponseParams
+@implementation CHIPNetworkCommissioningClusterNetworkConfigResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _errorCode = @(0);
+        _networkingStatus = @(0);
 
         _debugText = @"";
     }
@@ -1532,7 +1476,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterEnableNetworkParams
+@implementation CHIPNetworkCommissioningClusterConnectNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1540,49 +1484,36 @@ NS_ASSUME_NONNULL_BEGIN
         _networkID = [NSData data];
 
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterEnableNetworkResponseParams
+@implementation CHIPNetworkCommissioningClusterConnectNetworkResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _errorCode = @(0);
+        _networkingStatus = @(0);
 
         _debugText = @"";
+
+        _errorValue = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPNetworkCommissioningClusterDisableNetworkParams
+@implementation CHIPNetworkCommissioningClusterReorderNetworkParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _networkID = [NSData data];
 
+        _networkIndex = @(0);
+
         _breadcrumb = @(0);
-
-        _timeoutMs = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPNetworkCommissioningClusterDisableNetworkResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _errorCode = @(0);
-
-        _debugText = @"";
     }
     return self;
 }
@@ -1813,6 +1744,72 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPGroupKeyManagementClusterKeySetWriteParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetID = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetRemoveParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetID = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetIDs = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetIDs = [NSArray array];
+    }
+    return self;
+}
+@end
+
 @implementation CHIPModeSelectClusterChangeToModeParams
 - (instancetype)init
 {
@@ -1829,18 +1826,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _pin = [NSData data];
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterLockDoorResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _pinCode = nil;
     }
     return self;
 }
@@ -1851,40 +1837,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _pin = [NSData data];
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterUnlockDoorResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterToggleParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _pin = @"";
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterToggleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _pinCode = nil;
     }
     return self;
 }
@@ -1895,20 +1848,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _timeoutInSeconds = @(0);
+        _timeout = @(0);
 
-        _pin = [NSData data];
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterUnlockWithTimeoutResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _pinCode = nil;
     }
     return self;
 }
@@ -1948,7 +1890,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetPinParams
+@implementation CHIPDoorLockClusterSetPINCodeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1965,18 +1907,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetPinResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterGetPinParams
+@implementation CHIPDoorLockClusterGetPINCodeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1987,51 +1918,29 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetPinResponseParams
+@implementation CHIPDoorLockClusterGetPINCodeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _userId = @(0);
 
-        _userStatus = @(0);
+        _userStatus = nil;
 
-        _userType = @(0);
+        _userType = nil;
 
-        _pin = [NSData data];
+        _pin = nil;
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterClearPinParams
+@implementation CHIPDoorLockClusterClearPINCodeParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _userId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterClearPinResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterClearAllPinsResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _pinSlotIndex = @(0);
     }
     return self;
 }
@@ -2045,17 +1954,6 @@ NS_ASSUME_NONNULL_BEGIN
         _userId = @(0);
 
         _userStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterSetUserStatusResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
     }
     return self;
 }
@@ -2079,20 +1977,20 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userId = @(0);
 
-        _status = @(0);
+        _userStatus = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterSetWeekdayScheduleParams
+@implementation CHIPDoorLockClusterSetWeekDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _weekDayIndex = @(0);
 
-        _userId = @(0);
+        _userIndex = @(0);
 
         _daysMask = @(0);
 
@@ -2108,38 +2006,27 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetWeekdayScheduleResponseParams
+@implementation CHIPDoorLockClusterGetWeekDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _status = @(0);
+        _weekDayIndex = @(0);
+
+        _userIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterGetWeekdayScheduleParams
+@implementation CHIPDoorLockClusterGetWeekDayScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _weekDayIndex = @(0);
 
-        _userId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterGetWeekdayScheduleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _scheduleId = @(0);
-
-        _userId = @(0);
+        _userIndex = @(0);
 
         _status = @(0);
 
@@ -2157,38 +2044,27 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearWeekdayScheduleParams
+@implementation CHIPDoorLockClusterClearWeekDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _weekDayIndex = @(0);
 
-        _userId = @(0);
+        _userIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterClearWeekdayScheduleResponseParams
+@implementation CHIPDoorLockClusterSetYearDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _status = @(0);
-    }
-    return self;
-}
-@end
+        _yearDayIndex = @(0);
 
-@implementation CHIPDoorLockClusterSetYeardayScheduleParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _scheduleId = @(0);
-
-        _userId = @(0);
+        _userIndex = @(0);
 
         _localStartTime = @(0);
 
@@ -2198,38 +2074,27 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetYeardayScheduleResponseParams
+@implementation CHIPDoorLockClusterGetYearDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _status = @(0);
+        _yearDayIndex = @(0);
+
+        _userIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterGetYeardayScheduleParams
+@implementation CHIPDoorLockClusterGetYearDayScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _yearDayIndex = @(0);
 
-        _userId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterGetYeardayScheduleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _scheduleId = @(0);
-
-        _userId = @(0);
+        _userIndex = @(0);
 
         _status = @(0);
 
@@ -2241,25 +2106,14 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearYeardayScheduleParams
+@implementation CHIPDoorLockClusterClearYearDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _yearDayIndex = @(0);
 
-        _userId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterClearYeardayScheduleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _userIndex = @(0);
     }
     return self;
 }
@@ -2270,24 +2124,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _holidayIndex = @(0);
 
         _localStartTime = @(0);
 
         _localEndTime = @(0);
 
-        _operatingModeDuringHoliday = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterSetHolidayScheduleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _operatingMode = @(0);
     }
     return self;
 }
@@ -2298,7 +2141,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _holidayIndex = @(0);
     }
     return self;
 }
@@ -2309,7 +2152,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _holidayIndex = @(0);
 
         _status = @(0);
 
@@ -2317,7 +2160,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _localEndTime = @(0);
 
-        _operatingModeDuringHoliday = @(0);
+        _operatingMode = @(0);
     }
     return self;
 }
@@ -2328,18 +2171,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterClearHolidayScheduleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _holidayIndex = @(0);
     }
     return self;
 }
@@ -2353,17 +2185,6 @@ NS_ASSUME_NONNULL_BEGIN
         _userId = @(0);
 
         _userType = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterSetUserTypeResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
     }
     return self;
 }
@@ -2393,7 +2214,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetRfidParams
+@implementation CHIPDoorLockClusterSetRFIDCodeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2404,24 +2225,13 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userType = @(0);
 
-        _id = [NSData data];
+        _rfidCode = [NSData data];
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterSetRfidResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterGetRfidParams
+@implementation CHIPDoorLockClusterGetRFIDCodeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2432,72 +2242,124 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetRfidResponseParams
+@implementation CHIPDoorLockClusterGetRFIDCodeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _userId = @(0);
+
+        _userStatus = nil;
+
+        _userType = nil;
+
+        _rfidCode = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearRFIDCodeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _rfidSlotIndex = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetUserParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _operationType = @(0);
+
+        _userIndex = @(0);
+
+        _userName = nil;
+
+        _userUniqueId = nil;
 
         _userStatus = @(0);
 
         _userType = @(0);
 
-        _rfid = [NSData data];
+        _credentialRule = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterClearRfidParams
+@implementation CHIPDoorLockClusterGetUserParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _userId = @(0);
+        _userIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterClearRfidResponseParams
+@implementation CHIPDoorLockClusterGetUserResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _status = @(0);
+        _userIndex = @(0);
+
+        _userName = nil;
+
+        _userUniqueId = nil;
+
+        _userStatus = nil;
+
+        _userType = nil;
+
+        _credentialRule = nil;
+
+        _credentials = nil;
+
+        _creatorFabricIndex = nil;
+
+        _lastModifiedFabricIndex = nil;
+
+        _nextUserIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterClearAllRfidsResponseParams
+@implementation CHIPDoorLockClusterClearUserParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _status = @(0);
+        _userIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterOperationEventNotificationParams
+@implementation CHIPDoorLockClusterOperatingEventNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _source = @(0);
+        _operationEventSource = @(0);
 
-        _eventCode = @(0);
+        _operationEventCode = @(0);
 
         _userId = @(0);
 
         _pin = [NSData data];
 
-        _timeStamp = @(0);
+        _localTime = @(0);
 
-        _data = @"";
+        _data = nil;
     }
     return self;
 }
@@ -2508,9 +2370,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _source = @(0);
+        _programEventSource = @(0);
 
-        _eventCode = @(0);
+        _programEventCode = @(0);
 
         _userId = @(0);
 
@@ -2520,9 +2382,80 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userStatus = @(0);
 
-        _timeStamp = @(0);
+        _localTime = @(0);
 
-        _data = @"";
+        _data = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetCredentialParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _operationType = @(0);
+
+        _credential = [CHIPDoorLockClusterDlCredential new];
+
+        _credentialData = [NSData data];
+
+        _userIndex = @(0);
+
+        _userStatus = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetCredentialResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _userIndex = nil;
+
+        _nextCredentialIndex = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetCredentialStatusParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _credential = [CHIPDoorLockClusterDlCredential new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetCredentialStatusResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _credentialExists = @(0);
+
+        _userIndex = nil;
+
+        _nextCredentialIndex = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearCredentialParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _credential = [CHIPDoorLockClusterDlCredential new];
     }
     return self;
 }
@@ -2600,7 +2533,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterCurrentWeeklyScheduleParams
+@implementation CHIPThermostatClusterGetWeeklyScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2634,7 +2567,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPThermostatClusterRelayStatusLogParams
+@implementation CHIPThermostatClusterGetRelayStatusLogResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3324,7 +3257,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelParams
+@implementation CHIPChannelClusterChangeChannelRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3335,12 +3268,12 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelResponseParams
+@implementation CHIPChannelClusterChangeChannelResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _channelMatch = [NSArray array];
+        _channelMatch = [CHIPChannelClusterChannelInfo new];
 
         _errorType = @(0);
     }
@@ -3348,7 +3281,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterChangeChannelByNumberParams
+@implementation CHIPChannelClusterChangeChannelByNumberRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3361,7 +3294,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTvChannelClusterSkipChannelParams
+@implementation CHIPChannelClusterSkipChannelRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3372,7 +3305,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPTargetNavigatorClusterNavigateTargetParams
+@implementation CHIPTargetNavigatorClusterNavigateTargetRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3398,95 +3331,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaPlayResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaPauseResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaStopResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaStartOverResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaPreviousResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaNextResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaRewindResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaFastForwardResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaSkipForwardParams
+@implementation CHIPMediaPlaybackClusterSkipForwardRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3497,18 +3342,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSkipForwardResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaPlaybackClusterMediaSkipBackwardParams
+@implementation CHIPMediaPlaybackClusterSkipBackwardRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3519,18 +3353,18 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSkipBackwardResponseParams
+@implementation CHIPMediaPlaybackClusterPlaybackResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _mediaPlaybackStatus = @(0);
+        _status = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSeekParams
+@implementation CHIPMediaPlaybackClusterSeekRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3541,18 +3375,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaPlaybackClusterMediaSeekResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _mediaPlaybackStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPMediaInputClusterSelectInputParams
+@implementation CHIPMediaInputClusterSelectInputRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3563,7 +3386,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPMediaInputClusterRenameInputParams
+@implementation CHIPMediaInputClusterRenameInputRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3576,7 +3399,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPKeypadInputClusterSendKeyParams
+@implementation CHIPKeypadInputClusterSendKeyRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3598,7 +3421,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchContentParams
+@implementation CHIPContentLauncherClusterLaunchContentRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3606,25 +3429,14 @@ NS_ASSUME_NONNULL_BEGIN
         _autoPlay = @(0);
 
         _data = @"";
+
+        _search = [NSArray array];
     }
     return self;
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchContentResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _data = @"";
-
-        _contentLaunchStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPContentLauncherClusterLaunchURLParams
+@implementation CHIPContentLauncherClusterLaunchURLRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3632,25 +3444,27 @@ NS_ASSUME_NONNULL_BEGIN
         _contentURL = @"";
 
         _displayString = @"";
+
+        _brandingInformation = [CHIPContentLauncherClusterBrandingInformation new];
     }
     return self;
 }
 @end
 
-@implementation CHIPContentLauncherClusterLaunchURLResponseParams
+@implementation CHIPContentLauncherClusterLaunchResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _data = @"";
+        _status = @(0);
 
-        _contentLaunchStatus = @(0);
+        _data = @"";
     }
     return self;
 }
 @end
 
-@implementation CHIPAudioOutputClusterSelectOutputParams
+@implementation CHIPAudioOutputClusterSelectOutputRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3661,7 +3475,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAudioOutputClusterRenameOutputParams
+@implementation CHIPAudioOutputClusterRenameOutputRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3674,22 +3488,42 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterLaunchAppParams
+@implementation CHIPApplicationLauncherClusterLaunchAppRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _data = @"";
 
-        _catalogVendorId = @(0);
-
-        _applicationId = @"";
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
     }
     return self;
 }
 @end
 
-@implementation CHIPApplicationLauncherClusterLaunchAppResponseParams
+@implementation CHIPApplicationLauncherClusterStopAppRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterHideAppRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterLauncherResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3702,18 +3536,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPApplicationBasicClusterChangeStatusParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPAccountLoginClusterGetSetupPINParams
+@implementation CHIPAccountLoginClusterGetSetupPINRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -3735,7 +3558,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPAccountLoginClusterLoginParams
+@implementation CHIPAccountLoginClusterLoginRequestParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -4019,6 +3842,17 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPTestClusterClusterTestEmitTestEventResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _value = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPTestClusterClusterTestNestedStructListArgumentRequestParams
 - (instancetype)init
 {
@@ -4115,6 +3949,32 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _arg1 = [CHIPTestClusterClusterSimpleStruct new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterTestEmitTestEventRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = @(0);
+
+        _arg2 = @(0);
+
+        _arg3 = @(0);
     }
     return self;
 }
@@ -4372,62 +4232,6 @@ NS_ASSUME_NONNULL_BEGIN
         _startTime = @(0);
 
         _numberOfIntervals = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBindingClusterBindParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _nodeId = @(0);
-
-        _groupId = @(0);
-
-        _endpointId = @(0);
-
-        _clusterId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPBindingClusterUnbindParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _nodeId = @(0);
-
-        _groupId = @(0);
-
-        _endpointId = @(0);
-
-        _clusterId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPSampleMfgSpecificClusterClusterCommandOneParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _argOne = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPSampleMfgSpecificCluster2ClusterCommandTwoParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _argOne = @(0);
     }
     return self;
 }

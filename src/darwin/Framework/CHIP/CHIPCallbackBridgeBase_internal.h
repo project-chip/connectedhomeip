@@ -41,12 +41,12 @@ public:
         });
 
         if (CHIP_NO_ERROR != err) {
-            dispatch_async(queue, ^{
-                handler([CHIPError errorForCHIPErrorCode:err], nil);
-            });
+            NSLog(@"Failure performing action. C++-mangled success callback type: '%s', error: %s", typeid(T).name(),
+                chip::ErrorStr(err));
 
-            NSString * errorStr = [NSString stringWithFormat:@"%s: %s", typeid(T).name(), chip::ErrorStr(err)];
-            @throw [NSException exceptionWithName:errorStr reason:nil userInfo:nil];
+            // Take the normal async error-reporting codepath.  This will also
+            // handle cleaning us up properly.
+            DispatchFailure(this, [CHIPError errorForCHIPErrorCode:err]);
         }
     };
 
@@ -57,6 +57,9 @@ public:
     static void DispatchSuccess(void * context, id value) { DispatchCallbackResult(context, nil, value); }
 
     static void DispatchFailure(void * context, NSError * error) { DispatchCallbackResult(context, error, nil); }
+
+protected:
+    dispatch_queue_t mQueue;
 
 private:
     static void DispatchCallbackResult(void * context, NSError * error, id value)
@@ -71,8 +74,13 @@ private:
             return;
         }
 
+        if (error) {
+            // We should delete ourselves; there will be no more callbacks.
+            callbackBridge->mKeepAlive = false;
+        }
+
         dispatch_async(callbackBridge->mQueue, ^{
-            callbackBridge->mHandler(error, value);
+            callbackBridge->mHandler(value, error);
 
             if (!callbackBridge->mKeepAlive) {
                 delete callbackBridge;
@@ -80,7 +88,6 @@ private:
         });
     }
 
-    dispatch_queue_t mQueue;
     ResponseHandler mHandler;
     bool mKeepAlive;
 

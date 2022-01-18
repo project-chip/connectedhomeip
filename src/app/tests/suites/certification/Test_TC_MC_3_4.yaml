@@ -19,9 +19,13 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -29,7 +33,7 @@ tests:
 
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -37,7 +41,7 @@ tests:
 
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -45,7 +49,7 @@ tests:
 
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -53,7 +57,7 @@ tests:
 
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -61,7 +65,7 @@ tests:
 
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -69,7 +73,7 @@ tests:
 
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -77,7 +81,7 @@ tests:
 
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -85,7 +89,7 @@ tests:
 
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"
@@ -93,7 +97,7 @@ tests:
 
     - label: "Send RootMenu"
       disabled: true
-      command: "SendKey"
+      command: "SendKeyRequest"
       arguments:
           values:
               - name: "keyCode"

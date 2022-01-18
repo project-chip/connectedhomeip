@@ -18,7 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/af-structs.h>
-#include <app/Command.h>
+#include <app/CommandHandler.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/Nullable.h>
 #include <app/util/af-enums.h>
@@ -29,12 +29,8 @@
 // Note: The IMDefaultResponseCallback is a bridge to the old CallbackMgr before IM is landed, so it still accepts EmberAfStatus
 // instead of IM status code.
 // #6308 should handle IM error code on the application side, either modify this function or remove this.
-bool IMDefaultResponseCallback(const chip::app::Command * commandObj, EmberAfStatus status);
-bool IMReadReportAttributesResponseCallback(const chip::app::ReadClient * apReadClient,
-                                            const chip::app::ConcreteAttributePath * aPath, chip::TLV::TLVReader * apData,
-                                            chip::Protocols::InteractionModel::Status status);
+bool IMDefaultResponseCallback(const chip::app::CommandSender * commandObj, EmberAfStatus status);
 bool IMWriteResponseCallback(const chip::app::WriteClient * writeClient, chip::Protocols::InteractionModel::Status status);
-bool IMSubscribeResponseCallback(const chip::app::ReadClient * apSubscribeClient, EmberAfStatus status);
 void LogStatus(uint8_t status);
 
 // Global Response Callbacks
@@ -58,6 +54,10 @@ typedef void (*Int64uAttributeCallback)(void * context, uint64_t value);
 typedef void (*NullableInt64uAttributeCallback)(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
 typedef void (*Int64sAttributeCallback)(void * context, int64_t value);
 typedef void (*NullableInt64sAttributeCallback)(void * context, const chip::app::DataModel::Nullable<int64_t> & value);
+typedef void (*FloatAttributeCallback)(void * context, float value);
+typedef void (*NullableFloatAttributeCallback)(void * context, const chip::app::DataModel::Nullable<float> & value);
+typedef void (*DoubleAttributeCallback)(void * context, double value);
+typedef void (*NullableDoubleAttributeCallback)(void * context, const chip::app::DataModel::Nullable<double> & value);
 typedef void (*OctetStringAttributeCallback)(void * context, const chip::ByteSpan value);
 typedef void (*NullableOctetStringAttributeCallback)(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
 typedef void (*CharStringAttributeCallback)(void * context, const chip::CharSpan value);

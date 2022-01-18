@@ -106,6 +106,9 @@ void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp c
     case OutputEventType::kQueryReceived:
         event = OutputEvent(OutputEventType::kQueryReceived);
         break;
+    case OutputEventType::kQueryWithSkipReceived:
+        event = OutputEvent::QueryWithSkipEvent(mBytesToSkip);
+        break;
     case OutputEventType::kBlockReceived:
         event = OutputEvent::BlockDataEvent(mBlockEventData, std::move(mPendingMsgHandle));
         break;
@@ -120,7 +123,7 @@ void TransferSession::PollOutput(OutputEvent & event, System::Clock::Timestamp c
         break;
     }
 
-    // If there's no other pending output but an error occured or was received, then continue to output the error.
+    // If there's no other pending output but an error occurred or was received, then continue to output the error.
     // This ensures that when the TransferSession encounters an error and needs to send a StatusReport, both a kMsgToSend and a
     // kInternalError output event will be emitted.
     if (event.EventType == OutputEventType::kNone && mState == TransferState::kErrorState)
@@ -269,6 +272,34 @@ CHIP_ERROR TransferSession::PrepareBlockQuery()
 
     BlockQuery queryMsg;
     queryMsg.BlockCounter = mNextQueryNum;
+
+    ReturnErrorOnFailure(WriteToPacketBuffer(queryMsg, mPendingMsgHandle));
+
+#if CHIP_AUTOMATION_LOGGING
+    ChipLogAutomation("Sending BDX Message");
+    queryMsg.LogMessage(msgType);
+#endif // CHIP_AUTOMATION_LOGGING
+
+    mAwaitingResponse = true;
+    mLastQueryNum     = mNextQueryNum++;
+
+    PrepareOutgoingMessageEvent(msgType, mPendingOutput, mMsgTypeData);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TransferSession::PrepareBlockQueryWithSkip(const uint64_t & bytesToSkip)
+{
+    const MessageType msgType = MessageType::BlockQueryWithSkip;
+
+    VerifyOrReturnError(mState == TransferState::kTransferInProgress, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mRole == TransferRole::kReceiver, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mPendingOutput == OutputEventType::kNone, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(!mAwaitingResponse, CHIP_ERROR_INCORRECT_STATE);
+
+    BlockQueryWithSkip queryMsg;
+    queryMsg.BlockCounter = mNextQueryNum;
+    queryMsg.BytesToSkip  = bytesToSkip;
 
     ReturnErrorOnFailure(WriteToPacketBuffer(queryMsg, mPendingMsgHandle));
 
@@ -446,6 +477,9 @@ CHIP_ERROR TransferSession::HandleBdxMessage(const PayloadHeader & header, Syste
         break;
     case MessageType::BlockQuery:
         HandleBlockQuery(std::move(msg));
+        break;
+    case MessageType::BlockQueryWithSkip:
+        HandleBlockQueryWithSkip(std::move(msg));
         break;
     case MessageType::Block:
         HandleBlock(std::move(msg));
@@ -628,6 +662,29 @@ void TransferSession::HandleBlockQuery(System::PacketBufferHandle msgData)
 #endif // CHIP_AUTOMATION_LOGGING
 }
 
+void TransferSession::HandleBlockQueryWithSkip(System::PacketBufferHandle msgData)
+{
+    VerifyOrReturn(mRole == TransferRole::kSender, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrReturn(mState == TransferState::kTransferInProgress, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+    VerifyOrReturn(mAwaitingResponse, PrepareStatusReport(StatusCode::kUnexpectedMessage));
+
+    BlockQueryWithSkip query;
+    const CHIP_ERROR err = query.Parse(std::move(msgData));
+    VerifyOrReturn(err == CHIP_NO_ERROR, PrepareStatusReport(StatusCode::kBadMessageContents));
+
+    VerifyOrReturn(query.BlockCounter == mNextBlockNum, PrepareStatusReport(StatusCode::kBadBlockCounter));
+
+    mPendingOutput = OutputEventType::kQueryWithSkipReceived;
+
+    mAwaitingResponse        = false;
+    mLastQueryNum            = query.BlockCounter;
+    mBytesToSkip.BytesToSkip = query.BytesToSkip;
+
+#if CHIP_AUTOMATION_LOGGING
+    query.LogMessage(MessageType::BlockQueryWithSkip);
+#endif // CHIP_AUTOMATION_LOGGING
+}
+
 void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
 {
     VerifyOrReturn(mRole == TransferRole::kReceiver, PrepareStatusReport(StatusCode::kUnexpectedMessage));
@@ -648,9 +705,10 @@ void TransferSession::HandleBlock(System::PacketBufferHandle msgData)
                        PrepareStatusReport(StatusCode::kLengthMismatch));
     }
 
-    mBlockEventData.Data   = blockMsg.Data;
-    mBlockEventData.Length = blockMsg.DataLength;
-    mBlockEventData.IsEof  = false;
+    mBlockEventData.Data         = blockMsg.Data;
+    mBlockEventData.Length       = blockMsg.DataLength;
+    mBlockEventData.IsEof        = false;
+    mBlockEventData.BlockCounter = blockMsg.BlockCounter;
 
     mPendingMsgHandle = std::move(msgData);
     mPendingOutput    = OutputEventType::kBlockReceived;
@@ -678,9 +736,10 @@ void TransferSession::HandleBlockEOF(System::PacketBufferHandle msgData)
     VerifyOrReturn(blockEOFMsg.BlockCounter == mLastQueryNum, PrepareStatusReport(StatusCode::kBadBlockCounter));
     VerifyOrReturn(blockEOFMsg.DataLength <= mTransferMaxBlockSize, PrepareStatusReport(StatusCode::kBadMessageContents));
 
-    mBlockEventData.Data   = blockEOFMsg.Data;
-    mBlockEventData.Length = blockEOFMsg.DataLength;
-    mBlockEventData.IsEof  = true;
+    mBlockEventData.Data         = blockEOFMsg.Data;
+    mBlockEventData.Length       = blockEOFMsg.DataLength;
+    mBlockEventData.IsEof        = true;
+    mBlockEventData.BlockCounter = blockEOFMsg.BlockCounter;
 
     mPendingMsgHandle = std::move(msgData);
     mPendingOutput    = OutputEventType::kBlockReceived;
@@ -856,6 +915,8 @@ const char * TransferSession::OutputEvent::ToString(OutputEventType outputEventT
         return "BlockReceived";
     case OutputEventType::kQueryReceived:
         return "QueryReceived";
+    case OutputEventType::kQueryWithSkipReceived:
+        return "QueryWithSkipReceived";
     case OutputEventType::kAckReceived:
         return "AckReceived";
     case OutputEventType::kAckEOFReceived:
@@ -925,6 +986,13 @@ TransferSession::OutputEvent TransferSession::OutputEvent::MsgToSendEvent(Messag
     OutputEvent event(OutputEventType::kMsgToSend);
     event.MsgData     = std::move(msg);
     event.msgTypeData = typeData;
+    return event;
+}
+
+TransferSession::OutputEvent TransferSession::OutputEvent::QueryWithSkipEvent(TransferSkipData bytesToSkip)
+{
+    OutputEvent event(OutputEventType::kQueryWithSkipReceived);
+    event.bytesToSkip = bytesToSkip;
     return event;
 }
 

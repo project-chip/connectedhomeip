@@ -44,7 +44,7 @@ GetConnectedDeviceCallback::~GetConnectedDeviceCallback()
     env->DeleteGlobalRef(mJavaCallbackRef);
 }
 
-void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, DeviceProxy * device)
+void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);
@@ -65,7 +65,7 @@ void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, DeviceProxy
     env->CallVoidMethod(javaCallback, successMethod, reinterpret_cast<jlong>(device));
 }
 
-void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, NodeId nodeId, CHIP_ERROR error)
+void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error)
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);
@@ -92,5 +92,5 @@ void GetConnectedDeviceCallback::OnDeviceConnectionFailureFn(void * context, Nod
     jmethodID exceptionConstructor = env->GetMethodID(controllerExceptionCls, "<init>", "(ILjava/lang/String;)V");
     jobject exception = env->NewObject(controllerExceptionCls, exceptionConstructor, error, env->NewStringUTF(ErrorStr(error)));
 
-    env->CallVoidMethod(javaCallback, failureMethod, nodeId, exception);
+    env->CallVoidMethod(javaCallback, failureMethod, peerId.GetNodeId(), exception);
 }

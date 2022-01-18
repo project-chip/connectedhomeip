@@ -30,9 +30,11 @@ const appHelper       = require('../../../../../src/app/zap-templates/templates/
 function asExpectedEndpointForCluster(clusterName)
 {
   switch (clusterName) {
+  case 'AccessControl':
   case 'AdministratorCommissioning':
   case 'Basic':
   case 'Descriptor':
+  case 'DiagnosticLogs':
   case 'GeneralCommissioning':
   case 'GeneralDiagnostics':
   case 'SoftwareDiagnostics':
@@ -45,6 +47,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'TrustedRootCertificates':
   case 'OtaSoftwareUpdateProvider':
   case 'OtaSoftwareUpdateRequestor':
+  case 'PowerSourceConfiguration':
     return 0;
   }
   return 1;
@@ -53,20 +56,22 @@ function asExpectedEndpointForCluster(clusterName)
 function asTestValue()
 {
   if (StringHelper.isOctetString(this.type)) {
-    return '[@"Test" dataUsingEncoding:NSUTF8StringEncoding]';
+    return `[@"${"Test".substring(0, this.maxLength)}" dataUsingEncoding:NSUTF8StringEncoding]`;
   } else if (StringHelper.isCharString(this.type)) {
-    return '@"Test"';
+    return `@"${"Test".substring(0, this.maxLength)}"`;
+  } else if (this.isArray) {
+    return '[NSArray array]';
   } else {
     return `@(${this.min || this.max || 0})`;
   }
 }
 
-function asObjectiveCBasicType(type)
+function asObjectiveCBasicType(type, options)
 {
   if (StringHelper.isOctetString(type)) {
-    return 'NSData *';
+    return options.hash.is_mutable ? 'NSMutableData *' : 'NSData *';
   } else if (StringHelper.isCharString(type)) {
-    return 'NSString *';
+    return options.hash.is_mutable ? 'NSMutableString *' : 'NSString *';
   } else {
     return ChipTypesHelper.asBasicType(this.chipType);
   }
@@ -120,15 +125,12 @@ function asTestIndex(index)
   return index.toString().padStart(6, 0);
 }
 
-async function asObjectiveCClassHelper(type, cluster, options, mutable)
+async function asObjectiveCClass(type, cluster, options)
 {
   let pkgId    = await templateUtil.ensureZclPackageId(this);
   let isStruct = await zclHelper.isStruct(this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
 
   if ((this.isList || this.isArray || this.entryType || options.hash.forceList) && !options.hash.forceNotList) {
-    if (mutable) {
-      return 'NSMutableArray';
-    }
     return 'NSArray';
   }
 
@@ -147,16 +149,6 @@ async function asObjectiveCClassHelper(type, cluster, options, mutable)
   return 'NSNumber';
 }
 
-async function asObjectiveCClass(type, cluster, options)
-{
-  return asObjectiveCClassHelper.call(this, type, cluster, options, false);
-}
-
-async function asObjectiveCMutableClass(type, cluster, options)
-{
-  return asObjectiveCClassHelper.call(this, type, cluster, options, true);
-}
-
 async function asObjectiveCType(type, cluster, options)
 {
   let typeStr = await asObjectiveCClass.call(this, type, cluster, options);
@@ -167,11 +159,6 @@ async function asObjectiveCType(type, cluster, options)
   }
 
   return typeStr;
-}
-
-function incrementDepth(depth)
-{
-  return depth + 1;
 }
 
 function asStructPropertyName(prop)
@@ -213,9 +200,7 @@ exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
 exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;
 exports.asObjectiveCClass            = asObjectiveCClass;
-exports.asObjectiveCMutableClass     = asObjectiveCMutableClass;
 exports.asObjectiveCType             = asObjectiveCType;
-exports.incrementDepth               = incrementDepth;
 exports.asStructPropertyName         = asStructPropertyName;
 exports.asGetterName                 = asGetterName;
 exports.commandHasRequiredField      = commandHasRequiredField;

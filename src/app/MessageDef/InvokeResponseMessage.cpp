@@ -61,7 +61,7 @@ CHIP_ERROR InvokeResponseMessage::Parser::CheckSchemaValidity() const
             VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kInvokeResponses))), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << to_underlying(Tag::kInvokeResponses));
             {
-                InvokeResponses::Parser invokeResponses;
+                InvokeResponseIBs::Parser invokeResponses;
                 ReturnErrorOnFailure(invokeResponses.Init(reader));
 
                 PRETTY_PRINT_INCDEPTH();
@@ -103,7 +103,7 @@ CHIP_ERROR InvokeResponseMessage::Parser::GetSuppressResponse(bool * const apSup
     return GetSimpleValue(to_underlying(Tag::kSuppressResponse), TLV::kTLVType_Boolean, apSuppressResponse);
 }
 
-CHIP_ERROR InvokeResponseMessage::Parser::GetInvokeResponses(InvokeResponses::Parser * const apStatus) const
+CHIP_ERROR InvokeResponseMessage::Parser::GetInvokeResponses(InvokeResponseIBs::Parser * const apStatus) const
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kInvokeResponses)), reader));
@@ -120,7 +120,7 @@ InvokeResponseMessage::Builder & InvokeResponseMessage::Builder::SuppressRespons
     return *this;
 }
 
-InvokeResponses::Builder & InvokeResponseMessage::Builder::CreateInvokeResponses()
+InvokeResponseIBs::Builder & InvokeResponseMessage::Builder::CreateInvokeResponses()
 {
     if (mError == CHIP_NO_ERROR)
     {

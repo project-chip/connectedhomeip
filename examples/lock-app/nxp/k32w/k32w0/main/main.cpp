@@ -96,6 +96,8 @@ extern "C" void main_task(void const * argument)
         (*pFunc)();
     }
 
+    SHA_ClkInit(SHA_INSTANCE);
+
 #if defined(cPWR_UsePowerDownMode) && (cPWR_UsePowerDownMode)
     PWR_Init();
 

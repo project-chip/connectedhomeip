@@ -22,7 +22,8 @@ import os
 import sys
 from optparse import OptionParser
 from base import TestFail, TestTimeout, BaseTestHelper, FailIfNot, logger
-from cluster_objects import ClusterObjectTests
+from cluster_objects import NODE_ID, ClusterObjectTests
+from network_commissioning import NetworkCommissioningTests
 import asyncio
 
 # The thread network dataset tlv for testing, splited into T-L-V.
@@ -79,6 +80,9 @@ def main():
     FailIfNot(test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
               "Failed to discover any devices.")
 
+    FailIfNot(test.SetNetworkCommissioningParameters(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
+              "Failed to finish network commissioning")
+
     logger.info("Testing key exchange")
     FailIfNot(test.TestKeyExchange(ip=options.deviceAddress,
                                    setuppin=20202021,
@@ -92,12 +96,9 @@ def main():
     FailIfNot(test.TestResolve(nodeid=1),
               "Failed to resolve nodeid")
 
+    # Still test network commissioning
     logger.info("Testing network commissioning")
-    FailIfNot(test.TestNetworkCommissioning(nodeid=1,
-                                            endpoint=ENDPOINT_ID,
-                                            group=GROUP_ID,
-                                            dataset=TEST_THREAD_NETWORK_DATASET_TLV,
-                                            network_id=TEST_THREAD_NETWORK_ID),
+    FailIfNot(asyncio.run(NetworkCommissioningTests(devCtrl=test.devCtrl, nodeid=1).run()),
               "Failed to finish network commissioning")
 
     logger.info("Testing on off cluster")

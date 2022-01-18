@@ -21,6 +21,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     ### MANDATORY Attributes
     ### Attribute[  0]: Type  =======================================
     - label: "2: read the RO mandatory attribute default: Type"
@@ -38,7 +42,7 @@ tests:
       arguments:
           value: 250
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO mandatory attribute: Type"
       command: "readAttribute"
@@ -64,7 +68,7 @@ tests:
       arguments:
           value: 128
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO mandatory attribute: ConfigStatus"
       command: "readAttribute"
@@ -91,7 +95,7 @@ tests:
       arguments:
           value: 128
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO mandatory attribute: OperationalStatus"
       command: "readAttribute"
@@ -117,7 +121,7 @@ tests:
       arguments:
           value: 250
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO mandatory attribute: EndProductType"
       command: "readAttribute"
@@ -142,8 +146,6 @@ tests:
       attribute: "Mode"
       arguments:
           value: 8
-      response:
-          error: 0
 
     - label: "3b: reads back the RW mandatory attribute: Mode"
       command: "readAttribute"
@@ -160,7 +162,7 @@ tests:
       attribute: "TargetPositionLiftPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -172,7 +174,7 @@ tests:
       arguments:
           value: 20000
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute:
@@ -181,7 +183,7 @@ tests:
       attribute: "TargetPositionLiftPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               notValue: 20000
 
     ### Attribute[ 12]: TargetPositionTiltPercent100ths  ====================
@@ -192,7 +194,7 @@ tests:
       attribute: "TargetPositionTiltPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -204,7 +206,7 @@ tests:
       arguments:
           value: 20000
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute:
@@ -213,7 +215,7 @@ tests:
       attribute: "TargetPositionTiltPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               notValue: 20000
 
     ### Attribute[ 14]: CurrentPositionLiftPercent100ths  ====================
@@ -224,7 +226,7 @@ tests:
       attribute: "CurrentPositionLiftPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -236,7 +238,7 @@ tests:
       arguments:
           value: 20000
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute:
@@ -245,7 +247,7 @@ tests:
       attribute: "CurrentPositionLiftPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               notValue: 20000
 
     ### Attribute[ 15]: CurrentPositionTiltPercent100ths  ====================
@@ -256,7 +258,7 @@ tests:
       attribute: "CurrentPositionTiltPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               minValue: 0
               maxValue: 10000
 
@@ -268,7 +270,7 @@ tests:
       arguments:
           value: 20000
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute:
@@ -277,7 +279,7 @@ tests:
       attribute: "CurrentPositionTiltPercent100ths"
       response:
           constraints:
-              type: uint16
+              type: Percent100ths
               notValue: 20000
 
     ### Attribute[ 16]: InstalledOpenLimitLift  ====================
@@ -298,7 +300,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO optional attribute: InstalledOpenLimitLift"
       command: "readAttribute"
@@ -328,7 +330,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute: InstalledClosedLimitLift"
@@ -358,7 +360,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO optional attribute: InstalledOpenLimitTilt"
       command: "readAttribute"
@@ -388,7 +390,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute: InstalledClosedLimitTilt"
@@ -417,7 +419,7 @@ tests:
       arguments:
           value: 4096
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO mandatory attribute: SafetyStatus"
       command: "readAttribute"
@@ -448,7 +450,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: PhysicalClosedLimitLift"
       disabled: true
@@ -481,7 +483,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: PhysicalClosedLimitTilt"
       disabled: true
@@ -510,7 +512,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: CurrentPositionLift"
       command: "readAttribute"
@@ -538,7 +540,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: CurrentPositionTilt"
       command: "readAttribute"
@@ -569,7 +571,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: NumberOfActuationsLift"
       disabled: true
@@ -601,7 +603,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: NumberOfActuationsTilt"
       disabled: true
@@ -621,7 +623,7 @@ tests:
       attribute: "CurrentPositionLiftPercentage"
       response:
           constraints:
-              type: uint8
+              type: Percent
               minValue: 0
               maxValue: 100
 
@@ -633,7 +635,7 @@ tests:
       arguments:
           value: 200
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "5b: reads back the RO optional attribute:
@@ -642,7 +644,7 @@ tests:
       attribute: "CurrentPositionLiftPercentage"
       response:
           constraints:
-              type: uint8
+              type: Percent
               notValue: 200
 
     ### Attribute[  9]: CurrentPositionTiltPercentage  ====================
@@ -653,7 +655,7 @@ tests:
       attribute: "CurrentPositionTiltPercentage"
       response:
           constraints:
-              type: uint8
+              type: Percent
               minValue: 0
               maxValue: 100
 
@@ -665,7 +667,7 @@ tests:
       arguments:
           value: 200
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "5b: reads back the RO optional attribute:
@@ -674,7 +676,7 @@ tests:
       attribute: "CurrentPositionTiltPercentage"
       response:
           constraints:
-              type: uint8
+              type: Percent
               notValue: 200
     ###################################################
     # FYI Non Tested deprecated attributes

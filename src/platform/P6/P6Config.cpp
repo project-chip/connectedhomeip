@@ -57,9 +57,6 @@ const P6Config::Key P6Config::kConfigKey_HardwareVersion     = { kConfigNamespac
 const P6Config::Key P6Config::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
 const P6Config::Key P6Config::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
 const P6Config::Key P6Config::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
-const P6Config::Key P6Config::kConfigKey_RegulatoryLocation  = { kConfigNamespace_ChipConfig, "regulatory-location" };
-const P6Config::Key P6Config::kConfigKey_CountryCode         = { kConfigNamespace_ChipConfig, "country-code" };
-const P6Config::Key P6Config::kConfigKey_Breadcrumb          = { kConfigNamespace_ChipConfig, "breadcrumb" };
 
 // Keys stored in the chip-config namespace
 const P6Config::Key P6Config::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
@@ -70,6 +67,21 @@ const P6Config::Key P6Config::kConfigKey_GroupKeyIndex      = { kConfigNamespace
 const P6Config::Key P6Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace_ChipConfig, "last-ek-id" };
 const P6Config::Key P6Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const P6Config::Key P6Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
+const P6Config::Key P6Config::kConfigKey_RegulatoryLocation = { kConfigNamespace_ChipConfig, "regulatory-location" };
+const P6Config::Key P6Config::kConfigKey_CountryCode        = { kConfigNamespace_ChipConfig, "country-code" };
+const P6Config::Key P6Config::kConfigKey_ActiveLocale       = { kConfigNamespace_ChipConfig, "active-locale" };
+const P6Config::Key P6Config::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const P6Config::Key P6Config::kConfigKey_HourFormat         = { kConfigNamespace_ChipConfig, "hour-format" };
+const P6Config::Key P6Config::kConfigKey_CalendarType       = { kConfigNamespace_ChipConfig, "calendar-type" };
+const P6Config::Key P6Config::kConfigKey_WiFiSSID           = { kConfigNamespace_ChipConfig, "wifi-ssid" };
+const P6Config::Key P6Config::kConfigKey_WiFiPassword       = { kConfigNamespace_ChipConfig, "wifi-password" };
+const P6Config::Key P6Config::kConfigKey_WiFiSecurity       = { kConfigNamespace_ChipConfig, "wifi-security" };
+const P6Config::Key P6Config::kConfigKey_WiFiMode           = { kConfigNamespace_ChipConfig, "wifimode" };
+
+// Keys stored in the Chip-counters namespace
+const P6Config::Key P6Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
+const P6Config::Key P6Config::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
+const P6Config::Key P6Config::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters, "total-hours" };
 
 // Prefix used for keys that contain Chip group encryption keys.
 const char P6Config::kGroupKeyNamePrefix[] = "gk-";
@@ -204,9 +216,10 @@ bool P6Config::ConfigValueExists(Key key)
 // Clear out keys in config namespace
 CHIP_ERROR P6Config::FactoryResetConfig(void)
 {
-    const Key * config_keys[] = { &kConfigKey_FabricId,      &kConfigKey_ServiceConfig,     &kConfigKey_PairedAccountId,
-                                  &kConfigKey_ServiceId,     &kConfigKey_GroupKeyIndex,     &kConfigKey_LastUsedEpochKeyId,
-                                  &kConfigKey_FailSafeArmed, &kConfigKey_WiFiStationSecType };
+    const Key * config_keys[] = { &kConfigKey_FabricId,      &kConfigKey_ServiceConfig,      &kConfigKey_PairedAccountId,
+                                  &kConfigKey_ServiceId,     &kConfigKey_GroupKeyIndex,      &kConfigKey_LastUsedEpochKeyId,
+                                  &kConfigKey_FailSafeArmed, &kConfigKey_WiFiStationSecType, &kConfigKey_WiFiSSID,
+                                  &kConfigKey_WiFiPassword,  &kConfigKey_WiFiSecurity,       &kConfigKey_WiFiMode };
 
     for (uint32_t i = 0; i < (sizeof(config_keys) / sizeof(config_keys[0])); i++)
     {

@@ -39,7 +39,7 @@ limitations under the License.
     <item value="1" name="interrupted"/>
   </enum>
 
-  <enum name="ActionStatusEnum" type="ENUM8">
+  <enum name="ActionStateEnum" type="ENUM8">
     <cluster code="0x0025"/>
     <item value="0" name="Inactive"/>
     <item value="1" name="Active"/>
@@ -72,7 +72,7 @@ limitations under the License.
     <item name="Type"              type="ActionTypeEnum"/>
     <item name="EndpointListID"    type="INT16U"/>
     <item name="SupportedCommands" type="INT16U"/>
-    <item name="Status"            type="ActionStatusEnum"/>
+    <item name="Status"            type="ActionStateEnum"/>
   </struct>
 
   <struct name="EndpointListStruct">
@@ -171,6 +171,21 @@ limitations under the License.
       <arg name="InvokeID" type="INT32U" optional="true"/>
       <arg name="Duration" type="INT32U"/>
     </command>
+
+    <event side="server" code="0x00" priority="info" name="StateChanged" optional="false">
+      <description>This event SHALL be generated when there is a change in the Status of an ActionID.</description>
+      <field id="0" name="ActionID" type="INT16U" />
+      <field id="1" name="InvokeID" type="INT32U" />
+      <field id="2" name="NewState" type="ActionStateEnum" />
+    </event>
+
+    <event side="server" code="0x01" priority="info" name="ActionFailed" optional="false">
+      <description>This event SHALL be generated when there is some error which prevents the action from its normal planned execution.</description>
+      <field id="0" name="ActionID" type="INT16U" />
+      <field id="1" name="InvokeID" type="INT32U" />
+      <field id="2" name="NewState" type="ActionStateEnum" />
+      <field id="3" name="Error"    type="ActionErrorEnum" />
+    </event>
 
   </cluster>
 </configurator>

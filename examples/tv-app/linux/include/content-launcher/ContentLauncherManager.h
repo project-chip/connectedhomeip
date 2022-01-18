@@ -18,27 +18,24 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
-#include <app/AttributeAccessInterface.h>
+#include <app/clusters/content-launch-server/content-launch-server.h>
 
-#include <lib/core/CHIPError.h>
-#include <list>
-#include <string>
-#include <vector>
-struct ContentLaunchResponse
-{
-    EmberAfContentLaunchStatus status;
-    std::string data;
-};
-
-class ContentLauncherManager
+class ContentLauncherManager : public chip::app::Clusters::ContentLauncher::Delegate
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR proxyGetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR proxyGetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder);
-    ContentLaunchResponse proxyLaunchContentRequest(std::list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                    std::string data);
-    ContentLaunchResponse proxyLaunchUrlRequest(std::string contentUrl, std::string displayString,
-                                                ContentLaunchBrandingInformation brandingInformation);
+    ContentLauncherManager(chip::EndpointId endpointId) : mEndpointId(endpointId) {}
+
+    void
+    HandleLaunchContent(const std::list<Parameter> & parameterList, bool autoplay, const chip::CharSpan & data,
+                        chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> &
+                            responser) override;
+    void HandleLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                         const std::list<BrandingInformation> & brandingInformation,
+                         chip::app::CommandResponseHelper<chip::app::Clusters::ContentLauncher::Commands::LaunchResponse::Type> &
+                             responser) override;
+    CHIP_ERROR HandleGetAcceptHeaderList(chip::app::AttributeValueEncoder & aEncoder) override;
+    uint32_t HandleGetSupportedStreamingProtocols() override;
+
+private:
+    chip::EndpointId mEndpointId;
 };

@@ -23,21 +23,26 @@
 #include "LEDWidget.h"
 #include "LightingManager.h"
 #include "ThreadUtil.h"
-#include <app/server/OnboardingCodesUtil.h>
-#include <app/server/Server.h>
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/server/Dnssd.h>
+#include <app/server/OnboardingCodesUtil.h>
+#include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
-
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-
-#include <platform/CHIPDeviceLayer.h>
-
 #include <lib/support/ErrorStr.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <system/SystemClock.h>
+
+#if CONFIG_CHIP_OTA_REQUESTOR
+#include <app/clusters/ota-requestor/BDXDownloader.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
+#include <platform/GenericOTARequestorDriver.h>
+#include <platform/nrfconnect/OTAImageProcessorImpl.h>
+#endif
 
 #include <dk_buttons_and_leds.h>
 #include <logging/log.h>
@@ -45,10 +50,14 @@
 
 LOG_MODULE_DECLARE(app);
 
+using namespace ::chip::Credentials;
+using namespace ::chip::DeviceLayer;
+
 namespace {
 
 constexpr int kFactoryResetTriggerTimeout      = 3000;
 constexpr int kFactoryResetCancelWindowTimeout = 3000;
+constexpr int kExtDiscoveryTimeoutSecs         = 20;
 constexpr int kAppEventQueueSize               = 10;
 constexpr int kExampleVendorID                 = 0xabcd;
 constexpr uint8_t kButtonPushEvent             = 1;
@@ -65,10 +74,14 @@ bool sIsThreadProvisioned = false;
 bool sIsThreadEnabled     = false;
 bool sHaveBLEConnections  = false;
 
-} // namespace
+#if CONFIG_CHIP_OTA_REQUESTOR
+GenericOTARequestorDriver sOTARequestorDriver;
+OTAImageProcessorImpl sOTAImageProcessor;
+chip::BDXDownloader sBDXDownloader;
+chip::OTARequestor sOTARequestor;
+#endif
 
-using namespace ::chip::Credentials;
-using namespace ::chip::DeviceLayer;
+} // namespace
 
 AppTask AppTask::sAppTask;
 
@@ -115,11 +128,28 @@ int AppTask::Init()
     ConfigurationMgr().LogDeviceConfig();
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));
 
+#if defined(CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY)
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(kExtDiscoveryTimeoutSecs);
+#endif
+
 #if defined(CONFIG_CHIP_NFC_COMMISSIONING)
     PlatformMgr().AddEventHandler(ChipEventHandler, 0);
 #endif
 
+    InitOTARequestor();
+
     return 0;
+}
+
+void AppTask::InitOTARequestor()
+{
+#if CONFIG_CHIP_OTA_REQUESTOR
+    sOTAImageProcessor.SetOTADownloader(&sBDXDownloader);
+    sBDXDownloader.SetImageProcessorDelegate(&sOTAImageProcessor);
+    sOTARequestorDriver.Init(&sOTARequestor, &sOTAImageProcessor);
+    sOTARequestor.Init(&chip::Server::GetInstance(), &sOTARequestorDriver, &sBDXDownloader);
+    chip::SetRequestorInstance(&sOTARequestor);
+#endif
 }
 
 int AppTask::StartApp()

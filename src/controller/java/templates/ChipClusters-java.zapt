@@ -19,27 +19,44 @@ public class ChipClusters {
     /** Indicates a successful read for a CHAR_STRING attribute. */
     void onSuccess(String value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public interface OctetStringAttributeCallback {
     /** Indicates a successful read for an OCTET_STRING attribute. */
     void onSuccess(byte[] value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public interface IntegerAttributeCallback {
     void onSuccess(int value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public interface LongAttributeCallback {
     void onSuccess(long value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public interface BooleanAttributeCallback {
     void onSuccess(boolean value);
     void onError(Exception error);
+    default void onSubscriptionEstablished() {}
+  }
+
+  public interface FloatAttributeCallback {
+    void onSuccess(float value);
+    void onError(Exception error);
+    default void onSubscriptionEstablished() {}
+  }
+
+  public interface DoubleAttributeCallback {
+    void onSuccess(double value);
+    void onError(Exception error);
+    default void onSubscriptionEstablished() {}
   }
 
   public static abstract class BaseChipCluster {
@@ -66,27 +83,32 @@ public class ChipClusters {
 
   {{#chip_client_clusters}}
   public static class {{asUpperCamelCase name}}Cluster extends BaseChipCluster {
+    public static final long CLUSTER_ID = {{code}}L;
+
     public {{asUpperCamelCase name}}Cluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);
-    }
-
-    public static long clusterId() {
-      return Long.parseUnsignedLong("{{code}}");
     }
 
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
   {{#chip_cluster_commands}}
 
+    {{#unless mustUseTimedInvoke}}
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
-      {{#chip_cluster_command_arguments_with_structs_expanded}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}}) {
-      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
+      {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}) {
+      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}, {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}, null);
     }
+    {{/unless}}
 
+    public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
+      {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}, int timedInvokeTimeoutMs) {
+      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}, {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}, timedInvokeTimeoutMs);
+    }
   {{/chip_cluster_commands}}
   {{#chip_cluster_commands}}
     private native void {{asLowerCamelCase name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} Callback
-      {{#chip_cluster_command_arguments_with_structs_expanded}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
+      {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}
+      , @Nullable Integer timedInvokeTimeoutMs);
   {{/chip_cluster_commands}}
   {{#chip_cluster_responses}}
     public interface {{asUpperCamelCase name}}Callback {
@@ -98,6 +120,8 @@ public class ChipClusters {
   {{/chip_cluster_responses}}
 
   {{#chip_server_cluster_attributes}}
+  {{! TODO: Add support for struct-typed attributes }}
+  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
   {{#if isList}}
   {{#if isStruct}}
     public static class {{asUpperCamelCase name}}Attribute {
@@ -195,16 +219,21 @@ public class ChipClusters {
       public interface {{asUpperCamelCase name}}AttributeCallback {
         void onSuccess(List<{{#>list_attribute_callback_type}}{{/list_attribute_callback_type}}> valueList);
         void onError(Exception ex);
+        default void onSubscriptionEstablished() {}
       }
     {{else}}
       public interface {{asUpperCamelCase name}}AttributeCallback {
         void onSuccess({{#>list_attribute_callback_type}}{{/list_attribute_callback_type}} value);
         void onError(Exception ex);
+        default void onSubscriptionEstablished() {}
       }
     {{/if}}
   {{/if_in_global_responses}}
+  {{/unless}}
   {{/chip_server_cluster_attributes}}
   {{#chip_server_cluster_attributes}}
+  {{! TODO: Add support for struct-typed attributes }}
+  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
     public void read{{asUpperCamelCase name}}Attribute(
     {{#if_in_global_responses}}
@@ -218,26 +247,36 @@ public class ChipClusters {
   {{#if isWritableAttribute}}
   {{! TODO: Lists not supported in attribute writes yet. }}
   {{#unless isList}}
-
+    {{#unless mustUseTimedWrite}}
     public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback{{>java_type_for_argument}} value) {
-      write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value);
+      write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value, null);
+    }
+    {{/unless}}
+
+    public void write{{asUpperCamelCase name}}Attribute(DefaultClusterCallback callback{{>java_type_for_argument}} value, int timedWriteTimeoutMs) {
+      write{{asUpperCamelCase name}}Attribute(chipClusterPtr, callback, value, timedWriteTimeoutMs);
     }
   {{/unless}}
   {{/if}}
   {{#if isReportableAttribute}}
   {{#unless isList}}
-    public void subscribe{{asCamelCased name false}}Attribute(DefaultClusterCallback callback, int minInterval, int maxInterval) {
+    public void subscribe{{asCamelCased name false}}Attribute(
+      {{#if_in_global_responses}}
+        {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+      {{else}}
+        {{asUpperCamelCase name}}AttributeCallback callback
+      {{/if_in_global_responses}},
+      int minInterval, int maxInterval) {
       subscribe{{asCamelCased name false}}Attribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void report{{asCamelCased name false}}Attribute({{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback) {
-      report{{asCamelCased name false}}Attribute(chipClusterPtr, callback);
     }
   {{/unless}}
   {{/if}}
+  {{/unless}}
   {{/chip_server_cluster_attributes}}
   {{#chip_server_cluster_attributes}}
-  
+  {{! TODO: Add support for struct-typed attributes }}
+  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
+
     private native void read{{asUpperCamelCase name}}Attribute(long chipClusterPtr,
       {{#if_in_global_responses}}
         {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
@@ -249,16 +288,20 @@ public class ChipClusters {
   {{! TODO: Lists not supported in attribute writes yet. }}
   {{#unless isList}}
 
-    private native void write{{asUpperCamelCase name}}Attribute(long chipClusterPtr, DefaultClusterCallback callback{{>java_type_for_argument}} value);
+    private native void write{{asUpperCamelCase name}}Attribute(long chipClusterPtr, DefaultClusterCallback callback{{>java_type_for_argument}} value, @Nullable Integer timedWriteTimeoutMs);
   {{/unless}}
   {{/if}}
   {{#if isReportableAttribute}}
   {{#unless isList}}
-    private native void subscribe{{asCamelCased name false}}Attribute(long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
-
-    private native void report{{asCamelCased name false}}Attribute(long chipClusterPtr, {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback);
+    private native void subscribe{{asCamelCased name false}}Attribute(long chipClusterPtr,
+      {{#if_in_global_responses}}
+        {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
+      {{else}}
+        {{asUpperCamelCase name}}AttributeCallback callback
+      {{/if_in_global_responses}}, int minInterval, int maxInterval);
   {{/unless}}
   {{/if}}
+  {{/unless}}
   {{/chip_server_cluster_attributes}}
   }
   {{#not_last}}

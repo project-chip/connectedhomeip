@@ -12,13 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: 24.5.1. [TC-LVL-5.1] Stop Verification (DUT as Server)
+name: 24.5.1. [TC-LVL-5.1] Step Verification (DUT as Server)
 
 config:
     cluster: "Level Control"
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Sending on command"
       cluster: "On/Off"
       command: "on"
@@ -28,9 +32,9 @@ tests:
       arguments:
           values:
               - name: "stepMode"
-                value: 0
+                value: 1
               - name: "stepSize"
-                value: 128
+                value: 126
               - name: "transitionTime"
                 value: 20
               - name: "optionMask"
@@ -46,26 +50,26 @@ tests:
               - name: "ms"
                 value: 3000
 
-    #Disabling as current level value read was returning null on darwin build.
     - label: "Reads current level attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "current level"
       response:
           value: 128
 
-    - label: "Sends a move up command to DUT"
-      command: "Move"
+    - label: "Sends step down command to DUT"
+      command: "Step"
       arguments:
           values:
-              - name: "moveMode"
-                value: 0
-              - name: "rate"
+              - name: "stepMode"
                 value: 1
+              - name: "stepSize"
+                value: 64
+              - name: "transitionTime"
+                value: 20
               - name: "optionMask"
-                value: 1
+                value: 0
               - name: "optionOverride"
-                value: 1
+                value: 0
 
     - label: "Wait 3000ms"
       cluster: "DelayCommands"
@@ -75,22 +79,61 @@ tests:
               - name: "ms"
                 value: 3000
 
-    - label: "Sends stop command to DUT"
-      command: "Stop"
+    - label: "Reads current level attribute from DUT"
+      command: "readAttribute"
+      attribute: "current level"
+      response:
+          value: 64
+
+    - label: "Sends a Step up command"
+      command: "Step"
       arguments:
           values:
+              - name: "stepMode"
+                value: 0
+              - name: "stepSize"
+                value: 64
+              - name: "transitionTime"
+                value: 20
               - name: "optionMask"
                 value: 0
               - name: "optionOverride"
                 value: 0
 
-    #Disabling as current level value read was inconsistent when running test case multiple times.
+    - label: "Wait 3000ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 3000
+
     - label: "Reads current level attribute from DUT"
-      disabled: true
       command: "readAttribute"
       attribute: "current level"
       response:
-          value: 133
+          value: 128
+
+    - label: "Reset level to 254"
+      command: "MoveToLevel"
+      arguments:
+          values:
+              - name: "level"
+                value: 254
+              - name: "transitionTime"
+                value: 0
+              - name: "optionMask"
+                value: 1
+              - name: "optionOverride"
+                value: 1
+
+    - label: "Wait 100ms"
+      cluster: "DelayCommands"
+      command: "WaitForMs"
+      arguments:
+          values:
+              - name: "ms"
+                value: 100
 
     - label: "Sending off command"
       cluster: "On/Off"

@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file implements an object for a Matter User Directed Commissioning unsolicitied
+ *      This file implements an object for a Matter User Directed Commissioning unsolicited
  *      recipient (server).
  *
  */
@@ -47,8 +47,8 @@ void UserDirectedCommissioningServer::OnMessageReceived(const Transport::PeerAdd
     PayloadHeader payloadHeader;
     ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
-    char instanceName[Dnssd::Commissionable::kInstanceNameMaxLength + 1];
-    size_t instanceNameLength = std::min<size_t>(msg->DataLength(), Dnssd::Commissionable::kInstanceNameMaxLength);
+    char instanceName[Dnssd::Commission::kInstanceNameMaxLength + 1];
+    size_t instanceNameLength = std::min<size_t>(msg->DataLength(), Dnssd::Commission::kInstanceNameMaxLength);
     msg->Read(Uint8::from_char(instanceName), instanceNameLength);
 
     instanceName[instanceNameLength] = '\0';
@@ -144,9 +144,12 @@ void UserDirectedCommissioningServer::OnCommissionableNodeFound(const Dnssd::Dis
             client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
         }
 
-        // client->SetPeerAddress(chip::Transport::PeerAddress::UDP(nodeData.ipAddress[0], nodeData.port));
         client->SetDeviceName(nodeData.deviceName);
         client->SetLongDiscriminator(nodeData.longDiscriminator);
+        client->SetVendorId(nodeData.vendorId);
+        client->SetProductId(nodeData.productId);
+        client->SetDeviceName(nodeData.deviceName);
+        client->SetRotatingId(nodeData.rotatingId);
 
         // Call the registered mUserConfirmationProvider, if any.
         if (mUserConfirmationProvider != nullptr)
@@ -170,8 +173,13 @@ void UserDirectedCommissioningServer::PrintUDCClients()
             char addrBuffer[chip::Transport::PeerAddress::kMaxToStringSize];
             state->GetPeerAddress().ToString(addrBuffer);
 
-            ChipLogProgress(AppServer, "UDC Client[%d] instance=%s deviceName=%s address=%s, disc=%d", i, state->GetInstanceName(),
-                            state->GetDeviceName(), addrBuffer, state->GetLongDiscriminator());
+            char rotatingIdString[chip::Dnssd::kMaxRotatingIdLen * 2 + 1] = "";
+            Encoding::BytesToUppercaseHexString(state->GetRotatingId(), chip::Dnssd::kMaxRotatingIdLen, rotatingIdString,
+                                                sizeof(rotatingIdString));
+
+            ChipLogProgress(AppServer, "UDC Client[%d] instance=%s deviceName=%s address=%s, vid/pid=%d/%d disc=%d rid=%s", i,
+                            state->GetInstanceName(), state->GetDeviceName(), addrBuffer, state->GetVendorId(),
+                            state->GetProductId(), state->GetLongDiscriminator(), rotatingIdString);
         }
     }
 }

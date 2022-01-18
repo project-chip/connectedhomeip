@@ -55,7 +55,8 @@ public:
 
     CHIP_ERROR add(const uint8_t value);
 
-    int size() const;
+    uint8_t * data() { return mData; }
+    size_t size() const;
     uint8_t operator[](int index) const;
 
     Iterator begin() const;
@@ -84,9 +85,9 @@ inline CHIP_ERROR GeneralFaults<N>::add(const uint8_t value)
 }
 
 template <size_t N>
-inline int GeneralFaults<N>::size() const
+inline size_t GeneralFaults<N>::size() const
 {
-    return mSize;
+    return static_cast<size_t>(mSize);
 }
 
 template <size_t N>

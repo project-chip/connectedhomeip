@@ -121,10 +121,6 @@ if (NOT CHIP_LIBRARIES)
     set(CHIP_LIBRARIES -lCHIP)
 endif()
 
-if (CONFIG_CHIP_PW_RPC)
-    list(APPEND CHIP_LIBRARIES -lPwRpc)
-endif()
-
 # Set up CHIP project configuration file
 
 if (CONFIG_CHIP_PROJECT_CONFIG)
@@ -180,10 +176,6 @@ find_package(Python3 REQUIRED)
 # Generate configuration for CHIP GN build system
 # ==============================================================================
 
-if (CONFIG_CHIP_PW_RPC)
-    chip_gn_arg_import("${GN_ROOT_TARGET}/lib/pw_rpc/pw_rpc.gni")
-endif()
-
 chip_gn_arg_cflags("target_cflags"                          ${CHIP_CFLAGS})
 chip_gn_arg_cflags("target_cflags_c"                        ${CHIP_CFLAGS_C})
 chip_gn_arg_cflags("target_cflags_cc"                       ${CHIP_CFLAGS_CC})
@@ -193,6 +185,7 @@ chip_gn_arg_string("zephyr_cxx"                             ${CMAKE_CXX_COMPILER
 chip_gn_arg_bool  ("is_debug"                               CONFIG_DEBUG)
 chip_gn_arg_bool  ("chip_logging"                           CONFIG_LOG)
 chip_gn_arg_bool  ("chip_enable_openthread"                 CONFIG_NET_L2_OPENTHREAD)
+chip_gn_arg_bool  ("chip_openthread_ftd"                    CONFIG_OPENTHREAD_FTD)
 chip_gn_arg_bool  ("chip_config_network_layer_ble"          CONFIG_BT)
 chip_gn_arg_bool  ("chip_inet_config_enable_ipv4"           CONFIG_NET_IPV4)
 chip_gn_arg_bool  ("chip_enable_nfc"                        CONFIG_CHIP_NFC_COMMISSIONING)
@@ -201,7 +194,11 @@ chip_gn_arg_bool  ("chip_build_tests"                       CONFIG_CHIP_BUILD_TE
 chip_gn_arg_bool  ("chip_monolithic_tests"                  CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_inet_config_enable_tcp_endpoint"   CONFIG_CHIP_BUILD_TESTS)
 chip_gn_arg_bool  ("chip_build_libshell"                    CONFIG_CHIP_LIB_SHELL)
-chip_gn_arg_bool  ("chip_build_pw_rpc_lib"                  CONFIG_CHIP_PW_RPC)
+
+if (CONFIG_CHIP_ROTATING_DEVICE_ID)
+    chip_gn_arg_bool  ("chip_enable_rotating_device_id"          "true")
+    chip_gn_arg_bool  ("chip_enable_additional_data_advertising" "true")
+endif()
 
 if (CONFIG_CHIP_ENABLE_DNSSD_SRP)
     chip_gn_arg_string("chip_mdns" "platform")

@@ -36,8 +36,9 @@ CHIP_ERROR IOContext::Init()
 
     InitNetwork();
 
-    mSystemLayer = &gSystemLayer;
-    mInetLayer   = &gInet;
+    mSystemLayer        = &gSystemLayer;
+    mTCPEndPointManager = &gTCP;
+    mUDPEndPointManager = &gUDP;
 
     return err;
 }
@@ -56,8 +57,8 @@ CHIP_ERROR IOContext::Shutdown()
 
 void IOContext::DriveIO()
 {
-    // Set the select timeout to 100ms
-    constexpr uint32_t kSleepTimeMilliseconds = 100;
+    // Set the select timeout to 10ms
+    constexpr uint32_t kSleepTimeMilliseconds = 10;
     ServiceEvents(kSleepTimeMilliseconds);
 }
 

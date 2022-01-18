@@ -31,9 +31,6 @@
 namespace chip {
 namespace TestCerts {
 
-using namespace chip::Credentials;
-using namespace chip::ASN1;
-
 // clang-format off
 extern const uint8_t gTestCerts[] = {
     TestCert::kRoot01,

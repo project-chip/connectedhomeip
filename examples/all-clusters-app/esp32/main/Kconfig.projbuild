@@ -40,7 +40,7 @@ menu "Demo"
             bool "M5Stack"
             depends on IDF_TARGET_ESP32
         config DEVICE_TYPE_ESP32_C3_DEVKITM
-            bool "EXP32C3-DevKitM"
+            bool "ESP32C3-DevKitM"
             depends on IDF_TARGET_ESP32C3
     endchoice
 

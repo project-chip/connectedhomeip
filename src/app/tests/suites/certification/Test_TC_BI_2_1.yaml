@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Read mandatory non-global attribute: OutOfService"
       command: "readAttribute"
       attribute: "out of service"
@@ -90,7 +94,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back the mandatory non-global attribute: StatusFlags"
       command: "readAttribute"
@@ -99,6 +103,7 @@ tests:
           value: 0
 
     #Issue #11142 Disabled all optional attribute checks
+    #disabled due to issue #13442
     - label: "Read optional non-global attribute: ActiveText"
       disabled: true
       command: "readAttribute"
@@ -214,7 +219,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back the optional non-global attribute: Polarity"
       disabled: true
@@ -273,7 +278,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back the optional non-global attribute: ApplicationType"
       disabled: true

@@ -62,13 +62,6 @@
 #endif // BUILD_RELEASE
 
 /**
- * CHIP_DEVICE_CONFIG_THREAD_FTD
- *
- * Disable Full Thread Device features
- */
-#define CHIP_DEVICE_CONFIG_THREAD_FTD 1
-
-/**
  * CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID
  *
  * 0x235A: Chip's Vendor Id.
@@ -116,13 +109,6 @@
  * using the CHIP Time Sync protocol.
  */
 //#define CHIP_DEVICE_CONFIG_ENABLE_CHIP_TIME_SERVICE_TIME_SYNC 1
-
-/**
- * CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS
- *
- * Enable recording UTC timestamps.
- */
-#define CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS 1
 
 /**
  * CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE

@@ -25,27 +25,34 @@ class Esp32Board(Enum):
     DevKitC = auto()
     M5Stack = auto()
     C3DevKit = auto()
+    QEMU = auto()
 
 
 class Esp32App(Enum):
     ALL_CLUSTERS = auto()
+    LIGHT = auto()
     LOCK = auto()
     SHELL = auto()
     BRIDGE = auto()
     TEMPERATURE_MEASUREMENT = auto()
+    TESTS = auto()
 
     @property
-    def ExampleName(self):
+    def ExamplePath(self):
         if self == Esp32App.ALL_CLUSTERS:
-            return 'all-clusters-app'
+            return 'examples/all-clusters-app'
+        elif self == Esp32App.LIGHT:
+            return 'examples/lighting-app'
         elif self == Esp32App.LOCK:
-            return 'lock-app'
+            return 'examples/lock-app'
         elif self == Esp32App.SHELL:
-            return 'shell'
+            return 'examples/shell'
         elif self == Esp32App.BRIDGE:
-            return 'bridge-app'
+            return 'examples/bridge-app'
         elif self == Esp32App.TEMPERATURE_MEASUREMENT:
-            return 'temperature-measurement-app'
+            return 'examples/temperature-measurement-app'
+        elif self == Esp32App.TESTS:
+            return 'src/test_driver'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -53,6 +60,8 @@ class Esp32App(Enum):
     def AppNamePrefix(self):
         if self == Esp32App.ALL_CLUSTERS:
             return 'chip-all-clusters-app'
+        elif self == Esp32App.LIGHT:
+            return 'chip-lighting-app'
         elif self == Esp32App.LOCK:
             return 'chip-lock-app'
         elif self == Esp32App.SHELL:
@@ -61,15 +70,33 @@ class Esp32App(Enum):
             return 'chip-bridge-app'
         elif self == Esp32App.TEMPERATURE_MEASUREMENT:
             return 'chip-temperature-measurement-app'
+        elif self == Esp32App.TESTS:
+            return None
         else:
             raise Exception('Unknown app type: %r' % self)
 
+    @property
     def FlashBundleName(self):
+        if not self.AppNamePrefix:
+            return None
+
         return self.AppNamePrefix + '.flashbundle.txt'
+
+    def IsCompatible(self, board: Esp32Board):
+        if board == Esp32Board.QEMU:
+            return self == Esp32App.TESTS
+        elif board == Esp32Board.M5Stack:
+            return self == Esp32App.ALL_CLUSTERS
+        elif board == Esp32Board.C3DevKit:
+            return self == Esp32App.ALL_CLUSTERS
+        else:
+            return (board == Esp32Board.DevKitC) and (self != Esp32App.TESTS)
 
 
 def DefaultsFileName(board: Esp32Board, app: Esp32App, enable_rpcs: bool):
-    if app != Esp32App.ALL_CLUSTERS:
+    if app == Esp32App.TESTS:
+        return 'sdkconfig_qemu.defaults'
+    elif app != Esp32App.ALL_CLUSTERS:
         return 'sdkconfig.defaults'
 
     rpc = "_rpc" if enable_rpcs else ""
@@ -99,6 +126,10 @@ class Esp32Builder(Builder):
         self.enable_rpcs = enable_rpcs
         self.enable_ipv4 = enable_ipv4
 
+        if not app.IsCompatible(board):
+            raise Exception(
+                "Incompatible app/board combination: %r and %r", app, board)
+
     def _IdfEnvExecute(self, cmd, title=None):
         # Run activate.sh after export.sh to ensure using the chip environment.
         self._Execute(
@@ -107,7 +138,7 @@ class Esp32Builder(Builder):
 
     @property
     def ExamplePath(self):
-        return os.path.join('examples', self.app.ExampleName, 'esp32')
+        return os.path.join(self.app.ExamplePath, 'esp32')
 
     def generate(self):
         if os.path.exists(os.path.join(self.output_dir, 'build.ninja')):
@@ -162,6 +193,16 @@ class Esp32Builder(Builder):
         self._IdfEnvExecute(cmd, title='Building ' + self.identifier)
 
     def build_outputs(self):
+        if self.app == Esp32App.TESTS:
+            # Include the runnable image names as artifacts
+            result = dict()
+            with open(os.path.join(self.output_dir, 'test_images.txt'), 'rt') as f:
+                for name in f.readlines():
+                    name = name.strip()
+                    result[name] = os.path.join(self.output_dir, name)
+
+            return result
+
         return {
             self.app.AppNamePrefix + '.elf':
                 os.path.join(self.output_dir, self.app.AppNamePrefix + '.elf'),
@@ -170,7 +211,10 @@ class Esp32Builder(Builder):
         }
 
     def flashbundle(self):
-        with open(os.path.join(self.output_dir, self.app.FlashBundleName()), 'r') as fp:
+        if not self.app.FlashBundleName:
+            return {}
+
+        with open(os.path.join(self.output_dir, self.app.FlashBundleName), 'r') as fp:
             return {
                 l.strip(): os.path.join(self.output_dir, l.strip()) for l in fp.readlines() if l.strip()
             }

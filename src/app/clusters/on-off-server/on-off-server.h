@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
@@ -44,14 +45,15 @@ public:
 
     static OnOffServer & Instance();
 
-    bool offCommand();
-    bool onCommand();
-    bool toggleCommand();
+    bool offCommand(const chip::app::ConcreteCommandPath & commandPath);
+    bool onCommand(const chip::app::ConcreteCommandPath & commandPath);
+    bool toggleCommand(const chip::app::ConcreteCommandPath & commandPath);
     void initOnOffServer(chip::EndpointId endpoint);
-    bool offWithEffectCommand(uint8_t effectId, uint8_t effectVariant);
-    bool OnWithRecallGlobalSceneCommand();
-    bool OnWithTimedOffCommand(chip::BitFlags<chip::app::Clusters::OnOff::OnOffControl> onOffControl, uint16_t onTime,
-                               uint16_t offWaitTime);
+    bool offWithEffectCommand(const chip::app::ConcreteCommandPath & commandPath,
+                              const chip::app::Clusters::OnOff::Commands::OffWithEffect::DecodableType & commandData);
+    bool OnWithRecallGlobalSceneCommand(const chip::app::ConcreteCommandPath & commandPath);
+    bool OnWithTimedOffCommand(const chip::app::ConcreteCommandPath & commandPath,
+                               const chip::app::Clusters::OnOff::Commands::OnWithTimedOff::DecodableType & commandData);
     void updateOnOffTimeCommand(chip::EndpointId endpoint);
     EmberAfStatus setOnOffValue(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange);
 
@@ -60,14 +62,14 @@ private:
      * Functions Definitions
      *********************************************************/
 
-#ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
-    bool areStartUpOnOffServerAttributesTokenized(chip::EndpointId endpoint);
-#endif // ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+#ifndef IGNORE_ON_OFF_CLUSTER_START_UP_ON_OFF
+    bool areStartUpOnOffServerAttributesNonVolatile(chip::EndpointId endpoint);
+#endif
     EmberEventControl * getEventControl(chip::EndpointId endpoint);
     EmberEventControl * configureEventControl(chip::EndpointId endpoint);
 
     /**********************************************************
-     * Attributes Decleration
+     * Attributes Declaration
      *********************************************************/
 
     static OnOffServer instance;
@@ -80,15 +82,27 @@ struct OnOffEffect
 
     chip::EndpointId mEndpoint;
     OffWithEffectTriggerCommand mOffWithEffectTrigger = nullptr;
-    uint8_t mEffectIdentifier;
+    chip::app::Clusters::OnOff::OnOffEffectIdentifier mEffectIdentifier;
     uint8_t mEffectVariant;
-    bool mActive = false;
+    OnOffEffect * nextEffect = nullptr;
 
     OnOffEffect(
         chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
-        uint8_t effectIdentifier = static_cast<uint8_t>(EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF),
+        chip::app::Clusters::OnOff::OnOffEffectIdentifier effectIdentifier = EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF,
+
+        /*
+         * effectVariant's type depends on the effect effectIdentifier so we don't know the type at compile time.
+         * Casting to uint8_t for more flexibility since the type can be OnOffDelayedAllOffEffectVariant or
+         * OnOffDelayedAllOffEffectVariant
+         */
         uint8_t effectVariant = static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS));
     ~OnOffEffect();
+
+    bool hasNext() { return this->nextEffect != nullptr; }
+
+    OnOffEffect * next() { return this->nextEffect; }
+
+    void setNext(OnOffEffect * inst) { this->nextEffect = inst; }
 };
 
 /**********************************************************

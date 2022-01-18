@@ -20,20 +20,6 @@
 
 namespace chip {
 
-class DLL_EXPORT SessionCreationDelegate
-{
-public:
-    virtual ~SessionCreationDelegate() {}
-
-    /**
-     * @brief
-     *   Called when a new session is being established
-     *
-     * @param session   The handle to the secure session
-     */
-    virtual void OnNewSession(SessionHandle session) = 0;
-};
-
 class DLL_EXPORT SessionReleaseDelegate
 {
 public:
@@ -45,7 +31,22 @@ public:
      *
      * @param session   The handle to the secure session
      */
-    virtual void OnSessionReleased(SessionHandle session) = 0;
+    virtual void OnSessionReleased() = 0;
+};
+
+class DLL_EXPORT SessionRecoveryDelegate
+{
+public:
+    virtual ~SessionRecoveryDelegate() {}
+
+    /**
+     * @brief
+     *   Called when the first message delivery in a session failed,
+     *   so actions aiming to recover connection can be performed.
+     *
+     * @param session   The handle to the secure session
+     */
+    virtual void OnFirstMessageDeliveryFailed(const SessionHandle & session) = 0;
 };
 
 } // namespace chip

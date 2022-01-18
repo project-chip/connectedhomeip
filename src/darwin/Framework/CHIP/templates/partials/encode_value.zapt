@@ -18,25 +18,25 @@
       we are right now it may not (e.g. for a nullable list we're
       inside an "else" block here).  }}
   {
-    using ListType = std::remove_reference_t<decltype({{target}})>;
-    using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+    using ListType_{{depth}} = std::remove_reference_t<decltype({{target}})>;
+    using ListMemberType_{{depth}} = ListMemberTypeGetter<ListType_{{depth}}>::Type;
     if ({{source}}.count != 0) {
-      auto * listHolder_{{depth}} = new ListHolder<ListMemberType>({{source}}.count);
+      auto * listHolder_{{depth}} = new ListHolder<ListMemberType_{{depth}}>({{source}}.count);
       if (listHolder_{{depth}} == nullptr || listHolder_{{depth}}->mList == nullptr) {
         {{errorCode}}
       }
       listFreer.add(listHolder_{{depth}});
-      for (size_t i = 0; i < {{source}}.count; ++i) {
-        if (![{{source}}[i] isKindOfClass:[{{asObjectiveCClass type cluster forceNotList=true}} class]]) {
+      for (size_t i_{{depth}} = 0; i_{{depth}} < {{source}}.count; ++i_{{depth}}) {
+        if (![{{source}}[i_{{depth}}] isKindOfClass:[{{asObjectiveCClass type cluster forceNotList=true}} class]]) {
           // Wrong kind of value.
           {{errorCode}}
         }
-        auto element_{{depth}} = ({{asObjectiveCClass type cluster forceNotList=true}} *){{source}}[i];
-        {{>encode_value target=(concat "listHolder_" depth "->mList[i]") source=(concat "element_" depth) cluster=cluster errorCode=errorCode depth=(incrementDepth depth) isArray=false}}
+        auto element_{{depth}} = ({{asObjectiveCClass type cluster forceNotList=true}} *){{source}}[i_{{depth}}];
+        {{>encode_value target=(concat "listHolder_" depth "->mList[i_" depth "]") source=(concat "element_" depth) cluster=cluster errorCode=errorCode depth=(incrementDepth depth) isArray=false}}
       }
-      {{target}} = ListType(listHolder_{{depth}}->mList, {{source}}.count);
+      {{target}} = ListType_{{depth}}(listHolder_{{depth}}->mList, {{source}}.count);
     } else {
-      {{target}} = ListType();
+      {{target}} = ListType_{{depth}}();
     }
   }
 {{else if (isOctetString type)}}

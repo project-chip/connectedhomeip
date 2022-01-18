@@ -19,11 +19,26 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "read the global attribute: ClusterRevision"
       command: "readAttribute"
       attribute: "ClusterRevision"
       response:
           value: 4
+
+    - label: "Read the global attribute constraints: ClusterRevision"
+      command: "readAttribute"
+      attribute: "ClusterRevision"
+      response:
+          constraints:
+              type: uint16
 
     - label:
           "write the default values to mandatory global attribute:
@@ -33,7 +48,7 @@ tests:
       arguments:
           value: 3
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "reads back global attribute: ClusterRevision"
       command: "readAttribute"
@@ -41,11 +56,59 @@ tests:
       response:
           value: 4
 
+    #issue #11053 disabled steps below Global attributes missing from YAML framework
+    - label: "Read the global attribute: AttributeList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: CommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "CommandList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: EventList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "EventList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: ClientGeneratedCommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ClientGeneratedCommandList"
+      response:
+          constraints:
+              type: list
+
+    - label: "Read the global attribute: ServerGeneratedCommandList"
+      disabled: true
+      command: "readAttribute"
+      attribute: "ServerGeneratedCommandList"
+      response:
+          constraints:
+              type: list
+
     - label: "read the optional global attribute: FeatureMap"
       command: "readAttribute"
       attribute: "FeatureMap"
       response:
           value: 0
+
+    - label: "Read the optional global attribute : FeatureMap"
+      command: "readAttribute"
+      attribute: "FeatureMap"
+      response:
+          constraints:
+              type: map32
 
     - label: "write the default values to optional global attribute: FeatureMap"
       command: "writeAttribute"
@@ -53,7 +116,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "reads back optional global attribute: FeatureMap"
       command: "readAttribute"

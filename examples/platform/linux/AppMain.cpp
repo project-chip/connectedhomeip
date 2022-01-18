@@ -22,6 +22,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <lib/core/CHIPError.h>
@@ -54,6 +55,7 @@
 #include <CommonRpc.h>
 #endif
 
+#include "AppMain.h"
 #include "Options.h"
 
 using namespace chip;
@@ -68,13 +70,13 @@ using chip::Shell::Engine;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 /*
- * The device shall check every kWifiStartCheckTimeUsec whether Wi-Fi management
- * has been fully initialized. If after kWifiStartCheckAttempts Wi-Fi management
+ * The device shall check every kWiFiStartCheckTimeUsec whether Wi-Fi management
+ * has been fully initialized. If after kWiFiStartCheckAttempts Wi-Fi management
  * still hasn't been initialized, the device configuration is reset, and device
  * needs to be paired again.
  */
-static constexpr useconds_t kWifiStartCheckTimeUsec = 100 * 1000; // 100 ms
-static constexpr uint8_t kWifiStartCheckAttempts    = 5;
+static constexpr useconds_t kWiFiStartCheckTimeUsec = 100 * 1000; // 100 ms
+static constexpr uint8_t kWiFiStartCheckAttempts    = 5;
 #endif
 
 namespace {
@@ -89,16 +91,16 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-static bool EnsureWifiIsStarted()
+static bool EnsureWiFiIsStarted()
 {
-    for (int cnt = 0; cnt < kWifiStartCheckAttempts; cnt++)
+    for (int cnt = 0; cnt < kWiFiStartCheckAttempts; cnt++)
     {
         if (chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted())
         {
             return true;
         }
 
-        usleep(kWifiStartCheckTimeUsec);
+        usleep(kWiFiStartCheckTimeUsec);
     }
 
     return chip::DeviceLayer::ConnectivityMgrImpl().IsWiFiManagementStarted();
@@ -151,7 +153,7 @@ int ChipLinuxAppInit(int argc, char ** argv)
     if (LinuxDeviceOptions::GetInstance().mWiFi)
     {
         chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
-        if (!EnsureWifiIsStarted())
+        if (!EnsureWiFiIsStarted())
         {
             ChipLogError(NotSpecified, "Wi-Fi Management taking too long to start - device configuration will be reset.");
         }
@@ -222,8 +224,8 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(gFabricStorage.Initialize(&gServerStorage));
 
     factoryParams.fabricStorage = &gFabricStorage;
-    // use a different listen port for the commissioner.
-    factoryParams.listenPort              = LinuxDeviceOptions::GetInstance().securedCommissionerPort;
+    // use a different listen port for the commissioner than the default used by chip-tool.
+    factoryParams.listenPort              = LinuxDeviceOptions::GetInstance().securedCommissionerPort + 10;
     params.storageDelegate                = &gServerStorage;
     params.deviceAddressUpdateDelegate    = nullptr;
     params.operationalCredentialsDelegate = &gOpCredsIssuer;
@@ -234,7 +236,9 @@ CHIP_ERROR InitCommissioner()
     ReturnErrorOnFailure(gCommissioner.SetUdcListenPort(LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort));
 
     // Initialize device attestation verifier
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier());
+    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
@@ -272,6 +276,122 @@ CHIP_ERROR ShutdownCommissioner()
     return CHIP_NO_ERROR;
 }
 
+class PairingCommand : public chip::Controller::DevicePairingDelegate, public chip::Controller::DeviceAddressUpdateDelegate
+{
+    /////////// DevicePairingDelegate Interface /////////
+    void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
+    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingDeleted(CHIP_ERROR error) override;
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
+
+    /////////// DeviceAddressUpdateDelegate Interface /////////
+    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
+
+    CHIP_ERROR UpdateNetworkAddress();
+};
+
+PairingCommand gPairingCommand;
+NodeId gRemoteId = kTestDeviceNodeId;
+
+CHIP_ERROR PairingCommand::UpdateNetworkAddress()
+{
+    ChipLogProgress(AppServer, "Mdns: Updating NodeId: %" PRIx64 " ...", gRemoteId);
+    return gCommissioner.UpdateDevice(gRemoteId);
+}
+
+void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
+{
+    ChipLogProgress(AppServer, "OnAddressUpdateComplete: %s", ErrorStr(err));
+}
+
+void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
+{
+    switch (status)
+    {
+    case DevicePairingDelegate::Status::SecurePairingSuccess:
+        ChipLogProgress(AppServer, "Secure Pairing Success");
+        break;
+    case DevicePairingDelegate::Status::SecurePairingFailed:
+        ChipLogError(AppServer, "Secure Pairing Failed");
+        break;
+    }
+}
+
+void PairingCommand::OnPairingComplete(CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Pairing Success");
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "Pairing Failure: %s", ErrorStr(err));
+        // For some devices, it may take more time to appear on the network and become discoverable
+        // over DNS-SD, so don't give up on failure and restart the address update. Note that this
+        // will not be repeated endlessly as each chip-tool command has a timeout (in the case of
+        // the `pairing` command it equals 120s).
+        // UpdateNetworkAddress();
+    }
+}
+
+void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Pairing Deleted Success");
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "Pairing Deleted Failure: %s", ErrorStr(err));
+    }
+}
+
+void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Device commissioning completed with success");
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "Device commissioning Failure: %s", ErrorStr(err));
+    }
+}
+
+CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, chip::Transport::PeerAddress address)
+{
+    RendezvousParameters params = RendezvousParameters().SetSetupPINCode(pincode).SetDiscriminator(disc).SetPeerAddress(address);
+
+    gCommissioner.RegisterDeviceAddressUpdateDelegate(&gPairingCommand);
+    gCommissioner.RegisterPairingDelegate(&gPairingCommand);
+    gCommissioner.PairDevice(gRemoteId, params);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index)
+{
+    UDCClientState * state = gCommissioner.GetUserDirectedCommissioningServer()->GetUDCClients().GetUDCClientState(index);
+    if (state == nullptr)
+    {
+        ChipLogProgress(AppServer, "udc client[%ld] null \r\n", index);
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
+    else
+    {
+        Transport::PeerAddress peerAddress = state->GetPeerAddress();
+
+        state->SetUDCClientProcessingState(UDCClientProcessingState::kCommissioningNode);
+
+        return CommissionerPairOnNetwork(pincode, state->GetLongDiscriminator(), peerAddress);
+    }
+}
+
+DeviceCommissioner * GetDeviceCommissioner()
+{
+    return &gCommissioner;
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 void ChipLinuxAppMainLoop()
@@ -283,7 +403,7 @@ void ChipLinuxAppMainLoop()
     uint16_t securePort   = CHIP_PORT;
     uint16_t unsecurePort = CHIP_UDC_PORT;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE || CHIP_DEVICE_ENABLE_PORT_PARAMS
     // use a different service port to make testing possible with other sample devices running on same host
     securePort   = LinuxDeviceOptions::GetInstance().securedDevicePort;
     unsecurePort = LinuxDeviceOptions::GetInstance().unsecuredCommissionerPort;
@@ -305,9 +425,11 @@ void ChipLinuxAppMainLoop()
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();
 #if defined(ENABLE_CHIP_SHELL)
-    chip::Shell::RegisterControllerCommands(&gCommissioner);
+    chip::Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    ApplicationInit();
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

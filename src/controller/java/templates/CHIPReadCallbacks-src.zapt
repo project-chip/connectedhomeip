@@ -4,13 +4,15 @@
 
 #include <zap-generated/CHIPClientCallbacks.h>
 
+#include <jni.h>
 #include <lib/support/JniReferences.h>
 #include <lib/support/JniTypeWrappers.h>
-#include <jni.h>
 #include <lib/support/CodeUtils.h>
 #include <platform/PlatformManager.h>
 
 {{#chip_server_global_responses}}
+{{! TODO: Add support for struct-typed attributes }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
 CHIP{{chipCallback.name}}AttributeCallback::CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -78,10 +80,13 @@ void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{ch
     env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
     {{/if}}
 }
+{{/unless}}
 {{/chip_server_global_responses}}
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
+{{! TODO: Add support for struct-typed attributes }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
 {{! NOTE: Some of our helpers rely on broken ZAP APIs that sniff for "isArray"
     when we are just trying to work with the type of an array element.  Fix
@@ -181,7 +186,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         {{/if}}
 
         {{#if isOptional}}
-        {{chipType}} {{asLowerCamelCase name}}Value;
+        {{zapTypeToDecodableClusterObjectType type forceNotOptional=true forceNotNullable=true ns=parent.parent.name}} {{asLowerCamelCase name}}Value;
         {{#if isNullable}}
         {{asLowerCamelCase name}}HasValue = entry.{{asLowerCamelCase name}}.HasValue();
         if ({{asLowerCamelCase name}}HasValue) {
@@ -201,7 +206,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
 
         {{#unless isOptional}}
         {{#unless isNullable}}
-        {{chipType}} {{asLowerCamelCase name}}Value = entry.{{asLowerCamelCase name}};
+        {{zapTypeToDecodableClusterObjectType type ns=parent.parent.name}} {{asLowerCamelCase name}}Value = entry.{{asLowerCamelCase name}};
         {{/unless}}
         {{/unless}}
 
@@ -265,13 +270,13 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         bool entryNull = false;
         {{#unless isStruct}}
         {{#if isNullable}}
-        {{chipType}} entryValue;
+        {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotList=true}} entryValue;
         entryNull = entry.IsNull();
         if (!entryNull) {
             entryValue = entry.Value();
         }
         {{else}}
-        {{chipType}} entryValue = entry;
+        {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotList=true}} entryValue = entry;
         {{/if}}
         {{/unless}}
 
@@ -335,12 +340,13 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#if isArray}}{{else if isStruct}}{{else if isOptional}}Ljava/util/Optional;{{else if (isOctetString type)}}[B{{else if (isCharString type)}}Ljava/lang/String;{{else}}{{asJniSignature type true}}{{/if}})V", &javaMethod);
         VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
 
-        {{>decode_value source="value" target="javaValue"}}
+        {{>decode_value source="value" target="javaValue" cluster=parent.name}}
 
         env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
     }
   {{/if_in_global_responses}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 

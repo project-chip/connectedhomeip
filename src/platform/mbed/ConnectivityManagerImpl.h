@@ -94,7 +94,7 @@ private:
     ::chip::DeviceLayer::Internal::WiFiAuthSecurityType NsapiToNetworkSecurity(nsapi_security_t nsapi_security);
 
     void ExecuteStationChange(void);
-    static void OnWifiStationChange(intptr_t arg);
+    static void OnWiFiStationChange(intptr_t arg);
     // ===== Members for internal use by the following friends.
 
     friend ConnectivityManager & ConnectivityMgr(void);
@@ -107,7 +107,7 @@ private:
     System::Clock::Timeout mWiFiStationReconnectInterval =
         System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
     System::Clock::Timeout mWiFiAPIdleTimeout = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_AP_IDLE_TIMEOUT);
-    WiFiInterface * mWifiInterface            = nullptr;
+    WiFiInterface * mWiFiInterface            = nullptr;
     nsapi_security_t mSecurityType            = NSAPI_SECURITY_WPA_WPA2;
     bool mIsProvisioned                       = false;
     Inet::IPAddress mIp4Address               = Inet::IPAddress::Any;

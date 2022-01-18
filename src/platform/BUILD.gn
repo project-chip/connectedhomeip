@@ -25,7 +25,7 @@ import("device.gni")
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
 
-  if (chip_device_platform == "linux" || chip_device_platform == "Darwin") {
+  if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
     import("//build_overrides/ot_br_posix.gni")
   }
 }
@@ -47,11 +47,14 @@ if (chip_device_platform != "none") {
     # Time the firmware was built.
     chip_device_config_firmware_build_time = ""
 
+    # Use OpenThread ftd or mtd library
+    chip_device_config_thread_ftd = chip_openthread_ftd
+
     # By pass provision and secure session
     chip_bypass_rendezvous = false
 
     # Enable including the additional data in the advertisement packets
-    chip_enable_additional_data_advertising = true
+    chip_enable_additional_data_advertising = false
 
     # Enable adding optional rotating device id to the additional data.
     chip_enable_rotating_device_id = false
@@ -95,6 +98,7 @@ if (chip_device_platform != "none") {
     defines = [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA=${chip_device_config_enable_wpa}",
       "CHIP_ENABLE_OPENTHREAD=${chip_enable_openthread}",
+      "CHIP_DEVICE_CONFIG_THREAD_FTD=${chip_device_config_thread_ftd}",
       "CHIP_WITH_GIO=${chip_with_gio}",
       "OPENTHREAD_CONFIG_ENABLE_TOBLE=false",
       "CHIP_DEVICE_CONFIG_ENABLE_DNSSD=${chip_device_config_enable_dnssd}",
@@ -259,6 +263,7 @@ if (chip_device_platform != "none") {
       "../include/platform/CHIPDeviceLayer.h",
       "../include/platform/ConfigurationManager.h",
       "../include/platform/ConnectivityManager.h",
+      "../include/platform/DeviceControlServer.h",
       "../include/platform/GeneralUtils.h",
       "../include/platform/KeyValueStoreManager.h",
       "../include/platform/PersistedStorage.h",
@@ -266,7 +271,6 @@ if (chip_device_platform != "none") {
       "../include/platform/ThreadStackManager.h",
       "../include/platform/internal/BLEManager.h",
       "../include/platform/internal/CHIPDeviceLayerInternal.h",
-      "../include/platform/internal/DeviceControlServer.h",
       "../include/platform/internal/DeviceNetworkInfo.h",
       "../include/platform/internal/DeviceNetworkProvisioning.h",
       "../include/platform/internal/EventLogging.h",
@@ -291,6 +295,13 @@ if (chip_device_platform != "none") {
       "PersistedStorage.cpp",
       "PlatformEventSupport.cpp",
     ]
+
+    if (chip_enable_ota_requestor) {
+      sources += [
+        "GenericOTARequestorDriver.cpp",
+        "GenericOTARequestorDriver.h",
+      ]
+    }
 
     cflags = [ "-Wconversion" ]
 

@@ -114,6 +114,18 @@ public:
     CHIP_ERROR GetExtendedPanId(uint8_t (&aExtendedPanId)[kSizeExtendedPanId]) const;
 
     /**
+     * This method returns a const ByteSpan to the extended PAN ID in the dataset.
+     * This can be used to pass the extended PAN ID to a cluster command without the use of external memory.
+     *
+     * @param[out]  span  A reference to receive the location of the extended PAN ID.
+     *
+     * @retval CHIP_NO_ERROR                    Successfully retrieved the extended PAN ID.
+     * @retval CHIP_ERROR_TLV_TAG_NOT_FOUND     Thread extended PAN ID is not present in the dataset.
+     *
+     */
+    CHIP_ERROR GetExtendedPanIdAsByteSpan(ByteSpan & span) const;
+
+    /**
      * This method sets Thread extended PAN ID to the dataset.
      *
      * @param[in]   aExtendedPanId  The Thread extended PAN ID.

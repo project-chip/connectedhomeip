@@ -201,6 +201,14 @@ function convertCTypeToJniSignature(cType, useBoxedTypes)
     return 'Ljava/lang/Integer;';
   case 'Long':
     return 'Ljava/lang/Long;';
+  case 'double':
+    return 'D';
+  case 'Double':
+    return 'Ljava/lang/Double;';
+  case 'float':
+    return 'F';
+  case 'Float':
+    return 'Ljava/lang/Float;';
   default:
     error = 'Unhandled Java type ' + javaType + ' for C type ' + cType;
     throw error;

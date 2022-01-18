@@ -93,11 +93,32 @@ def runArgumentsParser():
     return (zap_file, zcl_file, templates_file, output_dir)
 
 
+def extractGeneratedIdl(output_dir, zap_config_path):
+    """Find a file Clusters.matter in the output directory and
+       place it along with the input zap file.
+
+       Intent is to make the "zap content" more humanly understandable.
+    """
+    idl_path = os.path.join(output_dir, "Clusters.matter")
+    if not os.path.exists(idl_path):
+        return
+
+    target_path = zap_config_path.replace(".zap", ".matter")
+    if not target_path.endswith(".matter"):
+        # We expect "something.zap" and don't handle corner cases of
+        # multiple extensions. This is to work with existing codebase only
+        raise Error("Unexpected input zap file  %s" % self.zap_config)
+
+    os.rename(idl_path, target_path)
+
+
 def runGeneration(zap_file, zcl_file, templates_file, output_dir):
     generator_dir = getDirPath('third_party/zap/repo')
     os.chdir(generator_dir)
     subprocess.check_call(['node', './src-script/zap-generate.js', '-z',
                           zcl_file, '-g', templates_file, '-i', zap_file, '-o', output_dir])
+
+    extractGeneratedIdl(output_dir, zap_file)
 
 
 def runClangPrettifier(templates_file, output_dir):
@@ -146,23 +167,6 @@ def runJavaPrettifier(templates_file, output_dir):
         print('google-java-format error:', err)
 
 
-def runPythonPrettifier(templates_file, output_dir):
-    try:
-        jsonData = json.loads(Path(templates_file).read_text())
-        outputs = [(os.path.join(output_dir, template['output']))
-                   for template in jsonData['templates']]
-        pyOutputs = list(
-            filter(lambda filepath: os.path.splitext(filepath)[1] == ".py", outputs))
-
-        if not pyOutputs:
-            return
-        args = ['autopep8', '--in-place']
-        args.extend(pyOutputs)
-        subprocess.check_call(args)
-    except Exception as err:
-        print('autopep8 error:', err)
-
-
 def main():
     checkPythonVersion()
 
@@ -172,7 +176,6 @@ def main():
     prettifiers = [
         runClangPrettifier,
         runJavaPrettifier,
-        runPythonPrettifier,
     ]
 
     for prettifier in prettifiers:

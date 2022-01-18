@@ -56,11 +56,23 @@ public:
 
     System::Clock::Timestamp GetStartTime() { return mStartTime; }
 
+    void HandleGeneralFault(uint32_t EventId);
+    void HandleSoftwareFault(uint32_t EventId);
+    void HandleSwitchEvent(uint32_t EventId);
+
 private:
     // ===== Methods that implement the PlatformManager abstract interface.
 
     CHIP_ERROR _InitChipStack();
     CHIP_ERROR _Shutdown();
+    CHIP_ERROR
+    _GetFixedLabelList(EndpointId endpoint,
+                       AttributeList<app::Clusters::FixedLabel::Structs::LabelStruct::Type, kMaxFixedLabels> & labelList);
+    CHIP_ERROR _SetUserLabelList(EndpointId endpoint,
+                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR _GetUserLabelList(EndpointId endpoint,
+                                 AttributeList<app::Clusters::UserLabel::Structs::LabelStruct::Type, kMaxUserLabels> & labelList);
+    CHIP_ERROR _GetSupportedLocales(AttributeList<chip::CharSpan, kMaxLanguageTags> & supportedLocales);
 
     // ===== Members for internal use by the following friends.
 

@@ -22,11 +22,11 @@ limitations under the License.
     <code>0x0028</code>
     <define>BASIC_CLUSTER</define>
     <description>Attributes for determining basic information about a device, and setting user device information such as location.</description>
-    <globalAttribute side="either" code="0xFFFD" value="3"/>
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
 
     <attribute side="server" code="0"  define="INTERACTION_MODEL_VERSION" type="int16u"                                 default="1"                                >InteractionModelVersion</attribute>
     <attribute side="server" code="1"  define="VENDOR_NAME"               type="char_string"               length="32"                                             >VendorName</attribute>
-    <attribute side="server" code="2"  define="VENDOR_ID"                 type="int16u"                                                                            >VendorID</attribute>
+    <attribute side="server" code="2"  define="VENDOR_ID"                 type="vendor_id"                                                                            >VendorID</attribute>
     <attribute side="server" code="3"  define="PRODUCT_NAME"              type="char_string"               length="32"                                             >ProductName</attribute>
     <attribute side="server" code="4"  define="PRODUCT_ID"                type="int16u"                                                                            >ProductID</attribute>
     <attribute side="server" code="5"  define="NODE_LABEL"                type="char_string"               length="32"  default=""  writable="true"                >NodeLabel</attribute>
@@ -44,21 +44,11 @@ limitations under the License.
     <attribute side="server" code="17" define="REACHABLE"                 type="boolean"                                default="1"                 optional="true">Reachable</attribute>
     <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                              optional="true">UniqueID</attribute>
 
-    <command source="server" code="0x00" name="StartUp">
-      <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
-    </command>
-    <command source="server" code="0x01" name="ShutDown">
-      <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>
-    </command>
-    <command source="server" code="0x02" name="Leave">
-      <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
-    </command>
-
     <event side="server" code="0x00" name="StartUp" priority="critical" optional="false">
       <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
       <field id="0" name="SoftwareVersion" type="INT32U"/>
     </event>
-    <event side="server" code="0x01" name="ShutDown" priority="info" optional="false">
+    <event side="server" code="0x01" name="ShutDown" priority="critical" optional="false">
       <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>
     </event>
     <event side="server" code="0x02" name="Leave" priority="info" optional="false">

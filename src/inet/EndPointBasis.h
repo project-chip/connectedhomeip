@@ -25,30 +25,55 @@
 #pragma once
 
 #include <inet/InetConfig.h>
+#include <lib/core/ReferenceCounted.h>
 #include <lib/support/DLLUtil.h>
 
 namespace chip {
+
+namespace System {
+class Layer;
+} // namespace System
+
 namespace Inet {
 
-class InetLayer;
+template <typename EndPointType>
+class EndPointManager;
+
+template <typename EndPointType>
+class EndPointDeletor;
 
 /**
  * Basis of internet transport endpoint classes.
  */
-class DLL_EXPORT EndPointBase
+template <typename EndPointType>
+class DLL_EXPORT EndPointBasis : public ReferenceCounted<EndPointType, EndPointDeletor<EndPointType>>
 {
 public:
-    EndPointBase(InetLayer & aInetLayer, void * aAppState = nullptr) : mAppState(aAppState), mInetLayer(aInetLayer) {}
+    using EndPoint = EndPointType;
+
+    EndPointBasis(EndPointManager<EndPoint> & endPointManager) : mAppState(nullptr), mEndPointManager(endPointManager) {}
 
     /**
-     *  Returns a reference to the Inet layer object that owns this basis object.
+     *  Returns a reference to the endpoint fatory that owns this basis object.
      */
-    InetLayer & Layer() const { return mInetLayer; }
+    EndPointManager<EndPoint> & GetEndPointManager() const { return mEndPointManager; }
+
+    /**
+     *  Returns a reference to the System::Layer associated with this object.
+     */
+    chip::System::Layer & GetSystemLayer() const { return mEndPointManager.SystemLayer(); }
 
     void * mAppState;
 
 private:
-    InetLayer & mInetLayer; /**< InetLayer object that owns this object. */
+    EndPointManager<EndPoint> & mEndPointManager; /**< Factory that owns this object. */
+};
+
+template <typename EndPointType>
+class EndPointDeletor
+{
+public:
+    static void Release(EndPointType * obj) { obj->GetEndPointManager().DeleteEndPoint(obj); }
 };
 
 } // namespace Inet

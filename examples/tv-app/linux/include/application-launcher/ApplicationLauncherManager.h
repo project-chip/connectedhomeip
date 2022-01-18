@@ -18,15 +18,20 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
-#include <lib/core/CHIPError.h>
+#include <app/clusters/application-launcher-server/application-launcher-delegate.h>
+#include <list>
 
-#include <string>
-#include <vector>
-
-class ApplicationLauncherManager
+class ApplicationLauncherManager : public chip::app::Clusters::ApplicationLauncher::Delegate
 {
 public:
-    CHIP_ERROR Init();
-    CHIP_ERROR proxyGetApplicationList(chip::app::AttributeValueEncoder & aEncoder);
+    chip::app::Clusters::ApplicationLauncher::Structs::ApplicationEP::Type HandleGetCurrentApp() override;
+    std::list<uint16_t> HandleGetCatalogList() override;
+
+    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleLaunchApp(
+        const chip::CharSpan & data,
+        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
+    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleStopApp(
+        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
+    chip::app::Clusters::ApplicationLauncher::Commands::LauncherResponse::Type HandleHideApp(
+        const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApplication::Type & application) override;
 };

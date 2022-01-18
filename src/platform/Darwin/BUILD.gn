@@ -76,6 +76,14 @@ static_library("Darwin") {
 
   public_configs = [ ":darwin_config" ]
 
+  if (chip_enable_ota_requestor) {
+    sources += [
+      # using the implements from Linux platform
+      "../Linux/OTAImageProcessorImpl.cpp",
+      "../Linux/OTAImageProcessorImpl.h",
+    ]
+  }
+
   if (chip_enable_ble) {
     sources += [
       "BleApplicationDelegate.h",

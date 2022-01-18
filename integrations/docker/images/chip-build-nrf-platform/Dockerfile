@@ -2,7 +2,7 @@ ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION} as build
 
 # Compatible Nordic Connect SDK revision.
-ARG NCS_REVISION=ffcf07fe4586634a6793a48e5444a7196e7ebac6
+ARG NCS_REVISION=v1.8.0
 
 RUN set -x \
     && apt-get update \
@@ -29,7 +29,7 @@ WORKDIR /opt/NordicSemiconductor/nrfconnect
 RUN set -x \
     && python3 -m pip install -U --no-cache-dir \
     cmake==3.21.2 \
-    west==0.11.1 \
+    west==0.12.0 \
     && west init -m https://github.com/nrfconnect/sdk-nrf \
     && git -C nrf fetch origin "$NCS_REVISION" \
     && git -C nrf checkout FETCH_HEAD \

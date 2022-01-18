@@ -22,6 +22,7 @@
  */
 
 #include <lib/core/CHIPConfig.h>
+#include <lib/support/EnforceFormat.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <lib/support/logging/Constants.h>
 #include <platform/logging/LogV.h>
@@ -65,7 +66,7 @@ char logMsgBuffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
 /**
  * CHIP log output functions.
  */
-void LogV(const char * module, uint8_t category, const char * msg, va_list v)
+void ENFORCE_FORMAT(3, 0) LogV(const char * module, uint8_t category, const char * msg, va_list v)
 {
     size_t prefixLen = 0;
     snprintf(logMsgBuffer, sizeof(logMsgBuffer), "[%s]", module);
@@ -93,7 +94,7 @@ void LogV(const char * module, uint8_t category, const char * msg, va_list v)
 
 void mbed_logging_init()
 {
-    // Mbed trace initalization
+    // Mbed trace initialization
     mbed_trace_init();
     mbed_trace_include_filters_set((char *) TRACE_GROUP);
     mbed_trace_config_set(TRACE_ACTIVE_LEVEL_ALL | TRACE_MODE_COLOR);

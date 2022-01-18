@@ -26,9 +26,16 @@
 
 #include <type_traits>
 
+#include <app/CommandPathParams.h>
+#include <app/InteractionModelDelegate.h>
+#include <app/MessageDef/InvokeRequestMessage.h>
+#include <app/MessageDef/InvokeResponseMessage.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/core/Optional.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -37,19 +44,33 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
-
-#include <app/Command.h>
-#include <app/MessageDef/InvokeRequestMessage.h>
-#include <app/MessageDef/InvokeResponseMessage.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 #define COMMON_STATUS_SUCCESS 0
 
 namespace chip {
 namespace app {
 
-class CommandSender final : public Command, public Messaging::ExchangeDelegate
+class CommandSender final : public Messaging::ExchangeDelegate
 {
 public:
+    /*
+     * Destructor - as part of destruction, it will abort the exchange context
+     * if a valid one still exists.
+     *
+     * See Abort() for details on when that might occur.
+     */
+    virtual ~CommandSender() { Abort(); }
+
+    /**
+     * Gets the inner exchange context object, without ownership.
+     *
+     * @return The inner exchange context, might be nullptr if no
+     *         exchange context has been assigned or the context
+     *         has been released.
+     */
+    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+
     class Callback
     {
     public:
@@ -76,7 +97,7 @@ public:
         {}
 
         /**
-         * OnError will be called when an error occurr *after* a successful call to SendCommandRequest(). The following
+         * OnError will be called when an error occur *after* a successful call to SendCommandRequest(). The following
          * errors will be delivered through this call in the aError field:
          *
          * - CHIP_ERROR_TIMEOUT: A response was not received within the expected response timeout.
@@ -96,7 +117,7 @@ public:
         virtual void OnError(const CommandSender * apCommandSender, const StatusIB & aStatusIB, CHIP_ERROR aError) {}
 
         /**
-         * OnDone will be called when CommandSender has finished all work and is safe to destory and free the
+         * OnDone will be called when CommandSender has finished all work and is safe to destroy and free the
          * allocated CommandSender object.
          *
          * This function will:
@@ -116,7 +137,7 @@ public:
      *
      * The callback passed in has to outlive this CommandSender object.
      */
-    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr);
+    CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest = false);
     CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
     CHIP_ERROR FinishCommand(bool aEndDataStruct = true);
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
@@ -129,22 +150,61 @@ public:
      * @param [in] aCommandPath  The path of the command being requested.
      * @param [in] aData         The data for the request.
      */
-    template <typename CommandDataT>
+    template <typename CommandDataT, typename std::enable_if_t<!CommandDataT::MustUseTimedInvoke(), int> = 0>
     CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData)
+    {
+        return AddRequestData(aCommandPath, aData, NullOptional);
+    }
+
+    /**
+     * API for adding a data request that allows caller to provide a timed
+     * invoke timeout.  If provided, this invoke will be a timed invoke, using
+     * the minimum of the provided timeouts.
+     */
+    template <typename CommandDataT>
+    CHIP_ERROR AddRequestData(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                              const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+    {
+        VerifyOrReturnError(!CommandDataT::MustUseTimedInvoke() || aTimedInvokeTimeoutMs.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+
+        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
+    }
+
+    CHIP_ERROR FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs);
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    /**
+     * Version of AddRequestData that allows sending a message that is
+     * guaranteed to fail due to requiring a timed invoke but not providing a
+     * timeout parameter.  For use in tests only.
+     */
+    template <typename CommandDataT>
+    CHIP_ERROR AddRequestDataNoTimedCheck(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                                          const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+    {
+        return AddRequestDataInternal(aCommandPath, aData, aTimedInvokeTimeoutMs);
+    }
+#endif // CONFIG_IM_BUILD_FOR_UNIT_TEST
+
+private:
+    template <typename CommandDataT>
+    CHIP_ERROR AddRequestDataInternal(const CommandPathParams & aCommandPath, const CommandDataT & aData,
+                                      const Optional<uint16_t> & aTimedInvokeTimeoutMs)
     {
         ReturnErrorOnFailure(PrepareCommand(aCommandPath, /* aStartDataStruct = */ false));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
-        return FinishCommand(/* aEndDataStruct = */ false);
+        return FinishCommand(aTimedInvokeTimeoutMs);
     }
 
+public:
     // Sends a queued up command request to the target encapsulated by the secureSession handle.
     //
     // Upon successful return from this call, all subsequent errors that occur during this interaction
     // will be conveyed through the OnError callback above. In addition, upon completion of work regardless of
     // whether it was successful or not, the OnDone callback will be invoked to indicate completion of work on this
-    // object and to indicate to the application that it can destory and free this object.
+    // object and to indicate to the application that it can destroy and free this object.
     //
     // Applications can, however, destroy this object at any time after this call, except while handling
     // an OnResponse or OnError callback, and it will safely clean-up.
@@ -155,10 +215,24 @@ public:
     // Client can specify the maximum time to wait for response (in milliseconds) via timeout parameter.
     // Default timeout value will be used otherwise.
     //
-    CHIP_ERROR SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout = kImMessageTimeout);
+    CHIP_ERROR SendCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
     friend class TestCommandInteraction;
+
+    enum class State
+    {
+        Idle,                ///< Default state that the object starts out in, where no work has commenced
+        AddingCommand,       ///< In the process of adding a command.
+        AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
+        AwaitingTimedStatus, ///< Sent a Timed Request and waiting for response.
+        CommandSent,         ///< The command has been sent successfully.
+        ResponseReceived,    ///< Received a response to our invoke and request and processing the response.
+        AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
+    };
+
+    void MoveToState(const State aTargetState);
+    const char * GetStateStr() const;
 
     /*
      * Allocates a packet buffer used for encoding an invoke request payload.
@@ -182,15 +256,50 @@ private:
     //
     void Close();
 
+    /*
+     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() above. This can only
+     * arise due to application-initiated destruction of the object when this object is handling receiving/sending
+     * message payloads.
+     */
+    void Abort();
+
     CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse);
 
+    // Handle a message received when we are expecting a status response to a
+    // Timed Request.  The caller is assumed to have already checked that our
+    // exchange context member is the one the message came in on.
+    //
+    // aStatusIB will be populated with the returned status if we can parse it
+    // successfully.
+    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
+                                 StatusIB & aStatusIB);
+
+    // Send our queued-up Invoke Request message.  Assumes the exchange is ready
+    // and mPendingInvokeData is populated.
+    CHIP_ERROR SendInvokeRequest();
+
+    CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
+
+    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InvokeRequestMessage::Builder mInvokeRequestBuilder;
+    // TODO Maybe we should change PacketBufferTLVWriter so we can finalize it
+    // but have it hold on to the buffer, and get the buffer from it later.
+    // Then we could avoid this extra pointer-sized member.
+    System::PacketBufferHandle mPendingInvokeData;
+    // If mTimedInvokeTimeoutMs has a value, we are expected to do a timed
+    // invoke.
+    Optional<uint16_t> mTimedInvokeTimeoutMs;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
+
+    State mState = State::Idle;
+    chip::System::PacketBufferTLVWriter mCommandMessageWriter;
+    bool mBufferAllocated = false;
 };
 
 } // namespace app

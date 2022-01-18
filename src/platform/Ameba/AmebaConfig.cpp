@@ -72,7 +72,10 @@ const AmebaConfig::Key AmebaConfig::kConfigKey_OperationalDeviceICACerts   = { k
 const AmebaConfig::Key AmebaConfig::kConfigKey_OperationalDevicePrivateKey = { kConfigNamespace_ChipConfig, "op-device-key" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_RegulatoryLocation          = { kConfigNamespace_ChipConfig, "regulatory-location" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_CountryCode                 = { kConfigNamespace_ChipConfig, "country-code" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_ActiveLocale                = { kConfigNamespace_ChipConfig, "active-locale" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_Breadcrumb                  = { kConfigNamespace_ChipConfig, "breadcrumb" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_HourFormat                  = { kConfigNamespace_ChipConfig, "hour-format" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_CalendarType                = { kConfigNamespace_ChipConfig, "calendar-type" };
 
 // Keys stored in the Chip-counters namespace
 const AmebaConfig::Key AmebaConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
@@ -251,17 +254,7 @@ CHIP_ERROR AmebaConfig::ClearConfigValue(Key key)
 
 bool AmebaConfig::ConfigValueExists(Key key)
 {
-    int32_t exist;
-    CHIP_ERROR err;
-
-    exist = checkExist(key.Namespace, key.Name);
-
-    if (exist == 1)
-        err = CHIP_NO_ERROR;
-    else
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-
-    return (err == CHIP_NO_ERROR);
+    return checkExist(key.Namespace, key.Name);
 }
 
 CHIP_ERROR AmebaConfig::EnsureNamespace(const char * ns)

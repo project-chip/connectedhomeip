@@ -19,19 +19,25 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+    #Disabled due to issue-12983
     - label: "Read location"
+      disabled: true
       command: "readAttribute"
       attribute: "location"
       response:
-          value: ""
+          value: "XX"
 
     - label: "Write location"
       command: "writeAttribute"
       attribute: "location"
       arguments:
           value: "us"
-
+    #Disabled due to issue-12983
     - label: "Read back location"
+      disabled: true
       command: "readAttribute"
       attribute: "location"
       response:
@@ -42,3 +48,32 @@ tests:
       attribute: "location"
       arguments:
           value: ""
+
+    - label: "Read AttributeList value"
+      command: "readAttribute"
+      attribute: "AttributeList"
+      response:
+          value:
+              [
+                  0,
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  0xFFFB,
+                  0xFFFD,
+              ]

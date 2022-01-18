@@ -8,6 +8,8 @@ static_library("secure_channel") {
     "CASEServer.h",
     "CASESession.cpp",
     "CASESession.h",
+    "CASESessionCache.cpp",
+    "CASESessionCache.h",
     "PASESession.cpp",
     "PASESession.h",
     "RendezvousParameters.h",
@@ -27,5 +29,6 @@ static_library("secure_channel") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/system",
+    "${chip_root}/src/trace",
   ]
 }

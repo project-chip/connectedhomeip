@@ -22,6 +22,7 @@ import threading
 
 from enum import Enum, auto
 from dataclasses import dataclass
+from random import randrange
 
 TEST_NODE_ID = '0x12344321'
 
@@ -79,7 +80,6 @@ class ExecutionCapture:
 
 @dataclass
 class TestDefinition:
-    yaml_file: str
     name: str
     run_name: str
     target: TestTarget
@@ -102,9 +102,15 @@ class TestDefinition:
             if os.path.exists('/tmp/chip_tool_config.ini'):
                 os.unlink('/tmp/chip_tool_config.ini')
 
-            logging.debug('Executing application under test.')
+            # Remove server all_clusters_app or tv_app storage, so it will be commissionable again
+            if os.path.exists('/tmp/chip_kvs'):
+                os.unlink('/tmp/chip_kvs')
+
+            discriminator = str(randrange(1, 4096))
+            logging.debug(
+                'Executing application under test with discriminator %s.' % discriminator)
             app_process, outpipe, errpipe = runner.RunSubprocess(
-                app_cmd, name='APP ', wait=False)
+                app_cmd + ['--discriminator', discriminator], name='APP ', wait=False)
 
             logging.debug('Waiting for server to listen.')
             start_time = time.time()
@@ -117,8 +123,11 @@ class TestDefinition:
                 server_is_listening = outpipe.CapturedLogContains(
                     "Server Listening")
             logging.debug('Server is listening. Can proceed.')
+            qrLine = outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
+            if not qrLine:
+                raise Exception("Unable to find QR code")
 
-            runner.RunSubprocess(tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, 'MT:D8XA0CQM00KA0648G00'],
+            runner.RunSubprocess(tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, qrLine.group(1)],
                                  name='PAIR', dependencies=[app_process])
 
             runner.RunSubprocess(tool_cmd + ['tests', self.run_name, TEST_NODE_ID],

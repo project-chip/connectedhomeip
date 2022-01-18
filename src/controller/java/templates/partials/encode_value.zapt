@@ -3,9 +3,9 @@ chip::JniReferences::GetInstance().GetOptionalValue({{source}}, {{source}});
 {{/if}}
 {{#if isNullable}}
 {{#if_chip_enum type}}
-  decltype({{target}}) {{source}}Value;
+  decltype({{target}})::UnderlyingType {{source}}Value;
   if ({{source}} != nullptr) {
-    {{source}}Value = static_cast<decltype({{target}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}));
+    {{source}}Value = static_cast<decltype({{source}}Value)>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}));
   }
 {{else}}
 {{#if isArray}}
@@ -41,9 +41,9 @@ chip::JniReferences::GetInstance().GetOptionalValue({{source}}, {{source}});
 {{#*inline "value"}}
 {{! TODO Implement complex types parsing in order to properly set the request parameters }}
 {{#if isArray}}
-{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}()
+{{zapTypeToEncodableClusterObjectType type ns=cluster}}()
 {{else if isStruct}}
-{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}()
+{{zapTypeToEncodableClusterObjectType type ns=cluster}}()
 {{else if (isOctetString type)}}
 chip::JniByteArray(env, static_cast<jbyteArray>({{source}})).byteSpan()
 {{else if (isCharString type)}}
@@ -62,10 +62,10 @@ chip::JniUtfString(env, static_cast<jstring>({{source}})).charSpan()
 {{/inline}}
 {{target}} =
 {{#if isOptional}}
-{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}(
+{{zapTypeToEncodableClusterObjectType type ns=cluster}}(
 {{/if}}
 {{#if isNullable}}
-  {{source}} == nullptr ? chip::app::DataModel::Nullable<{{chipType}}>() : chip::app::DataModel::Nullable<{{chipType}}>({{source}}Value)
+  {{source}} == nullptr ? {{zapTypeToEncodableClusterObjectType type ns=cluster forceNotOptional=true}}() : {{zapTypeToEncodableClusterObjectType type ns=cluster forceNotOptional=true}}({{source}}Value)
   {{else}}
 {{! TODO If the inline partial is indented, generation fails with "result.split is not a function". }}
 {{>value}}

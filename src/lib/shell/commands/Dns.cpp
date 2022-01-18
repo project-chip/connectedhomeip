@@ -20,6 +20,7 @@
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Advertiser.h>
 #include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/platform/Dnssd.h>
 #include <lib/shell/Commands.h>
 #include <lib/shell/Engine.h>
@@ -113,6 +114,7 @@ private:
 };
 
 DnsShellResolverDelegate sDnsShellResolverDelegate;
+Dnssd::ResolverProxy sResolverProxy;
 
 CHIP_ERROR ResolveHandler(int argc, char ** argv)
 {
@@ -124,7 +126,7 @@ CHIP_ERROR ResolveHandler(int argc, char ** argv)
     peerId.SetCompressedFabricId(strtoull(argv[0], NULL, 10));
     peerId.SetNodeId(strtoull(argv[1], NULL, 10));
 
-    return Dnssd::Resolver::Instance().ResolveNodeId(peerId, Inet::IPAddressType::kAny);
+    return sResolverProxy.ResolveNodeId(peerId, Inet::IPAddressType::kAny, Dnssd::Resolver::CacheBypass::On);
 }
 
 bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
@@ -147,13 +149,13 @@ bool ParseSubType(int argc, char ** argv, Dnssd::DiscoveryFilter & filter)
     switch (subtype[1])
     {
     case 'S':
-        filterType = Dnssd::DiscoveryFilterType::kShort;
+        filterType = Dnssd::DiscoveryFilterType::kShortDiscriminator;
         break;
     case 'L':
-        filterType = Dnssd::DiscoveryFilterType::kLong;
+        filterType = Dnssd::DiscoveryFilterType::kLongDiscriminator;
         break;
     case 'V':
-        filterType = Dnssd::DiscoveryFilterType::kVendor;
+        filterType = Dnssd::DiscoveryFilterType::kVendorId;
         break;
     case 'T':
         filterType = Dnssd::DiscoveryFilterType::kDeviceType;
@@ -184,7 +186,7 @@ CHIP_ERROR BrowseCommissionableHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Browsing commissionable nodes...\r\n");
 
-    return Dnssd::Resolver::Instance().FindCommissionableNodes(filter);
+    return sResolverProxy.FindCommissionableNodes(filter);
 }
 
 CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
@@ -199,7 +201,7 @@ CHIP_ERROR BrowseCommissionerHandler(int argc, char ** argv)
 
     streamer_printf(streamer_get(), "Browsing commissioners...\r\n");
 
-    return Dnssd::Resolver::Instance().FindCommissioners(filter);
+    return sResolverProxy.FindCommissioners(filter);
 }
 
 CHIP_ERROR BrowseHandler(int argc, char ** argv)
@@ -221,8 +223,8 @@ CHIP_ERROR DnsHandler(int argc, char ** argv)
         return CHIP_NO_ERROR;
     }
 
-    Dnssd::Resolver::Instance().Init(&DeviceLayer::InetLayer());
-    Dnssd::Resolver::Instance().SetResolverDelegate(&sDnsShellResolverDelegate);
+    sResolverProxy.Init(DeviceLayer::UDPEndPointManager());
+    sResolverProxy.SetResolverDelegate(&sDnsShellResolverDelegate);
 
     return sShellDnsSubcommands.ExecCommand(argc, argv);
 }

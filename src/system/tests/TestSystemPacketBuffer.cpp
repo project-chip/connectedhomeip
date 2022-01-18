@@ -48,11 +48,11 @@
 #include <nlunit-test.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-#if (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
-#define PBUF_TYPE(pbuf) (pbuf)->type_internal
-#else
+#if (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 #define PBUF_TYPE(pbuf) (pbuf)->type
-#endif // (LWIP_VERSION_MAJOR >= 2 && LWIP_VERSION_MINOR >= 1)
+#else // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
+#define PBUF_TYPE(pbuf) (pbuf)->type_internal
+#endif // (LWIP_VERSION_MAJOR == 2) && (LWIP_VERSION_MINOR == 0)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 using ::chip::Encoding::PacketBufferWriter;
@@ -531,7 +531,7 @@ void PacketBufferTest::CheckDataLength(nlTestSuite * inSuite, void * inContext)
  *               without specifying the head of the buffer chain. Otherwise,
  *               test SetDataLength with one buffer being down the chain and the
  *               other one being passed as the head of the chain. After calling
- *               the method verify that data lenghts were correctly adjusted.
+ *               the method verify that data lengths were correctly adjusted.
  */
 void PacketBufferTest::CheckSetDataLength(nlTestSuite * inSuite, void * inContext)
 {

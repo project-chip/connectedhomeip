@@ -24,12 +24,13 @@
 
 #pragma once
 
-#include <app/Command.h>
 #include <app/ConcreteCommandPath.h>
+#include <app/InteractionModelDelegate.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/core/CHIPTLVDebug.hpp>
+#include <lib/support/BitFlags.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -37,6 +38,7 @@
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 #include <app/MessageDef/InvokeRequestMessage.h>
 #include <app/MessageDef/InvokeResponseMessage.h>
@@ -44,9 +46,16 @@
 namespace chip {
 namespace app {
 
-class CommandHandler : public Command
+class CommandHandler
 {
 public:
+    /*
+     * Destructor - as part of destruction, it will abort the exchange context
+     * if a valid one still exists.
+     *
+     * See Abort() for details on when that might occur.
+     */
+    virtual ~CommandHandler() { Abort(); }
     class Callback
     {
     public:
@@ -128,19 +137,23 @@ public:
      *
      * This function will always call the OnDone function above on the registered callback
      * before returning.
+     *
+     * isTimedInvoke is true if and only if this is part of a Timed Invoke
+     * transaction (i.e. was preceded by a Timed Request).  If we reach here,
+     * the timer verification has already been done.
      */
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                      System::PacketBufferHandle && payload);
-    CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus) override;
+                                      System::PacketBufferHandle && payload, bool isTimedInvoke);
+    CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus);
 
-    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus) override;
+    CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
-    CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus) override;
+    CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus);
 
-    CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload);
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
+    CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
+    CHIP_ERROR PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
     CHIP_ERROR FinishCommand(bool aStartDataStruct = true);
-    CHIP_ERROR PrepareStatus(const CommandPathParams & aCommandPathParams);
+    CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
     CHIP_ERROR FinishStatus();
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
     FabricIndex GetAccessingFabricIndex() const;
@@ -158,7 +171,8 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        ReturnErrorOnFailure(PrepareResponse(aRequestCommandPath, CommandData::GetCommandId()));
+        ConcreteCommandPath path = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, CommandData::GetCommandId() };
+        ReturnErrorOnFailure(PrepareCommand(path, false));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
@@ -166,10 +180,43 @@ public:
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
+    /**
+     * Check whether the InvokeRequest we are handling is a timed invoke.
+     */
+    bool IsTimedInvoke() const { return mTimedRequest; }
+
+    /*
+     * This forcibly closes the exchange context if a valid one is pointed to. Such a situation does
+     * not arise during normal message processing flows that all normally call Close() above. This can only
+     * arise due to application-initiated destruction of the object when this object is handling receiving/sending
+     * message payloads.
+     */
+    void Abort();
+
+    /**
+     * Gets the inner exchange context object, without ownership.
+     *
+     * @return The inner exchange context, might be nullptr if no
+     *         exchange context has been assigned or the context
+     *         has been released.
+     */
+    Messaging::ExchangeContext * GetExchangeContext() const { return mpExchangeCtx; }
+
 private:
     friend class TestCommandInteraction;
     friend class CommandHandler::Handle;
 
+    enum class State
+    {
+        Idle,                ///< Default state that the object starts out in, where no work has commenced
+        AddingCommand,       ///< In the process of adding a command.
+        AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
+        CommandSent,         ///< The command has been sent successfully.
+        AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
+    };
+
+    void MoveToState(const State aTargetState);
+    const char * GetStateStr() const;
     /**
      * IncrementHoldOff will increase the inner refcount of the CommandHandler.
      *
@@ -192,6 +239,8 @@ private:
      */
     CHIP_ERROR AllocateBuffer();
 
+    CHIP_ERROR Finalize(System::PacketBufferHandle & commandPacket);
+
     /**
      * Called internally to signal the completion of all work on this object, gracefully close the
      * exchange (by calling into the base class) and finally, signal to a registerd callback that it's
@@ -201,16 +250,20 @@ private:
 
     CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
     CHIP_ERROR SendCommandResponse();
-    CHIP_ERROR PrepareResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommand);
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                                  const Optional<ClusterStatus> & aClusterStatus);
 
-    Callback * mpCallback = nullptr;
+    Messaging::ExchangeContext * mpExchangeCtx = nullptr;
+    Callback * mpCallback                      = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
     size_t mPendingWork                    = 0;
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
+
+    State mState = State::Idle;
+    chip::System::PacketBufferTLVWriter mCommandMessageWriter;
+    bool mBufferAllocated = false;
 };
 
 } // namespace app

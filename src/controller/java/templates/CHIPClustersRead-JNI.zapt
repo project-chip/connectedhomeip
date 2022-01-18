@@ -16,6 +16,7 @@
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, read{{asUpperCamelCase name}}Attribute)(JNIEnv * env, jobject self, jlong clusterPtr, jobject callback)
 {
     chip::DeviceLayer::StackLock lock;
@@ -48,6 +49,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, read{{asUpperCamelCase nam
     onFailure.release();
 }
 
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 {{/if}}

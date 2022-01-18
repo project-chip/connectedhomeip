@@ -52,15 +52,14 @@ CHIP_ERROR ClusterBase::AssociateWithGroup(DeviceProxy * device, GroupId groupId
     if (mDevice->GetSecureSession().HasValue())
     {
         // Local copy to preserve original SessionHandle for future Unicast communication.
-        SessionHandle session = mDevice->GetSecureSession().Value();
-        session.SetGroupId(groupId);
-        mSessionHandle.SetValue(session);
-
+        Optional<SessionHandle> session = mDevice->GetExchangeManager()->GetSessionManager()->CreateGroupSession(groupId);
         // Sanity check
-        if (!mSessionHandle.Value().IsGroupSession())
+        if (!session.HasValue() || !session.Value()->IsGroupSession())
         {
             err = CHIP_ERROR_INCORRECT_STATE;
         }
+
+        mGroupSession.Grab(session.Value());
     }
     else
     {
@@ -77,16 +76,6 @@ CHIP_ERROR ClusterBase::AssociateWithGroup(DeviceProxy * device, GroupId groupId
 void ClusterBase::Dissociate()
 {
     mDevice = nullptr;
-}
-
-CHIP_ERROR ClusterBase::RequestAttributeReporting(AttributeId attributeId, Callback::Cancelable * onReportCallback,
-                                                  app::TLVDataFilter tlvDataFilter)
-{
-    VerifyOrReturnError(onReportCallback != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(tlvDataFilter != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    mDevice->AddReportHandler(mEndpoint, mClusterId, attributeId, onReportCallback, tlvDataFilter);
-
-    return CHIP_NO_ERROR;
 }
 
 } // namespace Controller

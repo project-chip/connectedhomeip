@@ -18,13 +18,15 @@
 
 /**
  *    @file
- *      This file defines objects for a CHIP Interaction Data model Engine which handle unsolicitied IM message, and
+ *      This file defines objects for a CHIP Interaction Data model Engine which handle unsolicited IM message, and
  *      manage different kinds of IM client and handlers.
  *
  */
 
 #pragma once
 
+#include <access/AccessControl.h>
+#include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -48,6 +50,7 @@
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
+#include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
@@ -93,24 +96,6 @@ public:
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
     /**
-     *  Creates a new read client and send ReadRequest message to the node using the read client,
-     *  shutdown if fail to send it out
-     *
-     *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR SendReadRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
-
-    /**
-     *  Creates a new read client and sends SubscribeRequest message to the node using the read client.
-     *  Shuts down on transmission failure.
-     *
-     *  @retval #CHIP_ERROR_NO_MEMORY If there is no ReadClient available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR SendSubscribeRequest(ReadPrepareParams & aReadPrepareParams, ReadClient::Callback * aCallback);
-
-    /**
      * Tears down an active subscription.
      *
      * @retval #CHIP_ERROR_KEY_NOT_FOUND If the subscription is not found.
@@ -139,42 +124,17 @@ public:
      *  @retval #CHIP_ERROR_NO_MEMORY If there is no WriteClient available
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * callback);
-
-    /**
-     *  Allocate a ReadClient that can be used to do a read interaction.  If the call succeeds, the consumer
-     *  is responsible for calling Shutdown() on the ReadClient once it's done using it.
-     *
-     *  @param[in,out] 	apReadClient	      A double pointer to a ReadClient that is updated to point to a valid ReadClient
-     *                                      on successful completion of this function. On failure, it will be updated to point to
-     *                                      nullptr.
-     *  @param[in]      aInteractionType    Type of interaction (read or subscription) that the requested ReadClient should execute.
-     *  @param[in]      aCallback           If not-null, permits overriding the default delegate registered with the
-     *                                      InteractionModelEngine that will be used by the ReadClient.
-     *
-     *  @retval #CHIP_ERROR_INCORRECT_STATE If there is no ReadClient available
-     *  @retval #CHIP_NO_ERROR On success.
-     */
-    CHIP_ERROR NewReadClient(ReadClient ** const apReadClient, ReadClient::InteractionType aInteractionType,
-                             ReadClient::Callback * aCallback);
+    CHIP_ERROR NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * callback,
+                              const Optional<uint16_t> & aTimedWriteTimeoutMs = NullOptional);
 
     uint32_t GetNumActiveReadHandlers() const;
-    uint32_t GetNumActiveReadClients() const;
 
     uint32_t GetNumActiveWriteHandlers() const;
     uint32_t GetNumActiveWriteClients() const;
 
-    /**
-     *  Get read client index in mReadClients
-     *
-     *  @param[in]    apReadClient    A pointer to a read client object.
-     *
-     *  @retval  the index in mReadClients array
-     */
-    uint16_t GetReadClientArrayIndex(const ReadClient * const apReadClient) const;
-
     uint16_t GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const;
 
+    uint16_t GetReadHandlerArrayIndex(const ReadHandler * const apReadHandler) const;
     /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()
      */
@@ -184,9 +144,6 @@ public:
 
     void ReleaseClusterInfoList(ClusterInfo *& aClusterInfo);
     CHIP_ERROR PushFront(ClusterInfo *& aClusterInfoLisst, ClusterInfo & aClusterInfo);
-    // Merges aAttributePath inside apAttributePathList if current path is overlapped with existing path in apAttributePathList
-    // Overlap means the path is superset or subset of another path
-    bool MergeOverlappedAttributePath(ClusterInfo * apAttributePathList, ClusterInfo & aAttributePath);
     bool IsOverlappedAttributePath(ClusterInfo & aAttributePath);
 
     CHIP_ERROR RegisterCommandHandler(CommandHandlerInterface * handler);
@@ -194,9 +151,52 @@ public:
     CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
     void UnregisterCommandHandlers(EndpointId endpointId);
 
+    /**
+     * Called when a timed interaction has failed (i.e. the exchange it was
+     * happening on has closed while the exchange delegate was the timed
+     * handler).
+     */
+    void OnTimedInteractionFailed(TimedHandler * apTimedHandler);
+
+    /**
+     * Called when a timed invoke is received.  This function takes over all
+     * handling of the exchange, status reporting, and so forth.
+     */
+    void OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+
+    /**
+     * Called when a timed write is received.  This function takes over all
+     * handling of the exchange, status reporting, and so forth.
+     */
+    void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+
+    /**
+     * Add a read client to the internally tracked list of weak references. This list is used to
+     * correctly dispatch unsolicited reports to the right matching handler by subscription ID.
+     */
+    void AddReadClient(ReadClient * apReadClient);
+
+    /**
+     * Remove a read client from the internally tracked list of weak references.
+     */
+    void RemoveReadClient(ReadClient * apReadClient);
+
+    /**
+     * Test to see if a read client is in the actively tracked list.
+     */
+    bool InActiveReadClientList(ReadClient * apReadClient);
+
+    /**
+     * Return the number of active read clients being tracked by the engine.
+     */
+    size_t GetNumActiveReadClients();
+
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
+    using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;
 
@@ -206,7 +206,8 @@ private:
      * expected to set it to success if it does not want an automatic status response message to be sent.
      */
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                      System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);
+                                      System::PacketBufferHandle && aPayload, bool aIsTimedInvoke,
+                                      Protocols::InteractionModel::Status & aStatus);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
@@ -223,10 +224,19 @@ private:
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
-     * the Write Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
+     * the Write Request are handled entirely within this function. If the
+     * status returned is not Status::Success, the caller will send a status
+     * response message with that status.
+     */
+    Status OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                          System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+
+    /**
+     * Called when Interaction Model receives a Timed Request message.  Errors processing
+     * the Timed Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
      * expected to set it to success if it does not want an automatic status response message to be sent.
      */
-    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+    CHIP_ERROR OnTimedRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                               System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);
 
     /**This function handles processing of un-solicited ReportData messages on the client, which can
@@ -239,6 +249,8 @@ private:
                          TLV::TLVReader & apPayload) override;
     bool CommandExists(const ConcreteCommandPath & aCommandPath) override;
 
+    bool HasActiveRead();
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     InteractionModelDelegate * mpDelegate      = nullptr;
 
@@ -247,13 +259,14 @@ private:
     // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
     // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
     BitMapObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
-    ReadClient mReadClients[CHIP_IM_MAX_NUM_READ_CLIENT];
+    BitMapObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
     WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];
     WriteHandler mWriteHandlers[CHIP_IM_MAX_NUM_WRITE_HANDLER];
     reporting::Engine mReportingEngine;
-    ClusterInfo mClusterInfoPool[CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS];
-    ClusterInfo * mpNextAvailableClusterInfo = nullptr;
+    BitMapObjectPool<ClusterInfo, CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS> mClusterInfoPool;
+
+    ReadClient * mpActiveReadClientList = nullptr;
 
     // A magic number for tracking values between stack Shutdown()-s and Init()-s.
     // An ObjectHandle is valid iff. its magic equals to this one.
@@ -279,6 +292,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
 
 /**
  *  Fetch attribute value and version info and write to the AttributeReport provided.
+ *  The ReadSingleClusterData will do everything required for encoding an attribute, i.e. it will try to put one or more
+ * AttributeReportIB to the AttributeReportIBs::Builder.
  *  When the endpoint / cluster / attribute / event data specified by aClusterInfo does not exist, corresponding interaction model
  * error code will be put into the writer, and CHIP_NO_ERROR will be returned.
  *  If the data exists on the server, the data (with tag kData) and the data version (with tag kDataVersion) will be put
@@ -287,18 +302,20 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *  This function is implemented by CHIP as a part of cluster data storage & management.
  * The apWriter and apDataExists can be nullptr.
  *
- *  @param[in]    aAccessingFabricIndex The accessing fabric index for the read.
- *  @param[in]    aPath             The concrete path of the data being read.
- *  @param[in]    aAttributeReport  The TLV Builder for Cluter attribute builder.
+ *  @param[in]    aSubjectDescriptor    The subject descriptor for the read.
+ *  @param[in]    aPath                 The concrete path of the data being read.
+ *  @param[in]    aAttributeReports      The TLV Builder for Cluter attribute builder.
  *
  *  @retval  CHIP_NO_ERROR on success
  */
-CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIB::Builder & aAttributeReport);
+CHIP_ERROR ReadSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, const ConcreteReadAttributePath & aPath,
+                                 AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
 /**
  * TODO: Document.
  */
-CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
+CHIP_ERROR WriteSingleClusterData(const Access::SubjectDescriptor & aSubjectDescriptor, ClusterInfo & aClusterInfo,
+                                  TLV::TLVReader & aReader, WriteHandler * apWriteHandler);
 } // namespace app
 } // namespace chip

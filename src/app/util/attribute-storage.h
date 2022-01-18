@@ -45,6 +45,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
 #include <app-common/zap-generated/att-storage.h>
@@ -67,11 +68,7 @@
 
 // If we have fixed number of endpoints, then max is the same.
 #ifdef FIXED_ENDPOINT_COUNT
-#ifdef DYNAMIC_ENDPOINT_COUNT
-#define MAX_ENDPOINT_COUNT (FIXED_ENDPOINT_COUNT + DYNAMIC_ENDPOINT_COUNT)
-#else
-#define MAX_ENDPOINT_COUNT FIXED_ENDPOINT_COUNT
-#endif
+#define MAX_ENDPOINT_COUNT (FIXED_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
 #endif
 
 #include <app-common/zap-generated/attribute-type.h>
@@ -125,17 +122,26 @@ void emAfCallInits(void);
 void emberAfEndpointConfigure(void);
 
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
-                                       uint8_t * buffer, uint16_t readLength, bool write, int32_t index = -1);
+                                       uint8_t * buffer, uint16_t readLength, bool write);
 
 bool emAfMatchCluster(EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord);
 bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am, EmberAfAttributeSearchRecord * attRecord);
 
-EmberAfCluster * emberAfFindClusterInTypeWithMfgCode(EmberAfEndpointType * endpointType, chip::ClusterId clusterId,
-                                                     EmberAfClusterMask mask, uint16_t manufacturerCode);
+// Check if a cluster is implemented or not. If yes, the cluster is returned.
+//
+// mask = 0 -> find either client or server
+// mask = CLUSTER_MASK_CLIENT -> find client
+// mask = CLUSTER_MASK_SERVER -> find server
+//
+// If a pointer to an index is provided, it will be updated to point to the relative index of the cluster
+// within the set of clusters that match the mask criteria.
+//
+EmberAfCluster * emberAfFindClusterInType(EmberAfEndpointType * endpointType, chip::ClusterId clusterId, EmberAfClusterMask mask,
+                                          uint8_t * index = nullptr);
 
-EmberAfCluster * emberAfFindClusterInType(EmberAfEndpointType * endpointType, chip::ClusterId clusterId, EmberAfClusterMask mask);
-
-// This function returns the index of cluster for the particular endpoint.
+// For a given cluster and mask, retrieves the list of endpoints sorted by endpoint that contain the matching cluster and returns
+// the index within that list that matches the given endpoint.
+//
 // Mask is either CLUSTER_MASK_CLIENT or CLUSTER_MASK_SERVER
 // For example, if you have 3 endpoints, 10, 11, 12, and cluster X server is
 // located on 11 and 12, and cluster Y server is located only on 10 then
@@ -145,6 +151,13 @@ EmberAfCluster * emberAfFindClusterInType(EmberAfEndpointType * endpointType, ch
 //    clusterIndex(Y,10,CLUSTER_MASK_SERVER) returns 0
 //    clusterIndex(Y,11,CLUSTER_MASK_SERVER) returns 0xFF
 //    clusterIndex(Y,12,CLUSTER_MASK_SERVER) returns 0xFF
+uint8_t emberAfClusterIndexInMatchingEndpoints(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask);
+
+//
+// Given a cluster ID, endpoint ID and a cluster mask, finds a matching cluster within that endpoint
+// with a matching mask. If one is found, the relative index of that cluster within the list of clusters on that
+// endpoint is returned. Otherwise, 0xFF is returned.
+//
 uint8_t emberAfClusterIndex(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask);
 
 // If server == true, returns the number of server clusters,
@@ -165,19 +178,9 @@ chip::Optional<chip::ClusterId> emberAfGetNthClusterId(chip::EndpointId endpoint
 uint8_t emberAfGetClustersFromEndpoint(chip::EndpointId endpoint, chip::ClusterId * clusterList, uint8_t listLen, bool server);
 
 // Returns cluster within the endpoint, or NULL if it isn't there
-EmberAfCluster * emberAfFindClusterWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask,
-                                               uint16_t manufacturerCode);
-
-// Returns cluster within the endpoint, or NULL if it isn't there
-// This wraps emberAfFindClusterWithMfgCode with EMBER_AF_NULL_MANUFACTURER_CODE
 EmberAfCluster * emberAfFindCluster(chip::EndpointId endpoint, chip::ClusterId clusterId, EmberAfClusterMask mask);
 
 // Returns cluster within the endpoint; Does not ignore disabled endpoints
-EmberAfCluster * emberAfFindClusterIncludingDisabledEndpointsWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                                         EmberAfClusterMask mask, uint16_t manufacturerCode);
-
-// Returns cluster within the endpoint; Does not ignore disabled endpoints
-// This wraps emberAfFindClusterIncludingDisabledEndpointsWithMfgCode with EMBER_AF_NULL_MANUFACTURER_CODE
 EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                               EmberAfClusterMask mask);
 
@@ -191,19 +194,15 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(EmberAfCluster * cluste
 void emberAfInitializeAttributes(chip::EndpointId endpoint);
 void emberAfResetAttributes(chip::EndpointId endpoint);
 
-// Loads the attributes from built-in default and / or tokens
-void emAfLoadAttributeDefaults(chip::EndpointId endpoint, bool writeTokens);
+// Loads the attributes from built-in default and / or storage.  If
+// ignoreStorage is true, only defaults will be read, and the storage for
+// non-volatile attributes will be overwritten with those defaults.
+void emAfLoadAttributeDefaults(chip::EndpointId endpoint, bool ignoreStorage);
 
-// This function loads from tokens all the attributes that
-// are defined to be stored in tokens.
-void emAfLoadAttributesFromTokens(chip::EndpointId endpoint);
-
-// After the RAM value has changed, code should call this
-// function. If this attribute has been
-// tagged as stored-to-token, then code will store
-// the attribute to token.
-void emAfSaveAttributeToToken(uint8_t * data, chip::EndpointId endpoint, chip::ClusterId clusterId,
-                              EmberAfAttributeMetadata * metadata);
+// After the RAM value has changed, code should call this function. If this
+// attribute has been tagged as non-volatile, its value will be stored.
+void emAfSaveAttributeToStorageIfNeeded(uint8_t * data, chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                        EmberAfAttributeMetadata * metadata);
 
 // Calls the attribute changed callback
 void emAfClusterAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t clientServerMask);
@@ -213,28 +212,14 @@ EmberAfStatus emAfClusterPreAttributeChangedCallback(const chip::app::ConcreteAt
                                                      uint8_t clientServerMask, EmberAfAttributeType attributeType, uint16_t size,
                                                      uint8_t * value);
 
-// Calls the default response callback for a specific cluster, and wraps emberAfClusterDefaultResponseWithMfgCodeCallback
+// Calls the default response callback for a specific cluster.
 // with the EMBER_NULL_MANUFACTURER_CODE
 void emberAfClusterDefaultResponseCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::CommandId commandId,
                                            EmberAfStatus status, uint8_t clientServerMask);
 
-// Calls the default response callback for a specific cluster.
-void emberAfClusterDefaultResponseWithMfgCodeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                      chip::CommandId commandId, EmberAfStatus status, uint8_t clientServerMask,
-                                                      uint16_t manufacturerCode);
-
-// Calls the message sent callback for a specific cluster, and wraps emberAfClusterMessageSentWithMfgCodeCallback
+// Calls the message sent callback for a specific cluster.
 void emberAfClusterMessageSentCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame, uint16_t msgLen,
                                        uint8_t * message, EmberStatus status);
-
-// Calls the message sent callback for a specific cluster.
-void emberAfClusterMessageSentWithMfgCodeCallback(const chip::MessageSendDestination & destination, EmberApsFrame * apsFrame,
-                                                  uint16_t msgLen, uint8_t * message, EmberStatus status,
-                                                  uint16_t manufacturerCode);
-
-// Used to retrieve a manufacturer code from an attribute metadata
-uint16_t emAfGetManufacturerCodeForCluster(EmberAfCluster * cluster);
-uint16_t emAfGetManufacturerCodeForAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * attMetaData);
 
 // Checks a cluster mask byte against ticks passed bitmask
 // returns true if the mask matches a passed interval

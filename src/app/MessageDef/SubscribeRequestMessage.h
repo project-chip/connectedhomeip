@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include "AttributeDataVersionList.h"
 #include "AttributePathIBs.h"
-#include "EventFilters.h"
-#include "EventPaths.h"
+#include "DataVersionFilterIBs.h"
+#include "EventFilterIBs.h"
+#include "EventPathIBs.h"
 #include "StructBuilder.h"
 #include "StructParser.h"
 #include <app/AppBuildConfig.h>
@@ -95,20 +95,28 @@ public:
     CHIP_ERROR GetAttributeRequests(AttributePathIBs::Parser * const apAttributeRequests) const;
 
     /**
-     *  @brief Get a TLVReader for the EventPaths. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the DataVersionFilterIBs. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventRequests(EventPaths::Parser * const apEventRequests) const;
+    CHIP_ERROR GetDataVersionFilters(DataVersionFilterIBs::Parser * const apDataVersionFilters) const;
 
     /**
-     *  @brief Get a TLVReader for the EventFilters. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the EventPathIBs. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventFilters(EventFilters::Parser * const apEventFilters) const;
+    CHIP_ERROR GetEventRequests(EventPathIBs::Parser * const apEventRequests) const;
+
+    /**
+     *  @brief Get a TLVReader for the EventFilterIBs. Next() must be called before accessing them.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetEventFilters(EventFilterIBs::Parser * const apEventFilters) const;
 
     /**
      *  @brief Get GetIsProxy boolean .
@@ -139,8 +147,9 @@ public:
     SubscribeRequestMessage::Builder & MinIntervalFloorSeconds(const uint16_t aMinIntervalFloorSeconds);
     SubscribeRequestMessage::Builder & MaxIntervalCeilingSeconds(const uint16_t aMinIntervalFloorSeconds);
     AttributePathIBs::Builder & CreateAttributeRequests();
-    EventPaths::Builder & CreateEventRequests();
-    EventFilters::Builder & CreateEventFilters();
+    DataVersionFilterIBs::Builder & CreateDataVersionFilters();
+    EventPathIBs::Builder & CreateEventRequests();
+    EventFilterIBs::Builder & CreateEventFilters();
 
     /**
      *  @brief This is set to true by the subscriber if it is a proxy-type device proxying for another client. This
@@ -162,8 +171,9 @@ public:
 
 private:
     AttributePathIBs::Builder mAttributeRequests;
-    EventPaths::Builder mEventRequests;
-    EventFilters::Builder mEventFilters;
+    DataVersionFilterIBs::Builder mDataVersionFilters;
+    EventPathIBs::Builder mEventRequests;
+    EventFilterIBs::Builder mEventFilters;
 };
 } // namespace SubscribeRequestMessage
 } // namespace app

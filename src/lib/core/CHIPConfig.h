@@ -1330,7 +1330,7 @@
  *          1 -- Message Type
  *          2 -- Exchange Id
  *          4 -- Profile Id
- *          4 -- Acknowleged Message Id
+ *          4 -- Acknowledged Message Id
  *
  *    @note A number of these fields are optional or not presently used.
  *          So most headers will be considerably smaller than this.
@@ -2307,6 +2307,15 @@
 #endif // CHIP_CONFIG_UNAUTHENTICATED_CONNECTION_POOL_SIZE
 
 /**
+ * @def CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
+ *
+ * @brief Define the size of the pool used for tracking CHIP groups.
+ */
+#ifndef CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
+#define CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE 8
+#endif // CHIP_CONFIG_GROUP_CONNECTION_POOL_SIZE
+
+/**
  * @def CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE
  *
  * @brief Define the size of the pool used for tracking CHIP
@@ -2425,8 +2434,10 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *      * #CHIP_IM_MAX_NUM_READ_CLIENT
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
+ *      * #CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
  *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
  *      * #CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *      * #CHIP_IM_MAX_NUM_TIMED_HANDLER
  *
  *  @{
  */
@@ -2477,6 +2488,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
+ *
+ * @brief Defines the maximum number of dirty set, limits the number of attributes being read or subscribed at the same time.
+ */
+#ifndef CHIP_IM_SERVER_MAX_NUM_DIRTY_SET
+#define CHIP_IM_SERVER_MAX_NUM_DIRTY_SET 8
+#endif
+
+/**
  * @def CHIP_IM_MAX_NUM_WRITE_HANDLER
  *
  * @brief Defines the maximum number of WriteHandler, limits the number of active write transactions on server.
@@ -2495,12 +2515,23 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
+ * @def CHIP_IM_MAX_NUM_TIMED_HANDLER
  *
- * @brief Defines the object pool for allocating attribute path for subscription in device controller.
+ * @brief Defines the maximum number of TimedHandler, limits the number of
+ *        active timed interactions waiting for the Invoke or Write.
  */
-#ifndef CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
-#define CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE CHIP_IM_MAX_NUM_READ_CLIENT
+#ifndef CHIP_IM_MAX_NUM_TIMED_HANDLER
+#define CHIP_IM_MAX_NUM_TIMED_HANDLER 8
+#endif
+
+/**
+ * @def CONFIG_IM_BUILD_FOR_UNIT_TEST
+ *
+ * @brief Defines whether we're currently building the IM for unit testing, which enables a set of features
+ *        that are only utilized in those tests.
+ */
+#ifndef CONFIG_IM_BUILD_FOR_UNIT_TEST
+#define CONFIG_IM_BUILD_FOR_UNIT_TEST 0
 #endif
 
 /**
@@ -2541,6 +2572,33 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS
+ *
+ * @brief Number of outgoing CASE sessions can be simutaneously negotiated.
+ */
+#ifndef CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS
+#define CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS 16
+#endif
+
+/**
+ * @def CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS
+ *
+ * @brief Number of outgoing CASE sessions can be simutaneously negotiated on an end device.
+ */
+#ifndef CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS
+#define CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES
+ *
+ * @brief Number of devices an end device can be simultaneously connected to
+ */
+#ifndef CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES
+#define CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES 4
+#endif
+
+/**
  * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
  *
  * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
@@ -2551,7 +2609,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #define CHIP_CONFIG_MAX_GROUPS_PER_FABRIC 1
 #endif
 
-// TODO: Need to cap number of KeySets
+/**
+ * @def CHIP_CONFIG_MAX_GROUPS_PER_FABRIC
+ *
+ * @brief Defines the number of groups supported per fabric, see Group Key Management Cluster in specification.
+ *
+ * Binds to number of GroupState entries to support per fabric
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC
+#define CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC 1
+#endif
 
 /**
  * @def CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PER_FABRIC
@@ -2675,23 +2742,61 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
- *
- * @brief Defines the max number of SessionCreationDelegates
- */
-#ifndef CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES 2
-#endif
-
-/**
  * @def CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
  *
  * @brief Defines the max number of SessionReleaseDelegate
  */
 #ifndef CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
-#define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 2
+#define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 4
 #endif
 
+/**
+ * @def CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
+ *
+ * @brief Defines the max number of SessionRecoveryDelegate
+ */
+#ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
+#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 4
+#endif
+
+/**
+ * @def CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
+ *
+ * @brief
+ *   Maximum number of CASE sessions that a device caches, that can be resumed
+ */
+#ifndef CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
+#define CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE 4
+#endif
+
+/**
+ * @def CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD
+ *
+ * @brief The number of bytes written to the event logging system that
+ *   will trigger Report Delivery.
+ *
+ * The configuration captures the number of bytes written to the event
+ * logging subsystem needed to trigger a report. For example, if an application wants to offload all DEBUG events
+ * reliably, the threshold should be set to less than the size of the
+ * DEBUG buffer (plus a slop factor to account for events generated
+ * during the scheduling and event offload).  Similarly, if the
+ * application does not want to drop INFO events, the threshold should
+ * be set to the sum of DEBUG and INFO buffers (with the same
+ * correction).
+ *
+ */
+#ifndef CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD
+#define CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD 512
+#endif /* CHIP_CONFIG_EVENT_LOGGING_BYTE_THRESHOLD */
+
+/**
+ * @def CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+ *
+ * @brief Enable Interaction model Event support in server
+ */
+#ifndef CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
+#define CHIP_CONFIG_ENABLE_SERVER_IM_EVENT 1
+#endif
 /**
  * @}
  */

@@ -38,6 +38,156 @@ using namespace chip::app;
 
 namespace {
 
+void Test_UINT8(nlTestSuite * apSuite, void * apContext)
+{
+    // Unsigned 8-bit Integer : 1 byte, endianness does not matter.
+    using IntType     = NumericAttributeTraits<uint8_t>;
+    using StorageType = typename IntType::StorageType;
+    using WorkingType = typename IntType::WorkingType;
+
+    StorageType sValue;
+    WorkingType wValue;
+    StorageType sNullValue;
+    WorkingType wNullValue;
+    const StorageType storageTestData              = 17;
+    const WorkingType workingTestUnsignedNullValue = 0xFF;
+
+    // 1) Verify the size of the types
+    NL_TEST_ASSERT(apSuite, sizeof(sValue) == 1);
+    NL_TEST_ASSERT(apSuite, sizeof(wValue) >= 1);
+
+    // Initialize the Storage Value with the test-buffer
+    memcpy(&sValue, &storageTestData, sizeof(sValue));
+
+    // Convert the Storage Type to Working Type and
+    wValue = IntType::StorageToWorking(sValue);
+
+    // 2) Verify that the correct storage format has been used
+    NL_TEST_ASSERT(apSuite, wValue == 17);
+
+    StorageType sNewValue;
+
+    // Convert back to Storage Value
+    IntType::WorkingToStorage(wValue, sNewValue);
+
+    // 3) Verify that the bytes are located as intended
+    NL_TEST_ASSERT(apSuite, memcmp(&storageTestData, &sNewValue, sizeof(sNewValue)) == 0);
+
+    // Set Storage value to Null
+    IntType::SetNull(sNullValue);
+    wNullValue = IntType::StorageToWorking(sNullValue);
+    NL_TEST_ASSERT(apSuite, wNullValue == workingTestUnsignedNullValue);
+    NL_TEST_ASSERT(apSuite, (IntType::IsNullValue(sNullValue) == true));
+
+    // Verify that null values can fit into not nullable
+    NL_TEST_ASSERT(apSuite, (IntType::CanRepresentValue(false, sNullValue) == true));
+
+    // Verify that null values can't fit into nullable
+    NL_TEST_ASSERT(apSuite, (IntType::CanRepresentValue(true, sNullValue) == false));
+}
+
+void Test_SINT8(nlTestSuite * apSuite, void * apContext)
+{
+    // Signed 8-bit Integer : 1 byte, endianness does not matter.
+    using IntType     = NumericAttributeTraits<int8_t>;
+    using StorageType = typename IntType::StorageType;
+    using WorkingType = typename IntType::WorkingType;
+
+    StorageType sValue;
+    WorkingType wValue;
+    StorageType sNullValue;
+    WorkingType wNullValue;
+    const StorageType storageTestData              = 17;
+    const WorkingType workingTestUnsignedNullValue = -128; // 0x80
+
+    // 1) Verify the size of the types
+    NL_TEST_ASSERT(apSuite, sizeof(sValue) == 1);
+    NL_TEST_ASSERT(apSuite, sizeof(wValue) >= 1);
+
+    // Initialize the Storage Value with the test-buffer
+    memcpy(&sValue, &storageTestData, sizeof(sValue));
+
+    // Convert the Storage Type to Working Type and
+    wValue = IntType::StorageToWorking(sValue);
+
+    // 2) Verify that the correct storage format has been used
+    NL_TEST_ASSERT(apSuite, wValue == 17);
+
+    StorageType sNewValue;
+
+    // Convert back to Storage Value
+    IntType::WorkingToStorage(wValue, sNewValue);
+
+    // 3) Verify that the bytes are located as intended
+    NL_TEST_ASSERT(apSuite, memcmp(&storageTestData, &sNewValue, sizeof(sNewValue)) == 0);
+
+    // Set Storage value to Null
+    IntType::SetNull(sNullValue);
+    wNullValue = IntType::StorageToWorking(sNullValue);
+    NL_TEST_ASSERT(apSuite, wNullValue == workingTestUnsignedNullValue);
+    NL_TEST_ASSERT(apSuite, (IntType::IsNullValue(sNullValue) == true));
+
+    // Verify that null values can fit into not nullable
+    NL_TEST_ASSERT(apSuite, (IntType::CanRepresentValue(false, sNullValue) == true));
+
+    // Verify that null values can't fit into nullable
+    NL_TEST_ASSERT(apSuite, (IntType::CanRepresentValue(true, sNullValue) == false));
+}
+
+enum class SimpleEnum : uint8_t
+{
+    kZero = 0,
+    kOne  = 1,
+};
+
+void Test_SimpleEnum(nlTestSuite * apSuite, void * apContext)
+{
+    // Unsigned 8-bit Integer : 1 byte, endianness does not matter.
+    using IntType     = NumericAttributeTraits<SimpleEnum>;
+    using StorageType = typename IntType::StorageType;
+    using WorkingType = typename IntType::WorkingType;
+
+    StorageType sValue;
+    WorkingType wValue;
+    StorageType sNullValue;
+    WorkingType wNullValue;
+    const StorageType storageTestData              = SimpleEnum::kOne;
+    const WorkingType workingTestUnsignedNullValue = static_cast<SimpleEnum>(0xFF);
+
+    // 1) Verify the size of the types
+    NL_TEST_ASSERT(apSuite, sizeof(sValue) == 1);
+    NL_TEST_ASSERT(apSuite, sizeof(wValue) >= 1);
+
+    // Initialize the Storage Value with the test-buffer
+    memcpy(&sValue, &storageTestData, sizeof(sValue));
+
+    // Convert the Storage Type to Working Type and
+    wValue = IntType::StorageToWorking(sValue);
+
+    // 2) Verify that the correct storage format has been used
+    NL_TEST_ASSERT(apSuite, wValue == SimpleEnum::kOne);
+
+    StorageType sNewValue;
+
+    // Convert back to Storage Value
+    IntType::WorkingToStorage(wValue, sNewValue);
+
+    // 3) Verify that the bytes are located as intended
+    NL_TEST_ASSERT(apSuite, memcmp(&storageTestData, &sNewValue, sizeof(sNewValue)) == 0);
+
+    // Set Storage value to Null
+    IntType::SetNull(sNullValue);
+    wNullValue = IntType::StorageToWorking(sNullValue);
+    NL_TEST_ASSERT(apSuite, wNullValue == workingTestUnsignedNullValue);
+    NL_TEST_ASSERT(apSuite, (IntType::IsNullValue(sNullValue) == true));
+
+    // Verify that null values can fit into not nullable
+    NL_TEST_ASSERT(apSuite, (IntType::CanRepresentValue(false, sNullValue) == true));
+
+    // Verify that null values can't fit into nullable
+    NL_TEST_ASSERT(apSuite, (IntType::CanRepresentValue(true, sNullValue) == false));
+}
+
 ////////////////////////////////////////////////////////////
 //   ______   __    __        _______   ______  ________  //
 //  /      \ /  |  /  |      /       \ /      |/        | //
@@ -1009,6 +1159,10 @@ static int TestTeardown(void * inContext)
 // clang-format off
 const nlTest sTests[] =
 {
+    NL_TEST_DEF("Test_UINT8", Test_UINT8),
+    NL_TEST_DEF("Test_SINT8", Test_SINT8),
+    NL_TEST_DEF("Test_SimpleEnum", Test_SimpleEnum),
+
     NL_TEST_DEF("Test_UINT24_LE",Test_UINT24_LE),
     NL_TEST_DEF("Test_SINT24_LE",Test_SINT24_LE),
     NL_TEST_DEF("Test_UINT24_BE",Test_UINT24_BE),

@@ -140,7 +140,7 @@ class ClusterObjectDescriptor:
         for tag, value in tlvData.items():
             descriptor = self.GetFieldByTag(tag)
             if not descriptor:
-                # We do not have enough infomation for this field.
+                # We do not have enough information for this field.
                 ret[tag] = value
                 continue
 
@@ -213,8 +213,12 @@ class ClusterCommand(ClusterObject):
     def command_id(self) -> int:
         raise NotImplementedError()
 
+    @ChipUtility.classproperty
+    def must_use_timed_invoke(cls) -> bool:
+        return False
 
-class Cluster:
+
+class Cluster(ClusterObject):
     ''' This class does nothing, but a convenient class that generated clusters can inherit from.
     This gives the ability that the users can use issubclass(X, Cluster) to determine if the class represnents a Cluster.
     '''
@@ -260,6 +264,10 @@ class ClusterAttributeDescriptor:
         raise NotImplementedError()
 
     @ChipUtility.classproperty
+    def must_use_timed_write(cls) -> bool:
+        return False
+
+    @ChipUtility.classproperty
     def _cluster_object(cls) -> ClusterObject:
         return make_dataclass('InternalClass',
                               [
@@ -277,32 +285,7 @@ class ClusterAttributeDescriptor:
                               bases=(ClusterObject,))
 
 
-class ClusterEventDescriptor:
-    '''
-    The ClusterEventDescriptor is used for holding an event's metadata like its cluster id, event id and its type.
-
-    Users should not initialize an object based on this class. Instead, users should pass the subclass objects to tell some methods what they want.
-
-    The implementation of this functions is quite tricky, it will create a cluster object on-the-fly, and use it for actual encode / decode routine to save lines of code.
-    '''
-    @classmethod
-    def ToTLV(cls, tag: Union[int, None], value):
-        writer = tlv.TLVWriter()
-        wrapped_value = cls._cluster_object(Value=value)
-        cls.event_type.PutFieldToTLV(tag,
-                                     asdict(wrapped_value)['Value'], writer, '')
-        return writer.encoding
-
-    @classmethod
-    def FromTLV(cls, tlvBuffer: bytes):
-        obj_class = cls._cluster_object
-        return obj_class.FromDict(obj_class.descriptor.TagDictToLabelDict('', {0: tlv.TLVReader(tlvBuffer).get().get('Any', {})})).Value
-
-    @classmethod
-    def FromTagDictOrRawValue(cls, val: Any):
-        obj_class = cls._cluster_object
-        return obj_class.FromDict(obj_class.descriptor.TagDictToLabelDict('', {0: val})).Value
-
+class ClusterEvent(ClusterObject):
     @ChipUtility.classproperty
     def cluster_id(self) -> int:
         raise NotImplementedError()
@@ -310,24 +293,3 @@ class ClusterEventDescriptor:
     @ChipUtility.classproperty
     def event_id(self) -> int:
         raise NotImplementedError()
-
-    @ChipUtility.classproperty
-    def event_type(cls) -> ClusterObjectFieldDescriptor:
-        raise NotImplementedError()
-
-    @ChipUtility.classproperty
-    def _cluster_object(cls) -> ClusterObject:
-        return make_dataclass('InternalClass',
-                              [
-                                  ('Value', List[cls.event_type.Type]
-                                   if cls.event_type.IsArray else cls.event_type.Type, field(default=None)),
-                                  ('descriptor', ClassVar[ClusterObjectDescriptor],
-                                   field(
-                                       default=ClusterObjectDescriptor(
-                                           Fields=[ClusterObjectFieldDescriptor(
-                                               Label='Value', Tag=0, Type=cls.event_type.Type, IsArray=cls.event_type.IsArray)]
-                                       )
-                                  )
-                                  )
-                              ],
-                              bases=(ClusterObject,))

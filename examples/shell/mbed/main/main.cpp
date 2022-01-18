@@ -48,7 +48,7 @@ int main()
     err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Shell, "Memory initalization failed: %s", err.AsString());
+        ChipLogError(Shell, "Memory initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }
@@ -56,7 +56,7 @@ int main()
     err = PlatformMgr().InitChipStack();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Shell, "Chip stack initalization failed: %s", err.AsString());
+        ChipLogError(Shell, "Chip stack initialization failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }
@@ -84,7 +84,7 @@ int main()
     }
 
     // Initialize the default streamer that was linked.
-    ret = streamer_init(streamer_get());
+    ret = Engine::Root().Init();
     if (ret)
     {
         ChipLogError(Shell, "Streamer initialization failed [%d]", ret);

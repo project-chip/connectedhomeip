@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include <lib/core/GroupId.h>
+
 #include <cstdint>
 
 namespace chip {
@@ -40,11 +42,8 @@ constexpr NodeId kMinTemporaryLocalId = 0xFFFF'FFFE'0000'0000ULL;
 constexpr NodeId kMaxTemporaryLocalId = 0xFFFF'FFFE'FFFF'FFFEULL;
 constexpr NodeId kPlaceholderNodeId   = 0xFFFF'FFFE'FFFF'FFFFULL;
 
-constexpr NodeId kMinCASEAuthTag1 = 0xFFFF'FFFD'0000'0000ULL;
-constexpr NodeId kMaxCASEAuthTag1 = 0xFFFF'FFFD'FFFF'FFFFULL;
-
-constexpr NodeId kMinCASEAuthTag2 = 0xFFFF'FFFC'0000'0000ULL;
-constexpr NodeId kMaxCASEAuthTag2 = 0xFFFF'FFFC'FFFF'FFFFULL;
+constexpr NodeId kMinCASEAuthTag = 0xFFFF'FFFD'0000'0000ULL;
+constexpr NodeId kMaxCASEAuthTag = 0xFFFF'FFFD'FFFF'FFFFULL;
 
 constexpr NodeId kMinPAKEKeyId = 0xFFFF'FFFB'0000'0000ULL;
 constexpr NodeId kMaxPAKEKeyId = 0xFFFF'FFFB'FFFF'FFFFULL;
@@ -57,6 +56,31 @@ constexpr NodeId kMaxOperationalNodeId = 0xFFFF'FFEF'FFFF'FFFFULL;
 constexpr bool IsOperationalNodeId(NodeId aNodeId)
 {
     return (aNodeId != kUndefinedNodeId) && (aNodeId <= kMaxOperationalNodeId);
+}
+
+constexpr bool IsGroupId(NodeId aNodeId)
+{
+    return (aNodeId >= kMinGroupNodeId);
+}
+
+constexpr bool IsCASEAuthTag(NodeId aNodeId)
+{
+    return (aNodeId >= kMinCASEAuthTag) && (aNodeId <= kMaxCASEAuthTag);
+}
+
+constexpr bool IsPAKEKeyId(NodeId aNodeId)
+{
+    return (aNodeId >= kMinPAKEKeyId) && (aNodeId <= kMaxPAKEKeyId);
+}
+
+constexpr NodeId NodeIdFromGroupId(GroupId aGroupId)
+{
+    return kMinGroupNodeId | aGroupId;
+}
+
+constexpr NodeId NodeIdFromPAKEKeyId(uint16_t aPAKEKeyId)
+{
+    return kMinPAKEKeyId | aPAKEKeyId;
 }
 
 } // namespace chip

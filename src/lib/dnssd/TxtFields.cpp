@@ -171,13 +171,13 @@ void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction)
     Platform::CopyString(pairingInstruction, kMaxPairingInstructionLen + 1, value);
 }
 
-Optional<uint32_t> GetRetryInterval(const ByteSpan & value)
+Optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
 {
     const auto undefined     = std::numeric_limits<uint32_t>::max();
     const auto retryInterval = MakeU32FromAsciiDecimal(value, undefined);
 
-    if (retryInterval != undefined && retryInterval <= kMaxRetryInterval)
-        return MakeOptional(retryInterval);
+    if (retryInterval != undefined && retryInterval <= kMaxRetryInterval.count())
+        return MakeOptional(System::Clock::Milliseconds32(retryInterval));
 
     return NullOptional;
 }
@@ -232,7 +232,7 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & val, DiscoveredN
     case TxtFieldKey::kMrpRetryIntervalActive:
         nodeData.mrpRetryIntervalActive = Internal::GetRetryInterval(val);
         break;
-    case TxtFieldKey::kTcpSupport:
+    case TxtFieldKey::kTcpSupported:
         nodeData.supportsTcp = Internal::MakeBoolFromAsciiDecimal(val);
         break;
     default:
@@ -250,7 +250,7 @@ void FillNodeDataFromTxt(const ByteSpan & key, const ByteSpan & value, ResolvedN
     case TxtFieldKey::kMrpRetryIntervalActive:
         nodeData.mMrpRetryIntervalActive = Internal::GetRetryInterval(value);
         break;
-    case TxtFieldKey::kTcpSupport:
+    case TxtFieldKey::kTcpSupported:
         nodeData.mSupportsTcp = Internal::MakeBoolFromAsciiDecimal(value);
         break;
     default:

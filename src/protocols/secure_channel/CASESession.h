@@ -47,7 +47,7 @@
 namespace chip {
 
 constexpr uint16_t kSigmaParamRandomNumberSize = 32;
-constexpr uint16_t kTrustedRootIdSize          = Credentials::kKeyIdentifierLength;
+constexpr uint16_t kTrustedRootIdSize          = Crypto::kSubjectKeyIdentifierLength;
 constexpr uint16_t kMaxTrustedRootIds          = 5;
 
 constexpr uint16_t kIPKSize = 16;
@@ -58,19 +58,15 @@ constexpr size_t kCASEResumptionIDSize = 16;
 #define CASE_EPHEMERAL_KEY 0xCA5EECD0
 #endif
 
-struct CASESessionSerialized;
-
-struct CASESessionSerializable
+struct CASESessionCachable
 {
-    uint8_t mVersion;
-    uint16_t mSharedSecretLen;
-    uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length];
-    uint16_t mMessageDigestLen;
-    uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
-    NodeId mPeerNodeId;
-    uint16_t mLocalSessionId;
-    uint16_t mPeerSessionId;
-    uint8_t mResumptionId[kCASEResumptionIDSize];
+    uint16_t mSharedSecretLen                              = 0;
+    uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length] = { 0 };
+    FabricIndex mLocalFabricIndex                          = 0;
+    NodeId mPeerNodeId                                     = kUndefinedNodeId;
+    CATValues mPeerCATs;
+    uint8_t mResumptionId[kCASEResumptionIDSize] = { 0 };
+    uint64_t mSessionSetupTimeStamp              = 0;
 };
 
 class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession
@@ -94,7 +90,9 @@ public:
      *
      * @return CHIP_ERROR     The result of initialization
      */
-    CHIP_ERROR ListenForSessionEstablishment(uint16_t mySessionId, FabricTable * fabrics, SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR ListenForSessionEstablishment(
+        uint16_t mySessionId, FabricTable * fabrics, SessionEstablishmentDelegate * delegate,
+        Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
      * @brief
@@ -109,9 +107,10 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId,
-                                uint16_t mySessionId, Messaging::ExchangeContext * exchangeCtxt,
-                                SessionEstablishmentDelegate * delegate);
+    CHIP_ERROR
+    EstablishSession(const Transport::PeerAddress peerAddress, FabricInfo * fabric, NodeId peerNodeId, uint16_t mySessionId,
+                     Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate,
+                     Optional<ReliableMessageProtocolConfig> mrpConfig = Optional<ReliableMessageProtocolConfig>::Missing());
 
     /**
      * Parse a sigma1 message.  This function will return success only if the
@@ -131,10 +130,9 @@ public:
      * and the  resumptionID and initiatorResumeMIC outparams will be set to
      * valid values, or the resumptionRequested outparam will be set to false.
      */
-    static CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ByteSpan & initiatorRandom,
-                                  uint16_t & initiatorSessionId, ByteSpan & destinationId, ByteSpan & initiatorEphPubKey,
-                                  // TODO: MRP param parsing
-                                  bool & resumptionRequested, ByteSpan & resumptionId, ByteSpan & initiatorResumeMIC);
+    CHIP_ERROR ParseSigma1(TLV::ContiguousBufferTLVReader & tlvReader, ByteSpan & initiatorRandom, uint16_t & initiatorSessionId,
+                           ByteSpan & destinationId, ByteSpan & initiatorEphPubKey, bool & resumptionRequested,
+                           ByteSpan & resumptionId, ByteSpan & initiatorResumeMIC);
 
     /**
      * @brief
@@ -148,41 +146,21 @@ public:
      */
     virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
 
-    const char * GetI2RSessionInfo() const override { return "Sigma I2R Key"; }
-
-    const char * GetR2ISessionInfo() const override { return "Sigma R2I Key"; }
+    /**
+     * @brief Serialize the CASESession to the given cachableSession data structure for secure pairing
+     **/
+    CHIP_ERROR ToCachable(CASESessionCachable & output);
 
     /**
-     * @brief Serialize the Pairing Session to a string.
+     * @brief Reconstruct secure pairing class from the cachableSession data structure.
      **/
-    CHIP_ERROR Serialize(CASESessionSerialized & output);
-
-    /**
-     * @brief Deserialize the Pairing Session from the string.
-     **/
-    CHIP_ERROR Deserialize(CASESessionSerialized & input);
-
-    /**
-     * @brief Serialize the CASESession to the given serializable data structure for secure pairing
-     **/
-    CHIP_ERROR ToSerializable(CASESessionSerializable & output);
-
-    /**
-     * @brief Reconstruct secure pairing class from the serializable data structure.
-     **/
-    CHIP_ERROR FromSerializable(const CASESessionSerializable & output);
-
-    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
+    CHIP_ERROR FromCachable(const CASESessionCachable & output);
 
     //// ExchangeDelegate Implementation ////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SessionManager * sessionManager) override
-    {
-        return &mMessageDispatch;
-    }
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
     FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
 
@@ -242,8 +220,15 @@ private:
 
     void CloseExchange();
 
-    // TODO: Remove this and replace with system method to retrieve current time
-    CHIP_ERROR SetEffectiveTime(void);
+    /**
+     * Clear our reference to our exchange context pointer so that it can close
+     * itself at some later time.
+     */
+    void DiscardExchange();
+
+    CHIP_ERROR GetHardcodedTime();
+
+    CHIP_ERROR SetEffectiveTime();
 
     CHIP_ERROR ValidateReceivedMessage(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                        System::PacketBufferHandle & msg);
@@ -265,7 +250,6 @@ private:
     uint8_t mIPK[kIPKSize];
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     FabricTable * mFabricsTable = nullptr;
     FabricInfo * mFabricInfo    = nullptr;
@@ -275,6 +259,11 @@ private:
     uint8_t mInitiatorRandom[kSigmaParamRandomNumberSize];
 
     State mState;
+
+    uint8_t mLocalFabricIndex       = 0;
+    uint64_t mSessionSetupTimeStamp = 0;
+
+    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
 
 protected:
     bool mCASESessionEstablished = false;
@@ -289,12 +278,8 @@ protected:
         return ipkListSpan;
     }
     virtual size_t GetIPKListEntries() const { return 1; }
-};
 
-typedef struct CASESessionSerialized
-{
-    // Extra uint64_t to account for padding bytes (NULL termination, and some decoding overheads)
-    uint8_t inner[BASE64_ENCODED_LEN(sizeof(CASESessionSerializable) + sizeof(uint64_t))];
-} CASESessionSerialized;
+    void SetSessionTimeStamp(uint64_t timestamp) { mSessionSetupTimeStamp = timestamp; }
+};
 
 } // namespace chip

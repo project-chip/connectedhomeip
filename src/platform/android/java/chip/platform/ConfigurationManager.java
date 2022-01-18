@@ -31,9 +31,21 @@ public interface ConfigurationManager {
   String kConfigKey_MfrDeviceICACerts = "device-ca-certs";
   String kConfigKey_MfrDevicePrivateKey = "device-key";
   String kConfigKey_HardwareVersion = "hardware-ver";
+  String kConfigKey_HardwareVersionString = "hardware-ver-str";
   String kConfigKey_ManufacturingDate = "mfg-date";
   String kConfigKey_SetupPinCode = "pin-code";
   String kConfigKey_SetupDiscriminator = "discriminator";
+  String kConfigKey_ProductId = "product-id";
+  String kConfigKey_ProductName = "product-name";
+  String kConfigKey_SoftwareVersion = "software-version";
+  String kConfigKey_SoftwareVersionString = "software-version-str";
+  String kConfigKey_NodeLabel = "node-label";
+  String kConfigKey_PartNumber = "part-number";
+  String kConfigKey_ProductURL = "product-url";
+  String kConfigKey_ProductLabel = "product-label";
+  String kConfigKey_LocalConfigDisabled = "local-config-disabled";
+  String kConfigKey_Reachable = "reachable";
+  String kConfigKey_UniqueId = "uniqueId";
 
   // Keys stored in the Chip-config namespace
   String kConfigKey_FabricId = "fabric-id";
@@ -47,7 +59,10 @@ public interface ConfigurationManager {
   String kConfigKey_WiFiStationSecType = "sta-sec-type";
   String kConfigKey_RegulatoryLocation = "regulatory-location";
   String kConfigKey_CountryCode = "country-code";
+  String kConfigKey_ActiveLocale = "active-locale";
   String kConfigKey_Breadcrumb = "breadcrumb";
+  String kConfigKey_HourFormat = "hour-format";
+  String kConfigKey_CalendarType = "calendar-type";
 
   // Prefix used for NVS keys that contain Chip group encryption keys.
   String kGroupKeyNamePrefix = "gk-";

@@ -23,14 +23,18 @@
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
 
-#include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
-#include <app/tests/suites/pics/PICSBooleanReader.h>
+#include <app/tests/suites/commands/log/LogCommands.h>
+#include <app/tests/suites/include/PICSChecker.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app-common/zap-generated/ids/Commands.h>
 
-class TestCommand
+constexpr const char kIdentityAlpha[] = "";
+constexpr const char kIdentityBeta[]  = "";
+constexpr const char kIdentityGamma[] = "";
+
+class TestCommand : public PICSChecker, public LogCommands
 {
 public:
     TestCommand(const char * commandName) : mCommandPath(0, 0, 0), mAttributePath(0, 0, 0) {}
@@ -44,9 +48,20 @@ public:
         exit(CHIP_NO_ERROR == status ? EXIT_SUCCESS : EXIT_FAILURE);
     }
 
-    CHIP_ERROR Log(const char * message)
+    template <typename T>
+    size_t AddArgument(const char * name, chip::Optional<T> * value)
     {
-        ChipLogProgress(chipTool, "%s", message);
+        return 0;
+    }
+
+    template <typename T>
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, chip::Optional<T> * value)
+    {
+        return 0;
+    }
+
+    CHIP_ERROR ContinueOnChipMainThread() override
+    {
         NextTest();
         return CHIP_NO_ERROR;
     }
@@ -63,11 +78,11 @@ public:
         {
         case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
             ChipLogProgress(chipTool, "Commissioning complete");
-            chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, arg);
 
             TestCommand * command = reinterpret_cast<TestCommand *>(arg);
             command->isRunning    = true;
             command->NextTest();
+            chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, arg);
             break;
         }
     }
@@ -102,30 +117,11 @@ public:
         mAttributePath = chip::app::ConcreteAttributePath(0, 0, 0);
     }
 
-    bool ShouldSkip(const char * expression)
-    {
-        // If there is no PICS configuration file, considers that nothing should be skipped.
-        if (!PICS.HasValue())
-        {
-            return false;
-        }
-
-        std::map<std::string, bool> pics(PICS.Value());
-        bool shouldSkip = !PICSBooleanExpressionParser::Eval(expression, pics);
-        if (shouldSkip)
-        {
-            ChipLogProgress(chipTool, " **** Skipping: %s == false\n", expression);
-            NextTest();
-        }
-        return shouldSkip;
-    }
-
-    chip::Optional<std::map<std::string, bool>> PICS;
-
     std::atomic_bool isRunning{ true };
 
 protected:
     chip::app::ConcreteCommandPath mCommandPath;
     chip::app::ConcreteAttributePath mAttributePath;
     chip::Optional<chip::EndpointId> mEndpointId;
+    void SetIdentity(const char * name){};
 };

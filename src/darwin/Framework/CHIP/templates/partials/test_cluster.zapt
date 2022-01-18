@@ -5,9 +5,17 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
 {{/if}}
 {{#chip_tests_item_response_parameters}}
 {{#if saveAs}}
-{{asBasicType chipType}} {{saveAs}};
+{{asObjectiveCBasicType type is_mutable=true}} {{saveAs}};
 {{/if}}
 {{/chip_tests_item_response_parameters}}
+
+{{~#*inline "subscribeDataCallback"}}
+test_{{parent.filename}}_{{attribute}}_Reported
+{{/inline}}
+{{#if allocateSubscribeDataCallback}}
+ResponseHandler {{> subscribeDataCallback}} = nil;
+{{/if~}}
+
 - (void)testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}
 {
     {{#unless async}}
@@ -16,7 +24,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
 
 {{#if (isTestOnlyCluster cluster)}}
     dispatch_queue_t queue = dispatch_get_main_queue();
-    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{definedValue}}{{/chip_tests_item_parameters}});
+    {{command}}(expectation, queue{{#chip_tests_item_parameters}}, {{#if (isString type)}}@"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
 {{else}}
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -28,7 +36,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         __auto_type * params = [[CHIP{{asUpperCamelCase cluster}}Cluster{{asUpperCamelCase command}}Params alloc] init];
       {{/if}}
       {{#chip_tests_item_parameters}}
-        {{>test_value target=(concat "params." (asStructPropertyName label)) definedValue=definedValue cluster=parent.cluster}}
+        {{>test_value target=(concat "params." (asStructPropertyName label)) definedValue=definedValue cluster=parent.cluster depth=0}}
       {{/chip_tests_item_parameters}}
       [cluster {{asLowerCamelCase command}}With
       {{~#if commandObject.arguments.length~}}
@@ -43,27 +51,23 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
       {{/if}}
     {{else if isSubscribeAttribute}}
     {{#chip_tests_item_parameters}}
-    {{#if (isString type)}}
-    {{#if (isOctetString type)}}
-    NSData * {{asLowerCamelCase name}}Argument = [[NSData alloc] initWithBytes:"{{octetStringEscapedForCLiteral definedValue}}" length:{{definedValue.length}}];
-    {{else}}
-    NSString * {{asLowerCamelCase name}}Argument= @"{{definedValue}}";
-    {{/if}}
-    {{else}}
     {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{asTypedLiteral definedValue type}};
-    {{/if}}
     {{/chip_tests_item_parameters}}
     [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:minIntervalArgument
                                                                  maxInterval:maxIntervalArgument
-                                                             responseHandler:^(NSError * err, NSDictionary * values) {
+                                                     subscriptionEstablished:^{
+        XCTAssertEqual(testSendCluster{{parent.filename}}_{{asTestIndex waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, true);
+        [expectation fulfill];
+      }
+                                                               reportHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isList}} * _Nullable value, NSError * _Nullable err) {
     {{else if isWaitForReport}}
-    [cluster reportAttribute{{asUpperCamelCase attribute}}WithResponseHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isList}} * _Nullable value, NSError * _Nullable err) {
+    {{> subscribeDataCallback }} = ^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isList}} * _Nullable value, NSError * _Nullable err) {
     {{else if isReadAttribute}}
     [cluster readAttribute{{asUpperCamelCase attribute}}WithCompletionHandler:^({{asObjectiveCClass attributeObject.type cluster forceList=attributeObject.isList}} * _Nullable value, NSError * _Nullable err) {
     {{else if isWriteAttribute}}
     {{#chip_tests_item_parameters}}
     id {{asLowerCamelCase name}}Argument;
-    {{>test_value target=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue cluster=parent.cluster}}
+    {{>test_value target=(concat (asLowerCamelCase name) "Argument") definedValue=definedValue cluster=parent.cluster depth=0}}
     {{/chip_tests_item_parameters}}
     [cluster writeAttribute{{asUpperCamelCase attribute}}WithValue:{{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument{{/chip_tests_item_parameters}} completionHandler:^(NSError * _Nullable err) {
     {{/if}}
@@ -76,10 +80,14 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         }
         {{/if}}
 
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], {{response.error}});
-        {{#unless (isStrEqual "0" response.error)}}
-        [expectation fulfill];
+        {{#if response.error}}
+          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], {{response.error}});
+          [expectation fulfill];
+        {{else if response.errorWrongValue}}
+          XCTAssertNotEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+          [expectation fulfill];
         {{else}}
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
         {{#unless isSubscribeAttribute}}
 
         {{#chip_tests_item_response_parameters}}
@@ -95,54 +103,113 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
           {{> actualValue}}
           {{>check_test_value actual="actualValue" expected=expectedValue cluster=../cluster}}
           {{#if saveAs}}
+          {{#if (isOctetString type)}}
+          {{saveAs}} = [NSMutableData dataWithData:actualValue];
+          {{else if (isCharString type)}}
+          {{saveAs}} = [NSMutableString stringWithString:actualValue];
+          {{else}}
           {{saveAs}} = [actualValue {{asObjectiveCNumberType "" type true}}Value];
+          {{/if}}
           {{/if}}
         }
         {{/if}}
         {{#if hasExpectedConstraints}}
-        {{#if expectedConstraints.minLength}}
+        {{#if (hasProperty expectedConstraints "minLength")}}
         {
           {{> actualValue}}
           XCTAssertGreaterThanOrEqual([actualValue length], {{expectedConstraints.minLength}});
         }
         {{/if}}
-        {{#if expectedConstraints.maxLength}}
+        {{#if (hasProperty expectedConstraints "startsWith")}}
+        {
+          {{> actualValue}}
+          XCTAssertTrue([actualValue hasPrefix:@"{{expectedConstraints.startsWith}}"]);
+        }
+        {{/if}}
+        {{#if (hasProperty expectedConstraints "endsWith")}}
+        {
+          {{> actualValue}}
+          XCTAssertTrue([actualValue hasSuffix:@"{{expectedConstraints.endsWith}}"]);
+        }
+        {{/if}}
+        {{#if (hasProperty expectedConstraints "isLowerCase")}}
+        {
+          {{> actualValue}}
+          BOOL isLowerCase = [actualValue isEqualToString:[actualValue lowercaseString]];
+          XCTAssert{{#if expectedConstraints.isLowerCase}}True{{else}}False{{/if}}(isLowerCase);
+        }
+        {{/if}}
+        {{#if (hasProperty expectedConstraints "isUpperCase")}}
+        {
+          {{> actualValue}}
+          BOOL isUpperCase = [actualValue isEqualToString:[actualValue uppercaseString]];
+          XCTAssert{{#if expectedConstraints.isUpperCase}}True{{else}}False{{/if}}(isUpperCase);
+        }
+        {{/if}}
+        {{#if (hasProperty expectedConstraints "isHexString")}}
+        {
+          {{> actualValue}}
+          NSCharacterSet *chars = [[NSCharacterSet characterSetWithCharactersInString:@"0123456789ABCDEF"] invertedSet];
+          BOOL isHexString = (NSNotFound == [actualValue rangeOfCharacterFromSet:chars].location);
+          XCTAssert{{#if expectedConstraints.isHexString}}True{{else}}False{{/if}}(isHexString);
+        }
+        {{/if}}
+        {{#if (hasProperty expectedConstraints "maxLength")}}
         {
           {{> actualValue}}
           XCTAssertLessThanOrEqual([actualValue length], {{expectedConstraints.maxLength}});
         }
         {{/if}}
-        {{#if expectedConstraints.minValue}}
+        {{#if (hasProperty expectedConstraints "minValue")}}
         {
           {{> actualValue}}
-          XCTAssertGreaterThanOrEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.minValue}});
+          if (actualValue != nil) {
+            XCTAssertGreaterThanOrEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.minValue type}});
+          }
         }
         {{/if}}
-        {{#if expectedConstraints.maxValue}}
+        {{#if (hasProperty expectedConstraints "maxValue")}}
         {
           {{> actualValue}}
-          XCTAssertLessThanOrEqual([actualValue  {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.maxValue}});
+          if (actualValue != nil) {
+            XCTAssertLessThanOrEqual([actualValue  {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.maxValue type}});
+          }
         }
         {{/if}}
-        {{#if expectedConstraints.notValue}}
+        {{#if (hasProperty expectedConstraints "notValue")}}
         {
           {{> actualValue}}
-          XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{expectedConstraints.notValue}});
+        {{#if (isLiteralNull expectedConstraints.notValue)}}
+          XCTAssertFalse(actualValue == nil);
+        {{else}}
+          if (actualValue != nil) {
+            {{#if (isString type)}}
+            XCTAssertNotEqualObjects(actualValue, {{expectedConstraints.notValue}});
+            {{else}}
+            XCTAssertNotEqual([actualValue {{asObjectiveCNumberType "" type true}}Value], {{asTypedLiteral expectedConstraints.notValue type}});
+            {{/if}}
+          }
+        {{/if}}
         }
         {{/if}}
         {{/if}}
         {{/chip_tests_item_response_parameters}}
 
-        {{else}}
-        XCTAssertEqual(testSendCluster{{parent.filename}}_{{asTestIndex waitForReport.index}}_{{asUpperCamelCase waitForReport.command}}_Fulfilled, true);
-        {{/unless}}
         {{#unless async}}
         [expectation fulfill];
         {{else}}
         testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}_Fulfilled = true;
         {{/unless}}
+        {{else}}
+          {{! We're a subscription }}
+          if ({{> subscribeDataCallback}} != nil) {
+            ResponseHandler callback = {{> subscribeDataCallback}};
+            {{> subscribeDataCallback}} = nil;
+            callback(value, err);
+          }
         {{/unless}}
-    }];
+        {{/if}}
+    }{{#unless isWaitForReport}}]{{/unless}};
 
 {{/if}}
     {{#unless async}}

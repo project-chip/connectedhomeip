@@ -17,21 +17,15 @@ limitations under the License.
 <configurator>
   <domain name="CHIP"/>
 
-
   <cluster>
-    <domain>General</domain>
     <name>Power Source Configuration</name>
-    <code>0x002e</code>
+    <domain>CHIP</domain>
+    <description>This cluster is used to describe the configuration and capabilities of a Device's power system.</description>
+    <code>0x002E</code>
     <define>POWER_SOURCE_CONFIGURATION_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
-    <description>This cluster is used to describe the configuration and capabilities of a Device’s power system. It is
-among the clusters referenced by the Root Node device type, and provides an ordering overview as
-well as linking to the one or more endpoints each carrying a Power device type and Power Source
-cluster.</description>
-    <!-- Base data types -->
-
-    <!-- Test Commands -->
-
+    <globalAttribute side="either" code="0xFFFD" value="1"/>
+    <attribute side="server" code="0x0000" define="SOURCES" type="ARRAY" entryType="INT8U" length="6" writable="false" optional="false">Sources</attribute>
   </cluster>
 </configurator>
