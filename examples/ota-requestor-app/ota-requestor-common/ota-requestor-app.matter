@@ -21,18 +21,18 @@ server cluster Basic = 40 {
     boolean reachableNewValue = 0;
   }
 
-  attribute(readonly, reportable) int16u interactionModelVersion = 0;
-  attribute(readonly, reportable) char_string vendorName = 1;
-  attribute(readonly, reportable) vendor_id vendorID = 2;
-  attribute(readonly, reportable) char_string productName = 3;
-  attribute(readonly, reportable) int16u productID = 4;
-  attribute(writable, reportable) char_string nodeLabel = 5;
-  attribute(writable, reportable) char_string location = 6;
-  attribute(readonly, reportable) int16u hardwareVersion = 7;
-  attribute(readonly, reportable) char_string hardwareVersionString = 8;
-  attribute(readonly, reportable) int32u softwareVersion = 9;
-  attribute(readonly, reportable) char_string softwareVersionString = 10;
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(readonly) int16u interactionModelVersion = 0;
+  attribute(readonly) char_string vendorName = 1;
+  attribute(readonly) vendor_id vendorID = 2;
+  attribute(readonly) char_string productName = 3;
+  attribute(readonly) int16u productID = 4;
+  attribute(writable) char_string nodeLabel = 5;
+  attribute(writable) char_string location = 6;
+  attribute(readonly) int16u hardwareVersion = 7;
+  attribute(readonly) char_string hardwareVersionString = 8;
+  attribute(readonly) int32u softwareVersion = 9;
+  attribute(readonly) char_string softwareVersionString = 10;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
@@ -60,12 +60,12 @@ server cluster GeneralCommissioning = 48 {
     INT32U failSafeExpiryLengthMs = 1;
   }
 
-  attribute(writable, reportable) int64u breadcrumb = 0;
-  attribute(readonly, reportable) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  attribute(writable) int64u breadcrumb = 0;
+  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
   attribute(readonly) enum8 regulatoryConfig = 2;
   attribute(readonly) enum8 locationCapability = 3;
   attribute(readonly) bitmap32 featureMap = 65532;
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
@@ -164,7 +164,7 @@ server cluster NetworkCommissioning = 49 {
   attribute(readonly) octet_string lastNetworkID = 6;
   attribute(readonly) int32u lastConnectErrorValue = 7;
   attribute(readonly) bitmap32 featureMap = 65532;
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
     OCTET_STRING operationalDataset = 0;
@@ -245,7 +245,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     kDownloadProtocolNotSupported = 3;
   }
 
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct ApplyUpdateRequestRequest {
     OCTET_STRING updateToken = 0;
@@ -341,11 +341,11 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
     nullable INT64S platformCode = 3;
   }
 
-  attribute(writable, reportable) ProviderLocation defaultOtaProviders[] = 0;
-  attribute(readonly, reportable) boolean updatePossible = 1;
-  attribute(readonly, reportable) OTAUpdateStateEnum updateState = 2;
-  attribute(readonly, reportable) int8u updateStateProgress = 3;
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(writable) ProviderLocation defaultOtaProviders[] = 0;
+  attribute(readonly) boolean updatePossible = 1;
+  attribute(readonly) OTAUpdateStateEnum updateState = 2;
+  attribute(readonly) int8u updateStateProgress = 3;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
     node_id providerNodeId = 0;
@@ -381,12 +381,12 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING label = 6;
   }
 
-  attribute(readonly, reportable) FabricDescriptor fabricsList[] = 1;
-  attribute(readonly, reportable) int8u supportedFabrics = 2;
-  attribute(readonly, reportable) int8u commissionedFabrics = 3;
-  attribute(readonly, reportable) OCTET_STRING trustedRootCertificates[] = 4;
-  attribute(readonly, reportable) fabric_idx currentFabricIndex = 5;
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(readonly) FabricDescriptor fabricsList[] = 1;
+  attribute(readonly) int8u supportedFabrics = 2;
+  attribute(readonly) int8u commissionedFabrics = 3;
+  attribute(readonly) OCTET_STRING trustedRootCertificates[] = 4;
+  attribute(readonly) fabric_idx currentFabricIndex = 5;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
