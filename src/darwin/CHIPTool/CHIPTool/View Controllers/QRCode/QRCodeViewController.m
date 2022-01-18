@@ -46,8 +46,8 @@
 
 - (NSString *)hexString
 {
-    const unsigned char *bytes = (const unsigned char *)self.bytes;
-    NSMutableString *hex = [NSMutableString new];
+    const unsigned char * bytes = (const unsigned char *) self.bytes;
+    NSMutableString * hex = [NSMutableString new];
     for (NSInteger i = 0; i < self.length; i++) {
         [hex appendFormat:@"%02x", bytes[i]];
     }
@@ -697,7 +697,7 @@
     MasterKey = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kThreadNetworkKeyDefaultsKey);
     Channel = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kThreadNetworkChannelDefaultsKey);
 
-    CHIPThreadOperationalDataset *threadDataSet =
+    CHIPThreadOperationalDataset * threadDataSet =
         [[CHIPThreadOperationalDataset alloc] initWithNetworkName:nil
                                                     extendedPANID:[self convertString:ExtPanID]
                                                         masterKey:[self convertString:MasterKey]
