@@ -151,7 +151,7 @@ void TestCommandInteraction::TestNoHandler(nlTestSuite * apSuite, void * apConte
     ctx.EnableAsyncDispatch();
 
     chip::Controller::InvokeCommandRequest(&ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, request, onSuccessCb,
-                                           onFailureCb, Optional<System::Clock::Timeout>());
+                                           onFailureCb);
 
     ctx.DrainAndServiceIO();
 
