@@ -103,6 +103,7 @@ class ClusterObjectTests:
 
     @classmethod
     async def SendWriteRequest(cls, devCtrl):
+        logger.info("1: Trivial writes (multiple attributes)")
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
                                                (0, Clusters.Basic.Attributes.NodeLabel(
@@ -117,12 +118,26 @@ class ClusterObjectTests:
                             AttributeId=6), Status=chip.interaction_model.Status.InvalidValue)
         ]
 
+        logger.info(f"Received WriteResponse: {res}")
         if res != expectedRes:
             for i in range(len(res)):
                 if res[i] != expectedRes[i]:
                     logger.error(
                         f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
-            raise AssertionError("Read returned unexpected result.")
+            raise AssertionError("Write returned unexpected result.")
+
+        logger.info("2: Write chunked list")
+        res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
+                                           attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString([b"0123456789abcdef" * 32] * 5))])
+        expectedRes = [
+            AttributeStatus(Path=AttributePath(
+                EndpointId=1, Attribute=Clusters.TestCluster.Attributes.ListLongOctetString), Status=chip.interaction_model.Status.Success),
+        ]
+
+        logger.info(f"Received WriteResponse: {res}")
+        if res != expectedRes:
+            logger.error(f"Expect {expectedRes} got {res}")
+            raise AssertionError("Write returned unexpected result.")
 
     @classmethod
     async def TestSubscribeAttribute(cls, devCtrl):
@@ -343,9 +358,10 @@ class ClusterObjectTests:
             await cls.RoundTripTestWithBadEndpoint(devCtrl)
             await cls.SendCommandWithResponse(devCtrl)
             await cls.TestReadEventRequests(devCtrl, 1)
-            await cls.SendWriteRequest(devCtrl)
             await cls.TestReadAttributeRequests(devCtrl)
             await cls.TestSubscribeAttribute(devCtrl)
+            # Note: Write will change some attribute values, always put it after read tests
+            await cls.SendWriteRequest(devCtrl)
             await cls.TestTimedRequest(devCtrl)
         except Exception as ex:
             logger.error(

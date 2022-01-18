@@ -218,6 +218,90 @@ CHIP_ERROR WriteClient::PrepareNewChunk()
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR WriteClient::PutPreencodedAttributeWritePayload(const chip::app::ConcreteDataAttributePath & attributePath,
+                                                           const TLV::TLVReader & data)
+{
+    TLV::TLVReader dataToWrite;
+    dataToWrite.Init(data);
+    ReturnErrorOnFailure(PrepareNewChunk());
+
+    // ListIndex is missing and the data is an array -- we are writing a whole list.
+    if ((!attributePath.IsListOperation() || attributePath.mListOp == ConcreteDataAttributePath::ListOperation::ReplaceAll) &&
+        dataToWrite.GetType() == TLV::TLVType::kTLVType_Array)
+    {
+        TLV::TLVWriter backupWriter;
+        TLV::TLVReader valueReader;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        chip::TLV::TLVWriter * writer = nullptr;
+
+        ConcreteDataAttributePath path =
+            ConcreteDataAttributePath(attributePath.mEndpointId, attributePath.mClusterId, attributePath.mAttributeId);
+
+        dataToWrite.OpenContainer(valueReader);
+
+        // Encode a list with only one element before all other data. Since we are using a clean chunk for this payload, this call
+        // must success. Note: This is a hack for ACL cluster, since the first element must gurantee itself admin priviledge, we do
+        // not encode a real empty list, instead, we encode a list with first element.
+        {
+            TLV::TLVType outerType;
+            ReturnErrorOnFailure(PrepareAttribute(path));
+            VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+            ReturnErrorOnFailure(writer->StartContainer(TLV::ContextTag(to_underlying(app::AttributeDataIB::Tag::kData)),
+                                                        TLV::TLVType::kTLVType_Array, outerType));
+            err = valueReader.Next();
+            if (err == CHIP_NO_ERROR)
+            {
+                ReturnErrorOnFailure(writer->CopyElement(valueReader));
+            }
+            else if (err != CHIP_END_OF_TLV)
+            {
+                ReturnErrorOnFailure(err);
+            }
+            ReturnErrorOnFailure(writer->EndContainer(outerType));
+            ReturnErrorOnFailure(FinishAttribute());
+        }
+
+        path.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
+        while ((err = valueReader.Next()) == CHIP_NO_ERROR)
+        {
+            mWriteRequestBuilder.GetWriteRequests().Checkpoint(backupWriter);
+
+            // First attempt to write this attribute.
+            err = PutPreencodedAttributeWritePayload(path, valueReader);
+            if (err == CHIP_ERROR_NO_MEMORY || err == CHIP_ERROR_BUFFER_TOO_SMALL)
+            {
+                // If it failed with no memory, then we create a new chunk for it.
+                mWriteRequestBuilder.GetWriteRequests().Rollback(backupWriter);
+                ReturnErrorOnFailure(PrepareNewChunk());
+                ReturnErrorOnFailure(PutPreencodedAttributeWritePayload(path, valueReader));
+                // Since we have created a new chunk for this element, the encode is expected to success.
+            }
+            else
+            {
+                // All other errors are not expected.
+                ReturnErrorOnFailure(err);
+            }
+        }
+
+        if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        return err;
+    }
+    else // We are writing a non-list attribute, or we are writing a single element of a list.
+    {
+        chip::TLV::TLVWriter * writer = nullptr;
+
+        ReturnErrorOnFailure(PrepareAttribute(attributePath));
+        VerifyOrReturnError((writer = GetAttributeDataIBTLVWriter()) != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(writer->CopyElement(TLV::ContextTag(to_underlying(app::AttributeDataIB::Tag::kData)), dataToWrite));
+        ReturnErrorOnFailure(FinishAttribute());
+    }
+    return CHIP_NO_ERROR;
+}
+
 const char * WriteClient::GetStateStr() const
 {
 #if CHIP_DETAIL_LOGGING
