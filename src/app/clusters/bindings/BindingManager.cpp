@@ -118,11 +118,12 @@ CHIP_ERROR BindingManager::LastUnicastBindingRemoved(FabricIndex fabric, NodeId 
     VerifyOrReturnError(fabricInfo != nullptr, CHIP_ERROR_NOT_FOUND);
     PeerId peer                      = fabricInfo->GetPeerIdForNode(node);
     PendingNotificationEntry * entry = mPendingNotificationMap.FindEntry(peer);
-
-    VerifyOrReturnError(entry != nullptr, CHIP_ERROR_NOT_FOUND);
+    if (entry)
+    {
+        mPendingNotificationMap.RemoveEntry(entry);
+    }
 
     mAppServer->GetCASESessionManager()->ReleaseSession(peer);
-    mPendingNotificationMap.RemoveEntry(entry);
     return CHIP_NO_ERROR;
 }
 
