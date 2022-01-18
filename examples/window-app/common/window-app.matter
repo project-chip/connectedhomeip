@@ -837,11 +837,31 @@ server cluster WindowCovering = 258 {
 
 
 endpoint 0 {
+  instantiate cluster AdministratorCommissioning;
+  instantiate cluster Basic;
+  instantiate cluster Descriptor;
+  instantiate cluster EthernetNetworkDiagnostics;
+  instantiate cluster FixedLabel;
+  instantiate cluster GeneralCommissioning;
+  instantiate cluster GeneralDiagnostics;
+  instantiate cluster LocalizationConfiguration;
+  instantiate cluster NetworkCommissioning;
+  instantiate cluster OperationalCredentials;
+  instantiate cluster PowerSource;
+  instantiate cluster SoftwareDiagnostics;
+  instantiate cluster ThreadNetworkDiagnostics;
+  instantiate cluster UserLabel;
+  instantiate cluster WiFiNetworkDiagnostics;
 }
 
 endpoint 1 {
+  instantiate cluster Descriptor;
+  instantiate cluster Identify;
+  instantiate cluster WindowCovering;
 }
 
 endpoint 2 {
+  instantiate cluster Descriptor;
+  instantiate cluster WindowCovering;
 }
 
