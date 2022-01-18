@@ -34,9 +34,15 @@
 
 #include <AppTask.h>
 
+#include "cyhal_wdt.h"
 #include "AppConfig.h"
 #include "init_p6Platform.h"
 #include <app/server/Server.h>
+
+extern "C"
+{
+#include "cy_smif_psoc6.h"
+}
 
 #ifdef HEAP_MONITORING
 #include "MemMonitoring.h"
@@ -62,17 +68,10 @@ using chip::OTAImageProcessorParams;
 using chip::OTARequestor;
 using chip::System::Layer;
 
-void OnStartDelayTimerHandler(chip::System::Layer * systemLayer, void * appState);
-
 OTARequestor gRequestorCore;
-chip::DeviceLayer::GenericOTARequestorDriver gRequestorUser;
+GenericOTARequestorDriver gRequestorUser;
 BDXDownloader gDownloader;
 OTAImageProcessorImpl gImageProcessor;
-
-uint16_t delayQueryTimeInSec    = 0;
-// TODO: Shouldn't these come from a cluster command?
-NodeId providerNodeId           = 0x0;
-FabricIndex providerFabricIndex = 1;
 
 volatile int apperror_cnt;
 // ================================================================================
@@ -106,6 +105,13 @@ int main(void)
 {
     init_p6Platform();
 
+    // Clear watchdog timer (started by bootloader) so that it doesn't trigger a reset
+    cyhal_wdt_t wdt_obj;
+    cyhal_wdt_init(&wdt_obj, cyhal_wdt_get_max_timeout_ms());
+    cyhal_wdt_free(&wdt_obj);
+
+    psoc6_qspi_init();
+
 #ifdef HEAP_MONITORING
     MemMonitoring::startHeapMonitoring();
 #endif
@@ -131,43 +137,18 @@ int main(void)
         appError(ret);
     }
 
-    ret = chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("P6_OTA_REQUESTER");
+    ret = chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("P6_OTA_REQ");
     if (ret != CHIP_NO_ERROR)
     {
         P6_LOG("ConnectivityMgr().SetBLEDeviceName() failed");
         appError(ret);
     }
 
-    // Initialize and interconnect the Requestor and Image Processor objects -- START
-    SetRequestorInstance(&gRequestorCore);
-
-    // Set server instance used for session establishment
-    chip::Server * server = &(chip::Server::GetInstance());
-    gRequestorCore.SetServerInstance(server);
-
-    // Connect the Requestor and Requestor Driver objects
-    gRequestorCore.SetOtaRequestorDriver(&gRequestorUser);
-    gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
-
-    OTAImageProcessorParams ipParams;
-    ipParams.imageFile = CharSpan("test.txt");
-    gImageProcessor.SetOTAImageProcessorParams(ipParams);
-    gImageProcessor.SetOTADownloader(&gDownloader);
-
-    // Connect the Downloader and Image Processor objects
-    gDownloader.SetImageProcessorDelegate(&gImageProcessor);
-
-    gRequestorCore.SetBDXDownloader(&gDownloader);
-
-    // Test Mode operation: If a delay is provided, QueryImage after the timer expires
-    if (delayQueryTimeInSec > 0)
-    {
-        // In this mode Provider node ID and fabric idx must be supplied explicitly from program args
-        gRequestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex, chip::kRootEndpointId);
-
-        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
-                                                    OnStartDelayTimerHandler, nullptr);
-    }
+    //SetRequestorInstance(&gRequestorCore);
+    //gRequestorCore.Init(&(Server::GetInstance()), &gRequestorUser, &gDownloader);
+    //gImageProcessor.SetOTADownloader(&gDownloader);
+    //gDownloader.SetImageProcessorDelegate(&gImageProcessor);
+    //gRequestorUser.Init(&gRequestorCore, &gImageProcessor);
 
     P6_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
@@ -192,9 +173,4 @@ int main(void)
     // Should never get here.
     P6_LOG("vTaskStartScheduler() failed");
     appError(ret);
-}
-
-void OnStartDelayTimerHandler(chip::System::Layer * systemLayer, void * appState)
-{
-    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
