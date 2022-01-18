@@ -114,6 +114,7 @@ struct ControllerInitParams
 
     uint16_t controllerVendorId;
 
+    /* Set fabricIndex to kUndefinedFabricIndex to defeat self commissioning. */
     FabricIndex fabricIndex = kMinValidFabricIndex;
     FabricId fabricId       = kUndefinedFabricId;
 };
@@ -367,7 +368,7 @@ protected:
 
     void PersistNextKeyId();
 
-    FabricIndex mFabricIndex = kMinValidFabricIndex;
+    FabricIndex mFabricIndex = kUndefinedFabricIndex;
 
     OperationalCredentialsDelegate * mOperationalCredentialsDelegate;
 
