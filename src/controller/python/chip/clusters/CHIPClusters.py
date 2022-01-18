@@ -4494,6 +4494,7 @@ class ChipClusters:
                     "attributeId": 0x0000002A,
                     "type": "bytes",
                     "reportable": True,
+                    "writable": True,
                 },
                 0x00000030: {
                     "attributeName": "TimedWriteBoolean",

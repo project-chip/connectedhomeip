@@ -4320,6 +4320,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeListLongOctetStringWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeListLongOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeListLongOctetStringWithMinInterval:(uint16_t)minInterval
                                                  maxInterval:(uint16_t)maxInterval
                                      subscriptionEstablished:
