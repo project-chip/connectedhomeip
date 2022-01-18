@@ -36,9 +36,9 @@ server cluster AdministratorCommissioning = 60 {
     kWindowNotOpen = 3;
   }
 
-  attribute(readonly) int8u windowStatus = 0;
-  attribute(readonly) fabric_idx adminFabricIndex = 1;
-  attribute(readonly) int16u adminVendorId = 2;
+  attribute(readonly, reportable) int8u windowStatus = 0;
+  attribute(readonly, reportable) fabric_idx adminFabricIndex = 1;
+  attribute(readonly, reportable) int16u adminVendorId = 2;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct OpenBasicCommissioningWindowRequest {
@@ -189,7 +189,7 @@ server cluster Basic = 40 {
   attribute(readonly, reportable) char_string serialNumber = 15;
   attribute(writable, reportable) boolean localConfigDisabled = 16;
   attribute(readonly, reportable) boolean reachable = 17;
-  attribute(readonly) char_string uniqueID = 18;
+  attribute(readonly, reportable) char_string uniqueID = 18;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   command MfgSpecificPing(): DefaultSuccess = 0;
@@ -883,29 +883,29 @@ server cluster DoorLock = 257 {
   attribute(readonly, reportable) DlLockType lockType = 1;
   attribute(readonly, reportable) boolean actuatorEnabled = 2;
   attribute(readonly, reportable) DlDoorState doorState = 3;
-  attribute(writable) int32u doorOpenEvents = 4;
-  attribute(writable) int32u doorClosedEvents = 5;
-  attribute(writable) int16u openPeriod = 6;
-  attribute(readonly) int16u numberOfTotalUsersSupported = 17;
-  attribute(readonly) int16u numberOfPINUsersSupported = 18;
-  attribute(readonly) int16u numberOfWeekDaySchedulesSupportedPerUser = 20;
-  attribute(readonly) int16u numberOfYearDaySchedulesSupportedPerUser = 21;
-  attribute(readonly) int16u numberOfHolidaySchedulesSupported = 22;
-  attribute(readonly) int8u maxPINCodeLength = 23;
-  attribute(readonly) int8u minPINCodeLength = 24;
-  attribute(readonly) bitmap8 credentialRulesSupport = 27;
+  attribute(writable, reportable) int32u doorOpenEvents = 4;
+  attribute(writable, reportable) int32u doorClosedEvents = 5;
+  attribute(writable, reportable) int16u openPeriod = 6;
+  attribute(readonly, reportable) int16u numberOfTotalUsersSupported = 17;
+  attribute(readonly, reportable) int16u numberOfPINUsersSupported = 18;
+  attribute(readonly, reportable) int16u numberOfWeekDaySchedulesSupportedPerUser = 20;
+  attribute(readonly, reportable) int16u numberOfYearDaySchedulesSupportedPerUser = 21;
+  attribute(readonly, reportable) int16u numberOfHolidaySchedulesSupported = 22;
+  attribute(readonly, reportable) int8u maxPINCodeLength = 23;
+  attribute(readonly, reportable) int8u minPINCodeLength = 24;
+  attribute(readonly, reportable) bitmap8 credentialRulesSupport = 27;
   attribute(writable, reportable) char_string language = 33;
   attribute(writable, reportable) int32u autoRelockTime = 35;
   attribute(writable, reportable) int8u soundVolume = 36;
   attribute(writable, reportable) DlOperatingMode operatingMode = 37;
-  attribute(readonly) bitmap16 supportedOperatingModes = 38;
-  attribute(readonly) bitmap16 defaultConfigurationRegister = 39;
+  attribute(readonly, reportable) bitmap16 supportedOperatingModes = 38;
+  attribute(readonly, reportable) bitmap16 defaultConfigurationRegister = 39;
   attribute(writable, reportable) boolean enableOneTouchLocking = 41;
-  attribute(writable) boolean enableInsideStatusLED = 42;
+  attribute(writable, reportable) boolean enableInsideStatusLED = 42;
   attribute(writable, reportable) boolean enablePrivacyModeButton = 43;
   attribute(writable, reportable) int8u wrongCodeEntryLimit = 48;
   attribute(writable, reportable) int8u userCodeTemporaryDisableTime = 49;
-  attribute(writable) boolean requirePINforRemoteOperation = 51;
+  attribute(writable, reportable) boolean requirePINforRemoteOperation = 51;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ClearCredentialRequest {
@@ -1008,13 +1008,13 @@ server cluster EthernetNetworkDiagnostics = 55 {
   attribute(readonly, reportable) int64u overrunCount = 6;
   attribute(readonly, reportable) boolean carrierDetect = 7;
   attribute(readonly, reportable) int64u timeSinceReset = 8;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 server cluster FixedLabel = 64 {
-  attribute(readonly) LabelStruct labelList[] = 0;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) LabelStruct labelList[] = 0;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 server cluster FlowMeasurement = 1028 {
@@ -1044,9 +1044,9 @@ server cluster GeneralCommissioning = 48 {
 
   attribute(writable, reportable) int64u breadcrumb = 0;
   attribute(readonly, reportable) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
-  attribute(readonly) enum8 regulatoryConfig = 2;
-  attribute(readonly) enum8 locationCapability = 3;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) enum8 regulatoryConfig = 2;
+  attribute(readonly, reportable) enum8 locationCapability = 3;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
@@ -1529,8 +1529,8 @@ server cluster LevelControl = 8 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute(writable) char_string activeLocale = 1;
-  attribute(readonly) CHAR_STRING supportedLocales[] = 2;
+  attribute(writable, reportable) char_string activeLocale = 1;
+  attribute(readonly, reportable) CHAR_STRING supportedLocales[] = 2;
 }
 
 client cluster MediaInput = 1287 {
@@ -1668,15 +1668,15 @@ server cluster NetworkCommissioning = 49 {
     INT8U lqi = 8;
   }
 
-  attribute(readonly) int8u maxNetworks = 0;
-  attribute(readonly) NetworkInfo networks[] = 1;
-  attribute(readonly) int8u scanMaxTimeSeconds = 2;
-  attribute(readonly) int8u connectMaxTimeSeconds = 3;
-  attribute(writable) boolean interfaceEnabled = 4;
-  attribute(readonly) NetworkCommissioningStatus lastNetworkingStatus = 5;
-  attribute(readonly) octet_string lastNetworkID = 6;
-  attribute(readonly) int32u lastConnectErrorValue = 7;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) int8u maxNetworks = 0;
+  attribute(readonly, reportable) NetworkInfo networks[] = 1;
+  attribute(readonly, reportable) int8u scanMaxTimeSeconds = 2;
+  attribute(readonly, reportable) int8u connectMaxTimeSeconds = 3;
+  attribute(writable, reportable) boolean interfaceEnabled = 4;
+  attribute(readonly, reportable) NetworkCommissioningStatus lastNetworkingStatus = 5;
+  attribute(readonly, reportable) octet_string lastNetworkID = 6;
+  attribute(readonly, reportable) int32u lastConnectErrorValue = 7;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
@@ -2071,7 +2071,7 @@ server cluster SoftwareDiagnostics = 52 {
   attribute(readonly, reportable) int64u currentHeapFree = 1;
   attribute(readonly, reportable) int64u currentHeapUsed = 2;
   attribute(readonly, reportable) int64u currentHeapHighWatermark = 3;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -2360,13 +2360,13 @@ server cluster ThreadNetworkDiagnostics = 53 {
   attribute(readonly, reportable) octet_string channelMask = 60;
   attribute(readonly, reportable) OperationalDatasetComponents operationalDatasetComponents[] = 61;
   attribute(readonly, reportable) NetworkFault activeNetworkFaultsList[] = 62;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 server cluster UserLabel = 65 {
-  attribute(writable) LabelStruct labelList[] = 0;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute(writable, reportable) LabelStruct labelList[] = 0;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 server cluster WakeOnLan = 1283 {
@@ -2431,7 +2431,7 @@ server cluster WiFiNetworkDiagnostics = 54 {
   attribute(readonly, reportable) int32u packetUnicastTxCount = 10;
   attribute(readonly, reportable) int64u currentMaxRate = 11;
   attribute(readonly, reportable) int64u overrunCount = 12;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 

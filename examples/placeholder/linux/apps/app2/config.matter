@@ -34,7 +34,7 @@ server cluster Basic = 40 {
   attribute(readonly, reportable) char_string serialNumber = 15;
   attribute(writable, reportable) boolean localConfigDisabled = 16;
   attribute(readonly, reportable) boolean reachable = 17;
-  attribute(readonly) char_string uniqueID = 18;
+  attribute(readonly, reportable) char_string uniqueID = 18;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -399,14 +399,14 @@ server cluster NetworkCommissioning = 49 {
     INT8U lqi = 8;
   }
 
-  attribute(readonly) int8u maxNetworks = 0;
-  attribute(readonly) NetworkInfo networks[] = 1;
-  attribute(readonly) int8u scanMaxTimeSeconds = 2;
-  attribute(readonly) int8u connectMaxTimeSeconds = 3;
-  attribute(writable) boolean interfaceEnabled = 4;
-  attribute(readonly) NetworkCommissioningStatus lastNetworkingStatus = 5;
-  attribute(readonly) octet_string lastNetworkID = 6;
-  attribute(readonly) int32u lastConnectErrorValue = 7;
+  attribute(readonly, reportable) int8u maxNetworks = 0;
+  attribute(readonly, reportable) NetworkInfo networks[] = 1;
+  attribute(readonly, reportable) int8u scanMaxTimeSeconds = 2;
+  attribute(readonly, reportable) int8u connectMaxTimeSeconds = 3;
+  attribute(writable, reportable) boolean interfaceEnabled = 4;
+  attribute(readonly, reportable) NetworkCommissioningStatus lastNetworkingStatus = 5;
+  attribute(readonly, reportable) octet_string lastNetworkID = 6;
+  attribute(readonly, reportable) int32u lastConnectErrorValue = 7;
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 

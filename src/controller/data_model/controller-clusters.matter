@@ -42,12 +42,12 @@ client cluster AccessControl = 31 {
 
   attribute(writable, reportable) AccessControlEntry acl[] = 0;
   attribute(writable, reportable) ExtensionEntry extension[] = 1;
-  attribute(readonly) attrib_id attributeList[] = 65531;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 client cluster AccountLogin = 1294 {
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct GetSetupPINRequestRequest {
@@ -81,10 +81,10 @@ client cluster AdministratorCommissioning = 60 {
     kWindowNotOpen = 3;
   }
 
-  attribute(readonly) int8u windowStatus = 0;
-  attribute(readonly) fabric_idx adminFabricIndex = 1;
-  attribute(readonly) int16u adminVendorId = 2;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) int8u windowStatus = 0;
+  attribute(readonly, reportable) fabric_idx adminFabricIndex = 1;
+  attribute(readonly, reportable) int16u adminVendorId = 2;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct OpenBasicCommissioningWindowRequest {
@@ -122,11 +122,11 @@ client cluster ApplicationBasic = 1293 {
   attribute(readonly, reportable) int16u vendorId = 1;
   attribute(readonly, reportable) char_string applicationName = 2;
   attribute(readonly, reportable) int16u productId = 3;
-  attribute(writable) ApplicationBasicApplication applicationApp = 4;
+  attribute(writable, reportable) ApplicationBasicApplication applicationApp = 4;
   attribute(readonly, reportable) ApplicationStatusEnum applicationStatus = 5;
   attribute(readonly, reportable) char_string applicationVersion = 6;
-  attribute(readonly) vendor_id allowedVendorList[] = 7;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) vendor_id allowedVendorList[] = 7;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -143,7 +143,7 @@ client cluster ApplicationLauncher = 1292 {
   }
 
   attribute(readonly, reportable) INT16U applicationLauncherList[] = 0;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct HideAppRequestRequest {
@@ -187,7 +187,7 @@ client cluster AudioOutput = 1291 {
 
   attribute(readonly, reportable) OutputInfo audioOutputList[] = 0;
   attribute(readonly, reportable) int8u currentAudioOutput = 1;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct RenameOutputRequestRequest {
@@ -208,7 +208,7 @@ client cluster BarrierControl = 259 {
   attribute(readonly, reportable) bitmap16 barrierSafetyStatus = 2;
   attribute(readonly, reportable) bitmap8 barrierCapabilities = 3;
   attribute(readonly, reportable) int8u barrierPosition = 10;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct BarrierControlGoToPercentRequest {
@@ -252,8 +252,8 @@ client cluster Basic = 40 {
   attribute(readonly, reportable) char_string serialNumber = 15;
   attribute(writable, reportable) boolean localConfigDisabled = 16;
   attribute(readonly, reportable) boolean reachable = 17;
-  attribute(readonly) char_string uniqueID = 18;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) char_string uniqueID = 18;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   command MfgSpecificPing(): DefaultSuccess = 0;
@@ -263,12 +263,12 @@ client cluster BinaryInputBasic = 15 {
   attribute(writable, reportable) boolean outOfService = 81;
   attribute(writable, reportable) boolean presentValue = 85;
   attribute(readonly, reportable) bitmap8 statusFlags = 111;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 client cluster Binding = 30 {
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct BindRequest {
@@ -295,7 +295,7 @@ client cluster BooleanState = 69 {
   }
 
   attribute(readonly, reportable) boolean stateValue = 0;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -360,7 +360,7 @@ client cluster BridgedActions = 37 {
   attribute(readonly, reportable) ActionStruct actionList[] = 0;
   attribute(readonly, reportable) EndpointListStruct endpointList[] = 1;
   attribute(readonly, reportable) long_char_string setupUrl = 2;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct DisableActionRequest {
@@ -443,7 +443,7 @@ client cluster BridgedActions = 37 {
 }
 
 client cluster BridgedDeviceBasic = 57 {
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -466,7 +466,7 @@ client cluster Channel = 1284 {
   }
 
   attribute(readonly, reportable) ChannelInfo channelList[] = 0;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ChangeChannelByNumberRequestRequest {
@@ -591,7 +591,7 @@ client cluster ColorControl = 768 {
   attribute(readonly, reportable) int16u colorTempPhysicalMax = 16396;
   attribute(readonly, reportable) int16u coupleColorTempToLevelMinMireds = 16397;
   attribute(writable, reportable) int16u startUpColorTemperatureMireds = 16400;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ColorLoopSetRequest {
@@ -829,7 +829,7 @@ client cluster ContentLauncher = 1290 {
 
   attribute(readonly, reportable) CHAR_STRING acceptHeaderList[] = 0;
   attribute(writable, reportable) bitmap32 supportedStreamingProtocols = 1;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct LaunchContentRequestRequest {
@@ -863,7 +863,7 @@ client cluster Descriptor = 29 {
   attribute(readonly, reportable) CLUSTER_ID serverList[] = 1;
   attribute(readonly, reportable) CLUSTER_ID clientList[] = 2;
   attribute(readonly, reportable) ENDPOINT_NO partsList[] = 3;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -887,7 +887,7 @@ client cluster DiagnosticLogs = 50 {
     kBdx = 1;
   }
 
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
 
   request struct RetrieveLogsRequestRequest {
     LogsIntent intent = 0;
@@ -1145,19 +1145,19 @@ client cluster DoorLock = 257 {
   attribute(readonly, reportable) DlLockType lockType = 1;
   attribute(readonly, reportable) boolean actuatorEnabled = 2;
   attribute(readonly, reportable) DlDoorState doorState = 3;
-  attribute(readonly) int16u numberOfTotalUsersSupported = 17;
-  attribute(readonly) int16u numberOfPINUsersSupported = 18;
-  attribute(readonly) int8u maxPINCodeLength = 23;
-  attribute(readonly) int8u minPINCodeLength = 24;
+  attribute(readonly, reportable) int16u numberOfTotalUsersSupported = 17;
+  attribute(readonly, reportable) int16u numberOfPINUsersSupported = 18;
+  attribute(readonly, reportable) int8u maxPINCodeLength = 23;
+  attribute(readonly, reportable) int8u minPINCodeLength = 24;
   attribute(writable, reportable) char_string language = 33;
   attribute(writable, reportable) int32u autoRelockTime = 35;
   attribute(writable, reportable) int8u soundVolume = 36;
   attribute(writable, reportable) DlOperatingMode operatingMode = 37;
-  attribute(readonly) bitmap16 supportedOperatingModes = 38;
+  attribute(readonly, reportable) bitmap16 supportedOperatingModes = 38;
   attribute(writable, reportable) boolean enableOneTouchLocking = 41;
   attribute(writable, reportable) boolean enablePrivacyModeButton = 43;
   attribute(writable, reportable) int8u wrongCodeEntryLimit = 48;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ClearCredentialRequest {
@@ -1249,7 +1249,7 @@ client cluster ElectricalMeasurement = 2820 {
   attribute(readonly, reportable) int16s activePower = 1291;
   attribute(readonly, reportable) int16s activePowerMin = 1292;
   attribute(readonly, reportable) int16s activePowerMax = 1293;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -1276,8 +1276,8 @@ client cluster EthernetNetworkDiagnostics = 55 {
   attribute(readonly, reportable) int64u overrunCount = 6;
   attribute(readonly, reportable) boolean carrierDetect = 7;
   attribute(readonly, reportable) int64u timeSinceReset = 8;
-  attribute(readonly) attrib_id attributeList[] = 65531;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   command ResetCounts(): DefaultSuccess = 0;
@@ -1285,7 +1285,7 @@ client cluster EthernetNetworkDiagnostics = 55 {
 
 client cluster FixedLabel = 64 {
   attribute(readonly, reportable) LabelStruct labelList[] = 0;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -1294,7 +1294,7 @@ client cluster FlowMeasurement = 1028 {
   attribute(readonly, reportable) int16s minMeasuredValue = 1;
   attribute(readonly, reportable) int16s maxMeasuredValue = 2;
   attribute(readonly, reportable) int16u tolerance = 3;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -1318,9 +1318,9 @@ client cluster GeneralCommissioning = 48 {
 
   attribute(writable, reportable) int64u breadcrumb = 0;
   attribute(readonly, reportable) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
-  attribute(readonly) enum8 regulatoryConfig = 2;
-  attribute(readonly) enum8 locationCapability = 3;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) enum8 regulatoryConfig = 2;
+  attribute(readonly, reportable) enum8 locationCapability = 3;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
@@ -1442,7 +1442,7 @@ client cluster GeneralDiagnostics = 51 {
   attribute(readonly, reportable) ENUM8 activeHardwareFaults[] = 5;
   attribute(readonly, reportable) ENUM8 activeRadioFaults[] = 6;
   attribute(readonly, reportable) ENUM8 activeNetworkFaults[] = 7;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -1478,9 +1478,9 @@ client cluster GroupKeyManagement = 63 {
 
   attribute(readonly, reportable) GroupKey groupKeyMap[] = 0;
   attribute(readonly, reportable) GroupInfo groupTable[] = 1;
-  attribute(readonly) int16u maxGroupsPerFabric = 2;
-  attribute(readonly) int16u maxGroupKeysPerFabric = 3;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) int16u maxGroupsPerFabric = 2;
+  attribute(readonly, reportable) int16u maxGroupKeysPerFabric = 3;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct KeySetReadRequest {
@@ -1515,7 +1515,7 @@ client cluster GroupKeyManagement = 63 {
 
 client cluster Groups = 4 {
   attribute(readonly, reportable) bitmap8 nameSupport = 0;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
@@ -1594,7 +1594,7 @@ client cluster Identify = 3 {
 
   attribute(writable, reportable) int16u identifyTime = 0;
   attribute(readonly, reportable) enum8 identifyType = 1;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
@@ -1626,7 +1626,7 @@ client cluster IlluminanceMeasurement = 1024 {
   attribute(readonly, reportable) int16u maxMeasuredValue = 2;
   attribute(readonly, reportable) int16u tolerance = 3;
   attribute(readonly, reportable) enum8 lightSensorType = 4;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -1726,7 +1726,7 @@ client cluster KeypadInput = 1289 {
     kInvalidKeyInCurrentState = 2;
   }
 
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct SendKeyRequestRequest {
@@ -1765,8 +1765,8 @@ client cluster LevelControl = 8 {
   attribute(writable, reportable) int16u offTransitionTime = 19;
   attribute(writable, reportable) int8u defaultMoveRate = 20;
   attribute(writable, reportable) int8u startUpCurrentLevel = 16384;
-  attribute(readonly) attrib_id attributeList[] = 65531;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct MoveRequest {
@@ -1823,12 +1823,12 @@ client cluster LevelControl = 8 {
 }
 
 client cluster LocalizationConfiguration = 43 {
-  attribute(writable) char_string activeLocale = 1;
-  attribute(readonly) CHAR_STRING supportedLocales[] = 2;
+  attribute(writable, reportable) char_string activeLocale = 1;
+  attribute(readonly, reportable) CHAR_STRING supportedLocales[] = 2;
 }
 
 client cluster LowPower = 1288 {
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   command Sleep(): DefaultSuccess = 0;
@@ -1859,7 +1859,7 @@ client cluster MediaInput = 1287 {
 
   attribute(readonly, reportable) InputInfo mediaInputList[] = 0;
   attribute(readonly, reportable) int8u currentMediaInput = 1;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct RenameInputRequestRequest {
@@ -1897,10 +1897,10 @@ client cluster MediaPlayback = 1286 {
   attribute(readonly, reportable) PlaybackStateEnum playbackState = 0;
   attribute(readonly, reportable) epoch_us startTime = 1;
   attribute(readonly, reportable) int64u duration = 2;
-  attribute(readonly) single playbackSpeed = 4;
+  attribute(readonly, reportable) single playbackSpeed = 4;
   attribute(readonly, reportable) int64u seekRangeEnd = 5;
   attribute(readonly, reportable) int64u seekRangeStart = 6;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct SeekRequestRequest {
@@ -1944,7 +1944,7 @@ client cluster ModeSelect = 80 {
   attribute(writable, reportable) int8u onMode = 2;
   attribute(readonly, reportable) int8u startUpMode = 3;
   attribute(readonly, reportable) char_string description = 4;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ChangeToModeRequest {
@@ -2004,14 +2004,14 @@ client cluster NetworkCommissioning = 49 {
     INT8U lqi = 8;
   }
 
-  attribute(readonly) int8u maxNetworks = 0;
-  attribute(readonly) NetworkInfo networks[] = 1;
-  attribute(readonly) int8u scanMaxTimeSeconds = 2;
-  attribute(readonly) int8u connectMaxTimeSeconds = 3;
-  attribute(writable) boolean interfaceEnabled = 4;
-  attribute(readonly) NetworkCommissioningStatus lastNetworkingStatus = 5;
-  attribute(readonly) octet_string lastNetworkID = 6;
-  attribute(readonly) int32u lastConnectErrorValue = 7;
+  attribute(readonly, reportable) int8u maxNetworks = 0;
+  attribute(readonly, reportable) NetworkInfo networks[] = 1;
+  attribute(readonly, reportable) int8u scanMaxTimeSeconds = 2;
+  attribute(readonly, reportable) int8u connectMaxTimeSeconds = 3;
+  attribute(writable, reportable) boolean interfaceEnabled = 4;
+  attribute(readonly, reportable) NetworkCommissioningStatus lastNetworkingStatus = 5;
+  attribute(readonly, reportable) octet_string lastNetworkID = 6;
+  attribute(readonly, reportable) int32u lastConnectErrorValue = 7;
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
@@ -2094,7 +2094,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     kDownloadProtocolNotSupported = 3;
   }
 
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ApplyUpdateRequestRequest {
@@ -2195,7 +2195,7 @@ client cluster OtaSoftwareUpdateRequestor = 42 {
   attribute(readonly, reportable) boolean updatePossible = 1;
   attribute(readonly, reportable) OTAUpdateStateEnum updateState = 2;
   attribute(readonly, reportable) int8u updateStateProgress = 3;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
@@ -2213,7 +2213,7 @@ client cluster OccupancySensing = 1030 {
   attribute(readonly, reportable) bitmap8 occupancy = 0;
   attribute(readonly, reportable) enum8 occupancySensorType = 1;
   attribute(readonly, reportable) bitmap8 occupancySensorTypeBitmap = 2;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -2238,7 +2238,7 @@ client cluster OnOff = 6 {
   attribute(writable, reportable) int16u onTime = 16385;
   attribute(writable, reportable) int16u offWaitTime = 16386;
   attribute(writable, reportable) enum8 startUpOnOff = 16387;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
@@ -2264,7 +2264,7 @@ client cluster OnOff = 6 {
 client cluster OnOffSwitchConfiguration = 7 {
   attribute(readonly, reportable) enum8 switchType = 0;
   attribute(writable, reportable) enum8 switchActions = 16;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -2296,7 +2296,7 @@ client cluster OperationalCredentials = 62 {
   attribute(readonly, reportable) int8u commissionedFabrics = 3;
   attribute(readonly, reportable) OCTET_STRING trustedRootCertificates[] = 4;
   attribute(readonly, reportable) fabric_idx currentFabricIndex = 5;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
@@ -2381,22 +2381,22 @@ client cluster PowerSource = 47 {
   attribute(readonly, reportable) enum8 batteryChargeLevel = 14;
   attribute(readonly, reportable) ENUM8 activeBatteryFaults[] = 18;
   attribute(readonly, reportable) enum8 batteryChargeState = 26;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 client cluster PowerSourceConfiguration = 46 {
-  attribute(readonly) INT8U sources[] = 0;
-  attribute(readonly) attrib_id attributeList[] = 65531;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) INT8U sources[] = 0;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 client cluster PressureMeasurement = 1027 {
   attribute(readonly, reportable) int16s measuredValue = 0;
   attribute(readonly, reportable) int16s minMeasuredValue = 1;
   attribute(readonly, reportable) int16s maxMeasuredValue = 2;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -2492,7 +2492,7 @@ client cluster PumpConfigurationAndControl = 512 {
   attribute(writable, reportable) enum8 operationMode = 32;
   attribute(writable, reportable) enum8 controlMode = 33;
   attribute(readonly, reportable) bitmap16 alarmMask = 34;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
@@ -2502,7 +2502,7 @@ client cluster RelativeHumidityMeasurement = 1029 {
   attribute(readonly, reportable) int16u minMeasuredValue = 1;
   attribute(readonly, reportable) int16u maxMeasuredValue = 2;
   attribute(readonly, reportable) int16u tolerance = 3;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -2518,7 +2518,7 @@ client cluster Scenes = 5 {
   attribute(readonly, reportable) int16u currentGroup = 2;
   attribute(readonly, reportable) boolean sceneValid = 3;
   attribute(readonly, reportable) bitmap8 nameSupport = 4;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
@@ -2624,8 +2624,8 @@ client cluster SoftwareDiagnostics = 52 {
   attribute(readonly, reportable) int64u currentHeapFree = 1;
   attribute(readonly, reportable) int64u currentHeapUsed = 2;
   attribute(readonly, reportable) int64u currentHeapHighWatermark = 3;
-  attribute(readonly) attrib_id attributeList[] = 65531;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   command ResetWatermarks(): DefaultSuccess = 0;
@@ -2665,7 +2665,7 @@ client cluster Switch = 59 {
   attribute(readonly, reportable) int8u numberOfPositions = 0;
   attribute(readonly, reportable) int8u currentPosition = 1;
   attribute(readonly, reportable) int8u multiPressMax = 2;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
@@ -2684,7 +2684,7 @@ client cluster TargetNavigator = 1285 {
 
   attribute(readonly, reportable) TargetInfo targetNavigatorList[] = 0;
   attribute(readonly, reportable) int8u currentNavigatorTarget = 1;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct NavigateTargetRequestRequest {
@@ -2705,7 +2705,7 @@ client cluster TemperatureMeasurement = 1026 {
   attribute(readonly, reportable) int16s minMeasuredValue = 1;
   attribute(readonly, reportable) int16s maxMeasuredValue = 2;
   attribute(readonly, reportable) int16u tolerance = 3;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -2815,8 +2815,8 @@ client cluster TestCluster = 1295 {
   attribute(writable, reportable) int8s rangeRestrictedInt8s = 39;
   attribute(writable, reportable) int16u rangeRestrictedInt16u = 40;
   attribute(writable, reportable) int16s rangeRestrictedInt16s = 41;
-  attribute(readonly) LONG_OCTET_STRING listLongOctetString[] = 42;
-  attribute(writable) boolean timedWriteBoolean = 48;
+  attribute(readonly, reportable) LONG_OCTET_STRING listLongOctetString[] = 42;
+  attribute(writable, reportable) boolean timedWriteBoolean = 48;
   attribute(writable, reportable) boolean unsupported = 255;
   attribute(writable, reportable) boolean nullableBoolean = 32768;
   attribute(writable, reportable) bitmap8 nullableBitmap8 = 32769;
@@ -2851,7 +2851,7 @@ client cluster TestCluster = 1295 {
   attribute(writable, reportable) int8s nullableRangeRestrictedInt8s = 32807;
   attribute(writable, reportable) int16u nullableRangeRestrictedInt16u = 32808;
   attribute(writable, reportable) int16s nullableRangeRestrictedInt16s = 32809;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct SimpleStructEchoRequestRequest {
@@ -2990,7 +2990,7 @@ client cluster Thermostat = 513 {
   attribute(readonly, reportable) enum8 startOfWeek = 32;
   attribute(readonly, reportable) int8u numberOfWeeklyTransitions = 33;
   attribute(readonly, reportable) int8u numberOfDailyTransitions = 34;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
@@ -3038,7 +3038,7 @@ client cluster ThermostatUserInterfaceConfiguration = 516 {
   attribute(writable, reportable) enum8 temperatureDisplayMode = 0;
   attribute(writable, reportable) enum8 keypadLockout = 1;
   attribute(writable, reportable) enum8 scheduleProgrammingVisibility = 2;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -3182,21 +3182,21 @@ client cluster ThreadNetworkDiagnostics = 53 {
   attribute(readonly, reportable) octet_string channelMask = 60;
   attribute(readonly, reportable) OperationalDatasetComponents operationalDatasetComponents[] = 61;
   attribute(readonly, reportable) NetworkFault activeNetworkFaultsList[] = 62;
-  attribute(readonly) attrib_id attributeList[] = 65531;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   command ResetCounts(): DefaultSuccess = 0;
 }
 
 client cluster UserLabel = 65 {
-  attribute(writable) LabelStruct labelList[] = 0;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute(writable, reportable) LabelStruct labelList[] = 0;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 client cluster WakeOnLan = 1283 {
   attribute(readonly, reportable) char_string wakeOnLanMacAddress = 0;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
@@ -3257,8 +3257,8 @@ client cluster WiFiNetworkDiagnostics = 54 {
   attribute(readonly, reportable) int32u packetUnicastTxCount = 10;
   attribute(readonly, reportable) int64u currentMaxRate = 11;
   attribute(readonly, reportable) int64u overrunCount = 12;
-  attribute(readonly) attrib_id attributeList[] = 65531;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   command ResetCounts(): DefaultSuccess = 0;
@@ -3283,7 +3283,7 @@ client cluster WindowCovering = 258 {
   attribute(readonly, reportable) int16u installedClosedLimitTilt = 19;
   attribute(writable, reportable) bitmap8 mode = 23;
   attribute(readonly, reportable) bitmap16 safetyStatus = 26;
-  attribute(readonly) attrib_id attributeList[] = 65531;
+  attribute(readonly, reportable) attrib_id attributeList[] = 65531;
   attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
