@@ -1809,7 +1809,7 @@ server cluster NetworkCommissioning = 49 {
   attribute(readonly) octet_string lastNetworkID = 6;
   attribute(readonly) int32u lastConnectErrorValue = 7;
   attribute(readonly) bitmap32 featureMap = 65532;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute(readonly) int17u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
     OCTET_STRING operationalDataset = 0;
