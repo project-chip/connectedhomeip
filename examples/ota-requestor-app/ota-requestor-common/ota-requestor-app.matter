@@ -38,8 +38,8 @@ server cluster Basic = 40 {
 }
 
 server cluster FixedLabel = 64 {
-  attribute(readonly) LabelStruct labelList[] = 0;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute(readonly, reportable) LabelStruct labelList[] = 0;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 server cluster GeneralCommissioning = 48 {
@@ -62,9 +62,9 @@ server cluster GeneralCommissioning = 48 {
 
   attribute(writable, reportable) int64u breadcrumb = 0;
   attribute(readonly, reportable) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
-  attribute(readonly) enum8 regulatoryConfig = 2;
-  attribute(readonly) enum8 locationCapability = 3;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) enum8 regulatoryConfig = 2;
+  attribute(readonly, reportable) enum8 locationCapability = 3;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
@@ -101,8 +101,8 @@ server cluster GeneralCommissioning = 48 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute(writable) char_string activeLocale = 1;
-  attribute(readonly) CHAR_STRING supportedLocales[] = 2;
+  attribute(writable, reportable) char_string activeLocale = 1;
+  attribute(readonly, reportable) CHAR_STRING supportedLocales[] = 2;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -155,15 +155,15 @@ server cluster NetworkCommissioning = 49 {
     INT8U lqi = 8;
   }
 
-  attribute(readonly) int8u maxNetworks = 0;
-  attribute(readonly) NetworkInfo networks[] = 1;
-  attribute(readonly) int8u scanMaxTimeSeconds = 2;
-  attribute(readonly) int8u connectMaxTimeSeconds = 3;
-  attribute(writable) boolean interfaceEnabled = 4;
-  attribute(readonly) NetworkCommissioningStatus lastNetworkingStatus = 5;
-  attribute(readonly) octet_string lastNetworkID = 6;
-  attribute(readonly) int32u lastConnectErrorValue = 7;
-  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly, reportable) int8u maxNetworks = 0;
+  attribute(readonly, reportable) NetworkInfo networks[] = 1;
+  attribute(readonly, reportable) int8u scanMaxTimeSeconds = 2;
+  attribute(readonly, reportable) int8u connectMaxTimeSeconds = 3;
+  attribute(writable, reportable) boolean interfaceEnabled = 4;
+  attribute(readonly, reportable) NetworkCommissioningStatus lastNetworkingStatus = 5;
+  attribute(readonly, reportable) octet_string lastNetworkID = 6;
+  attribute(readonly, reportable) int32u lastConnectErrorValue = 7;
+  attribute(readonly, reportable) bitmap32 featureMap = 65532;
   attribute(readonly, reportable) int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
@@ -461,8 +461,8 @@ server cluster OperationalCredentials = 62 {
 }
 
 server cluster UserLabel = 65 {
-  attribute(writable) LabelStruct labelList[] = 0;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute(writable, reportable) LabelStruct labelList[] = 0;
+  attribute(readonly, reportable) int16u clusterRevision = 65533;
 }
 
 
