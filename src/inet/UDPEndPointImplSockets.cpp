@@ -530,6 +530,17 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
 #endif // defined(IP_PKTINFO)
 #endif // INET_CONFIG_ENABLE_IPV4
 
+#ifdef IPV6_PKTINFO
+        if (addressType == IPAddressType::kIPv6)
+        {
+            res = setsockopt(mSocket, IPPROTO_IPV6, IPV6_PKTINFO, &one, sizeof(one));
+            if (res != 0)
+            {
+                ChipLogError(Inet, "IPV6_PKTINFO failed: %d", errno);
+            }
+        }
+#endif // defined(IPV6_PKTINFO)
+
 #ifdef IPV6_RECVPKTINFO
         if (addressType == IPAddressType::kIPv6)
         {
