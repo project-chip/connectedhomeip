@@ -799,6 +799,14 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
 CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, NodeId * nodeId, FabricId * fabricId);
 
 /**
+ * Extract Node ID and Compressed Fabric ID from an operational certificate
+ * and root public key.
+ *
+ * @return CHIP_ERROR on failure or CHIP_NO_ERROR otherwise.
+ */
+CHIP_ERROR ExtractOperationalDiscoveryIdFromRootPubKeyOpCert(const Crypto::P256PublicKey & rootPubKey, ByteSpan noc, PeerId & id);
+
+/**
  * Extract CASE Authenticated Tags from an operational certificate in ByteSpan TLV-encoded form.
  *
  * All values in the 'cats' struct will be set either to a valid CAT value or zero (undefined) value.

@@ -1016,7 +1016,7 @@ static void TestChipCert_VerifyGeneratedCertsNoICA(nlTestSuite * inSuite, void *
     NL_TEST_ASSERT(inSuite, certSet.FindValidCert(subjectDN, subjectKeyId, validContext, &resultCert) == CHIP_NO_ERROR);
 }
 
-static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
+static void TestChipCert_ExtractNodeIdFabricId(nlTestSuite * inSuite, void * inContext)
 {
     struct TestCase
     {
@@ -1043,7 +1043,7 @@ static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
     };
     // clang-format on
 
-    // Test extraction from the raw ByteSpan form.
+    // Test node ID and fabric ID extraction from the raw ByteSpan form.
     for (auto & testCase : sTestCases)
     {
         ByteSpan cert;
@@ -1058,7 +1058,7 @@ static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, fabricId == testCase.ExpectedFabricId);
     }
 
-    // Test extraction from the parsed form.
+    // Test node ID and fabric ID extraction from the parsed form.
     ChipCertificateSet certSet;
     for (auto & testCase : sTestCases)
     {
@@ -1077,7 +1077,7 @@ static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
         certSet.Release();
     }
 
-    // Test extraction from the parsed form.
+    // Test fabric ID extraction from the parsed form.
     for (auto & testCase : sTestCases)
     {
         CHIP_ERROR err = certSet.Init(1);
@@ -1105,6 +1105,66 @@ static void TestChipCert_ExtractPeerId(nlTestSuite * inSuite, void * inContext)
         err = ExtractFabricIdFromCert(certSet.GetCertSet()[0], &fabricId);
         NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
         certSet.Release();
+    }
+}
+
+static void TestChipCert_ExtractOperationalDiscoveryId(nlTestSuite * inSuite, void * inContext)
+{
+    struct TestCase
+    {
+        uint8_t Noc;
+        uint8_t Rcac;
+        uint64_t ExpectedNodeId;
+        uint64_t ExpectedFabricId;
+        uint64_t ExpectedCompressedFabricId;
+    };
+
+    // clang-format off
+    static constexpr TestCase sTestCases[] = {
+        // Cert                  ICA               ExpectedNodeId       ExpectedFabricId    ExpectedCompressedFabricId
+        // ===========================================================================================================
+        {  TestCert::kNode01_01, TestCert::kRoot01, 0xDEDEDEDE00010001, 0xFAB000000000001D, 0x3893C4324526C775 },
+        {  TestCert::kNode01_02, TestCert::kRoot01, 0xDEDEDEDE00010002, 0xFAB000000000001D, 0x3893C4324526C775 },
+        {  TestCert::kNode02_01, TestCert::kRoot02, 0xDEDEDEDE00020001, 0xFAB000000000001D, 0x89E8911178DAC089 },
+        {  TestCert::kNode02_02, TestCert::kRoot02, 0xDEDEDEDE00020002, 0xFAB000000000001D, 0x89E8911178DAC089 },
+        {  TestCert::kNode02_03, TestCert::kRoot02, 0xDEDEDEDE00020003, 0xFAB000000000001D, 0x89E8911178DAC089 },
+        {  TestCert::kNode02_04, TestCert::kRoot02, 0xDEDEDEDE00020004, 0xFAB000000000001D, 0x89E8911178DAC089 },
+        {  TestCert::kNode02_05, TestCert::kRoot02, 0xDEDEDEDE00020005, 0xFAB000000000001D, 0x89E8911178DAC089 },
+        {  TestCert::kNode02_06, TestCert::kRoot02, 0xDEDEDEDE00020006, 0xFAB000000000001D, 0x89E8911178DAC089 },
+        {  TestCert::kNode02_07, TestCert::kRoot02, 0xDEDEDEDE00020007, 0xFAB000000000001D, 0x89E8911178DAC089 },
+        {  TestCert::kNode02_08, TestCert::kRoot02, 0xDEDEDEDE00020008, 0xFAB000000000001D, 0x89E8911178DAC089 },
+    };
+    // clang-format on
+
+    for (auto & testCase : sTestCases)
+    {
+        ByteSpan noc;
+        ByteSpan rcac;
+        CHIP_ERROR err = GetTestCert(testCase.Noc, sNullLoadFlag, noc);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        err = GetTestCert(testCase.Rcac, sNullLoadFlag, rcac);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        // Extract Node ID and Fabric ID from the leaf node certificate.
+        NodeId nodeId;
+        FabricId fabricId;
+        err = ExtractNodeIdFabricIdFromOpCert(noc, &nodeId, &fabricId);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, nodeId == testCase.ExpectedNodeId);
+        NL_TEST_ASSERT(inSuite, fabricId == testCase.ExpectedFabricId);
+
+        // Extract the Public key from the root certificate.
+        Credentials::P256PublicKeySpan rootPubKey;
+        err = Credentials::ExtractPublicKeyFromChipCert(rcac, rootPubKey);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        // Generate the Operational Discovery ID from the root key and noc.
+        // Operational Discovery ID is Compressed Fabric ID + Node ID.
+        PeerId operationalDiscvoeryId;
+        err = ExtractOperationalDiscoveryIdFromRootPubKeyOpCert(rootPubKey, noc, operationalDiscvoeryId);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, operationalDiscvoeryId.GetNodeId() == testCase.ExpectedNodeId);
+        NL_TEST_ASSERT(inSuite, operationalDiscvoeryId.GetCompressedFabricId() == testCase.ExpectedCompressedFabricId);
     }
 }
 
@@ -1273,7 +1333,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("Test CHIP Generate NOC using ICA", TestChipCert_GenerateNOCICA),
     NL_TEST_DEF("Test CHIP Verify Generated Cert Chain", TestChipCert_VerifyGeneratedCerts),
     NL_TEST_DEF("Test CHIP Verify Generated Cert Chain No ICA", TestChipCert_VerifyGeneratedCertsNoICA),
-    NL_TEST_DEF("Test extracting PeerId from node certificate", TestChipCert_ExtractPeerId),
+    NL_TEST_DEF("Test extracting Node ID and Fabric ID from node certificate", TestChipCert_ExtractNodeIdFabricId),
+    NL_TEST_DEF("Test extracting Operational Discovery ID from node and root certificate", TestChipCert_ExtractOperationalDiscoveryId),
     NL_TEST_DEF("Test extracting CASE Authenticated Tags from node certificate", TestChipCert_ExtractCATsFromOpCert),
     NL_TEST_DEF("Test extracting PublicKey and SKID from chip certificate", TestChipCert_ExtractPublicKeyAndSKID),
     NL_TEST_SENTINEL()

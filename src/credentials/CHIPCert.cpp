@@ -867,6 +867,17 @@ CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, N
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ExtractOperationalDiscoveryIdFromRootPubKeyOpCert(const Crypto::P256PublicKey & rootPublicKey, ByteSpan noc, PeerId & id)
+{
+    CompressedFabricId compressedFabricId;
+    FabricId fabricId;
+    NodeId nodeId;
+    ReturnErrorOnFailure(Credentials::ExtractNodeIdFabricIdFromOpCert(noc, &nodeId, &fabricId));
+    ReturnErrorOnFailure(GenerateCompressedFabricId(rootPublicKey, fabricId, compressedFabricId));
+    id = PeerId().SetCompressedFabricId(compressedFabricId).SetNodeId(nodeId);
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * fabricId)
 {
     const ChipDN & subjectDN = cert.mSubjectDN;
