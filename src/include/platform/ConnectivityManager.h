@@ -29,7 +29,6 @@
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/CHIPDeviceConfig.h>
 #include <platform/CHIPDeviceEvent.h>
-#include <platform/ConfigurationManager.h>
 
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
