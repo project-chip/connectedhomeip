@@ -152,6 +152,32 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_cluster_events(self):
+        actual = parseText("""
+            client cluster EventTester = 0x123 {
+               critical event StartUp = 0 {
+                 INT32U softwareVersion = 0;
+               }
+               info event Hello = 1 {}
+               debug event GoodBye = 2 {}
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.CLIENT,
+                    name="EventTester",
+                    code=0x123,
+                    events=[
+                        Event(priority=EventPriority.CRITICAL, name="StartUp", code=0, members=[
+                            StructureMember(data_type="INT32U",
+                                            code=0, name="softwareVersion"),
+                        ]),
+                        Event(priority=EventPriority.INFO,
+                              name="Hello", code=1, members=[]),
+                        Event(priority=EventPriority.DEBUG,
+                              name="GoodBye", code=2, members=[]),
+                    ])])
+        self.assertEqual(actual, expected)
+
     def test_multiple_clusters(self):
         actual = parseText("""
             server cluster A = 1 {}
