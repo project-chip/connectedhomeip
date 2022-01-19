@@ -34,7 +34,7 @@ Access::SubjectDescriptor SecureSession::GetSubjectDescriptor() const
     {
         subjectDescriptor.authMode    = Access::AuthMode::kPase;
         subjectDescriptor.subject     = mPeerNodeId;
-        subjectDescriptor.fabricIndex = mPaseFabric;
+        subjectDescriptor.fabricIndex = mFabric;
     }
     else
     {
