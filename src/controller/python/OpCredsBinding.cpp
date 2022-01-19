@@ -26,9 +26,9 @@
  */
 #include <type_traits>
 
-#include "ChipDeviceController-StorageDelegate.h"
 #include "ChipDeviceController-ScriptDeviceAddressUpdateDelegate.h"
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
+#include "ChipDeviceController-StorageDelegate.h"
 
 #include "controller/python/chip/interaction_model/Delegate.h"
 
@@ -41,7 +41,6 @@
 #include <lib/support/DLLUtil.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/logging/CHIPLogging.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
 
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DefaultDeviceAttestationVerifier.h>
@@ -50,25 +49,25 @@ using namespace chip;
 
 static_assert(std::is_same<uint32_t, ChipError::StorageType>::value, "python assumes CHIP_ERROR maps to c_uint32");
 
-using Py_GenerateNOCChainFunc = void (*)(void* pyContext, const char *csrElements, const char *attestationSignature, const char *dac, const char *pai, const char *paa, Controller::OnNOCChainGeneration onNocChainGenerationFunc);
-using Py_SetNodeIdForNextNOCRequest = void (*)(void *pyContext, NodeId nodeId);
-using Py_SetFabricIdForNextNOCRequest = void (*)(void *pyContext, FabricId fabricId);
+using Py_GenerateNOCChainFunc         = void (*)(void * pyContext, const char * csrElements, const char * attestationSignature,
+                                         const char * dac, const char * pai, const char * paa,
+                                         Controller::OnNOCChainGeneration onNocChainGenerationFunc);
+using Py_SetNodeIdForNextNOCRequest   = void (*)(void * pyContext, NodeId nodeId);
+using Py_SetFabricIdForNextNOCRequest = void (*)(void * pyContext, FabricId fabricId);
 
 namespace chip {
 namespace Controller {
 namespace Python {
 
-class OperationalCredentialsAdapter : public OperationalCredentialsDelegate {
+class OperationalCredentialsAdapter : public OperationalCredentialsDelegate
+{
 public:
-    OperationalCredentialsAdapter(uint32_t fabricCredentialsIndex) : mExampleOpCredsIssuer(fabricCredentialsIndex)
-    {}
+    OperationalCredentialsAdapter(uint32_t fabricCredentialsIndex) : mExampleOpCredsIssuer(fabricCredentialsIndex) {}
 
-    CHIP_ERROR Initialize(PersistentStorageDelegate &storageDelegate) {
-        return mExampleOpCredsIssuer.Initialize(storageDelegate);
-    }
+    CHIP_ERROR Initialize(PersistentStorageDelegate & storageDelegate) { return mExampleOpCredsIssuer.Initialize(storageDelegate); }
 
-    CHIP_ERROR GenerateNOCChain(NodeId nodeId, FabricId fabricId, const Crypto::P256PublicKey & pubKey,
-                                MutableByteSpan & rcac, MutableByteSpan &icac, MutableByteSpan &noc)
+    CHIP_ERROR GenerateNOCChain(NodeId nodeId, FabricId fabricId, const Crypto::P256PublicKey & pubKey, MutableByteSpan & rcac,
+                                MutableByteSpan & icac, MutableByteSpan & noc)
     {
         return mExampleOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, pubKey, rcac, icac, noc);
     }
@@ -81,102 +80,102 @@ private:
         return mExampleOpCredsIssuer.GenerateNOCChain(csrElements, attestationSignature, DAC, PAI, PAA, onCompletion);
     }
 
+    void SetNodeIdForNextNOCRequest(NodeId nodeId) override { mExampleOpCredsIssuer.SetNodeIdForNextNOCRequest(nodeId); }
 
-    void SetNodeIdForNextNOCRequest(NodeId nodeId) override
-    {
-        mExampleOpCredsIssuer.SetNodeIdForNextNOCRequest(nodeId);
-    }
-
-    void SetFabricIdForNextNOCRequest(FabricId fabricId) override {
-        mExampleOpCredsIssuer.SetFabricIdForNextNOCRequest(fabricId);
-    }
+    void SetFabricIdForNextNOCRequest(FabricId fabricId) override { mExampleOpCredsIssuer.SetFabricIdForNextNOCRequest(fabricId); }
 
     ExampleOperationalCredentialsIssuer mExampleOpCredsIssuer;
 };
 
-}
-}
-}
+} // namespace Python
+} // namespace Controller
+} // namespace chip
 
-extern chip::Controller::Python::StorageAdapter *pychip_Storage_GetStorageAdapter();
-extern chip::Controller::Python::StorageAdapter *sStorageAdapter;
+extern chip::Controller::Python::StorageAdapter * pychip_Storage_GetStorageAdapter();
+extern chip::Controller::Python::StorageAdapter * sStorageAdapter;
 extern chip::Controller::ScriptDeviceAddressUpdateDelegate sDeviceAddressUpdateDelegate;
 extern chip::Controller::ScriptDevicePairingDelegate sPairingDelegate;
 
 extern "C" {
-    struct OpCredsContext {
-        Platform::UniquePtr<Controller::Python::OperationalCredentialsAdapter> mAdapter;
-        void *mPyContext;
-    };
+struct OpCredsContext
+{
+    Platform::UniquePtr<Controller::Python::OperationalCredentialsAdapter> mAdapter;
+    void * mPyContext;
+};
 
+void * pychip_OpCreds_InitializeDelegate(void * pyContext, uint32_t fabricCredentialsIndex)
+{
+    auto context      = Platform::MakeUnique<OpCredsContext>();
+    context->mAdapter = Platform::MakeUnique<Controller::Python::OperationalCredentialsAdapter>(fabricCredentialsIndex);
 
-    void *pychip_OpCreds_InitializeDelegate(void *pyContext, uint32_t fabricCredentialsIndex) {
-        auto context = Platform::MakeUnique<OpCredsContext>();
-        context->mAdapter = Platform::MakeUnique<Controller::Python::OperationalCredentialsAdapter>(fabricCredentialsIndex);
-
-        if (pychip_Storage_GetStorageAdapter() == nullptr) {
-            return nullptr;
-        }
-
-        if (context->mAdapter->Initialize(*pychip_Storage_GetStorageAdapter()) != CHIP_NO_ERROR) {
-            return nullptr;
-        }
-
-        return context.release();
-    }
-
-    ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext *context, chip::Controller::DeviceCommissioner ** outDevCtrl, uint8_t fabricIndex, FabricId fabricId, chip::NodeId nodeId)
+    if (pychip_Storage_GetStorageAdapter() == nullptr)
     {
-        ChipLogDetail(Controller, "Creating New Device Controller");
-
-        VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
-
-        *outDevCtrl = new chip::Controller::DeviceCommissioner();
-        VerifyOrReturnError(*outDevCtrl != NULL, CHIP_ERROR_NO_MEMORY.AsInteger());
-
-        // Initialize device attestation verifier
-        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
-        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
-        SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
-
-        chip::Crypto::P256Keypair ephemeralKey;
-        CHIP_ERROR err = ephemeralKey.Initialize();
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-
-        chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
-        ReturnErrorCodeIf(!noc.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
-        MutableByteSpan nocSpan(noc.Get(), Controller::kMaxCHIPDERCertLength);
-
-        chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
-        ReturnErrorCodeIf(!icac.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
-        MutableByteSpan icacSpan(icac.Get(), Controller::kMaxCHIPDERCertLength);
-
-        chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
-        ReturnErrorCodeIf(!rcac.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
-        MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
-
-        err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-
-        Controller::SetupParams initParams;
-        initParams.storageDelegate                = sStorageAdapter;
-        initParams.deviceAddressUpdateDelegate    = &sDeviceAddressUpdateDelegate;
-        initParams.pairingDelegate                = &sPairingDelegate;
-        initParams.operationalCredentialsDelegate = context->mAdapter.get();
-        initParams.ephemeralKeypair               = &ephemeralKey;
-        initParams.controllerRCAC                 = rcacSpan;
-        initParams.controllerICAC                 = icacSpan;
-        initParams.controllerNOC                  = nocSpan;
-        initParams.fabricIndex                    = (uint8_t)fabricIndex;
-        initParams.fabricId                       = fabricId;
-
-        err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, **outDevCtrl);
-        VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-
-        return CHIP_NO_ERROR.AsInteger();
+        return nullptr;
     }
 
-    void pychip_OpCreds_FreeDelegate(OpCredsContext *context) {
-        Platform::Delete(context);
+    if (context->mAdapter->Initialize(*pychip_Storage_GetStorageAdapter()) != CHIP_NO_ERROR)
+    {
+        return nullptr;
     }
+
+    return context.release();
+}
+
+ChipError::StorageType pychip_OpCreds_AllocateController(OpCredsContext * context,
+                                                         chip::Controller::DeviceCommissioner ** outDevCtrl, uint8_t fabricIndex,
+                                                         FabricId fabricId, chip::NodeId nodeId)
+{
+    ChipLogDetail(Controller, "Creating New Device Controller");
+
+    VerifyOrReturnError(context != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
+
+    *outDevCtrl = new chip::Controller::DeviceCommissioner();
+    VerifyOrReturnError(*outDevCtrl != NULL, CHIP_ERROR_NO_MEMORY.AsInteger());
+
+    // Initialize device attestation verifier
+    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+
+    chip::Crypto::P256Keypair ephemeralKey;
+    CHIP_ERROR err = ephemeralKey.Initialize();
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
+    ReturnErrorCodeIf(!noc.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
+    MutableByteSpan nocSpan(noc.Get(), Controller::kMaxCHIPDERCertLength);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> icac;
+    ReturnErrorCodeIf(!icac.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
+    MutableByteSpan icacSpan(icac.Get(), Controller::kMaxCHIPDERCertLength);
+
+    chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
+    ReturnErrorCodeIf(!rcac.Alloc(Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY.AsInteger());
+    MutableByteSpan rcacSpan(rcac.Get(), Controller::kMaxCHIPDERCertLength);
+
+    err = context->mAdapter->GenerateNOCChain(nodeId, fabricId, ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
+    Controller::SetupParams initParams;
+    initParams.storageDelegate                = sStorageAdapter;
+    initParams.deviceAddressUpdateDelegate    = &sDeviceAddressUpdateDelegate;
+    initParams.pairingDelegate                = &sPairingDelegate;
+    initParams.operationalCredentialsDelegate = context->mAdapter.get();
+    initParams.ephemeralKeypair               = &ephemeralKey;
+    initParams.controllerRCAC                 = rcacSpan;
+    initParams.controllerICAC                 = icacSpan;
+    initParams.controllerNOC                  = nocSpan;
+    initParams.fabricIndex                    = (uint8_t) fabricIndex;
+    initParams.fabricId                       = fabricId;
+
+    err = Controller::DeviceControllerFactory::GetInstance().SetupCommissioner(initParams, **outDevCtrl);
+    VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
+
+    return CHIP_NO_ERROR.AsInteger();
+}
+
+void pychip_OpCreds_FreeDelegate(OpCredsContext * context)
+{
+    Platform::Delete(context);
+}
 }

@@ -327,7 +327,7 @@ public:
 
     void ReleaseOperationalDevice(NodeId remoteDeviceId);
 
-    OperationalCredentialsDelegate* GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
+    OperationalCredentialsDelegate * GetOperationalCredentialsDelegate() { return mOperationalCredentialsDelegate; }
 
 protected:
     enum class State

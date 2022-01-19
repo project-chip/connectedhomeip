@@ -44,18 +44,19 @@ namespace Python {
 
 using PyObject = void;
 
-using SyncSetKeyValueCb = void (*)(PyObject * appContext, const char *key, const void *value, uint16_t size);
-using SetGetKeyValueCb = void (*)(PyObject * appContext, const char *key, char *value, uint16_t *size);
-using SyncDeleteKeyValueCb = void (*)(PyObject *appContext, const char *key);
+using SyncSetKeyValueCb    = void (*)(PyObject * appContext, const char * key, const void * value, uint16_t size);
+using SetGetKeyValueCb     = void (*)(PyObject * appContext, const char * key, char * value, uint16_t * size);
+using SyncDeleteKeyValueCb = void (*)(PyObject * appContext, const char * key);
 
 class StorageAdapter : public PersistentStorageDelegate
 {
 public:
-    StorageAdapter(PyObject *context, SyncSetKeyValueCb setCb, SetGetKeyValueCb getCb, SyncDeleteKeyValueCb deleteCb) {
-        mSetKeyCb = setCb;
-        mGetKeyCb = getCb;
+    StorageAdapter(PyObject * context, SyncSetKeyValueCb setCb, SetGetKeyValueCb getCb, SyncDeleteKeyValueCb deleteCb)
+    {
+        mSetKeyCb    = setCb;
+        mGetKeyCb    = getCb;
         mDeleteKeyCb = deleteCb;
-        mContext = context;
+        mContext     = context;
     }
 
     CHIP_ERROR SyncGetKeyValue(const char * key, void * buffer, uint16_t & size) override;
@@ -63,12 +64,12 @@ public:
     CHIP_ERROR SyncDeleteKeyValue(const char * key) override;
 
 private:
-   SyncSetKeyValueCb mSetKeyCb;
-   SetGetKeyValueCb mGetKeyCb;
-   SyncDeleteKeyValueCb mDeleteKeyCb;
-   PyObject *mContext;
+    SyncSetKeyValueCb mSetKeyCb;
+    SetGetKeyValueCb mGetKeyCb;
+    SyncDeleteKeyValueCb mDeleteKeyCb;
+    PyObject * mContext;
 
-   std::map<std::string, std::string> mStorage;
+    std::map<std::string, std::string> mStorage;
 };
 
 } // namespace Python

@@ -26,7 +26,6 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-
 namespace chip {
 namespace Controller {
 
@@ -84,18 +83,21 @@ CHIP_ERROR StorageAdapter::SyncGetKeyValue(const char * key, void * value, uint1
 
     uint16_t tmpSize = size;
 
-    mGetKeyCb(mContext, key, (char *)value, &tmpSize);
+    mGetKeyCb(mContext, key, (char *) value, &tmpSize);
 
-    if (tmpSize == 0) {
+    if (tmpSize == 0)
+    {
         ChipLogDetail(Controller, "Key Not Found\n");
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
-    else if (size < tmpSize) {
+    else if (size < tmpSize)
+    {
         ChipLogDetail(Controller, "Buf not big enough\n");
         size = tmpSize;
         return CHIP_ERROR_NO_MEMORY;
     }
-    else {
+    else
+    {
         ChipLogDetail(Controller, "Key Found %d\n", tmpSize);
         size = tmpSize;
         return CHIP_NO_ERROR;

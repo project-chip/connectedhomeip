@@ -846,7 +846,7 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     // Immediately persist the updated mNextKeyID value
     // TODO maybe remove FreeRendezvousSession() since mNextKeyID is always persisted immediately
-    //PersistNextKeyId();
+    // PersistNextKeyId();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -1539,7 +1539,7 @@ void DeviceCommissioner::OnSessionEstablishmentTimeout()
 
 void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * aLayer, void * aAppState)
 {
-    static_cast<DeviceCommissioner*>(aAppState)->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
+    static_cast<DeviceCommissioner *>(aAppState)->OnSessionEstablishmentError(CHIP_ERROR_TIMEOUT);
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD

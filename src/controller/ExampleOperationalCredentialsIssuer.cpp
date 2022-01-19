@@ -79,7 +79,6 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::Initialize(PersistentStorageDele
     PERSISTENT_KEY_OP(mIndex, kOperationalCredentialsIntermediateIssuerKeypairStorage, key,
                       err = storage.SyncGetKeyValue(key, &serializedKey, keySize));
 
-
     if (err != CHIP_NO_ERROR)
     {
         // Storage doesn't have an existing keypair. Let's create one and add it to the storage.
@@ -121,7 +120,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
         // Found root certificate in the storage.
         icac.reduce_size(icacBufLen);
     }
-    else {
+    else
+    {
         ChipLogProgress(Controller, "Generating ICAC");
         X509CertRequestParams icac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
         ReturnErrorOnFailure(NewICAX509Cert(icac_request, mIntermediateIssuerId, mIntermediateIssuer.Pubkey(), mIssuer, icac));
@@ -139,7 +139,8 @@ CHIP_ERROR ExampleOperationalCredentialsIssuer::GenerateNOCChainAfterValidation(
         // Found root certificate in the storage.
         rcac.reduce_size(rcacBufLen);
     }
-    else {
+    else
+    {
         ChipLogProgress(Controller, "Generating RCAC");
         X509CertRequestParams rcac_request = { 0, mIssuerId, mNow, mNow + mValidity, true, fabricId, false, 0 };
         ReturnErrorOnFailure(NewRootX509Cert(rcac_request, mIssuer, rcac));
