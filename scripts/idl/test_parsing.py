@@ -99,6 +99,37 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_cluster_commands(self):
+        actual = parseText("""
+            server cluster WithCommands = 1 {
+                struct FreeStruct {}
+                request struct InParam {}
+                response struct OutParam {}
+
+                command WithoutArg(): DefaultSuccess = 123;
+                command InOutStuff(InParam): OutParam = 222;
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER,
+                    name="WithCommands",
+                    code=1,
+                    structs=[
+                        Struct(name="FreeStruct", members=[]),
+                        Struct(name="InParam", members=[],
+                               tag=StructTag.REQUEST),
+                        Struct(name="OutParam", members=[],
+                               tag=StructTag.RESPONSE),
+                    ],
+                    commands=[
+                        Command(name="WithoutArg", code=123,
+                                input_param=None, output_param="DefaultSuccess"),
+                        Command(name="InOutStuff", code=222,
+                                input_param="InParam", output_param="OutParam"),
+                    ],
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_multiple_clusters(self):
         actual = parseText("""
             server cluster A = 1 {}
