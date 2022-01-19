@@ -187,19 +187,19 @@ chip::ChipError::StorageType pychip_InteractionModel_ShutdownSubscription(uint64
 //
 // Storage
 //
-void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject *context, chip::Controller::Python::SyncSetKeyValueCb setCb, 
+void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject *context, chip::Controller::Python::SyncSetKeyValueCb setCb,
                                                                                 chip::Controller::Python::SetGetKeyValueCb getCb, chip::Controller::Python::SyncDeleteKeyValueCb deleteCb);
 void pychip_Storage_ShutdownAdapter();
 
 }
 
-void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject *context, chip::Controller::Python::SyncSetKeyValueCb setCb, 
+void pychip_Storage_InitializeStorageAdapter(chip::Controller::Python::PyObject *context, chip::Controller::Python::SyncSetKeyValueCb setCb,
                                                                                 chip::Controller::Python::SetGetKeyValueCb getCb, chip::Controller::Python::SyncDeleteKeyValueCb deleteCb)
 {
     sStorageAdapter = new chip::Controller::Python::StorageAdapter(context, setCb, getCb, deleteCb);
 }
 
-void pychip_Storage_ShutdownAdapter() 
+void pychip_Storage_ShutdownAdapter()
 {
     delete sStorageAdapter;
 }
@@ -217,7 +217,7 @@ ChipError::StorageType pychip_DeviceController_StackInit()
 
     err = sFabricStorage.Initialize(sStorageAdapter);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());
-    
+
     FactoryInitParams factoryParams;
     factoryParams.fabricStorage = &sFabricStorage;
     factoryParams.imDelegate    = nullptr;

@@ -22,7 +22,7 @@
 namespace chip {
 
 uint16_t SessionIDAllocator::mNextAvailable = 1;
-    
+
 CHIP_ERROR SessionIDAllocator::Allocate(uint16_t & id)
 {
     VerifyOrReturnError(mNextAvailable < kMaxSessionID, CHIP_ERROR_NO_MEMORY);

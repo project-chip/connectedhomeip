@@ -47,7 +47,7 @@ using PyObject = void;
 using SyncSetKeyValueCb = void (*)(PyObject * appContext, const char *key, const void *value, uint16_t size);
 using SetGetKeyValueCb = void (*)(PyObject * appContext, const char *key, char *value, uint16_t *size);
 using SyncDeleteKeyValueCb = void (*)(PyObject *appContext, const char *key);
-    
+
 class StorageAdapter : public PersistentStorageDelegate
 {
 public:

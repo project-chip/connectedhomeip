@@ -72,11 +72,11 @@ public:
     {
         return mExampleOpCredsIssuer.GenerateNOCChainAfterValidation(nodeId, fabricId, pubKey, rcac, icac, noc);
     }
-    
+
 private:
     CHIP_ERROR GenerateNOCChain(const ByteSpan & csrElements, const ByteSpan & attestationSignature, const ByteSpan & DAC,
                                 const ByteSpan & PAI, const ByteSpan & PAA,
-                                Callback::Callback<OnNOCChainGeneration> * onCompletion) override 
+                                Callback::Callback<OnNOCChainGeneration> * onCompletion) override
     {
         return mExampleOpCredsIssuer.GenerateNOCChain(csrElements, attestationSignature, DAC, PAI, PAA, onCompletion);
     }
@@ -87,7 +87,7 @@ private:
         mExampleOpCredsIssuer.SetNodeIdForNextNOCRequest(nodeId);
     }
 
-    void SetFabricIdForNextNOCRequest(FabricId fabricId) override { 
+    void SetFabricIdForNextNOCRequest(FabricId fabricId) override {
         mExampleOpCredsIssuer.SetFabricIdForNextNOCRequest(fabricId);
     }
 
@@ -112,7 +112,7 @@ extern "C" {
 
     void *pychip_OpCreds_InitializeDelegate(void *pyContext, uint32_t fabricCredentialsIndex) {
         auto context = Platform::MakeUnique<OpCredsContext>();
-        context->mAdapter = Platform::MakeUnique<Controller::Python::OperationalCredentialsAdapter>(fabricCredentialsIndex); 
+        context->mAdapter = Platform::MakeUnique<Controller::Python::OperationalCredentialsAdapter>(fabricCredentialsIndex);
 
         if (pychip_Storage_GetStorageAdapter() == nullptr) {
             return nullptr;
@@ -133,7 +133,7 @@ extern "C" {
 
         *outDevCtrl = new chip::Controller::DeviceCommissioner();
         VerifyOrReturnError(*outDevCtrl != NULL, CHIP_ERROR_NO_MEMORY.AsInteger());
-        
+
         // Initialize device attestation verifier
         // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
         const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
