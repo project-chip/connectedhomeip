@@ -19,52 +19,55 @@ smartphone application or a PC command line tool.
 
 To test the DFU over Matter, complete the following steps:
 
-1. Navigate to the CHIP root directory.
-2. Build OTA Provider application for Linux:
+1.  Navigate to the CHIP root directory.
+2.  Build OTA Provider application for Linux:
 
         $ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/provider chip_config_network_layer_ble=false
 
-3. Build chip-tool for Linux:
+3.  Build chip-tool for Linux:
 
         $ scripts/examples/gn_build_example.sh examples/chip-tool out/chiptool 'chip_mdns="platform"'
 
-4. Run OTA Provider application with _app\_update.bin_ replaced with the path to
-   the new firmware image which you wish to provide to the Matter device:
+4.  Run OTA Provider application with _app_update.bin_ replaced with the path to
+    the new firmware image which you wish to provide to the Matter device:
 
-        $ out/provider/chip-ota-provider-app -f app_update.bin
-    
-   Keep the application running and use another terminal for the remaining
-   steps.
-5. Commission the OTA Provider into the Matter network using Node Id 1:
+         $ out/provider/chip-ota-provider-app -f app_update.bin
+
+    Keep the application running and use another terminal for the remaining
+    steps.
+
+5.  Commission the OTA Provider into the Matter network using Node Id 1:
 
         $ ./out/chiptool/chip-tool pairing onnetwork 1 20202021
 
-6. Use the OTBR web interface to form a new Thread network using the default
-   network settings.
-7. Commission the Matter device into the same Matter network using Node Id 2:
+6.  Use the OTBR web interface to form a new Thread network using the default
+    network settings.
+7.  Commission the Matter device into the same Matter network using Node Id 2:
 
-        $ ./out/chiptool/chip-tool pairing ble-thread 2 hex:000300000f02081111111122222222051000112233445566778899aabbccddeeff01021234 20202021 3840
+         $ ./out/chiptool/chip-tool pairing ble-thread 2 hex:000300000f02081111111122222222051000112233445566778899aabbccddeeff01021234 20202021 3840
 
-   Note that the parameter starting with _hex:_ prefix is the Thread network's
-   Active Operational Dataset. It can be retrieved from the OTBR in case you
-   have changed the default network settings when forming the network.
-8. Initiate the DFU procedure in one of the following ways:
+    Note that the parameter starting with _hex:_ prefix is the Thread network's
+    Active Operational Dataset. It can be retrieved from the OTBR in case you
+    have changed the default network settings when forming the network.
 
-   - If you have built the device firmware with `-DCONFIG_CHIP_LIB_SHELL=y`
-     option which enables Matter shell commands, run the following command on
-     the device shell:
+8.  Initiate the DFU procedure in one of the following ways:
 
-            $ matter ota query 1 1 0
+    -   If you have built the device firmware with `-DCONFIG_CHIP_LIB_SHELL=y`
+        option which enables Matter shell commands, run the following command on
+        the device shell:
 
-   - Otherwise, use chip-tool to send Announce OTA Provider command to the
-     device:
+               $ matter ota query 1 1 0
 
-            $ ./out/avahi/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+    -   Otherwise, use chip-tool to send Announce OTA Provider command to the
+        device:
 
-     Once the device is made aware of the OTA Provider node, it automatically
-     queries the OTA Provider for a new firmware image.
+               $ ./out/avahi/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 
-9. When the firmware image download is complete, reboot the device to apply the update.
+        Once the device is made aware of the OTA Provider node, it automatically
+        queries the OTA Provider for a new firmware image.
+
+9.  When the firmware image download is complete, reboot the device to apply the
+    update.
 
 ## Device Firmware Upgrade over Bluetooth LE using smartphone
 
