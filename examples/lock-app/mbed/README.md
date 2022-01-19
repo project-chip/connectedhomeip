@@ -134,11 +134,11 @@ There are also three types of built application: _simple, boot_ and _upgrade_:
 
 -   **simple** - standalone application, mainly for developing and testing
     purpose (all building profiles are supported)
--   **boot** - signed application + bootloader, it supports booting process
-    and can be use for firmware update (only _release_ building profiles is
+-   **boot** - signed application + bootloader, it supports booting process and
+    can be use for firmware update (only _release_ building profiles is
     supported)
--   **update** - signed application, application image can be used for
-    firmware update (only _release_ building profiles is supported)
+-   **update** - signed application, application image can be used for firmware
+    update (only _release_ building profiles is supported)
 
 When using the building script, it is possible expand the list of acceptable
 targets; this may be useful for rapid testing of a new mbed-targets.

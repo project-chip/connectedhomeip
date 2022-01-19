@@ -136,11 +136,11 @@ There are also three types of built application: _simple, boot_ and _upgrade_:
 
 -   **simple** - standalone application, mainly for developing and testing
     purpose (all building profiles are supported)
--   **boot** - signed application + bootloader, it supports booting process
-    and can be use for firmware update (only _release_ building profiles is
+-   **boot** - signed application + bootloader, it supports booting process and
+    can be use for firmware update (only _release_ building profiles is
     supported)
--   **update** - signed application, application image can be used for
-    firmware update (only _release_ building profiles is supported)
+-   **update** - signed application, application image can be used for firmware
+    update (only _release_ building profiles is supported)
 
 When using the building script, it is possible expand the list of acceptable
 targets; this may be useful for rapid testing of a new mbed-targets.
@@ -232,7 +232,8 @@ receiving this command OTA requestor will query for OTA image:
 
     chip-device-ctrl > zcl OtaSoftwareUpdateRequestor AnnounceOtaProvider 1234 0 0 providerNodeId=1235 vendorId=9020 announcementReason=0
 
-The OTA requestor should communicate with provider, downalod update image and apply it.
+The OTA requestor should communicate with provider, downalod update image and
+apply it.
 
 #### Notes
 
@@ -296,8 +297,8 @@ following states are possible:
 -   _Pressed for less than 3 s_ &mdash; Initiates the OTA software update
     process. This feature is not currently supported.
 
-**Button 1** &mdash; Pressing the button once delete all fabric IDs and start BLE
-    advertising.
+**Button 1** &mdash; Pressing the button once delete all fabric IDs and start
+BLE advertising.
 
 Some of the supported boards may not have sufficient number PCB components to
 follow above description. In that case please refer to
