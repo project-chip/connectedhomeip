@@ -40,7 +40,7 @@ class TestParser(unittest.TestCase):
         self.assertEqual(parseText("""
             enum GlobalEnum : ENUM8 {
                kValue1 = 1;
-               kOther = 0x12;
+               kOther = 0x12; /* hex numbers tested sporadically */
             }
         """),
                          Idl(enums=[
