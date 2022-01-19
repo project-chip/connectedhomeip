@@ -1,0 +1,224 @@
+#!/usr/bin/env python
+
+import logging
+
+from lark import Lark
+from lark.visitors import Transformer, v_args
+
+try:
+    from .matter_idl_types import *
+except:
+    import os
+    import sys
+    sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+
+    from matter_idl_types import *
+
+
+class MatterIdlTransformer(Transformer):
+    """A transformer capable to transform data
+       parsed by Lark according to matter_grammar.lark
+    """
+
+    def number(self, tokens):
+        """Numbers in the grammar are integers or hex numbers.
+        """
+        if len(tokens) != 1:
+            raise Error("Unexpected argument counts")
+
+        n = tokens[0].value
+        if n.startswith('0x'):
+            return int(n[2:], 16)
+        else:
+            return int(n)
+
+    def id(self, tokens):
+        """An id is a string containing an identifier
+        """
+        if len(tokens) != 1:
+            raise Error("Unexpected argument counts")
+        return tokens[0].value
+
+    def type(self, tokens):
+        """A type is just a string for the type
+        """
+        if len(tokens) != 1:
+            raise Error("Unexpected argument counts")
+        return tokens[0].value
+
+    @v_args(inline=True)
+    def enum_entry(self, id, number):
+        return EnumEntry(name=id, code=number)
+
+    @v_args(inline=True)
+    def enum(self, id, type, *entries):
+        return Enum(name=id, base_type=type, entries=list(entries))
+
+    def named_member(self, args):
+        data_type, name = args[0], args[1]
+        is_list = (len(args) == 4)
+        code = args[-1]
+
+        return StructureMember(data_type=data_type, name=name, code=code, is_list=is_list)
+
+    def optional(self, _):
+        return MemberAttribute.OPTIONAL
+
+    def nullable(self, _):
+        return MemberAttribute.NULLABLE
+
+    def readonly(self, _):
+        return AttributeAccess.READONLY
+
+    def writable(self, _):
+        return AttributeAccess.WRITABLE
+
+    def critical_priority(self, _):
+        return EventPriority.CRITICAL
+
+    def info_priority(self, _):
+        return EventPriority.INFO
+
+    def debug_priority(self, _):
+        return EventPriority.DEBUG
+
+    def endpoint_server_cluster(self, _):
+        return EndpointContentType.SERVER_CLUSTER
+
+    def endpoint_binding_to_cluster(self, _):
+        return EndpointContentType.CLIENT_BINDING
+
+    def struct_member(self, args):
+        # Last argument is the named_member, the rest
+        # are attributes
+        member = args[-1]
+        member.attributes = set(args[:-1])
+        return member
+
+    def server_cluster(self, _):
+        return ClusterSide.SERVER
+
+    def client_cluster(self, _):
+        return ClusterSide.CLIENT
+
+    def command(self, args):
+        # A command has 3 arguments if no input or
+        # 4 arguments if input parameter is available
+        param_in = None
+        if len(args) > 3:
+            param_in = args[1]
+        return Command(name=args[0], input_param=param_in, output_param=args[-2], code=args[-1])
+
+    def event(self, args):
+        return Event(priority=args[0], name=args[1], code=args[2], members=args[3:], )
+
+    @v_args(inline=True)
+    def attribute(self, attribute_access, named_member):
+        return Attribute(access=attribute_access, definition=named_member)
+
+    @v_args(inline=True)
+    def struct(self, id, *members):
+        return Struct(name=id, members=list(members))
+
+    @v_args(inline=True)
+    def request_struct(self, value):
+        value.tag = StructTag.REQUEST
+        return value
+
+    @v_args(inline=True)
+    def response_struct(self, value):
+        value.tag = StructTag.RESPONSE
+        return value
+
+    @v_args(inline=True)
+    def endpoint(self, number, *clusters):
+        endpoint = Endpoint(number=number)
+
+        for t, name in clusters:
+            if t == EndpointContentType.CLIENT_BINDING:
+                endpoint.client_bindings.append(t)
+            elif t == EndpointContentType.SERVER_CLUSTER:
+                endpoint.server_clusters.append(t)
+            else:
+                raise Error("Unknown endpoint content: %r" % t)
+
+        return endpoint
+
+    @v_args(inline=True)
+    def endpoint_cluster(self, t, id):
+        return (t, id)
+
+    @v_args(inline=True)
+    def cluster(self, side, name, code, *content):
+        result = Cluster(side=side, name=name, code=code)
+
+        for item in content:
+            if type(item) == Enum:
+                result.enums.append(item)
+            elif type(item) == Event:
+                result.events.append(item)
+            elif type(item) == Attribute:
+                result.attributes.append(item)
+            elif type(item) == Struct:
+                result.structs.append(item)
+            elif type(item) == Command:
+                result.commands.append(item)
+            else:
+                raise Error("UNKNOWN cluster content item: %r" % item)
+
+        return result
+
+    def idl(self, items):
+        idl = Idl()
+
+        for item in items:
+            if type(item) == Enum:
+                idl.enums.append(item)
+            elif type(item) == Struct:
+                idl.structs.append(item)
+            elif type(item) == Cluster:
+                idl.clusters.append(item)
+            elif type(item) == Endpoint:
+                idl.endpoints.append(item)
+            else:
+                raise Error("UNKNOWN idl content item: %r" % item)
+
+        return idl
+
+
+def CreateParser():
+    return Lark.open('matter_grammar.lark', rel_to=__file__, start='idl', parser='lalr', transformer=MatterIdlTransformer())
+
+
+if __name__ == '__main__':
+    import click
+    import coloredlogs
+
+    # Supported log levels, mapping string values required for argument
+    # parsing into logging constants
+    __LOG_LEVELS__ = {
+        'debug': logging.DEBUG,
+        'info': logging.INFO,
+        'warn': logging.WARN,
+        'fatal': logging.FATAL,
+    }
+
+    @click.command()
+    @click.option(
+        '--log-level',
+        default='INFO',
+        type=click.Choice(__LOG_LEVELS__.keys(), case_sensitive=False),
+        help='Determines the verbosity of script output.')
+    @click.argument('filename')
+    def main(log_level, filename=None):
+        coloredlogs.install(level=__LOG_LEVELS__[
+                            log_level], fmt='%(asctime)s %(levelname)-7s %(message)s')
+
+        logging.info("Starting to parse ...")
+        data = CreateParser().parse(open(filename).read())
+        logging.info("Parse completed")
+
+        logging.info("Data:")
+        print(data)
+
+    main()
