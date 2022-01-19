@@ -1111,7 +1111,7 @@ void emberAfResetAttributes(EndpointId endpoint)
     emAfLoadAttributeDefaults(endpoint, true);
 }
 
-void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage)
+void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage, Optional<ClusterId> clusterId)
 {
     uint16_t ep;
     uint8_t clusterI, curNetwork = 0 /* emberGetCurrentNetwork() */;
@@ -1142,6 +1142,13 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool ignoreStorage)
         for (clusterI = 0; clusterI < de->endpointType->clusterCount; clusterI++)
         {
             EmberAfCluster * cluster = &(de->endpointType->cluster[clusterI]);
+            if (clusterId.HasValue())
+            {
+                if (clusterId.Value() != cluster->clusterId)
+                {
+                    continue;
+                }
+            }
 
             // when the attributeCount is high, the loop takes too long to run and a
             // watchdog kicks in causing a reset. As a workaround, we'll
