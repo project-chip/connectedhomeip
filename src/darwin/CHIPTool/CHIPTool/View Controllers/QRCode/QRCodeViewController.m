@@ -637,7 +637,7 @@
 - (void)commissionWithSSID:(NSString *)ssid password:(NSString *)password
 {
 
-    NSError *error;
+    NSError * error;
     CHIPDeviceController * controller = [CHIPDeviceController sharedController];
     // create commissioning params in ObjC. Pass those in here with network credentials.
     // maybe this just becomes the new norm
@@ -647,8 +647,7 @@
 
     uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
 
-    if (![controller commissionDevice:deviceId commissioningParams:params error:&error])
-    {
+    if (![controller commissionDevice:deviceId commissioningParams:params error:&error]) {
         NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
     }
 }

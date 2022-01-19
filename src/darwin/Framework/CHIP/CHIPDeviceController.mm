@@ -353,7 +353,9 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     return success;
 }
 
-- (BOOL)commissionDevice:(uint64_t)deviceId commissioningParams:(CHIPCommissioningParameters *)commissioningParams error:(NSError * __autoreleasing *)error
+- (BOOL)commissionDevice:(uint64_t)deviceId
+     commissioningParams:(CHIPCommissioningParameters *)commissioningParams
+                   error:(NSError * __autoreleasing *)error
 {
     __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
     __block BOOL success = NO;
@@ -364,22 +366,22 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
     dispatch_sync(_chipWorkQueue, ^{
         if ([self isRunning]) {
             chip::Controller::CommissioningParameters params;
-            if (commissioningParams.CSRNonce)
-            {
-                params.SetCSRNonce(chip::ByteSpan ((uint8_t *) commissioningParams.CSRNonce.bytes, commissioningParams.CSRNonce.length));
+            if (commissioningParams.CSRNonce) {
+                params.SetCSRNonce(
+                    chip::ByteSpan((uint8_t *) commissioningParams.CSRNonce.bytes, commissioningParams.CSRNonce.length));
             }
-            if (commissioningParams.attestationNonce)
-            {
-                params.SetAttestationNonce(chip::ByteSpan ((uint8_t *) commissioningParams.attestationNonce.bytes, commissioningParams.attestationNonce.length));
+            if (commissioningParams.attestationNonce) {
+                params.SetAttestationNonce(chip::ByteSpan(
+                    (uint8_t *) commissioningParams.attestationNonce.bytes, commissioningParams.attestationNonce.length));
             }
-            if (commissioningParams.threadOperationalDataset)
-            {
-                params.SetThreadOperationalDataset(chip::ByteSpan ((uint8_t *) commissioningParams.threadOperationalDataset.bytes, commissioningParams.threadOperationalDataset.length));
+            if (commissioningParams.threadOperationalDataset) {
+                params.SetThreadOperationalDataset(chip::ByteSpan((uint8_t *) commissioningParams.threadOperationalDataset.bytes,
+                    commissioningParams.threadOperationalDataset.length));
             }
-            if (commissioningParams.wifiSSID && commissioningParams.wifiCredentials)
-            {
+            if (commissioningParams.wifiSSID && commissioningParams.wifiCredentials) {
                 chip::ByteSpan ssid((uint8_t *) commissioningParams.wifiSSID.bytes, commissioningParams.wifiSSID.length);
-                chip::ByteSpan credentials((uint8_t *) commissioningParams.wifiCredentials.bytes, commissioningParams.wifiCredentials.length);
+                chip::ByteSpan credentials(
+                    (uint8_t *) commissioningParams.wifiCredentials.bytes, commissioningParams.wifiCredentials.length);
                 chip::Controller::WiFiCredentials wifiCreds(ssid, credentials);
                 params.SetWiFiCredentials(wifiCreds);
             }
