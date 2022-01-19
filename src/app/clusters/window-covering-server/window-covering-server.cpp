@@ -40,29 +40,12 @@ using namespace chip;
 using namespace chip::app::Clusters::WindowCovering;
 
 
-static bool HasFeature(chip::EndpointId endpoint, WcFeature feature)
 {
-    uint32_t FeatureMap = 0;
-    if (EMBER_ZCL_STATUS_SUCCESS ==
-        emberAfReadServerAttribute(endpoint, chip::app::Clusters::WindowCovering::Id,
-                                   chip::app::Clusters::WindowCovering::Attributes::FeatureMap::Id,
-                                   reinterpret_cast<uint8_t *>(&FeatureMap), sizeof(FeatureMap)))
     {
-        return (FeatureMap & chip::to_underlying(feature)) != 0;
     }
 
-    return false;
-}
 
-static bool HasFeaturePaLift(chip::EndpointId endpoint)
-{
-    return (HasFeature(endpoint, WcFeature::kLift) && HasFeature(endpoint, WcFeature::kPositionAwareLift));
-}
 
-static bool HasFeaturePaTilt(chip::EndpointId endpoint)
-{
-    return (HasFeature(endpoint, WcFeature::kTilt) && HasFeature(endpoint, WcFeature::kPositionAwareTilt));
-}
 
 static uint16_t ValueToPercent100ths(uint16_t openLimit, uint16_t closedLimit, uint16_t value)
 {
@@ -153,14 +136,29 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
+bool HasFeature(chip::EndpointId endpoint, WcFeature feature)
 {
+    bool hasFeature = false;
+    uint32_t FeatureMap = 0;
+    if (EMBER_ZCL_STATUS_SUCCESS ==
+        emberAfReadServerAttribute(endpoint, chip::app::Clusters::WindowCovering::Id,
+                                   chip::app::Clusters::WindowCovering::Attributes::FeatureMap::Id,
+                                   reinterpret_cast<uint8_t *>(&FeatureMap), sizeof(FeatureMap)))
+    {
+        hasFeature = (FeatureMap & chip::to_underlying(feature));
+    }
 
+    return hasFeature;
 }
 
+static bool HasFeaturePaLift(chip::EndpointId endpoint)
 {
+    return (HasFeature(endpoint, WcFeature::kLift) && HasFeature(endpoint, WcFeature::kPositionAwareLift));
 }
 
+static bool HasFeaturePaTilt(chip::EndpointId endpoint)
 {
+    return (HasFeature(endpoint, WcFeature::kTilt) && HasFeature(endpoint, WcFeature::kPositionAwareTilt));
 }
 
 void TypeSet(chip::EndpointId endpoint, EmberAfWcType type)
