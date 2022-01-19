@@ -71,7 +71,7 @@ class MatterIdlTransformer(Transformer):
         return AttributeAccess.READONLY
 
     def writable(self, _):
-        return AttributeAccess.WRITABLE
+        return AttributeAccess.READWRITE
 
     def critical_priority(self, _):
         return EventPriority.CRITICAL

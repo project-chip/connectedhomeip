@@ -11,7 +11,7 @@ class MemberAttribute(enum.Enum):
 
 class AttributeAccess(enum.Enum):
     READONLY = enum.auto()
-    WRITABLE = enum.auto()
+    READWRITE = enum.auto()
 
 
 class EventPriority(enum.Enum):

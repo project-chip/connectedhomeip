@@ -71,6 +71,25 @@ class TestParser(unittest.TestCase):
                                     ])]
                              ))
 
+    def test_cluster_attribute(self):
+        self.assertEqual(parseText("""
+            server cluster MyCluster = 0x321 {
+                attribute(readonly) int8u roAttr = 1;
+                attribute(writable) int32u rwAttr[] = 123;
+            }
+        """),
+                         Idl(clusters=[
+                             Cluster(side=ClusterSide.SERVER,
+                                     name="MyCluster",
+                                     code=0x321,
+                                     attributes=[
+                                         Attribute(access=AttributeAccess.READONLY, definition=StructureMember(
+                                             data_type="int8u", code=1, name="roAttr")),
+                                         Attribute(access=AttributeAccess.READWRITE, definition=StructureMember(
+                                             data_type="int32u", code=123, name="rwAttr", is_list=True)),
+                                     ]
+                                     )]))
+
 
 if __name__ == '__main__':
     unittest.main()
