@@ -18,11 +18,16 @@ declare_args() {
   chip_build_pw_trace_lib = false
 }
 
+config("config") {
+  defines = [
+    "PW_TRACE_BACKEND_SET=1",
+  ]
+}
+
 source_set("trace") {
   sources = [ "trace.h" ]
-
   if (chip_build_pw_trace_lib) {
-    cflags = [ "-DPW_TRACE_BACKEND_SET=1" ]
+    public_configs = [ ":config" ]
     public_deps = [ "${dir_pigweed}/pw_trace" ]
   }
 }
