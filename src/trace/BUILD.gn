@@ -19,7 +19,7 @@ declare_args() {
 }
 
 config("config") {
-  defines = [ "PW_TRACE_BACKEND_SET=1" ]
+  defines = [ "PW_TRACE_BACKEND_SET" ]
 }
 
 source_set("trace") {
