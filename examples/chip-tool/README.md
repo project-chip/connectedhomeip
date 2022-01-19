@@ -37,7 +37,8 @@ automation.
 There are additional flags to chip-tool to control where the traces should go:
 
 -   --trace_file <file> Outputs trace data to the specified file.
--   --trace_log <0/1> Outputs trace data to the console with automation logs if set to 1
+-   --trace_log <0/1> Outputs trace data to the console with automation logs if
+    set to 1
 
 For example:
 
