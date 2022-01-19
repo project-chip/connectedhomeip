@@ -81,8 +81,8 @@ class TestParser(unittest.TestCase):
     def test_cluster_attribute(self):
         actual = parseText("""
             server cluster MyCluster = 0x321 {
-                attribute(readonly) int8u roAttr = 1;
-                attribute(writable) int32u rwAttr[] = 123;
+                readonly attribute int8u roAttr = 1;
+                attribute int32u rwAttr[] = 123;
             }
         """)
 

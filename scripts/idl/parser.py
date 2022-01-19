@@ -112,9 +112,12 @@ class MatterIdlTransformer(Transformer):
     def event(self, args):
         return Event(priority=args[0], name=args[1], code=args[2], fields=args[3:], )
 
-    @v_args(inline=True)
-    def attribute(self, attribute_access, named_member):
-        return Attribute(access=attribute_access, definition=named_member)
+    def attribute(self, args):
+        access = AttributeAccess.READWRITE  # default
+        if len(args) > 1:
+            access = args[0]
+
+        return Attribute(access=access, definition=args[-1])
 
     @v_args(inline=True)
     def struct(self, id, *fields):

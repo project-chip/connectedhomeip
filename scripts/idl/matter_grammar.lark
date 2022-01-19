@@ -7,9 +7,8 @@ event: event_priority "event"i id "=" number "{" struct_field* "}"
                | "info"i     -> info_priority
                | "debug"i    -> debug_priority
 
-attribute: "attribute"i "(" attribute_access ")"  field
+attribute: attribute_access? "attribute"i   field
 attribute_access: "readonly"i -> readonly
-                | "writable"i -> writable
 
 request_struct: "request"i struct
 response_struct: "response"i struct
