@@ -330,7 +330,7 @@ void WindowAppImpl::UpdateLEDs()
         if (!current.IsNull())
         {
             AbsoluteLimits limits = { .open = WC_PERCENT100THS_MIN_OPEN, .closed = WC_PERCENT100THS_MAX_CLOSED };
-            liftLimit = CheckLimitState(current.Value(), limits);
+            liftLimit             = CheckLimitState(current.Value(), limits);
         }
 
         if (EventId::None != cover.mLiftAction || EventId::None != cover.mTiltAction)
