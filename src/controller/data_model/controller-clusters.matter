@@ -13,6 +13,12 @@ client cluster AccessControl = 31 {
     kGroup = 3;
   }
 
+  enum ChangeTypeEnum : ENUM8 {
+    kChanged = 0;
+    kAdded = 1;
+    kRemoved = 2;
+  }
+
   enum Privilege : ENUM8 {
     kView = 1;
     kProxyView = 2;
@@ -38,6 +44,22 @@ client cluster AccessControl = 31 {
   struct ExtensionEntry {
     fabric_idx fabricIndex = 0;
     OCTET_STRING data = 1;
+  }
+
+  info event AccessControlEntryChanged = 0 {
+    fabric_idx adminFabricIndex = 0;
+    node_id adminNodeID = 1;
+    INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    AccessControlEntry latestValue = 4;
+  }
+
+  info event AccessControlExtensionChanged = 1 {
+    fabric_idx adminFabricIndex = 0;
+    node_id adminNodeID = 1;
+    INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    ExtensionEntry latestValue = 4;
   }
 
   attribute(writable) AccessControlEntry acl[] = 0;
