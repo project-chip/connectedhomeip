@@ -135,7 +135,7 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 
 void SetUpCodePairer::OnDeviceDiscovered(RendezvousParameters & params)
 {
-    LogErrorOnFailure(mCommissioner->pairDevice(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    LogErrorOnFailure(mCommissioner->PairDevice(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
 }
 
 #if CONFIG_NETWORK_LAYER_BLE
