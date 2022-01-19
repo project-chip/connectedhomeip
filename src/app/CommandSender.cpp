@@ -62,8 +62,30 @@ CHIP_ERROR CommandSender::AllocateBuffer()
 
 CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    bool isGroupCommand = false;
+    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+
+    ReturnErrorOnFailure(Finalize(mPendingInvokeData));
+
+    // Create a new exchange context.
+    mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
+    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    mpExchangeCtx->SetResponseTimeout(timeout);
+
+    if (mTimedInvokeTimeoutMs.HasValue())
+    {
+        ReturnErrorOnFailure(TimedRequest::Send(mpExchangeCtx, mTimedInvokeTimeoutMs.Value()));
+        MoveToState(State::AwaitingTimedStatus);
+        return CHIP_NO_ERROR;
+    }
+
+    return SendInvokeRequest();
+}
+
+CHIP_ERROR CommandSender::SendGroupCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     VerifyOrExit(mState == State::AddedCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
     err = Finalize(mPendingInvokeData);
@@ -72,30 +94,14 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Syst
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    isGroupCommand = mpExchangeCtx->IsGroupExchangeContext();
     mpExchangeCtx->SetResponseTimeout(timeout);
 
-    if (mTimedInvokeTimeoutMs.HasValue())
-    {
-        VerifyOrExit(!isGroupCommand, err = CHIP_ERROR_INCORRECT_STATE);
-
-        err = TimedRequest::Send(mpExchangeCtx, mTimedInvokeTimeoutMs.Value());
-        SuccessOrExit(err);
-        MoveToState(State::AwaitingTimedStatus);
-    }
-    else
-    {
-        err = SendInvokeRequest();
-    }
+    err = SendInvokeRequest();
     SuccessOrExit(err);
 
-exit:
-    if (isGroupCommand && err == CHIP_NO_ERROR)
-    {
-        Close();
-    }
+    Close();
 
+exit:
     return err;
 }
 

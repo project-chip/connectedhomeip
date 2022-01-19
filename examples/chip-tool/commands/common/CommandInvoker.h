@@ -124,9 +124,10 @@ public:
         {
             return CHIP_ERROR_NO_MEMORY;
         }
-        ReturnErrorOnFailure(commandSender->SendCommandRequest(session.Value()));
 
+        ReturnErrorOnFailure(commandSender->SendGroupCommandRequest(session.Value()));
         commandSender.release();
+
         exchangeManager->GetSessionManager()->RemoveGroupSession(session.Value()->AsGroupSession());
 
         return CHIP_NO_ERROR;

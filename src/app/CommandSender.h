@@ -124,6 +124,7 @@ public:
          *      - Always be called exactly *once* for a given CommandSender instance.
          *      - Be called even in error circumstances.
          *      - Only be called after a successful call to SendCommandRequest as been made.
+         *      - Will always be called before the return of SendGroupCommandRequest
          *
          * This function must be implemented to destroy the CommandSender object.
          *
@@ -216,6 +217,14 @@ public:
     // Default timeout value will be used otherwise.
     //
     CHIP_ERROR SendCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
+
+    // Sends a queued up group command request to the target encapsulated by the secureSession handle.
+    //
+    // Upon completion of work regardless of whether it was successful or not, the OnDone
+    // callback will be invoked to indicate completion of work on this object and to indicate
+    // to the application that it can destroy and free this object.
+    //
+    CHIP_ERROR SendGroupCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout = kImMessageTimeout);
 
 private:
     friend class TestCommandInteraction;
