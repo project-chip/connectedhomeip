@@ -299,8 +299,9 @@ From within the console you can then invoke rpcs:
 
 ## Device Tracing
 
-Device tracing is available to analyze the device performance. To turn on tracing, build with RPC enabled.
-See [Using the RPC console](#using-the-rpc-console).
+Device tracing is available to analyze the device performance. To turn on
+tracing, build with RPC enabled. See
+[Using the RPC console](#using-the-rpc-console).
 
 Obtain tracing json file.
 
@@ -308,4 +309,3 @@ Obtain tracing json file.
     $ ./{PIGWEED_REPO}/pw_trace_tokenized/py/pw_trace_tokenized/get_trace.py -d {PORT} -o {OUTPUT_FILE} \
     -t {ELF_FILE} {PIGWEED_REPO}/pw_trace_tokenized/pw_trace_protos/trace_rpc.proto
 ```
-
