@@ -13,12 +13,34 @@ server cluster AccessControl = 31 {
     kGroup = 3;
   }
 
+  enum ChangeTypeEnum : ENUM8 {
+    kChanged = 0;
+    kAdded = 1;
+    kRemoved = 2;
+  }
+
   enum Privilege : ENUM8 {
     kView = 1;
     kProxyView = 2;
     kOperate = 3;
     kManage = 4;
     kAdminister = 5;
+  }
+
+  info event AccessControlEntryChanged = 0 {
+    fabric_idx adminFabricIndex = 0;
+    node_id adminNodeID = 1;
+    INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    AccessControlEntry latestValue = 4;
+  }
+
+  info event AccessControlExtensionChanged = 1 {
+    fabric_idx adminFabricIndex = 0;
+    node_id adminNodeID = 1;
+    INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    ExtensionEntry latestValue = 4;
   }
 
 }
@@ -308,8 +330,8 @@ server cluster GroupKeyManagement = 63 {
 }
 
 server cluster Groups = 4 {
-  attribute(readonly, reportable) bitmap8 nameSupport = 0;
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(readonly) bitmap8 nameSupport = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct AddGroupRequest {
     INT16U groupId = 0;
@@ -385,8 +407,8 @@ server cluster Identify = 3 {
     kActuator = 5;
   }
 
-  attribute(writable, reportable) int16u identifyTime = 0;
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(writable) int16u identifyTime = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct IdentifyRequest {
     INT16U identifyTime = 0;
@@ -468,6 +490,8 @@ server cluster LevelControl = 8 {
 }
 
 server cluster LocalizationConfiguration = 43 {
+  attribute(writable) char_string activeLocale = 1;
+  attribute(readonly) CHAR_STRING supportedLocales[] = 2;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -835,12 +859,12 @@ server cluster Scenes = 5 {
     INT8U value = 3;
   }
 
-  attribute(readonly, reportable) int8u sceneCount = 0;
-  attribute(readonly, reportable) int8u currentScene = 1;
-  attribute(readonly, reportable) int16u currentGroup = 2;
-  attribute(readonly, reportable) boolean sceneValid = 3;
-  attribute(readonly, reportable) bitmap8 nameSupport = 4;
-  attribute(readonly, reportable) int16u clusterRevision = 65533;
+  attribute(readonly) int8u sceneCount = 0;
+  attribute(readonly) int8u currentScene = 1;
+  attribute(readonly) int16u currentGroup = 2;
+  attribute(readonly) boolean sceneValid = 3;
+  attribute(readonly) bitmap8 nameSupport = 4;
+  attribute(readonly) int16u clusterRevision = 65533;
 
   request struct AddSceneRequest {
     INT16U groupId = 0;
@@ -1114,6 +1138,7 @@ server cluster UserLabel = 65 {
 
 
 endpoint 0 {
+  server  cluster AccessControl;
   server  cluster AdministratorCommissioning;
   server  cluster Basic;
   server  cluster Descriptor;
@@ -1121,6 +1146,7 @@ endpoint 0 {
   server  cluster FixedLabel;
   server  cluster GeneralCommissioning;
   server  cluster GeneralDiagnostics;
+  server  cluster GroupKeyManagement;
   server  cluster LocalizationConfiguration;
   server  cluster NetworkCommissioning;
   server  cluster OperationalCredentials;
@@ -1133,11 +1159,16 @@ endpoint 1 {
   server  cluster Descriptor;
   binding cluster FlowMeasurement;
   server  cluster FlowMeasurement;
+  server  cluster Groups;
+  server  cluster Identify;
   server  cluster LevelControl;
+  binding cluster OccupancySensing;
   server  cluster OnOff;
   binding cluster PressureMeasurement;
   server  cluster PressureMeasurement;
   server  cluster PumpConfigurationAndControl;
+  server  cluster Scenes;
   binding cluster TemperatureMeasurement;
   server  cluster TemperatureMeasurement;
 }
+
