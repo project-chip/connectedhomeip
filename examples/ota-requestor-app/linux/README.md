@@ -58,8 +58,10 @@ In terminal 2:
     ota-requestor-app specified in terminal 3 above
 
 ```
-./chip-tool otasoftwareupdaterequestor announce-ota-provider  ${NODE_ID_TO_ASSIGN_PROVIDER} 0 0 0 ${NODE_ID_TO_ASSIGN_REQUESTOR} 0
+./chip-tool otasoftwareupdaterequestor announce-ota-provider ${PROVIDER_NODE_ID} 0 0 0 ${REQUESTOR_NODE_ID} 0
 ```
+-   `${PROVIDER_NODE_ID}` is the node ID of the ota-provider-app assigned to it during the pairing step above
+-   `${REQUESTOR_NODE_ID}` is the node ID of the ota-requestor-app assigned to it during the pairing step above
 
 ## Note
 

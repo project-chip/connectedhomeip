@@ -9,7 +9,7 @@ Silicon Labs EFR32 MG12.
 
 The EFR32 OTA Requestor example provides a baseline demonstration the Matter OTA
 Requestor functionality built with the Silicon Labs gecko SDK. It can be
-controlled by a Chip controller over Open thread network..
+controlled by a Chip controller over OpenThread network.
 
 <a name="building"></a>
 
@@ -69,7 +69,7 @@ See `examples/lighting-app/efr32/README.md`
 
 ## Running the OTA Download scenario
 
--   Bring up the Open Thread Border Router as discussed in
+-   Bring up the OpenThread Border Router as discussed in
     examples/lighting-app/efr32/README.md and get its operational dataset.
 
 -   On a Linux or Darwin platform build the chip-tool and the ota-provider-app
@@ -99,7 +99,7 @@ See `examples/lighting-app/efr32/README.md`
 
             ./out/chip-tool pairing ble-thread 2 hex:<operationalDataset> 73141520   3840
 
-where operationalDataset is obtained from the Open Thread Border Router.
+where operationalDataset is obtained from the OpenThread Border Router.
 
 -   Once the commissioning process completes enter:
 
