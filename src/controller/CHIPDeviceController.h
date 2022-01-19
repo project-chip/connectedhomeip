@@ -584,6 +584,12 @@ public:
                                        const ByteSpan & attestationNonce, const ByteSpan & pai, const ByteSpan & dac,
                                        DeviceProxy * proxy);
 
+    /**
+     * @brief
+     * Sends CommissioningStepComplete report to the commissioning delegate. Function will fill in current step.
+     * @params[in] err      error from the current step
+     * @params[in] report   report to send. Current step will be filled in automatically
+     */
     void
     CommissioningStageComplete(CHIP_ERROR err,
                                CommissioningDelegate::CommissioningReport report = CommissioningDelegate::CommissioningReport());

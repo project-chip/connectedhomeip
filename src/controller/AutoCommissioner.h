@@ -25,6 +25,14 @@ namespace Controller {
 
 class DeviceCommissioner;
 
+// It seems like this should come from the zap
+enum NetworkClusterFeatureFlags : uint32_t
+{
+    kWifi     = 0x01,
+    kThread   = 0x02,
+    kEthernet = 0x04,
+};
+
 class AutoCommissioner : public CommissioningDelegate
 {
 public:
@@ -39,7 +47,7 @@ public:
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
 private:
-    CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR lastErr);
+    CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR & lastErr);
     void ReleaseDAC();
     void ReleasePAI();
 
@@ -61,6 +69,9 @@ private:
     uint8_t mSsid[CommissioningParameters::kMaxSsidLen];
     uint8_t mCredentials[CommissioningParameters::kMaxCredentialsLen];
     uint8_t mThreadOperationalDataset[CommissioningParameters::kMaxThreadDatasetLen];
+    // TODO: if the device library adds a network commissioning device type, this will need to be 1 per endpoint.
+    BitFlags<NetworkClusterFeatureFlags> mNetworkTechnology;
+    bool mNeedsNetworkSetup = false;
 
     // TODO: Why were the nonces statically allocated, but the certs dynamically allocated?
     uint8_t * mDAC   = nullptr;
