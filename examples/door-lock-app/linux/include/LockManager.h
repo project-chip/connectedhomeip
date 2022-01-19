@@ -52,7 +52,7 @@ struct LockCredentialInfo
 class LockManager
 {
 public:
-    LockManager() : mLocked(false) {}
+    LockManager() : mLocked(DlLockState::kLocked) {}
 
     bool Lock(chip::Optional<chip::ByteSpan> pin);
     bool Unlock(chip::Optional<chip::ByteSpan> pin);
@@ -71,7 +71,10 @@ public:
     static LockManager & Instance();
 
 private:
-    bool mLocked;
+    bool setLockState(DlLockState lockState, chip::Optional<chip::ByteSpan> & pin);
+    const char * lockStateToString(DlLockState lockState);
+
+    DlLockState mLocked;
 
     // TODO: Support multiple endpoints in the app.
     std::array<LockUserInfo, 10> mLockUsers;

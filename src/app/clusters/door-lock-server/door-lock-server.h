@@ -29,11 +29,13 @@
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
 
+using chip::Optional;
 using chip::app::Clusters::DoorLock::DlCredentialRule;
 using chip::app::Clusters::DoorLock::DlCredentialType;
 using chip::app::Clusters::DoorLock::DlDataOperationType;
 using chip::app::Clusters::DoorLock::DlDoorState;
 using chip::app::Clusters::DoorLock::DlLockDataType;
+using chip::app::Clusters::DoorLock::DlLockOperationType;
 using chip::app::Clusters::DoorLock::DlLockState;
 using chip::app::Clusters::DoorLock::DlOperationSource;
 using chip::app::Clusters::DoorLock::DlStatus;
@@ -88,6 +90,9 @@ public:
     void ClearCredentialCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                        const chip::app::Clusters::DoorLock::Commands::ClearCredential::DecodableType & commandData);
 
+    void LockUnlockDoorCommandHandler(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                      DlLockOperationType operationType, const chip::Optional<chip::ByteSpan> & pinCode);
+
     bool HasFeature(chip::EndpointId endpointId, DoorLockFeature feature);
 
     inline bool SupportsPIN(chip::EndpointId endpointId) { return HasFeature(endpointId, DoorLockFeature::kPINCredentials); }
@@ -126,6 +131,9 @@ private:
 
     bool findUserIndexByCredential(chip::EndpointId endpointId, DlCredentialType credentialType, uint16_t credentialIndex,
                                    uint16_t & userIndex);
+
+    bool findUserIndexByCredential(chip::EndpointId endpointId, DlCredentialType credentialType, chip::ByteSpan credentialData,
+                                   uint16_t & userIndex, uint16_t & credentialIndex);
 
     EmberAfStatus createUser(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
                              uint16_t userIndex, const Nullable<chip::CharSpan> & userName, const Nullable<uint32_t> & userUniqueId,
@@ -205,6 +213,8 @@ struct EmberAfPluginDoorLockUserInfo
     chip::FabricIndex createdBy;                /**< ID of the fabric that created the user. */
     chip::FabricIndex lastModifiedBy;           /**< ID of the fabric that modified the user. */
 };
+
+typedef bool (*EmberAfDoorLockLockUnlockCommand)(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
 
 bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
 bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, chip::Optional<chip::ByteSpan> pinCode);
