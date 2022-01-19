@@ -92,6 +92,7 @@ public:
         if (request.pushed)
         {
             ScreenManager::ButtonPressed(1 + request.idx);
+            WakeDisplay();
         }
         return pw::OkStatus();
 #else  // CONFIG_DEVICE_TYPE_M5STACK
