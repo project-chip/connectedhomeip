@@ -106,6 +106,26 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, X & x)
 /*
  * @brief
  *
+ * This specific variant that decodes fabric scoped cluster objects (like structs, commands, events) from TLV depends on the
+ * presence of a Decode method on the object to present. The signature of that method is as follows:
+ *
+ * CHIP_ERROR <Object>::Decode(TLVReader &reader, Optional<FabricIndex> &overwriteFabricIndex);
+ *
+ */
+template <typename X,
+          typename std::enable_if_t<std::is_class<X>::value &&
+                                        std::is_same<decltype(std::declval<X>().Decode(std::declval<TLV::TLVReader &>(),
+                                                                                       std::declval<Optional<FabricIndex> &>())),
+                                                     CHIP_ERROR>::value,
+                                    X> * = nullptr>
+CHIP_ERROR Decode(TLV::TLVReader & reader, X & x, const Optional<FabricIndex> & overwriteFabricIndex)
+{
+    return x.Decode(reader, overwriteFabricIndex);
+}
+
+/*
+ * @brief
+ *
  * This specific variant decodes from TLV a cluster object that contains all attributes encapsulated within a single, monolithic
  * cluster object.
  *
@@ -135,7 +155,10 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, const ConcreteAttributePath & path, X
  *
  * Decodes an optional value (struct field, command field, event field).
  */
-template <typename X>
+template <
+    typename X,
+    typename std::enable_if_t<
+        std::is_same<decltype(Decode(std::declval<TLV::TLVReader &>(), std::declval<X &>())), CHIP_ERROR>::value, X> * = nullptr>
 CHIP_ERROR Decode(TLV::TLVReader & reader, Optional<X> & x)
 {
     // If we are calling this, it means we found the right tag, so just decode
@@ -146,9 +169,30 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, Optional<X> & x)
 /*
  * @brief
  *
+ * Decodes an fabric scoped optional value (struct field, command field, event field).
+ */
+template <typename X,
+          typename std::enable_if_t<std::is_class<X>::value &&
+                                        std::is_same<decltype(Decode(std::declval<TLV::TLVReader &>(), std::declval<X &>(),
+                                                                     std::declval<Optional<FabricIndex> &>())),
+                                                     CHIP_ERROR>::value,
+                                    X> * = nullptr>
+CHIP_ERROR Decode(TLV::TLVReader & reader, Optional<X> & x, const Optional<FabricIndex> & overwriteFabricIndex)
+{
+    // If we are calling this, it means we found the right tag, so just decode
+    // the item.
+    return Decode(reader, x.Emplace(), overwriteFabricIndex);
+}
+
+/*
+ * @brief
+ *
  * Decodes a nullable value.
  */
-template <typename X>
+template <
+    typename X,
+    typename std::enable_if_t<
+        std::is_same<decltype(Decode(std::declval<TLV::TLVReader &>(), std::declval<X &>())), CHIP_ERROR>::value, X> * = nullptr>
 CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
 {
     if (reader.GetType() == TLV::kTLVType_Null)
@@ -159,6 +203,34 @@ CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x)
 
     // We have a value; decode it.
     ReturnErrorOnFailure(Decode(reader, x.SetNonNull()));
+    if (!x.HasValidValue())
+    {
+        return CHIP_ERROR_IM_CONSTRAINT_ERROR;
+    }
+    return CHIP_NO_ERROR;
+}
+
+/*
+ * @brief
+ *
+ * Decodes a fabric scoped nullable value.
+ */
+template <typename X,
+          typename std::enable_if_t<std::is_class<X>::value &&
+                                        std::is_same<decltype(Decode(std::declval<TLV::TLVReader &>(), std::declval<X &>(),
+                                                                     std::declval<Optional<FabricIndex> &>())),
+                                                     CHIP_ERROR>::value,
+                                    X> * = nullptr>
+CHIP_ERROR Decode(TLV::TLVReader & reader, Nullable<X> & x, const Optional<FabricIndex> & overwriteFabricIndex)
+{
+    if (reader.GetType() == TLV::kTLVType_Null)
+    {
+        x.SetNull();
+        return CHIP_NO_ERROR;
+    }
+
+    // We have a value; decode it.
+    ReturnErrorOnFailure(Decode(reader, x.SetNonNull(), overwriteFabricIndex));
     if (!x.HasValidValue())
     {
         return CHIP_ERROR_IM_CONSTRAINT_ERROR;

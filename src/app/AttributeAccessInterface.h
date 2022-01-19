@@ -311,11 +311,30 @@ public:
         mReader(aReader), mAccessingFabricIndex(aAccessingFabricIndex)
     {}
 
-    template <typename T>
+    template <
+        typename T,
+        typename std::enable_if_t<
+            std::is_same<decltype(DataModel::Decode(std::declval<TLV::TLVReader &>(), std::declval<T &>())), CHIP_ERROR>::value,
+            T> * = nullptr>
     CHIP_ERROR Decode(T & aArg)
     {
         mTriedDecode = true;
         return DataModel::Decode(mReader, aArg);
+    }
+
+    template <
+        typename T,
+        typename std::enable_if_t<std::is_class<T>::value &&
+                                      std::is_same<decltype(DataModel::Decode(std::declval<TLV::TLVReader &>(), std::declval<T &>(),
+                                                                              std::declval<Optional<FabricIndex> &>())),
+                                                   CHIP_ERROR>::value,
+                                  T> * = nullptr>
+    CHIP_ERROR Decode(T & aArg)
+    {
+        mTriedDecode = true;
+        // TODO: We may want to reject kUndefinedFabricIndex for writing fabric scoped data. mAccessingFabricIndex will be
+        // kUndefinedFabricIndex on PASE sessions.
+        return DataModel::Decode(mReader, aArg, MakeOptional(mAccessingFabricIndex));
     }
 
     bool TriedDecode() const { return mTriedDecode; }

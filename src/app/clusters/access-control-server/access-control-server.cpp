@@ -224,11 +224,11 @@ struct AccessControlEntryCodec
         return staging.Encode(aWriter, aTag);
     }
 
-    CHIP_ERROR Decode(TLV::TLVReader & aReader)
+    CHIP_ERROR Decode(TLV::TLVReader & aReader, const Optional<FabricIndex> & aFabricIndex)
     {
         AccessControlCluster::Structs::AccessControlEntry::DecodableType staging;
 
-        ReturnErrorOnFailure(staging.Decode(aReader));
+        ReturnErrorOnFailure(staging.Decode(aReader, aFabricIndex));
 
         ReturnErrorOnFailure(GetAccessControl().PrepareEntry(entry));
 
