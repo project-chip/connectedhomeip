@@ -3,13 +3,70 @@
 Some examples for the development kits from Nordic Semiconductor support
 over-the-air Device Firmware Upgrade.
 
-Currently, the Bluetooth LE is the only available transport for performing the
-DFU operation and it uses nRF Connect SDK's
-[Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt).
-The upgrade can be done either using a smartphone application or a PC command
-line tool.
+Depending on the example, the DFU can be performed using the Matter-compliant
+OTA feature in which the Matter operational network is used for downloading a
+new firmware image, or using
+[Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt)
+over Bluetooth LE. In the latter case, the DFU can be done either using a
+smartphone application or a PC command line tool.
 
-## Device Firmware Upgrade using smartphone
+## Devide Firmware Upgrade over Matter
+
+> **_NOTE:_** The procedure presented below requires that you have OpenThread
+> Border Router set up either in Docker or on a Raspberry Pi. Read
+> [Setup OpenThread Border Router on Raspberry Pi](openthread_border_router_pi.md)
+> to learn how to install the OTBR on a Raspberry Pi.
+
+To test the DFU over Matter, complete the following steps:
+
+1. Navigate to the CHIP root directory.
+2. Build OTA Provider application for Linux:
+
+        $ scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/provider chip_config_network_layer_ble=false
+
+3. Build chip-tool for Linux:
+
+        $ scripts/examples/gn_build_example.sh examples/chip-tool out/chiptool 'chip_mdns="platform"'
+
+4. Run OTA Provider application with _app\_update.bin_ replaced with the path to
+   the new firmware image which you wish to provide to the Matter device:
+
+        $ out/provider/chip-ota-provider-app -f app_update.bin
+    
+   Keep the application running and use another terminal for the remaining
+   steps.
+5. Commission the OTA Provider into the Matter network using Node Id 1:
+
+        $ ./out/chiptool/chip-tool pairing onnetwork 1 20202021
+
+6. Use the OTBR web interface to form a new Thread network using the default
+   network settings.
+7. Commission the Matter device into the same Matter network using Node Id 2:
+
+        $ ./out/chiptool/chip-tool pairing ble-thread 2 hex:000300000f02081111111122222222051000112233445566778899aabbccddeeff01021234 20202021 3840
+
+   Note that the parameter starting with _hex:_ prefix is the Thread network's
+   Active Operational Dataset. It can be retrieved from the OTBR in case you
+   have changed the default network settings when forming the network.
+8. Initiate the DFU procedure in one of the following ways:
+
+   - If you have built the device firmware with `-DCONFIG_CHIP_LIB_SHELL=y`
+     option which enables Matter shell commands, run the following command on
+     the device shell:
+
+            $ matter ota query 1 1 0
+
+   - Otherwise, use chip-tool to send Announce OTA Provider command to the
+     device:
+
+            $ ./out/avahi/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+
+     Once the device is made aware of the OTA Provider node, it automatically
+     queries the OTA Provider for a new firmware image.
+
+9. When the firmware image download is complete, reboot the device to apply the update.
+
+## Device Firmware Upgrade over Bluetooth LE using smartphone
 
 To upgrade your device firmware over Bluetooth LE using smartphone, complete the
 following steps:
@@ -30,7 +87,7 @@ following steps:
    [FOTA upgrades](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/ug_nrf52.html#fota-upgrades)
    page in the nRF Connect SDK documentation.
 
-## Device Firmware Upgrade using PC command line tool
+## Device Firmware Upgrade over Bluetooth LE using PC command line tool
 
 To upgrade your device firmware over Bluetooth LE, you can use the PC command
 line tool provided by the [mcumgr](https://github.com/zephyrproject-rtos/mcumgr)
