@@ -1,4 +1,4 @@
-#CHIP EFR32 OTA Requestor Example
+# CHIP EFR32 OTA Requestor Example
 
 An example showing the use of the Matter OTA Requestor functionality on the
 Silicon Labs EFR32 MG12.
@@ -9,7 +9,7 @@ Silicon Labs EFR32 MG12.
 
 The EFR32 OTA Requestor example provides a baseline demonstration the Matter OTA
 Requestor functionality built with the Silicon Labs gecko SDK. It can be
-controlled by a Chip controller over Openthread network..
+controlled by a Chip controller over Open thread network..
 
 <a name="building"></a>
 
@@ -48,6 +48,8 @@ examples/lighting-app/efr32/README.md
           $ cd ~/connectedhomeip
           $ rm -rf ./out/
 
+<a name="Flashing the Application"></a>
+
 ## Flashing the Application
 
 -   On the command line:
@@ -61,7 +63,9 @@ examples/lighting-app/efr32/README.md
 
 ## Viewing Logging Output
 
-See examples/lighting-app/efr32/README.md
+See `examples/lighting-app/efr32/README.md`
+
+<a name="Running the OTA Download scenario"></a>
 
 ## Running the OTA Download scenario
 
@@ -74,10 +78,14 @@ See examples/lighting-app/efr32/README.md
            scripts/examples/gn_build_example.sh examples/chip-tool out/
            scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
 
--   In a terminal start the provider app passing to it the path to the image
-    file that the Requestor is supposed to download (for example /tmp/ota.out):
+-   Create a bootable image file:
 
-                ./out/debug/chip-ota-provider-app -f /tmp/ota.out
+           commander gbl create chip-efr32-ota-requestor-example.gbl --app chip-efr32-ota-requestor-example.s37
+
+-   In a terminal start the provider app passing to it the path to the bootable image
+    file created in the previous step:
+
+           ./out/debug/chip-ota-provider-app -f chip-efr32-ota-requestor-example.gbl
 
 -   In a separate terminal run the chip-tool commands to provision the Provider:
 
@@ -97,4 +105,5 @@ where operationalDataset is obtained from the Open Thread Border Router.
 
             ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 
--   The Requestor will connect to the Provider and start the image download.
+-   The Requestor will connect to the Provider and start the image download. Once the image is downloaded
+    the Requestor will reboot into the downloaded image.
