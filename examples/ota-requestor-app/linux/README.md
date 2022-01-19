@@ -63,16 +63,21 @@ In terminal 2:
 
 ## Note
 
-When the Provider, Requestor and chip-tool are run on the same Linux node the user must issue `rm -r /tmp/chip_*` before starting the Provider and `rm /tmp/chip_kvs` before starting the Requestor. These commands reset the shared Key Value Store to a consistent state. 
+When the Provider, Requestor and chip-tool are run on the same Linux node the
+user must issue `rm -r /tmp/chip_*` before starting the Provider and
+`rm /tmp/chip_kvs` before starting the Requestor. These commands reset the
+shared Key Value Store to a consistent state.
 
 ## Example
 
 Building:
+
 ```
 scripts/examples/gn_build_example.sh examples/chip-tool out/ chip_config_network_layer_ble=false && scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false  && scripts/examples/gn_build_example.sh examples/ota-requestor-app/linux out/debug chip_config_network_layer_ble=false
 ```
 
 Running (in separate terminals as described above):
+
 ```
 rm -r /tmp/chip_*
 ./out/debug/chip-ota-provider-app -f /tmp/ota.txt
@@ -82,6 +87,7 @@ rm /tmp/chip_kvs
 ./out/chip-tool pairing onnetwork-long 2 20202021 42
 ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 ```
+
 ## Current Features / Limitations
 
 ### Features

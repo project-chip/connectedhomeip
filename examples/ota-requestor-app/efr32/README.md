@@ -82,8 +82,8 @@ See `examples/lighting-app/efr32/README.md`
 
            commander gbl create chip-efr32-ota-requestor-example.gbl --app chip-efr32-ota-requestor-example.s37
 
--   In a terminal start the provider app passing to it the path to the bootable image
-    file created in the previous step:
+-   In a terminal start the provider app passing to it the path to the bootable
+    image file created in the previous step:
 
            ./out/debug/chip-ota-provider-app -f chip-efr32-ota-requestor-example.gbl
 
@@ -105,5 +105,6 @@ where operationalDataset is obtained from the Open Thread Border Router.
 
             ./out/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 
--   The Requestor will connect to the Provider and start the image download. Once the image is downloaded
-    the Requestor will reboot into the downloaded image.
+-   The Requestor will connect to the Provider and start the image download.
+    Once the image is downloaded the Requestor will reboot into the downloaded
+    image.
