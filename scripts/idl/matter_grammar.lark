@@ -1,13 +1,13 @@
-struct: "struct"i id "{" struct_member* "}"
+struct: "struct"i id "{" struct_field* "}"
 enum: "enum"i id ":" type "{" enum_entry* "}"
 
-event: event_priority "event"i id "=" number "{" struct_member* "}"
+event: event_priority "event"i id "=" number "{" struct_field* "}"
 
 ?event_priority: "critical"i -> critical_priority
                | "info"i     -> info_priority
                | "debug"i    -> debug_priority
 
-attribute: "attribute"i "(" attribute_access ")"  named_member
+attribute: "attribute"i "(" attribute_access ")"  field
 attribute_access: "readonly"i -> readonly
                 | "writable"i -> writable
 
@@ -29,12 +29,12 @@ endpoint_cluster: endpoint_cluster_type "cluster"i id ";"
 enum_entry: id "=" number ";"
 number: POSITIVE_INTEGER | HEX_INTEGER
 
-struct_member: member_attribute* named_member
+struct_field: member_attribute* field
 
 member_attribute: "optional"i -> optional
                 | "nullable"i -> nullable
 
-named_member: type id list_marker? "=" number ";"
+field: type id list_marker? "=" number ";"
 list_marker: "[" "]"
 
 id: ID

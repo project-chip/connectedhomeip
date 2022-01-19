@@ -54,18 +54,18 @@ class MatterIdlTransformer(Transformer):
     def enum(self, id, type, *entries):
         return Enum(name=id, base_type=type, entries=list(entries))
 
-    def named_member(self, args):
+    def field(self, args):
         data_type, name = args[0], args[1]
         is_list = (len(args) == 4)
         code = args[-1]
 
-        return StructureMember(data_type=data_type, name=name, code=code, is_list=is_list)
+        return Field(data_type=data_type, name=name, code=code, is_list=is_list)
 
     def optional(self, _):
-        return MemberAttribute.OPTIONAL
+        return FieldAttribute.OPTIONAL
 
     def nullable(self, _):
-        return MemberAttribute.NULLABLE
+        return FieldAttribute.NULLABLE
 
     def readonly(self, _):
         return AttributeAccess.READONLY
@@ -88,12 +88,12 @@ class MatterIdlTransformer(Transformer):
     def endpoint_binding_to_cluster(self, _):
         return EndpointContentType.CLIENT_BINDING
 
-    def struct_member(self, args):
+    def struct_field(self, args):
         # Last argument is the named_member, the rest
         # are attributes
-        member = args[-1]
-        member.attributes = set(args[:-1])
-        return member
+        field = args[-1]
+        field.attributes = set(args[:-1])
+        return field
 
     def server_cluster(self, _):
         return ClusterSide.SERVER
@@ -110,15 +110,15 @@ class MatterIdlTransformer(Transformer):
         return Command(name=args[0], input_param=param_in, output_param=args[-2], code=args[-1])
 
     def event(self, args):
-        return Event(priority=args[0], name=args[1], code=args[2], members=args[3:], )
+        return Event(priority=args[0], name=args[1], code=args[2], fields=args[3:], )
 
     @v_args(inline=True)
     def attribute(self, attribute_access, named_member):
         return Attribute(access=attribute_access, definition=named_member)
 
     @v_args(inline=True)
-    def struct(self, id, *members):
-        return Struct(name=id, members=list(members))
+    def struct(self, id, *fields):
+        return Struct(name=id, fields=list(fields))
 
     @v_args(inline=True)
     def request_struct(self, value):

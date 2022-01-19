@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import List, Set
 
 
-class MemberAttribute(enum.Enum):
+class FieldAttribute(enum.Enum):
     OPTIONAL = enum.auto()
     NULLABLE = enum.auto()
 
@@ -36,24 +36,24 @@ class EndpointContentType(enum.Enum):
 
 
 @dataclass
-class StructureMember:
+class Field:
     data_type: str
     code: int
     name: str
     is_list: bool = False
-    attributes: Set[MemberAttribute] = field(default_factory=set)
+    attributes: Set[FieldAttribute] = field(default_factory=set)
 
 
 @dataclass
 class Attribute:
     access: AttributeAccess
-    definition: StructureMember
+    definition: Field
 
 
 @dataclass
 class Struct:
     name: str
-    members: List[StructureMember]
+    fields: List[Field]
     tag: StructTag = None
 
 
@@ -62,7 +62,7 @@ class Event:
     priority: EventPriority
     name: str
     code: int
-    members: List[StructureMember]
+    fields: List[Field]
 
 
 @dataclass

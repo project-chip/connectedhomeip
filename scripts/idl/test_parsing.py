@@ -67,13 +67,13 @@ class TestParser(unittest.TestCase):
 
         expected = Idl(structs=[
             Struct(name='Something',
-                   members=[
-                        StructureMember(
+                   fields=[
+                        Field(
                             data_type="CHAR_STRING", code=1, name="astring", ),
-                        StructureMember(data_type="CLUSTER_ID", code=2, name="idlist", is_list=True, attributes=set(
-                            [MemberAttribute.OPTIONAL])),
-                        StructureMember(data_type="int", code=0x123, name="valueThatIsNullable", attributes=set(
-                            [MemberAttribute.NULLABLE])),
+                        Field(data_type="CLUSTER_ID", code=2, name="idlist", is_list=True, attributes=set(
+                            [FieldAttribute.OPTIONAL])),
+                        Field(data_type="int", code=0x123, name="valueThatIsNullable", attributes=set(
+                            [FieldAttribute.NULLABLE])),
                    ])]
         )
         self.assertEqual(actual, expected)
@@ -91,9 +91,9 @@ class TestParser(unittest.TestCase):
                     name="MyCluster",
                     code=0x321,
                     attributes=[
-                        Attribute(access=AttributeAccess.READONLY, definition=StructureMember(
+                        Attribute(access=AttributeAccess.READONLY, definition=Field(
                             data_type="int8u", code=1, name="roAttr")),
-                        Attribute(access=AttributeAccess.READWRITE, definition=StructureMember(
+                        Attribute(access=AttributeAccess.READWRITE, definition=Field(
                             data_type="int32u", code=123, name="rwAttr", is_list=True)),
                     ]
                     )])
@@ -115,10 +115,10 @@ class TestParser(unittest.TestCase):
                     name="WithCommands",
                     code=1,
                     structs=[
-                        Struct(name="FreeStruct", members=[]),
-                        Struct(name="InParam", members=[],
+                        Struct(name="FreeStruct", fields=[]),
+                        Struct(name="InParam", fields=[],
                                tag=StructTag.REQUEST),
-                        Struct(name="OutParam", members=[],
+                        Struct(name="OutParam", fields=[],
                                tag=StructTag.RESPONSE),
                     ],
                     commands=[
@@ -167,14 +167,14 @@ class TestParser(unittest.TestCase):
                     name="EventTester",
                     code=0x123,
                     events=[
-                        Event(priority=EventPriority.CRITICAL, name="StartUp", code=0, members=[
-                            StructureMember(data_type="INT32U",
+                        Event(priority=EventPriority.CRITICAL, name="StartUp", code=0, fields=[
+                            Field(data_type="INT32U",
                                             code=0, name="softwareVersion"),
                         ]),
                         Event(priority=EventPriority.INFO,
-                              name="Hello", code=1, members=[]),
+                              name="Hello", code=1, fields=[]),
                         Event(priority=EventPriority.DEBUG,
-                              name="GoodBye", code=2, members=[]),
+                              name="GoodBye", code=2, fields=[]),
                     ])])
         self.assertEqual(actual, expected)
 
