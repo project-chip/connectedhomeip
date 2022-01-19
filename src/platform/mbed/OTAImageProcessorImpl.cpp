@@ -176,6 +176,7 @@ void OTAImageProcessorImpl::HandleApply(intptr_t context)
     }
 
 #ifdef BOOT_ENABLED
+    ChipLogProgress(SoftwareUpdate, "Set secondary image pending");
     auto ret = boot_set_pending_multi(/*image index*/ 0, /*permanent*/ 0);
     if (ret)
     {
@@ -234,6 +235,7 @@ int OTAImageProcessorImpl::PrepareMemory()
     int ret = 0;
 
 #ifdef BOOT_ENABLED
+    ChipLogProgress(SoftwareUpdate, "Secondary slot initialize");
     // Initialize block device and erase update block
     ret = mBlockDevice->init();
     if (ret)
@@ -273,6 +275,10 @@ int OTAImageProcessorImpl::ProgramMemory()
     int ret = 0;
 
 #ifdef BOOT_ENABLED
+    ChipLogProgress(SoftwareUpdate,
+                    "Secondary slot program with offset: "
+                    "0x%" PRIx64,
+                    mParams.downloadedBytes);
     // Write data to memory
     ret = mBlockDevice->program(mBlock.data(), mParams.downloadedBytes, mBlock.size());
     if (ret)
