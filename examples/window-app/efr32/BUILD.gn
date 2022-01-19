@@ -145,7 +145,7 @@ efr32_executable("window_app") {
      sources += rs911x_src_plat
      # All the stuff from wiseconnect
      sources += rs911x_src_sapi
-     # Apparently - the rsi library needs this SH%T (though we may not use use it)
+     # Apparently - the rsi library needs this (though we may not use use it)
      sources += rs911x_src_sock
      include_dirs += rs911x_inc_plat
 
