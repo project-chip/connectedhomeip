@@ -251,7 +251,7 @@ function chip_cluster_command_arguments(options)
 
   const filter = command => command.id == commandId;
   return asBlocks.call(this,
-      commands.then(items => items.find(filter).arguments.map((value, index) => ({...value, fieldIdentifier : index }))), options);
+      commands.then(items => items.find(filter).arguments), options);
 }
 
 /**
@@ -301,7 +301,7 @@ function chip_cluster_response_arguments(options)
 
   const filter = command => command.id == commandId;
   return asBlocks.call(this,
-      responses.then(items => items.find(filter).arguments.map((value, index) => ({...value, fieldIdentifier : index }))), options);
+      responses.then(items => items.find(filter).arguments), options);
 }
 
 /**
