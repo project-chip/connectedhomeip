@@ -161,7 +161,7 @@ CHIP_ERROR WindowApp::Run()
             mState.isWiFiProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
             mState.isWiFiEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
 #endif
-            mState.haveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
+            mState.haveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 

@@ -97,11 +97,11 @@ public:
     static constexpr Key kConfigKey_ActiveLocale       = EFR32ConfigKey(kChipConfig_KeyBase, 0x0C);
     static constexpr Key kConfigKey_HourFormat         = EFR32ConfigKey(kChipConfig_KeyBase, 0x0D);
     static constexpr Key kConfigKey_CalendarType       = EFR32ConfigKey(kChipConfig_KeyBase, 0x0E);
-    static constexpr Key kConfigKey_WiFiSSID          = EFR32ConfigKey(kChipConfig_KeyBase, 0x0F);
-    static constexpr Key kConfigKey_WiFiPSK           = EFR32ConfigKey(kChipConfig_KeyBase, 0x10);
-    static constexpr Key kConfigKey_WiFiSEC           = EFR32ConfigKey(kChipConfig_KeyBase, 0x11);
+    static constexpr Key kConfigKey_WiFiSSID           = EFR32ConfigKey(kChipConfig_KeyBase, 0x0F);
+    static constexpr Key kConfigKey_WiFiPSK            = EFR32ConfigKey(kChipConfig_KeyBase, 0x10);
+    static constexpr Key kConfigKey_WiFiSEC            = EFR32ConfigKey(kChipConfig_KeyBase, 0x11);
     static constexpr Key kConfigKey_GroupKeyBase       = EFR32ConfigKey(kChipConfig_KeyBase, 0x12);
-    static constexpr Key kConfigKey_GroupKeyMax        = EFR32ConfigKey(kChipConfig_KeyBase, 0x21); // Allows 16 Group Keys to be created.
+    static constexpr Key kConfigKey_GroupKeyMax = EFR32ConfigKey(kChipConfig_KeyBase, 0x21); // Allows 16 Group Keys to be created.
 
     // CHIP Counter Keys
     static constexpr Key kConfigKey_BootCount             = EFR32ConfigKey(kChipCounter_KeyBase, 0x00);

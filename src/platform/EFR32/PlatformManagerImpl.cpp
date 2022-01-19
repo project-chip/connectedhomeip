@@ -149,7 +149,7 @@ void PlatformManagerImpl::HandleWFXSystemEvent(wfx_event_base_t eventBase, sl_wf
         }
     }
 
-    (void)sInstance.PostEvent(&event);
+    (void) sInstance.PostEvent(&event);
 }
 #endif
 

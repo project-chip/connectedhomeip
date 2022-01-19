@@ -72,16 +72,16 @@ LEDWidget sStatusLED;
 LEDWidget sLockLED;
 
 #ifdef SL_WIFI
-bool sIsWiFiProvisioned       = false;
-bool sIsWiFiEnabled           = false;
-bool sIsWiFiAttached          = false;
+bool sIsWiFiProvisioned = false;
+bool sIsWiFiEnabled     = false;
+bool sIsWiFiAttached    = false;
 #endif
 
 #if CHIP_ENABLE_OPENTHREAD
-bool sIsThreadProvisioned     = false;
-bool sIsThreadEnabled         = false;
+bool sIsThreadProvisioned = false;
+bool sIsThreadEnabled     = false;
 #endif
-bool sHaveBLEConnections  = false;
+bool sHaveBLEConnections = false;
 
 StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
 StaticTask_t appTaskStruct;
@@ -113,11 +113,12 @@ CHIP_ERROR AppTask::Init()
     /*
      * Wait for the WiFi to be initialized
      */
-    EFR32_LOG ("APP: Wait WiFi Init");
-    while (!wfx_hw_ready ()) {
-        vTaskDelay (10);
+    EFR32_LOG("APP: Wait WiFi Init");
+    while (!wfx_hw_ready())
+    {
+        vTaskDelay(10);
     }
-    EFR32_LOG ("APP: Done WiFi Init");
+    EFR32_LOG("APP: Done WiFi Init");
     /* We will init server when we get IP */
 #endif
     // Init ZCL Data Model
@@ -208,15 +209,15 @@ void AppTask::AppTaskMain(void * pvParameter)
         if (PlatformMgr().TryLockChipStack())
         {
 #ifdef SL_WIFI
-            sIsWiFiProvisioned       = ConnectivityMgr().IsWiFiStationProvisioned();
-            sIsWiFiEnabled           = ConnectivityMgr().IsWiFiStationEnabled();
-            sIsWiFiAttached          = ConnectivityMgr().IsWiFiStationConnected();
+            sIsWiFiProvisioned = ConnectivityMgr().IsWiFiStationProvisioned();
+            sIsWiFiEnabled     = ConnectivityMgr().IsWiFiStationEnabled();
+            sIsWiFiAttached    = ConnectivityMgr().IsWiFiStationConnected();
 #endif
 #if CHIP_ENABLE_OPENTHREAD
-            sIsThreadProvisioned     = ConnectivityMgr().IsThreadProvisioned();
-            sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
+            sIsThreadProvisioned = ConnectivityMgr().IsThreadProvisioned();
+            sIsThreadEnabled     = ConnectivityMgr().IsThreadEnabled();
 #endif
-            sHaveBLEConnections  = (ConnectivityMgr().NumBLEConnections() != 0);
+            sHaveBLEConnections = (ConnectivityMgr().NumBLEConnections() != 0);
             PlatformMgr().UnlockChipStack();
         }
 
@@ -242,14 +243,8 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 sStatusLED.Blink(950, 50);
             }
-            else if (sHaveBLEConnections)
-            {
-                sStatusLED.Blink(100, 100);
-            }
-            else
-            {
-                sStatusLED.Blink(50, 950);
-            }
+            else if (sHaveBLEConnections) { sStatusLED.Blink(100, 100); }
+            else { sStatusLED.Blink(50, 950); }
         }
 
         sStatusLED.Animate();
@@ -399,10 +394,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
                 ConnectivityMgr().SetBLEAdvertisingEnabled(true);
                 ConnectivityMgr().SetBLEAdvertisingMode(ConnectivityMgr().kFastAdvertising);
             }
-            else
-            {
-                EFR32_LOG("Network is already provisioned, Ble advertissement not enabled");
-            }
+            else { EFR32_LOG("Network is already provisioned, Ble advertissement not enabled"); }
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {

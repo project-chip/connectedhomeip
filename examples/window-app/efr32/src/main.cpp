@@ -42,7 +42,7 @@
 #include <openthread/thread.h>
 #endif // CHIP_ENABLE_OPENTHREAD
 
-#if defined (RS911X_WIFI) || defined (WF200_WIFI)
+#if defined(RS911X_WIFI) || defined(WF200_WIFI)
 #include "wfx_host_events.h"
 #endif /* RS911X_WIFI */
 
@@ -155,7 +155,7 @@ int main(void)
 #ifdef SL_WFX_USE_SECURE_LINK
     wfx_securelink_task_start(); // start securelink key renegotiation task
 #endif                           // SL_WFX_USE_SECURE_LINK
-#endif /* WF200_WIFI */
+#endif                           /* WF200_WIFI */
 
 #ifdef ENABLE_CHIP_SHELL
     chip::startShellTask();
