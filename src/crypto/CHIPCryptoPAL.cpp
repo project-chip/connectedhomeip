@@ -657,5 +657,36 @@ CHIP_ERROR GenerateCompressedFabricId(const Crypto::P256PublicKey & root_public_
     return status;
 }
 
+/* Operational Group Key Group, Security Salt: "GroupKey v1.0" */
+static const uint8_t kGroupSecuritySalt[]        = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x20, 0x76, 0x31, 0x2e, 0x30 };
+static const uint8_t kOperationalGroupKeySalt[0] = {};
+
+/* Group Key Derivation Function, Info: "GroupKeyHash" ” */
+static const uint8_t kGroupKeyHashInfo[]  = { 0x47, 0x72, 0x6f, 0x75, 0x70, 0x4b, 0x65, 0x79, 0x48, 0x61, 0x73, 0x68 };
+static const uint8_t kGroupKeyHashSalt[0] = {};
+
+CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key)
+{
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == epoch_key.size(), CHIP_ERROR_INTERNAL);
+    VerifyOrReturnError(Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES == out_key.size(), CHIP_ERROR_INTERNAL);
+
+    Crypto::HKDF_sha crypto;
+    return crypto.HKDF_SHA256(epoch_key.data(), epoch_key.size(), kOperationalGroupKeySalt, sizeof(kOperationalGroupKeySalt),
+                              kGroupSecuritySalt, sizeof(kGroupSecuritySalt), out_key.data(),
+                              Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES);
+}
+
+CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & session_id)
+{
+    Crypto::HKDF_sha crypto;
+    uint8_t out_key[2];
+
+    ReturnErrorOnFailure(crypto.HKDF_SHA256(operational_key.data(), operational_key.size(), kGroupKeyHashSalt,
+                                            sizeof(kGroupKeyHashSalt), kGroupKeyHashInfo, sizeof(kGroupKeyHashInfo), out_key,
+                                            sizeof(out_key)));
+    session_id = static_cast<uint16_t>(out_key[0] | (out_key[1] << 8));
+    return CHIP_NO_ERROR;
+}
+
 } // namespace Crypto
 } // namespace chip
