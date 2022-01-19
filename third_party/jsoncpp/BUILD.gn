@@ -13,9 +13,7 @@
 # limitations under the License.
 
 config("jsoncpp_config") {
-  include_dirs = [
-    "repo/include",
-  ]
+  include_dirs = [ "repo/include" ]
 }
 
 source_set("jsoncpp") {
