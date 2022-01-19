@@ -99,6 +99,20 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_multiple_clusters(self):
+        actual = parseText("""
+            server cluster A = 1 {}
+            client cluster B = 2 {}
+            client cluster C = 3 {}
+        """)
+
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.SERVER, name="A", code=1),
+            Cluster(side=ClusterSide.CLIENT, name="B", code=2),
+            Cluster(side=ClusterSide.CLIENT, name="C", code=3),
+        ])
+        self.assertEqual(actual, expected)
+
 
 if __name__ == '__main__':
     unittest.main()
