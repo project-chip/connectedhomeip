@@ -121,6 +121,9 @@ void OperationalStatusSet(chip::EndpointId endpoint, const OperationalStatus & s
 void OperationalStatusSetWithGlobalUpdated(chip::EndpointId endpoint, OperationalStatus & status);
 const OperationalStatus OperationalStatusGet(chip::EndpointId endpoint);
 
+OperationalState ComputeOperationalState(uint16_t target, uint16_t current);
+OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current);
+
 void EndProductTypeSet(chip::EndpointId endpoint, EmberAfWcEndProductType type);
 EmberAfWcEndProductType EndProductTypeGet(chip::EndpointId endpoint);
 

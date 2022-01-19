@@ -419,6 +419,26 @@ void TiltPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
     emberAfWindowCoveringClusterPrint("Tilt Position Set: %u%%", percent);
 }
 
+OperationalState ComputeOperationalState(uint16_t target, uint16_t current)
+{
+    OperationalState opState = OperationalState::Stall;
+
+    if (current != target)
+    {
+        opState = (current < target) ? OperationalState::MovingDownOrClose : OperationalState::MovingUpOrOpen;
+    }
+    return opState;
+}
+
+OperationalState ComputeOperationalState(NPercent100ths target, NPercent100ths current)
+{
+    if (!current.IsNull() && !target.IsNull())
+    {
+        return ComputeOperationalState(target.Value(), current.Value());
+    }
+    return OperationalState::Stall;
+}
+
 } // namespace WindowCovering
 } // namespace Clusters
 } // namespace app
