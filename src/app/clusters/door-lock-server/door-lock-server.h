@@ -378,7 +378,8 @@ bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, uint16_t userInde
  *
  * @param endpointId ID of the endpoint which contains the lock.
  * @param credentialIndex Index of the credential to access. It is guaranteed to be within limits declared in the spec for
- *                        particular credential type. Starts from 1.
+ *                        particular credential type. Starts from 1 for all credential types except Programming PIN -- in that case
+ *                         it could only be equal to 0.
  * @param credentialType Type of the accessing credential.
  * @param[out] credential Reference to the credential information which will be filled upon successful function call.
  *
@@ -396,7 +397,8 @@ bool emberAfPluginDoorLockGetCredential(chip::EndpointId endpointId, uint16_t cr
  *
  * @param endpointId ID of the endpoint which contains the lock.
  * @param credentialIndex Index of the credential to access. It is guaranteed to be within limits declared in the spec for
- *                         particular credential type. Starts from 1.
+ *                         particular credential type. Starts from 1 for all credential types except Programming PIN -- in that case
+ *                         it could only be equal to 0.
  * @param credentialStatus New status of the credential slot (occupied/available). DlCredentialStatus::kAvailable means that the
  *                         credential must be deleted.
  * @param credentialType Type of the credential (PIN, RFID, etc.).
