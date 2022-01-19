@@ -20,6 +20,8 @@ then echo Provider Commissioned;
 else echo Provider not commissioned properly;
 fi
 
+rm /tmp/chip_kvs
+
 stdbuf -o0 ./out/ota_requestor_debug/chip-ota-requestor-app -u "$ARG3" -d "$ARG2" | tee /tmp/ota/requestor-log.txt & 
 requestor_pid=$!
 
