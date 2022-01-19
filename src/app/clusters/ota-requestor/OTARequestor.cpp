@@ -118,6 +118,9 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
 {
     LogQueryImageResponse(response);
 
+    uint32_t currentSoftwareVersion;
+    chip::app::Clusters::Basic::Attributes::SoftwareVersion::Get(0, &currentSoftwareVersion);
+
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
@@ -133,13 +136,30 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             return;
         }
 
-        MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
-        CopySpanToMutableSpan(update.updateToken, updateToken);
-        requestorCore->mUpdateVersion = update.softwareVersion;
-        requestorCore->mUpdateToken   = updateToken;
+	if(response.softwareVersion.HasValue())
+	{
+	    if(update.softwareVersion > currentSoftwareVersion)
+	    {	
+		printf("we need to update to newer version %u\n",update .softwareVersion);
+		MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
+	        CopySpanToMutableSpan(update.updateToken, updateToken);
+                requestorCore->mUpdateVersion = update.softwareVersion;
+                requestorCore->mUpdateToken   = updateToken;
+		
+		requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
+                                                        System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+           
+	     }else
+	      {
+		printf("no updates available!!!\n");
+                
+                requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+	      }	
+	}else
+	{
+	     printf("NO updates\n");	
+	}
 
-        requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
-                                                            System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         break;
     }
     case OTAQueryStatus::kBusy:
