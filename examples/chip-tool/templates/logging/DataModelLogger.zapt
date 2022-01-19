@@ -1,0 +1,21 @@
+{{> header}}
+
+{{#zcl_structs}}
+{{#if has_more_than_one_cluster}}
+static CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns="detail" isArgument=true}} value);
+{{/if}}
+{{/zcl_structs}}
+
+{{#zcl_clusters}}
+{{#zcl_structs}}
+{{#unless has_more_than_one_cluster}}
+static CHIP_ERROR LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns=parent.name isArgument=true}} value);
+{{/unless}}
+{{/zcl_structs}}
+{{/zcl_clusters}}
+
+{{#zcl_clusters}}
+{{#zcl_events}}
+static CHIP_ERROR LogValue(const char * label, size_t indent, const chip::app::Clusters::{{asUpperCamelCase parent.name}}::Events::{{asUpperCamelCase name}}::DecodableType & value);
+{{/zcl_events}}
+{{/zcl_clusters}}

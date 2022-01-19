@@ -39,10 +39,6 @@
         {
             "name": "log_struct_value",
             "path": "partials/log_struct_value.zapt"
-        },
-        {
-            "name": "log_event_value",
-            "path": "partials/log_event_value.zapt"
         }
     ],
     "templates": [
@@ -50,6 +46,16 @@
             "path": "commands.zapt",
             "name": "Cluster Commands header",
             "output": "cluster/Commands.h"
+        },
+        {
+            "path": "logging/DataModelLogger.zapt",
+            "name": "Data Model Logger header",
+            "output": "cluster/logging/DataModelLogger.h"
+        },
+        {
+            "path": "logging/DataModelLogger-src.zapt",
+            "name": "Data Model Logger",
+            "output": "cluster/logging/DataModelLogger.cpp"
         },
         {
             "path": "tests-commands.zapt",
