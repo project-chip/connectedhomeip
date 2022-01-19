@@ -91,15 +91,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, Syst
     SuccessOrExit(err);
 
 exit:
-    if (mpCallback != nullptr)
-    {
-        if (err != CHIP_NO_ERROR)
-        {
-            mpCallback->OnError(this, StatusIB(Protocols::InteractionModel::Status::Failure), err);
-        }
-    }
-
-    if (isGroupCommand)
+    if (isGroupCommand && err == CHIP_NO_ERROR)
     {
         Close();
     }
