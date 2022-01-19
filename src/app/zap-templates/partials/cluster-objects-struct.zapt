@@ -9,7 +9,7 @@ namespace {{asUpperCamelCase name}} {
     struct Type {
     public:
         {{#zcl_struct_items}}
-        {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}};
+        {{zapTypeToEncodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
         {{/zcl_struct_items}}
 
         CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
@@ -27,7 +27,7 @@ namespace {{asUpperCamelCase name}} {
     struct DecodableType {
     public:
         {{#zcl_struct_items}}
-        {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}};
+        {{zapTypeToDecodableClusterObjectType type}} {{asLowerCamelCase label}}{{> cluster_objects_field_init}};
         {{/zcl_struct_items}}
         CHIP_ERROR Decode(TLV::TLVReader &reader);
     };
