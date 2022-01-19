@@ -39,6 +39,8 @@
 using namespace chip;
 using namespace chip::app::Clusters::WindowCovering;
 
+#define CHECK_BOUNDS_INVALID(MIN, VAL, MAX) ((VAL < MIN) || (VAL > MAX))
+#define CHECK_BOUNDS_VALID(MIN, VAL, MAX)   (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
 
 static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue, uint16_t value, bool offset)
 {
@@ -318,6 +320,24 @@ LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
     return LimitStatus::Intermediate;
 }
 
+bool IsPercent100thsValid(Percent100ths percent100ths)
+{
+    if (CHECK_BOUNDS_VALID(WC_PERCENT100THS_MIN_OPEN, percent100ths, WC_PERCENT100THS_MAX_CLOSED))
+        return true;
+
+    return false;
+}
+
+bool IsPercent100thsValid(NPercent100ths percent100ths)
+{
+    if (!percent100ths.IsNull())
+    {
+        return IsPercent100thsValid(percent100ths.Value());
+    }
+
+    return true;
+}
+
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)
 {
     uint16_t openLimit   = 0;
@@ -514,9 +534,16 @@ bool emberAfWindowCoveringClusterGoToLiftPercentageCallback(app::CommandHandler 
     emberAfWindowCoveringClusterPrint("GoToLiftPercentage Percentage command received");
     if (HasFeaturePaLift(endpoint))
     {
-        Attributes::TargetPositionLiftPercent100ths::Set(
-            endpoint, static_cast<uint16_t>(liftPercentageValue > 100 ? liftPercent100thsValue : liftPercentageValue * 100));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        if (IsPercent100thsValid(liftPercent100thsValue))
+        {
+            Attributes::TargetPositionLiftPercent100ths::Set(
+                endpoint, static_cast<uint16_t>(liftPercentageValue > 100 ? liftPercent100thsValue : liftPercentageValue * 100));
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        }
+        else
+        {
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
     }
     else
     {
@@ -566,9 +593,16 @@ bool emberAfWindowCoveringClusterGoToTiltPercentageCallback(app::CommandHandler 
     emberAfWindowCoveringClusterPrint("GoToTiltPercentage command received");
     if (HasFeaturePaTilt(endpoint))
     {
-        Attributes::TargetPositionTiltPercent100ths::Set(
-            endpoint, static_cast<uint16_t>(tiltPercentageValue > 100 ? tiltPercent100thsValue : tiltPercentageValue * 100));
-        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        if (IsPercent100thsValid(tiltPercent100thsValue))
+        {
+            Attributes::TargetPositionTiltPercent100ths::Set(
+                endpoint, static_cast<uint16_t>(tiltPercentageValue > 100 ? tiltPercent100thsValue : tiltPercentageValue * 100));
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+        }
+        else
+        {
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
     }
     else
     {
