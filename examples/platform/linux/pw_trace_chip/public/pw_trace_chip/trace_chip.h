@@ -69,10 +69,10 @@ struct TraceEventFields
     size_t dataSize;
 };
 
-typedef bool (*TraceHandlerCallback)(const TraceEventFields & trace);
+typedef bool (*TraceHandlerCallback)(const TraceEventFields & eventFields, void * context);
 
-// Register a trace handler which gets called for all data trace events.
-void RegisterTraceHandler(TraceHandlerCallback callback);
+// Register an additional trace handler which gets called for all data trace events with the given context
+void RegisterTraceHandler(TraceHandlerCallback callback, void * context);
 void UnregisterAllTraceHandlers();
 
 // These are what the facade actually calls.
