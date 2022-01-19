@@ -520,11 +520,6 @@ inline bool ConnectivityManager::IsBLEAdvertisingEnabled()
 
 inline CHIP_ERROR ConnectivityManager::SetBLEAdvertisingEnabled(bool val)
 {
-    if (val)
-    {
-        // Notify BLE advertisement
-        ConfigurationMgr().NotifyOfAdvertisementStart();
-    }
     return static_cast<ImplClass *>(this)->_SetBLEAdvertisingEnabled(val);
 }
 
