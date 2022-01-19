@@ -21,10 +21,19 @@
 #include <app-common/zap-generated/enums.h>
 #include <app/util/af-types.h>
 
+#include <app/data-model/Nullable.h>
+
+#define WC_PERCENT100THS_MIN_OPEN   0
+#define WC_PERCENT100THS_MAX_CLOSED 10000
+
 namespace chip {
 namespace app {
 namespace Clusters {
 namespace WindowCovering {
+
+typedef DataModel::Nullable<Percent> NPercent;
+typedef DataModel::Nullable<Percent100ths> NPercent100ths;
+typedef DataModel::Nullable<uint16_t> NAbsolute;
 
 struct Mode
 {
@@ -81,11 +90,24 @@ struct SafetyStatus
 };
 static_assert(sizeof(SafetyStatus) == sizeof(uint16_t), "SafetyStatus Size is not correct");
 
-bool IsLiftOpen(chip::EndpointId endpoint);
-bool IsLiftClosed(chip::EndpointId endpoint);
+// Declare Position Limit Status
+enum class LimitStatus : uint8_t
+{
+    Intermediate      = 0x00,
+    IsUpOrOpen        = 0x01,
+    IsDownOrClose     = 0x02,
+    Inverted          = 0x03,
+    IsOverUpOrOpen    = 0x04,
+    IsOverDownOrClose = 0x05,
+};
+static_assert(sizeof(LimitStatus) == sizeof(uint8_t), "LimitStatus Size is not correct");
 
-bool IsTiltOpen(chip::EndpointId endpoint);
-bool IsTiltClosed(chip::EndpointId endpoint);
+struct AbsoluteLimits
+{
+    uint16_t open;
+    uint16_t closed;
+};
+
 
 void TypeSet(chip::EndpointId endpoint, EmberAfWcType type);
 EmberAfWcType TypeGet(chip::EndpointId endpoint);
@@ -104,6 +126,8 @@ const Mode ModeGet(chip::EndpointId endpoint);
 
 void SafetyStatusSet(chip::EndpointId endpoint, SafetyStatus & status);
 const SafetyStatus SafetyStatusGet(chip::EndpointId endpoint);
+
+LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits);
 
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift);
 uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths);

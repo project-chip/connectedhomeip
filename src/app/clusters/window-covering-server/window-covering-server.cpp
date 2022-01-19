@@ -39,8 +39,6 @@
 using namespace chip;
 using namespace chip::app::Clusters::WindowCovering;
 
-#define WC_PERCENT100THS_MIN 0
-#define WC_PERCENT100THS_MAX 10000
 
 static bool HasFeature(chip::EndpointId endpoint, WcFeature feature)
 {
@@ -155,56 +153,14 @@ namespace app {
 namespace Clusters {
 namespace WindowCovering {
 
-bool IsLiftOpen(chip::EndpointId endpoint)
 {
-    EmberAfStatus status;
-    app::DataModel::Nullable<Percent100ths> position;
 
-    status = Attributes::TargetPositionLiftPercent100ths::Get(endpoint, position);
-
-    if ((status != EMBER_ZCL_STATUS_SUCCESS) || position.IsNull())
-        return false;
-
-    return ((position.Value() == WC_PERCENT100THS_MIN));
 }
 
-bool IsTiltOpen(chip::EndpointId endpoint)
 {
-    EmberAfStatus status;
-    app::DataModel::Nullable<Percent100ths> position;
-
-    status = Attributes::TargetPositionTiltPercent100ths::Get(endpoint, position);
-
-    if ((status != EMBER_ZCL_STATUS_SUCCESS) || position.IsNull())
-        return false;
-
-    return ((position.Value() == WC_PERCENT100THS_MIN));
 }
 
-bool IsLiftClosed(chip::EndpointId endpoint)
 {
-    EmberAfStatus status;
-    app::DataModel::Nullable<Percent100ths> position;
-
-    status = Attributes::TargetPositionLiftPercent100ths::Get(endpoint, position);
-
-    if ((status != EMBER_ZCL_STATUS_SUCCESS) || position.IsNull())
-        return false;
-
-    return ((position.Value() == WC_PERCENT100THS_MAX));
-}
-
-bool IsTiltClosed(chip::EndpointId endpoint)
-{
-    EmberAfStatus status;
-    app::DataModel::Nullable<Percent100ths> position;
-
-    status = Attributes::TargetPositionTiltPercent100ths::Get(endpoint, position);
-
-    if ((status != EMBER_ZCL_STATUS_SUCCESS) || position.IsNull())
-        return false;
-
-    return ((position.Value() == WC_PERCENT100THS_MAX));
 }
 
 void TypeSet(chip::EndpointId endpoint, EmberAfWcType type)
@@ -340,6 +296,27 @@ const SafetyStatus SafetyStatusGet(chip::EndpointId endpoint)
     return status;
 }
 
+LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
+{
+
+    if (limits.open > limits.closed)
+        return LimitStatus::Inverted;
+
+    if (position == limits.open)
+        return LimitStatus::IsUpOrOpen;
+
+    if (position == limits.closed)
+        return LimitStatus::IsDownOrClose;
+
+    if ((limits.open   > 0) && (position < limits.open  ))
+        return LimitStatus::IsOverUpOrOpen;
+
+    if ((limits.closed > 0) && (position > limits.closed))
+        return LimitStatus::IsOverDownOrClose;
+
+    return LimitStatus::Intermediate;
+}
+
 uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)
 {
     uint16_t openLimit   = 0;
@@ -429,11 +406,11 @@ bool emberAfWindowCoveringClusterUpOrOpenCallback(app::CommandHandler * commandO
     emberAfWindowCoveringClusterPrint("UpOrOpen command received");
     if (HasFeature(endpoint, WcFeature::kLift))
     {
-        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN);
+        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
     }
     if (HasFeature(endpoint, WcFeature::kTilt))
     {
-        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN);
+        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MIN_OPEN);
     }
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -450,11 +427,11 @@ bool emberAfWindowCoveringClusterDownOrCloseCallback(app::CommandHandler * comma
     emberAfWindowCoveringClusterPrint("DownOrClose command received");
     if (HasFeature(endpoint, WcFeature::kLift))
     {
-        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX);
+        Attributes::TargetPositionLiftPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
     }
     if (HasFeature(endpoint, WcFeature::kTilt))
     {
-        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX);
+        Attributes::TargetPositionTiltPercent100ths::Set(endpoint, WC_PERCENT100THS_MAX_CLOSED);
     }
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
