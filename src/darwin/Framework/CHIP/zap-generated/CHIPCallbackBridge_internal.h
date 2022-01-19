@@ -165,6 +165,9 @@ typedef void (*NullableApplianceControlClusterWarningEventAttributeCallback)(
 typedef void (*AccessControlClusterAuthModeAttributeCallback)(void *, chip::app::Clusters::AccessControl::AuthMode);
 typedef void (*NullableAccessControlClusterAuthModeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::AuthMode> &);
+typedef void (*AccessControlClusterChangeTypeEnumAttributeCallback)(void *, chip::app::Clusters::AccessControl::ChangeTypeEnum);
+typedef void (*NullableAccessControlClusterChangeTypeEnumAttributeCallback)(
+    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> &);
 typedef void (*AccessControlClusterPrivilegeAttributeCallback)(void *, chip::app::Clusters::AccessControl::Privilege);
 typedef void (*NullableAccessControlClusterPrivilegeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::Privilege> &);
@@ -5394,6 +5397,64 @@ public:
                                                                                 CHIPActionBlock action,
                                                                                 SubscriptionEstablishedHandler establishedHandler) :
         CHIPNullableAccessControlClusterAuthModeAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<AccessControlClusterChangeTypeEnumAttributeCallback>
+{
+public:
+    CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<AccessControlClusterChangeTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::app::Clusters::AccessControl::ChangeTypeEnum value);
+};
+
+class CHIPAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge
+    : public CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge
+{
+public:
+    CHIPAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                              CHIPActionBlock action,
+                                                                              SubscriptionEstablishedHandler establishedHandler) :
+        CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge(queue, handler, action, true),
+        mEstablishedHandler(establishedHandler)
+    {}
+
+    static void OnSubscriptionEstablished(void * context);
+
+private:
+    SubscriptionEstablishedHandler mEstablishedHandler;
+};
+
+class CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge
+    : public CHIPCallbackBridge<NullableAccessControlClusterChangeTypeEnumAttributeCallback>
+{
+public:
+    CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<NullableAccessControlClusterChangeTypeEnumAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> & value);
+};
+
+class CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge
+    : public CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge
+{
+public:
+    CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge(
+        dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+        SubscriptionEstablishedHandler establishedHandler) :
+        CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge(queue, handler, action, true),
         mEstablishedHandler(establishedHandler)
     {}
 

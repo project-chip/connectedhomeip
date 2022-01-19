@@ -6724,6 +6724,58 @@ void CHIPNullableAccessControlClusterAuthModeAttributeCallbackSubscriptionBridge
     }
 }
 
+void CHIPAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, chip::app::Clusters::AccessControl::ChangeTypeEnum value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
+void CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::AccessControl::ChangeTypeEnum> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
+{
+    auto * self = static_cast<CHIPNullableAccessControlClusterChangeTypeEnumAttributeCallbackSubscriptionBridge *>(context);
+    if (!self->mQueue) {
+        return;
+    }
+
+    if (self->mEstablishedHandler != nil) {
+        dispatch_async(self->mQueue, self->mEstablishedHandler);
+        // On failure, mEstablishedHandler will be cleaned up by our destructor,
+        // but we can clean it up earlier on successful subscription
+        // establishment.
+        self->mEstablishedHandler = nil;
+    }
+}
+
 void CHIPAccessControlClusterPrivilegeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::AccessControl::Privilege value)
 {
