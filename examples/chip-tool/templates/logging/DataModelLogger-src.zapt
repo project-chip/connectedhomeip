@@ -2,19 +2,25 @@
 
 #include <commands/clusters/DataModelLogger.h>
 
-{{#zcl_structs}}
-{{#if has_more_than_one_cluster}}
-{{> log_struct_value ns="detail"}}
-{{/if}}
-{{/zcl_structs}}
+{{#structs_with_cluster_name}}
+CHIP_ERROR DataModelLogger::LogValue(const char * label, size_t indent, {{zapTypeToDecodableClusterObjectType name ns=clusterName isArgument=true}} value)
+{
+  DataModelLogger::LogString(label, indent, "{");
+{{#zcl_struct_items}}
+  {
+      CHIP_ERROR err = LogValue("{{asUpperCamelCase label}}", indent + 1, value.{{asLowerCamelCase label}});
+      if (err != CHIP_NO_ERROR)
+      {
+          DataModelLogger::LogString(indent + 1, "Struct truncated due to invalid value for '{{asUpperCamelCase label}}'");
+          return err;
+      }
+  }
+{{/zcl_struct_items}}
+  DataModelLogger::LogString(indent, "}");
 
-{{#zcl_clusters}}
-{{#zcl_structs}}
-{{#unless has_more_than_one_cluster}}
-{{> log_struct_value ns=parent.name}}
-{{/unless}}
-{{/zcl_structs}}
-{{/zcl_clusters}}
+  return CHIP_NO_ERROR;
+}
+{{/structs_with_cluster_name}}
 
 {{#zcl_clusters}}
 {{#zcl_events}}
