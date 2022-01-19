@@ -48,6 +48,8 @@ CHIP_ERROR InteractionModelEngine::Init(Messaging::ExchangeManager * apExchangeM
 
     mMagic++;
 
+    StatusIB::RegisterErrorFormatter();
+
     return CHIP_NO_ERROR;
 }
 

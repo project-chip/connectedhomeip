@@ -312,10 +312,10 @@ server cluster OperationalCredentials = 62 {
 
 
 endpoint 0 {
-  instantiate cluster DiagnosticLogs;
-  instantiate cluster DiagnosticLogs;
-  instantiate cluster GeneralCommissioning;
-  instantiate cluster NetworkCommissioning;
-  instantiate cluster OperationalCredentials;
+  binding cluster DiagnosticLogs;
+  server  cluster DiagnosticLogs;
+  server  cluster GeneralCommissioning;
+  server  cluster NetworkCommissioning;
+  server  cluster OperationalCredentials;
 }
 

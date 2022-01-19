@@ -61,10 +61,17 @@ public:
     bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
     bool HasWiFiCredentials() const { return mWiFiCreds.HasValue(); }
     bool HasThreadOperationalDataset() const { return mThreadOperationalDataset.HasValue(); }
+    uint16_t GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
     const Optional<WiFiCredentials> GetWiFiCredentials() const { return mWiFiCreds; }
     const Optional<ByteSpan> GetThreadOperationalDataset() const { return mThreadOperationalDataset; }
+
+    CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
+    {
+        mFailsafeTimerSeconds = seconds;
+        return *this;
+    }
 
     // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
     CommissioningParameters & SetCSRNonce(ByteSpan csrNonce)
@@ -95,6 +102,7 @@ public:
     CHIP_ERROR GetCompletionStatus() { return completionStatus; }
 
 private:
+    uint16_t mFailsafeTimerSeconds = 60;
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
     Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
     Optional<WiFiCredentials> mWiFiCreds;

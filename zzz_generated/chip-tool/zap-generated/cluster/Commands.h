@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -148,6 +148,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType & value);
 
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -2544,6 +2548,104 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("AdminFabricIndex", indent + 1, value.adminFabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminFabricIndex'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AdminNodeID", indent + 1, value.adminNodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminNodeID'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AdminPasscodeID", indent + 1, value.adminPasscodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminPasscodeID'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ChangeType", indent + 1, value.changeType);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ChangeType'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LatestValue", indent + 1, value.latestValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'LatestValue'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("AdminFabricIndex", indent + 1, value.adminFabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminFabricIndex'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AdminNodeID", indent + 1, value.adminNodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminNodeID'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AdminPasscodeID", indent + 1, value.adminPasscodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminPasscodeID'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ChangeType", indent + 1, value.changeType);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ChangeType'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LatestValue", indent + 1, value.latestValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'LatestValue'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
@@ -4516,7 +4618,156 @@ static void OnThermostatGetWeeklyScheduleResponseSuccess(
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * AccessControlEntryChanged                                         | 0x0000 |
+| * AccessControlExtensionChanged                                     | 0x0001 |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Event AccessControlEntryChanged
+ */
+class ReadAccessControlAccessControlEntryChanged : public ModelCommand
+{
+public:
+    ReadAccessControlAccessControlEntryChanged() : ModelCommand("read-event")
+    {
+        AddArgument("event-name", "access-control-entry-changed");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlAccessControlEntryChanged() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReadEvent on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadEvent<chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType>(
+            this, OnEventResponse, OnDefaultFailure);
+    }
+
+    static void OnEventResponse(void * context,
+                                chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value)
+    {
+        OnGeneralAttributeEventResponse(context, "AccessControl.AccessControlEntryChanged response", value);
+    }
+};
+
+class ReportAccessControlAccessControlEntryChanged : public ModelCommand
+{
+public:
+    ReportAccessControlAccessControlEntryChanged() : ModelCommand("report-event")
+    {
+        AddArgument("event-name", "access-control-entry-changed");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAccessControlAccessControlEntryChanged() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportEvent on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeEvent<chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context,
+                              chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value)
+    {
+        LogValue("AccessControl.AccessControlEntryChanged report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+/*
+ * Event AccessControlExtensionChanged
+ */
+class ReadAccessControlAccessControlExtensionChanged : public ModelCommand
+{
+public:
+    ReadAccessControlAccessControlExtensionChanged() : ModelCommand("read-event")
+    {
+        AddArgument("event-name", "access-control-extension-changed");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlAccessControlExtensionChanged() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReadEvent on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadEvent<chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType>(
+            this, OnEventResponse, OnDefaultFailure);
+    }
+
+    static void OnEventResponse(void * context,
+                                chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value)
+    {
+        OnGeneralAttributeEventResponse(context, "AccessControl.AccessControlExtensionChanged response", value);
+    }
+};
+
+class ReportAccessControlAccessControlExtensionChanged : public ModelCommand
+{
+public:
+    ReportAccessControlAccessControlExtensionChanged() : ModelCommand("report-event")
+    {
+        AddArgument("event-name", "access-control-extension-changed");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAccessControlAccessControlExtensionChanged() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportEvent on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeEvent<chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context,
+                              chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value)
+    {
+        LogValue("AccessControl.AccessControlExtensionChanged report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
 
 /*
  * Attribute Acl
@@ -4704,6 +4955,48 @@ public:
     }
 };
 
+class ReportAccessControlAttributeList : public ModelCommand
+{
+public:
+    ReportAccessControlAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAccessControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::AccessControl::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("AccessControl.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -4732,6 +5025,45 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "AccessControl.ClusterRevision response", value);
     }
+};
+
+class ReportAccessControlClusterRevision : public ModelCommand
+{
+public:
+    ReportAccessControlClusterRevision() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAccessControlClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::AccessControl::Attributes::ClusterRevision::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value) { LogValue("AccessControl.ClusterRevision report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -4846,6 +5178,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "AccountLogin.AttributeList response", value);
     }
+};
+
+class ReportAccountLoginAttributeList : public ModelCommand
+{
+public:
+    ReportAccountLoginAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAccountLoginAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050E) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccountLoginCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::AccountLogin::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("AccountLogin.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -5038,6 +5412,48 @@ public:
     }
 };
 
+class ReportAdministratorCommissioningWindowStatus : public ModelCommand
+{
+public:
+    ReportAdministratorCommissioningWindowStatus() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "window-status");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAdministratorCommissioningWindowStatus() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::AdministratorCommissioning::Attributes::WindowStatus::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        LogValue("AdministratorCommissioning.WindowStatus report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute AdminFabricIndex
  */
@@ -5066,6 +5482,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "AdministratorCommissioning.AdminFabricIndex response", value);
     }
+};
+
+class ReportAdministratorCommissioningAdminFabricIndex : public ModelCommand
+{
+public:
+    ReportAdministratorCommissioningAdminFabricIndex() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "admin-fabric-index");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAdministratorCommissioningAdminFabricIndex() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::FabricIndex value)
+    {
+        LogValue("AdministratorCommissioning.AdminFabricIndex report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -5098,6 +5556,48 @@ public:
     }
 };
 
+class ReportAdministratorCommissioningAdminVendorId : public ModelCommand
+{
+public:
+    ReportAdministratorCommissioningAdminVendorId() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "admin-vendor-id");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAdministratorCommissioningAdminVendorId() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::AdministratorCommissioning::Attributes::AdminVendorId::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        LogValue("AdministratorCommissioning.AdminVendorId report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute AttributeList
  */
@@ -5126,6 +5626,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "AdministratorCommissioning.AttributeList response", value);
     }
+};
+
+class ReportAdministratorCommissioningAttributeList : public ModelCommand
+{
+public:
+    ReportAdministratorCommissioningAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAdministratorCommissioningAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::AdministratorCommissioning::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("AdministratorCommissioning.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -5673,6 +6215,48 @@ public:
     }
 };
 
+class ReportApplicationBasicAllowedVendorList : public ModelCommand
+{
+public:
+    ReportApplicationBasicAllowedVendorList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "allowed-vendor-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportApplicationBasicAllowedVendorList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::VendorId> & value)
+    {
+        LogValue("ApplicationBasic.AllowedVendorList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute AttributeList
  */
@@ -5701,6 +6285,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "ApplicationBasic.AttributeList response", value);
     }
+};
+
+class ReportApplicationBasicAttributeList : public ModelCommand
+{
+public:
+    ReportApplicationBasicAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportApplicationBasicAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("ApplicationBasic.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -5961,6 +6587,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "ApplicationLauncher.AttributeList response", value);
     }
+};
+
+class ReportApplicationLauncherAttributeList : public ModelCommand
+{
+public:
+    ReportApplicationLauncherAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportApplicationLauncherAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050C) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationLauncherCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("ApplicationLauncher.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -6270,6 +6938,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "AudioOutput.AttributeList response", value);
     }
+};
+
+class ReportAudioOutputAttributeList : public ModelCommand
+{
+public:
+    ReportAudioOutputAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAudioOutputAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050B) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AudioOutputCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::AudioOutput::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("AudioOutput.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -6707,6 +7417,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "BarrierControl.AttributeList response", value);
     }
+};
+
+class ReportBarrierControlAttributeList : public ModelCommand
+{
+public:
+    ReportBarrierControlAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBarrierControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0103) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BarrierControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BarrierControl::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("BarrierControl.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -8468,6 +9220,45 @@ public:
     }
 };
 
+class ReportBasicUniqueID : public ModelCommand
+{
+public:
+    ReportBasicUniqueID() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "unique-id");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBasicUniqueID() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Basic::Attributes::UniqueID::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value) { LogValue("Basic.UniqueID report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute AttributeList
  */
@@ -8496,6 +9287,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "Basic.AttributeList response", value);
     }
+};
+
+class ReportBasicAttributeList : public ModelCommand
+{
+public:
+    ReportBasicAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBasicAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0028) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Basic::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("Basic.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -8871,6 +9704,48 @@ public:
     }
 };
 
+class ReportBinaryInputBasicAttributeList : public ModelCommand
+{
+public:
+    ReportBinaryInputBasicAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBinaryInputBasicAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x000F) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BinaryInputBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("BinaryInputBasic.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -9036,6 +9911,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "Binding.AttributeList response", value);
     }
+};
+
+class ReportBindingAttributeList : public ModelCommand
+{
+public:
+    ReportBindingAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBindingAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001E) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BindingCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Binding::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("Binding.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -9290,6 +10207,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "BooleanState.AttributeList response", value);
     }
+};
+
+class ReportBooleanStateAttributeList : public ModelCommand
+{
+public:
+    ReportBooleanStateAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBooleanStateAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0045) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BooleanStateCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BooleanState::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("BooleanState.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -10093,6 +11052,48 @@ public:
     }
 };
 
+class ReportBridgedActionsAttributeList : public ModelCommand
+{
+public:
+    ReportBridgedActionsAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedActionsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0025) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedActionsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedActions::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("BridgedActions.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -10202,6 +11203,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "BridgedDeviceBasic.AttributeList response", value);
     }
+};
+
+class ReportBridgedDeviceBasicAttributeList : public ModelCommand
+{
+public:
+    ReportBridgedDeviceBasicAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportBridgedDeviceBasicAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0039) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::BridgedDeviceBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("BridgedDeviceBasic.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -10466,6 +11509,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "Channel.AttributeList response", value);
     }
+};
+
+class ReportChannelAttributeList : public ModelCommand
+{
+public:
+    ReportChannelAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportChannelAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0504) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ChannelCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Channel::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("Channel.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -15130,6 +16215,48 @@ public:
     }
 };
 
+class ReportColorControlAttributeList : public ModelCommand
+{
+public:
+    ReportColorControlAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportColorControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0300) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ColorControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::ColorControl::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("ColorControl.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -15465,6 +16592,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "ContentLauncher.AttributeList response", value);
     }
+};
+
+class ReportContentLauncherAttributeList : public ModelCommand
+{
+public:
+    ReportContentLauncherAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportContentLauncherAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050A) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ContentLauncherCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::ContentLauncher::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("ContentLauncher.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -15874,6 +17043,48 @@ public:
     }
 };
 
+class ReportDescriptorAttributeList : public ModelCommand
+{
+public:
+    ReportDescriptorAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDescriptorAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001D) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DescriptorCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Descriptor::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("Descriptor.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -16011,6 +17222,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "DiagnosticLogs.AttributeList response", value);
     }
+};
+
+class ReportDiagnosticLogsAttributeList : public ModelCommand
+{
+public:
+    ReportDiagnosticLogsAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDiagnosticLogsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0032) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DiagnosticLogsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DiagnosticLogs::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("DiagnosticLogs.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -16937,6 +18190,45 @@ public:
     }
 };
 
+class ReportDoorLockNumberOfTotalUsersSupported : public ModelCommand
+{
+public:
+    ReportDoorLockNumberOfTotalUsersSupported() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "number-of-total-users-supported");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockNumberOfTotalUsersSupported() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfTotalUsersSupported::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.NumberOfTotalUsersSupported report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute NumberOfPINUsersSupported
  */
@@ -16965,6 +18257,45 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "DoorLock.NumberOfPINUsersSupported response", value);
     }
+};
+
+class ReportDoorLockNumberOfPINUsersSupported : public ModelCommand
+{
+public:
+    ReportDoorLockNumberOfPINUsersSupported() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "number-of-pinusers-supported");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockNumberOfPINUsersSupported() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::NumberOfPINUsersSupported::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.NumberOfPINUsersSupported report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -16997,6 +18328,45 @@ public:
     }
 };
 
+class ReportDoorLockMaxPINCodeLength : public ModelCommand
+{
+public:
+    ReportDoorLockMaxPINCodeLength() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "max-pincode-length");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockMaxPINCodeLength() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::MaxPINCodeLength::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.MaxPINCodeLength report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute MinPINCodeLength
  */
@@ -17025,6 +18395,45 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "DoorLock.MinPINCodeLength response", value);
     }
+};
+
+class ReportDoorLockMinPINCodeLength : public ModelCommand
+{
+public:
+    ReportDoorLockMinPINCodeLength() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "min-pincode-length");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockMinPINCodeLength() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::MinPINCodeLength::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value) { LogValue("DoorLock.MinPINCodeLength report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -17440,6 +18849,45 @@ public:
     }
 };
 
+class ReportDoorLockSupportedOperatingModes : public ModelCommand
+{
+public:
+    ReportDoorLockSupportedOperatingModes() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "supported-operating-modes");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockSupportedOperatingModes() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::SupportedOperatingModes::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value) { LogValue("DoorLock.SupportedOperatingModes report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute EnableOneTouchLocking
  */
@@ -17753,6 +19201,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "DoorLock.AttributeList response", value);
     }
+};
+
+class ReportDoorLockAttributeList : public ModelCommand
+{
+public:
+    ReportDoorLockAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportDoorLockAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0101) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::DoorLockCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::DoorLock::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("DoorLock.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -18642,6 +20132,48 @@ public:
     }
 };
 
+class ReportElectricalMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReportElectricalMeasurementAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportElectricalMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0B04) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ElectricalMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("ElectricalMeasurement.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -19426,6 +20958,48 @@ public:
     }
 };
 
+class ReportEthernetNetworkDiagnosticsAttributeList : public ModelCommand
+{
+public:
+    ReportEthernetNetworkDiagnosticsAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportEthernetNetworkDiagnosticsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("EthernetNetworkDiagnostics.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FeatureMap
  */
@@ -19454,6 +21028,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "EthernetNetworkDiagnostics.FeatureMap response", value);
     }
+};
+
+class ReportEthernetNetworkDiagnosticsFeatureMap : public ModelCommand
+{
+public:
+    ReportEthernetNetworkDiagnosticsFeatureMap() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "feature-map");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportEthernetNetworkDiagnosticsFeatureMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0037) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::FeatureMap::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        LogValue("EthernetNetworkDiagnostics.FeatureMap report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -19645,6 +21261,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "FixedLabel.AttributeList response", value);
     }
+};
+
+class ReportFixedLabelAttributeList : public ModelCommand
+{
+public:
+    ReportFixedLabelAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportFixedLabelAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0040) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FixedLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::FixedLabel::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("FixedLabel.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -20038,6 +21696,48 @@ public:
     }
 };
 
+class ReportFlowMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReportFlowMeasurementAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportFlowMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0404) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::FlowMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::FlowMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("FlowMeasurement.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -20404,6 +22104,45 @@ public:
     }
 };
 
+class ReportGeneralCommissioningRegulatoryConfig : public ModelCommand
+{
+public:
+    ReportGeneralCommissioningRegulatoryConfig() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "regulatory-config");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportGeneralCommissioningRegulatoryConfig() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value) { LogValue("GeneralCommissioning.RegulatoryConfig report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute LocationCapability
  */
@@ -20434,6 +22173,48 @@ public:
     }
 };
 
+class ReportGeneralCommissioningLocationCapability : public ModelCommand
+{
+public:
+    ReportGeneralCommissioningLocationCapability() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "location-capability");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportGeneralCommissioningLocationCapability() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::LocationCapability::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        LogValue("GeneralCommissioning.LocationCapability report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute AttributeList
  */
@@ -20462,6 +22243,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "GeneralCommissioning.AttributeList response", value);
     }
+};
+
+class ReportGeneralCommissioningAttributeList : public ModelCommand
+{
+public:
+    ReportGeneralCommissioningAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportGeneralCommissioningAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0030) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("GeneralCommissioning.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -21450,6 +23273,48 @@ public:
     }
 };
 
+class ReportGeneralDiagnosticsAttributeList : public ModelCommand
+{
+public:
+    ReportGeneralDiagnosticsAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportGeneralDiagnosticsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0033) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("GeneralDiagnostics.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -21821,6 +23686,48 @@ public:
     }
 };
 
+class ReportGroupKeyManagementMaxGroupsPerFabric : public ModelCommand
+{
+public:
+    ReportGroupKeyManagementMaxGroupsPerFabric() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "max-groups-per-fabric");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportGroupKeyManagementMaxGroupsPerFabric() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GroupKeyManagementCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupsPerFabric::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        LogValue("GroupKeyManagement.MaxGroupsPerFabric report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute MaxGroupKeysPerFabric
  */
@@ -21851,6 +23758,48 @@ public:
     }
 };
 
+class ReportGroupKeyManagementMaxGroupKeysPerFabric : public ModelCommand
+{
+public:
+    ReportGroupKeyManagementMaxGroupKeysPerFabric() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "max-group-keys-per-fabric");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportGroupKeyManagementMaxGroupKeysPerFabric() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GroupKeyManagementCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::MaxGroupKeysPerFabric::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        LogValue("GroupKeyManagement.MaxGroupKeysPerFabric report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute AttributeList
  */
@@ -21879,6 +23828,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "GroupKeyManagement.AttributeList response", value);
     }
+};
+
+class ReportGroupKeyManagementAttributeList : public ModelCommand
+{
+public:
+    ReportGroupKeyManagementAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportGroupKeyManagementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GroupKeyManagementCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("GroupKeyManagement.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -22208,6 +24199,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "Groups.AttributeList response", value);
     }
+};
+
+class ReportGroupsAttributeList : public ModelCommand
+{
+public:
+    ReportGroupsAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportGroupsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0004) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GroupsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Groups::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("Groups.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -22559,6 +24592,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "Identify.AttributeList response", value);
     }
+};
+
+class ReportIdentifyAttributeList : public ModelCommand
+{
+public:
+    ReportIdentifyAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportIdentifyAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0003) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::IdentifyCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Identify::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("Identify.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -23034,6 +25109,48 @@ public:
     }
 };
 
+class ReportIlluminanceMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReportIlluminanceMeasurementAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportIlluminanceMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0400) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::IlluminanceMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("IlluminanceMeasurement.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -23172,6 +25289,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "KeypadInput.AttributeList response", value);
     }
+};
+
+class ReportKeypadInputAttributeList : public ModelCommand
+{
+public:
+    ReportKeypadInputAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportKeypadInputAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0509) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::KeypadInputCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::KeypadInput::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("KeypadInput.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -24678,6 +26837,48 @@ public:
     }
 };
 
+class ReportLevelControlAttributeList : public ModelCommand
+{
+public:
+    ReportLevelControlAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportLevelControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LevelControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::LevelControl::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("LevelControl.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FeatureMap
  */
@@ -24706,6 +26907,45 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "LevelControl.FeatureMap response", value);
     }
+};
+
+class ReportLevelControlFeatureMap : public ModelCommand
+{
+public:
+    ReportLevelControlFeatureMap() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "feature-map");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportLevelControlFeatureMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0008) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LevelControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::LevelControl::Attributes::FeatureMap::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint32_t value) { LogValue("LevelControl.FeatureMap report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -24845,6 +27085,48 @@ private:
     chip::CharSpan mValue;
 };
 
+class ReportLocalizationConfigurationActiveLocale : public ModelCommand
+{
+public:
+    ReportLocalizationConfigurationActiveLocale() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "active-locale");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportLocalizationConfigurationActiveLocale() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::ActiveLocale::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::CharSpan value)
+    {
+        LogValue("LocalizationConfiguration.ActiveLocale report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute SupportedLocales
  */
@@ -24873,6 +27155,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "LocalizationConfiguration.SupportedLocales response", value);
     }
+};
+
+class ReportLocalizationConfigurationSupportedLocales : public ModelCommand
+{
+public:
+    ReportLocalizationConfigurationSupportedLocales() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "supported-locales");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportLocalizationConfigurationSupportedLocales() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002B) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LocalizationConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::LocalizationConfiguration::Attributes::SupportedLocales::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::CharSpan> & value)
+    {
+        LogValue("LocalizationConfiguration.SupportedLocales report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -24936,6 +27260,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "LowPower.AttributeList response", value);
     }
+};
+
+class ReportLowPowerAttributeList : public ModelCommand
+{
+public:
+    ReportLowPowerAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportLowPowerAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0508) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::LowPowerCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::LowPower::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("LowPower.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -25287,6 +27653,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "MediaInput.AttributeList response", value);
     }
+};
+
+class ReportMediaInputAttributeList : public ModelCommand
+{
+public:
+    ReportMediaInputAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportMediaInputAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0507) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaInputCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::MediaInput::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("MediaInput.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -25859,6 +28267,45 @@ public:
     }
 };
 
+class ReportMediaPlaybackPlaybackSpeed : public ModelCommand
+{
+public:
+    ReportMediaPlaybackPlaybackSpeed() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "playback-speed");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportMediaPlaybackPlaybackSpeed() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, float value) { LogValue("MediaPlayback.PlaybackSpeed report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute SeekRangeEnd
  */
@@ -26025,6 +28472,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "MediaPlayback.AttributeList response", value);
     }
+};
+
+class ReportMediaPlaybackAttributeList : public ModelCommand
+{
+public:
+    ReportMediaPlaybackAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportMediaPlaybackAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0506) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::MediaPlaybackCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::MediaPlayback::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("MediaPlayback.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -26548,6 +29037,48 @@ public:
     }
 };
 
+class ReportModeSelectAttributeList : public ModelCommand
+{
+public:
+    ReportModeSelectAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportModeSelectAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0050) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ModeSelectCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::ModeSelect::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("ModeSelect.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -26825,6 +29356,45 @@ public:
     }
 };
 
+class ReportNetworkCommissioningMaxNetworks : public ModelCommand
+{
+public:
+    ReportNetworkCommissioningMaxNetworks() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "max-networks");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportNetworkCommissioningMaxNetworks() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::MaxNetworks::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value) { LogValue("NetworkCommissioning.MaxNetworks report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute Networks
  */
@@ -26858,6 +29428,51 @@ public:
     }
 };
 
+class ReportNetworkCommissioningNetworks : public ModelCommand
+{
+public:
+    ReportNetworkCommissioningNetworks() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "networks");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportNetworkCommissioningNetworks() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::Networks::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::NetworkCommissioning::Structs::NetworkInfo::DecodableType> &
+            value)
+    {
+        LogValue("NetworkCommissioning.Networks report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ScanMaxTimeSeconds
  */
@@ -26888,6 +29503,48 @@ public:
     }
 };
 
+class ReportNetworkCommissioningScanMaxTimeSeconds : public ModelCommand
+{
+public:
+    ReportNetworkCommissioningScanMaxTimeSeconds() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "scan-max-time-seconds");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportNetworkCommissioningScanMaxTimeSeconds() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::ScanMaxTimeSeconds::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        LogValue("NetworkCommissioning.ScanMaxTimeSeconds report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ConnectMaxTimeSeconds
  */
@@ -26916,6 +29573,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "NetworkCommissioning.ConnectMaxTimeSeconds response", value);
     }
+};
+
+class ReportNetworkCommissioningConnectMaxTimeSeconds : public ModelCommand
+{
+public:
+    ReportNetworkCommissioningConnectMaxTimeSeconds() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "connect-max-time-seconds");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportNetworkCommissioningConnectMaxTimeSeconds() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::ConnectMaxTimeSeconds::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint8_t value)
+    {
+        LogValue("NetworkCommissioning.ConnectMaxTimeSeconds report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -26974,6 +29673,45 @@ private:
     bool mValue;
 };
 
+class ReportNetworkCommissioningInterfaceEnabled : public ModelCommand
+{
+public:
+    ReportNetworkCommissioningInterfaceEnabled() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "interface-enabled");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportNetworkCommissioningInterfaceEnabled() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::InterfaceEnabled::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, bool value) { LogValue("NetworkCommissioning.InterfaceEnabled report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute LastNetworkingStatus
  */
@@ -27002,6 +29740,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "NetworkCommissioning.LastNetworkingStatus response", value);
     }
+};
+
+class ReportNetworkCommissioningLastNetworkingStatus : public ModelCommand
+{
+public:
+    ReportNetworkCommissioningLastNetworkingStatus() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "last-networking-status");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportNetworkCommissioningLastNetworkingStatus() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::LastNetworkingStatus::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::app::Clusters::NetworkCommissioning::NetworkCommissioningStatus value)
+    {
+        LogValue("NetworkCommissioning.LastNetworkingStatus report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -27034,6 +29814,48 @@ public:
     }
 };
 
+class ReportNetworkCommissioningLastNetworkID : public ModelCommand
+{
+public:
+    ReportNetworkCommissioningLastNetworkID() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "last-network-id");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportNetworkCommissioningLastNetworkID() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::LastNetworkID::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, chip::ByteSpan value)
+    {
+        LogValue("NetworkCommissioning.LastNetworkID report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute LastConnectErrorValue
  */
@@ -27062,6 +29884,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "NetworkCommissioning.LastConnectErrorValue response", value);
     }
+};
+
+class ReportNetworkCommissioningLastConnectErrorValue : public ModelCommand
+{
+public:
+    ReportNetworkCommissioningLastConnectErrorValue() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "last-connect-error-value");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportNetworkCommissioningLastConnectErrorValue() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0031) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::NetworkCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::LastConnectErrorValue::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint32_t value)
+    {
+        LogValue("NetworkCommissioning.LastConnectErrorValue report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -27326,6 +30190,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "OtaSoftwareUpdateProvider.AttributeList response", value);
     }
+};
+
+class ReportOtaSoftwareUpdateProviderAttributeList : public ModelCommand
+{
+public:
+    ReportOtaSoftwareUpdateProviderAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportOtaSoftwareUpdateProviderAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0029) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("OtaSoftwareUpdateProvider.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -27996,6 +30902,48 @@ public:
     }
 };
 
+class ReportOtaSoftwareUpdateRequestorAttributeList : public ModelCommand
+{
+public:
+    ReportOtaSoftwareUpdateRequestorAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportOtaSoftwareUpdateRequestorAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002A) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("OtaSoftwareUpdateRequestor.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -28321,6 +31269,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "OccupancySensing.AttributeList response", value);
     }
+};
+
+class ReportOccupancySensingAttributeList : public ModelCommand
+{
+public:
+    ReportOccupancySensingAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportOccupancySensingAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0406) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OccupancySensingCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::OccupancySensing::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("OccupancySensing.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -29003,6 +31993,48 @@ public:
     }
 };
 
+class ReportOnOffAttributeList : public ModelCommand
+{
+public:
+    ReportOnOffAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportOnOffAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0006) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::OnOff::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("OnOff.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FeatureMap
  */
@@ -29350,6 +32382,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "OnOffSwitchConfiguration.AttributeList response", value);
     }
+};
+
+class ReportOnOffSwitchConfigurationAttributeList : public ModelCommand
+{
+public:
+    ReportOnOffSwitchConfigurationAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportOnOffSwitchConfigurationAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0007) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OnOffSwitchConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("OnOffSwitchConfiguration.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -30065,6 +33139,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "OperationalCredentials.AttributeList response", value);
     }
+};
+
+class ReportOperationalCredentialsAttributeList : public ModelCommand
+{
+public:
+    ReportOperationalCredentialsAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportOperationalCredentialsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003E) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::OperationalCredentialsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::OperationalCredentials::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("OperationalCredentials.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -30815,6 +33931,48 @@ public:
     }
 };
 
+class ReportPowerSourceAttributeList : public ModelCommand
+{
+public:
+    ReportPowerSourceAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportPowerSourceAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002F) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::PowerSource::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("PowerSource.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FeatureMap
  */
@@ -30996,6 +34154,48 @@ public:
     }
 };
 
+class ReportPowerSourceConfigurationSources : public ModelCommand
+{
+public:
+    ReportPowerSourceConfigurationSources() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "sources");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportPowerSourceConfigurationSources() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002E) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::PowerSourceConfiguration::Attributes::Sources::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+    {
+        LogValue("PowerSourceConfiguration.Sources report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute AttributeList
  */
@@ -31026,6 +34226,48 @@ public:
     }
 };
 
+class ReportPowerSourceConfigurationAttributeList : public ModelCommand
+{
+public:
+    ReportPowerSourceConfigurationAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportPowerSourceConfigurationAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002E) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::PowerSourceConfiguration::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("PowerSourceConfiguration.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -31054,6 +34296,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "PowerSourceConfiguration.ClusterRevision response", value);
     }
+};
+
+class ReportPowerSourceConfigurationClusterRevision : public ModelCommand
+{
+public:
+    ReportPowerSourceConfigurationClusterRevision() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportPowerSourceConfigurationClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x002E) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PowerSourceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::PowerSourceConfiguration::Attributes::ClusterRevision::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value)
+    {
+        LogValue("PowerSourceConfiguration.ClusterRevision report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -31306,6 +34590,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "PressureMeasurement.AttributeList response", value);
     }
+};
+
+class ReportPressureMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReportPressureMeasurementAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportPressureMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0403) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PressureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::PressureMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("PressureMeasurement.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -34540,6 +37866,48 @@ public:
     }
 };
 
+class ReportPumpConfigurationAndControlAttributeList : public ModelCommand
+{
+public:
+    ReportPumpConfigurationAndControlAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportPumpConfigurationAndControlAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("PumpConfigurationAndControl.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FeatureMap
  */
@@ -35016,6 +38384,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "RelativeHumidityMeasurement.AttributeList response", value);
     }
+};
+
+class ReportRelativeHumidityMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReportRelativeHumidityMeasurementAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportRelativeHumidityMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0405) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::RelativeHumidityMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("RelativeHumidityMeasurement.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -35666,6 +39076,48 @@ public:
     }
 };
 
+class ReportScenesAttributeList : public ModelCommand
+{
+public:
+    ReportScenesAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportScenesAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0005) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ScenesCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Scenes::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("Scenes.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -36165,6 +39617,48 @@ public:
     }
 };
 
+class ReportSoftwareDiagnosticsAttributeList : public ModelCommand
+{
+public:
+    ReportSoftwareDiagnosticsAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportSoftwareDiagnosticsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SoftwareDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("SoftwareDiagnostics.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FeatureMap
  */
@@ -36193,6 +39687,45 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "SoftwareDiagnostics.FeatureMap response", value);
     }
+};
+
+class ReportSoftwareDiagnosticsFeatureMap : public ModelCommand
+{
+public:
+    ReportSoftwareDiagnosticsFeatureMap() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "feature-map");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportSoftwareDiagnosticsFeatureMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0034) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SoftwareDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::FeatureMap::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint32_t value) { LogValue("SoftwareDiagnostics.FeatureMap report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -37022,6 +40555,48 @@ public:
     }
 };
 
+class ReportSwitchAttributeList : public ModelCommand
+{
+public:
+    ReportSwitchAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportSwitchAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003B) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::SwitchCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Switch::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("Switch.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FeatureMap
  */
@@ -37376,6 +40951,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "TargetNavigator.AttributeList response", value);
     }
+};
+
+class ReportTargetNavigatorAttributeList : public ModelCommand
+{
+public:
+    ReportTargetNavigatorAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTargetNavigatorAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0505) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TargetNavigatorCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TargetNavigator::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("TargetNavigator.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -37773,6 +41390,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "TemperatureMeasurement.AttributeList response", value);
     }
+};
+
+class ReportTemperatureMeasurementAttributeList : public ModelCommand
+{
+public:
+    ReportTemperatureMeasurementAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTemperatureMeasurementAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0402) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TemperatureMeasurementCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("TemperatureMeasurement.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -42291,6 +45950,48 @@ public:
     }
 };
 
+class ReportTestClusterListLongOctetString : public ModelCommand
+{
+public:
+    ReportTestClusterListLongOctetString() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "list-long-octet-string");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterListLongOctetString() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TestCluster::Attributes::ListLongOctetString::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+    {
+        LogValue("TestCluster.ListLongOctetString report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute TimedWriteBoolean
  */
@@ -42345,6 +46046,45 @@ public:
 
 private:
     bool mValue;
+};
+
+class ReportTestClusterTimedWriteBoolean : public ModelCommand
+{
+public:
+    ReportTestClusterTimedWriteBoolean() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "timed-write-boolean");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterTimedWriteBoolean() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, bool value) { LogValue("TestCluster.TimedWriteBoolean report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -45610,6 +49350,48 @@ public:
     }
 };
 
+class ReportTestClusterAttributeList : public ModelCommand
+{
+public:
+    ReportTestClusterAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::TestCluster::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("TestCluster.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -47275,6 +51057,48 @@ public:
     }
 };
 
+class ReportThermostatAttributeList : public ModelCommand
+{
+public:
+    ReportThermostatAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportThermostatAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0201) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::Thermostat::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("Thermostat.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FeatureMap
  */
@@ -47761,6 +51585,49 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "ThermostatUserInterfaceConfiguration.AttributeList response", value);
     }
+};
+
+class ReportThermostatUserInterfaceConfigurationAttributeList : public ModelCommand
+{
+public:
+    ReportThermostatUserInterfaceConfigurationAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportThermostatUserInterfaceConfigurationAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0204) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster
+            .SubscribeAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::AttributeList::TypeInfo>(
+                this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("ThermostatUserInterfaceConfiguration.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -52591,6 +56458,48 @@ public:
     }
 };
 
+class ReportThreadNetworkDiagnosticsAttributeList : public ModelCommand
+{
+public:
+    ReportThreadNetworkDiagnosticsAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportThreadNetworkDiagnosticsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("ThreadNetworkDiagnostics.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FeatureMap
  */
@@ -52619,6 +56528,45 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "ThreadNetworkDiagnostics.FeatureMap response", value);
     }
+};
+
+class ReportThreadNetworkDiagnosticsFeatureMap : public ModelCommand
+{
+public:
+    ReportThreadNetworkDiagnosticsFeatureMap() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "feature-map");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportThreadNetworkDiagnosticsFeatureMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0035) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::FeatureMap::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint32_t value) { LogValue("ThreadNetworkDiagnostics.FeatureMap report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -52737,6 +56685,50 @@ public:
     }
 };
 
+class ReportUserLabelLabelList : public ModelCommand
+{
+public:
+    ReportUserLabelLabelList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "label-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportUserLabelLabelList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0041) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::UserLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::UserLabel::Attributes::LabelList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType> & value)
+    {
+        LogValue("UserLabel.LabelList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute ClusterRevision
  */
@@ -52765,6 +56757,45 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "UserLabel.ClusterRevision response", value);
     }
+};
+
+class ReportUserLabelClusterRevision : public ModelCommand
+{
+public:
+    ReportUserLabelClusterRevision() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "cluster-revision");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportUserLabelClusterRevision() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0041) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::UserLabelCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::UserLabel::Attributes::ClusterRevision::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint16_t value) { LogValue("UserLabel.ClusterRevision report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -52877,6 +56908,48 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "WakeOnLan.AttributeList response", value);
     }
+};
+
+class ReportWakeOnLanAttributeList : public ModelCommand
+{
+public:
+    ReportWakeOnLanAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWakeOnLanAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0503) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WakeOnLanCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::WakeOnLan::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("WakeOnLan.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -54165,6 +58238,48 @@ public:
     }
 };
 
+class ReportWiFiNetworkDiagnosticsAttributeList : public ModelCommand
+{
+public:
+    ReportWiFiNetworkDiagnosticsAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWiFiNetworkDiagnosticsAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("WiFiNetworkDiagnostics.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FeatureMap
  */
@@ -54193,6 +58308,45 @@ public:
     {
         OnGeneralAttributeEventResponse(context, "WiFiNetworkDiagnostics.FeatureMap response", value);
     }
+};
+
+class ReportWiFiNetworkDiagnosticsFeatureMap : public ModelCommand
+{
+public:
+    ReportWiFiNetworkDiagnosticsFeatureMap() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "feature-map");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWiFiNetworkDiagnosticsFeatureMap() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0036) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::FeatureMap::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, uint32_t value) { LogValue("WiFiNetworkDiagnostics.FeatureMap report", 0, value); }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -55801,6 +59955,48 @@ public:
     }
 };
 
+class ReportWindowCoveringAttributeList : public ModelCommand
+{
+public:
+    ReportWindowCoveringAttributeList() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "attribute-list");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportWindowCoveringAttributeList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0102) ReportAttribute on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::WindowCoveringCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeAttribute<chip::app::Clusters::WindowCovering::Attributes::AttributeList::TypeInfo>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
+    {
+        LogValue("WindowCovering.AttributeList report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
 /*
  * Attribute FeatureMap
  */
@@ -55947,10 +60143,15 @@ void registerClusterAccessControl(Commands & commands)
     const char * clusterName = "AccessControl";
 
     commands_list clusterCommands = {
-        make_unique<ReadAccessControlAcl>(),             //
-        make_unique<ReadAccessControlExtension>(),       //
-        make_unique<ReadAccessControlAttributeList>(),   //
-        make_unique<ReadAccessControlClusterRevision>(), //
+        make_unique<ReadAccessControlAcl>(),                             //
+        make_unique<ReadAccessControlExtension>(),                       //
+        make_unique<ReadAccessControlAttributeList>(),                   //
+        make_unique<ReadAccessControlClusterRevision>(),                 //
+        make_unique<ReportAccessControlClusterRevision>(),               //
+        make_unique<ReadAccessControlAccessControlEntryChanged>(),       //
+        make_unique<ReportAccessControlAccessControlEntryChanged>(),     //
+        make_unique<ReadAccessControlAccessControlExtensionChanged>(),   //
+        make_unique<ReportAccessControlAccessControlExtensionChanged>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -55979,8 +60180,11 @@ void registerClusterAdministratorCommissioning(Commands & commands)
         make_unique<AdministratorCommissioningOpenCommissioningWindow>(),      //
         make_unique<AdministratorCommissioningRevokeCommissioning>(),          //
         make_unique<ReadAdministratorCommissioningWindowStatus>(),             //
+        make_unique<ReportAdministratorCommissioningWindowStatus>(),           //
         make_unique<ReadAdministratorCommissioningAdminFabricIndex>(),         //
+        make_unique<ReportAdministratorCommissioningAdminFabricIndex>(),       //
         make_unique<ReadAdministratorCommissioningAdminVendorId>(),            //
+        make_unique<ReportAdministratorCommissioningAdminVendorId>(),          //
         make_unique<ReadAdministratorCommissioningAttributeList>(),            //
         make_unique<ReadAdministratorCommissioningClusterRevision>(),          //
         make_unique<ReportAdministratorCommissioningClusterRevision>(),        //
@@ -56114,6 +60318,7 @@ void registerClusterBasic(Commands & commands)
         make_unique<ReadBasicReachable>(),                 //
         make_unique<ReportBasicReachable>(),               //
         make_unique<ReadBasicUniqueID>(),                  //
+        make_unique<ReportBasicUniqueID>(),                //
         make_unique<ReadBasicAttributeList>(),             //
         make_unique<ReadBasicClusterRevision>(),           //
         make_unique<ReportBasicClusterRevision>(),         //
@@ -56437,61 +60642,66 @@ void registerClusterDoorLock(Commands & commands)
     const char * clusterName = "DoorLock";
 
     commands_list clusterCommands = {
-        make_unique<DoorLockClearCredential>(),                 //
-        make_unique<DoorLockClearUser>(),                       //
-        make_unique<DoorLockGetCredentialStatus>(),             //
-        make_unique<DoorLockGetUser>(),                         //
-        make_unique<DoorLockLockDoor>(),                        //
-        make_unique<DoorLockSetCredential>(),                   //
-        make_unique<DoorLockSetUser>(),                         //
-        make_unique<DoorLockUnlockDoor>(),                      //
-        make_unique<ReadDoorLockLockState>(),                   //
-        make_unique<ReportDoorLockLockState>(),                 //
-        make_unique<ReadDoorLockLockType>(),                    //
-        make_unique<ReportDoorLockLockType>(),                  //
-        make_unique<ReadDoorLockActuatorEnabled>(),             //
-        make_unique<ReportDoorLockActuatorEnabled>(),           //
-        make_unique<ReadDoorLockDoorState>(),                   //
-        make_unique<ReportDoorLockDoorState>(),                 //
-        make_unique<ReadDoorLockNumberOfTotalUsersSupported>(), //
-        make_unique<ReadDoorLockNumberOfPINUsersSupported>(),   //
-        make_unique<ReadDoorLockMaxPINCodeLength>(),            //
-        make_unique<ReadDoorLockMinPINCodeLength>(),            //
-        make_unique<ReadDoorLockLanguage>(),                    //
-        make_unique<WriteDoorLockLanguage>(),                   //
-        make_unique<ReportDoorLockLanguage>(),                  //
-        make_unique<ReadDoorLockAutoRelockTime>(),              //
-        make_unique<WriteDoorLockAutoRelockTime>(),             //
-        make_unique<ReportDoorLockAutoRelockTime>(),            //
-        make_unique<ReadDoorLockSoundVolume>(),                 //
-        make_unique<WriteDoorLockSoundVolume>(),                //
-        make_unique<ReportDoorLockSoundVolume>(),               //
-        make_unique<ReadDoorLockOperatingMode>(),               //
-        make_unique<WriteDoorLockOperatingMode>(),              //
-        make_unique<ReportDoorLockOperatingMode>(),             //
-        make_unique<ReadDoorLockSupportedOperatingModes>(),     //
-        make_unique<ReadDoorLockEnableOneTouchLocking>(),       //
-        make_unique<WriteDoorLockEnableOneTouchLocking>(),      //
-        make_unique<ReportDoorLockEnableOneTouchLocking>(),     //
-        make_unique<ReadDoorLockEnablePrivacyModeButton>(),     //
-        make_unique<WriteDoorLockEnablePrivacyModeButton>(),    //
-        make_unique<ReportDoorLockEnablePrivacyModeButton>(),   //
-        make_unique<ReadDoorLockWrongCodeEntryLimit>(),         //
-        make_unique<WriteDoorLockWrongCodeEntryLimit>(),        //
-        make_unique<ReportDoorLockWrongCodeEntryLimit>(),       //
-        make_unique<ReadDoorLockAttributeList>(),               //
-        make_unique<ReadDoorLockClusterRevision>(),             //
-        make_unique<ReportDoorLockClusterRevision>(),           //
-        make_unique<ReadDoorLockDoorLockAlarm>(),               //
-        make_unique<ReportDoorLockDoorLockAlarm>(),             //
-        make_unique<ReadDoorLockDoorStateChange>(),             //
-        make_unique<ReportDoorLockDoorStateChange>(),           //
-        make_unique<ReadDoorLockLockOperation>(),               //
-        make_unique<ReportDoorLockLockOperation>(),             //
-        make_unique<ReadDoorLockLockOperationError>(),          //
-        make_unique<ReportDoorLockLockOperationError>(),        //
-        make_unique<ReadDoorLockLockUserChange>(),              //
-        make_unique<ReportDoorLockLockUserChange>(),            //
+        make_unique<DoorLockClearCredential>(),                   //
+        make_unique<DoorLockClearUser>(),                         //
+        make_unique<DoorLockGetCredentialStatus>(),               //
+        make_unique<DoorLockGetUser>(),                           //
+        make_unique<DoorLockLockDoor>(),                          //
+        make_unique<DoorLockSetCredential>(),                     //
+        make_unique<DoorLockSetUser>(),                           //
+        make_unique<DoorLockUnlockDoor>(),                        //
+        make_unique<ReadDoorLockLockState>(),                     //
+        make_unique<ReportDoorLockLockState>(),                   //
+        make_unique<ReadDoorLockLockType>(),                      //
+        make_unique<ReportDoorLockLockType>(),                    //
+        make_unique<ReadDoorLockActuatorEnabled>(),               //
+        make_unique<ReportDoorLockActuatorEnabled>(),             //
+        make_unique<ReadDoorLockDoorState>(),                     //
+        make_unique<ReportDoorLockDoorState>(),                   //
+        make_unique<ReadDoorLockNumberOfTotalUsersSupported>(),   //
+        make_unique<ReportDoorLockNumberOfTotalUsersSupported>(), //
+        make_unique<ReadDoorLockNumberOfPINUsersSupported>(),     //
+        make_unique<ReportDoorLockNumberOfPINUsersSupported>(),   //
+        make_unique<ReadDoorLockMaxPINCodeLength>(),              //
+        make_unique<ReportDoorLockMaxPINCodeLength>(),            //
+        make_unique<ReadDoorLockMinPINCodeLength>(),              //
+        make_unique<ReportDoorLockMinPINCodeLength>(),            //
+        make_unique<ReadDoorLockLanguage>(),                      //
+        make_unique<WriteDoorLockLanguage>(),                     //
+        make_unique<ReportDoorLockLanguage>(),                    //
+        make_unique<ReadDoorLockAutoRelockTime>(),                //
+        make_unique<WriteDoorLockAutoRelockTime>(),               //
+        make_unique<ReportDoorLockAutoRelockTime>(),              //
+        make_unique<ReadDoorLockSoundVolume>(),                   //
+        make_unique<WriteDoorLockSoundVolume>(),                  //
+        make_unique<ReportDoorLockSoundVolume>(),                 //
+        make_unique<ReadDoorLockOperatingMode>(),                 //
+        make_unique<WriteDoorLockOperatingMode>(),                //
+        make_unique<ReportDoorLockOperatingMode>(),               //
+        make_unique<ReadDoorLockSupportedOperatingModes>(),       //
+        make_unique<ReportDoorLockSupportedOperatingModes>(),     //
+        make_unique<ReadDoorLockEnableOneTouchLocking>(),         //
+        make_unique<WriteDoorLockEnableOneTouchLocking>(),        //
+        make_unique<ReportDoorLockEnableOneTouchLocking>(),       //
+        make_unique<ReadDoorLockEnablePrivacyModeButton>(),       //
+        make_unique<WriteDoorLockEnablePrivacyModeButton>(),      //
+        make_unique<ReportDoorLockEnablePrivacyModeButton>(),     //
+        make_unique<ReadDoorLockWrongCodeEntryLimit>(),           //
+        make_unique<WriteDoorLockWrongCodeEntryLimit>(),          //
+        make_unique<ReportDoorLockWrongCodeEntryLimit>(),         //
+        make_unique<ReadDoorLockAttributeList>(),                 //
+        make_unique<ReadDoorLockClusterRevision>(),               //
+        make_unique<ReportDoorLockClusterRevision>(),             //
+        make_unique<ReadDoorLockDoorLockAlarm>(),                 //
+        make_unique<ReportDoorLockDoorLockAlarm>(),               //
+        make_unique<ReadDoorLockDoorStateChange>(),               //
+        make_unique<ReportDoorLockDoorStateChange>(),             //
+        make_unique<ReadDoorLockLockOperation>(),                 //
+        make_unique<ReportDoorLockLockOperation>(),               //
+        make_unique<ReadDoorLockLockOperationError>(),            //
+        make_unique<ReportDoorLockLockOperationError>(),          //
+        make_unique<ReadDoorLockLockUserChange>(),                //
+        make_unique<ReportDoorLockLockUserChange>(),              //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -56556,6 +60766,7 @@ void registerClusterEthernetNetworkDiagnostics(Commands & commands)
         make_unique<ReportEthernetNetworkDiagnosticsTimeSinceReset>(),  //
         make_unique<ReadEthernetNetworkDiagnosticsAttributeList>(),     //
         make_unique<ReadEthernetNetworkDiagnosticsFeatureMap>(),        //
+        make_unique<ReportEthernetNetworkDiagnosticsFeatureMap>(),      //
         make_unique<ReadEthernetNetworkDiagnosticsClusterRevision>(),   //
         make_unique<ReportEthernetNetworkDiagnosticsClusterRevision>(), //
     };
@@ -56608,7 +60819,9 @@ void registerClusterGeneralCommissioning(Commands & commands)
         make_unique<ReportGeneralCommissioningBreadcrumb>(),               //
         make_unique<ReadGeneralCommissioningBasicCommissioningInfoList>(), //
         make_unique<ReadGeneralCommissioningRegulatoryConfig>(),           //
+        make_unique<ReportGeneralCommissioningRegulatoryConfig>(),         //
         make_unique<ReadGeneralCommissioningLocationCapability>(),         //
+        make_unique<ReportGeneralCommissioningLocationCapability>(),       //
         make_unique<ReadGeneralCommissioningAttributeList>(),              //
         make_unique<ReadGeneralCommissioningClusterRevision>(),            //
         make_unique<ReportGeneralCommissioningClusterRevision>(),          //
@@ -56653,17 +60866,19 @@ void registerClusterGroupKeyManagement(Commands & commands)
     const char * clusterName = "GroupKeyManagement";
 
     commands_list clusterCommands = {
-        make_unique<GroupKeyManagementKeySetRead>(),                //
-        make_unique<GroupKeyManagementKeySetReadAllIndices>(),      //
-        make_unique<GroupKeyManagementKeySetRemove>(),              //
-        make_unique<GroupKeyManagementKeySetWrite>(),               //
-        make_unique<ReadGroupKeyManagementGroupKeyMap>(),           //
-        make_unique<ReadGroupKeyManagementGroupTable>(),            //
-        make_unique<ReadGroupKeyManagementMaxGroupsPerFabric>(),    //
-        make_unique<ReadGroupKeyManagementMaxGroupKeysPerFabric>(), //
-        make_unique<ReadGroupKeyManagementAttributeList>(),         //
-        make_unique<ReadGroupKeyManagementClusterRevision>(),       //
-        make_unique<ReportGroupKeyManagementClusterRevision>(),     //
+        make_unique<GroupKeyManagementKeySetRead>(),                  //
+        make_unique<GroupKeyManagementKeySetReadAllIndices>(),        //
+        make_unique<GroupKeyManagementKeySetRemove>(),                //
+        make_unique<GroupKeyManagementKeySetWrite>(),                 //
+        make_unique<ReadGroupKeyManagementGroupKeyMap>(),             //
+        make_unique<ReadGroupKeyManagementGroupTable>(),              //
+        make_unique<ReadGroupKeyManagementMaxGroupsPerFabric>(),      //
+        make_unique<ReportGroupKeyManagementMaxGroupsPerFabric>(),    //
+        make_unique<ReadGroupKeyManagementMaxGroupKeysPerFabric>(),   //
+        make_unique<ReportGroupKeyManagementMaxGroupKeysPerFabric>(), //
+        make_unique<ReadGroupKeyManagementAttributeList>(),           //
+        make_unique<ReadGroupKeyManagementClusterRevision>(),         //
+        make_unique<ReportGroupKeyManagementClusterRevision>(),       //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -56793,6 +61008,7 @@ void registerClusterLevelControl(Commands & commands)
         make_unique<ReportLevelControlStartUpCurrentLevel>(), //
         make_unique<ReadLevelControlAttributeList>(),         //
         make_unique<ReadLevelControlFeatureMap>(),            //
+        make_unique<ReportLevelControlFeatureMap>(),          //
         make_unique<ReadLevelControlClusterRevision>(),       //
         make_unique<ReportLevelControlClusterRevision>(),     //
     };
@@ -56806,6 +61022,7 @@ void registerClusterLocalizationConfiguration(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ReadLocalizationConfigurationActiveLocale>(),     //
         make_unique<WriteLocalizationConfigurationActiveLocale>(),    //
+        make_unique<ReportLocalizationConfigurationActiveLocale>(),   //
         make_unique<ReadLocalizationConfigurationSupportedLocales>(), //
     };
 
@@ -56866,6 +61083,7 @@ void registerClusterMediaPlayback(Commands & commands)
         make_unique<ReadMediaPlaybackDuration>(),          //
         make_unique<ReportMediaPlaybackDuration>(),        //
         make_unique<ReadMediaPlaybackPlaybackSpeed>(),     //
+        make_unique<ReportMediaPlaybackPlaybackSpeed>(),   //
         make_unique<ReadMediaPlaybackSeekRangeEnd>(),      //
         make_unique<ReportMediaPlaybackSeekRangeEnd>(),    //
         make_unique<ReadMediaPlaybackSeekRangeStart>(),    //
@@ -56905,25 +61123,32 @@ void registerClusterNetworkCommissioning(Commands & commands)
     const char * clusterName = "NetworkCommissioning";
 
     commands_list clusterCommands = {
-        make_unique<NetworkCommissioningAddOrUpdateThreadNetwork>(),  //
-        make_unique<NetworkCommissioningAddOrUpdateWiFiNetwork>(),    //
-        make_unique<NetworkCommissioningConnectNetwork>(),            //
-        make_unique<NetworkCommissioningRemoveNetwork>(),             //
-        make_unique<NetworkCommissioningReorderNetwork>(),            //
-        make_unique<NetworkCommissioningScanNetworks>(),              //
-        make_unique<ReadNetworkCommissioningMaxNetworks>(),           //
-        make_unique<ReadNetworkCommissioningNetworks>(),              //
-        make_unique<ReadNetworkCommissioningScanMaxTimeSeconds>(),    //
-        make_unique<ReadNetworkCommissioningConnectMaxTimeSeconds>(), //
-        make_unique<ReadNetworkCommissioningInterfaceEnabled>(),      //
-        make_unique<WriteNetworkCommissioningInterfaceEnabled>(),     //
-        make_unique<ReadNetworkCommissioningLastNetworkingStatus>(),  //
-        make_unique<ReadNetworkCommissioningLastNetworkID>(),         //
-        make_unique<ReadNetworkCommissioningLastConnectErrorValue>(), //
-        make_unique<ReadNetworkCommissioningFeatureMap>(),            //
-        make_unique<ReportNetworkCommissioningFeatureMap>(),          //
-        make_unique<ReadNetworkCommissioningClusterRevision>(),       //
-        make_unique<ReportNetworkCommissioningClusterRevision>(),     //
+        make_unique<NetworkCommissioningAddOrUpdateThreadNetwork>(),    //
+        make_unique<NetworkCommissioningAddOrUpdateWiFiNetwork>(),      //
+        make_unique<NetworkCommissioningConnectNetwork>(),              //
+        make_unique<NetworkCommissioningRemoveNetwork>(),               //
+        make_unique<NetworkCommissioningReorderNetwork>(),              //
+        make_unique<NetworkCommissioningScanNetworks>(),                //
+        make_unique<ReadNetworkCommissioningMaxNetworks>(),             //
+        make_unique<ReportNetworkCommissioningMaxNetworks>(),           //
+        make_unique<ReadNetworkCommissioningNetworks>(),                //
+        make_unique<ReadNetworkCommissioningScanMaxTimeSeconds>(),      //
+        make_unique<ReportNetworkCommissioningScanMaxTimeSeconds>(),    //
+        make_unique<ReadNetworkCommissioningConnectMaxTimeSeconds>(),   //
+        make_unique<ReportNetworkCommissioningConnectMaxTimeSeconds>(), //
+        make_unique<ReadNetworkCommissioningInterfaceEnabled>(),        //
+        make_unique<WriteNetworkCommissioningInterfaceEnabled>(),       //
+        make_unique<ReportNetworkCommissioningInterfaceEnabled>(),      //
+        make_unique<ReadNetworkCommissioningLastNetworkingStatus>(),    //
+        make_unique<ReportNetworkCommissioningLastNetworkingStatus>(),  //
+        make_unique<ReadNetworkCommissioningLastNetworkID>(),           //
+        make_unique<ReportNetworkCommissioningLastNetworkID>(),         //
+        make_unique<ReadNetworkCommissioningLastConnectErrorValue>(),   //
+        make_unique<ReportNetworkCommissioningLastConnectErrorValue>(), //
+        make_unique<ReadNetworkCommissioningFeatureMap>(),              //
+        make_unique<ReportNetworkCommissioningFeatureMap>(),            //
+        make_unique<ReadNetworkCommissioningClusterRevision>(),         //
+        make_unique<ReportNetworkCommissioningClusterRevision>(),       //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -57102,9 +61327,10 @@ void registerClusterPowerSourceConfiguration(Commands & commands)
     const char * clusterName = "PowerSourceConfiguration";
 
     commands_list clusterCommands = {
-        make_unique<ReadPowerSourceConfigurationSources>(),         //
-        make_unique<ReadPowerSourceConfigurationAttributeList>(),   //
-        make_unique<ReadPowerSourceConfigurationClusterRevision>(), //
+        make_unique<ReadPowerSourceConfigurationSources>(),           //
+        make_unique<ReadPowerSourceConfigurationAttributeList>(),     //
+        make_unique<ReadPowerSourceConfigurationClusterRevision>(),   //
+        make_unique<ReportPowerSourceConfigurationClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -57291,6 +61517,7 @@ void registerClusterSoftwareDiagnostics(Commands & commands)
         make_unique<ReportSoftwareDiagnosticsCurrentHeapHighWatermark>(), //
         make_unique<ReadSoftwareDiagnosticsAttributeList>(),              //
         make_unique<ReadSoftwareDiagnosticsFeatureMap>(),                 //
+        make_unique<ReportSoftwareDiagnosticsFeatureMap>(),               //
         make_unique<ReadSoftwareDiagnosticsClusterRevision>(),            //
         make_unique<ReportSoftwareDiagnosticsClusterRevision>(),          //
         make_unique<ReadSoftwareDiagnosticsSoftwareFault>(),              //
@@ -57510,6 +61737,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterListLongOctetString>(),                 //
         make_unique<ReadTestClusterTimedWriteBoolean>(),                   //
         make_unique<WriteTestClusterTimedWriteBoolean>(),                  //
+        make_unique<ReportTestClusterTimedWriteBoolean>(),                 //
         make_unique<ReadTestClusterUnsupported>(),                         //
         make_unique<WriteTestClusterUnsupported>(),                        //
         make_unique<ReportTestClusterUnsupported>(),                       //
@@ -57830,6 +62058,7 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
         make_unique<ReadThreadNetworkDiagnosticsActiveNetworkFaultsList>(),             //
         make_unique<ReadThreadNetworkDiagnosticsAttributeList>(),                       //
         make_unique<ReadThreadNetworkDiagnosticsFeatureMap>(),                          //
+        make_unique<ReportThreadNetworkDiagnosticsFeatureMap>(),                        //
         make_unique<ReadThreadNetworkDiagnosticsClusterRevision>(),                     //
         make_unique<ReportThreadNetworkDiagnosticsClusterRevision>(),                   //
         make_unique<ReadThreadNetworkDiagnosticsConnectionStatus>(),                    //
@@ -57843,8 +62072,9 @@ void registerClusterUserLabel(Commands & commands)
     const char * clusterName = "UserLabel";
 
     commands_list clusterCommands = {
-        make_unique<ReadUserLabelLabelList>(),       //
-        make_unique<ReadUserLabelClusterRevision>(), //
+        make_unique<ReadUserLabelLabelList>(),         //
+        make_unique<ReadUserLabelClusterRevision>(),   //
+        make_unique<ReportUserLabelClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -57897,6 +62127,7 @@ void registerClusterWiFiNetworkDiagnostics(Commands & commands)
         make_unique<ReportWiFiNetworkDiagnosticsOverrunCount>(),           //
         make_unique<ReadWiFiNetworkDiagnosticsAttributeList>(),            //
         make_unique<ReadWiFiNetworkDiagnosticsFeatureMap>(),               //
+        make_unique<ReportWiFiNetworkDiagnosticsFeatureMap>(),             //
         make_unique<ReadWiFiNetworkDiagnosticsClusterRevision>(),          //
         make_unique<ReportWiFiNetworkDiagnosticsClusterRevision>(),        //
         make_unique<ReadWiFiNetworkDiagnosticsDisconnection>(),            //

@@ -1719,10 +1719,9 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         ChipLogProgress(Controller, "Arming failsafe");
         // TODO(cecille): Find a way to enumerate the clusters here.
         GeneralCommissioningCluster genCom;
+        // TODO: should get the endpoint information from the descriptor cluster.
         SetupCluster(genCom, proxy, endpoint, timeout);
-        // TODO(cecille): Make this a parameter
-        uint16_t commissioningExpirySeconds = 60;
-        genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), commissioningExpirySeconds, breadcrumb, kCommandTimeoutMs);
+        genCom.ArmFailSafe(mSuccess.Cancel(), mFailure.Cancel(), params.GetFailsafeTimerSeconds(), breadcrumb, kCommandTimeoutMs);
     }
     break;
     case CommissioningStage::kConfigRegulatory: {
