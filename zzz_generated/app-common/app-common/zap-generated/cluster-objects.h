@@ -1799,9 +1799,9 @@ enum class Fields
 struct Type
 {
 public:
-    chip::ClusterId clusterId;
-    uint8_t length;
-    uint8_t value;
+    chip::ClusterId clusterId = static_cast<chip::ClusterId>(0);
+    uint8_t length            = static_cast<uint8_t>(0);
+    uint8_t value             = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4543,10 +4543,10 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t powerProfileId;
-    uint8_t energyPhaseId;
-    bool powerProfileRemoteControl;
-    uint8_t powerProfileState;
+    uint8_t powerProfileId         = static_cast<uint8_t>(0);
+    uint8_t energyPhaseId          = static_cast<uint8_t>(0);
+    bool powerProfileRemoteControl = static_cast<bool>(0);
+    uint8_t powerProfileState      = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4565,8 +4565,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t energyPhaseId;
-    uint16_t scheduledTime;
+    uint8_t energyPhaseId  = static_cast<uint8_t>(0);
+    uint16_t scheduledTime = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -4589,12 +4589,12 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t energyPhaseId;
-    uint8_t macroPhaseId;
-    uint16_t expectedDuration;
-    uint16_t peakPower;
-    uint16_t energy;
-    uint16_t maxActivationDelay;
+    uint8_t energyPhaseId       = static_cast<uint8_t>(0);
+    uint8_t macroPhaseId        = static_cast<uint8_t>(0);
+    uint16_t expectedDuration   = static_cast<uint16_t>(0);
+    uint16_t peakPower          = static_cast<uint16_t>(0);
+    uint16_t energy             = static_cast<uint16_t>(0);
+    uint16_t maxActivationDelay = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6119,8 +6119,8 @@ enum class Fields
 struct Type
 {
 public:
-    chip::DeviceTypeId type;
-    uint16_t revision;
+    chip::DeviceTypeId type = static_cast<chip::DeviceTypeId>(0);
+    uint16_t revision       = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6455,9 +6455,9 @@ enum class Fields
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex;
-    Privilege privilege;
-    AuthMode authMode;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    Privilege privilege           = static_cast<Privilege>(0);
+    AuthMode authMode             = static_cast<AuthMode>(0);
     DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
     DataModel::Nullable<DataModel::List<const Structs::Target::Type>> targets;
 
@@ -6468,9 +6468,9 @@ public:
 struct DecodableType
 {
 public:
-    chip::FabricIndex fabricIndex;
-    Privilege privilege;
-    AuthMode authMode;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    Privilege privilege           = static_cast<Privilege>(0);
+    AuthMode authMode             = static_cast<AuthMode>(0);
     DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
     DataModel::Nullable<DataModel::DecodableList<Structs::Target::DecodableType>> targets;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6487,7 +6487,7 @@ enum class Fields
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
     chip::ByteSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -7077,12 +7077,12 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t actionID;
+    uint16_t actionID = static_cast<uint16_t>(0);
     chip::CharSpan name;
-    ActionTypeEnum type;
-    uint16_t endpointListID;
-    uint16_t supportedCommands;
-    ActionStateEnum status;
+    ActionTypeEnum type        = static_cast<ActionTypeEnum>(0);
+    uint16_t endpointListID    = static_cast<uint16_t>(0);
+    uint16_t supportedCommands = static_cast<uint16_t>(0);
+    ActionStateEnum status     = static_cast<ActionStateEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -7103,9 +7103,9 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t endpointListID;
+    uint16_t endpointListID = static_cast<uint16_t>(0);
     chip::CharSpan name;
-    EndpointListTypeEnum type;
+    EndpointListTypeEnum type = static_cast<EndpointListTypeEnum>(0);
     DataModel::List<const chip::EndpointId> endpoints;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -7114,9 +7114,9 @@ public:
 struct DecodableType
 {
 public:
-    uint16_t endpointListID;
+    uint16_t endpointListID = static_cast<uint16_t>(0);
     chip::CharSpan name;
-    EndpointListTypeEnum type;
+    EndpointListTypeEnum type = static_cast<EndpointListTypeEnum>(0);
     DataModel::DecodableList<chip::EndpointId> endpoints;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -8641,9 +8641,9 @@ enum class Fields
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex;
-    chip::NodeId providerNodeID;
-    chip::EndpointId endpoint;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::NodeId providerNodeID   = static_cast<chip::NodeId>(0);
+    chip::EndpointId endpoint     = static_cast<chip::EndpointId>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -9705,7 +9705,7 @@ enum class Fields
 struct Type
 {
 public:
-    uint32_t failSafeExpiryLengthMs;
+    uint32_t failSafeExpiryLengthMs = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10115,7 +10115,7 @@ struct Type
 {
 public:
     chip::ByteSpan networkID;
-    bool connected;
+    bool connected = static_cast<bool>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10140,14 +10140,14 @@ enum class Fields
 struct Type
 {
 public:
-    uint64_t panId;
-    uint64_t extendedPanId;
+    uint64_t panId         = static_cast<uint64_t>(0);
+    uint64_t extendedPanId = static_cast<uint64_t>(0);
     chip::CharSpan networkName;
-    uint16_t channel;
-    uint8_t version;
-    uint64_t extendedAddress;
-    int8_t rssi;
-    uint8_t lqi;
+    uint16_t channel         = static_cast<uint16_t>(0);
+    uint8_t version          = static_cast<uint8_t>(0);
+    uint64_t extendedAddress = static_cast<uint64_t>(0);
+    int8_t rssi              = static_cast<int8_t>(0);
+    uint8_t lqi              = static_cast<uint8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -10170,12 +10170,12 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t security;
+    uint8_t security = static_cast<uint8_t>(0);
     chip::ByteSpan ssid;
     chip::ByteSpan bssid;
-    uint16_t channel;
-    WiFiBand wiFiBand;
-    int8_t rssi;
+    uint16_t channel  = static_cast<uint16_t>(0);
+    WiFiBand wiFiBand = static_cast<WiFiBand>(0);
+    int8_t rssi       = static_cast<int8_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11006,11 +11006,11 @@ struct Type
 {
 public:
     chip::CharSpan name;
-    bool fabricConnected;
-    bool offPremiseServicesReachableIPv4;
-    bool offPremiseServicesReachableIPv6;
+    bool fabricConnected                 = static_cast<bool>(0);
+    bool offPremiseServicesReachableIPv4 = static_cast<bool>(0);
+    bool offPremiseServicesReachableIPv6 = static_cast<bool>(0);
     chip::ByteSpan hardwareAddress;
-    InterfaceType type;
+    InterfaceType type = static_cast<InterfaceType>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11338,7 +11338,7 @@ enum class Fields
 struct Type
 {
 public:
-    uint64_t id;
+    uint64_t id = static_cast<uint64_t>(0);
     chip::CharSpan name;
     chip::ByteSpan faultRecording;
 
@@ -11362,11 +11362,11 @@ enum class Fields
 struct Type
 {
 public:
-    uint64_t id;
+    uint64_t id = static_cast<uint64_t>(0);
     chip::CharSpan name;
-    uint32_t stackFreeCurrent;
-    uint32_t stackFreeMinimum;
-    uint32_t stackSize;
+    uint32_t stackFreeCurrent = static_cast<uint32_t>(0);
+    uint32_t stackFreeMinimum = static_cast<uint32_t>(0);
+    uint32_t stackSize        = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11617,20 +11617,20 @@ enum class Fields
 struct Type
 {
 public:
-    uint64_t extAddress;
-    uint32_t age;
-    uint16_t rloc16;
-    uint32_t linkFrameCounter;
-    uint32_t mleFrameCounter;
-    uint8_t lqi;
-    int8_t averageRssi;
-    int8_t lastRssi;
-    uint8_t frameErrorRate;
-    uint8_t messageErrorRate;
-    bool rxOnWhenIdle;
-    bool fullThreadDevice;
-    bool fullNetworkData;
-    bool isChild;
+    uint64_t extAddress       = static_cast<uint64_t>(0);
+    uint32_t age              = static_cast<uint32_t>(0);
+    uint16_t rloc16           = static_cast<uint16_t>(0);
+    uint32_t linkFrameCounter = static_cast<uint32_t>(0);
+    uint32_t mleFrameCounter  = static_cast<uint32_t>(0);
+    uint8_t lqi               = static_cast<uint8_t>(0);
+    int8_t averageRssi        = static_cast<int8_t>(0);
+    int8_t lastRssi           = static_cast<int8_t>(0);
+    uint8_t frameErrorRate    = static_cast<uint8_t>(0);
+    uint8_t messageErrorRate  = static_cast<uint8_t>(0);
+    bool rxOnWhenIdle         = static_cast<bool>(0);
+    bool fullThreadDevice     = static_cast<bool>(0);
+    bool fullNetworkData      = static_cast<bool>(0);
+    bool isChild              = static_cast<bool>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11659,18 +11659,18 @@ enum class Fields
 struct Type
 {
 public:
-    bool activeTimestampPresent;
-    bool pendingTimestampPresent;
-    bool masterKeyPresent;
-    bool networkNamePresent;
-    bool extendedPanIdPresent;
-    bool meshLocalPrefixPresent;
-    bool delayPresent;
-    bool panIdPresent;
-    bool channelPresent;
-    bool pskcPresent;
-    bool securityPolicyPresent;
-    bool channelMaskPresent;
+    bool activeTimestampPresent  = static_cast<bool>(0);
+    bool pendingTimestampPresent = static_cast<bool>(0);
+    bool masterKeyPresent        = static_cast<bool>(0);
+    bool networkNamePresent      = static_cast<bool>(0);
+    bool extendedPanIdPresent    = static_cast<bool>(0);
+    bool meshLocalPrefixPresent  = static_cast<bool>(0);
+    bool delayPresent            = static_cast<bool>(0);
+    bool panIdPresent            = static_cast<bool>(0);
+    bool channelPresent          = static_cast<bool>(0);
+    bool pskcPresent             = static_cast<bool>(0);
+    bool securityPolicyPresent   = static_cast<bool>(0);
+    bool channelMaskPresent      = static_cast<bool>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11697,16 +11697,16 @@ enum class Fields
 struct Type
 {
 public:
-    uint64_t extAddress;
-    uint16_t rloc16;
-    uint8_t routerId;
-    uint8_t nextHop;
-    uint8_t pathCost;
-    uint8_t LQIIn;
-    uint8_t LQIOut;
-    uint8_t age;
-    bool allocated;
-    bool linkEstablished;
+    uint64_t extAddress  = static_cast<uint64_t>(0);
+    uint16_t rloc16      = static_cast<uint16_t>(0);
+    uint8_t routerId     = static_cast<uint8_t>(0);
+    uint8_t nextHop      = static_cast<uint8_t>(0);
+    uint8_t pathCost     = static_cast<uint8_t>(0);
+    uint8_t LQIIn        = static_cast<uint8_t>(0);
+    uint8_t LQIOut       = static_cast<uint8_t>(0);
+    uint8_t age          = static_cast<uint8_t>(0);
+    bool allocated       = static_cast<bool>(0);
+    bool linkEstablished = static_cast<bool>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -11725,8 +11725,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t rotationTime;
-    uint16_t flags;
+    uint16_t rotationTime = static_cast<uint16_t>(0);
+    uint16_t flags        = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -14410,11 +14410,11 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t fabricIndex;
+    uint8_t fabricIndex = static_cast<uint8_t>(0);
     chip::ByteSpan rootPublicKey;
-    uint16_t vendorId;
-    chip::FabricId fabricId;
-    chip::NodeId nodeId;
+    uint16_t vendorId       = static_cast<uint16_t>(0);
+    chip::FabricId fabricId = static_cast<chip::FabricId>(0);
+    chip::NodeId nodeId     = static_cast<chip::NodeId>(0);
     chip::CharSpan label;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -14434,7 +14434,7 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t fabricIndex;
+    uint8_t fabricIndex = static_cast<uint8_t>(0);
     chip::ByteSpan noc;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -15104,8 +15104,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t fabricIndex;
-    uint16_t groupId;
+    uint16_t fabricIndex = static_cast<uint16_t>(0);
+    uint16_t groupId     = static_cast<uint16_t>(0);
     DataModel::List<const uint16_t> endpoints;
     chip::CharSpan groupName;
 
@@ -15115,8 +15115,8 @@ public:
 struct DecodableType
 {
 public:
-    uint16_t fabricIndex;
-    uint16_t groupId;
+    uint16_t fabricIndex = static_cast<uint16_t>(0);
+    uint16_t groupId     = static_cast<uint16_t>(0);
     DataModel::DecodableList<uint16_t> endpoints;
     chip::CharSpan groupName;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -15134,9 +15134,9 @@ enum class Fields
 struct Type
 {
 public:
-    chip::FabricIndex fabricIndex;
-    uint16_t groupId;
-    uint16_t groupKeySetID;
+    chip::FabricIndex fabricIndex = static_cast<chip::FabricIndex>(0);
+    uint16_t groupId              = static_cast<uint16_t>(0);
+    uint16_t groupKeySetID        = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -15162,14 +15162,14 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t groupKeySetID;
-    GroupKeySecurityPolicy securityPolicy;
+    uint16_t groupKeySetID                = static_cast<uint16_t>(0);
+    GroupKeySecurityPolicy securityPolicy = static_cast<GroupKeySecurityPolicy>(0);
     chip::ByteSpan epochKey0;
-    uint64_t epochStartTime0;
+    uint64_t epochStartTime0 = static_cast<uint64_t>(0);
     chip::ByteSpan epochKey1;
-    uint64_t epochStartTime1;
+    uint64_t epochStartTime1 = static_cast<uint64_t>(0);
     chip::ByteSpan epochKey2;
-    uint64_t epochStartTime2;
+    uint64_t epochStartTime2 = static_cast<uint64_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -15955,8 +15955,8 @@ struct Type
 {
 public:
     chip::CharSpan label;
-    uint8_t mode;
-    uint32_t semanticTag;
+    uint8_t mode         = static_cast<uint8_t>(0);
+    uint32_t semanticTag = static_cast<uint32_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -15975,8 +15975,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t mfgCode;
-    uint16_t value;
+    uint16_t mfgCode = static_cast<uint16_t>(0);
+    uint16_t value   = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -16682,8 +16682,8 @@ enum class Fields
 struct Type
 {
 public:
-    DlCredentialType credentialType;
-    uint16_t credentialIndex;
+    DlCredentialType credentialType = static_cast<DlCredentialType>(0);
+    uint16_t credentialIndex        = static_cast<uint16_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -29265,8 +29265,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t zoneId;
-    chip::BitFlags<IasZoneStatus> zoneStatus;
+    uint8_t zoneId                           = static_cast<uint8_t>(0);
+    chip::BitFlags<IasZoneStatus> zoneStatus = static_cast<chip::BitFlags<IasZoneStatus>>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -30404,8 +30404,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t majorNumber;
-    uint16_t minorNumber;
+    uint16_t majorNumber = static_cast<uint16_t>(0);
+    uint16_t minorNumber = static_cast<uint16_t>(0);
     chip::CharSpan name;
     chip::CharSpan callSign;
     chip::CharSpan affiliateCallSign;
@@ -30432,7 +30432,7 @@ public:
     chip::CharSpan operatorName;
     chip::CharSpan lineupName;
     chip::CharSpan postalCode;
-    LineupInfoTypeEnum lineupInfoType;
+    LineupInfoTypeEnum lineupInfoType = static_cast<LineupInfoTypeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -30719,7 +30719,7 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t identifier;
+    uint8_t identifier = static_cast<uint8_t>(0);
     chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -30932,8 +30932,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint64_t updatedAt;
-    uint64_t position;
+    uint64_t updatedAt = static_cast<uint64_t>(0);
+    uint64_t position  = static_cast<uint64_t>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -31546,8 +31546,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t index;
-    InputTypeEnum inputType;
+    uint8_t index           = static_cast<uint8_t>(0);
+    InputTypeEnum inputType = static_cast<InputTypeEnum>(0);
     chip::CharSpan name;
     chip::CharSpan description;
 
@@ -32190,9 +32190,9 @@ enum class Fields
 struct Type
 {
 public:
-    double width;
-    double height;
-    MetricTypeEnum metric;
+    double width          = static_cast<double>(0);
+    double height         = static_cast<double>(0);
+    MetricTypeEnum metric = static_cast<MetricTypeEnum>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -32232,7 +32232,7 @@ enum class Fields
 struct Type
 {
 public:
-    ParameterEnum type;
+    ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
     DataModel::List<const Structs::AdditionalInfo::Type> externalIDList;
 
@@ -32242,7 +32242,7 @@ public:
 struct DecodableType
 {
 public:
-    ParameterEnum type;
+    ParameterEnum type = static_cast<ParameterEnum>(0);
     chip::CharSpan value;
     DataModel::DecodableList<Structs::AdditionalInfo::DecodableType> externalIDList;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -32567,8 +32567,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t index;
-    OutputTypeEnum outputType;
+    uint8_t index             = static_cast<uint8_t>(0);
+    OutputTypeEnum outputType = static_cast<OutputTypeEnum>(0);
     chip::CharSpan name;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -32779,7 +32779,7 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t catalogVendorId;
+    uint16_t catalogVendorId = static_cast<uint16_t>(0);
     chip::CharSpan applicationId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -33074,7 +33074,7 @@ enum class Fields
 struct Type
 {
 public:
-    uint16_t catalogVendorId;
+    uint16_t catalogVendorId = static_cast<uint16_t>(0);
     chip::CharSpan applicationId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -33490,14 +33490,14 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t a;
-    bool b;
-    SimpleEnum c;
+    uint8_t a    = static_cast<uint8_t>(0);
+    bool b       = static_cast<bool>(0);
+    SimpleEnum c = static_cast<SimpleEnum>(0);
     chip::ByteSpan d;
     chip::CharSpan e;
-    chip::BitFlags<SimpleBitmap> f;
-    float g;
-    double h;
+    chip::BitFlags<SimpleBitmap> f = static_cast<chip::BitFlags<SimpleBitmap>>(0);
+    float g                        = static_cast<float>(0);
+    double h                       = static_cast<double>(0);
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -33572,8 +33572,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t a;
-    bool b;
+    uint8_t a = static_cast<uint8_t>(0);
+    bool b    = static_cast<bool>(0);
     Structs::SimpleStruct::Type c;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -33598,8 +33598,8 @@ enum class Fields
 struct Type
 {
 public:
-    uint8_t a;
-    bool b;
+    uint8_t a = static_cast<uint8_t>(0);
+    bool b    = static_cast<bool>(0);
     Structs::SimpleStruct::Type c;
     DataModel::List<const Structs::SimpleStruct::Type> d;
     DataModel::List<const uint32_t> e;
@@ -33612,8 +33612,8 @@ public:
 struct DecodableType
 {
 public:
-    uint8_t a;
-    bool b;
+    uint8_t a = static_cast<uint8_t>(0);
+    bool b    = static_cast<bool>(0);
     Structs::SimpleStruct::DecodableType c;
     DataModel::DecodableList<Structs::SimpleStruct::DecodableType> d;
     DataModel::DecodableList<uint32_t> e;
@@ -33655,7 +33655,7 @@ enum class Fields
 struct Type
 {
 public:
-    uint64_t fabricIndex;
+    uint64_t fabricIndex = static_cast<uint64_t>(0);
     chip::ByteSpan operationalCert;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
