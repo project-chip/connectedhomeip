@@ -40,65 +40,68 @@ using namespace chip;
 using namespace chip::app::Clusters::WindowCovering;
 
 
+static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue, uint16_t value, bool offset)
 {
+    uint16_t inputMin = inputLowValue, inputMax = inputHighValue, inputRange = UINT16_MAX;
+    uint16_t outputMin = outputLowValue, outputMax = outputHighValue, outputRange = UINT16_MAX;
+
+    if (inputLowValue > inputHighValue)
     {
+        inputMin = inputHighValue;
+        inputMax = inputLowValue;
     }
 
-
-
-
-static uint16_t ValueToPercent100ths(uint16_t openLimit, uint16_t closedLimit, uint16_t value)
-{
-    uint16_t minimum = 0, range = UINT16_MAX;
-
-    if (openLimit > closedLimit)
+    if (outputLowValue > outputHighValue)
     {
-        minimum = closedLimit;
-        range   = static_cast<uint16_t>(openLimit - minimum);
+        outputMin = outputHighValue;
+        outputMax = outputLowValue;
+    }
+
+    inputRange = static_cast<uint16_t>(inputMax - inputMin);
+    outputRange = static_cast<uint16_t>(outputMax - outputMin);
+
+
+    if (offset)
+    {
+        if (value < inputMin)
+        {
+            return outputMin;
+        }
+
+        if (value > inputMax)
+        {
+            return outputMax;
+        }
+
+
+        if (inputRange > 0)
+        {
+            return static_cast<uint16_t>(outputMin + ((outputRange * (value - inputMin) / inputRange)));
+        }
     }
     else
     {
-        minimum = openLimit;
-        range   = static_cast<uint16_t>(closedLimit - minimum);
+        if (inputRange > 0)
+        {
+            return static_cast<uint16_t>((outputRange * (value) / inputRange));
+        }
     }
 
-    if (value < minimum)
-    {
-        return 0;
-    }
+    return outputMax;
 
-    if (range > 0)
-    {
-        return static_cast<uint16_t>(WC_PERCENT100THS_MAX * (value - minimum) / range);
-    }
-
-    return WC_PERCENT100THS_MAX;
 }
 
-static uint16_t Percent100thsToValue(uint16_t openLimit, uint16_t closedLimit, uint16_t percent100ths)
+static Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
 {
-    uint16_t minimum = 0, maximum = UINT16_MAX, range = UINT16_MAX;
-
-    if (openLimit > closedLimit)
-    {
-        minimum = closedLimit;
-        maximum = openLimit;
-    }
-    else
-    {
-        minimum = openLimit;
-        maximum = closedLimit;
-    }
-
-    range = static_cast<uint16_t>(maximum - minimum);
-
-    if (percent100ths > WC_PERCENT100THS_MAX)
-    {
-        return maximum;
-    }
-
-    return static_cast<uint16_t>(minimum + ((range * percent100ths) / WC_PERCENT100THS_MAX));
+    return ConvertValue(limits.open, limits.closed, WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, absolute, true);
 }
+
+static uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relative)
+{
+    return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative, true);
+}
+
+
 
 static OperationalState ValueToOperationalState(uint8_t value)
 {
@@ -321,7 +324,9 @@ uint16_t LiftToPercent100ths(chip::EndpointId endpoint, uint16_t lift)
     uint16_t closedLimit = 0;
     Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
     Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
-    return ValueToPercent100ths(openLimit, closedLimit, lift);
+
+    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
+    return ValueToPercent100ths(limits, lift);
 }
 
 uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
@@ -330,7 +335,9 @@ uint16_t Percent100thsToLift(chip::EndpointId endpoint, uint16_t percent100ths)
     uint16_t closedLimit = 0;
     Attributes::InstalledOpenLimitLift::Get(endpoint, &openLimit);
     Attributes::InstalledClosedLimitLift::Get(endpoint, &closedLimit);
-    return Percent100thsToValue(openLimit, closedLimit, percent100ths);
+
+    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
+    return Percent100thsToValue(limits, percent100ths);
 }
 
 void LiftPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
@@ -350,7 +357,10 @@ uint16_t TiltToPercent100ths(chip::EndpointId endpoint, uint16_t tilt)
     uint16_t closedLimit = 0;
     Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
     Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
-    return ValueToPercent100ths(openLimit, closedLimit, tilt);
+
+    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
+
+    return ValueToPercent100ths(limits, tilt);
 }
 
 uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
@@ -359,7 +369,10 @@ uint16_t Percent100thsToTilt(chip::EndpointId endpoint, uint16_t percent100ths)
     uint16_t closedLimit = 0;
     Attributes::InstalledOpenLimitTilt::Get(endpoint, &openLimit);
     Attributes::InstalledClosedLimitTilt::Get(endpoint, &closedLimit);
-    return Percent100thsToValue(openLimit, closedLimit, percent100ths);
+
+    AbsoluteLimits limits = { .open = openLimit, .closed = closedLimit };
+
+    return Percent100thsToValue(limits, percent100ths);
 }
 
 void TiltPositionSet(chip::EndpointId endpoint, uint16_t percent100ths)
