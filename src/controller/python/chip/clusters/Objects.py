@@ -5297,17 +5297,17 @@ class AccessControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=typing.Union[Nullable, uint]),
+                            ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="changeType", Tag=3, Type=AccessControl.Enums.ChangeTypeEnum),
-                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=AccessControl.Structs.AccessControlEntry),
+                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=typing.Union[Nullable, AccessControl.Structs.AccessControlEntry]),
                     ])
 
             adminFabricIndex: 'uint' = 0
-            adminNodeID: 'uint' = 0
-            adminPasscodeID: 'uint' = 0
+            adminNodeID: 'typing.Union[Nullable, uint]' = NullValue
+            adminPasscodeID: 'typing.Union[Nullable, uint]' = NullValue
             changeType: 'AccessControl.Enums.ChangeTypeEnum' = 0
-            latestValue: 'AccessControl.Structs.AccessControlEntry' = field(default_factory=lambda: AccessControl.Structs.AccessControlEntry())
+            latestValue: 'typing.Union[Nullable, AccessControl.Structs.AccessControlEntry]' = NullValue
 
         @dataclass
         class AccessControlExtensionChanged(ClusterEvent):
@@ -5324,17 +5324,17 @@ class AccessControl(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=typing.Union[Nullable, uint]),
+                            ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="changeType", Tag=3, Type=AccessControl.Enums.ChangeTypeEnum),
-                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=AccessControl.Structs.ExtensionEntry),
+                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=typing.Union[Nullable, AccessControl.Structs.ExtensionEntry]),
                     ])
 
             adminFabricIndex: 'uint' = 0
-            adminNodeID: 'uint' = 0
-            adminPasscodeID: 'uint' = 0
+            adminNodeID: 'typing.Union[Nullable, uint]' = NullValue
+            adminPasscodeID: 'typing.Union[Nullable, uint]' = NullValue
             changeType: 'AccessControl.Enums.ChangeTypeEnum' = 0
-            latestValue: 'AccessControl.Structs.ExtensionEntry' = field(default_factory=lambda: AccessControl.Structs.ExtensionEntry())
+            latestValue: 'typing.Union[Nullable, AccessControl.Structs.ExtensionEntry]' = NullValue
 
 
 @dataclass

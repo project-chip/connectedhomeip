@@ -48,18 +48,18 @@ client cluster AccessControl = 31 {
 
   info event AccessControlEntryChanged = 0 {
     fabric_idx adminFabricIndex = 0;
-    node_id adminNodeID = 1;
-    INT16U adminPasscodeID = 2;
+    nullable node_id adminNodeID = 1;
+    nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    AccessControlEntry latestValue = 4;
+    nullable AccessControlEntry latestValue = 4;
   }
 
   info event AccessControlExtensionChanged = 1 {
     fabric_idx adminFabricIndex = 0;
-    node_id adminNodeID = 1;
-    INT16U adminPasscodeID = 2;
+    nullable node_id adminNodeID = 1;
+    nullable INT16U adminPasscodeID = 2;
     ChangeTypeEnum changeType = 3;
-    ExtensionEntry latestValue = 4;
+    nullable ExtensionEntry latestValue = 4;
   }
 
   attribute AccessControlEntry acl[] = 0;
