@@ -43,10 +43,6 @@ EmberEventControl emberAfPluginDoorLockServerRelockEventControl;
 
 DoorLockServer DoorLockServer::instance;
 
-// TODO: Remove hardcoded pin when SetCredential command is implemented.
-static const uint8_t HARD_CODED_PIN_CODE[] = { 1, 2, 3, 4 };
-chip::ByteSpan mPin(HARD_CODED_PIN_CODE);
-
 /**********************************************************
  * DoorLockServer public methods
  *********************************************************/
@@ -798,6 +794,85 @@ void DoorLockServer::ClearCredentialCommandHandler(
         clearCredential(commandPath.mEndpointId, modifier, sourceNodeId, credentialType, credentialIndex, false));
 }
 
+void DoorLockServer::LockUnlockDoorCommandHandler(chip::app::CommandHandler * commandObj,
+                                                  const chip::app::ConcreteCommandPath & commandPath,
+                                                  DlLockOperationType operationType, const chip::Optional<chip::ByteSpan> & pinCode)
+{
+    chip::EndpointId endpoint = commandPath.mEndpointId;
+
+    VerifyOrDie(DlLockOperationType::kLock == operationType || DlLockOperationType::kUnlock == operationType);
+
+    EmberAfDoorLockLockUnlockCommand appCommandHandler = emberAfPluginDoorLockOnDoorLockCommand;
+    const char * commandNameStr                        = "LockDoor";
+    auto newLockState                                  = DlLockState::kLocked;
+    if (DlLockOperationType::kUnlock == operationType)
+    {
+        newLockState      = DlLockState::kUnlocked;
+        commandNameStr    = "UnlockDoor";
+        appCommandHandler = emberAfPluginDoorLockOnDoorUnlockCommand;
+    }
+    VerifyOrDie(nullptr != commandNameStr);
+    VerifyOrDie(nullptr != appCommandHandler);
+
+    emberAfDoorLockClusterPrintln("[%s] Received Lock Door command [endpointId=%d]", commandNameStr, endpoint);
+
+    bool require_pin = false;
+    auto status      = Attributes::RequirePINforRemoteOperation::Get(endpoint, &require_pin);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        emberAfDoorLockClusterPrintln(
+            "[%s] Unable to get value of RequirePINforRemoteOperation attribute, defaulting to 'true' [endpointId=%d,status=%d]",
+            commandNameStr, endpoint, status);
+
+        require_pin = true;
+    }
+
+    if (pinCode.HasValue() && !(SupportsPIN(endpoint) && SupportsUSR(endpoint)))
+    {
+        emberAfDoorLockClusterPrintln(
+            "[%s] PIN is supplied but USR and PIN features are disabled - ignoring command [endpointId=%d]", commandNameStr,
+            endpoint);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+    }
+
+    if (require_pin && !pinCode.HasValue())
+    {
+        emberAfDoorLockClusterPrintln("[%s] PIN is required but not provided - ignoring command [endpointId=%d]", commandNameStr,
+                                      endpoint);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
+
+        return;
+    }
+
+    // Look up the user index and credential index -- it should be used in the Lock Operation event. However, I don't think we
+    // should prevent door lock/unlocking if we couldn't find credential associated with user - I think if the app thinks that PIN
+    // is correct the door should be unlocked.
+    uint16_t associatedUserIndex = 0;
+    uint16_t usedCredentialIndex = 0;
+    if (pinCode.HasValue())
+    {
+        if (!findUserIndexByCredential(endpoint, DlCredentialType::kPin, pinCode.Value(), associatedUserIndex, usedCredentialIndex))
+        {
+            emberAfDoorLockClusterPrintln("[%s] Provided credential is not associated with any user [endpointId=%d]",
+                                          commandNameStr, endpoint);
+        }
+    }
+
+    // The app is responsible to search through the list of PIN codes internally
+    if (!appCommandHandler(endpoint, pinCode))
+    {
+        ChipLogError(Zcl, "[%s] Unable to change the door state - internal error [endpointId=%d]", commandNameStr, endpoint);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+
+        return;
+    }
+
+    // TODO: Send lock operation change event
+    SetLockState(endpoint, newLockState);
+
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+}
+
 bool DoorLockServer::HasFeature(chip::EndpointId endpointId, DoorLockFeature feature)
 {
     uint32_t featureMap = 0;
@@ -1045,6 +1120,74 @@ bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, DlCr
                 user.credentials.data()[j].CredentialType == to_underlying(credentialType))
             {
                 userIndex = i;
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool DoorLockServer::findUserIndexByCredential(chip::EndpointId endpointId, DlCredentialType credentialType,
+                                               chip::ByteSpan credentialData, uint16_t & userIndex, uint16_t & credentialIndex)
+{
+    uint16_t maxNumberOfUsers = 0;
+    EmberAfStatus status      = Attributes::NumberOfTotalUsersSupported::Get(endpointId, &maxNumberOfUsers);
+    if (EMBER_ZCL_STATUS_SUCCESS != status)
+    {
+        ChipLogError(Zcl, "[findUserIndexByCredential] Unable to read attribute 'NumberOfTotalUsersSupported' [status=%d]", status);
+        return false;
+    }
+
+    for (uint16_t i = 1; i <= maxNumberOfUsers; ++i)
+    {
+        EmberAfPluginDoorLockUserInfo user;
+        if (!emberAfPluginDoorLockGetUser(endpointId, i, user))
+        {
+            ChipLogError(Zcl, "[findUserIndexByCredential] Unable to get user: app error [status=%d,userIndex=%d]", status, i);
+            emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+            return false;
+        }
+
+        // Go through occupied users only
+        if (DlUserStatus::kAvailable == user.userStatus)
+        {
+            continue;
+        }
+
+        for (const auto & credential : user.credentials)
+        {
+            if (credential.CredentialType != to_underlying(credentialType))
+            {
+                continue;
+            }
+
+            EmberAfPluginDoorLockCredentialInfo credentialInfo;
+            if (!emberAfPluginDoorLockGetCredential(endpointId, credential.CredentialIndex, credentialType, credentialInfo))
+            {
+                ChipLogError(Zcl,
+                             "[findUserIndexByCredential] Unable to get credential: app error "
+                             "[userIndex=%d,credentialIndex=%d,credentialType=%hhu]",
+                             i, credential.CredentialIndex, credentialType);
+                emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+                return false;
+            }
+
+            if (credentialInfo.status != DlCredentialStatus::kOccupied)
+            {
+                ChipLogError(Zcl,
+                             "[findUserIndexByCredential] Users/Credentials database error: credential index attached to user is "
+                             "not occupied "
+                             "[userIndex=%d,credentialIndex=%d,credentialType=%hhu]",
+                             i, credential.CredentialIndex, credentialType);
+                emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+                return false;
+            }
+
+            if (credentialInfo.credentialData.data_equal(credentialData))
+            {
+                userIndex       = i;
+                credentialIndex = i;
                 return true;
             }
         }
@@ -1769,45 +1912,8 @@ bool emberAfDoorLockClusterLockDoorCallback(chip::app::CommandHandler * commandO
                                             const chip::app::ConcreteCommandPath & commandPath,
                                             const chip::app::Clusters::DoorLock::Commands::LockDoor::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("Received Lock Door command");
-    bool success = false;
-
-    chip::EndpointId endpoint = commandPath.mEndpointId;
-
-    bool require_pin = false;
-    Attributes::RequirePINforRemoteOperation::Get(endpoint, &require_pin);
-
-    if (commandData.pinCode.HasValue())
-    {
-        // TODO: Search through list of stored PINs and check each.
-        if (mPin.data_equal(commandData.pinCode.Value()))
-        {
-            success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, commandData.pinCode);
-        }
-        else
-        {
-            success = false; // Just to be explicit. success == false at this point anyway
-        }
-    }
-    else
-    {
-        if (!require_pin)
-        {
-            success = emberAfPluginDoorLockOnDoorLockCommand(endpoint, commandData.pinCode);
-        }
-        else
-        {
-            success = false;
-        }
-    }
-
-    if (success)
-    {
-        success = DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kLocked) == EMBER_ZCL_STATUS_SUCCESS;
-    }
-
-    emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-
+    DoorLockServer::Instance().LockUnlockDoorCommandHandler(commandObj, commandPath, DlLockOperationType::kLock,
+                                                            commandData.pinCode);
     return true;
 }
 
@@ -1815,45 +1921,8 @@ bool emberAfDoorLockClusterUnlockDoorCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::DoorLock::Commands::UnlockDoor::DecodableType & commandData)
 {
-    emberAfDoorLockClusterPrintln("Received Unlock Door command");
-    bool success = false;
-
-    chip::EndpointId endpoint = commandPath.mEndpointId;
-
-    bool require_pin = false;
-    Attributes::RequirePINforRemoteOperation::Get(endpoint, &require_pin);
-
-    if (commandData.pinCode.HasValue())
-    {
-        // TODO: Search through list of stored PINs and check each.
-        if (mPin.data_equal(commandData.pinCode.Value()))
-        {
-            success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint, commandData.pinCode);
-        }
-        else
-        {
-            success = false; // Just to be explicit. success == false at this point anyway
-        }
-    }
-    else
-    {
-        if (!require_pin)
-        {
-            success = emberAfPluginDoorLockOnDoorUnlockCommand(endpoint, commandData.pinCode);
-        }
-        else
-        {
-            success = false;
-        }
-    }
-
-    if (success)
-    {
-        success = DoorLockServer::Instance().SetLockState(endpoint, DlLockState::kUnlocked) == EMBER_ZCL_STATUS_SUCCESS;
-    }
-
-    emberAfSendImmediateDefaultResponse(success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE);
-
+    DoorLockServer::Instance().LockUnlockDoorCommandHandler(commandObj, commandPath, DlLockOperationType::kUnlock,
+                                                            commandData.pinCode);
     return true;
 }
 
