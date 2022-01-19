@@ -117,6 +117,9 @@ BOOTLOADER_ROOT_DIRECTORY="$CHIP_ROOT"/examples/platform/mbed/bootloader
 # Set bootloader build directory
 BOOTLOADER_BUILD_DIRECTORY="$BOOTLOADER_ROOT_DIRECTORY"/build-"$TARGET_BOARD"/"$PROFILE"/
 
+# Set encryption key directory
+ENC_KEY_DIRECTORY="$BOOTLOADER_ROOT_DIRECTORY"/enc-key
+
 if [[ "$COMMAND" == *"build"* ]]; then
     echo "Build $TYPE $APP app for $TARGET_BOARD target with $TOOLCHAIN toolchain and $PROFILE profile"
 
@@ -129,8 +132,7 @@ if [[ "$COMMAND" == *"build"* ]]; then
     # Set Mbed MCU boot path
     MBED_MCU_BOOT_PATH="$CHIP_ROOT"/third_party/mbed-mcu-boot/repo
 
-    if [[ "$TYPE" == "boot" || "$TYPE" == "upgrade" ]]; then
-
+    if [[ "$TYPE" == "boot" ]]; then
         cd "$BOOTLOADER_ROOT_DIRECTORY"
 
         # Install mcuboot requirements (silently)
@@ -139,11 +141,14 @@ if [[ "$COMMAND" == *"build"* ]]; then
         # Run mcuboot setup script
         python "$MBED_MCU_BOOT_PATH"/scripts/setup.py install
 
-        # Create the signing keys is not exist
-        if [ ! -f signing-keys.pem ] || [ ! -f signing_keys.c ]; then
-            "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py keygen -k signing-keys.pem -t rsa-2048 &&
-                "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py getpub -k signing-keys.pem >signing_keys.c
+        # Check if encryption key exists, if not generate it
+        if [[ ! -f "$ENC_KEY_DIRECTORY"/enc-key.pem ]]; then
+            mkdir -p "$ENC_KEY_DIRECTORY"
+            "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py keygen -k "$ENC_KEY_DIRECTORY"/enc-key.pem -t rsa-2048
         fi
+
+        # Create the signing keys source fille
+        "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py getpub -k "$ENC_KEY_DIRECTORY"/enc-key.pem >signing_keys.c
 
         ln -sfTr "$MBED_MCU_BOOT_PATH"/boot/mbed mcuboot
 
@@ -158,6 +163,14 @@ if [[ "$COMMAND" == *"build"* ]]; then
         cmake --build "$BOOTLOADER_BUILD_DIRECTORY"
 
         cd "$CHIP_ROOT"/examples
+    fi
+
+    if [[ "$TYPE" == "upgrade" ]]; then
+        # Check if encryption key exists
+        if [[ ! -f "$ENC_KEY_DIRECTORY"/enc-key.pem ]]; then
+            echo "ERROR: encryption key for upgrade image not exist"
+            exit 1
+        fi
     fi
 
     # Set Mbed OS posix socket submodule path
@@ -182,12 +195,17 @@ if [[ "$COMMAND" == *"build"* ]]; then
         HEADER_SIZE=$(jq '.target_overrides.'\""$TARGET_BOARD"\"'."mcuboot.header-size"' "$APP"/mbed/mbed_app.json | tr -d \")
         SLOT_SIZE=$(jq '.target_overrides.'\""$TARGET_BOARD"\"'."mcuboot.slot-size"' "$APP"/mbed/mbed_app.json | tr -d \")
         # Signed the primary application
-        "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py sign -k "$BOOTLOADER_ROOT_DIRECTORY"/signing-keys.pem \
+        "$MBED_MCU_BOOT_PATH"/scripts/imgtool.py sign -k "$ENC_KEY_DIRECTORY"/enc-key.pem \
             --align "${TARGET_MEMORY_ALIGN[$TARGET_BOARD]}" -v "$APP_VERSION" --header-size $(($HEADER_SIZE)) --pad-header -S "$SLOT_SIZE" \
             "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex
 
-        # Create the factory firmware (bootloader + signed primary application)
-        hexmerge.py -o "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.hex --no-start-addr "$BOOTLOADER_BUILD_DIRECTORY"/chip-mbed-bootloader.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex
+        if [[ "$TYPE" == "boot" ]]; then
+            # Create the factory firmware (bootloader + signed primary application)
+            hexmerge.py -o "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.hex --no-start-addr "$BOOTLOADER_BUILD_DIRECTORY"/chip-mbed-bootloader.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex
+        elif [[ "$TYPE" == "upgrade" ]]; then
+            # Convert hex image to raw binary file
+            arm-none-eabi-objcopy -I ihex -O binary "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example-signed.hex "$BUILD_DIRECTORY"/chip-mbed-"$APP"-example.bin
+        fi
     fi
 fi
 

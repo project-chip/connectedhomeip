@@ -3,3 +3,4 @@ dist/
 imgtool*
 mcuboot
 signing*
+enc-key/
