@@ -136,9 +136,9 @@ class MatterIdlTransformer(Transformer):
 
         for t, name in clusters:
             if t == EndpointContentType.CLIENT_BINDING:
-                endpoint.client_bindings.append(t)
+                endpoint.client_bindings.append(name)
             elif t == EndpointContentType.SERVER_CLUSTER:
-                endpoint.server_clusters.append(t)
+                endpoint.server_clusters.append(name)
             else:
                 raise Error("Unknown endpoint content: %r" % t)
 

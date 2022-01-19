@@ -113,6 +113,38 @@ class TestParser(unittest.TestCase):
         ])
         self.assertEqual(actual, expected)
 
+    def test_endpoints(self):
+        actual = parseText("""
+            endpoint 12 {
+                server cluster Foo;
+                server cluster Bar;
+                binding cluster Bar;
+                binding cluster Test;
+            }
+        """)
+
+        expected = Idl(endpoints=[Endpoint(number=12,
+                                           server_clusters=["Foo", "Bar"],
+                                           client_bindings=["Bar", "Test"],)
+                                  ])
+        self.assertEqual(actual, expected)
+
+    def test_multi_endpoints(self):
+        actual = parseText("""
+            endpoint 1 {}
+            endpoint 2 {}
+            endpoint 0xa {}
+            endpoint 100 {}
+        """)
+
+        expected = Idl(endpoints=[
+            Endpoint(number=1),
+            Endpoint(number=2),
+            Endpoint(number=10),
+            Endpoint(number=100),
+        ])
+        self.assertEqual(actual, expected)
+
 
 if __name__ == '__main__':
     unittest.main()
