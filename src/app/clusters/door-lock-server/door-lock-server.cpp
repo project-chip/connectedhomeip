@@ -534,56 +534,10 @@ void DoorLockServer::SetCredentialCommandHandler(
     switch (operationType)
     {
     case DlDataOperationType::kAdd: {
-        // appclusters, 5.2.4.41.1: should send the OCCUPIED in the response when the credential is in use
-        if (DlCredentialStatus::kAvailable != existingCredential.status)
-        {
-            emberAfDoorLockClusterPrintln(
-                "[SetCredential] Unable to set the credential: credential slot is occupied [endpointId=%d,credentialIndex=%d]",
-                commandPath.mEndpointId, credentialIndex);
-
-            sendSetCredentialResponse(commandObj, DlStatus::kOccupied, 0, nextAvailableCredentialSlot);
-            return;
-        }
-
-        if (!userType.IsNull() && DlUserType::kProgrammingUser == userType.Value())
-        {
-            emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: user type is invalid "
-                                          "[endpointId=%d,credentialIndex=%d,userType=%hhu]",
-                                          commandPath.mEndpointId, credentialIndex, userType.Value());
-
-            sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
-            return;
-        }
-
-        DlCredential credential{ to_underlying(credentialType), credentialIndex };
-        // appclusters, 5.2.4.40: if userIndex is not provided we should create new user
-        DlStatus status           = DlStatus::kSuccess;
         uint16_t createdUserIndex = 0;
-        if (userIndex.IsNull())
-        {
-            emberAfDoorLockClusterPrintln(
-                "[SetCredential] UserIndex is not set, creating new user [endpointId=%d,credentialIndex=%d]",
-                commandPath.mEndpointId, credentialIndex);
 
-            status = createNewCredentialAndUser(commandPath.mEndpointId, fabricIdx, sourceNodeId, userStatus, userType, credential,
-                                                credentialData, createdUserIndex);
-        }
-        else
-        {
-            // appclusters, 5.2.4.40: if user index is NULL, we should try to modify the existing user
-            status = createNewCredentialAndAddItToUser(commandPath.mEndpointId, fabricIdx, userIndex.Value(), credential,
-                                                       credentialData);
-        }
-
-        if (DlStatus::kSuccess != status)
-        {
-            nextAvailableCredentialSlot = credentialIndex;
-        }
-
-        sendRemoteLockUserChange(commandPath.mEndpointId, credentialTypeToLockDataType(credentialType), DlDataOperationType::kAdd,
-                                 sourceNodeId, fabricIdx, createdUserIndex == 0 ? userIndex.Value() : createdUserIndex,
-                                 credentialIndex);
-
+        DlStatus status = createCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
+                                           existingCredential, credentialData, userIndex, userStatus, userType, createdUserIndex);
         sendSetCredentialResponse(commandObj, status, createdUserIndex, nextAvailableCredentialSlot);
         return;
     }
@@ -602,86 +556,14 @@ void DoorLockServer::SetCredentialCommandHandler(
         // if userIndex is NULL then we're changing the programming user PIN
         if (userIndex.IsNull())
         {
-            if (DlCredentialType::kProgrammingPIN != credentialType || 0 != credentialIndex)
-            {
-                emberAfDoorLockClusterPrintln(
-                    "[SetCredential] Unable to modify programming PIN: invalid argument [endpointId=%d,credentialIndex=%d]",
-                    commandPath.mEndpointId, credentialIndex);
-
-                sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
-                return;
-            }
-
-            emberAfDoorLockClusterPrintln("[SetCredential] Modifying the programming PIN [endpointId=%d,credentialIndex=%d]",
-                                          commandPath.mEndpointId, credentialIndex);
-
-            uint16_t relatedUserIndex = 0;
-            if (!findUserIndexByCredential(commandPath.mEndpointId, DlCredentialType::kProgrammingPIN, 0, relatedUserIndex))
-            {
-                ChipLogError(Zcl, "[SetCredential] Unable to modify PIN - related user not found (internal error) [endpointId=%d]", commandPath.mEndpointId);
-                sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
-                return;
-            }
-
-            auto status = DlStatus::kSuccess;
-            if (!emberAfPluginDoorLockSetCredential(commandPath.mEndpointId, credentialIndex, existingCredential.status,
-                                                    existingCredential.credentialType, credentialData))
-            {
-                emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: app error "
-                                              "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
-                                              commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size());
-                status = DlStatus::kFailure;
-            }
-            else
-            {
-                emberAfDoorLockClusterPrintln("[SetCredential] Successfully modified the credential "
-                                              "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
-                                              commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size());
-
-                sendRemoteLockUserChange(commandPath.mEndpointId, credentialTypeToLockDataType(credentialType),
-                                         DlDataOperationType::kModify, sourceNodeId, fabricIdx, relatedUserIndex, credentialIndex);
-            }
+            auto status = modifyProgrammingPIN(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
+                                               existingCredential, credentialData);
             sendSetCredentialResponse(commandObj, status, 0, nextAvailableCredentialSlot);
             return;
         }
 
-        // appclusters, 5.2.4.40: when modifying a credential, userStatus and userType shall both be NULL.
-        if (!userStatus.IsNull() || (!userType.IsNull() && DlUserType::kProgrammingUser != userType.Value()))
-        {
-            emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: invalid arguments "
-                                          "[endpointId=%d,credentialIndex=%d,credentialType=%hhu]",
-                                          commandPath.mEndpointId, credentialIndex, credentialType);
-
-            sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
-            return;
-        }
-
-        DlCredential credential{ to_underlying(credentialType), credentialIndex };
-        auto userIndexValue = userIndex.Value();
-        auto status         = modifyCredentialForUser(commandPath.mEndpointId, fabricIdx, userIndexValue, credential);
-
-        if (DlStatus::kSuccess == status)
-        {
-            if (!emberAfPluginDoorLockSetCredential(commandPath.mEndpointId, credentialIndex, existingCredential.status,
-                                                    existingCredential.credentialType, credentialData))
-            {
-                emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: app error "
-                                              "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
-                                              commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size());
-
-                status = DlStatus::kFailure;
-            }
-            else
-            {
-                emberAfDoorLockClusterPrintln("[SetCredential] Successfully modified the credential "
-                                              "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
-                                              commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size());
-
-                sendRemoteLockUserChange(commandPath.mEndpointId, credentialTypeToLockDataType(credentialType),
-                                         DlDataOperationType::kModify, sourceNodeId, fabricIdx, userIndexValue, credentialIndex);
-            }
-        }
-
+        auto status = modifyCredential(commandPath.mEndpointId, fabricIdx, sourceNodeId, credentialIndex, credentialType,
+                                       existingCredential, credentialData, userIndex.Value(), userStatus, userType);
         sendSetCredentialResponse(commandObj, status, 0, nextAvailableCredentialSlot);
         return;
     }
@@ -1606,6 +1488,145 @@ DlStatus DoorLockServer::modifyCredentialForUser(chip::EndpointId endpointId, ch
         endpointId, userIndex, credential.CredentialIndex);
 
     return DlStatus::kInvalidField;
+}
+
+DlStatus DoorLockServer::createCredential(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx,
+                                          chip::NodeId sourceNodeId, uint16_t credentialIndex, DlCredentialType credentialType,
+                                          const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+                                          const chip::ByteSpan & credentialData, Nullable<uint16_t> userIndex,
+                                          Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType,
+                                          uint16_t & createdUserIndex)
+{
+    // appclusters, 5.2.4.41.1: should send the OCCUPIED in the response when the credential is in use
+    if (DlCredentialStatus::kAvailable != existingCredential.status)
+    {
+        emberAfDoorLockClusterPrintln(
+            "[SetCredential] Unable to set the credential: credential slot is occupied [endpointId=%d,credentialIndex=%d]",
+            endpointId, credentialIndex);
+
+        return DlStatus::kOccupied;
+    }
+
+    if (!userType.IsNull() && DlUserType::kProgrammingUser == userType.Value())
+    {
+        emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: user type is invalid "
+                                      "[endpointId=%d,credentialIndex=%d,userType=%hhu]",
+                                      endpointId, credentialIndex, userType.Value());
+
+        return DlStatus::kInvalidField;
+    }
+
+    DlCredential credential{ to_underlying(credentialType), credentialIndex };
+    // appclusters, 5.2.4.40: if userIndex is not provided we should create new user
+    DlStatus status = DlStatus::kSuccess;
+    if (userIndex.IsNull())
+    {
+        emberAfDoorLockClusterPrintln("[SetCredential] UserIndex is not set, creating new user [endpointId=%d,credentialIndex=%d]",
+                                      endpointId, credentialIndex);
+
+        status = createNewCredentialAndUser(endpointId, creatorFabricIdx, sourceNodeId, userStatus, userType, credential,
+                                            credentialData, createdUserIndex);
+    }
+    else
+    {
+        // appclusters, 5.2.4.40: if user index is NULL, we should try to modify the existing user
+        status = createNewCredentialAndAddItToUser(endpointId, creatorFabricIdx, userIndex.Value(), credential, credentialData);
+    }
+
+    if (DlStatus::kSuccess == status)
+    {
+        sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DlDataOperationType::kAdd, sourceNodeId,
+                                 creatorFabricIdx, createdUserIndex == 0 ? userIndex.Value() : createdUserIndex, credentialIndex);
+    }
+
+    return status;
+}
+
+DlStatus DoorLockServer::modifyProgrammingPIN(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex,
+                                              chip::NodeId sourceNodeId, uint16_t credentialIndex, DlCredentialType credentialType,
+                                              const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+                                              const chip::ByteSpan & credentialData)
+{
+    if (DlCredentialType::kProgrammingPIN != credentialType || 0 != credentialIndex)
+    {
+        emberAfDoorLockClusterPrintln(
+            "[SetCredential] Unable to modify programming PIN: invalid argument [endpointId=%d,credentialIndex=%d]", endpointId,
+            credentialIndex);
+
+        return DlStatus::kInvalidField;
+    }
+
+    emberAfDoorLockClusterPrintln("[SetCredential] Modifying the programming PIN [endpointId=%d,credentialIndex=%d]", endpointId,
+                                  credentialIndex);
+
+    uint16_t relatedUserIndex = 0;
+    if (!findUserIndexByCredential(endpointId, DlCredentialType::kProgrammingPIN, 0, relatedUserIndex))
+    {
+        ChipLogError(Zcl, "[SetCredential] Unable to modify PIN - related user not found (internal error) [endpointId=%d]",
+                     endpointId);
+        return DlStatus::kFailure;
+    }
+
+    if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, existingCredential.status,
+                                            existingCredential.credentialType, credentialData))
+    {
+        emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: app error "
+                                      "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
+                                      endpointId, credentialIndex, credentialType, credentialData.size());
+        return DlStatus::kFailure;
+    }
+    else
+    {
+        emberAfDoorLockClusterPrintln("[SetCredential] Successfully modified the credential "
+                                      "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
+                                      endpointId, credentialIndex, credentialType, credentialData.size());
+
+        sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DlDataOperationType::kModify,
+                                 sourceNodeId, modifierFabricIndex, relatedUserIndex, credentialIndex);
+    }
+
+    return DlStatus::kSuccess;
+}
+
+DlStatus DoorLockServer::modifyCredential(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex,
+                                          chip::NodeId sourceNodeId, uint16_t credentialIndex, DlCredentialType credentialType,
+                                          const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+                                          const chip::ByteSpan & credentialData, uint16_t userIndex,
+                                          Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType)
+{
+
+    // appclusters, 5.2.4.40: when modifying a credential, userStatus and userType shall both be NULL.
+    if (!userStatus.IsNull() || (!userType.IsNull() && DlUserType::kProgrammingUser != userType.Value()))
+    {
+        emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: invalid arguments "
+                                      "[endpointId=%d,credentialIndex=%d,credentialType=%hhu]",
+                                      endpointId, credentialIndex, credentialType);
+        return DlStatus::kInvalidField;
+    }
+
+    DlCredential credential{ to_underlying(credentialType), credentialIndex };
+    auto status = modifyCredentialForUser(endpointId, modifierFabricIndex, userIndex, credential);
+
+    if (DlStatus::kSuccess == status)
+    {
+        if (!emberAfPluginDoorLockSetCredential(endpointId, credentialIndex, existingCredential.status,
+                                                existingCredential.credentialType, credentialData))
+        {
+            emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: app error "
+                                          "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
+                                          endpointId, credentialIndex, credentialType, credentialData.size());
+
+            return DlStatus::kFailure;
+        }
+
+        emberAfDoorLockClusterPrintln("[SetCredential] Successfully modified the credential "
+                                      "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
+                                      endpointId, credentialIndex, credentialType, credentialData.size());
+
+        sendRemoteLockUserChange(endpointId, credentialTypeToLockDataType(credentialType), DlDataOperationType::kModify,
+                                 sourceNodeId, modifierFabricIndex, userIndex, credentialIndex);
+    }
+    return status;
 }
 
 CHIP_ERROR DoorLockServer::sendSetCredentialResponse(chip::app::CommandHandler * commandObj, DlStatus status, uint16_t userIndex,
