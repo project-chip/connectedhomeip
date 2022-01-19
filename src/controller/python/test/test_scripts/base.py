@@ -105,7 +105,8 @@ class TestResult:
 class BaseTestHelper:
     def __init__(self, nodeid: int):
         self.chipStack = ChipStack()
-        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(fabricId = 1, fabricIndex = 1)
+        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
+            fabricId=1, fabricIndex=1)
         self.devCtrl = self.fabricAdmin.NewController(nodeid)
         self.controllerNodeId = nodeid
         self.logger = logger
@@ -144,16 +145,16 @@ class BaseTestHelper:
         return True
 
     async def TestMultiFabric(self, ip: str, setuppin: int, nodeid: int):
-        self.logger.info("Opening Commissioning Window") 
+        self.logger.info("Opening Commissioning Window")
 
-        await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(100)) 
+        await self.devCtrl.SendCommand(nodeid, 0, Clusters.AdministratorCommissioning.Commands.OpenBasicCommissioningWindow(100))
 
         self.logger.info("Creating 2nd Fabric Admin")
-        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId = 2, fabricIndex = 2)
+        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
 
         self.logger.info("Creating Device Controller on 2nd Fabric")
         devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
-        
+
         if not devCtrl2.CommissionIP(ip.encode("utf-8"), setuppin, nodeid):
             self.logger.info(
                 "Failed to finish key exchange with device {}".format(ip))
@@ -163,19 +164,21 @@ class BaseTestHelper:
         # Shut-down all the controllers (which will free them up as well as de-initialize the
         # stack as well.
         #
-        self.logger.info("Shutting down controllers & fabrics and re-initing stack...")
+        self.logger.info(
+            "Shutting down controllers & fabrics and re-initing stack...")
 
         ChipDeviceCtrl.ChipDeviceController.ShutdownAll()
         chip.FabricAdmin.FabricAdmin.ShutdownAll()
 
-        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(fabricId = 1, fabricIndex = 1)
-        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId = 2, fabricIndex = 2)
+        self.fabricAdmin = chip.FabricAdmin.FabricAdmin(
+            fabricId=1, fabricIndex=1)
+        fabricAdmin2 = chip.FabricAdmin.FabricAdmin(fabricId=2, fabricIndex=2)
 
         self.devCtrl = self.fabricAdmin.NewController(self.controllerNodeId)
         devCtrl2 = fabricAdmin2.NewController(self.controllerNodeId)
 
-        await self.devCtrl.ReadAttribute(nodeid, [ (Clusters.Basic) ])
-        await devCtrl2.ReadAttribute(nodeid, [ (Clusters.Basic) ])
+        await self.devCtrl.ReadAttribute(nodeid, [(Clusters.Basic)])
+        await devCtrl2.ReadAttribute(nodeid, [(Clusters.Basic)])
 
         devCtrl2.Shutdown()
         fabricAdmin2.Shutdown()

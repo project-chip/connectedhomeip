@@ -32,13 +32,17 @@ import copy
 import chip.native
 import builtins
 
-_SyncSetKeyValueCbFunct = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char),  c_uint16)
-_SyncGetKeyValueCbFunct = CFUNCTYPE(None, py_object, c_char_p, POINTER(c_char), POINTER(c_uint16))
+_SyncSetKeyValueCbFunct = CFUNCTYPE(
+    None, py_object, c_char_p, POINTER(c_char),  c_uint16)
+_SyncGetKeyValueCbFunct = CFUNCTYPE(
+    None, py_object, c_char_p, POINTER(c_char), POINTER(c_uint16))
 _SyncDeleteKeyValueCbFunct = CFUNCTYPE(None, py_object, POINTER(c_char_p))
+
 
 @_SyncSetKeyValueCbFunct
 def _OnSyncSetKeyValueCb(storageObj, key: str, value, size):
     storageObj.SetSdkKey(key.decode("utf-8"), ctypes.string_at(value, size))
+
 
 @_SyncGetKeyValueCbFunct
 def _OnSyncGetKeyValueCb(storageObj, key: str, value, size):
@@ -57,19 +61,21 @@ def _OnSyncGetKeyValueCb(storageObj, key: str, value, size):
         for idx, val in enumerate(keyValue):
             value[idx] = val
             count = count + 1
-       
+
         size[0] = count
     else:
         size[0] = 0
+
 
 @_SyncDeleteKeyValueCbFunct
 def _OnSyncDeleteKeyValueCb(storageObj, key):
     print("OnSyncDeleteKeyValue")
     storageObj.SetKey(key, None)
 
+
 class PersistentStorage:
     _handle = chip.native.GetLibraryHandle()
-    
+
     def __init__(self, path: str):
         self._path = path
 
@@ -83,25 +89,29 @@ class PersistentStorage:
                 logging.critical(f"Loading configuration from {path}...")
                 self.jsonData = json.load(self._file)
             else:
-                logging.warn(f"No valid configuration present at {path} - clearing out configuration")
+                logging.warn(
+                    f"No valid configuration present at {path} - clearing out configuration")
                 self.jsonData = {'repl-config': {}, 'sdk-config': {}}
-            
+
         except Exception as ex:
             logging.error(ex)
-            logging.warn(f"Could not load configuration from {path} - resetting configuration...")
+            logging.warn(
+                f"Could not load configuration from {path} - resetting configuration...")
             self.jsonData = {'repl-config': {}, 'sdk-config': {}}
 
         self._file = None
-        self._handle.pychip_Storage_InitializeStorageAdapter(ctypes.py_object(self), _OnSyncSetKeyValueCb, _OnSyncGetKeyValueCb, _OnSyncDeleteKeyValueCb)
+        self._handle.pychip_Storage_InitializeStorageAdapter(ctypes.py_object(
+            self), _OnSyncSetKeyValueCb, _OnSyncGetKeyValueCb, _OnSyncDeleteKeyValueCb)
 
     def Sync(self):
         if (self._file is None):
             try:
                 self._file = open(self._path, 'w')
             except Exception as ex:
-                logging.warn(f"Could not open {path} for writing configuration. Error:")
+                logging.warn(
+                    f"Could not open {path} for writing configuration. Error:")
                 logging.warn(ex)
-        
+
         self._file.seek(0)
         json.dump(self.jsonData, self._file, ensure_ascii=True, indent=4)
         self._file.truncate()
@@ -117,7 +127,7 @@ class PersistentStorage:
             del(self.jsonData['repl-config'][key])
         else:
             self.jsonData['repl-config'][key] = value
-    
+
         self.Sync()
 
     def GetReplKey(self, key: str):
@@ -132,8 +142,9 @@ class PersistentStorage:
         if (value is None):
             del(self.jsonData['sdk-config'][key])
         else:
-            self.jsonData['sdk-config'][key] = base64.b64encode(value).decode("utf-8")
-    
+            self.jsonData['sdk-config'][key] = base64.b64encode(
+                value).decode("utf-8")
+
         self.Sync()
 
     def GetSdkKey(self, key: str):
@@ -144,5 +155,5 @@ class PersistentStorage:
 
     def __del__(self):
         builtins.chipStack.Call(
-                lambda: self._handle.pychip_Storage_ShutdownAdapter()
+            lambda: self._handle.pychip_Storage_ShutdownAdapter()
         )

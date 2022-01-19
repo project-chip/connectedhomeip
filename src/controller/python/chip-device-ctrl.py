@@ -148,8 +148,10 @@ def FormatZCLArguments(args, command):
 
 
 def ShowColoredWarnings(message, category, filename, lineno, file=None, line=None):
-    logging.warning( ' %s:%s: %s:%s' % (filename, lineno, category.__name__, message))
+    logging.warning(' %s:%s: %s:%s' %
+                    (filename, lineno, category.__name__, message))
     return
+
 
 class DeviceMgrCmd(Cmd):
     def __init__(self, rendezvousAddr=None, controllerNodeId=1, bluetoothAdapter=None):
@@ -181,7 +183,8 @@ class DeviceMgrCmd(Cmd):
         self.fabricAdmin = FabricAdmin.FabricAdmin()
         self.devCtrl = self.fabricAdmin.NewController(controllerNodeId)
 
-        self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController(self.chipStack)
+        self.commissionableNodeCtrl = ChipCommissionableNodeCtrl.ChipCommissionableNodeController(
+            self.chipStack)
 
         # If we are on Linux and user selects non-default bluetooth adapter.
         if sys.platform.startswith("linux") and (bluetoothAdapter is not None):
@@ -303,7 +306,8 @@ class DeviceMgrCmd(Cmd):
         Close the ble connection to the device.
         """
 
-        warnings.warn("This method is being deprecated. Please use the DeviceController.CloseBLEConnection method directly in the REPL", DeprecationWarning)
+        warnings.warn(
+            "This method is being deprecated. Please use the DeviceController.CloseBLEConnection method directly in the REPL", DeprecationWarning)
 
         args = shlex.split(line)
 
@@ -373,7 +377,7 @@ class DeviceMgrCmd(Cmd):
         """
 
         # warnings.warn("This method is being deprecated. Please use the SetupPayload function in the chip.setup_payload package directly", DeprecationWarning)
-        
+
         try:
             arglist = shlex.split(line)
             if arglist[0] not in ("generate", "parse-manual", "parse-qr"):

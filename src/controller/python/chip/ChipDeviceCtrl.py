@@ -74,6 +74,7 @@ def _singleton(cls):
 
     return wrapper
 
+
 class DCState(enum.IntEnum):
     NOT_INITIALIZED = 0
     IDLE = 1
@@ -96,7 +97,8 @@ class ChipDeviceController():
         devCtrl = c_void_p(None)
 
         res = self._ChipStack.Call(
-                lambda: self._dmLib.pychip_OpCreds_AllocateController(ctypes.c_void_p(opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId)
+            lambda: self._dmLib.pychip_OpCreds_AllocateController(ctypes.c_void_p(
+                opCredsContext), pointer(devCtrl), fabricIndex, fabricId, nodeId)
         )
 
         if res != 0:
@@ -157,7 +159,7 @@ class ChipDeviceController():
 
         self.state = DCState.IDLE
         self.isActive = True
-    
+
         ChipDeviceController.activeList.add(self)
 
     def Shutdown(self):
@@ -167,8 +169,8 @@ class ChipDeviceController():
         if (self.isActive):
             if self.devCtrl != None:
                 self._ChipStack.Call(
-                        lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
-                    self.devCtrl)
+                    lambda: self._dmLib.pychip_DeviceController_DeleteDeviceController(
+                        self.devCtrl)
                 )
                 self.devCtrl = None
 
@@ -184,11 +186,11 @@ class ChipDeviceController():
         #
         # We need a copy since we're going to walk through the list and shutdown
         # each controller, which in turn, will remove themselves from the active list.
-        # 
+        #
         # We cannot do that while iterating through the original list.
         #
         activeList = copy.copy(ChipDeviceController.activeList)
-        
+
         for controller in activeList:
             controller.Shutdown()
 
@@ -196,7 +198,8 @@ class ChipDeviceController():
 
     def CheckIsActive(self):
         if (not self.isActive):
-            raise RuntimeError("DeviceCtrl instance was already shutdown previously!")
+            raise RuntimeError(
+                "DeviceCtrl instance was already shutdown previously!")
 
     def __del__(self):
         self.Shutdown()
@@ -211,7 +214,7 @@ class ChipDeviceController():
 
     def ConnectBle(self, bleConnection):
         self.CheckIsActive()
-        
+
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ValidateBTP(
                 self.devCtrl,
@@ -223,7 +226,7 @@ class ChipDeviceController():
 
     def ConnectBLE(self, discriminator, setupPinCode, nodeid):
         self.CheckIsActive()
-        
+
         self.state = DCState.RENDEZVOUS_ONGOING
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_ConnectBLE(
@@ -239,7 +242,7 @@ class ChipDeviceController():
 
     def CloseBLEConnection(self):
         self.CheckIsActive()
-        
+
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceCommissioner_CloseBleConnection(
                 self.devCtrl)
@@ -264,7 +267,7 @@ class ChipDeviceController():
 
     def Commission(self, nodeid):
         self.CheckIsActive()
-        
+
         self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_Commission(
                 self.devCtrl, nodeid)
@@ -279,7 +282,7 @@ class ChipDeviceController():
 
     def CommissionIP(self, ipaddr, setupPinCode, nodeid):
         self.CheckIsActive()
-        
+
         # IP connection will run through full commissioning, so we need to wait
         # for the commissioning complete event, not just any callback.
         self.state = DCState.RENDEZVOUS_ONGOING
@@ -300,7 +303,7 @@ class ChipDeviceController():
 
     def SetWiFiCredentials(self, ssid, credentials):
         self.CheckIsActive()
-        
+
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetWiFiCredentials(
                 ssid, credentials)
@@ -308,7 +311,7 @@ class ChipDeviceController():
 
     def SetThreadOperationalDataset(self, threadOperationalDataset):
         self.CheckIsActive()
-        
+
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_SetThreadOperationalDataset(
                 threadOperationalDataset, len(threadOperationalDataset))
@@ -316,7 +319,7 @@ class ChipDeviceController():
 
     def ResolveNode(self, nodeid):
         self.CheckIsActive()
-        
+
         return self._ChipStack.CallAsync(
             lambda: self._dmLib.pychip_DeviceController_UpdateDevice(
                 self.devCtrl, nodeid)
@@ -324,7 +327,7 @@ class ChipDeviceController():
 
     def GetAddressAndPort(self, nodeid):
         self.CheckIsActive()
-        
+
         address = create_string_buffer(64)
         port = c_uint16(0)
 
@@ -337,7 +340,7 @@ class ChipDeviceController():
 
     def DiscoverCommissionableNodesLongDiscriminator(self, long_discriminator):
         self.CheckIsActive()
-        
+
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesLongDiscriminator(
                 self.devCtrl, long_discriminator)
@@ -345,7 +348,7 @@ class ChipDeviceController():
 
     def DiscoverCommissionableNodesShortDiscriminator(self, short_discriminator):
         self.CheckIsActive()
-        
+
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesShortDiscriminator(
                 self.devCtrl, short_discriminator)
@@ -353,7 +356,7 @@ class ChipDeviceController():
 
     def DiscoverCommissionableNodesVendor(self, vendor):
         self.CheckIsActive()
-        
+
         return self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesVendor(
                 self.devCtrl, vendor)
@@ -721,7 +724,7 @@ class ChipDeviceController():
 
     def ZCLReadAttribute(self, cluster, attribute, nodeid, endpoint, groupid, blocking=True):
         self.CheckIsActive()
-        
+
         req = None
         clusterType = eval(f"GeneratedObjects.{cluster}")
 
@@ -763,7 +766,7 @@ class ChipDeviceController():
 
     def ZCLAttributeList(self):
         self.CheckIsActive()
-        
+
         return self._Cluster.ListClusterAttributes()
 
     def SetLogFilter(self, category):
@@ -778,14 +781,14 @@ class ChipDeviceController():
 
     def GetLogFilter(self):
         self.CheckIsActive()
-        
+
         self._ChipStack.Call(
             lambda: self._dmLib.pychip_DeviceController_GetLogFilter()
         )
 
     def SetBlockingCB(self, blockingCB):
         self.CheckIsActive()
-        
+
         self._ChipStack.blockingCB = blockingCB
 
     # ----- Private Members -----

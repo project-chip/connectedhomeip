@@ -32,6 +32,7 @@ import chip.exceptions
 from chip import ChipDeviceCtrl
 import copy
 
+
 class FabricAdmin:
     ''' Administers a given fabric instance. Each admin is associated with
         a specific RCAC and ICAC as well as Fabric ID and Index.
@@ -75,7 +76,7 @@ class FabricAdmin:
         nextFabricIndex = 1
         while (True):
             if (nextFabricIndex in FabricAdmin.activeFabricIndexList):
-                nextFabricIndex = nextFabricIndex + 1 
+                nextFabricIndex = nextFabricIndex + 1
             else:
                 return nextFabricIndex
 
@@ -85,14 +86,14 @@ class FabricAdmin:
         nextFabricId = 1
         while (True):
             if (nextFabricId in FabricAdmin.activeFabricIdList):
-                nextFabricId = nextFabricId + 1 
+                nextFabricId = nextFabricId + 1
             else:
                 return nextFabricId
 
     def __init__(self, rcac: bytes = None, icac: bytes = None, fabricIndex: int = None, fabricId: int = None):
         ''' Creates a valid FabricAdmin object with valid RCAC/ICAC, and registers itself as an OperationalCredentialsDelegate
             for other parts of the system (notably, DeviceController) to vend NOCs.
-            
+
             rcac, icac:     Specify the RCAC and ICAC to be used with this fabric (not-supported). If not specified, an RCAC and ICAC will
                             be automatically generated.
 
@@ -100,13 +101,15 @@ class FabricAdmin:
             fabricId:       Local fabric ID to be associated with this fabric. If omitted, one will be automatically assigned.
         '''
         if (rcac is not None or icac is not None):
-            raise ValueError("Providing valid rcac/icac values is not supported right now!")
-      
+            raise ValueError(
+                "Providing valid rcac/icac values is not supported right now!")
+
         if (fabricId is None):
             self._fabricId = self.AllocateNextFabricId()
         else:
             if (fabricId in FabricAdmin.activeFabricIdList):
-                raise ValueError(f"FabricId {fabricId} is already being managed by an existing FabricAdmin object!")
+                raise ValueError(
+                    f"FabricId {fabricId} is already being managed by an existing FabricAdmin object!")
 
             self._fabricId = fabricId
 
@@ -114,19 +117,22 @@ class FabricAdmin:
             self._fabricIndex = self.AllocateNextFabricIndex()
         else:
             if (fabricIndex in FabricAdmin.activeFabricIndexList):
-                raise ValueError(f"FabricIndex {fabricIndex} is already being managed by an existing FabricAdmin object!")
-            
+                raise ValueError(
+                    f"FabricIndex {fabricIndex} is already being managed by an existing FabricAdmin object!")
+
             self._fabricIndex = fabricIndex
 
         # Add it to the tracker to prevent future FabricAdmins from managing the same fabric.
         FabricAdmin.activeFabricIdList.add(self._fabricId)
         FabricAdmin.activeFabricIndexList.add(self._fabricIndex)
 
-        print(f"New FabricAdmin: FabricId: {self._fabricId}({self._fabricIndex})")
+        print(
+            f"New FabricAdmin: FabricId: {self._fabricId}({self._fabricIndex})")
         self._handle.pychip_OpCreds_InitializeDelegate.restype = c_void_p
 
         self.closure = builtins.chipStack.Call(
-            lambda: self._handle.pychip_OpCreds_InitializeDelegate(ctypes.py_object(self), ctypes.c_uint32(self._fabricIndex))
+            lambda: self._handle.pychip_OpCreds_InitializeDelegate(
+                ctypes.py_object(self), ctypes.c_uint32(self._fabricIndex))
         )
 
         if (self.closure is None):
@@ -138,7 +144,7 @@ class FabricAdmin:
         try:
             adminList = builtins.chipStack.GetStorageManager().GetReplKey('fabricAdmins')
         except KeyError:
-            adminList = {str(self._fabricIndex): { 'fabricId': self._fabricId }}
+            adminList = {str(self._fabricIndex): {'fabricId': self._fabricId}}
             builtins.chipStack.GetStorageManager().SetReplKey('fabricAdmins', adminList)
 
         adminList[str(self._fabricIndex)] = {'fabricId': self._fabricId}
@@ -146,21 +152,24 @@ class FabricAdmin:
 
         self._isActive = True
         self.nextControllerId = 1
-        
+
         FabricAdmin.activeAdmins.add(self)
 
     def NewController(self, nodeId: int = None):
         ''' Vend a new controller on this fabric seeded with the right fabric details.
         '''
         if (not(self._isActive)):
-            raise RuntimeError(f"FabricAdmin object was previously shutdown and is no longer valid!")
+            raise RuntimeError(
+                f"FabricAdmin object was previously shutdown and is no longer valid!")
 
         if (nodeId is None):
             nodeId = self.nextControllerId
             self.nextControllerId = self.nextControllerId + 1
 
-        print(f"Allocating new controller with FabricId: {self._fabricId}({self._fabricIndex}), NodeId: {nodeId}")
-        controller = ChipDeviceCtrl.ChipDeviceController(self.closure, self._fabricId, self._fabricIndex, nodeId)
+        print(
+            f"Allocating new controller with FabricId: {self._fabricId}({self._fabricIndex}), NodeId: {nodeId}")
+        controller = ChipDeviceCtrl.ChipDeviceController(
+            self.closure, self._fabricId, self._fabricIndex, nodeId)
         return controller
 
     def ShutdownAll():
@@ -170,7 +179,7 @@ class FabricAdmin:
 
         for admin in activeAdmins:
             admin.Shutdown(False)
-        
+
         FabricAdmin.activeAdmins.clear()
 
     def Shutdown(self, deleteFromStorage: bool = True):
@@ -181,7 +190,8 @@ class FabricAdmin:
         '''
         if (self._isActive):
             builtins.chipStack.Call(
-                    lambda: self._handle.pychip_OpCreds_FreeDelegate(ctypes.c_void_p(self.closure))
+                lambda: self._handle.pychip_OpCreds_FreeDelegate(
+                    ctypes.c_void_p(self.closure))
             )
 
             FabricAdmin.activeFabricIdList.remove(self._fabricId)

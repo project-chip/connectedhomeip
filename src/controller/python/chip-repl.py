@@ -30,9 +30,11 @@ import builtins
 import argparse
 import sys
 
+
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--storagepath", help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)", action="store", default="/tmp/repl-storage.json")
+    parser.add_argument("-p", "--storagepath", help="Path to persistent storage configuration file (default: /tmp/repl-storage.json)",
+                        action="store", default="/tmp/repl-storage.json")
 
     args = parser.parse_args()
 
@@ -46,6 +48,7 @@ def main():
     sys.argv = [sys.argv[0]]
 
     IPython.start_ipython(config=c)
+
 
 if __name__ == "__main__":
     main()

@@ -861,10 +861,10 @@ def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPat
     readCallbackObj = ctypes.POINTER(c_void_p)()
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
-    
+
     minInterval = 0
     maxInterval = 0
-   
+
     if subscriptionParameters is not None:
         minInterval = subscriptionParameters.MinReportIntervalFloorSeconds
         maxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds

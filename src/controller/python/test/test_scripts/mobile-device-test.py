@@ -90,8 +90,8 @@ def main():
               "Failed to finish key exchange")
 
     asyncio.run(test.TestMultiFabric(ip=options.deviceAddress,
-                                   setuppin=20202021,
-                                   nodeid=1))
+                                     setuppin=20202021,
+                                     nodeid=1))
 
     logger.info("Testing closing sessions")
     FailIfNot(test.TestCloseSession(nodeid=1), "Failed to close sessions")
