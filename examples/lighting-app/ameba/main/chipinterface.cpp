@@ -185,34 +185,20 @@ std::string createSetupPayload()
 };
 
 #if CONFIG_ENABLE_OTA_REQUESTOR
-void QueryImageTimerHandler(Layer * systemLayer, void * appState)
-{
-    ChipLogProgress(DeviceLayer, "QueryImageTimerHandler");
-    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
-}
-
-void ApplyUpdateTimerHandler(Layer * systemLayer, void * appState)
-{
-    ChipLogProgress(DeviceLayer, "ApplyUpdateTimerHandler");
-    static_cast<OTARequestor *>(GetRequestorInstance())->ApplyUpdate();
-}
-
 extern "C" void amebaQueryImageCmdHandler(uint32_t nodeId, uint32_t fabricId)
 {
     ChipLogProgress(DeviceLayer, "Calling amebaQueryImageCmdHandler");
     // In this mode Provider node ID and fabric idx must be supplied explicitly from ATS$ cmd
     gRequestorCore.TestModeSetProviderParameters(nodeId, fabricId, chip::kRootEndpointId);
 
-    /* Start one shot timer with 1 second timeout to send QueryImage Request command */
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000), QueryImageTimerHandler, nullptr);
+    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
 
 extern "C" void amebaApplyUpdateCmdHandler()
 {
     ChipLogProgress(DeviceLayer, "Calling amebaApplyUpdateCmdHandler");
 
-    /* Start one shot timer with 1 second timeout to send QueryImage Request command */
-    chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(1 * 1000), ApplyUpdateTimerHandler, nullptr);
+    static_cast<OTARequestor *>(GetRequestorInstance())->ApplyUpdate();
 }
 
 static void InitOTARequestor(void)

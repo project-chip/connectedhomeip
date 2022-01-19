@@ -49,14 +49,15 @@ namespace Internal {
 ClockImpl gClockImpl;
 } // namespace Internal
 
+
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
-    return Clock::Microseconds64(xTaskGetTickCount());
+    return (Clock::Microseconds64(xTaskGetTickCount()) * configTICK_RATE_HZ);
 }
 
 Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
-    return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
+    return (Clock::Milliseconds64(xTaskGetTickCount()));
 }
 
 #if 0
