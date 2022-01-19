@@ -37,3 +37,17 @@ JNI_METHOD(void, GetConnectedDeviceCallbackJni, deleteCallback)(JNIEnv * env, jo
     VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
     delete connectedDeviceCallback;
 }
+
+JNI_METHOD(jlong, ReportCallbackJni, newCallback)
+(JNIEnv * env, jobject self, jobject subscriptionEstablishedCallbackJava, jobject reportCallbackJava)
+{
+    ReportCallback * reportCallback = new ReportCallback(subscriptionEstablishedCallbackJava, reportCallbackJava);
+    return reinterpret_cast<jlong>(reportCallback);
+}
+
+JNI_METHOD(void, ReportCallbackJni, deleteCallback)(JNIEnv * env, jobject self, jlong callbackHandle)
+{
+    ReportCallback * reportCallback = reinterpret_cast<ReportCallback *>(callbackHandle);
+    VerifyOrReturn(reportCallback != nullptr, ChipLogError(Controller, "ReportCallback handle is nullptr"));
+    delete reportCallback;
+}

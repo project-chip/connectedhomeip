@@ -21,6 +21,7 @@ import android.bluetooth.BluetoothGatt;
 import android.util.Log;
 import androidx.annotation.Nullable;
 import chip.devicecontroller.GetConnectedDeviceCallbackJni.GetConnectedDeviceCallback;
+import chip.devicecontroller.model.ChipAttributePath;
 
 /** Controller to interact with the CHIP device. */
 public class ChipDeviceController {
@@ -296,6 +297,31 @@ public class ChipDeviceController {
     shutdownSubscriptions(deviceControllerPtr, devicePtr);
   }
 
+  /** Subscribe to the given attribute path. */
+  public void subscribeToPath(
+      SubscriptionEstablishedCallback subscriptionEstablishedCallback,
+      ReportCallback reportCallback,
+      long devicePtr,
+      ChipAttributePath attributePath,
+      int minInterval,
+      int maxInterval) {
+    ReportCallbackJni jniCallback =
+        new ReportCallbackJni(subscriptionEstablishedCallback, reportCallback);
+    subscribeToPath(
+        deviceControllerPtr,
+        jniCallback.getCallbackHandle(),
+        devicePtr,
+        attributePath,
+        minInterval,
+        maxInterval);
+  }
+
+  /** Read the given attribute path. */
+  public void readPath(ReportCallback callback, long devicePtr, ChipAttributePath attributePath) {
+    ReportCallbackJni jniCallback = new ReportCallbackJni(null, callback);
+    readPath(deviceControllerPtr, jniCallback.getCallbackHandle(), devicePtr, attributePath);
+  }
+
   /**
    * Generates a new PASE verifier and passcode ID for the given setup PIN code.
    *
@@ -311,6 +337,20 @@ public class ChipDeviceController {
 
   private native PaseVerifierParams computePaseVerifier(
       long deviceControllerPtr, long devicePtr, long setupPincode, int iterations, byte[] salt);
+
+  private native void subscribeToPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      ChipAttributePath attributePath,
+      int minInterval,
+      int maxInterval);
+
+  public native void readPath(
+      long deviceControllerPtr,
+      long callbackHandle,
+      long devicePtr,
+      ChipAttributePath attributePath);
 
   private native long newDeviceController();
 

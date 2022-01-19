@@ -1524,4 +1524,3 @@ endpoint 1 {
   binding cluster OnOff;
   binding cluster Scenes;
 }
-
