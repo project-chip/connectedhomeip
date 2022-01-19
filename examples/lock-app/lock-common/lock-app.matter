@@ -1,0 +1,826 @@
+// This IDL was generated automatically by ZAP.
+// It is for view/code review purposes only.
+
+struct LabelStruct {
+    CHAR_STRING label = 1;
+    CHAR_STRING value = 2;
+}
+
+server cluster AdministratorCommissioning = 60 {
+  enum CommissioningWindowStatus : ENUM8 {
+    kWindowNotOpen = 0;
+    kEnhancedWindowOpen = 1;
+    kBasicWindowOpen = 2;
+  }
+
+  enum StatusCode : ENUM8 {
+    kBusy = 1;
+    kPAKEParameterError = 2;
+    kWindowNotOpen = 3;
+  }
+
+  attribute(readonly) int8u windowStatus = 0;
+  attribute(readonly) fabric_idx adminFabricIndex = 1;
+  attribute(readonly) int16u adminVendorId = 2;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct OpenBasicCommissioningWindowRequest {
+    INT16U commissioningTimeout = 0;
+  }
+
+  request struct OpenCommissioningWindowRequest {
+    INT16U commissioningTimeout = 0;
+    OCTET_STRING PAKEVerifier = 1;
+    INT16U discriminator = 2;
+    INT32U iterations = 3;
+    OCTET_STRING salt = 4;
+    INT16U passcodeID = 5;
+  }
+
+  command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  command RevokeCommissioning(): DefaultSuccess = 2;
+}
+
+server cluster Basic = 40 {
+  critical event StartUp = 0 {
+    INT32U softwareVersion = 0;
+  }
+
+  critical event ShutDown = 1 {
+  }
+
+  info event Leave = 2 {
+  }
+
+  info event ReachableChanged = 3 {
+    boolean reachableNewValue = 0;
+  }
+
+  attribute(readonly) int16u interactionModelVersion = 0;
+  attribute(readonly) char_string vendorName = 1;
+  attribute(readonly) vendor_id vendorID = 2;
+  attribute(readonly) char_string productName = 3;
+  attribute(readonly) int16u productID = 4;
+  attribute(writable) char_string nodeLabel = 5;
+  attribute(writable) char_string location = 6;
+  attribute(readonly) int16u hardwareVersion = 7;
+  attribute(readonly) char_string hardwareVersionString = 8;
+  attribute(readonly) int32u softwareVersion = 9;
+  attribute(readonly) char_string softwareVersionString = 10;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster Descriptor = 29 {
+  struct DeviceType {
+    DEVTYPE_ID type = 1;
+    INT16U revision = 2;
+  }
+
+  attribute(readonly) DeviceType deviceList[] = 0;
+  attribute(readonly) CLUSTER_ID serverList[] = 1;
+  attribute(readonly) CLUSTER_ID clientList[] = 2;
+  attribute(readonly) ENDPOINT_NO partsList[] = 3;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster DiagnosticLogs = 50 {
+  enum LogsIntent : ENUM8 {
+    kEndUserSupport = 0;
+    kNetworkDiag = 1;
+    kCrashLogs = 2;
+  }
+
+  enum LogsStatus : ENUM8 {
+    kSuccess = 0;
+    kExhausted = 1;
+    kNoLogs = 2;
+    kBusy = 3;
+    kDenied = 4;
+  }
+
+  enum LogsTransferProtocol : ENUM8 {
+    kResponsePayload = 0;
+    kBdx = 1;
+  }
+
+
+  request struct RetrieveLogsRequestRequest {
+    LogsIntent intent = 0;
+    LogsTransferProtocol requestedProtocol = 1;
+    OCTET_STRING transferFileDesignator = 2;
+  }
+
+  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
+}
+
+server cluster EthernetNetworkDiagnostics = 55 {
+  enum PHYRateType : ENUM8 {
+    k10m = 0;
+    k100m = 1;
+    k1000m = 2;
+    k25g = 3;
+    k5g = 4;
+    k10g = 5;
+    k40g = 6;
+    k100g = 7;
+    k200g = 8;
+    k400g = 9;
+  }
+
+  attribute(readonly) enum8 PHYRate = 0;
+  attribute(readonly) boolean fullDuplex = 1;
+  attribute(readonly) int64u packetRxCount = 2;
+  attribute(readonly) int64u packetTxCount = 3;
+  attribute(readonly) int64u txErrCount = 4;
+  attribute(readonly) int64u collisionCount = 5;
+  attribute(readonly) int64u overrunCount = 6;
+  attribute(readonly) boolean carrierDetect = 7;
+  attribute(readonly) int64u timeSinceReset = 8;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster FixedLabel = 64 {
+  attribute(readonly) LabelStruct labelList[] = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster GeneralCommissioning = 48 {
+  enum GeneralCommissioningError : ENUM8 {
+    kOk = 0;
+    kValueOutsideRange = 1;
+    kInvalidAuthentication = 2;
+    kNotCommissioning = 3;
+  }
+
+  enum RegulatoryLocationType : ENUM8 {
+    kIndoor = 0;
+    kOutdoor = 1;
+    kIndoorOutdoor = 2;
+  }
+
+  struct BasicCommissioningInfoType {
+    INT32U failSafeExpiryLengthMs = 1;
+  }
+
+  attribute(writable) int64u breadcrumb = 0;
+  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  attribute(readonly) enum8 regulatoryConfig = 2;
+  attribute(readonly) enum8 locationCapability = 3;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct ArmFailSafeRequest {
+    INT16U expiryLengthSeconds = 0;
+    INT64U breadcrumb = 1;
+    INT32U timeoutMs = 2;
+  }
+
+  request struct SetRegulatoryConfigRequest {
+    RegulatoryLocationType location = 0;
+    CHAR_STRING countryCode = 1;
+    INT64U breadcrumb = 2;
+    INT32U timeoutMs = 3;
+  }
+
+  response struct ArmFailSafeResponse {
+    GeneralCommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
+  }
+
+  response struct CommissioningCompleteResponse {
+    GeneralCommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
+  }
+
+  response struct SetRegulatoryConfigResponse {
+    GeneralCommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
+  }
+
+  command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
+  command CommissioningComplete(): CommissioningCompleteResponse = 4;
+  command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
+}
+
+server cluster GeneralDiagnostics = 51 {
+  enum BootReasonType : ENUM8 {
+    kUnspecified = 0;
+    kPowerOnReboot = 1;
+    kBrownOutReset = 2;
+    kSoftwareWatchdogReset = 3;
+    kHardwareWatchdogReset = 4;
+    kSoftwareUpdateCompleted = 5;
+    kSoftwareReset = 6;
+  }
+
+  enum HardwareFaultType : ENUM8 {
+    kUnspecified = 0;
+    kRadio = 1;
+    kSensor = 2;
+    kResettableOverTemp = 3;
+    kNonResettableOverTemp = 4;
+    kPowerSource = 5;
+    kVisualDisplayFault = 6;
+    kAudioOutputFault = 7;
+    kUserInterfaceFault = 8;
+    kNonVolatileMemoryError = 9;
+    kTamperDetected = 10;
+  }
+
+  enum InterfaceType : ENUM8 {
+    kUnspecified = 0;
+    kWiFi = 1;
+    kEthernet = 2;
+    kCellular = 3;
+    kThread = 4;
+  }
+
+  enum NetworkFaultType : ENUM8 {
+    kUnspecified = 0;
+    kHardwareFailure = 1;
+    kNetworkJammed = 2;
+    kConnectionFailed = 3;
+  }
+
+  enum RadioFaultType : ENUM8 {
+    kUnspecified = 0;
+    kWiFiFault = 1;
+    kCellularFault = 2;
+    kThreadFault = 3;
+    kNFCFault = 4;
+    kBLEFault = 5;
+    kEthernetFault = 6;
+  }
+
+  struct NetworkInterfaceType {
+    CHAR_STRING name = 1;
+    BOOLEAN fabricConnected = 2;
+    BOOLEAN offPremiseServicesReachableIPv4 = 3;
+    BOOLEAN offPremiseServicesReachableIPv6 = 4;
+    OCTET_STRING hardwareAddress = 5;
+    InterfaceType type = 6;
+  }
+
+  critical event HardwareFaultChange = 0 {
+    HardwareFaultType current[] = 0;
+    HardwareFaultType previous[] = 1;
+  }
+
+  critical event RadioFaultChange = 1 {
+    RadioFaultType current[] = 0;
+    RadioFaultType previous[] = 1;
+  }
+
+  critical event NetworkFaultChange = 2 {
+    NetworkFaultType current[] = 0;
+    NetworkFaultType previous[] = 1;
+  }
+
+  critical event BootReason = 3 {
+    BootReasonType bootReason = 0;
+  }
+
+  attribute(readonly) NetworkInterfaceType networkInterfaces[] = 0;
+  attribute(readonly) int16u rebootCount = 1;
+  attribute(readonly) int64u upTime = 2;
+  attribute(readonly) int32u totalOperationalHours = 3;
+  attribute(readonly) enum8 bootReasons = 4;
+  attribute(readonly) ENUM8 activeHardwareFaults[] = 5;
+  attribute(readonly) ENUM8 activeRadioFaults[] = 6;
+  attribute(readonly) ENUM8 activeNetworkFaults[] = 7;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster LocalizationConfiguration = 43 {
+  attribute(writable) char_string activeLocale = 1;
+  attribute(readonly) CHAR_STRING supportedLocales[] = 2;
+}
+
+server cluster NetworkCommissioning = 49 {
+  enum NetworkCommissioningStatus : ENUM8 {
+    kSuccess = 0;
+    kOutOfRange = 1;
+    kBoundsExceeded = 2;
+    kNetworkIDNotFound = 3;
+    kDuplicateNetworkID = 4;
+    kNetworkNotFound = 5;
+    kRegulatoryError = 6;
+    kAuthFailure = 7;
+    kUnsupportedSecurity = 8;
+    kOtherConnectionFailure = 9;
+    kIPV6Failed = 10;
+    kIPBindFailed = 11;
+    kUnknownError = 12;
+  }
+
+  enum WiFiBand : ENUM8 {
+    k2g4 = 0;
+    k3g65 = 1;
+    k5g = 2;
+    k6g = 3;
+    k60g = 4;
+  }
+
+  struct NetworkInfo {
+    OCTET_STRING networkID = 1;
+    BOOLEAN connected = 2;
+  }
+
+  struct WiFiInterfaceScanResult {
+    BITMAP8 security = 1;
+    OCTET_STRING ssid = 2;
+    OCTET_STRING bssid = 3;
+    INT16U channel = 4;
+    WiFiBand wiFiBand = 5;
+    INT8S rssi = 6;
+  }
+
+  struct ThreadInterfaceScanResult {
+    INT64U panId = 1;
+    INT64U extendedPanId = 2;
+    CHAR_STRING networkName = 3;
+    INT16U channel = 4;
+    INT8U version = 5;
+    INT64U extendedAddress = 6;
+    INT8S rssi = 7;
+    INT8U lqi = 8;
+  }
+
+  attribute(readonly) int8u maxNetworks = 0;
+  attribute(readonly) NetworkInfo networks[] = 1;
+  attribute(readonly) int8u scanMaxTimeSeconds = 2;
+  attribute(readonly) int8u connectMaxTimeSeconds = 3;
+  attribute(writable) boolean interfaceEnabled = 4;
+  attribute(readonly) NetworkCommissioningStatus lastNetworkingStatus = 5;
+  attribute(readonly) octet_string lastNetworkID = 6;
+  attribute(readonly) int32u lastConnectErrorValue = 7;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct AddOrUpdateThreadNetworkRequest {
+    OCTET_STRING operationalDataset = 0;
+    INT64U breadcrumb = 1;
+  }
+
+  request struct AddOrUpdateWiFiNetworkRequest {
+    OCTET_STRING ssid = 0;
+    OCTET_STRING credentials = 1;
+    INT64U breadcrumb = 2;
+  }
+
+  request struct ConnectNetworkRequest {
+    OCTET_STRING networkID = 0;
+    INT64U breadcrumb = 1;
+  }
+
+  request struct RemoveNetworkRequest {
+    OCTET_STRING networkID = 0;
+    INT64U breadcrumb = 1;
+  }
+
+  request struct ReorderNetworkRequest {
+    OCTET_STRING networkID = 0;
+    INT8U networkIndex = 1;
+    INT64U breadcrumb = 2;
+  }
+
+  request struct ScanNetworksRequest {
+    OCTET_STRING ssid = 0;
+    INT64U breadcrumb = 1;
+  }
+
+  response struct ConnectNetworkResponse {
+    NetworkCommissioningStatus networkingStatus = 0;
+    CHAR_STRING debugText = 1;
+    INT32S errorValue = 2;
+  }
+
+  response struct NetworkConfigResponse {
+    NetworkCommissioningStatus networkingStatus = 0;
+    CHAR_STRING debugText = 1;
+  }
+
+  response struct ScanNetworksResponse {
+    NetworkCommissioningStatus networkingStatus = 0;
+    CHAR_STRING debugText = 1;
+    optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
+    optional ThreadInterfaceScanResult threadScanResults[] = 3;
+  }
+
+  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
+  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
+  command ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
+  command RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
+  command ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
+  command ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
+}
+
+server cluster OnOff = 6 {
+  enum OnOffDelayedAllOffEffectVariant : enum8 {
+    kFadeToOffIn0p8Seconds = 0;
+    kNoFade = 1;
+    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+  }
+
+  enum OnOffDyingLightEffectVariant : enum8 {
+    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  }
+
+  enum OnOffEffectIdentifier : enum8 {
+    kDelayedAllOff = 0;
+    kDyingLight = 1;
+  }
+
+  attribute(readonly) boolean onOff = 0;
+  attribute(readonly) boolean globalSceneControl = 16384;
+  attribute(writable) int16u onTime = 16385;
+  attribute(writable) int16u offWaitTime = 16386;
+  attribute(writable) enum8 startUpOnOff = 16387;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  command Off(): DefaultSuccess = 0;
+  command On(): DefaultSuccess = 1;
+  command Toggle(): DefaultSuccess = 2;
+}
+
+server cluster OperationalCredentials = 62 {
+  enum NodeOperationalCertStatus : ENUM8 {
+    kSuccess = 0;
+    kInvalidPublicKey = 1;
+    kInvalidNodeOpId = 2;
+    kInvalidNOC = 3;
+    kMissingCsr = 4;
+    kTableFull = 5;
+    kInsufficientPrivilege = 8;
+    kFabricConflict = 9;
+    kLabelConflict = 10;
+    kInvalidFabricIndex = 11;
+  }
+
+  struct FabricDescriptor {
+    INT8U fabricIndex = 1;
+    OCTET_STRING rootPublicKey = 2;
+    INT16U vendorId = 3;
+    FABRIC_ID fabricId = 4;
+    NODE_ID nodeId = 5;
+    CHAR_STRING label = 6;
+  }
+
+  attribute(readonly) FabricDescriptor fabricsList[] = 1;
+  attribute(readonly) int8u supportedFabrics = 2;
+  attribute(readonly) int8u commissionedFabrics = 3;
+  attribute(readonly) OCTET_STRING trustedRootCertificates[] = 4;
+  attribute(readonly) fabric_idx currentFabricIndex = 5;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct AddNOCRequest {
+    OCTET_STRING NOCValue = 0;
+    optional OCTET_STRING ICACValue = 1;
+    OCTET_STRING IPKValue = 2;
+    NODE_ID caseAdminNode = 3;
+    INT16U adminVendorId = 4;
+  }
+
+  request struct AddTrustedRootCertificateRequest {
+    OCTET_STRING rootCertificate = 0;
+  }
+
+  request struct AttestationRequestRequest {
+    OCTET_STRING attestationNonce = 0;
+  }
+
+  request struct CertificateChainRequestRequest {
+    INT8U certificateType = 0;
+  }
+
+  request struct OpCSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
+  }
+
+  request struct RemoveFabricRequest {
+    INT8U fabricIndex = 0;
+  }
+
+  request struct RemoveTrustedRootCertificateRequest {
+    OCTET_STRING trustedRootIdentifier = 0;
+  }
+
+  request struct UpdateFabricLabelRequest {
+    CHAR_STRING label = 0;
+  }
+
+  request struct UpdateNOCRequest {
+    OCTET_STRING NOCValue = 0;
+    optional OCTET_STRING ICACValue = 1;
+  }
+
+  response struct AttestationResponse {
+    OCTET_STRING attestationElements = 0;
+    OCTET_STRING signature = 1;
+  }
+
+  response struct CertificateChainResponse {
+    OCTET_STRING certificate = 0;
+  }
+
+  response struct NOCResponse {
+    INT8U statusCode = 0;
+    INT8U fabricIndex = 1;
+    CHAR_STRING debugText = 2;
+  }
+
+  response struct OpCSRResponse {
+    OCTET_STRING NOCSRElements = 0;
+    OCTET_STRING attestationSignature = 1;
+  }
+
+  command AddNOC(AddNOCRequest): NOCResponse = 6;
+  command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
+  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
+  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
+  command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+}
+
+server cluster PowerSource = 47 {
+  attribute(readonly) enum8 status = 0;
+  attribute(readonly) int8u order = 1;
+  attribute(readonly) char_string description = 2;
+  attribute(readonly) int32u wiredAssessedCurrent = 6;
+  attribute(readonly) enum8 batteryChargeLevel = 14;
+  attribute(readonly) boolean batteryReplacementNeeded = 15;
+  attribute(readonly) enum8 batteryReplaceability = 16;
+  attribute(readonly) char_string batteryReplacementDescription = 19;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster PowerSourceConfiguration = 46 {
+  attribute(readonly) INT8U sources[] = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster SoftwareDiagnostics = 52 {
+  struct ThreadMetrics {
+    INT64U id = 1;
+    CHAR_STRING name = 2;
+    INT32U stackFreeCurrent = 3;
+    INT32U stackFreeMinimum = 4;
+    INT32U stackSize = 5;
+  }
+
+  info event SoftwareFault = 0 {
+    SoftwareFault softwareFault = 0;
+  }
+
+  attribute(readonly) ThreadMetrics threadMetrics[] = 0;
+  attribute(readonly) int64u currentHeapFree = 1;
+  attribute(readonly) int64u currentHeapUsed = 2;
+  attribute(readonly) int64u currentHeapHighWatermark = 3;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster ThreadNetworkDiagnostics = 53 {
+  enum NetworkFault : ENUM8 {
+    kUnspecified = 0;
+    kLinkDown = 1;
+    kHardwareFailure = 2;
+    kNetworkJammed = 3;
+  }
+
+  enum RoutingRole : ENUM8 {
+    kUnspecified = 0;
+    kUnassigned = 1;
+    kSleepyEndDevice = 2;
+    kEndDevice = 3;
+    kReed = 4;
+    kRouter = 5;
+    kLeader = 6;
+  }
+
+  enum ThreadConnectionStatus : ENUM8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
+  struct NeighborTable {
+    INT64U extAddress = 1;
+    INT32U age = 2;
+    INT16U rloc16 = 3;
+    INT32U linkFrameCounter = 4;
+    INT32U mleFrameCounter = 5;
+    INT8U lqi = 6;
+    INT8S averageRssi = 7;
+    INT8S lastRssi = 8;
+    INT8U frameErrorRate = 9;
+    INT8U messageErrorRate = 10;
+    BOOLEAN rxOnWhenIdle = 11;
+    BOOLEAN fullThreadDevice = 12;
+    BOOLEAN fullNetworkData = 13;
+    BOOLEAN isChild = 14;
+  }
+
+  struct RouteTable {
+    INT64U extAddress = 1;
+    INT16U rloc16 = 2;
+    INT8U routerId = 3;
+    INT8U nextHop = 4;
+    INT8U pathCost = 5;
+    INT8U LQIIn = 6;
+    INT8U LQIOut = 7;
+    INT8U age = 8;
+    BOOLEAN allocated = 9;
+    BOOLEAN linkEstablished = 10;
+  }
+
+  struct SecurityPolicy {
+    INT16U rotationTime = 1;
+    BITMAP16 flags = 2;
+  }
+
+  struct OperationalDatasetComponents {
+    BOOLEAN activeTimestampPresent = 1;
+    BOOLEAN pendingTimestampPresent = 2;
+    BOOLEAN masterKeyPresent = 3;
+    BOOLEAN networkNamePresent = 4;
+    BOOLEAN extendedPanIdPresent = 5;
+    BOOLEAN meshLocalPrefixPresent = 6;
+    BOOLEAN delayPresent = 7;
+    BOOLEAN panIdPresent = 8;
+    BOOLEAN channelPresent = 9;
+    BOOLEAN pskcPresent = 10;
+    BOOLEAN securityPolicyPresent = 11;
+    BOOLEAN channelMaskPresent = 12;
+  }
+
+  info event ConnectionStatus = 0 {
+    ThreadConnectionStatus connectionStatus = 0;
+  }
+
+  attribute(readonly) int16u channel = 0;
+  attribute(readonly) enum8 routingRole = 1;
+  attribute(readonly) octet_string networkName = 2;
+  attribute(readonly) int16u panId = 3;
+  attribute(readonly) int64u extendedPanId = 4;
+  attribute(readonly) octet_string meshLocalPrefix = 5;
+  attribute(readonly) int64u overrunCount = 6;
+  attribute(readonly) NeighborTable neighborTableList[] = 7;
+  attribute(readonly) RouteTable routeTableList[] = 8;
+  attribute(readonly) int32u partitionId = 9;
+  attribute(readonly) int8u weighting = 10;
+  attribute(readonly) int8u dataVersion = 11;
+  attribute(readonly) int8u stableDataVersion = 12;
+  attribute(readonly) int8u leaderRouterId = 13;
+  attribute(readonly) int16u detachedRoleCount = 14;
+  attribute(readonly) int16u childRoleCount = 15;
+  attribute(readonly) int16u routerRoleCount = 16;
+  attribute(readonly) int16u leaderRoleCount = 17;
+  attribute(readonly) int16u attachAttemptCount = 18;
+  attribute(readonly) int16u partitionIdChangeCount = 19;
+  attribute(readonly) int16u betterPartitionAttachAttemptCount = 20;
+  attribute(readonly) int16u parentChangeCount = 21;
+  attribute(readonly) int32u txTotalCount = 22;
+  attribute(readonly) int32u txUnicastCount = 23;
+  attribute(readonly) int32u txBroadcastCount = 24;
+  attribute(readonly) int32u txAckRequestedCount = 25;
+  attribute(readonly) int32u txAckedCount = 26;
+  attribute(readonly) int32u txNoAckRequestedCount = 27;
+  attribute(readonly) int32u txDataCount = 28;
+  attribute(readonly) int32u txDataPollCount = 29;
+  attribute(readonly) int32u txBeaconCount = 30;
+  attribute(readonly) int32u txBeaconRequestCount = 31;
+  attribute(readonly) int32u txOtherCount = 32;
+  attribute(readonly) int32u txRetryCount = 33;
+  attribute(readonly) int32u txDirectMaxRetryExpiryCount = 34;
+  attribute(readonly) int32u txIndirectMaxRetryExpiryCount = 35;
+  attribute(readonly) int32u txErrCcaCount = 36;
+  attribute(readonly) int32u txErrAbortCount = 37;
+  attribute(readonly) int32u txErrBusyChannelCount = 38;
+  attribute(readonly) int32u rxTotalCount = 39;
+  attribute(readonly) int32u rxUnicastCount = 40;
+  attribute(readonly) int32u rxBroadcastCount = 41;
+  attribute(readonly) int32u rxDataCount = 42;
+  attribute(readonly) int32u rxDataPollCount = 43;
+  attribute(readonly) int32u rxBeaconCount = 44;
+  attribute(readonly) int32u rxBeaconRequestCount = 45;
+  attribute(readonly) int32u rxOtherCount = 46;
+  attribute(readonly) int32u rxAddressFilteredCount = 47;
+  attribute(readonly) int32u rxDestAddrFilteredCount = 48;
+  attribute(readonly) int32u rxDuplicatedCount = 49;
+  attribute(readonly) int32u rxErrNoFrameCount = 50;
+  attribute(readonly) int32u rxErrUnknownNeighborCount = 51;
+  attribute(readonly) int32u rxErrInvalidSrcAddrCount = 52;
+  attribute(readonly) int32u rxErrSecCount = 53;
+  attribute(readonly) int32u rxErrFcsCount = 54;
+  attribute(readonly) int32u rxErrOtherCount = 55;
+  attribute(readonly) int64u activeTimestamp = 56;
+  attribute(readonly) int64u pendingTimestamp = 57;
+  attribute(readonly) int32u delay = 58;
+  attribute(readonly) SecurityPolicy securityPolicy[] = 59;
+  attribute(readonly) octet_string channelMask = 60;
+  attribute(readonly) OperationalDatasetComponents operationalDatasetComponents[] = 61;
+  attribute(readonly) NetworkFault activeNetworkFaultsList[] = 62;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster UserLabel = 65 {
+  attribute(writable) LabelStruct labelList[] = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster WiFiNetworkDiagnostics = 54 {
+  enum AssociationFailureCause : ENUM8 {
+    kUnknown = 0;
+    kAssociationFailed = 1;
+    kAuthenticationFailed = 2;
+    kSsidNotFound = 3;
+  }
+
+  enum SecurityType : ENUM8 {
+    kUnspecified = 0;
+    kNone = 1;
+    kWep = 2;
+    kWpa = 3;
+    kWpa2 = 4;
+    kWpa3 = 5;
+  }
+
+  enum WiFiConnectionStatus : ENUM8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
+  enum WiFiVersionType : ENUM8 {
+    k80211a = 0;
+    k80211b = 1;
+    k80211g = 2;
+    k80211n = 3;
+    k80211ac = 4;
+    k80211ax = 5;
+  }
+
+  info event Disconnection = 0 {
+    INT16U reasonCode = 0;
+  }
+
+  info event AssociationFailure = 1 {
+    AssociationFailureCause associationFailure = 0;
+    INT16U status = 1;
+  }
+
+  info event ConnectionStatus = 2 {
+    WiFiConnectionStatus connectionStatus = 0;
+  }
+
+  attribute(readonly) octet_string bssid = 0;
+  attribute(readonly) enum8 securityType = 1;
+  attribute(readonly) enum8 wiFiVersion = 2;
+  attribute(readonly) int16u channelNumber = 3;
+  attribute(readonly) int8s rssi = 4;
+  attribute(readonly) int32u beaconLostCount = 5;
+  attribute(readonly) int32u beaconRxCount = 6;
+  attribute(readonly) int32u packetMulticastRxCount = 7;
+  attribute(readonly) int32u packetMulticastTxCount = 8;
+  attribute(readonly) int32u packetUnicastRxCount = 9;
+  attribute(readonly) int32u packetUnicastTxCount = 10;
+  attribute(readonly) int64u currentMaxRate = 11;
+  attribute(readonly) int64u overrunCount = 12;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+
+endpoint 0 {
+  server  cluster AdministratorCommissioning;
+  server  cluster Basic;
+  server  cluster Descriptor;
+  server  cluster DiagnosticLogs;
+  server  cluster EthernetNetworkDiagnostics;
+  server  cluster FixedLabel;
+  server  cluster GeneralCommissioning;
+  server  cluster GeneralDiagnostics;
+  server  cluster LocalizationConfiguration;
+  server  cluster NetworkCommissioning;
+  server  cluster OperationalCredentials;
+  server  cluster PowerSource;
+  server  cluster PowerSourceConfiguration;
+  server  cluster SoftwareDiagnostics;
+  server  cluster ThreadNetworkDiagnostics;
+  server  cluster UserLabel;
+  server  cluster WiFiNetworkDiagnostics;
+}
+
+endpoint 1 {
+  server  cluster Descriptor;
+  server  cluster OnOff;
+  server  cluster PowerSource;
+}
+

@@ -1,0 +1,3106 @@
+// This IDL was generated automatically by ZAP.
+// It is for view/code review purposes only.
+
+struct LabelStruct {
+    CHAR_STRING label = 1;
+    CHAR_STRING value = 2;
+}
+
+server cluster AccessControl = 31 {
+  enum AuthMode : ENUM8 {
+    kPase = 1;
+    kCase = 2;
+    kGroup = 3;
+  }
+
+  enum ChangeTypeEnum : ENUM8 {
+    kChanged = 0;
+    kAdded = 1;
+    kRemoved = 2;
+  }
+
+  enum Privilege : ENUM8 {
+    kView = 1;
+    kProxyView = 2;
+    kOperate = 3;
+    kManage = 4;
+    kAdminister = 5;
+  }
+
+  struct AccessControlEntry {
+    fabric_idx fabricIndex = 0;
+    Privilege privilege = 1;
+    AuthMode authMode = 2;
+    nullable INT64U subjects[] = 3;
+    nullable Target targets[] = 4;
+  }
+
+  struct Target {
+    nullable cluster_id cluster = 0;
+    nullable endpoint_no endpoint = 1;
+    nullable devtype_id deviceType = 2;
+  }
+
+  struct ExtensionEntry {
+    fabric_idx fabricIndex = 0;
+    OCTET_STRING data = 1;
+  }
+
+  info event AccessControlEntryChanged = 0 {
+    fabric_idx adminFabricIndex = 0;
+    node_id adminNodeID = 1;
+    INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    AccessControlEntry latestValue = 4;
+  }
+
+  info event AccessControlExtensionChanged = 1 {
+    fabric_idx adminFabricIndex = 0;
+    node_id adminNodeID = 1;
+    INT16U adminPasscodeID = 2;
+    ChangeTypeEnum changeType = 3;
+    ExtensionEntry latestValue = 4;
+  }
+
+  attribute(writable) AccessControlEntry acl[] = 0;
+  attribute(writable) ExtensionEntry extension[] = 1;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster AccountLogin = 1294 {
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster AdministratorCommissioning = 60 {
+  enum CommissioningWindowStatus : ENUM8 {
+    kWindowNotOpen = 0;
+    kEnhancedWindowOpen = 1;
+    kBasicWindowOpen = 2;
+  }
+
+  enum StatusCode : ENUM8 {
+    kBusy = 1;
+    kPAKEParameterError = 2;
+    kWindowNotOpen = 3;
+  }
+
+  attribute(readonly) int8u windowStatus = 0;
+  attribute(readonly) fabric_idx adminFabricIndex = 1;
+  attribute(readonly) int16u adminVendorId = 2;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct OpenBasicCommissioningWindowRequest {
+    INT16U commissioningTimeout = 0;
+  }
+
+  request struct OpenCommissioningWindowRequest {
+    INT16U commissioningTimeout = 0;
+    OCTET_STRING PAKEVerifier = 1;
+    INT16U discriminator = 2;
+    INT32U iterations = 3;
+    OCTET_STRING salt = 4;
+    INT16U passcodeID = 5;
+  }
+
+  command OpenBasicCommissioningWindow(OpenBasicCommissioningWindowRequest): DefaultSuccess = 1;
+  command OpenCommissioningWindow(OpenCommissioningWindowRequest): DefaultSuccess = 0;
+  command RevokeCommissioning(): DefaultSuccess = 2;
+}
+
+server cluster ApplicationBasic = 1293 {
+  enum ApplicationStatusEnum : ENUM8 {
+    kStopped = 0;
+    kActiveVisibleFocus = 1;
+    kActiveHidden = 2;
+    kActiveVisibleNotFocus = 3;
+  }
+
+  attribute(readonly) char_string vendorName = 0;
+  attribute(readonly) int16u vendorId = 1;
+  attribute(readonly) char_string applicationName = 2;
+  attribute(readonly) int16u productId = 3;
+  attribute(readonly) ApplicationStatusEnum applicationStatus = 5;
+  attribute(readonly) char_string applicationVersion = 6;
+  attribute(readonly) vendor_id allowedVendorList[] = 7;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster ApplicationLauncher = 1292 {
+  enum StatusEnum : ENUM8 {
+    kSuccess = 0;
+    kAppNotAvailable = 1;
+    kSystemBusy = 2;
+  }
+
+  struct ApplicationLauncherApplication {
+    INT16U catalogVendorId = 1;
+    CHAR_STRING applicationId = 2;
+  }
+
+  attribute(readonly) INT16U applicationLauncherList[] = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster AudioOutput = 1291 {
+  enum OutputTypeEnum : ENUM8 {
+    kHdmi = 0;
+    kBt = 1;
+    kOptical = 2;
+    kHeadphone = 3;
+    kInternal = 4;
+    kOther = 5;
+  }
+
+  struct OutputInfo {
+    INT8U index = 1;
+    OutputTypeEnum outputType = 2;
+    CHAR_STRING name = 3;
+  }
+
+  attribute(readonly) OutputInfo audioOutputList[] = 0;
+  attribute(readonly) int8u currentAudioOutput = 1;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster BarrierControl = 259 {
+  attribute(readonly) enum8 barrierMovingState = 1;
+  attribute(readonly) bitmap16 barrierSafetyStatus = 2;
+  attribute(readonly) bitmap8 barrierCapabilities = 3;
+  attribute(readonly) int8u barrierPosition = 10;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct BarrierControlGoToPercentRequest {
+    INT8U percentOpen = 0;
+  }
+
+  command BarrierControlGoToPercent(BarrierControlGoToPercentRequest): DefaultSuccess = 0;
+  command BarrierControlStop(): DefaultSuccess = 1;
+}
+
+server cluster Basic = 40 {
+  critical event StartUp = 0 {
+    INT32U softwareVersion = 0;
+  }
+
+  critical event ShutDown = 1 {
+  }
+
+  info event Leave = 2 {
+  }
+
+  info event ReachableChanged = 3 {
+    boolean reachableNewValue = 0;
+  }
+
+  attribute(readonly) int16u interactionModelVersion = 0;
+  attribute(readonly) char_string vendorName = 1;
+  attribute(readonly) vendor_id vendorID = 2;
+  attribute(readonly) char_string productName = 3;
+  attribute(readonly) int16u productID = 4;
+  attribute(writable) char_string nodeLabel = 5;
+  attribute(writable) char_string location = 6;
+  attribute(readonly) int16u hardwareVersion = 7;
+  attribute(readonly) char_string hardwareVersionString = 8;
+  attribute(readonly) int32u softwareVersion = 9;
+  attribute(readonly) char_string softwareVersionString = 10;
+  attribute(readonly) char_string manufacturingDate = 11;
+  attribute(readonly) char_string partNumber = 12;
+  attribute(readonly) long_char_string productURL = 13;
+  attribute(readonly) char_string productLabel = 14;
+  attribute(readonly) char_string serialNumber = 15;
+  attribute(writable) boolean localConfigDisabled = 16;
+  attribute(readonly) boolean reachable = 17;
+  attribute(readonly) char_string uniqueID = 18;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  command MfgSpecificPing(): DefaultSuccess = 0;
+}
+
+server cluster BinaryInputBasic = 15 {
+  attribute(writable) boolean outOfService = 81;
+  attribute(writable) boolean presentValue = 85;
+  attribute(readonly) bitmap8 statusFlags = 111;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster Binding = 30 {
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct BindRequest {
+    NODE_ID nodeId = 0;
+    GROUP_ID groupId = 1;
+    ENDPOINT_NO endpointId = 2;
+    CLUSTER_ID clusterId = 3;
+  }
+
+  request struct UnbindRequest {
+    NODE_ID nodeId = 0;
+    GROUP_ID groupId = 1;
+    ENDPOINT_NO endpointId = 2;
+    CLUSTER_ID clusterId = 3;
+  }
+
+  command Bind(BindRequest): DefaultSuccess = 0;
+  command Unbind(UnbindRequest): DefaultSuccess = 1;
+}
+
+server cluster BooleanState = 69 {
+  info event StateChange = 0 {
+    boolean stateValue = 0;
+  }
+
+  attribute(readonly) boolean stateValue = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster BridgedActions = 37 {
+  enum ActionErrorEnum : ENUM8 {
+    kUnknown = 0;
+    kInterrupted = 1;
+  }
+
+  enum ActionStateEnum : ENUM8 {
+    kInactive = 0;
+    kActive = 1;
+    kPaused = 2;
+    kDisabled = 3;
+  }
+
+  enum ActionTypeEnum : ENUM8 {
+    kOther = 0;
+    kScene = 1;
+    kSequence = 2;
+    kAutomation = 3;
+    kException = 4;
+    kNotification = 5;
+    kAlarm = 6;
+  }
+
+  enum EndpointListTypeEnum : ENUM8 {
+    kOther = 0;
+    kRoom = 1;
+    kZone = 2;
+  }
+
+  struct ActionStruct {
+    INT16U actionID = 1;
+    CHAR_STRING name = 2;
+    ActionTypeEnum type = 3;
+    INT16U endpointListID = 4;
+    INT16U supportedCommands = 5;
+    ActionStateEnum status = 6;
+  }
+
+  struct EndpointListStruct {
+    INT16U endpointListID = 1;
+    CHAR_STRING name = 2;
+    EndpointListTypeEnum type = 3;
+    ENDPOINT_NO endpoints[] = 4;
+  }
+
+  info event StateChanged = 0 {
+    INT16U actionID = 0;
+    INT32U invokeID = 1;
+    ActionStateEnum newState = 2;
+  }
+
+  info event ActionFailed = 1 {
+    INT16U actionID = 0;
+    INT32U invokeID = 1;
+    ActionStateEnum newState = 2;
+    ActionErrorEnum error = 3;
+  }
+
+  attribute(readonly) ActionStruct actionList[] = 0;
+  attribute(readonly) EndpointListStruct endpointList[] = 1;
+  attribute(readonly) long_char_string setupUrl = 2;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster BridgedDeviceBasic = 57 {
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster Channel = 1284 {
+  enum ErrorTypeEnum : ENUM8 {
+    kMultipleMatches = 0;
+    kNoMatches = 1;
+  }
+
+  enum LineupInfoTypeEnum : ENUM8 {
+    kMso = 0;
+  }
+
+  struct ChannelInfo {
+    INT16U majorNumber = 1;
+    INT16U minorNumber = 2;
+    CHAR_STRING name = 3;
+    CHAR_STRING callSign = 4;
+    CHAR_STRING affiliateCallSign = 5;
+  }
+
+  attribute(readonly) ChannelInfo channelList[] = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster ColorControl = 768 {
+  enum ColorLoopAction : ENUM8 {
+    kDeactivate = 0;
+    kActivateFromColorLoopStartEnhancedHue = 1;
+    kActivateFromEnhancedCurrentHue = 2;
+  }
+
+  enum ColorLoopDirection : ENUM8 {
+    kDecrementHue = 0;
+    kIncrementHue = 1;
+  }
+
+  enum ColorMode : ENUM8 {
+    kCurrentHueAndCurrentSaturation = 0;
+    kCurrentXAndCurrentY = 1;
+    kColorTemperature = 2;
+  }
+
+  enum HueDirection : ENUM8 {
+    kShortestDistance = 0;
+    kLongestDistance = 1;
+    kUp = 2;
+    kDown = 3;
+  }
+
+  enum HueMoveMode : ENUM8 {
+    kStop = 0;
+    kUp = 1;
+    kDown = 3;
+  }
+
+  enum HueStepMode : ENUM8 {
+    kUp = 1;
+    kDown = 3;
+  }
+
+  enum SaturationMoveMode : ENUM8 {
+    kStop = 0;
+    kUp = 1;
+    kDown = 3;
+  }
+
+  enum SaturationStepMode : ENUM8 {
+    kUp = 1;
+    kDown = 3;
+  }
+
+  attribute(readonly) int8u currentHue = 0;
+  attribute(readonly) int8u currentSaturation = 1;
+  attribute(readonly) int16u remainingTime = 2;
+  attribute(readonly) int16u currentX = 3;
+  attribute(readonly) int16u currentY = 4;
+  attribute(readonly) enum8 driftCompensation = 5;
+  attribute(readonly) char_string compensationText = 6;
+  attribute(readonly) int16u colorTemperature = 7;
+  attribute(readonly) enum8 colorMode = 8;
+  attribute(writable) bitmap8 colorControlOptions = 15;
+  attribute(readonly) int8u numberOfPrimaries = 16;
+  attribute(readonly) int16u primary1X = 17;
+  attribute(readonly) int16u primary1Y = 18;
+  attribute(readonly) int8u primary1Intensity = 19;
+  attribute(readonly) int16u primary2X = 21;
+  attribute(readonly) int16u primary2Y = 22;
+  attribute(readonly) int8u primary2Intensity = 23;
+  attribute(readonly) int16u primary3X = 25;
+  attribute(readonly) int16u primary3Y = 26;
+  attribute(readonly) int8u primary3Intensity = 27;
+  attribute(readonly) int16u primary4X = 32;
+  attribute(readonly) int16u primary4Y = 33;
+  attribute(readonly) int8u primary4Intensity = 34;
+  attribute(readonly) int16u primary5X = 36;
+  attribute(readonly) int16u primary5Y = 37;
+  attribute(readonly) int8u primary5Intensity = 38;
+  attribute(readonly) int16u primary6X = 40;
+  attribute(readonly) int16u primary6Y = 41;
+  attribute(readonly) int8u primary6Intensity = 42;
+  attribute(writable) int16u whitePointX = 48;
+  attribute(writable) int16u whitePointY = 49;
+  attribute(writable) int16u colorPointRX = 50;
+  attribute(writable) int16u colorPointRY = 51;
+  attribute(writable) int8u colorPointRIntensity = 52;
+  attribute(writable) int16u colorPointGX = 54;
+  attribute(writable) int16u colorPointGY = 55;
+  attribute(writable) int8u colorPointGIntensity = 56;
+  attribute(writable) int16u colorPointBX = 58;
+  attribute(writable) int16u colorPointBY = 59;
+  attribute(writable) int8u colorPointBIntensity = 60;
+  attribute(readonly) int16u enhancedCurrentHue = 16384;
+  attribute(readonly) enum8 enhancedColorMode = 16385;
+  attribute(readonly) int8u colorLoopActive = 16386;
+  attribute(readonly) int8u colorLoopDirection = 16387;
+  attribute(readonly) int16u colorLoopTime = 16388;
+  attribute(readonly) int16u colorLoopStartEnhancedHue = 16389;
+  attribute(readonly) int16u colorLoopStoredEnhancedHue = 16390;
+  attribute(readonly) bitmap16 colorCapabilities = 16394;
+  attribute(readonly) int16u colorTempPhysicalMin = 16395;
+  attribute(readonly) int16u colorTempPhysicalMax = 16396;
+  attribute(readonly) int16u coupleColorTempToLevelMinMireds = 16397;
+  attribute(writable) int16u startUpColorTemperatureMireds = 16400;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct ColorLoopSetRequest {
+    ColorLoopUpdateFlags updateFlags = 0;
+    ColorLoopAction action = 1;
+    ColorLoopDirection direction = 2;
+    INT16U time = 3;
+    INT16U startHue = 4;
+    BITMAP8 optionsMask = 5;
+    BITMAP8 optionsOverride = 6;
+  }
+
+  request struct EnhancedMoveHueRequest {
+    HueMoveMode moveMode = 0;
+    INT16U rate = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
+  }
+
+  request struct EnhancedMoveToHueRequest {
+    INT16U enhancedHue = 0;
+    HueDirection direction = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct EnhancedMoveToHueAndSaturationRequest {
+    INT16U enhancedHue = 0;
+    INT8U saturation = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct EnhancedStepHueRequest {
+    HueStepMode stepMode = 0;
+    INT16U stepSize = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct MoveColorRequest {
+    INT16S rateX = 0;
+    INT16S rateY = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
+  }
+
+  request struct MoveColorTemperatureRequest {
+    HueMoveMode moveMode = 0;
+    INT16U rate = 1;
+    INT16U colorTemperatureMinimum = 2;
+    INT16U colorTemperatureMaximum = 3;
+    BITMAP8 optionsMask = 4;
+    BITMAP8 optionsOverride = 5;
+  }
+
+  request struct MoveHueRequest {
+    HueMoveMode moveMode = 0;
+    INT8U rate = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
+  }
+
+  request struct MoveSaturationRequest {
+    SaturationMoveMode moveMode = 0;
+    INT8U rate = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
+  }
+
+  request struct MoveToColorRequest {
+    INT16U colorX = 0;
+    INT16U colorY = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct MoveToColorTemperatureRequest {
+    INT16U colorTemperature = 0;
+    INT16U transitionTime = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
+  }
+
+  request struct MoveToHueRequest {
+    INT8U hue = 0;
+    HueDirection direction = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct MoveToHueAndSaturationRequest {
+    INT8U hue = 0;
+    INT8U saturation = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct MoveToSaturationRequest {
+    INT8U saturation = 0;
+    INT16U transitionTime = 1;
+    BITMAP8 optionsMask = 2;
+    BITMAP8 optionsOverride = 3;
+  }
+
+  request struct StepColorRequest {
+    INT16S stepX = 0;
+    INT16S stepY = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct StepColorTemperatureRequest {
+    HueStepMode stepMode = 0;
+    INT16U stepSize = 1;
+    INT16U transitionTime = 2;
+    INT16U colorTemperatureMinimum = 3;
+    INT16U colorTemperatureMaximum = 4;
+    BITMAP8 optionsMask = 5;
+    BITMAP8 optionsOverride = 6;
+  }
+
+  request struct StepHueRequest {
+    HueStepMode stepMode = 0;
+    INT8U stepSize = 1;
+    INT8U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct StepSaturationRequest {
+    SaturationStepMode stepMode = 0;
+    INT8U stepSize = 1;
+    INT8U transitionTime = 2;
+    BITMAP8 optionsMask = 3;
+    BITMAP8 optionsOverride = 4;
+  }
+
+  request struct StopMoveStepRequest {
+    BITMAP8 optionsMask = 0;
+    BITMAP8 optionsOverride = 1;
+  }
+
+  command ColorLoopSet(ColorLoopSetRequest): DefaultSuccess = 68;
+  command EnhancedMoveHue(EnhancedMoveHueRequest): DefaultSuccess = 65;
+  command EnhancedMoveToHue(EnhancedMoveToHueRequest): DefaultSuccess = 64;
+  command EnhancedMoveToHueAndSaturation(EnhancedMoveToHueAndSaturationRequest): DefaultSuccess = 67;
+  command EnhancedStepHue(EnhancedStepHueRequest): DefaultSuccess = 66;
+  command MoveColor(MoveColorRequest): DefaultSuccess = 8;
+  command MoveColorTemperature(MoveColorTemperatureRequest): DefaultSuccess = 75;
+  command MoveHue(MoveHueRequest): DefaultSuccess = 1;
+  command MoveSaturation(MoveSaturationRequest): DefaultSuccess = 4;
+  command MoveToColor(MoveToColorRequest): DefaultSuccess = 7;
+  command MoveToColorTemperature(MoveToColorTemperatureRequest): DefaultSuccess = 10;
+  command MoveToHue(MoveToHueRequest): DefaultSuccess = 0;
+  command MoveToHueAndSaturation(MoveToHueAndSaturationRequest): DefaultSuccess = 6;
+  command MoveToSaturation(MoveToSaturationRequest): DefaultSuccess = 3;
+  command StepColor(StepColorRequest): DefaultSuccess = 9;
+  command StepColorTemperature(StepColorTemperatureRequest): DefaultSuccess = 76;
+  command StepHue(StepHueRequest): DefaultSuccess = 2;
+  command StepSaturation(StepSaturationRequest): DefaultSuccess = 5;
+  command StopMoveStep(StopMoveStepRequest): DefaultSuccess = 71;
+}
+
+server cluster ContentLauncher = 1290 {
+  enum MetricTypeEnum : ENUM8 {
+    kPixels = 0;
+    kPercentage = 1;
+  }
+
+  enum ParameterEnum : ENUM8 {
+    kActor = 0;
+    kChannel = 1;
+    kCharacter = 2;
+    kDirector = 3;
+    kEvent = 4;
+    kFranchise = 5;
+    kGenre = 6;
+    kLeague = 7;
+    kPopularity = 8;
+    kProvider = 9;
+    kSport = 10;
+    kSportsTeam = 11;
+    kType = 12;
+  }
+
+  enum StatusEnum : ENUM8 {
+    kSuccess = 0;
+    kUrlNotAvailable = 1;
+    kAuthFailed = 2;
+  }
+
+  struct ContentSearch {
+    Parameter parameterList[] = 1;
+  }
+
+  struct Parameter {
+    ParameterEnum type = 1;
+    CHAR_STRING value = 2;
+    AdditionalInfo externalIDList[] = 3;
+  }
+
+  struct AdditionalInfo {
+    CHAR_STRING name = 1;
+    CHAR_STRING value = 2;
+  }
+
+  struct BrandingInformation {
+    CHAR_STRING providerName = 1;
+    StyleInformation background = 2;
+    StyleInformation logo = 3;
+    StyleInformation progressBar = 4;
+    StyleInformation splash = 5;
+    StyleInformation waterMark = 6;
+  }
+
+  struct StyleInformation {
+    CHAR_STRING imageUrl = 1;
+    CHAR_STRING color = 2;
+    Dimension size = 3;
+  }
+
+  struct Dimension {
+    double width = 1;
+    double height = 2;
+    MetricTypeEnum metric = 3;
+  }
+
+  attribute(readonly) CHAR_STRING acceptHeaderList[] = 0;
+  attribute(writable) bitmap32 supportedStreamingProtocols = 1;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster Descriptor = 29 {
+  struct DeviceType {
+    DEVTYPE_ID type = 1;
+    INT16U revision = 2;
+  }
+
+  attribute(readonly) DeviceType deviceList[] = 0;
+  attribute(readonly) CLUSTER_ID serverList[] = 1;
+  attribute(readonly) CLUSTER_ID clientList[] = 2;
+  attribute(readonly) ENDPOINT_NO partsList[] = 3;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster DiagnosticLogs = 50 {
+  enum LogsIntent : ENUM8 {
+    kEndUserSupport = 0;
+    kNetworkDiag = 1;
+    kCrashLogs = 2;
+  }
+
+  enum LogsStatus : ENUM8 {
+    kSuccess = 0;
+    kExhausted = 1;
+    kNoLogs = 2;
+    kBusy = 3;
+    kDenied = 4;
+  }
+
+  enum LogsTransferProtocol : ENUM8 {
+    kResponsePayload = 0;
+    kBdx = 1;
+  }
+
+
+  request struct RetrieveLogsRequestRequest {
+    LogsIntent intent = 0;
+    LogsTransferProtocol requestedProtocol = 1;
+    OCTET_STRING transferFileDesignator = 2;
+  }
+
+  command RetrieveLogsRequest(RetrieveLogsRequestRequest): RetrieveLogsResponse = 0;
+}
+
+server cluster DoorLock = 257 {
+  enum DlAlarmCode : ENUM8 {
+    kLockJammed = 0;
+    kLockFactoryReset = 1;
+    kLockRadioPowerCycled = 3;
+    kWrongCodeEntryLimit = 4;
+    kFrontEsceutcheonRemoved = 5;
+    kDoorForcedOpen = 6;
+    kDoorAjar = 7;
+    kForcedUser = 8;
+  }
+
+  enum DlCredentialRule : ENUM8 {
+    kSingle = 0;
+    kDouble = 1;
+    kTri = 2;
+  }
+
+  enum DlCredentialType : ENUM8 {
+    kProgrammingPIN = 0;
+    kPin = 1;
+    kRfid = 2;
+    kFingerprint = 3;
+    kFingerVein = 4;
+    kFace = 5;
+  }
+
+  enum DlDataOperationType : ENUM8 {
+    kAdd = 0;
+    kClear = 1;
+    kModify = 2;
+  }
+
+  enum DlDoorLockStatus : ENUM8 {
+    kDuplicate = 2;
+    kOccupied = 3;
+  }
+
+  enum DlDoorState : ENUM8 {
+    kDoorOpen = 0;
+    kDoorClosed = 1;
+    kDoorJammed = 2;
+    kDoorForcedOpen = 3;
+    kDoorUnspecifiedError = 4;
+    kDoorAjar = 5;
+  }
+
+  enum DlLockDataType : ENUM8 {
+    kUnspecified = 0;
+    kProgrammingCode = 1;
+    kUserIndex = 2;
+    kWeekDaySchedule = 3;
+    kYearDaySchedule = 4;
+    kHolidaySchedule = 5;
+    kPin = 6;
+    kRfid = 7;
+    kFingerprint = 8;
+  }
+
+  enum DlLockOperationType : ENUM8 {
+    kLock = 0;
+    kUnlock = 1;
+    kNonAccessUserEvent = 2;
+    kForcedUserEvent = 3;
+  }
+
+  enum DlLockState : ENUM8 {
+    kNotFullyLocked = 0;
+    kLocked = 1;
+    kUnlocked = 2;
+  }
+
+  enum DlLockType : ENUM8 {
+    kDeadBolt = 0;
+    kMagnetic = 1;
+    kOther = 2;
+    kMortise = 3;
+    kRim = 4;
+    kLatchBolt = 5;
+    kCylindricalLock = 6;
+    kTubularLock = 7;
+    kInterconnectedLock = 8;
+    kDeadLatch = 9;
+    kDoorFurniture = 10;
+  }
+
+  enum DlOperatingMode : ENUM8 {
+    kNormal = 0;
+    kVacation = 1;
+    kPrivacy = 2;
+    kNoRemoteLockUnlock = 3;
+    kPassage = 4;
+  }
+
+  enum DlOperationError : ENUM8 {
+    kUnspecified = 0;
+    kInvalidCredential = 1;
+    kDisabledUserDenied = 2;
+    kRestricted = 3;
+    kInsufficientBattery = 4;
+  }
+
+  enum DlOperationSource : ENUM8 {
+    kUnspecified = 0;
+    kManual = 1;
+    kProprietaryRemote = 2;
+    kKeypad = 3;
+    kAuto = 4;
+    kButton = 5;
+    kSchedule = 6;
+    kRemote = 7;
+    kRfid = 8;
+    kBiometric = 9;
+  }
+
+  enum DlStatus : ENUM8 {
+    kSuccess = 0;
+    kFailure = 1;
+    kDuplicate = 2;
+    kOccupied = 3;
+    kInvalidField = 133;
+    kNotFound = 139;
+  }
+
+  enum DlUserStatus : ENUM8 {
+    kAvailable = 0;
+    kOccupiedEnabled = 1;
+    kOccupiedDisabled = 3;
+  }
+
+  enum DlUserType : ENUM8 {
+    kUnrestrictedUser = 0;
+    kYearDayScheduleUser = 1;
+    kWeekDayScheduleUser = 2;
+    kProgrammingUser = 3;
+    kNonAccessUser = 4;
+    kForcedUser = 5;
+    kDisposableUser = 6;
+    kExpiringUser = 7;
+    kScheduleRestrictedUser = 8;
+    kRemoteOnlyUser = 9;
+  }
+
+  enum DoorLockOperationEventCode : ENUM8 {
+    kUnknownOrMfgSpecific = 0;
+    kLock = 1;
+    kUnlock = 2;
+    kLockInvalidPinOrId = 3;
+    kLockInvalidSchedule = 4;
+    kUnlockInvalidPinOrId = 5;
+    kUnlockInvalidSchedule = 6;
+    kOneTouchLock = 7;
+    kKeyLock = 8;
+    kKeyUnlock = 9;
+    kAutoLock = 10;
+    kScheduleLock = 11;
+    kScheduleUnlock = 12;
+    kManualLock = 13;
+    kManualUnlock = 14;
+  }
+
+  enum DoorLockProgrammingEventCode : ENUM8 {
+    kUnknownOrMfgSpecific = 0;
+    kMasterCodeChanged = 1;
+    kPinAdded = 2;
+    kPinDeleted = 3;
+    kPinChanged = 4;
+    kIdAdded = 5;
+    kIdDeleted = 6;
+  }
+
+  enum DoorLockSetPinOrIdStatus : ENUM8 {
+    kSuccess = 0;
+    kGeneralFailure = 1;
+    kMemoryFull = 2;
+    kDuplicateCodeError = 3;
+  }
+
+  enum DoorLockUserStatus : ENUM8 {
+    kAvailable = 0;
+    kOccupiedEnabled = 1;
+    kOccupiedDisabled = 3;
+    kNotSupported = 255;
+  }
+
+  enum DoorLockUserType : ENUM8 {
+    kUnrestricted = 0;
+    kYearDayScheduleUser = 1;
+    kWeekDayScheduleUser = 2;
+    kMasterUser = 3;
+    kNonAccessUser = 4;
+    kNotSupported = 255;
+  }
+
+  struct DlCredential {
+    DlCredentialType credentialType = 1;
+    INT16U credentialIndex = 2;
+  }
+
+  critical event DoorLockAlarm = 0 {
+    DlAlarmCode alarmCode = 0;
+  }
+
+  critical event DoorStateChange = 1 {
+    DlDoorState doorState = 0;
+  }
+
+  critical event LockOperation = 2 {
+    DlLockOperationType lockOperationType = 0;
+    DlOperationSource operationSource = 1;
+    nullable INT16U userIndex = 2;
+    nullable fabric_idx fabricIndex = 3;
+    nullable NODE_ID sourceNode = 4;
+    optional nullable DlCredential credentials[] = 5;
+  }
+
+  critical event LockOperationError = 3 {
+    DlLockOperationType lockOperationType = 0;
+    DlOperationSource operationSource = 1;
+    DlOperationError operationError = 2;
+    nullable INT16U userIndex = 3;
+    nullable fabric_idx fabricIndex = 4;
+    nullable NODE_ID sourceNode = 5;
+    optional nullable DlCredential credentials[] = 6;
+  }
+
+  info event LockUserChange = 4 {
+    DlLockDataType lockDataType = 0;
+    DlDataOperationType dataOperationType = 1;
+    DlOperationSource operationSource = 2;
+    nullable INT16U userIndex = 3;
+    nullable fabric_idx fabricIndex = 4;
+    nullable NODE_ID sourceNode = 5;
+    nullable INT16U dataIndex = 6;
+  }
+
+  attribute(readonly) DlLockState lockState = 0;
+  attribute(readonly) DlLockType lockType = 1;
+  attribute(readonly) boolean actuatorEnabled = 2;
+  attribute(readonly) DlDoorState doorState = 3;
+  attribute(writable) int32u doorOpenEvents = 4;
+  attribute(writable) int32u doorClosedEvents = 5;
+  attribute(writable) int16u openPeriod = 6;
+  attribute(readonly) int16u numberOfTotalUsersSupported = 17;
+  attribute(readonly) int16u numberOfPINUsersSupported = 18;
+  attribute(readonly) int16u numberOfWeekDaySchedulesSupportedPerUser = 20;
+  attribute(readonly) int16u numberOfYearDaySchedulesSupportedPerUser = 21;
+  attribute(readonly) int16u numberOfHolidaySchedulesSupported = 22;
+  attribute(readonly) int8u maxPINCodeLength = 23;
+  attribute(readonly) int8u minPINCodeLength = 24;
+  attribute(readonly) bitmap8 credentialRulesSupport = 27;
+  attribute(writable) char_string language = 33;
+  attribute(writable) int32u autoRelockTime = 35;
+  attribute(writable) int8u soundVolume = 36;
+  attribute(writable) DlOperatingMode operatingMode = 37;
+  attribute(readonly) bitmap16 supportedOperatingModes = 38;
+  attribute(readonly) bitmap16 defaultConfigurationRegister = 39;
+  attribute(writable) boolean enableOneTouchLocking = 41;
+  attribute(writable) boolean enableInsideStatusLED = 42;
+  attribute(writable) boolean enablePrivacyModeButton = 43;
+  attribute(writable) int8u wrongCodeEntryLimit = 48;
+  attribute(writable) int8u userCodeTemporaryDisableTime = 49;
+  attribute(writable) boolean requirePINforRemoteOperation = 51;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct ClearCredentialRequest {
+    DlCredential credential = 0;
+  }
+
+  request struct ClearUserRequest {
+    INT16U userIndex = 0;
+  }
+
+  request struct GetCredentialStatusRequest {
+    DlCredential credential = 0;
+  }
+
+  request struct GetUserRequest {
+    INT16U userIndex = 0;
+  }
+
+  request struct LockDoorRequest {
+    optional OCTET_STRING pinCode = 0;
+  }
+
+  request struct SetCredentialRequest {
+    DlDataOperationType operationType = 0;
+    DlCredential credential = 1;
+    LONG_OCTET_STRING credentialData = 2;
+    INT16U userIndex = 3;
+    DlUserStatus userStatus = 4;
+  }
+
+  request struct SetUserRequest {
+    DlDataOperationType operationType = 0;
+    INT16U userIndex = 1;
+    nullable CHAR_STRING userName = 2;
+    nullable INT32U userUniqueId = 3;
+    DlUserStatus userStatus = 4;
+    DlUserType userType = 5;
+    DlCredentialRule credentialRule = 6;
+  }
+
+  request struct UnlockDoorRequest {
+    optional OCTET_STRING pinCode = 0;
+  }
+
+  response struct GetCredentialStatusResponse {
+    boolean credentialExists = 0;
+    nullable INT16U userIndex = 1;
+    nullable INT16U nextCredentialIndex = 2;
+  }
+
+  response struct GetUserResponse {
+    INT16U userIndex = 0;
+    nullable CHAR_STRING userName = 1;
+    nullable INT32U userUniqueId = 2;
+    nullable DlUserStatus userStatus = 3;
+    nullable DlUserType userType = 4;
+    nullable DlCredentialRule credentialRule = 5;
+    nullable DlCredential credentials[] = 6;
+    nullable fabric_idx creatorFabricIndex = 7;
+    nullable fabric_idx lastModifiedFabricIndex = 8;
+    INT16U nextUserIndex = 9;
+  }
+
+  response struct SetCredentialResponse {
+    DlStatus status = 0;
+    nullable INT16U userIndex = 1;
+    nullable INT16U nextCredentialIndex = 2;
+  }
+
+  command ClearCredential(ClearCredentialRequest): DefaultSuccess = 38;
+  command ClearUser(ClearUserRequest): DefaultSuccess = 29;
+  command GetCredentialStatus(GetCredentialStatusRequest): GetCredentialStatusResponse = 36;
+  command GetUser(GetUserRequest): GetUserResponse = 27;
+  command LockDoor(LockDoorRequest): DefaultSuccess = 0;
+  command SetCredential(SetCredentialRequest): SetCredentialResponse = 34;
+  command SetUser(SetUserRequest): DefaultSuccess = 26;
+  command UnlockDoor(UnlockDoorRequest): DefaultSuccess = 1;
+}
+
+server cluster ElectricalMeasurement = 2820 {
+  attribute(readonly) bitmap32 measurementType = 0;
+  attribute(readonly) int32s totalActivePower = 772;
+  attribute(readonly) int16u rmsVoltage = 1285;
+  attribute(readonly) int16u rmsVoltageMin = 1286;
+  attribute(readonly) int16u rmsVoltageMax = 1287;
+  attribute(readonly) int16u rmsCurrent = 1288;
+  attribute(readonly) int16u rmsCurrentMin = 1289;
+  attribute(readonly) int16u rmsCurrentMax = 1290;
+  attribute(readonly) int16s activePower = 1291;
+  attribute(readonly) int16s activePowerMin = 1292;
+  attribute(readonly) int16s activePowerMax = 1293;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster EthernetNetworkDiagnostics = 55 {
+  enum PHYRateType : ENUM8 {
+    k10m = 0;
+    k100m = 1;
+    k1000m = 2;
+    k25g = 3;
+    k5g = 4;
+    k10g = 5;
+    k40g = 6;
+    k100g = 7;
+    k200g = 8;
+    k400g = 9;
+  }
+
+  attribute(readonly) enum8 PHYRate = 0;
+  attribute(readonly) boolean fullDuplex = 1;
+  attribute(readonly) int64u packetRxCount = 2;
+  attribute(readonly) int64u packetTxCount = 3;
+  attribute(readonly) int64u txErrCount = 4;
+  attribute(readonly) int64u collisionCount = 5;
+  attribute(readonly) int64u overrunCount = 6;
+  attribute(readonly) boolean carrierDetect = 7;
+  attribute(readonly) int64u timeSinceReset = 8;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
+}
+
+server cluster FixedLabel = 64 {
+  attribute(readonly) LabelStruct labelList[] = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster FlowMeasurement = 1028 {
+  attribute(readonly) int16s measuredValue = 0;
+  attribute(readonly) int16s minMeasuredValue = 1;
+  attribute(readonly) int16s maxMeasuredValue = 2;
+  attribute(readonly) int16u tolerance = 3;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster GeneralCommissioning = 48 {
+  enum GeneralCommissioningError : ENUM8 {
+    kOk = 0;
+    kValueOutsideRange = 1;
+    kInvalidAuthentication = 2;
+    kNotCommissioning = 3;
+  }
+
+  enum RegulatoryLocationType : ENUM8 {
+    kIndoor = 0;
+    kOutdoor = 1;
+    kIndoorOutdoor = 2;
+  }
+
+  struct BasicCommissioningInfoType {
+    INT32U failSafeExpiryLengthMs = 1;
+  }
+
+  attribute(writable) int64u breadcrumb = 0;
+  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  attribute(readonly) enum8 regulatoryConfig = 2;
+  attribute(readonly) enum8 locationCapability = 3;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct ArmFailSafeRequest {
+    INT16U expiryLengthSeconds = 0;
+    INT64U breadcrumb = 1;
+    INT32U timeoutMs = 2;
+  }
+
+  request struct SetRegulatoryConfigRequest {
+    RegulatoryLocationType location = 0;
+    CHAR_STRING countryCode = 1;
+    INT64U breadcrumb = 2;
+    INT32U timeoutMs = 3;
+  }
+
+  response struct ArmFailSafeResponse {
+    GeneralCommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
+  }
+
+  response struct CommissioningCompleteResponse {
+    GeneralCommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
+  }
+
+  response struct SetRegulatoryConfigResponse {
+    GeneralCommissioningError errorCode = 0;
+    CHAR_STRING debugText = 1;
+  }
+
+  command ArmFailSafe(ArmFailSafeRequest): ArmFailSafeResponse = 0;
+  command CommissioningComplete(): CommissioningCompleteResponse = 4;
+  command SetRegulatoryConfig(SetRegulatoryConfigRequest): SetRegulatoryConfigResponse = 2;
+}
+
+server cluster GeneralDiagnostics = 51 {
+  enum BootReasonType : ENUM8 {
+    kUnspecified = 0;
+    kPowerOnReboot = 1;
+    kBrownOutReset = 2;
+    kSoftwareWatchdogReset = 3;
+    kHardwareWatchdogReset = 4;
+    kSoftwareUpdateCompleted = 5;
+    kSoftwareReset = 6;
+  }
+
+  enum HardwareFaultType : ENUM8 {
+    kUnspecified = 0;
+    kRadio = 1;
+    kSensor = 2;
+    kResettableOverTemp = 3;
+    kNonResettableOverTemp = 4;
+    kPowerSource = 5;
+    kVisualDisplayFault = 6;
+    kAudioOutputFault = 7;
+    kUserInterfaceFault = 8;
+    kNonVolatileMemoryError = 9;
+    kTamperDetected = 10;
+  }
+
+  enum InterfaceType : ENUM8 {
+    kUnspecified = 0;
+    kWiFi = 1;
+    kEthernet = 2;
+    kCellular = 3;
+    kThread = 4;
+  }
+
+  enum NetworkFaultType : ENUM8 {
+    kUnspecified = 0;
+    kHardwareFailure = 1;
+    kNetworkJammed = 2;
+    kConnectionFailed = 3;
+  }
+
+  enum RadioFaultType : ENUM8 {
+    kUnspecified = 0;
+    kWiFiFault = 1;
+    kCellularFault = 2;
+    kThreadFault = 3;
+    kNFCFault = 4;
+    kBLEFault = 5;
+    kEthernetFault = 6;
+  }
+
+  struct NetworkInterfaceType {
+    CHAR_STRING name = 1;
+    BOOLEAN fabricConnected = 2;
+    BOOLEAN offPremiseServicesReachableIPv4 = 3;
+    BOOLEAN offPremiseServicesReachableIPv6 = 4;
+    OCTET_STRING hardwareAddress = 5;
+    InterfaceType type = 6;
+  }
+
+  critical event HardwareFaultChange = 0 {
+    HardwareFaultType current[] = 0;
+    HardwareFaultType previous[] = 1;
+  }
+
+  critical event RadioFaultChange = 1 {
+    RadioFaultType current[] = 0;
+    RadioFaultType previous[] = 1;
+  }
+
+  critical event NetworkFaultChange = 2 {
+    NetworkFaultType current[] = 0;
+    NetworkFaultType previous[] = 1;
+  }
+
+  critical event BootReason = 3 {
+    BootReasonType bootReason = 0;
+  }
+
+  attribute(readonly) NetworkInterfaceType networkInterfaces[] = 0;
+  attribute(readonly) int16u rebootCount = 1;
+  attribute(readonly) int64u upTime = 2;
+  attribute(readonly) int32u totalOperationalHours = 3;
+  attribute(readonly) enum8 bootReasons = 4;
+  attribute(readonly) ENUM8 activeHardwareFaults[] = 5;
+  attribute(readonly) ENUM8 activeRadioFaults[] = 6;
+  attribute(readonly) ENUM8 activeNetworkFaults[] = 7;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster GroupKeyManagement = 63 {
+  enum GroupKeySecurityPolicy : ENUM8 {
+    kStandard = 0;
+    kLowLatency = 1;
+  }
+
+  struct GroupKey {
+    fabric_idx fabricIndex = 0;
+    INT16U groupId = 1;
+    INT16U groupKeySetID = 2;
+  }
+
+  struct GroupInfo {
+    INT16U fabricIndex = 0;
+    INT16U groupId = 1;
+    INT16U endpoints[] = 2;
+    CHAR_STRING groupName = 3;
+  }
+
+  struct GroupKeySet {
+    INT16U groupKeySetID = 0;
+    GroupKeySecurityPolicy securityPolicy = 1;
+    OCTET_STRING epochKey0 = 2;
+    INT64U epochStartTime0 = 3;
+    OCTET_STRING epochKey1 = 4;
+    INT64U epochStartTime1 = 5;
+    OCTET_STRING epochKey2 = 6;
+    INT64U epochStartTime2 = 7;
+  }
+
+  attribute(readonly) GroupKey groupKeyMap[] = 0;
+  attribute(readonly) GroupInfo groupTable[] = 1;
+  attribute(readonly) int16u maxGroupsPerFabric = 2;
+  attribute(readonly) int16u maxGroupKeysPerFabric = 3;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct KeySetReadRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetReadAllIndicesRequest {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  request struct KeySetRemoveRequest {
+    INT16U groupKeySetID = 0;
+  }
+
+  request struct KeySetWriteRequest {
+    GroupKeySet groupKeySet = 0;
+  }
+
+  response struct KeySetReadAllIndicesResponse {
+    INT16U groupKeySetIDs[] = 0;
+  }
+
+  response struct KeySetReadResponse {
+    GroupKeySet groupKeySet = 0;
+  }
+
+  command KeySetRead(KeySetReadRequest): KeySetReadResponse = 1;
+  command KeySetReadAllIndices(KeySetReadAllIndicesRequest): KeySetReadAllIndicesResponse = 4;
+  command KeySetRemove(KeySetRemoveRequest): DefaultSuccess = 3;
+  command KeySetWrite(KeySetWriteRequest): DefaultSuccess = 0;
+}
+
+server cluster Groups = 4 {
+  attribute(readonly) bitmap8 nameSupport = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct AddGroupRequest {
+    INT16U groupId = 0;
+    CHAR_STRING groupName = 1;
+  }
+
+  request struct AddGroupIfIdentifyingRequest {
+    INT16U groupId = 0;
+    CHAR_STRING groupName = 1;
+  }
+
+  request struct GetGroupMembershipRequest {
+    INT16U groupList[] = 0;
+  }
+
+  request struct RemoveGroupRequest {
+    INT16U groupId = 0;
+  }
+
+  request struct ViewGroupRequest {
+    INT16U groupId = 0;
+  }
+
+  response struct AddGroupResponse {
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+  }
+
+  response struct GetGroupMembershipResponse {
+    INT8U capacity = 0;
+    INT16U groupList[] = 1;
+  }
+
+  response struct RemoveGroupResponse {
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+  }
+
+  response struct ViewGroupResponse {
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+    CHAR_STRING groupName = 2;
+  }
+
+  command AddGroup(AddGroupRequest): AddGroupResponse = 0;
+  command AddGroupIfIdentifying(AddGroupIfIdentifyingRequest): DefaultSuccess = 5;
+  command GetGroupMembership(GetGroupMembershipRequest): GetGroupMembershipResponse = 2;
+  command RemoveAllGroups(): DefaultSuccess = 4;
+  command RemoveGroup(RemoveGroupRequest): RemoveGroupResponse = 3;
+  command ViewGroup(ViewGroupRequest): ViewGroupResponse = 1;
+}
+
+server cluster IasZone = 1280 {
+  enum IasEnrollResponseCode : ENUM8 {
+    kSuccess = 0;
+    kNotSupported = 1;
+    kNoEnrollPermit = 2;
+    kTooManyZones = 3;
+  }
+
+  enum IasZoneType : ENUM16 {
+    kStandardCie = 0;
+    kMotionSensor = 13;
+    kContactSwitch = 21;
+    kFireSensor = 40;
+    kWaterSensor = 42;
+    kGasSensor = 43;
+    kPersonalEmergencyDevice = 44;
+    kVibrationMovementSensor = 45;
+    kRemoteControl = 271;
+    kKeyFob = 277;
+    kKeypad = 541;
+    kStandardWarningDevice = 549;
+    kGlassBreakSensor = 550;
+    kCarbonMonoxideSensor = 551;
+    kSecurityRepeater = 553;
+    kInvalidZoneType = 65535;
+  }
+
+  attribute(readonly) enum8 zoneState = 0;
+  attribute(readonly) enum16 zoneType = 1;
+  attribute(readonly) bitmap16 zoneStatus = 2;
+  attribute(writable) node_id iasCieAddress = 16;
+  attribute(readonly) int8u zoneId = 17;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct ZoneEnrollRequestRequest {
+    IasZoneType zoneType = 0;
+    INT16U manufacturerCode = 1;
+  }
+
+  request struct ZoneStatusChangeNotificationRequest {
+    IasZoneStatus zoneStatus = 0;
+    BITMAP8 extendedStatus = 1;
+    INT8U zoneId = 2;
+    INT16U delay = 3;
+  }
+
+  response struct ZoneEnrollResponse {
+    IasEnrollResponseCode enrollResponseCode = 0;
+    INT8U zoneId = 1;
+  }
+
+  command ZoneEnrollRequest(ZoneEnrollRequestRequest): ZoneEnrollResponse = 1;
+  command ZoneStatusChangeNotification(ZoneStatusChangeNotificationRequest): DefaultSuccess = 0;
+}
+
+server cluster Identify = 3 {
+  enum IdentifyEffectIdentifier : ENUM8 {
+    kBlink = 0;
+    kBreathe = 1;
+    kOkay = 2;
+    kChannelChange = 11;
+    kFinishEffect = 254;
+    kStopEffect = 255;
+  }
+
+  enum IdentifyEffectVariant : ENUM8 {
+    kDefault = 0;
+  }
+
+  enum IdentifyIdentifyType : ENUM8 {
+    kNone = 0;
+    kVisibleLight = 1;
+    kVisibleLED = 2;
+    kAudibleBeep = 3;
+    kDisplay = 4;
+    kActuator = 5;
+  }
+
+  attribute(writable) int16u identifyTime = 0;
+  attribute(readonly) enum8 identifyType = 1;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct IdentifyRequest {
+    INT16U identifyTime = 0;
+  }
+
+  request struct TriggerEffectRequest {
+    IdentifyEffectIdentifier effectIdentifier = 0;
+    IdentifyEffectVariant effectVariant = 1;
+  }
+
+  response struct IdentifyQueryResponse {
+    INT16U timeout = 0;
+  }
+
+  command Identify(IdentifyRequest): DefaultSuccess = 0;
+  command IdentifyQuery(): IdentifyQueryResponse = 1;
+  command TriggerEffect(TriggerEffectRequest): DefaultSuccess = 64;
+}
+
+server cluster IlluminanceMeasurement = 1024 {
+  enum LightSensorType : ENUM8 {
+    kPhotodiode = 0;
+    kCmos = 1;
+  }
+
+  attribute(readonly) int16u measuredValue = 0;
+  attribute(readonly) int16u minMeasuredValue = 1;
+  attribute(readonly) int16u maxMeasuredValue = 2;
+  attribute(readonly) int16u tolerance = 3;
+  attribute(readonly) enum8 lightSensorType = 4;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster KeypadInput = 1289 {
+  enum CecKeyCode : ENUM8 {
+    kSelect = 0;
+    kUp = 1;
+    kDown = 2;
+    kLeft = 3;
+    kRight = 4;
+    kRightUp = 5;
+    kRightDown = 6;
+    kLeftUp = 7;
+    kLeftDown = 8;
+    kRootMenu = 9;
+    kSetupMenu = 10;
+    kContentsMenu = 11;
+    kFavoriteMenu = 12;
+    kExit = 13;
+    kMediaTopMenu = 16;
+    kMediaContextSensitiveMenu = 17;
+    kNumberEntryMode = 29;
+    kNumber11 = 30;
+    kNumber12 = 31;
+    kNumber0OrNumber10 = 32;
+    kNumbers1 = 33;
+    kNumbers2 = 34;
+    kNumbers3 = 35;
+    kNumbers4 = 36;
+    kNumbers5 = 37;
+    kNumbers6 = 38;
+    kNumbers7 = 39;
+    kNumbers8 = 40;
+    kNumbers9 = 41;
+    kDot = 42;
+    kEnter = 43;
+    kClear = 44;
+    kNextFavorite = 47;
+    kChannelUp = 48;
+    kChannelDown = 49;
+    kPreviousChannel = 50;
+    kSoundSelect = 51;
+    kInputSelect = 52;
+    kDisplayInformation = 53;
+    kHelp = 54;
+    kPageUp = 55;
+    kPageDown = 56;
+    kPower = 64;
+    kVolumeUp = 65;
+    kVolumeDown = 66;
+    kMute = 67;
+    kPlay = 68;
+    kStop = 69;
+    kPause = 70;
+    kRecord = 71;
+    kRewind = 72;
+    kFastForward = 73;
+    kEject = 74;
+    kForward = 75;
+    kBackward = 76;
+    kStopRecord = 77;
+    kPauseRecord = 78;
+    kReserved = 79;
+    kAngle = 80;
+    kSubPicture = 81;
+    kVideoOnDemand = 82;
+    kElectronicProgramGuide = 83;
+    kTimerProgramming = 84;
+    kInitialConfiguration = 85;
+    kSelectBroadcastType = 86;
+    kSelectSoundPresentation = 87;
+    kPlayFunction = 96;
+    kPausePlayFunction = 97;
+    kRecordFunction = 98;
+    kPauseRecordFunction = 99;
+    kStopFunction = 100;
+    kMuteFunction = 101;
+    kRestoreVolumeFunction = 102;
+    kTuneFunction = 103;
+    kSelectMediaFunction = 104;
+    kSelectAvInputFunction = 105;
+    kSelectAudioInputFunction = 106;
+    kPowerToggleFunction = 107;
+    kPowerOffFunction = 108;
+    kPowerOnFunction = 109;
+    kF1Blue = 113;
+    kF2Red = 114;
+    kF3Green = 115;
+    kF4Yellow = 116;
+    kF5 = 117;
+    kData = 118;
+  }
+
+  enum StatusEnum : ENUM8 {
+    kSuccess = 0;
+    kUnsupportedKey = 1;
+    kInvalidKeyInCurrentState = 2;
+  }
+
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster LevelControl = 8 {
+  enum MoveMode : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  enum StepMode : ENUM8 {
+    kUp = 0;
+    kDown = 1;
+  }
+
+  attribute(readonly) int8u currentLevel = 0;
+  attribute(readonly) int16u remainingTime = 1;
+  attribute(readonly) int8u minLevel = 2;
+  attribute(readonly) int8u maxLevel = 3;
+  attribute(readonly) int16u currentFrequency = 4;
+  attribute(readonly) int16u minFrequency = 5;
+  attribute(readonly) int16u maxFrequency = 6;
+  attribute(writable) bitmap8 options = 15;
+  attribute(writable) int16u onOffTransitionTime = 16;
+  attribute(writable) int8u onLevel = 17;
+  attribute(writable) int16u onTransitionTime = 18;
+  attribute(writable) int16u offTransitionTime = 19;
+  attribute(writable) int8u defaultMoveRate = 20;
+  attribute(writable) int8u startUpCurrentLevel = 16384;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct MoveRequest {
+    MoveMode moveMode = 0;
+    INT8U rate = 1;
+    BITMAP8 optionMask = 2;
+    BITMAP8 optionOverride = 3;
+  }
+
+  request struct MoveToLevelRequest {
+    INT8U level = 0;
+    INT16U transitionTime = 1;
+    BITMAP8 optionMask = 2;
+    BITMAP8 optionOverride = 3;
+  }
+
+  request struct MoveToLevelWithOnOffRequest {
+    INT8U level = 0;
+    INT16U transitionTime = 1;
+  }
+
+  request struct MoveWithOnOffRequest {
+    MoveMode moveMode = 0;
+    INT8U rate = 1;
+  }
+
+  request struct StepRequest {
+    StepMode stepMode = 0;
+    INT8U stepSize = 1;
+    INT16U transitionTime = 2;
+    BITMAP8 optionMask = 3;
+    BITMAP8 optionOverride = 4;
+  }
+
+  request struct StepWithOnOffRequest {
+    StepMode stepMode = 0;
+    INT8U stepSize = 1;
+    INT16U transitionTime = 2;
+  }
+
+  request struct StopRequest {
+    BITMAP8 optionMask = 0;
+    BITMAP8 optionOverride = 1;
+  }
+
+  command Move(MoveRequest): DefaultSuccess = 1;
+  command MoveToLevel(MoveToLevelRequest): DefaultSuccess = 0;
+  command MoveToLevelWithOnOff(MoveToLevelWithOnOffRequest): DefaultSuccess = 4;
+  command MoveWithOnOff(MoveWithOnOffRequest): DefaultSuccess = 5;
+  command Step(StepRequest): DefaultSuccess = 2;
+  command StepWithOnOff(StepWithOnOffRequest): DefaultSuccess = 6;
+  command Stop(StopRequest): DefaultSuccess = 3;
+  command StopWithOnOff(): DefaultSuccess = 7;
+}
+
+server cluster LocalizationConfiguration = 43 {
+  attribute(writable) char_string activeLocale = 1;
+  attribute(readonly) CHAR_STRING supportedLocales[] = 2;
+}
+
+server cluster LowPower = 1288 {
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  command Sleep(): DefaultSuccess = 0;
+}
+
+server cluster MediaInput = 1287 {
+  enum InputTypeEnum : ENUM8 {
+    kInternal = 0;
+    kAux = 1;
+    kCoax = 2;
+    kComposite = 3;
+    kHdmi = 4;
+    kInput = 5;
+    kLine = 6;
+    kOptical = 7;
+    kVideo = 8;
+    kScart = 9;
+    kUsb = 10;
+    kOther = 11;
+  }
+
+  struct InputInfo {
+    INT8U index = 1;
+    InputTypeEnum inputType = 2;
+    CHAR_STRING name = 3;
+    CHAR_STRING description = 4;
+  }
+
+  attribute(readonly) InputInfo mediaInputList[] = 0;
+  attribute(readonly) int8u currentMediaInput = 1;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster MediaPlayback = 1286 {
+  enum PlaybackStateEnum : ENUM8 {
+    kPlaying = 0;
+    kPaused = 1;
+    kNotPlaying = 2;
+    kBuffering = 3;
+  }
+
+  enum StatusEnum : ENUM8 {
+    kSuccess = 0;
+    kInvalidStateForCommand = 1;
+    kNotAllowed = 2;
+    kNotActive = 3;
+    kSpeedOutOfRange = 4;
+    kSeekOutOfRange = 5;
+  }
+
+  attribute(readonly) PlaybackStateEnum playbackState = 0;
+  attribute(readonly) epoch_us startTime = 1;
+  attribute(readonly) int64u duration = 2;
+  attribute(readonly) single playbackSpeed = 4;
+  attribute(readonly) int64u seekRangeEnd = 5;
+  attribute(readonly) int64u seekRangeStart = 6;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster ModeSelect = 80 {
+  struct ModeOptionStruct {
+    CHAR_STRING label = 1;
+    INT8U mode = 2;
+    INT32U semanticTag = 3;
+  }
+
+  attribute(readonly) int8u currentMode = 0;
+  attribute(readonly) ModeOptionStruct supportedModes[] = 1;
+  attribute(writable) int8u onMode = 2;
+  attribute(readonly) int8u startUpMode = 3;
+  attribute(readonly) char_string description = 4;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct ChangeToModeRequest {
+    INT8U newMode = 0;
+  }
+
+  command ChangeToMode(ChangeToModeRequest): DefaultSuccess = 0;
+}
+
+server cluster NetworkCommissioning = 49 {
+  enum NetworkCommissioningStatus : ENUM8 {
+    kSuccess = 0;
+    kOutOfRange = 1;
+    kBoundsExceeded = 2;
+    kNetworkIDNotFound = 3;
+    kDuplicateNetworkID = 4;
+    kNetworkNotFound = 5;
+    kRegulatoryError = 6;
+    kAuthFailure = 7;
+    kUnsupportedSecurity = 8;
+    kOtherConnectionFailure = 9;
+    kIPV6Failed = 10;
+    kIPBindFailed = 11;
+    kUnknownError = 12;
+  }
+
+  enum WiFiBand : ENUM8 {
+    k2g4 = 0;
+    k3g65 = 1;
+    k5g = 2;
+    k6g = 3;
+    k60g = 4;
+  }
+
+  struct NetworkInfo {
+    OCTET_STRING networkID = 1;
+    BOOLEAN connected = 2;
+  }
+
+  struct WiFiInterfaceScanResult {
+    BITMAP8 security = 1;
+    OCTET_STRING ssid = 2;
+    OCTET_STRING bssid = 3;
+    INT16U channel = 4;
+    WiFiBand wiFiBand = 5;
+    INT8S rssi = 6;
+  }
+
+  struct ThreadInterfaceScanResult {
+    INT64U panId = 1;
+    INT64U extendedPanId = 2;
+    CHAR_STRING networkName = 3;
+    INT16U channel = 4;
+    INT8U version = 5;
+    INT64U extendedAddress = 6;
+    INT8S rssi = 7;
+    INT8U lqi = 8;
+  }
+
+  attribute(readonly) int8u maxNetworks = 0;
+  attribute(readonly) NetworkInfo networks[] = 1;
+  attribute(readonly) int8u scanMaxTimeSeconds = 2;
+  attribute(readonly) int8u connectMaxTimeSeconds = 3;
+  attribute(writable) boolean interfaceEnabled = 4;
+  attribute(readonly) NetworkCommissioningStatus lastNetworkingStatus = 5;
+  attribute(readonly) octet_string lastNetworkID = 6;
+  attribute(readonly) int32u lastConnectErrorValue = 7;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct AddOrUpdateThreadNetworkRequest {
+    OCTET_STRING operationalDataset = 0;
+    INT64U breadcrumb = 1;
+  }
+
+  request struct AddOrUpdateWiFiNetworkRequest {
+    OCTET_STRING ssid = 0;
+    OCTET_STRING credentials = 1;
+    INT64U breadcrumb = 2;
+  }
+
+  request struct ConnectNetworkRequest {
+    OCTET_STRING networkID = 0;
+    INT64U breadcrumb = 1;
+  }
+
+  request struct RemoveNetworkRequest {
+    OCTET_STRING networkID = 0;
+    INT64U breadcrumb = 1;
+  }
+
+  request struct ReorderNetworkRequest {
+    OCTET_STRING networkID = 0;
+    INT8U networkIndex = 1;
+    INT64U breadcrumb = 2;
+  }
+
+  request struct ScanNetworksRequest {
+    OCTET_STRING ssid = 0;
+    INT64U breadcrumb = 1;
+  }
+
+  response struct ConnectNetworkResponse {
+    NetworkCommissioningStatus networkingStatus = 0;
+    CHAR_STRING debugText = 1;
+    INT32S errorValue = 2;
+  }
+
+  response struct NetworkConfigResponse {
+    NetworkCommissioningStatus networkingStatus = 0;
+    CHAR_STRING debugText = 1;
+  }
+
+  response struct ScanNetworksResponse {
+    NetworkCommissioningStatus networkingStatus = 0;
+    CHAR_STRING debugText = 1;
+    optional WiFiInterfaceScanResult wiFiScanResults[] = 2;
+    optional ThreadInterfaceScanResult threadScanResults[] = 3;
+  }
+
+  command AddOrUpdateThreadNetwork(AddOrUpdateThreadNetworkRequest): NetworkConfigResponse = 3;
+  command AddOrUpdateWiFiNetwork(AddOrUpdateWiFiNetworkRequest): NetworkConfigResponse = 2;
+  command ConnectNetwork(ConnectNetworkRequest): ConnectNetworkResponse = 6;
+  command RemoveNetwork(RemoveNetworkRequest): NetworkConfigResponse = 4;
+  command ReorderNetwork(ReorderNetworkRequest): NetworkConfigResponse = 8;
+  command ScanNetworks(ScanNetworksRequest): ScanNetworksResponse = 0;
+}
+
+client cluster OtaSoftwareUpdateProvider = 41 {
+  enum OTAApplyUpdateAction : ENUM8 {
+    kProceed = 0;
+    kAwaitNextAction = 1;
+    kDiscontinue = 2;
+  }
+
+  enum OTADownloadProtocol : ENUM8 {
+    kBDXSynchronous = 0;
+    kBDXAsynchronous = 1;
+    kHttps = 2;
+    kVendorSpecific = 3;
+  }
+
+  enum OTAQueryStatus : ENUM8 {
+    kUpdateAvailable = 0;
+    kBusy = 1;
+    kNotAvailable = 2;
+    kDownloadProtocolNotSupported = 3;
+  }
+
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct ApplyUpdateRequestRequest {
+    OCTET_STRING updateToken = 0;
+    INT32U newVersion = 1;
+  }
+
+  request struct NotifyUpdateAppliedRequest {
+    OCTET_STRING updateToken = 0;
+    INT32U softwareVersion = 1;
+  }
+
+  request struct QueryImageRequest {
+    vendor_id vendorId = 0;
+    INT16U productId = 1;
+    INT32U softwareVersion = 2;
+    OTADownloadProtocol protocolsSupported[] = 3;
+    optional INT16U hardwareVersion = 4;
+    optional CHAR_STRING location = 5;
+    optional BOOLEAN requestorCanConsent = 6;
+    optional OCTET_STRING metadataForProvider = 7;
+  }
+
+  response struct ApplyUpdateResponse {
+    OTAApplyUpdateAction action = 0;
+    INT32U delayedActionTime = 1;
+  }
+
+  command ApplyUpdateRequest(ApplyUpdateRequestRequest): ApplyUpdateResponse = 2;
+  command NotifyUpdateApplied(NotifyUpdateAppliedRequest): DefaultSuccess = 4;
+  command QueryImage(QueryImageRequest): QueryImageResponse = 0;
+}
+
+server cluster OtaSoftwareUpdateRequestor = 42 {
+  enum OTAAnnouncementReason : ENUM8 {
+    kSimpleAnnouncement = 0;
+    kUpdateAvailable = 1;
+    kUrgentUpdateAvailable = 2;
+  }
+
+  enum OTAChangeReasonEnum : ENUM8 {
+    kUnknown = 0;
+    kSuccess = 1;
+    kFailure = 2;
+    kTimeOut = 3;
+    kDelayByProvider = 4;
+  }
+
+  enum OTAUpdateStateEnum : ENUM8 {
+    kUnknown = 0;
+    kIdle = 1;
+    kQuerying = 2;
+    kDelayedOnQuery = 3;
+    kDownloading = 4;
+    kApplying = 5;
+    kDelayedOnApply = 6;
+    kRollingBack = 7;
+    kDelayedOnUserConsent = 8;
+  }
+
+  struct ProviderLocation {
+    fabric_idx fabricIndex = 0;
+    node_id providerNodeID = 1;
+    endpoint_no endpoint = 2;
+  }
+
+  info event StateTransition = 0 {
+    nullable OTAUpdateStateEnum previousState = 0;
+    OTAUpdateStateEnum newState = 1;
+    OTAChangeReasonEnum reason = 2;
+    nullable INT32U targetSoftwareVersion = 3;
+  }
+
+  critical event VersionApplied = 1 {
+    INT32U softwareVersion = 0;
+    INT16U productID = 1;
+  }
+
+  info event DownloadError = 2 {
+    INT32U softwareVersion = 0;
+    INT64U bytesDownloaded = 1;
+    INT8U progressPercent = 2;
+    nullable INT64S platformCode = 3;
+  }
+
+  attribute(writable) ProviderLocation defaultOtaProviders[] = 0;
+  attribute(readonly) boolean updatePossible = 1;
+  attribute(readonly) OTAUpdateStateEnum updateState = 2;
+  attribute(readonly) int8u updateStateProgress = 3;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct AnnounceOtaProviderRequest {
+    node_id providerNodeId = 0;
+    vendor_id vendorId = 1;
+    OTAAnnouncementReason announcementReason = 2;
+    optional OCTET_STRING metadataForNode = 3;
+    endpoint_no endpoint = 4;
+  }
+
+  command AnnounceOtaProvider(AnnounceOtaProviderRequest): DefaultSuccess = 0;
+}
+
+server cluster OccupancySensing = 1030 {
+  attribute(readonly) bitmap8 occupancy = 0;
+  attribute(readonly) enum8 occupancySensorType = 1;
+  attribute(readonly) bitmap8 occupancySensorTypeBitmap = 2;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster OnOff = 6 {
+  enum OnOffDelayedAllOffEffectVariant : enum8 {
+    kFadeToOffIn0p8Seconds = 0;
+    kNoFade = 1;
+    k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 2;
+  }
+
+  enum OnOffDyingLightEffectVariant : enum8 {
+    k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0;
+  }
+
+  enum OnOffEffectIdentifier : enum8 {
+    kDelayedAllOff = 0;
+    kDyingLight = 1;
+  }
+
+  attribute(readonly) boolean onOff = 0;
+  attribute(readonly) boolean globalSceneControl = 16384;
+  attribute(writable) int16u onTime = 16385;
+  attribute(writable) int16u offWaitTime = 16386;
+  attribute(writable) enum8 startUpOnOff = 16387;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct OffWithEffectRequest {
+    OnOffEffectIdentifier effectId = 0;
+    OnOffDelayedAllOffEffectVariant effectVariant = 1;
+  }
+
+  request struct OnWithTimedOffRequest {
+    OnOffControl onOffControl = 0;
+    int16u onTime = 1;
+    int16u offWaitTime = 2;
+  }
+
+  command Off(): DefaultSuccess = 0;
+  command OffWithEffect(OffWithEffectRequest): DefaultSuccess = 64;
+  command On(): DefaultSuccess = 1;
+  command OnWithRecallGlobalScene(): DefaultSuccess = 65;
+  command OnWithTimedOff(OnWithTimedOffRequest): DefaultSuccess = 66;
+  command Toggle(): DefaultSuccess = 2;
+}
+
+server cluster OnOffSwitchConfiguration = 7 {
+  attribute(readonly) enum8 switchType = 0;
+  attribute(writable) enum8 switchActions = 16;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster OperationalCredentials = 62 {
+  enum NodeOperationalCertStatus : ENUM8 {
+    kSuccess = 0;
+    kInvalidPublicKey = 1;
+    kInvalidNodeOpId = 2;
+    kInvalidNOC = 3;
+    kMissingCsr = 4;
+    kTableFull = 5;
+    kInsufficientPrivilege = 8;
+    kFabricConflict = 9;
+    kLabelConflict = 10;
+    kInvalidFabricIndex = 11;
+  }
+
+  struct FabricDescriptor {
+    INT8U fabricIndex = 1;
+    OCTET_STRING rootPublicKey = 2;
+    INT16U vendorId = 3;
+    FABRIC_ID fabricId = 4;
+    NODE_ID nodeId = 5;
+    CHAR_STRING label = 6;
+  }
+
+  attribute(readonly) FabricDescriptor fabricsList[] = 1;
+  attribute(readonly) int8u supportedFabrics = 2;
+  attribute(readonly) int8u commissionedFabrics = 3;
+  attribute(readonly) OCTET_STRING trustedRootCertificates[] = 4;
+  attribute(readonly) fabric_idx currentFabricIndex = 5;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct AddNOCRequest {
+    OCTET_STRING NOCValue = 0;
+    optional OCTET_STRING ICACValue = 1;
+    OCTET_STRING IPKValue = 2;
+    NODE_ID caseAdminNode = 3;
+    INT16U adminVendorId = 4;
+  }
+
+  request struct AddTrustedRootCertificateRequest {
+    OCTET_STRING rootCertificate = 0;
+  }
+
+  request struct AttestationRequestRequest {
+    OCTET_STRING attestationNonce = 0;
+  }
+
+  request struct CertificateChainRequestRequest {
+    INT8U certificateType = 0;
+  }
+
+  request struct OpCSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
+  }
+
+  request struct RemoveFabricRequest {
+    INT8U fabricIndex = 0;
+  }
+
+  request struct RemoveTrustedRootCertificateRequest {
+    OCTET_STRING trustedRootIdentifier = 0;
+  }
+
+  request struct UpdateFabricLabelRequest {
+    CHAR_STRING label = 0;
+  }
+
+  request struct UpdateNOCRequest {
+    OCTET_STRING NOCValue = 0;
+    optional OCTET_STRING ICACValue = 1;
+  }
+
+  response struct AttestationResponse {
+    OCTET_STRING attestationElements = 0;
+    OCTET_STRING signature = 1;
+  }
+
+  response struct CertificateChainResponse {
+    OCTET_STRING certificate = 0;
+  }
+
+  response struct NOCResponse {
+    INT8U statusCode = 0;
+    INT8U fabricIndex = 1;
+    CHAR_STRING debugText = 2;
+  }
+
+  response struct OpCSRResponse {
+    OCTET_STRING NOCSRElements = 0;
+    OCTET_STRING attestationSignature = 1;
+  }
+
+  command AddNOC(AddNOCRequest): NOCResponse = 6;
+  command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
+  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
+  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
+  command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+}
+
+server cluster PowerSource = 47 {
+  attribute(readonly) enum8 status = 0;
+  attribute(readonly) int8u order = 1;
+  attribute(readonly) char_string description = 2;
+  attribute(readonly) int32u batteryVoltage = 11;
+  attribute(readonly) int8u batteryPercentRemaining = 12;
+  attribute(readonly) int32u batteryTimeRemaining = 13;
+  attribute(readonly) enum8 batteryChargeLevel = 14;
+  attribute(readonly) ENUM8 activeBatteryFaults[] = 18;
+  attribute(readonly) enum8 batteryChargeState = 26;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster PowerSourceConfiguration = 46 {
+  attribute(readonly) INT8U sources[] = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster PressureMeasurement = 1027 {
+  attribute(readonly) int16s measuredValue = 0;
+  attribute(readonly) int16s minMeasuredValue = 1;
+  attribute(readonly) int16s maxMeasuredValue = 2;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster PumpConfigurationAndControl = 512 {
+  enum PumpControlMode : ENUM8 {
+    kConstantSpeed = 0;
+    kConstantPressure = 1;
+    kProportionalPressure = 2;
+    kConstantFlow = 3;
+    kConstantTemperature = 5;
+    kAutomatic = 7;
+  }
+
+  enum PumpOperationMode : ENUM8 {
+    kNormal = 0;
+    kMinimum = 1;
+    kMaximum = 2;
+    kLocal = 3;
+  }
+
+  info event SupplyVoltageLow = 0 {
+  }
+
+  info event SupplyVoltageHigh = 1 {
+  }
+
+  info event PowerMissingPhase = 2 {
+  }
+
+  info event SystemPressureLow = 3 {
+  }
+
+  info event SystemPressureHigh = 4 {
+  }
+
+  critical event DryRunning = 5 {
+  }
+
+  info event MotorTemperatureHigh = 6 {
+  }
+
+  critical event PumpMotorFatalFailure = 7 {
+  }
+
+  info event ElectronicTemperatureHigh = 8 {
+  }
+
+  critical event PumpBlocked = 9 {
+  }
+
+  info event SensorFailure = 10 {
+  }
+
+  info event ElectronicNonFatalFailure = 11 {
+  }
+
+  critical event ElectronicFatalFailure = 12 {
+  }
+
+  info event GeneralFault = 13 {
+  }
+
+  info event Leakage = 14 {
+  }
+
+  info event AirDetection = 15 {
+  }
+
+  info event TurbineOperation = 16 {
+  }
+
+  attribute(readonly) int16s maxPressure = 0;
+  attribute(readonly) int16u maxSpeed = 1;
+  attribute(readonly) int16u maxFlow = 2;
+  attribute(readonly) int16s minConstPressure = 3;
+  attribute(readonly) int16s maxConstPressure = 4;
+  attribute(readonly) int16s minCompPressure = 5;
+  attribute(readonly) int16s maxCompPressure = 6;
+  attribute(readonly) int16u minConstSpeed = 7;
+  attribute(readonly) int16u maxConstSpeed = 8;
+  attribute(readonly) int16u minConstFlow = 9;
+  attribute(readonly) int16u maxConstFlow = 10;
+  attribute(readonly) int16s minConstTemp = 11;
+  attribute(readonly) int16s maxConstTemp = 12;
+  attribute(readonly) bitmap16 pumpStatus = 16;
+  attribute(readonly) enum8 effectiveOperationMode = 17;
+  attribute(readonly) enum8 effectiveControlMode = 18;
+  attribute(readonly) int16s capacity = 19;
+  attribute(readonly) int16u speed = 20;
+  attribute(writable) int24u lifetimeRunningHours = 21;
+  attribute(readonly) int24u power = 22;
+  attribute(writable) int32u lifetimeEnergyConsumed = 23;
+  attribute(writable) enum8 operationMode = 32;
+  attribute(writable) enum8 controlMode = 33;
+  attribute(readonly) bitmap16 alarmMask = 34;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster RelativeHumidityMeasurement = 1029 {
+  attribute(readonly) int16u measuredValue = 0;
+  attribute(readonly) int16u minMeasuredValue = 1;
+  attribute(readonly) int16u maxMeasuredValue = 2;
+  attribute(readonly) int16u tolerance = 3;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster Scenes = 5 {
+  struct SceneExtensionFieldSet {
+    CLUSTER_ID clusterId = 1;
+    INT8U length = 2;
+    INT8U value = 3;
+  }
+
+  attribute(readonly) int8u sceneCount = 0;
+  attribute(readonly) int8u currentScene = 1;
+  attribute(readonly) int16u currentGroup = 2;
+  attribute(readonly) boolean sceneValid = 3;
+  attribute(readonly) bitmap8 nameSupport = 4;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct AddSceneRequest {
+    INT16U groupId = 0;
+    INT8U sceneId = 1;
+    INT16U transitionTime = 2;
+    CHAR_STRING sceneName = 3;
+    SceneExtensionFieldSet extensionFieldSets[] = 4;
+  }
+
+  request struct GetSceneMembershipRequest {
+    INT16U groupId = 0;
+  }
+
+  request struct RecallSceneRequest {
+    INT16U groupId = 0;
+    INT8U sceneId = 1;
+    INT16U transitionTime = 2;
+  }
+
+  request struct RemoveAllScenesRequest {
+    INT16U groupId = 0;
+  }
+
+  request struct RemoveSceneRequest {
+    INT16U groupId = 0;
+    INT8U sceneId = 1;
+  }
+
+  request struct StoreSceneRequest {
+    INT16U groupId = 0;
+    INT8U sceneId = 1;
+  }
+
+  request struct ViewSceneRequest {
+    INT16U groupId = 0;
+    INT8U sceneId = 1;
+  }
+
+  response struct AddSceneResponse {
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+    INT8U sceneId = 2;
+  }
+
+  response struct GetSceneMembershipResponse {
+    ENUM8 status = 0;
+    INT8U capacity = 1;
+    INT16U groupId = 2;
+    INT8U sceneCount = 3;
+    INT8U sceneList[] = 4;
+  }
+
+  response struct RemoveAllScenesResponse {
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+  }
+
+  response struct RemoveSceneResponse {
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+    INT8U sceneId = 2;
+  }
+
+  response struct StoreSceneResponse {
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+    INT8U sceneId = 2;
+  }
+
+  response struct ViewSceneResponse {
+    ENUM8 status = 0;
+    INT16U groupId = 1;
+    INT8U sceneId = 2;
+    INT16U transitionTime = 3;
+    CHAR_STRING sceneName = 4;
+    SceneExtensionFieldSet extensionFieldSets[] = 5;
+  }
+
+  command AddScene(AddSceneRequest): AddSceneResponse = 0;
+  command GetSceneMembership(GetSceneMembershipRequest): GetSceneMembershipResponse = 6;
+  command RecallScene(RecallSceneRequest): DefaultSuccess = 5;
+  command RemoveAllScenes(RemoveAllScenesRequest): RemoveAllScenesResponse = 3;
+  command RemoveScene(RemoveSceneRequest): RemoveSceneResponse = 2;
+  command StoreScene(StoreSceneRequest): StoreSceneResponse = 4;
+  command ViewScene(ViewSceneRequest): ViewSceneResponse = 1;
+}
+
+server cluster SoftwareDiagnostics = 52 {
+  struct ThreadMetrics {
+    INT64U id = 1;
+    CHAR_STRING name = 2;
+    INT32U stackFreeCurrent = 3;
+    INT32U stackFreeMinimum = 4;
+    INT32U stackSize = 5;
+  }
+
+  info event SoftwareFault = 0 {
+    SoftwareFault softwareFault = 0;
+  }
+
+  attribute(readonly) ThreadMetrics threadMetrics[] = 0;
+  attribute(readonly) int64u currentHeapFree = 1;
+  attribute(readonly) int64u currentHeapUsed = 2;
+  attribute(readonly) int64u currentHeapHighWatermark = 3;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  command ResetWatermarks(): DefaultSuccess = 0;
+}
+
+server cluster Switch = 59 {
+  info event SwitchLatched = 0 {
+    INT8U newPosition = 0;
+  }
+
+  info event InitialPress = 1 {
+    INT8U newPosition = 0;
+  }
+
+  info event LongPress = 2 {
+    INT8U newPosition = 0;
+  }
+
+  info event ShortRelease = 3 {
+    INT8U previousPosition = 0;
+  }
+
+  info event LongRelease = 4 {
+    INT8U previousPosition = 0;
+  }
+
+  info event MultiPressOngoing = 5 {
+    INT8U newPosition = 0;
+    INT8U currentNumberOfPressesCounted = 1;
+  }
+
+  info event MultiPressComplete = 6 {
+    INT8U newPosition = 0;
+    INT8U totalNumberOfPressesCounted = 1;
+  }
+
+  attribute(readonly) int8u numberOfPositions = 0;
+  attribute(readonly) int8u currentPosition = 1;
+  attribute(readonly) int8u multiPressMax = 2;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster TargetNavigator = 1285 {
+  enum StatusEnum : ENUM8 {
+    kSuccess = 0;
+    kAppNotAvailable = 1;
+    kSystemBusy = 2;
+  }
+
+  struct TargetInfo {
+    INT8U identifier = 1;
+    CHAR_STRING name = 2;
+  }
+
+  attribute(readonly) TargetInfo targetNavigatorList[] = 0;
+  attribute(readonly) int8u currentNavigatorTarget = 1;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster TemperatureMeasurement = 1026 {
+  attribute(readonly) int16s measuredValue = 0;
+  attribute(readonly) int16s minMeasuredValue = 1;
+  attribute(readonly) int16s maxMeasuredValue = 2;
+  attribute(readonly) int16u tolerance = 3;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster TestCluster = 1295 {
+  enum SimpleEnum : ENUM8 {
+    kUnspecified = 0;
+    kValueA = 1;
+    kValueB = 2;
+    kValueC = 3;
+  }
+
+  struct TestListStructOctet {
+    INT64U fabricIndex = 1;
+    OCTET_STRING operationalCert = 2;
+  }
+
+  struct NullablesAndOptionalsStruct {
+    nullable INT16U nullableInt = 1;
+    optional INT16U optionalInt = 2;
+    optional nullable INT16U nullableOptionalInt = 3;
+    nullable CHAR_STRING nullableString = 4;
+    optional CHAR_STRING optionalString = 5;
+    optional nullable CHAR_STRING nullableOptionalString = 6;
+    nullable SimpleStruct nullableStruct = 7;
+    optional SimpleStruct optionalStruct = 8;
+    optional nullable SimpleStruct nullableOptionalStruct = 9;
+    nullable SimpleEnum nullableList[] = 10;
+    optional SimpleEnum optionalList[] = 11;
+    optional nullable SimpleEnum nullableOptionalList[] = 12;
+  }
+
+  struct SimpleStruct {
+    INT8U a = 1;
+    BOOLEAN b = 2;
+    SimpleEnum c = 3;
+    OCTET_STRING d = 4;
+    CHAR_STRING e = 5;
+    SimpleBitmap f = 6;
+    single g = 7;
+    double h = 8;
+  }
+
+  struct NestedStructList {
+    INT8U a = 1;
+    BOOLEAN b = 2;
+    SimpleStruct c = 3;
+    SimpleStruct d[] = 4;
+    INT32U e[] = 5;
+    OCTET_STRING f[] = 6;
+    INT8U g[] = 7;
+  }
+
+  struct NestedStruct {
+    INT8U a = 1;
+    BOOLEAN b = 2;
+    SimpleStruct c = 3;
+  }
+
+  info event TestEvent = 1 {
+    INT8U arg1 = 1;
+    SimpleEnum arg2 = 2;
+    BOOLEAN arg3 = 3;
+    SimpleStruct arg4 = 4;
+    SimpleStruct arg5[] = 5;
+    SimpleEnum arg6[] = 6;
+  }
+
+  attribute(writable) boolean boolean = 0;
+  attribute(writable) bitmap8 bitmap8 = 1;
+  attribute(writable) bitmap16 bitmap16 = 2;
+  attribute(writable) bitmap32 bitmap32 = 3;
+  attribute(writable) bitmap64 bitmap64 = 4;
+  attribute(writable) int8u int8u = 5;
+  attribute(writable) int16u int16u = 6;
+  attribute(writable) int24u int24u = 7;
+  attribute(writable) int32u int32u = 8;
+  attribute(writable) int40u int40u = 9;
+  attribute(writable) int48u int48u = 10;
+  attribute(writable) int56u int56u = 11;
+  attribute(writable) int64u int64u = 12;
+  attribute(writable) int8s int8s = 13;
+  attribute(writable) int16s int16s = 14;
+  attribute(writable) int24s int24s = 15;
+  attribute(writable) int32s int32s = 16;
+  attribute(writable) int40s int40s = 17;
+  attribute(writable) int48s int48s = 18;
+  attribute(writable) int56s int56s = 19;
+  attribute(writable) int64s int64s = 20;
+  attribute(writable) enum8 enum8 = 21;
+  attribute(writable) enum16 enum16 = 22;
+  attribute(writable) single floatSingle = 23;
+  attribute(writable) double floatDouble = 24;
+  attribute(writable) octet_string octetString = 25;
+  attribute(writable) INT8U listInt8u[] = 26;
+  attribute(writable) OCTET_STRING listOctetString[] = 27;
+  attribute(writable) TestListStructOctet listStructOctetString[] = 28;
+  attribute(writable) long_octet_string longOctetString = 29;
+  attribute(writable) char_string charString = 30;
+  attribute(writable) long_char_string longCharString = 31;
+  attribute(writable) epoch_us epochUs = 32;
+  attribute(writable) epoch_s epochS = 33;
+  attribute(writable) vendor_id vendorId = 34;
+  attribute(writable) NullablesAndOptionalsStruct listNullablesAndOptionalsStruct[] = 35;
+  attribute(writable) SimpleEnum enumAttr = 36;
+  attribute(writable) SimpleStruct structAttr = 37;
+  attribute(writable) int8u rangeRestrictedInt8u = 38;
+  attribute(writable) int8s rangeRestrictedInt8s = 39;
+  attribute(writable) int16u rangeRestrictedInt16u = 40;
+  attribute(writable) int16s rangeRestrictedInt16s = 41;
+  attribute(readonly) LONG_OCTET_STRING listLongOctetString[] = 42;
+  attribute(writable) boolean timedWriteBoolean = 48;
+  attribute(writable) boolean nullableBoolean = 32768;
+  attribute(writable) bitmap8 nullableBitmap8 = 32769;
+  attribute(writable) bitmap16 nullableBitmap16 = 32770;
+  attribute(writable) bitmap32 nullableBitmap32 = 32771;
+  attribute(writable) bitmap64 nullableBitmap64 = 32772;
+  attribute(writable) int8u nullableInt8u = 32773;
+  attribute(writable) int16u nullableInt16u = 32774;
+  attribute(writable) int24u nullableInt24u = 32775;
+  attribute(writable) int32u nullableInt32u = 32776;
+  attribute(writable) int40u nullableInt40u = 32777;
+  attribute(writable) int48u nullableInt48u = 32778;
+  attribute(writable) int56u nullableInt56u = 32779;
+  attribute(writable) int64u nullableInt64u = 32780;
+  attribute(writable) int8s nullableInt8s = 32781;
+  attribute(writable) int16s nullableInt16s = 32782;
+  attribute(writable) int24s nullableInt24s = 32783;
+  attribute(writable) int32s nullableInt32s = 32784;
+  attribute(writable) int40s nullableInt40s = 32785;
+  attribute(writable) int48s nullableInt48s = 32786;
+  attribute(writable) int56s nullableInt56s = 32787;
+  attribute(writable) int64s nullableInt64s = 32788;
+  attribute(writable) enum8 nullableEnum8 = 32789;
+  attribute(writable) enum16 nullableEnum16 = 32790;
+  attribute(writable) single nullableFloatSingle = 32791;
+  attribute(writable) double nullableFloatDouble = 32792;
+  attribute(writable) octet_string nullableOctetString = 32793;
+  attribute(writable) char_string nullableCharString = 32798;
+  attribute(writable) SimpleEnum nullableEnumAttr = 32804;
+  attribute(writable) SimpleStruct nullableStruct = 32805;
+  attribute(writable) int8u nullableRangeRestrictedInt8u = 32806;
+  attribute(writable) int8s nullableRangeRestrictedInt8s = 32807;
+  attribute(writable) int16u nullableRangeRestrictedInt16u = 32808;
+  attribute(writable) int16s nullableRangeRestrictedInt16s = 32809;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  request struct SimpleStructEchoRequestRequest {
+    SimpleStruct arg1 = 0;
+  }
+
+  request struct TestAddArgumentsRequest {
+    INT8U arg1 = 0;
+    INT8U arg2 = 1;
+  }
+
+  request struct TestEmitTestEventRequestRequest {
+    INT8U arg1 = 0;
+    SimpleEnum arg2 = 1;
+    BOOLEAN arg3 = 2;
+  }
+
+  request struct TestEnumsRequestRequest {
+    vendor_id arg1 = 0;
+    SimpleEnum arg2 = 1;
+  }
+
+  request struct TestListInt8UArgumentRequestRequest {
+    INT8U arg1[] = 0;
+  }
+
+  request struct TestListInt8UReverseRequestRequest {
+    INT8U arg1[] = 0;
+  }
+
+  request struct TestListNestedStructListArgumentRequestRequest {
+    NestedStructList arg1[] = 0;
+  }
+
+  request struct TestListStructArgumentRequestRequest {
+    SimpleStruct arg1[] = 0;
+  }
+
+  request struct TestNestedStructArgumentRequestRequest {
+    NestedStruct arg1 = 0;
+  }
+
+  request struct TestNestedStructListArgumentRequestRequest {
+    NestedStructList arg1 = 0;
+  }
+
+  request struct TestNullableOptionalRequestRequest {
+    optional nullable INT8U arg1 = 0;
+  }
+
+  request struct TestSimpleOptionalArgumentRequestRequest {
+    optional BOOLEAN arg1 = 0;
+  }
+
+  request struct TestStructArgumentRequestRequest {
+    SimpleStruct arg1 = 0;
+  }
+
+  response struct SimpleStructResponse {
+    SimpleStruct arg1 = 0;
+  }
+
+  response struct TestAddArgumentsResponse {
+    INT8U returnValue = 0;
+  }
+
+  response struct TestEmitTestEventResponse {
+    INT64U value = 0;
+  }
+
+  response struct TestEnumsResponse {
+    vendor_id arg1 = 0;
+    SimpleEnum arg2 = 1;
+  }
+
+  response struct TestListInt8UReverseResponse {
+    INT8U arg1[] = 0;
+  }
+
+  response struct TestNullableOptionalResponse {
+    BOOLEAN wasPresent = 0;
+    optional BOOLEAN wasNull = 1;
+    optional INT8U value = 2;
+    optional nullable INT8U originalValue = 3;
+  }
+
+  response struct TestSpecificResponse {
+    INT8U returnValue = 0;
+  }
+
+  command SimpleStructEchoRequest(SimpleStructEchoRequestRequest): SimpleStructResponse = 17;
+  command Test(): DefaultSuccess = 0;
+  command TestAddArguments(TestAddArgumentsRequest): TestAddArgumentsResponse = 4;
+  command TestEmitTestEventRequest(TestEmitTestEventRequestRequest): TestEmitTestEventResponse = 20;
+  command TestEnumsRequest(TestEnumsRequestRequest): TestEnumsResponse = 14;
+  command TestListInt8UArgumentRequest(TestListInt8UArgumentRequestRequest): BooleanResponse = 10;
+  command TestListInt8UReverseRequest(TestListInt8UReverseRequestRequest): TestListInt8UReverseResponse = 13;
+  command TestListNestedStructListArgumentRequest(TestListNestedStructListArgumentRequestRequest): BooleanResponse = 12;
+  command TestListStructArgumentRequest(TestListStructArgumentRequestRequest): BooleanResponse = 9;
+  command TestNestedStructArgumentRequest(TestNestedStructArgumentRequestRequest): BooleanResponse = 8;
+  command TestNestedStructListArgumentRequest(TestNestedStructListArgumentRequestRequest): BooleanResponse = 11;
+  command TestNotHandled(): DefaultSuccess = 1;
+  command TestNullableOptionalRequest(TestNullableOptionalRequestRequest): TestNullableOptionalResponse = 15;
+  command TestSimpleOptionalArgumentRequest(TestSimpleOptionalArgumentRequestRequest): DefaultSuccess = 19;
+  command TestSpecific(): TestSpecificResponse = 2;
+  command TestStructArgumentRequest(TestStructArgumentRequestRequest): BooleanResponse = 7;
+  command TimedInvokeRequest(): DefaultSuccess = 18;
+}
+
+server cluster Thermostat = 513 {
+  enum SetpointAdjustMode : ENUM8 {
+    kHeatSetpoint = 0;
+    kCoolSetpoint = 1;
+    kHeatAndCoolSetpoints = 2;
+  }
+
+  attribute(readonly) int16s localTemperature = 0;
+  attribute(readonly) int16s absMinHeatSetpointLimit = 3;
+  attribute(readonly) int16s absMaxHeatSetpointLimit = 4;
+  attribute(readonly) int16s absMinCoolSetpointLimit = 5;
+  attribute(readonly) int16s absMaxCoolSetpointLimit = 6;
+  attribute(writable) int16s occupiedCoolingSetpoint = 17;
+  attribute(writable) int16s occupiedHeatingSetpoint = 18;
+  attribute(writable) int16s minHeatSetpointLimit = 21;
+  attribute(writable) int16s maxHeatSetpointLimit = 22;
+  attribute(writable) int16s minCoolSetpointLimit = 23;
+  attribute(writable) int16s maxCoolSetpointLimit = 24;
+  attribute(writable) int8s minSetpointDeadBand = 25;
+  attribute(writable) enum8 controlSequenceOfOperation = 27;
+  attribute(writable) enum8 systemMode = 28;
+  attribute(readonly) enum8 startOfWeek = 32;
+  attribute(readonly) int8u numberOfWeeklyTransitions = 33;
+  attribute(readonly) int8u numberOfDailyTransitions = 34;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster ThermostatUserInterfaceConfiguration = 516 {
+  attribute(writable) enum8 temperatureDisplayMode = 0;
+  attribute(writable) enum8 keypadLockout = 1;
+  attribute(writable) enum8 scheduleProgrammingVisibility = 2;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster ThreadNetworkDiagnostics = 53 {
+  enum NetworkFault : ENUM8 {
+    kUnspecified = 0;
+    kLinkDown = 1;
+    kHardwareFailure = 2;
+    kNetworkJammed = 3;
+  }
+
+  enum RoutingRole : ENUM8 {
+    kUnspecified = 0;
+    kUnassigned = 1;
+    kSleepyEndDevice = 2;
+    kEndDevice = 3;
+    kReed = 4;
+    kRouter = 5;
+    kLeader = 6;
+  }
+
+  enum ThreadConnectionStatus : ENUM8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
+  struct NeighborTable {
+    INT64U extAddress = 1;
+    INT32U age = 2;
+    INT16U rloc16 = 3;
+    INT32U linkFrameCounter = 4;
+    INT32U mleFrameCounter = 5;
+    INT8U lqi = 6;
+    INT8S averageRssi = 7;
+    INT8S lastRssi = 8;
+    INT8U frameErrorRate = 9;
+    INT8U messageErrorRate = 10;
+    BOOLEAN rxOnWhenIdle = 11;
+    BOOLEAN fullThreadDevice = 12;
+    BOOLEAN fullNetworkData = 13;
+    BOOLEAN isChild = 14;
+  }
+
+  struct RouteTable {
+    INT64U extAddress = 1;
+    INT16U rloc16 = 2;
+    INT8U routerId = 3;
+    INT8U nextHop = 4;
+    INT8U pathCost = 5;
+    INT8U LQIIn = 6;
+    INT8U LQIOut = 7;
+    INT8U age = 8;
+    BOOLEAN allocated = 9;
+    BOOLEAN linkEstablished = 10;
+  }
+
+  struct SecurityPolicy {
+    INT16U rotationTime = 1;
+    BITMAP16 flags = 2;
+  }
+
+  struct OperationalDatasetComponents {
+    BOOLEAN activeTimestampPresent = 1;
+    BOOLEAN pendingTimestampPresent = 2;
+    BOOLEAN masterKeyPresent = 3;
+    BOOLEAN networkNamePresent = 4;
+    BOOLEAN extendedPanIdPresent = 5;
+    BOOLEAN meshLocalPrefixPresent = 6;
+    BOOLEAN delayPresent = 7;
+    BOOLEAN panIdPresent = 8;
+    BOOLEAN channelPresent = 9;
+    BOOLEAN pskcPresent = 10;
+    BOOLEAN securityPolicyPresent = 11;
+    BOOLEAN channelMaskPresent = 12;
+  }
+
+  info event ConnectionStatus = 0 {
+    ThreadConnectionStatus connectionStatus = 0;
+  }
+
+  attribute(readonly) int16u channel = 0;
+  attribute(readonly) enum8 routingRole = 1;
+  attribute(readonly) octet_string networkName = 2;
+  attribute(readonly) int16u panId = 3;
+  attribute(readonly) int64u extendedPanId = 4;
+  attribute(readonly) octet_string meshLocalPrefix = 5;
+  attribute(readonly) int64u overrunCount = 6;
+  attribute(readonly) NeighborTable neighborTableList[] = 7;
+  attribute(readonly) RouteTable routeTableList[] = 8;
+  attribute(readonly) int32u partitionId = 9;
+  attribute(readonly) int8u weighting = 10;
+  attribute(readonly) int8u dataVersion = 11;
+  attribute(readonly) int8u stableDataVersion = 12;
+  attribute(readonly) int8u leaderRouterId = 13;
+  attribute(readonly) int16u detachedRoleCount = 14;
+  attribute(readonly) int16u childRoleCount = 15;
+  attribute(readonly) int16u routerRoleCount = 16;
+  attribute(readonly) int16u leaderRoleCount = 17;
+  attribute(readonly) int16u attachAttemptCount = 18;
+  attribute(readonly) int16u partitionIdChangeCount = 19;
+  attribute(readonly) int16u betterPartitionAttachAttemptCount = 20;
+  attribute(readonly) int16u parentChangeCount = 21;
+  attribute(readonly) int32u txTotalCount = 22;
+  attribute(readonly) int32u txUnicastCount = 23;
+  attribute(readonly) int32u txBroadcastCount = 24;
+  attribute(readonly) int32u txAckRequestedCount = 25;
+  attribute(readonly) int32u txAckedCount = 26;
+  attribute(readonly) int32u txNoAckRequestedCount = 27;
+  attribute(readonly) int32u txDataCount = 28;
+  attribute(readonly) int32u txDataPollCount = 29;
+  attribute(readonly) int32u txBeaconCount = 30;
+  attribute(readonly) int32u txBeaconRequestCount = 31;
+  attribute(readonly) int32u txOtherCount = 32;
+  attribute(readonly) int32u txRetryCount = 33;
+  attribute(readonly) int32u txDirectMaxRetryExpiryCount = 34;
+  attribute(readonly) int32u txIndirectMaxRetryExpiryCount = 35;
+  attribute(readonly) int32u txErrCcaCount = 36;
+  attribute(readonly) int32u txErrAbortCount = 37;
+  attribute(readonly) int32u txErrBusyChannelCount = 38;
+  attribute(readonly) int32u rxTotalCount = 39;
+  attribute(readonly) int32u rxUnicastCount = 40;
+  attribute(readonly) int32u rxBroadcastCount = 41;
+  attribute(readonly) int32u rxDataCount = 42;
+  attribute(readonly) int32u rxDataPollCount = 43;
+  attribute(readonly) int32u rxBeaconCount = 44;
+  attribute(readonly) int32u rxBeaconRequestCount = 45;
+  attribute(readonly) int32u rxOtherCount = 46;
+  attribute(readonly) int32u rxAddressFilteredCount = 47;
+  attribute(readonly) int32u rxDestAddrFilteredCount = 48;
+  attribute(readonly) int32u rxDuplicatedCount = 49;
+  attribute(readonly) int32u rxErrNoFrameCount = 50;
+  attribute(readonly) int32u rxErrUnknownNeighborCount = 51;
+  attribute(readonly) int32u rxErrInvalidSrcAddrCount = 52;
+  attribute(readonly) int32u rxErrSecCount = 53;
+  attribute(readonly) int32u rxErrFcsCount = 54;
+  attribute(readonly) int32u rxErrOtherCount = 55;
+  attribute(readonly) int64u activeTimestamp = 56;
+  attribute(readonly) int64u pendingTimestamp = 57;
+  attribute(readonly) int32u delay = 58;
+  attribute(readonly) SecurityPolicy securityPolicy[] = 59;
+  attribute(readonly) octet_string channelMask = 60;
+  attribute(readonly) OperationalDatasetComponents operationalDatasetComponents[] = 61;
+  attribute(readonly) NetworkFault activeNetworkFaultsList[] = 62;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
+}
+
+server cluster UserLabel = 65 {
+  attribute(writable) LabelStruct labelList[] = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster WakeOnLan = 1283 {
+  attribute(readonly) char_string wakeOnLanMacAddress = 0;
+  attribute(readonly) int16u clusterRevision = 65533;
+}
+
+server cluster WiFiNetworkDiagnostics = 54 {
+  enum AssociationFailureCause : ENUM8 {
+    kUnknown = 0;
+    kAssociationFailed = 1;
+    kAuthenticationFailed = 2;
+    kSsidNotFound = 3;
+  }
+
+  enum SecurityType : ENUM8 {
+    kUnspecified = 0;
+    kNone = 1;
+    kWep = 2;
+    kWpa = 3;
+    kWpa2 = 4;
+    kWpa3 = 5;
+  }
+
+  enum WiFiConnectionStatus : ENUM8 {
+    kConnected = 0;
+    kNotConnected = 1;
+  }
+
+  enum WiFiVersionType : ENUM8 {
+    k80211a = 0;
+    k80211b = 1;
+    k80211g = 2;
+    k80211n = 3;
+    k80211ac = 4;
+    k80211ax = 5;
+  }
+
+  info event Disconnection = 0 {
+    INT16U reasonCode = 0;
+  }
+
+  info event AssociationFailure = 1 {
+    AssociationFailureCause associationFailure = 0;
+    INT16U status = 1;
+  }
+
+  info event ConnectionStatus = 2 {
+    WiFiConnectionStatus connectionStatus = 0;
+  }
+
+  attribute(readonly) octet_string bssid = 0;
+  attribute(readonly) enum8 securityType = 1;
+  attribute(readonly) enum8 wiFiVersion = 2;
+  attribute(readonly) int16u channelNumber = 3;
+  attribute(readonly) int8s rssi = 4;
+  attribute(readonly) int32u beaconLostCount = 5;
+  attribute(readonly) int32u beaconRxCount = 6;
+  attribute(readonly) int32u packetMulticastRxCount = 7;
+  attribute(readonly) int32u packetMulticastTxCount = 8;
+  attribute(readonly) int32u packetUnicastRxCount = 9;
+  attribute(readonly) int32u packetUnicastTxCount = 10;
+  attribute(readonly) int64u currentMaxRate = 11;
+  attribute(readonly) int64u overrunCount = 12;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  command ResetCounts(): DefaultSuccess = 0;
+}
+
+server cluster WindowCovering = 258 {
+  attribute(readonly) enum8 type = 0;
+  attribute(readonly) int16u currentPositionLift = 3;
+  attribute(readonly) int16u currentPositionTilt = 4;
+  attribute(readonly) bitmap8 configStatus = 7;
+  attribute(readonly) Percent currentPositionLiftPercentage = 8;
+  attribute(readonly) Percent currentPositionTiltPercentage = 9;
+  attribute(readonly) bitmap8 operationalStatus = 10;
+  attribute(readonly) Percent100ths targetPositionLiftPercent100ths = 11;
+  attribute(readonly) Percent100ths targetPositionTiltPercent100ths = 12;
+  attribute(readonly) enum8 endProductType = 13;
+  attribute(readonly) Percent100ths currentPositionLiftPercent100ths = 14;
+  attribute(readonly) Percent100ths currentPositionTiltPercent100ths = 15;
+  attribute(readonly) int16u installedOpenLimitLift = 16;
+  attribute(readonly) int16u installedClosedLimitLift = 17;
+  attribute(readonly) int16u installedOpenLimitTilt = 18;
+  attribute(readonly) int16u installedClosedLimitTilt = 19;
+  attribute(writable) bitmap8 mode = 23;
+  attribute(readonly) bitmap16 safetyStatus = 26;
+  attribute(readonly) bitmap32 featureMap = 65532;
+  attribute(readonly) int16u clusterRevision = 65533;
+
+  command DownOrClose(): DefaultSuccess = 1;
+  command StopMotion(): DefaultSuccess = 2;
+  command UpOrOpen(): DefaultSuccess = 0;
+}
+
+
+endpoint 0 {
+  server  cluster AccessControl;
+  server  cluster AdministratorCommissioning;
+  server  cluster Basic;
+  server  cluster Binding;
+  server  cluster Descriptor;
+  server  cluster DiagnosticLogs;
+  server  cluster EthernetNetworkDiagnostics;
+  server  cluster FixedLabel;
+  server  cluster GeneralCommissioning;
+  server  cluster GeneralDiagnostics;
+  server  cluster GroupKeyManagement;
+  server  cluster Groups;
+  server  cluster Identify;
+  server  cluster LocalizationConfiguration;
+  server  cluster NetworkCommissioning;
+  binding cluster OtaSoftwareUpdateProvider;
+  server  cluster OtaSoftwareUpdateRequestor;
+  server  cluster OperationalCredentials;
+  server  cluster PowerSourceConfiguration;
+  server  cluster RelativeHumidityMeasurement;
+  server  cluster SoftwareDiagnostics;
+  server  cluster ThreadNetworkDiagnostics;
+  server  cluster UserLabel;
+  server  cluster WiFiNetworkDiagnostics;
+}
+
+endpoint 1 {
+  server  cluster AccountLogin;
+  server  cluster ApplicationBasic;
+  server  cluster ApplicationLauncher;
+  server  cluster AudioOutput;
+  server  cluster BarrierControl;
+  server  cluster BinaryInputBasic;
+  server  cluster Binding;
+  server  cluster BooleanState;
+  server  cluster BridgedActions;
+  server  cluster BridgedDeviceBasic;
+  server  cluster Channel;
+  server  cluster ColorControl;
+  server  cluster ContentLauncher;
+  server  cluster Descriptor;
+  server  cluster DoorLock;
+  server  cluster ElectricalMeasurement;
+  server  cluster FixedLabel;
+  server  cluster FlowMeasurement;
+  server  cluster Groups;
+  server  cluster IasZone;
+  server  cluster Identify;
+  server  cluster IlluminanceMeasurement;
+  server  cluster KeypadInput;
+  server  cluster LevelControl;
+  server  cluster LocalizationConfiguration;
+  server  cluster LowPower;
+  server  cluster MediaInput;
+  server  cluster MediaPlayback;
+  server  cluster ModeSelect;
+  server  cluster NetworkCommissioning;
+  server  cluster OccupancySensing;
+  server  cluster OnOff;
+  server  cluster OnOffSwitchConfiguration;
+  server  cluster PowerSource;
+  server  cluster PressureMeasurement;
+  server  cluster PumpConfigurationAndControl;
+  server  cluster RelativeHumidityMeasurement;
+  server  cluster Scenes;
+  server  cluster Switch;
+  server  cluster TargetNavigator;
+  server  cluster TemperatureMeasurement;
+  server  cluster TestCluster;
+  server  cluster Thermostat;
+  server  cluster ThermostatUserInterfaceConfiguration;
+  server  cluster UserLabel;
+  server  cluster WakeOnLan;
+  server  cluster WindowCovering;
+}
+
+endpoint 2 {
+  server  cluster Descriptor;
+  server  cluster Groups;
+  server  cluster OccupancySensing;
+  server  cluster OnOff;
+}
+

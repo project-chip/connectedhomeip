@@ -39,7 +39,7 @@ tests:
       command: "readAttribute"
       attribute: "max level"
       response:
-          value: 255
+          value: 254
 
     - label: "sends a Move to level command"
       command: "MoveToLevel"
@@ -120,7 +120,7 @@ tests:
       arguments:
           values:
               - name: "ms"
-                value: 10
+                value: 100
 
     - label: "reads CurrentLevel attribute from DUT"
       command: "readAttribute"

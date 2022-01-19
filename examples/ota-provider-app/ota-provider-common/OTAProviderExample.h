@@ -44,19 +44,19 @@ public:
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::NotifyUpdateApplied::DecodableType & commandData) override;
 
-    enum queryImageBehaviorType
+    enum QueryImageBehaviorType
     {
         kRespondWithUpdateAvailable,
         kRespondWithBusy,
         kRespondWithNotAvailable
     };
-    void SetQueryImageBehavior(queryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
+    void SetQueryImageBehavior(QueryImageBehaviorType behavior) { mQueryImageBehavior = behavior; }
     void SetDelayedActionTimeSec(uint32_t time) { mDelayedActionTimeSec = time; }
 
 private:
     BdxOtaSender mBdxOtaSender;
     static constexpr size_t kFilepathBufLen = 256;
     char mOTAFilePath[kFilepathBufLen]; // null-terminated
-    queryImageBehaviorType mQueryImageBehavior;
+    QueryImageBehaviorType mQueryImageBehavior;
     uint32_t mDelayedActionTimeSec;
 };

@@ -110,6 +110,11 @@ struct StatusIB
      */
     void InitFromChipError(CHIP_ERROR aError);
 
+    /**
+     * Register the StatusIB error formatter.
+     */
+    static void RegisterErrorFormatter();
+
     Protocols::InteractionModel::Status mStatus = Protocols::InteractionModel::Status::Success;
     Optional<ClusterStatus> mClusterStatus      = Optional<ClusterStatus>::Missing();
 

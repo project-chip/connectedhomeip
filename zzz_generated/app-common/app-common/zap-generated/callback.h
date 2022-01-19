@@ -15285,23 +15285,21 @@ void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks);
  */
 EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                                           chip::AttributeId attributeId, uint8_t mask,
-                                                                          uint16_t manufacturerCode, uint8_t * value, uint8_t type);
+                                                                          uint8_t * value, uint8_t type);
 
 /** @brief Attribute Read Access
  *
  * This function is called whenever the Application Framework needs to check
  * access permission for an attribute read.
  */
-bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
-                                        chip::AttributeId attributeId);
+bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 /** @brief Attribute Write Access
  *
  * This function is called whenever the Application Framework needs to check
  * access permission for an attribute write.
  */
-bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
-                                         chip::AttributeId attributeId);
+bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId);
 
 /** @brief Default Response
  *
@@ -15381,8 +15379,8 @@ bool emberAfMessageSentCallback(const chip::MessageSendDestination & destination
  * application was not able to read the attribute.
  */
 EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                   EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                   uint8_t * buffer, uint16_t maxReadLength);
+                                                   EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer,
+                                                   uint16_t maxReadLength);
 
 /** @brief External Attribute Write
  *
@@ -15425,8 +15423,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, ch
  * attribute.
  */
 EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
-                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                    uint8_t * buffer);
+                                                    EmberAfAttributeMetadata * attributeMetadata, uint8_t * buffer);
 
 /** @brief Get Current Time
  *

@@ -3278,6 +3278,14 @@ enum class StepMode : uint8_t
 using StepMode                        = EmberAfStepMode;
 #endif
 
+// Bitmap for LevelControlFeature
+enum class LevelControlFeature : uint32_t
+{
+    kOnOff     = 0x1,
+    kLighting  = 0x2,
+    kFrequency = 0x4,
+};
+
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
@@ -3784,9 +3792,9 @@ struct TypeInfo
 namespace StartUpCurrentLevel {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableType    = chip::app::DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const chip::app::DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpCurrentLevel::Id; }
@@ -3851,7 +3859,7 @@ struct TypeInfo
         Attributes::OnTransitionTime::TypeInfo::DecodableType onTransitionTime;
         Attributes::OffTransitionTime::TypeInfo::DecodableType offTransitionTime;
         Attributes::DefaultMoveRate::TypeInfo::DecodableType defaultMoveRate;
-        Attributes::StartUpCurrentLevel::TypeInfo::DecodableType startUpCurrentLevel = static_cast<uint8_t>(0);
+        Attributes::StartUpCurrentLevel::TypeInfo::DecodableType startUpCurrentLevel;
         Attributes::AttributeList::TypeInfo::DecodableType attributeList;
         Attributes::FeatureMap::TypeInfo::DecodableType featureMap           = static_cast<uint32_t>(0);
         Attributes::ClusterRevision::TypeInfo::DecodableType clusterRevision = static_cast<uint16_t>(0);
@@ -6394,6 +6402,13 @@ enum class AuthMode : uint8_t
     kCase  = 0x02,
     kGroup = 0x03,
 };
+// Enum for ChangeTypeEnum
+enum class ChangeTypeEnum : uint8_t
+{
+    kChanged = 0x00,
+    kAdded   = 0x01,
+    kRemoved = 0x02,
+};
 // Enum for Privilege
 enum class Privilege : uint8_t
 {
@@ -6568,6 +6583,98 @@ struct TypeInfo
     };
 };
 } // namespace Attributes
+namespace Events {
+namespace AccessControlEntryChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kAdminFabricIndex = 0,
+    kAdminNodeID      = 1,
+    kAdminPasscodeID  = 2,
+    kChangeType       = 3,
+    kLatestValue      = 4,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::NodeId adminNodeID           = static_cast<chip::NodeId>(0);
+    uint16_t adminPasscodeID           = static_cast<uint16_t>(0);
+    ChangeTypeEnum changeType          = static_cast<ChangeTypeEnum>(0);
+    Structs::AccessControlEntry::Type latestValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::NodeId adminNodeID           = static_cast<chip::NodeId>(0);
+    uint16_t adminPasscodeID           = static_cast<uint16_t>(0);
+    ChangeTypeEnum changeType          = static_cast<ChangeTypeEnum>(0);
+    Structs::AccessControlEntry::DecodableType latestValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AccessControlEntryChanged
+namespace AccessControlExtensionChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kAdminFabricIndex = 0,
+    kAdminNodeID      = 1,
+    kAdminPasscodeID  = 2,
+    kChangeType       = 3,
+    kLatestValue      = 4,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::NodeId adminNodeID           = static_cast<chip::NodeId>(0);
+    uint16_t adminPasscodeID           = static_cast<uint16_t>(0);
+    ChangeTypeEnum changeType          = static_cast<ChangeTypeEnum>(0);
+    Structs::ExtensionEntry::Type latestValue;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+
+    chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
+    chip::NodeId adminNodeID           = static_cast<chip::NodeId>(0);
+    uint16_t adminPasscodeID           = static_cast<uint16_t>(0);
+    ChangeTypeEnum changeType          = static_cast<ChangeTypeEnum>(0);
+    Structs::ExtensionEntry::DecodableType latestValue;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace AccessControlExtensionChanged
+} // namespace Events
 } // namespace AccessControl
 namespace PollControl {
 

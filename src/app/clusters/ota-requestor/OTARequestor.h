@@ -43,6 +43,7 @@ public:
         kQueryImage = 0,
         kStartBDX,
         kApplyUpdate,
+        kNotifyUpdateApplied,
     };
 
     OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
@@ -61,6 +62,9 @@ public:
 
     // Send ApplyImage
     void ApplyUpdate() override;
+
+    // Send NotifyUpdateApplied
+    void NotifyUpdateApplied() override;
 
     //////////// BDXDownloader::StateDelegate Implementation ///////////////
     void OnDownloadStateChanged(OTADownloader::State state) override;
@@ -189,6 +193,11 @@ private:
     };
 
     /**
+     * Generate an update token using the operational node ID in case of token lost, received in QueryImageResponse
+     */
+    CHIP_ERROR GenerateUpdateToken();
+
+    /**
      * Send QueryImage request using values matching Basic cluster
      */
     CHIP_ERROR SendQueryImageRequest(OperationalDeviceProxy & deviceProxy);
@@ -209,6 +218,11 @@ private:
     CHIP_ERROR SendApplyUpdateRequest(OperationalDeviceProxy & deviceProxy);
 
     /**
+     * Send NotifyUpdateApplied request
+     */
+    CHIP_ERROR SendNotifyUpdateAppliedRequest(OperationalDeviceProxy & deviceProxy);
+
+    /**
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
@@ -227,6 +241,12 @@ private:
      */
     static void OnApplyUpdateResponse(void * context, const ApplyUpdateResponseDecodableType & response);
     static void OnApplyUpdateFailure(void * context, EmberAfStatus);
+
+    /**
+     * NotifyUpdateApplied callbacks
+     */
+    static void OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response);
+    static void OnNotifyUpdateAppliedFailure(void * context, EmberAfStatus);
 
     OTARequestorDriver * mOtaRequestorDriver  = nullptr;
     NodeId mProviderNodeId                    = kUndefinedNodeId;

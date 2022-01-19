@@ -2761,7 +2761,7 @@ class LevelControl(Cluster):
                 ClusterObjectFieldDescriptor(Label="onTransitionTime", Tag=0x00000012, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="offTransitionTime", Tag=0x00000013, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="defaultMoveRate", Tag=0x00000014, Type=typing.Union[None, Nullable, uint]),
-                ClusterObjectFieldDescriptor(Label="startUpCurrentLevel", Tag=0x00004000, Type=typing.Optional[uint]),
+                ClusterObjectFieldDescriptor(Label="startUpCurrentLevel", Tag=0x00004000, Type=typing.Union[None, Nullable, uint]),
                 ClusterObjectFieldDescriptor(Label="attributeList", Tag=0x0000FFFB, Type=typing.List[uint]),
                 ClusterObjectFieldDescriptor(Label="featureMap", Tag=0x0000FFFC, Type=typing.Optional[uint]),
                 ClusterObjectFieldDescriptor(Label="clusterRevision", Tag=0x0000FFFD, Type=uint),
@@ -2780,7 +2780,7 @@ class LevelControl(Cluster):
     onTransitionTime: 'typing.Union[None, Nullable, uint]' = None
     offTransitionTime: 'typing.Union[None, Nullable, uint]' = None
     defaultMoveRate: 'typing.Union[None, Nullable, uint]' = None
-    startUpCurrentLevel: 'typing.Optional[uint]' = None
+    startUpCurrentLevel: 'typing.Union[None, Nullable, uint]' = None
     attributeList: 'typing.List[uint]' = None
     featureMap: 'typing.Optional[uint]' = None
     clusterRevision: 'uint' = None
@@ -3167,9 +3167,9 @@ class LevelControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+                return ClusterObjectFieldDescriptor(Type=typing.Union[None, Nullable, uint])
 
-            value: 'typing.Optional[uint]' = None
+            value: 'typing.Union[None, Nullable, uint]' = None
 
         @dataclass
         class AttributeList(ClusterAttributeDescriptor):
@@ -5135,6 +5135,11 @@ class AccessControl(Cluster):
             kCase = 0x02
             kGroup = 0x03
 
+        class ChangeTypeEnum(IntEnum):
+            kChanged = 0x00
+            kAdded = 0x01
+            kRemoved = 0x02
+
         class Privilege(IntEnum):
             kView = 0x01
             kProxyView = 0x02
@@ -5275,6 +5280,61 @@ class AccessControl(Cluster):
 
             value: 'uint' = 0
 
+
+    class Events:
+        @dataclass
+        class AccessControlEntryChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="changeType", Tag=3, Type=AccessControl.Enums.ChangeTypeEnum),
+                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=AccessControl.Structs.AccessControlEntry),
+                    ])
+
+            adminFabricIndex: 'uint' = 0
+            adminNodeID: 'uint' = 0
+            adminPasscodeID: 'uint' = 0
+            changeType: 'AccessControl.Enums.ChangeTypeEnum' = 0
+            latestValue: 'AccessControl.Structs.AccessControlEntry' = field(default_factory=lambda: AccessControl.Structs.AccessControlEntry())
+
+        @dataclass
+        class AccessControlExtensionChanged(ClusterEvent):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="adminFabricIndex", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="adminNodeID", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="adminPasscodeID", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="changeType", Tag=3, Type=AccessControl.Enums.ChangeTypeEnum),
+                            ClusterObjectFieldDescriptor(Label="latestValue", Tag=4, Type=AccessControl.Structs.ExtensionEntry),
+                    ])
+
+            adminFabricIndex: 'uint' = 0
+            adminNodeID: 'uint' = 0
+            adminPasscodeID: 'uint' = 0
+            changeType: 'AccessControl.Enums.ChangeTypeEnum' = 0
+            latestValue: 'AccessControl.Structs.ExtensionEntry' = field(default_factory=lambda: AccessControl.Structs.ExtensionEntry())
 
 
 @dataclass
