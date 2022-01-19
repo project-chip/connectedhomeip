@@ -145,11 +145,15 @@ chip-device-ctrl > ble-scan
 
 ### Step 4: Set network pairing credentials
 
-You must provide the controller with network credentials that will be further used in the device commissioning procedure to configure the device with a network interface, such as Thread or Wi-Fi.
+You must provide the controller with network credentials that will be further
+used in the device commissioning procedure to configure the device with a
+network interface, such as Thread or Wi-Fi.
 
 #### Setting Thread network credentials
 
-1. Fetch and store the current Active Operational Dataset from the Thread Border Router. Depending on if the Thread Border Router is running on Docker or natively on Raspberry Pi, execute the following commands:
+1. Fetch and store the current Active Operational Dataset from the Thread Border
+   Router. Depending on if the Thread Border Router is running on Docker or
+   natively on Raspberry Pi, execute the following commands:
 
     - For Docker:
 
@@ -172,7 +176,8 @@ You must provide the controller with network credentials that will be further us
     datasets directly from the Thread Border Router, you might also use a
     different out-of-band method.
 
-2. Set the previously obtained Active Operational Dataset as a hex-encoded value using the following command:
+2. Set the previously obtained Active Operational Dataset as a hex-encoded value
+   using the following command:
 
     ```
     chip-device-ctrl > set-pairing-thread-credential 0e080000000000010000000300001135060004001fffe0020811111111222222220708fd910d7c195b2158051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212550410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8
@@ -180,7 +185,8 @@ You must provide the controller with network credentials that will be further us
 
 #### Setting Wi-Fi network credentials
 
-Assuming your Wi-Fi SSID is _TESTSSID_, and your Wi-Fi password is _P455W4RD_, set the credentials to the controller by executing the following command:
+Assuming your Wi-Fi SSID is _TESTSSID_, and your Wi-Fi password is _P455W4RD_,
+set the credentials to the controller by executing the following command:
 
 ```
 chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
@@ -189,9 +195,9 @@ chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
 ### Step 5: Commission the Matter accessory device over Bluetooth LE
 
 The controller uses a 12-bit value called **discriminator** to discern between
-multiple commissionable device advertisements, as well as a 27-bit **setup PIN code**
-to authenticate the device. You can find these
-values in the logging terminal of the device (for example, UART). For example:
+multiple commissionable device advertisements, as well as a 27-bit **setup PIN
+code** to authenticate the device. You can find these values in the logging
+terminal of the device (for example, UART). For example:
 
 ```
 I: 254 [DL]Device Configuration:
@@ -216,21 +222,32 @@ with the following assumptions for the Matter accessory device:
 chip-device-ctrl > connect -ble 3840 20202021 1234
 ```
 
-You can skip the last parameter, the Node ID, in the command. If you skip it, the
-controller will assign it randomly. In that case, note down the Node ID, because it
-is required later in the configuration process.
+You can skip the last parameter, the Node ID, in the command. If you skip it,
+the controller will assign it randomly. In that case, note down the Node ID,
+because it is required later in the configuration process.
 
-After connecting the device over Bluetooth LE, the controller will go through the following stages:
-- Establishing a secure connection that completes the PASE (Password-Authenticated Session Establishment) session
-using SPAKE2+ protocol and results in printing the following log:
+After connecting the device over Bluetooth LE, the controller will go through
+the following stages:
 
-    ```
-    Secure Session to Device Established
-    ```
-- Providing the device with a network interface using ZCL Network Commissioning cluster commands, and the network pairing credentials set in the previous step.
-- Discovering the IPv6 address of the Matter accessory using the SRP (Service Registration Protocol) for Thread devices, or the mDNS (Multicast
-Domain Name System) protocol for Wi-Fi or Ethernet devices. It results in printing log that indicates that the node address has been updated. The IPv6 address of the device is cached in the controller for later usage.
-- Closing the Bluetooth LE connection, as the commissioning process is finished and the Python CHIP controller is now using only the IPv6 traffic to reach the device.
+-   Establishing a secure connection that completes the PASE
+    (Password-Authenticated Session Establishment) session using SPAKE2+
+    protocol and results in printing the following log:
+
+        ```
+        Secure Session to Device Established
+        ```
+
+-   Providing the device with a network interface using ZCL Network
+    Commissioning cluster commands, and the network pairing credentials set in
+    the previous step.
+-   Discovering the IPv6 address of the Matter accessory using the SRP (Service
+    Registration Protocol) for Thread devices, or the mDNS (Multicast Domain
+    Name System) protocol for Wi-Fi or Ethernet devices. It results in printing
+    log that indicates that the node address has been updated. The IPv6 address
+    of the device is cached in the controller for later usage.
+-   Closing the Bluetooth LE connection, as the commissioning process is
+    finished and the Python CHIP controller is now using only the IPv6 traffic
+    to reach the device.
 
 ### Step 6: Control application ZCL clusters.
 
@@ -312,7 +329,8 @@ chip-device-ctrl > ble-scan
 
 ### `set-pairing-thread-credential <threadOperationalDataset>`
 
-Provides the controller with Thread network credentials that will be used in the device commissioning procedure to configure the device with a Thread interface.
+Provides the controller with Thread network credentials that will be used in the
+device commissioning procedure to configure the device with a Thread interface.
 
 ```
 chip-device-ctrl > set-pairing-thread-credential 0e080000000000010000000300001135060004001fffe0020811111111222222220708fd910d7c195b2158051000112233445566778899aabbccddeeff030e4f70656e54687265616444656d6f010212550410445f2b5ca6f2a93a55ce570a70efeecb0c0402a0fff8
@@ -320,7 +338,8 @@ chip-device-ctrl > set-pairing-thread-credential 0e08000000000001000000030000113
 
 ### `set-pairing-wifi-credential <ssid> <credentials>`
 
-Provides the controller with Wi-Fi network credentials that will be used in the device commissioning procedure to configure the device with a Wi-Fi interface.
+Provides the controller with Wi-Fi network credentials that will be used in the
+device commissioning procedure to configure the device with a Wi-Fi interface.
 
 ```
 chip-device-ctrl > set-pairing-wifi-credential TESTSSID P455W4RD
