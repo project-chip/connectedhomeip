@@ -1,14 +1,13 @@
 # Performing Device Firmware Upgrade in the nRF Connect examples
 
 Some examples for the development kits from Nordic Semiconductor support
-over-the-air Device Firmware Upgrade.
-
-Depending on the example, the DFU can be performed using the Matter-compliant
-OTA feature in which the Matter operational network is used for downloading a
-new firmware image, or using
-[Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt)
-over Bluetooth LE. In the latter case, the DFU can be done either using a
-smartphone application or a PC command line tool.
+over-the-air Device Firmware Upgrade using one of the following protocols:
+-   Matter-compliant OTA update protocol that uses the Matter operational
+    network for querying and downloading a new firmware image.
+-   [Simple Management Protocol](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/device_mgmt/index.html#device-mgmt)
+    over Bluetooth LE. In this case, the DFU can be done either using a
+    smartphone application or a PC command line tool. Note that this protocol is
+    not part of the Matter specification.
 
 ## Devide Firmware Upgrade over Matter
 
@@ -17,7 +16,15 @@ smartphone application or a PC command line tool.
 > [Setup OpenThread Border Router on Raspberry Pi](openthread_border_router_pi.md)
 > to learn how to install the OTBR on a Raspberry Pi.
 
-To test the DFU over Matter, complete the following steps:
+The DFU over Matter involves two kinds of nodes: OTA Provider and OTA Requestor.
+The OTA Provider is a node that can respond to the OTA Requestors' queries about
+available software updates and share the update packages with them. The OTA
+Requestor is any node that needs to be updated and can communicate with the OTA
+Provider to fetch applicable software updates. In the procedure described below,
+the OTA Provider will be a Linux application and the example running on the
+Nordic Semiconductor's board will work as the OTA Requestor.
+
+To test the DFU over Matter, you need to complete the following steps:
 
 1.  Navigate to the CHIP root directory.
 2.  Build OTA Provider application for Linux:
@@ -28,7 +35,7 @@ To test the DFU over Matter, complete the following steps:
 
         $ scripts/examples/gn_build_example.sh examples/chip-tool out/chiptool 'chip_mdns="platform"'
 
-4.  Run OTA Provider application with _app_update.bin_ replaced with the path to
+4.  Run OTA Provider application with _app\_update.bin_ replaced with the path to
     the new firmware image which you wish to provide to the Matter device:
 
          $ out/provider/chip-ota-provider-app -f app_update.bin
@@ -42,26 +49,27 @@ To test the DFU over Matter, complete the following steps:
 
 6.  Use the OTBR web interface to form a new Thread network using the default
     network settings.
-7.  Commission the Matter device into the same Matter network using Node Id 2:
+7.  Commission the Matter device into the same Matter network using Node Id 2.
+    The parameter starting with _hex:_ prefix is the Thread network's Active
+    Operational Dataset. It can be retrieved from the OTBR in case you have
+    changed the default network settings when forming the network.
 
          $ ./out/chiptool/chip-tool pairing ble-thread 2 hex:000300000f02081111111122222222051000112233445566778899aabbccddeeff01021234 20202021 3840
-
-    Note that the parameter starting with _hex:_ prefix is the Thread network's
-    Active Operational Dataset. It can be retrieved from the OTBR in case you
-    have changed the default network settings when forming the network.
 
 8.  Initiate the DFU procedure in one of the following ways:
 
     -   If you have built the device firmware with `-DCONFIG_CHIP_LIB_SHELL=y`
-        option which enables Matter shell commands, run the following command on
-        the device shell:
+        option, which enables Matter shell commands, run the following command
+        on the device shell. The numeric arguments are Fabic Index, Provider
+        Node Id and Provider Endpoint Id, respectively.
 
                $ matter ota query 1 1 0
 
     -   Otherwise, use chip-tool to send Announce OTA Provider command to the
-        device:
+        device. Note that Provider Node Id and Provider Endpoint Id are sent in
+        the last two arguments:
 
-               $ ./out/avahi/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
+               $ ./out/chiptool/chip-tool otasoftwareupdaterequestor announce-ota-provider 1 0 0 0 2 0
 
         Once the device is made aware of the OTA Provider node, it automatically
         queries the OTA Provider for a new firmware image.
