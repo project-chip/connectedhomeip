@@ -130,6 +130,28 @@ class TestParser(unittest.TestCase):
                     )])
         self.assertEqual(actual, expected)
 
+    def test_cluster_enum(self):
+        actual = parseText("""
+            client cluster WithEnums = 0xab {
+                enum TestEnum : ENUM16 {
+                    A = 0x123;
+                    B = 0x234;
+                }
+            }
+        """)
+        expected = Idl(clusters=[
+            Cluster(side=ClusterSide.CLIENT,
+                    name="WithEnums",
+                    code=0xab,
+                    enums=[
+                        Enum(name="TestEnum", base_type="ENUM16",
+                             entries=[
+                                 EnumEntry(name="A", code=0x123),
+                                 EnumEntry(name="B", code=0x234),
+                             ])],
+                    )])
+        self.assertEqual(actual, expected)
+
     def test_multiple_clusters(self):
         actual = parseText("""
             server cluster A = 1 {}
