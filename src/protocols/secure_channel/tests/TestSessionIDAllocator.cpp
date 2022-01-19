@@ -37,7 +37,7 @@ void TestSessionIDAllocator_Allocate(nlTestSuite * inSuite, void * inContext)
         CHIP_ERROR err = allocator.Allocate(id);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, id == i);
-        NL_TEST_ASSERT(inSuite, allocator.Peek() == i + 1);
+        NL_TEST_ASSERT(inSuite, allocator.Peek() == static_cast<uint16_t>(i + 1));
     }
 }
 
@@ -52,21 +52,21 @@ void TestSessionIDAllocator_Free(nlTestSuite * inSuite, void * inContext)
     {
         CHIP_ERROR err = allocator.Allocate(id);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, id == (i + j));
-        NL_TEST_ASSERT(inSuite, allocator.Peek() == (i + j + 1));
+        NL_TEST_ASSERT(inSuite, id == static_cast<uint16_t>(i + j));
+        NL_TEST_ASSERT(inSuite, allocator.Peek() == static_cast<uint16_t>(i + j + 1));
     }
 
     // Free an intermediate ID
     allocator.Free(10);
-    NL_TEST_ASSERT(inSuite, allocator.Peek() == (i + 17));
+    NL_TEST_ASSERT(inSuite, allocator.Peek() == static_cast<uint16_t>(i + 17));
 
     // Free the last allocated ID
-    allocator.Free(i + 16);
-    NL_TEST_ASSERT(inSuite, allocator.Peek() == (i + 16));
+    allocator.Free(static_cast<uint16_t>(i + 16));
+    NL_TEST_ASSERT(inSuite, allocator.Peek() == static_cast<uint16_t>(i + 16));
 
     // Free some random unallocated ID
     allocator.Free(100);
-    NL_TEST_ASSERT(inSuite, allocator.Peek() == (i + 16));
+    NL_TEST_ASSERT(inSuite, allocator.Peek() == static_cast<uint16_t>(i + 16));
 }
 
 void TestSessionIDAllocator_Reserve(nlTestSuite * inSuite, void * inContext)
@@ -79,13 +79,13 @@ void TestSessionIDAllocator_Reserve(nlTestSuite * inSuite, void * inContext)
     {
         CHIP_ERROR err = allocator.Allocate(id);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, id == (i + j));
-        NL_TEST_ASSERT(inSuite, allocator.Peek() == (i + j + 1));
+        NL_TEST_ASSERT(inSuite, id == static_cast<uint16_t>(i + j));
+        NL_TEST_ASSERT(inSuite, allocator.Peek() == static_cast<uint16_t>(i + j + 1));
     }
 
     i = allocator.Peek();
-    allocator.Reserve(i + 100);
-    NL_TEST_ASSERT(inSuite, allocator.Peek() == (i + 101));
+    allocator.Reserve(static_cast<uint16_t>(i + 100));
+    NL_TEST_ASSERT(inSuite, allocator.Peek() == static_cast<uint16_t>(i + 101));
 }
 
 void TestSessionIDAllocator_ReserveUpTo(nlTestSuite * inSuite, void * inContext)
@@ -94,8 +94,8 @@ void TestSessionIDAllocator_ReserveUpTo(nlTestSuite * inSuite, void * inContext)
     uint16_t i = allocator.Peek();
 
     i = allocator.Peek();
-    allocator.Reserve(i + 100);
-    NL_TEST_ASSERT(inSuite, allocator.Peek() == (i + 101));
+    allocator.Reserve(static_cast<uint16_t>(i + 100));
+    NL_TEST_ASSERT(inSuite, allocator.Peek() == static_cast<uint16_t>(i + 101));
 }
 
 // Test Suite
