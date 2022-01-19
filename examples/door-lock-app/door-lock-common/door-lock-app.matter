@@ -1162,4 +1162,3 @@ endpoint 1 {
   server  cluster DoorLock;
   server  cluster PowerSource;
 }
-
