@@ -15,12 +15,12 @@
  *    limitations under the License.
  */
 
-#include <platform/CHIPDeviceLayer.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceLayer.h>
 
-#include <platform/EFR32/EFR32Config.h>
 #include "wfx_host_events.h"
+#include <platform/EFR32/EFR32Config.h>
 
 #include "ServiceProvisioning.h"
 
@@ -42,9 +42,10 @@ CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
     // Configure the WFX WiFi interface.
     wfx_set_wifi_provision(&wifiConfig);
     /* Save into internal Keys */
-    (void)Internal::EFR32Config::WriteConfigValueStr (Internal::EFR32Config::kConfigKey_WiFiSSID, (char *)ssid);
-    (void)Internal::EFR32Config::WriteConfigValueStr (Internal::EFR32Config::kConfigKey_WiFiPSK, key);
-    (void)Internal::EFR32Config::WriteConfigValueBin (Internal::EFR32Config::kConfigKey_WiFiSEC, &wifiConfig.security, sizeof (wifiConfig.security));
+    (void) Internal::EFR32Config::WriteConfigValueStr(Internal::EFR32Config::kConfigKey_WiFiSSID, (char *) ssid);
+    (void) Internal::EFR32Config::WriteConfigValueStr(Internal::EFR32Config::kConfigKey_WiFiPSK, key);
+    (void) Internal::EFR32Config::WriteConfigValueBin(Internal::EFR32Config::kConfigKey_WiFiSEC, &wifiConfig.security,
+                                                      sizeof(wifiConfig.security));
 
     ChipLogProgress(DeviceLayer, "SP WiFi STA provision set (SSID: %s)", wifiConfig.ssid);
 

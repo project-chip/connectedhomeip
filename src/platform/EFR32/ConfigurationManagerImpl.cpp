@@ -177,7 +177,7 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
-                                                                uint32_t & value)
+                                                               uint32_t & value)
 {
     // This method reads CHIP Persisted Counter type nvm3 objects.
     // (where persistedStorageKey represents an index to the counter).
@@ -195,7 +195,7 @@ exit:
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
-                                                                 uint32_t value)
+                                                                uint32_t value)
 {
     // This method reads CHIP Persisted Counter type nvm3 objects.
     // (where persistedStorageKey represents an index to the counter).
@@ -308,11 +308,11 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 #ifdef SL_WIFI
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-	sl_wfx_mac_address_t macaddr;
-	wfx_get_wifi_mac_addr (SL_WFX_STA_INTERFACE, &macaddr);
-	memcpy(buf, &macaddr.octet[0], sizeof(macaddr.octet));
+    sl_wfx_mac_address_t macaddr;
+    wfx_get_wifi_mac_addr(SL_WFX_STA_INTERFACE, &macaddr);
+    memcpy(buf, &macaddr.octet[0], sizeof(macaddr.octet));
 
-	return CHIP_NO_ERROR;
+    return CHIP_NO_ERROR;
 }
 #endif
 

@@ -75,7 +75,7 @@ private:
 
     bool _HaveIPv4InternetConnectivity(void);
     bool _HaveIPv6InternetConnectivity(void);
-#if 0//CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if 0 // CHIP_DEVICE_CONFIG_ENABLE_THREAD
     bool _HaveServiceConnectivity(void);
 #endif
     CHIP_ERROR _Init(void);
@@ -161,7 +161,7 @@ inline bool ConnectivityManagerImpl::_CanStartWiFiScan()
     return mWiFiStationState != kWiFiStationState_Connecting;
 }
 #endif
-#if 0//CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if 0 // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
 {
     return _HaveServiceConnectivityViaThread();
