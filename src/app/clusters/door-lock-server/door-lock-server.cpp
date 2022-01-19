@@ -477,7 +477,6 @@ void DoorLockServer::SetCredentialCommandHandler(
         return;
     }
 
-    // TODO: move to a separate function
     // appclusters, 5.2.4.40.3: If the credential data length is out of bounds we should return INVALID_COMMAND
     size_t minSize, maxSize;
     if (!getCredentialRange(commandPath.mEndpointId, credentialType, minSize, maxSize))
@@ -498,7 +497,7 @@ void DoorLockServer::SetCredentialCommandHandler(
     }
 
     // appclusters, 5.2.4.41.1: we should return DUPLICATE in the response if we're trying to create duplicated credential entry
-    for (uint16_t i = 1; i <= maxNumberOfCredentials; ++i)
+    for (uint16_t i = 1; DlCredentialType::kProgrammingPIN != credentialType && (i <= maxNumberOfCredentials); ++i)
     {
         EmberAfPluginDoorLockCredentialInfo currentCredential;
         if (!emberAfPluginDoorLockGetCredential(commandPath.mEndpointId, i, credentialType, currentCredential))
@@ -543,6 +542,16 @@ void DoorLockServer::SetCredentialCommandHandler(
                 commandPath.mEndpointId, credentialIndex);
 
             sendSetCredentialResponse(commandObj, DlStatus::kOccupied, 0, nextAvailableCredentialSlot);
+            return;
+        }
+
+        if (!userType.IsNull() && DlUserType::kProgrammingUser == userType.Value())
+        {
+            emberAfDoorLockClusterPrintln("[SetCredential] Unable to set the credential: user type is invalid "
+                                          "[endpointId=%d,credentialIndex=%d,userType=%hhu]",
+                                          commandPath.mEndpointId, credentialIndex, userType.Value());
+
+            sendSetCredentialResponse(commandObj, DlStatus::kInvalidField, 0, nextAvailableCredentialSlot);
             return;
         }
 
@@ -593,8 +602,7 @@ void DoorLockServer::SetCredentialCommandHandler(
         // if userIndex is NULL then we're changing the programming user PIN
         if (userIndex.IsNull())
         {
-            if (DlCredentialType::kProgrammingPIN != credentialType || 0 != credentialIndex || !userStatus.IsNull() ||
-                userType.IsNull() || DlUserType::kProgrammingUser != userType.Value())
+            if (DlCredentialType::kProgrammingPIN != credentialType || 0 != credentialIndex)
             {
                 emberAfDoorLockClusterPrintln(
                     "[SetCredential] Unable to modify programming PIN: invalid argument [endpointId=%d,credentialIndex=%d]",
@@ -604,17 +612,41 @@ void DoorLockServer::SetCredentialCommandHandler(
                 return;
             }
 
-            emberAfDoorLockClusterPrintln(
-                "[SetCredential] Modifying the programming PIN (not implemented yet) [endpointId=%d,credentialIndex=%d]",
-                commandPath.mEndpointId, credentialIndex);
+            emberAfDoorLockClusterPrintln("[SetCredential] Modifying the programming PIN [endpointId=%d,credentialIndex=%d]",
+                                          commandPath.mEndpointId, credentialIndex);
 
-            // TODO: Change the programming PIN
-            sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
+            uint16_t relatedUserIndex = 0;
+            if (!findUserIndexByCredential(commandPath.mEndpointId, DlCredentialType::kProgrammingPIN, 0, relatedUserIndex))
+            {
+                ChipLogError(Zcl, "[SetCredential] Unable to modify PIN - related user not found (internal error) [endpointId=%d]", commandPath.mEndpointId);
+                sendSetCredentialResponse(commandObj, DlStatus::kFailure, 0, nextAvailableCredentialSlot);
+                return;
+            }
+
+            auto status = DlStatus::kSuccess;
+            if (!emberAfPluginDoorLockSetCredential(commandPath.mEndpointId, credentialIndex, existingCredential.status,
+                                                    existingCredential.credentialType, credentialData))
+            {
+                emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: app error "
+                                              "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
+                                              commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size());
+                status = DlStatus::kFailure;
+            }
+            else
+            {
+                emberAfDoorLockClusterPrintln("[SetCredential] Successfully modified the credential "
+                                              "[endpointId=%d,credentialIndex=%d,credentialType=%hhu,credentialDataSize=%zu]",
+                                              commandPath.mEndpointId, credentialIndex, credentialType, credentialData.size());
+
+                sendRemoteLockUserChange(commandPath.mEndpointId, credentialTypeToLockDataType(credentialType),
+                                         DlDataOperationType::kModify, sourceNodeId, fabricIdx, relatedUserIndex, credentialIndex);
+            }
+            sendSetCredentialResponse(commandObj, status, 0, nextAvailableCredentialSlot);
             return;
         }
 
         // appclusters, 5.2.4.40: when modifying a credential, userStatus and userType shall both be NULL.
-        if (!userStatus.IsNull() || !userType.IsNull())
+        if (!userStatus.IsNull() || (!userType.IsNull() && DlUserType::kProgrammingUser != userType.Value()))
         {
             emberAfDoorLockClusterPrintln("[SetCredential] Unable to modify the credential: invalid arguments "
                                           "[endpointId=%d,credentialIndex=%d,credentialType=%hhu]",
@@ -894,8 +926,6 @@ chip::FabricIndex DoorLockServer::getFabricIndex(const chip::app::CommandHandler
         ChipLogError(Zcl, "Cannot access ExchangeContext of Command Object for Fabric Index");
         return kUndefinedFabricIndex;
     }
-    emberAfDoorLockClusterPrintln("Source node ID: %llu",
-                                  commandObj->GetExchangeContext()->GetSessionHandle()->AsSecureSession()->GetPeerNodeId());
 
     return commandObj->GetAccessingFabricIndex();
 }
@@ -951,6 +981,12 @@ bool DoorLockServer::credentialIndexValid(chip::EndpointId endpointId, DlCredent
     if (!getMaxNumberOfCredentials(endpointId, type, maxNumberOfCredentials))
     {
         return false;
+    }
+
+    // appclusters, 5.2.6.3.1: 0 is allowed index for Programming PIN credential only
+    if (DlCredentialType::kProgrammingPIN == type)
+    {
+        return (0 == credentialIndex);
     }
 
     if (0 == credentialIndex || credentialIndex > maxNumberOfCredentials)
@@ -1065,6 +1101,13 @@ bool DoorLockServer::findUnoccupiedCredentialSlot(chip::EndpointId endpointId, D
     if (!getMaxNumberOfCredentials(endpointId, credentialType, maxNumberOfCredentials))
     {
         return false;
+    }
+
+    // Programming PIN index starts with 0, and it is assumed that it is unique. Therefor different bounds checking for that
+    // credential type
+    if (DlCredentialType::kProgrammingPIN == credentialType)
+    {
+        maxNumberOfCredentials--;
     }
 
     for (uint16_t i = startIndex; i <= maxNumberOfCredentials; ++i)

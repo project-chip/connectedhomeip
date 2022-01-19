@@ -125,27 +125,25 @@ bool LockManager::GetCredential(chip::EndpointId endpointId, uint16_t credential
     ChipLogProgress(Zcl, "Door Lock App: LockManager::GetCredential [endpoint=%d,credentialIndex=%hu,credentialType=%hhu]",
                     endpointId, credentialIndex, credentialType);
 
-    uint16_t adjustedCredentialIndex = credentialIndex - 1;
-    if (adjustedCredentialIndex > mLockCredentials.size())
+    if (credentialIndex >= mLockCredentials.size() || (0 == credentialIndex && DlCredentialType::kProgrammingPIN != credentialType))
     {
-        ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d,adjustedUserIndex=%hu]", endpointId,
-                     credentialIndex, adjustedCredentialIndex);
+        ChipLogError(Zcl, "Cannot get the credential - index out of range [endpoint=%d,index=%d]", endpointId, credentialIndex);
         return false;
     }
 
-    const auto & credentialInStorage = mLockCredentials[adjustedCredentialIndex];
+    const auto & credentialInStorage = mLockCredentials[credentialIndex];
 
     credential.status = credentialInStorage.status;
     if (DlCredentialStatus::kAvailable == credential.status)
     {
-        ChipLogDetail(Zcl, "Found unoccupied credential [endpoint=%d,adjustedIndex=%hu]", endpointId, adjustedCredentialIndex);
+        ChipLogDetail(Zcl, "Found unoccupied credential [endpoint=%d,index=%hu]", endpointId, credentialIndex);
         return true;
     }
     credential.credentialType = credentialInStorage.credentialType;
     credential.credentialData = chip::ByteSpan(credentialInStorage.credentialData, credentialInStorage.credentialDataSize);
 
-    ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,adjustedIndex=%hu,type=%hhu,dataSize=%zu]", endpointId,
-                  adjustedCredentialIndex, credential.credentialType, credential.credentialData.size());
+    ChipLogDetail(Zcl, "Found occupied credential [endpoint=%d,index=%hu,type=%hhu,dataSize=%zu]", endpointId, credentialIndex,
+                  credential.credentialType, credential.credentialData.size());
 
     return true;
 }
@@ -158,22 +156,19 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
                     "[endpoint=%d,credentialIndex=%hu,credentialStatus=%hhu,credentialType=%hhu,credentialDataSize=%zu]",
                     endpointId, credentialIndex, credentialStatus, credentialType, credentialData.size());
 
-    uint16_t adjustedCredentialIndex = credentialIndex - 1;
-    if (adjustedCredentialIndex > mLockCredentials.size())
+    if (credentialIndex >= mLockCredentials.size() || (0 == credentialIndex && DlCredentialType::kProgrammingPIN != credentialType))
     {
-        ChipLogError(Zcl, "Cannot set the credential - index out of range [endpoint=%d,index=%d,adjustedUserIndex=%hu]", endpointId,
-                     credentialIndex, adjustedCredentialIndex);
+        ChipLogError(Zcl, "Cannot set the credential - index out of range [endpoint=%d,index=%d]", endpointId, credentialIndex);
         return false;
     }
 
-    auto & credentialInStorage = mLockCredentials[adjustedCredentialIndex];
+    auto & credentialInStorage = mLockCredentials[credentialIndex];
     if (credentialData.size() > DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE)
     {
         ChipLogError(Zcl,
                      "Cannot get the credential - data size exceeds limit "
-                     "[endpoint=%d,index=%d,adjustedUserIndex=%hu,dataSize=%zu,maxDataSize=%zu]",
-                     endpointId, credentialIndex, adjustedCredentialIndex, credentialData.size(),
-                     DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE);
+                     "[endpoint=%d,index=%d,dataSize=%zu,maxDataSize=%zu]",
+                     endpointId, credentialIndex, credentialData.size(), DOOR_LOCK_CREDENTIAL_INFO_MAX_DATA_SIZE);
         return false;
     }
     credentialInStorage.status         = credentialStatus;
@@ -181,8 +176,8 @@ bool LockManager::SetCredential(chip::EndpointId endpointId, uint16_t credential
     std::memcpy(credentialInStorage.credentialData, credentialData.data(), credentialData.size());
     credentialInStorage.credentialDataSize = credentialData.size();
 
-    ChipLogProgress(Zcl, "Successfully set the credential [endpointId=%d,index=%d,adjustedIndex=%d,credentialType=%hhu]",
-                    endpointId, credentialIndex, adjustedCredentialIndex, credentialType);
+    ChipLogProgress(Zcl, "Successfully set the credential [endpointId=%d,index=%d,credentialType=%hhu]",
+                    endpointId, credentialIndex, credentialType);
 
     return true;
 }

@@ -78,6 +78,7 @@ private:
 
     // TODO: Support multiple endpoints in the app.
     std::array<LockUserInfo, 10> mLockUsers;
-    std::array<LockCredentialInfo, 10> mLockCredentials;
+    // Also include programming User PIN as a zero index
+    std::array<LockCredentialInfo, 11> mLockCredentials;
     static LockManager instance;
 };
