@@ -60,8 +60,11 @@ In terminal 2:
 ```
 ./chip-tool otasoftwareupdaterequestor announce-ota-provider ${PROVIDER_NODE_ID} 0 0 0 ${REQUESTOR_NODE_ID} 0
 ```
--   `${PROVIDER_NODE_ID}` is the node ID of the ota-provider-app assigned to it during the pairing step above
--   `${REQUESTOR_NODE_ID}` is the node ID of the ota-requestor-app assigned to it during the pairing step above
+
+-   `${PROVIDER_NODE_ID}` is the node ID of the ota-provider-app assigned to it
+    during the pairing step above
+-   `${REQUESTOR_NODE_ID}` is the node ID of the ota-requestor-app assigned to
+    it during the pairing step above
 
 ## Note
 
