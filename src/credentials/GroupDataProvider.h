@@ -37,15 +37,15 @@ public:
         static constexpr size_t kGroupNameMax = CHIP_CONFIG_MAX_GROUP_NAME_LENGTH;
 
         // Identifies group within the scope of the given Fabric
-        chip::GroupId group_id = kUndefinedGroupId;
+        GroupId group_id = kUndefinedGroupId;
         // Lastest group name written for a given GroupId on any Endpoint via the Groups cluster
         char name[kGroupNameMax + 1] = { 0 };
 
         GroupInfo() { SetName(nullptr); }
         GroupInfo(const char * groupName) { SetName(groupName); }
         GroupInfo(const CharSpan & groupName) { SetName(groupName); }
-        GroupInfo(chip::GroupId id, const char * groupName) : group_id(id) { SetName(groupName); }
-        GroupInfo(chip::GroupId id, const CharSpan & groupName) : group_id(id) { SetName(groupName); }
+        GroupInfo(GroupId id, const char * groupName) : group_id(id) { SetName(groupName); }
+        GroupInfo(GroupId id, const CharSpan & groupName) : group_id(id) { SetName(groupName); }
         void SetName(const char * groupName)
         {
             if (nullptr == groupName)
@@ -81,27 +81,35 @@ public:
     struct GroupKey
     {
         GroupKey() = default;
-        GroupKey(chip::GroupId group, chip::KeysetId keyset) : group_id(group), keyset_id(keyset) {}
+        GroupKey(GroupId group, KeysetId keyset) : group_id(group), keyset_id(keyset) {}
         // Identifies group within the scope of the given Fabric
-        chip::GroupId group_id = kUndefinedGroupId;
+        GroupId group_id = kUndefinedGroupId;
         // Set of group keys that generate operational group keys for use with this group
-        chip::KeysetId keyset_id = 0;
+        KeysetId keyset_id = 0;
         bool operator==(const GroupKey & other) { return this->group_id == other.group_id && this->keyset_id == other.keyset_id; }
     };
 
     struct GroupEndpoint
     {
         GroupEndpoint() = default;
-        GroupEndpoint(chip::GroupId group, chip::EndpointId endpoint) : group_id(group), endpoint_id(endpoint) {}
+        GroupEndpoint(GroupId group, EndpointId endpoint) : group_id(group), endpoint_id(endpoint) {}
         // Identifies group within the scope of the given Fabric
-        chip::GroupId group_id = kUndefinedGroupId;
+        GroupId group_id = kUndefinedGroupId;
         // Endpoint on the Node to which messages to this group may be forwarded
-        chip::EndpointId endpoint_id = kInvalidEndpointId;
+        EndpointId endpoint_id = kInvalidEndpointId;
 
         bool operator==(const GroupEndpoint & other)
         {
             return this->group_id == other.group_id && this->endpoint_id == other.endpoint_id;
         }
+    };
+
+    struct SessionKey
+    {
+        SessionKey()     = default;
+        GroupId group_id = kUndefinedGroupId;
+        FabricIndex fabric_index;
+        Crypto::AesCcmKeyContext * key = nullptr;
     };
 
     // An EpochKey is a single key usable to determine an operational group key
@@ -118,14 +126,15 @@ public:
     // A operational group key set, usable by many GroupState mappings
     struct KeySet
     {
-        using SecurityPolicy = chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy;
+        static constexpr size_t kEpochKeysMax = 3;
+        using SecurityPolicy                  = app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy;
 
         KeySet() = default;
         KeySet(uint16_t id, SecurityPolicy policy_id, uint8_t num_keys) : keyset_id(id), policy(policy_id), num_keys_used(num_keys)
         {}
 
         // The actual keys for the group key set
-        EpochKey epoch_keys[3];
+        EpochKey epoch_keys[kEpochKeysMax];
         // Logical id provided by the Administrator that configured the entry
         uint16_t keyset_id = 0;
         // Security policy to use for groups that use this keyset
@@ -137,6 +146,31 @@ public:
         {
             VerifyOrReturnError(this->policy == other.policy && this->num_keys_used == other.num_keys_used, false);
             return !memcmp(this->epoch_keys, other.epoch_keys, this->num_keys_used * sizeof(EpochKey));
+        }
+
+        ByteSpan GetCurrentKey()
+        {
+            auto now                                = System::SystemClock().GetMonotonicTimestamp();
+            GroupDataProvider::EpochKey * epoch_key = nullptr;
+            GroupDataProvider::EpochKey * found     = nullptr;
+
+            for (size_t i = 0; i < this->num_keys_used && i < kEpochKeysMax; i++)
+            {
+                epoch_key       = &epoch_keys[i];
+                auto epoch_time = System::Clock::Microseconds64(epoch_key->start_time);
+                if ((now > epoch_time) && ((nullptr == found) || (epoch_key->start_time > found->start_time)))
+                {
+                    found = epoch_key;
+                }
+            }
+            if (found)
+            {
+                return ByteSpan(found->key, EpochKey::kLengthBytes);
+            }
+            else
+            {
+                return ByteSpan(nullptr, 0);
+            }
         }
     };
 
@@ -152,13 +186,13 @@ public:
          *
          *  @param[in] new_group  GroupInfo structure of the new group.
          */
-        virtual void OnGroupAdded(chip::FabricIndex fabric_index, const GroupInfo & new_group) = 0;
+        virtual void OnGroupAdded(FabricIndex fabric_index, const GroupInfo & new_group) = 0;
         /**
          *  Callback invoked when an existing group is removed.
          *
          *  @param[in] removed_state  GroupInfo structure of the removed group.
          */
-        virtual void OnGroupRemoved(chip::FabricIndex fabric_index, const GroupInfo & old_group) = 0;
+        virtual void OnGroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group) = 0;
     };
 
     /**
@@ -189,10 +223,11 @@ public:
         Iterator() = default;
     };
 
-    using GroupInfoIterator = Iterator<GroupInfo>;
-    using GroupKeyIterator  = Iterator<GroupKey>;
-    using EndpointIterator  = Iterator<GroupEndpoint>;
-    using KeySetIterator    = Iterator<KeySet>;
+    using GroupInfoIterator  = Iterator<GroupInfo>;
+    using GroupKeyIterator   = Iterator<GroupKey>;
+    using EndpointIterator   = Iterator<GroupEndpoint>;
+    using KeySetIterator     = Iterator<KeySet>;
+    using SessionKeyIterator = Iterator<SessionKey>;
 
     GroupDataProvider(uint16_t maxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC,
                       uint16_t maxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC) :
@@ -224,18 +259,18 @@ public:
     //
 
     // By id
-    virtual CHIP_ERROR SetGroupInfo(chip::FabricIndex fabric_index, const GroupInfo & info)                   = 0;
-    virtual CHIP_ERROR GetGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id, GroupInfo & info) = 0;
-    virtual CHIP_ERROR RemoveGroupInfo(chip::FabricIndex fabric_index, chip::GroupId group_id)                = 0;
+    virtual CHIP_ERROR SetGroupInfo(FabricIndex fabric_index, const GroupInfo & info)             = 0;
+    virtual CHIP_ERROR GetGroupInfo(FabricIndex fabric_index, GroupId group_id, GroupInfo & info) = 0;
+    virtual CHIP_ERROR RemoveGroupInfo(FabricIndex fabric_index, GroupId group_id)                = 0;
     // By index
-    virtual CHIP_ERROR SetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, const GroupInfo & info) = 0;
-    virtual CHIP_ERROR GetGroupInfoAt(chip::FabricIndex fabric_index, size_t index, GroupInfo & info)       = 0;
-    virtual CHIP_ERROR RemoveGroupInfoAt(chip::FabricIndex fabric_index, size_t index)                      = 0;
+    virtual CHIP_ERROR SetGroupInfoAt(FabricIndex fabric_index, size_t index, const GroupInfo & info) = 0;
+    virtual CHIP_ERROR GetGroupInfoAt(FabricIndex fabric_index, size_t index, GroupInfo & info)       = 0;
+    virtual CHIP_ERROR RemoveGroupInfoAt(FabricIndex fabric_index, size_t index)                      = 0;
     // Endpoints
-    virtual bool HasEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id, chip::EndpointId endpoint_id)          = 0;
-    virtual CHIP_ERROR AddEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id, chip::EndpointId endpoint_id)    = 0;
-    virtual CHIP_ERROR RemoveEndpoint(chip::FabricIndex fabric_index, chip::GroupId group_id, chip::EndpointId endpoint_id) = 0;
-    virtual CHIP_ERROR RemoveEndpoint(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id)                         = 0;
+    virtual bool HasEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id)          = 0;
+    virtual CHIP_ERROR AddEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id)    = 0;
+    virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, GroupId group_id, EndpointId endpoint_id) = 0;
+    virtual CHIP_ERROR RemoveEndpoint(FabricIndex fabric_index, EndpointId endpoint_id)                   = 0;
     // Iterators
     /**
      *  Creates an iterator that may be used to obtain the list of groups associated with the given fabric.
@@ -244,7 +279,7 @@ public:
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual GroupInfoIterator * IterateGroupInfo(chip::FabricIndex fabric_index) = 0;
+    virtual GroupInfoIterator * IterateGroupInfo(FabricIndex fabric_index) = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of (group, endpoint) pairs associated with the given fabric.
      *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
@@ -252,16 +287,16 @@ public:
      *  @retval An instance of EndpointIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual EndpointIterator * IterateEndpoints(chip::FabricIndex fabric_index) = 0;
+    virtual EndpointIterator * IterateEndpoints(FabricIndex fabric_index) = 0;
 
     //
     // Group-Key map
     //
 
-    virtual CHIP_ERROR SetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, const GroupKey & info) = 0;
-    virtual CHIP_ERROR GetGroupKeyAt(chip::FabricIndex fabric_index, size_t index, GroupKey & info)       = 0;
-    virtual CHIP_ERROR RemoveGroupKeyAt(chip::FabricIndex fabric_index, size_t index)                     = 0;
-    virtual CHIP_ERROR RemoveGroupKeys(chip::FabricIndex fabric_index)                                    = 0;
+    virtual CHIP_ERROR SetGroupKeyAt(FabricIndex fabric_index, size_t index, const GroupKey & info) = 0;
+    virtual CHIP_ERROR GetGroupKeyAt(FabricIndex fabric_index, size_t index, GroupKey & info)       = 0;
+    virtual CHIP_ERROR RemoveGroupKeyAt(FabricIndex fabric_index, size_t index)                     = 0;
+    virtual CHIP_ERROR RemoveGroupKeys(FabricIndex fabric_index)                                    = 0;
 
     /**
      *  Creates an iterator that may be used to obtain the list of (group, keyset) pairs associated with the given fabric.
@@ -270,15 +305,15 @@ public:
      *  @retval An instance of GroupKeyIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual GroupKeyIterator * IterateGroupKeys(chip::FabricIndex fabric_index) = 0;
+    virtual GroupKeyIterator * IterateGroupKeys(FabricIndex fabric_index) = 0;
 
     //
     // Key Sets
     //
 
-    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, const KeySet & keys)                     = 0;
-    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, chip::KeysetId keyset_id, KeySet & keys) = 0;
-    virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, chip::KeysetId keyset_id)             = 0;
+    virtual CHIP_ERROR SetKeySet(FabricIndex fabric_index, const KeySet & keys)               = 0;
+    virtual CHIP_ERROR GetKeySet(FabricIndex fabric_index, KeysetId keyset_id, KeySet & keys) = 0;
+    virtual CHIP_ERROR RemoveKeySet(FabricIndex fabric_index, KeysetId keyset_id)             = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of key sets associated with the given fabric.
      *  In order to release the allocated memory, the Release() method must be called after the iteration is finished.
@@ -286,24 +321,31 @@ public:
      *  @retval An instance of KeySetIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index) = 0;
+    virtual KeySetIterator * IterateKeySets(FabricIndex fabric_index) = 0;
 
     // Fabrics
-    virtual CHIP_ERROR RemoveFabric(chip::FabricIndex fabric_index) = 0;
+    virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
 
-    // General
-    virtual CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle & msg) = 0;
+    // Decryption
+    virtual SessionKeyIterator * IterateSessionKeys(uint16_t session_id) = 0;
 
     // Listener
     void SetListener(GroupListener * listener) { mListener = listener; };
     void RemoveListener() { mListener = nullptr; };
 
 protected:
-    void GroupAdded(chip::FabricIndex fabric_index, const GroupInfo & new_group)
+    void GroupAdded(FabricIndex fabric_index, const GroupInfo & new_group)
     {
         if (mListener)
         {
             mListener->OnGroupAdded(fabric_index, new_group);
+        }
+    }
+    void GroupRemoved(FabricIndex fabric_index, const GroupInfo & old_group)
+    {
+        if (mListener)
+        {
+            mListener->OnGroupRemoved(fabric_index, old_group);
         }
     }
     const uint16_t mMaxGroupsPerFabric;
