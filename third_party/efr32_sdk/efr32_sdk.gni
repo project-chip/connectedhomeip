@@ -152,6 +152,18 @@ template("efr32_sdk") {
 
     defines += board_defines
 
+    if (defined(invoker.sleepy_device))
+    {
+      if (invoker.sleepy_device) {
+        print("INVOKER SLEEPY")
+        defines += [
+          "CHIP_DEVICE_CONFIG_ENABLE_SED=1",
+          "SL_CATALOG_POWER_MANAGER_PRESENT",
+          "SL_CATALOG_SLEEPTIMER_PRESENT",
+          ]
+      }
+    } 
+
     if (chip_build_libshell) {
       defines += [
         "ENABLE_CHIP_SHELL",
