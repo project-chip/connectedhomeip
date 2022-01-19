@@ -99,7 +99,7 @@ namespace Commands {
 namespace {{asUpperCamelCase name}} {
 enum class Fields {
     {{#zcl_command_arguments}}
-    k{{asUpperCamelCase label}} = {{index}},
+    k{{asUpperCamelCase label}} = {{fieldIdentifier}},
     {{/zcl_command_arguments}}
 };
 
