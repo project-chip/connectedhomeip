@@ -125,7 +125,7 @@ server cluster NetworkCommissioning = 49 {
   }
 
   attribute(readonly) int8u maxNetworks = 0;
-  attribute(readonly) NetworkInfo networks[] = 1;
+  attribute(readonly) NetworkInfo networks[12] = 1;
   attribute(readonly) int8u scanMaxTimeSeconds = 2;
   attribute(readonly) int8u connectMaxTimeSeconds = 3;
   attribute(writable) boolean interfaceEnabled = 4;

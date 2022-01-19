@@ -147,7 +147,7 @@ client cluster ApplicationBasic = 1293 {
   attribute(writable) ApplicationBasicApplication applicationApp = 4;
   attribute(readonly) ApplicationStatusEnum applicationStatus = 5;
   attribute(readonly) char_string applicationVersion = 6;
-  attribute(readonly) vendor_id allowedVendorList[] = 7;
+  attribute(readonly) vendor_id allowedVendorList[32] = 7;
   attribute(readonly) attrib_id attributeList[] = 65531;
   attribute(readonly) int16u clusterRevision = 65533;
 }
@@ -2027,7 +2027,7 @@ client cluster NetworkCommissioning = 49 {
   }
 
   attribute(readonly) int8u maxNetworks = 0;
-  attribute(readonly) NetworkInfo networks[] = 1;
+  attribute(readonly) NetworkInfo networks[12] = 1;
   attribute(readonly) int8u scanMaxTimeSeconds = 2;
   attribute(readonly) int8u connectMaxTimeSeconds = 3;
   attribute(writable) boolean interfaceEnabled = 4;
@@ -2401,7 +2401,7 @@ client cluster PowerSource = 47 {
   attribute(readonly) int8u batteryPercentRemaining = 12;
   attribute(readonly) int32u batteryTimeRemaining = 13;
   attribute(readonly) enum8 batteryChargeLevel = 14;
-  attribute(readonly) ENUM8 activeBatteryFaults[] = 18;
+  attribute(readonly) ENUM8 activeBatteryFaults[8] = 18;
   attribute(readonly) enum8 batteryChargeState = 26;
   attribute(readonly) attrib_id attributeList[] = 65531;
   attribute(readonly) bitmap32 featureMap = 65532;
@@ -2409,7 +2409,7 @@ client cluster PowerSource = 47 {
 }
 
 client cluster PowerSourceConfiguration = 46 {
-  attribute(readonly) INT8U sources[] = 0;
+  attribute(readonly) INT8U sources[6] = 0;
   attribute(readonly) attrib_id attributeList[] = 65531;
   attribute(readonly) int16u clusterRevision = 65533;
 }
@@ -2821,7 +2821,7 @@ client cluster TestCluster = 1295 {
   attribute(writable) single floatSingle = 23;
   attribute(writable) double floatDouble = 24;
   attribute(writable) octet_string octetString = 25;
-  attribute(writable) INT8U listInt8u[] = 26;
+  attribute(writable) INT8U listInt8u[10] = 26;
   attribute(writable) OCTET_STRING listOctetString[] = 27;
   attribute(writable) TestListStructOctet listStructOctetString[] = 28;
   attribute(writable) long_octet_string longOctetString = 29;
@@ -3200,10 +3200,10 @@ client cluster ThreadNetworkDiagnostics = 53 {
   attribute(readonly) int64u activeTimestamp = 56;
   attribute(readonly) int64u pendingTimestamp = 57;
   attribute(readonly) int32u delay = 58;
-  attribute(readonly) SecurityPolicy securityPolicy[] = 59;
+  attribute(readonly) SecurityPolicy securityPolicy[6] = 59;
   attribute(readonly) octet_string channelMask = 60;
-  attribute(readonly) OperationalDatasetComponents operationalDatasetComponents[] = 61;
-  attribute(readonly) NetworkFault activeNetworkFaultsList[] = 62;
+  attribute(readonly) OperationalDatasetComponents operationalDatasetComponents[14] = 61;
+  attribute(readonly) NetworkFault activeNetworkFaultsList[4] = 62;
   attribute(readonly) attrib_id attributeList[] = 65531;
   attribute(readonly) bitmap32 featureMap = 65532;
   attribute(readonly) int16u clusterRevision = 65533;

@@ -430,7 +430,7 @@ server cluster NetworkCommissioning = 49 {
   }
 
   attribute(readonly) int8u maxNetworks = 0;
-  attribute(readonly) NetworkInfo networks[] = 1;
+  attribute(readonly) NetworkInfo networks[12] = 1;
   attribute(readonly) int8u scanMaxTimeSeconds = 2;
   attribute(readonly) int8u connectMaxTimeSeconds = 3;
   attribute(writable) boolean interfaceEnabled = 4;
@@ -819,10 +819,10 @@ server cluster ThreadNetworkDiagnostics = 53 {
   attribute(readonly) int64u activeTimestamp = 56;
   attribute(readonly) int64u pendingTimestamp = 57;
   attribute(readonly) int32u delay = 58;
-  attribute(readonly) SecurityPolicy securityPolicy[] = 59;
+  attribute(readonly) SecurityPolicy securityPolicy[6] = 59;
   attribute(readonly) octet_string channelMask = 60;
-  attribute(readonly) OperationalDatasetComponents operationalDatasetComponents[] = 61;
-  attribute(readonly) NetworkFault activeNetworkFaultsList[] = 62;
+  attribute(readonly) OperationalDatasetComponents operationalDatasetComponents[14] = 61;
+  attribute(readonly) NetworkFault activeNetworkFaultsList[4] = 62;
   attribute(readonly) bitmap32 featureMap = 65532;
   attribute(readonly) int16u clusterRevision = 65533;
 }

@@ -42,7 +42,11 @@
     {{~/unless~}}
     ) {{type}} {{asLowerCamelCase name~}}
     {{~#if isList~}}
-      []
+      [
+        {{~#if_valid_list_size_restriction~}}
+          {{maxLength}}
+        {{~/if_valid_list_size_restriction~}}
+      ]
     {{~/if}} = {{code}};
   {{/chip_server_cluster_attributes}}
   {{#chip_cluster_commands}}
