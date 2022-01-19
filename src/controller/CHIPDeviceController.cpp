@@ -845,7 +845,17 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        RendezvousCleanup(err);
+        // Delete the current rendezvous session only if a device is not currently being paired.
+        if (mDeviceBeingCommissioned == nullptr)
+        {
+            FreeRendezvousSession();
+        }
+
+        if (device != nullptr)
+        {
+            ReleaseCommissioneeDevice(device);
+            mDeviceBeingCommissioned = nullptr;
+        }
     }
 
     return err;
