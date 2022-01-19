@@ -21,25 +21,25 @@ server cluster Basic = 40 {
     boolean reachableNewValue = 0;
   }
 
-  attribute(readonly) int16u interactionModelVersion = 0;
-  attribute(readonly) char_string vendorName = 1;
-  attribute(readonly) vendor_id vendorID = 2;
-  attribute(readonly) char_string productName = 3;
-  attribute(readonly) int16u productID = 4;
-  attribute(writable) char_string nodeLabel = 5;
-  attribute(writable) char_string location = 6;
-  attribute(readonly) int16u hardwareVersion = 7;
-  attribute(readonly) char_string hardwareVersionString = 8;
-  attribute(readonly) int32u softwareVersion = 9;
-  attribute(readonly) char_string softwareVersionString = 10;
-  attribute(readonly) int16u clusterRevision = 65533;
+  readonly attribute int16u interactionModelVersion = 0;
+  readonly attribute char_string vendorName = 1;
+  readonly attribute vendor_id vendorID = 2;
+  readonly attribute char_string productName = 3;
+  readonly attribute int16u productID = 4;
+  attribute char_string nodeLabel = 5;
+  attribute char_string location = 6;
+  readonly attribute int16u hardwareVersion = 7;
+  readonly attribute char_string hardwareVersionString = 8;
+  readonly attribute int32u softwareVersion = 9;
+  readonly attribute char_string softwareVersionString = 10;
+  readonly attribute int16u clusterRevision = 65533;
 
   command MfgSpecificPing(): DefaultSuccess = 0;
 }
 
 server cluster FixedLabel = 64 {
-  attribute(readonly) LabelStruct labelList[] = 0;
-  attribute(readonly) int16u clusterRevision = 65533;
+  readonly attribute LabelStruct labelList[] = 0;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 server cluster GeneralCommissioning = 48 {
@@ -60,12 +60,12 @@ server cluster GeneralCommissioning = 48 {
     INT32U failSafeExpiryLengthMs = 1;
   }
 
-  attribute(writable) int64u breadcrumb = 0;
-  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
-  attribute(readonly) enum8 regulatoryConfig = 2;
-  attribute(readonly) enum8 locationCapability = 3;
-  attribute(readonly) bitmap32 featureMap = 65532;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute int64u breadcrumb = 0;
+  readonly attribute BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  readonly attribute enum8 regulatoryConfig = 2;
+  readonly attribute enum8 locationCapability = 3;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 
   request struct ArmFailSafeRequest {
     INT16U expiryLengthSeconds = 0;
@@ -101,8 +101,8 @@ server cluster GeneralCommissioning = 48 {
 }
 
 server cluster LocalizationConfiguration = 43 {
-  attribute(writable) char_string activeLocale = 1;
-  attribute(readonly) CHAR_STRING supportedLocales[] = 2;
+  attribute char_string activeLocale = 1;
+  readonly attribute CHAR_STRING supportedLocales[] = 2;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -155,16 +155,16 @@ server cluster NetworkCommissioning = 49 {
     INT8U lqi = 8;
   }
 
-  attribute(readonly) int8u maxNetworks = 0;
-  attribute(readonly) NetworkInfo networks[] = 1;
-  attribute(readonly) int8u scanMaxTimeSeconds = 2;
-  attribute(readonly) int8u connectMaxTimeSeconds = 3;
-  attribute(writable) boolean interfaceEnabled = 4;
-  attribute(readonly) NetworkCommissioningStatus lastNetworkingStatus = 5;
-  attribute(readonly) octet_string lastNetworkID = 6;
-  attribute(readonly) int32u lastConnectErrorValue = 7;
-  attribute(readonly) bitmap32 featureMap = 65532;
-  attribute(readonly) int16u clusterRevision = 65533;
+  readonly attribute int8u maxNetworks = 0;
+  readonly attribute NetworkInfo networks[] = 1;
+  readonly attribute int8u scanMaxTimeSeconds = 2;
+  readonly attribute int8u connectMaxTimeSeconds = 3;
+  attribute boolean interfaceEnabled = 4;
+  readonly attribute NetworkCommissioningStatus lastNetworkingStatus = 5;
+  readonly attribute octet_string lastNetworkID = 6;
+  readonly attribute int32u lastConnectErrorValue = 7;
+  readonly attribute bitmap32 featureMap = 65532;
+  readonly attribute int16u clusterRevision = 65533;
 
   request struct AddOrUpdateThreadNetworkRequest {
     OCTET_STRING operationalDataset = 0;
@@ -245,7 +245,7 @@ client cluster OtaSoftwareUpdateProvider = 41 {
     kDownloadProtocolNotSupported = 3;
   }
 
-  attribute(readonly) int16u clusterRevision = 65533;
+  readonly attribute int16u clusterRevision = 65533;
 
   request struct ApplyUpdateRequestRequest {
     OCTET_STRING updateToken = 0;
@@ -341,11 +341,11 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
     nullable INT64S platformCode = 3;
   }
 
-  attribute(writable) ProviderLocation defaultOtaProviders[] = 0;
-  attribute(readonly) boolean updatePossible = 1;
-  attribute(readonly) OTAUpdateStateEnum updateState = 2;
-  attribute(readonly) int8u updateStateProgress = 3;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute ProviderLocation defaultOtaProviders[] = 0;
+  readonly attribute boolean updatePossible = 1;
+  readonly attribute OTAUpdateStateEnum updateState = 2;
+  readonly attribute int8u updateStateProgress = 3;
+  readonly attribute int16u clusterRevision = 65533;
 
   request struct AnnounceOtaProviderRequest {
     node_id providerNodeId = 0;
@@ -381,12 +381,12 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING label = 6;
   }
 
-  attribute(readonly) FabricDescriptor fabricsList[] = 1;
-  attribute(readonly) int8u supportedFabrics = 2;
-  attribute(readonly) int8u commissionedFabrics = 3;
-  attribute(readonly) OCTET_STRING trustedRootCertificates[] = 4;
-  attribute(readonly) fabric_idx currentFabricIndex = 5;
-  attribute(readonly) int16u clusterRevision = 65533;
+  readonly attribute FabricDescriptor fabricsList[] = 1;
+  readonly attribute int8u supportedFabrics = 2;
+  readonly attribute int8u commissionedFabrics = 3;
+  readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
+  readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly attribute int16u clusterRevision = 65533;
 
   request struct AddNOCRequest {
     OCTET_STRING NOCValue = 0;
@@ -461,8 +461,8 @@ server cluster OperationalCredentials = 62 {
 }
 
 server cluster UserLabel = 65 {
-  attribute(writable) LabelStruct labelList[] = 0;
-  attribute(readonly) int16u clusterRevision = 65533;
+  attribute LabelStruct labelList[] = 0;
+  readonly attribute int16u clusterRevision = 65533;
 }
 
 

@@ -73,8 +73,6 @@ const PosixConfig::Key PosixConfig::kConfigKey_CountryCode        = { kConfigNam
 const PosixConfig::Key PosixConfig::kConfigKey_ActiveLocale       = { kConfigNamespace_ChipConfig, "active-locale" };
 const PosixConfig::Key PosixConfig::kConfigKey_Breadcrumb         = { kConfigNamespace_ChipConfig, "breadcrumb" };
 const PosixConfig::Key PosixConfig::kConfigKey_LocationCapability = { kConfigNamespace_ChipConfig, "location-capability" };
-const PosixConfig::Key PosixConfig::kConfigKey_HourFormat         = { kConfigNamespace_ChipConfig, "hour-format" };
-const PosixConfig::Key PosixConfig::kConfigKey_CalendarType       = { kConfigNamespace_ChipConfig, "calendar-type" };
 
 // Keys stored in the Chip-counters namespace
 const PosixConfig::Key PosixConfig::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };

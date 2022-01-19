@@ -29,21 +29,16 @@ scripts/examples/gn_build_example.sh examples/chip-tool SOME-PATH/
 
 which puts the binary at `SOME-PATH/chip-tool`.
 
-### Building with message tracing
+### Using message tracing
 
 Message tracing allows capture of the secure messages which can be used for test
 automation.
 
-```
-gn gen out/with_trace/ --args='import("//with_pw_trace.gni")'
-ninja -C out/with_trace chip-tool
-```
-
-This enables tracing and adds additional flags to chip-tool to control where the
-traces should go:
+There are additional flags to chip-tool to control where the traces should go:
 
 -   --trace_file <file> Outputs trace data to the specified file.
--   --trace_log Outputs trace data to the chip log stream.
+-   --trace_log <0/1> Outputs trace data to the console with automation logs if
+    set to 1
 
 For example:
 

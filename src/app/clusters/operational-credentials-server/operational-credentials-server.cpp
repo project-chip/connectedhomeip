@@ -103,8 +103,11 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
             fabricDescriptor.vendorId    = fabricInfo.GetVendorId();
             fabricDescriptor.fabricId    = fabricInfo.GetFabricId();
 
-            fabricDescriptor.label         = fabricInfo.GetFabricLabel();
-            fabricDescriptor.rootPublicKey = fabricInfo.GetRootPubkey();
+            fabricDescriptor.label = fabricInfo.GetFabricLabel();
+
+            Credentials::P256PublicKeySpan pubKey;
+            ReturnErrorOnFailure(fabricInfo.GetRootPubkey(pubKey));
+            fabricDescriptor.rootPublicKey = pubKey;
 
             ReturnErrorOnFailure(encoder.Encode(fabricDescriptor));
         }

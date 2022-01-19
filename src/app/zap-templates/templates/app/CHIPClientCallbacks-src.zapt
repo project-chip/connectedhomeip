@@ -171,7 +171,7 @@ bool emberAf{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Call
     GET_CLUSTER_RESPONSE_CALLBACKS("{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback");
 
     Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback> * cb = Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext{{#chip_cluster_response_arguments}}, {{#if isArray}}{{asSymbol label}}{{else}}{{#if_is_struct type}}{{asUnderlyingZclType type}}(){{else}}{{asSymbol label}}{{/if_is_struct}}{{/if}}{{/chip_cluster_response_arguments}});
+    cb->mCall(cb->mContext{{#chip_cluster_response_arguments}}, {{#if isArray}}{{asSymbol label}}{{else}}{{#if_is_struct type}}::{{asUnderlyingZclType type}}(){{else}}{{asSymbol label}}{{/if_is_struct}}{{/if}}{{/chip_cluster_response_arguments}});
     return true;
 }
 

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -2331,7 +2331,7 @@ bool emberAfChannelClusterChangeChannelResponseCallback(
 
     Callback::Callback<ChannelClusterChangeChannelResponseCallback> * cb =
         Callback::Callback<ChannelClusterChangeChannelResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, ChannelInfo(), errorType);
+    cb->mCall(cb->mContext, ::ChannelInfo(), errorType);
     return true;
 }
 
@@ -2498,7 +2498,7 @@ bool emberAfGroupKeyManagementClusterKeySetReadResponseCallback(
 
     Callback::Callback<GroupKeyManagementClusterKeySetReadResponseCallback> * cb =
         Callback::Callback<GroupKeyManagementClusterKeySetReadResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, GroupKeySet());
+    cb->mCall(cb->mContext, ::GroupKeySet());
     return true;
 }
 
@@ -2897,7 +2897,7 @@ bool emberAfTestClusterClusterSimpleStructResponseCallback(
 
     Callback::Callback<TestClusterClusterSimpleStructResponseCallback> * cb =
         Callback::Callback<TestClusterClusterSimpleStructResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, SimpleStruct());
+    cb->mCall(cb->mContext, ::SimpleStruct());
     return true;
 }
 

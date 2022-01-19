@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -148,6 +148,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType & value);
 
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -2544,6 +2548,104 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("AdminFabricIndex", indent + 1, value.adminFabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminFabricIndex'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AdminNodeID", indent + 1, value.adminNodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminNodeID'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AdminPasscodeID", indent + 1, value.adminPasscodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminPasscodeID'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ChangeType", indent + 1, value.changeType);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ChangeType'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LatestValue", indent + 1, value.latestValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'LatestValue'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("AdminFabricIndex", indent + 1, value.adminFabricIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminFabricIndex'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AdminNodeID", indent + 1, value.adminNodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminNodeID'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("AdminPasscodeID", indent + 1, value.adminPasscodeID);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'AdminPasscodeID'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ChangeType", indent + 1, value.changeType);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'ChangeType'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("LatestValue", indent + 1, value.latestValue);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sEvent truncated due to invalid value for 'LatestValue'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     chip::app::Clusters::BridgedActions::Events::StateChanged::DecodableType value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
@@ -4516,7 +4618,156 @@ static void OnThermostatGetWeeklyScheduleResponseSuccess(
 | * ClusterRevision                                                   | 0xFFFD |
 |------------------------------------------------------------------------------|
 | Events:                                                             |        |
+| * AccessControlEntryChanged                                         | 0x0000 |
+| * AccessControlExtensionChanged                                     | 0x0001 |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Event AccessControlEntryChanged
+ */
+class ReadAccessControlAccessControlEntryChanged : public ModelCommand
+{
+public:
+    ReadAccessControlAccessControlEntryChanged() : ModelCommand("read-event")
+    {
+        AddArgument("event-name", "access-control-entry-changed");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlAccessControlEntryChanged() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReadEvent on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadEvent<chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType>(
+            this, OnEventResponse, OnDefaultFailure);
+    }
+
+    static void OnEventResponse(void * context,
+                                chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value)
+    {
+        OnGeneralAttributeEventResponse(context, "AccessControl.AccessControlEntryChanged response", value);
+    }
+};
+
+class ReportAccessControlAccessControlEntryChanged : public ModelCommand
+{
+public:
+    ReportAccessControlAccessControlEntryChanged() : ModelCommand("report-event")
+    {
+        AddArgument("event-name", "access-control-entry-changed");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAccessControlAccessControlEntryChanged() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportEvent on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeEvent<chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context,
+                              chip::app::Clusters::AccessControl::Events::AccessControlEntryChanged::DecodableType value)
+    {
+        LogValue("AccessControl.AccessControlEntryChanged report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+/*
+ * Event AccessControlExtensionChanged
+ */
+class ReadAccessControlAccessControlExtensionChanged : public ModelCommand
+{
+public:
+    ReadAccessControlAccessControlExtensionChanged() : ModelCommand("read-event")
+    {
+        AddArgument("event-name", "access-control-extension-changed");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAccessControlAccessControlExtensionChanged() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReadEvent on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadEvent<chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType>(
+            this, OnEventResponse, OnDefaultFailure);
+    }
+
+    static void OnEventResponse(void * context,
+                                chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value)
+    {
+        OnGeneralAttributeEventResponse(context, "AccessControl.AccessControlExtensionChanged response", value);
+    }
+};
+
+class ReportAccessControlAccessControlExtensionChanged : public ModelCommand
+{
+public:
+    ReportAccessControlAccessControlExtensionChanged() : ModelCommand("report-event")
+    {
+        AddArgument("event-name", "access-control-extension-changed");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportAccessControlAccessControlExtensionChanged() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x001F) ReportEvent on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AccessControlCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        auto subscriptionEstablishedCallback = mWait ? OnDefaultSuccessResponseWithoutExit : OnDefaultSuccessResponse;
+        return cluster.SubscribeEvent<chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType>(
+            this, OnValueReport, OnDefaultFailure, mMinInterval, mMaxInterval, subscriptionEstablishedCallback);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+    static void OnValueReport(void * context,
+                              chip::app::Clusters::AccessControl::Events::AccessControlExtensionChanged::DecodableType value)
+    {
+        LogValue("AccessControl.AccessControlExtensionChanged report", 0, value);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
 
 /*
  * Attribute Acl
@@ -59892,11 +60143,15 @@ void registerClusterAccessControl(Commands & commands)
     const char * clusterName = "AccessControl";
 
     commands_list clusterCommands = {
-        make_unique<ReadAccessControlAcl>(),               //
-        make_unique<ReadAccessControlExtension>(),         //
-        make_unique<ReadAccessControlAttributeList>(),     //
-        make_unique<ReadAccessControlClusterRevision>(),   //
-        make_unique<ReportAccessControlClusterRevision>(), //
+        make_unique<ReadAccessControlAcl>(),                             //
+        make_unique<ReadAccessControlExtension>(),                       //
+        make_unique<ReadAccessControlAttributeList>(),                   //
+        make_unique<ReadAccessControlClusterRevision>(),                 //
+        make_unique<ReportAccessControlClusterRevision>(),               //
+        make_unique<ReadAccessControlAccessControlEntryChanged>(),       //
+        make_unique<ReportAccessControlAccessControlEntryChanged>(),     //
+        make_unique<ReadAccessControlAccessControlExtensionChanged>(),   //
+        make_unique<ReportAccessControlAccessControlExtensionChanged>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
