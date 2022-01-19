@@ -49,7 +49,6 @@ namespace Internal {
 ClockImpl gClockImpl;
 } // namespace Internal
 
-
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 {
     return (Clock::Microseconds64(xTaskGetTickCount()) * configTICK_RATE_HZ);
