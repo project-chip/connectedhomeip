@@ -40,9 +40,10 @@ using namespace chip;
 using namespace chip::app::Clusters::WindowCovering;
 
 #define CHECK_BOUNDS_INVALID(MIN, VAL, MAX) ((VAL < MIN) || (VAL > MAX))
-#define CHECK_BOUNDS_VALID(MIN, VAL, MAX)   (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
+#define CHECK_BOUNDS_VALID(MIN, VAL, MAX) (!CHECK_BOUNDS_INVALID(MIN, VAL, MAX))
 
-static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue, uint16_t value, bool offset)
+static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, uint16_t outputLowValue, uint16_t outputHighValue,
+                             uint16_t value, bool offset)
 {
     uint16_t inputMin = inputLowValue, inputMax = inputHighValue, inputRange = UINT16_MAX;
     uint16_t outputMin = outputLowValue, outputMax = outputHighValue, outputRange = UINT16_MAX;
@@ -59,9 +60,8 @@ static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, ui
         outputMax = outputLowValue;
     }
 
-    inputRange = static_cast<uint16_t>(inputMax - inputMin);
+    inputRange  = static_cast<uint16_t>(inputMax - inputMin);
     outputRange = static_cast<uint16_t>(outputMax - outputMin);
-
 
     if (offset)
     {
@@ -74,7 +74,6 @@ static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, ui
         {
             return outputMax;
         }
-
 
         if (inputRange > 0)
         {
@@ -90,7 +89,6 @@ static uint16_t ConvertValue(uint16_t inputLowValue, uint16_t inputHighValue, ui
     }
 
     return outputMax;
-
 }
 
 static Percent100ths ValueToPercent100ths(AbsoluteLimits limits, uint16_t absolute)
@@ -102,8 +100,6 @@ static uint16_t Percent100thsToValue(AbsoluteLimits limits, Percent100ths relati
 {
     return ConvertValue(WC_PERCENT100THS_MIN_OPEN, WC_PERCENT100THS_MAX_CLOSED, limits.open, limits.closed, relative, true);
 }
-
-
 
 static OperationalState ValueToOperationalState(uint8_t value)
 {
@@ -143,7 +139,7 @@ namespace WindowCovering {
 
 bool HasFeature(chip::EndpointId endpoint, WcFeature feature)
 {
-    bool hasFeature = false;
+    bool hasFeature     = false;
     uint32_t FeatureMap = 0;
     if (EMBER_ZCL_STATUS_SUCCESS ==
         emberAfReadServerAttribute(endpoint, chip::app::Clusters::WindowCovering::Id,
@@ -208,13 +204,15 @@ const ConfigStatus ConfigStatusGet(chip::EndpointId endpoint)
     return status;
 }
 
-
 void OperationalStatusSetWithGlobalUpdated(chip::EndpointId endpoint, OperationalStatus & status)
 {
     /* Global Always follow Lift by priority and then fallback to Tilt */
-    if (OperationalState::Stall != status.lift) {
+    if (OperationalState::Stall != status.lift)
+    {
         status.global = status.lift;
-    } else {
+    }
+    else
+    {
         status.global = status.tilt;
     }
 
@@ -324,7 +322,7 @@ LimitStatus CheckLimitState(uint16_t position, AbsoluteLimits limits)
     if (position == limits.closed)
         return LimitStatus::IsDownOrClose;
 
-    if ((limits.open   > 0) && (position < limits.open  ))
+    if ((limits.open > 0) && (position < limits.open))
         return LimitStatus::IsOverUpOrOpen;
 
     if ((limits.closed > 0) && (position > limits.closed))
