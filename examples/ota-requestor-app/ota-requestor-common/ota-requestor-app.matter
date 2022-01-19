@@ -2,8 +2,8 @@
 // It is for view/code review purposes only.
 
 struct LabelStruct {
-    CHAR_STRING label = 1;
-    CHAR_STRING value = 2;
+    CHAR_STRING<16> label = 1;
+    CHAR_STRING<16> value = 2;
 }
 
 server cluster Basic = 40 {
@@ -374,11 +374,11 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     INT8U fabricIndex = 1;
-    OCTET_STRING rootPublicKey = 2;
+    OCTET_STRING<65> rootPublicKey = 2;
     INT16U vendorId = 3;
     FABRIC_ID fabricId = 4;
     NODE_ID nodeId = 5;
-    CHAR_STRING label = 6;
+    CHAR_STRING<32> label = 6;
   }
 
   attribute(readonly) FabricDescriptor fabricsList[] = 1;

@@ -1,7 +1,11 @@
 {{~#if isOptional~}} optional {{/if~}}
 {{~#if isNullable~}} nullable {{/if~}}
 
-{{type}} {{asLowerCamelCase label~}}
+{{type}} {{~#if (isString type)~}}
+  {{~#if maxLength~}} 
+    <{{maxLength}}> 
+  {{~/if~}}
+{{~/if}} {{asLowerCamelCase label~}}
 
 {{~#if isArray~}}
   []

@@ -2,8 +2,8 @@
 // It is for view/code review purposes only.
 
 struct LabelStruct {
-    CHAR_STRING label = 1;
-    CHAR_STRING value = 2;
+    CHAR_STRING<16> label = 1;
+    CHAR_STRING<16> value = 2;
 }
 
 server cluster AccessControl = 31 {
@@ -43,7 +43,7 @@ server cluster AccessControl = 31 {
 
   struct ExtensionEntry {
     fabric_idx fabricIndex = 0;
-    OCTET_STRING data = 1;
+    OCTET_STRING<254> data = 1;
   }
 
   info event AccessControlEntryChanged = 0 {
@@ -154,7 +154,7 @@ server cluster AudioOutput = 1291 {
   struct OutputInfo {
     INT8U index = 1;
     OutputTypeEnum outputType = 2;
-    CHAR_STRING name = 3;
+    CHAR_STRING<32> name = 3;
   }
 
   attribute(readonly) OutputInfo audioOutputList[] = 0;
@@ -284,7 +284,7 @@ server cluster BridgedActions = 37 {
 
   struct ActionStruct {
     INT16U actionID = 1;
-    CHAR_STRING name = 2;
+    CHAR_STRING<32> name = 2;
     ActionTypeEnum type = 3;
     INT16U endpointListID = 4;
     INT16U supportedCommands = 5;
@@ -293,7 +293,7 @@ server cluster BridgedActions = 37 {
 
   struct EndpointListStruct {
     INT16U endpointListID = 1;
-    CHAR_STRING name = 2;
+    CHAR_STRING<32> name = 2;
     EndpointListTypeEnum type = 3;
     ENDPOINT_NO endpoints[] = 4;
   }
@@ -334,9 +334,9 @@ server cluster Channel = 1284 {
   struct ChannelInfo {
     INT16U majorNumber = 1;
     INT16U minorNumber = 2;
-    CHAR_STRING name = 3;
-    CHAR_STRING callSign = 4;
-    CHAR_STRING affiliateCallSign = 5;
+    CHAR_STRING<32> name = 3;
+    CHAR_STRING<32> callSign = 4;
+    CHAR_STRING<32> affiliateCallSign = 5;
   }
 
   attribute(readonly) ChannelInfo channelList[] = 0;
@@ -1233,11 +1233,11 @@ server cluster GeneralDiagnostics = 51 {
   }
 
   struct NetworkInterfaceType {
-    CHAR_STRING name = 1;
+    CHAR_STRING<32> name = 1;
     BOOLEAN fabricConnected = 2;
     BOOLEAN offPremiseServicesReachableIPv4 = 3;
     BOOLEAN offPremiseServicesReachableIPv6 = 4;
-    OCTET_STRING hardwareAddress = 5;
+    OCTET_STRING<8> hardwareAddress = 5;
     InterfaceType type = 6;
   }
 
@@ -1287,17 +1287,17 @@ server cluster GroupKeyManagement = 63 {
     INT16U fabricIndex = 0;
     INT16U groupId = 1;
     INT16U endpoints[] = 2;
-    CHAR_STRING groupName = 3;
+    CHAR_STRING<16> groupName = 3;
   }
 
   struct GroupKeySet {
     INT16U groupKeySetID = 0;
     GroupKeySecurityPolicy securityPolicy = 1;
-    OCTET_STRING epochKey0 = 2;
+    OCTET_STRING<16> epochKey0 = 2;
     INT64U epochStartTime0 = 3;
-    OCTET_STRING epochKey1 = 4;
+    OCTET_STRING<16> epochKey1 = 4;
     INT64U epochStartTime1 = 5;
-    OCTET_STRING epochKey2 = 6;
+    OCTET_STRING<16> epochKey2 = 6;
     INT64U epochStartTime2 = 7;
   }
 
@@ -1716,8 +1716,8 @@ server cluster MediaInput = 1287 {
   struct InputInfo {
     INT8U index = 1;
     InputTypeEnum inputType = 2;
-    CHAR_STRING name = 3;
-    CHAR_STRING description = 4;
+    CHAR_STRING<32> name = 3;
+    CHAR_STRING<32> description = 4;
   }
 
   attribute(readonly) InputInfo mediaInputList[] = 0;
@@ -1753,7 +1753,7 @@ server cluster MediaPlayback = 1286 {
 
 server cluster ModeSelect = 80 {
   struct ModeOptionStruct {
-    CHAR_STRING label = 1;
+    CHAR_STRING<32> label = 1;
     INT8U mode = 2;
     INT32U semanticTag = 3;
   }
@@ -2086,11 +2086,11 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     INT8U fabricIndex = 1;
-    OCTET_STRING rootPublicKey = 2;
+    OCTET_STRING<65> rootPublicKey = 2;
     INT16U vendorId = 3;
     FABRIC_ID fabricId = 4;
     NODE_ID nodeId = 5;
-    CHAR_STRING label = 6;
+    CHAR_STRING<32> label = 6;
   }
 
   attribute(readonly) FabricDescriptor fabricsList[] = 1;
@@ -2405,7 +2405,7 @@ server cluster Scenes = 5 {
 server cluster SoftwareDiagnostics = 52 {
   struct ThreadMetrics {
     INT64U id = 1;
-    CHAR_STRING name = 2;
+    CHAR_STRING<8> name = 2;
     INT32U stackFreeCurrent = 3;
     INT32U stackFreeMinimum = 4;
     INT32U stackSize = 5;
@@ -2472,7 +2472,7 @@ server cluster TargetNavigator = 1285 {
 
   struct TargetInfo {
     INT8U identifier = 1;
-    CHAR_STRING name = 2;
+    CHAR_STRING<32> name = 2;
   }
 
   attribute(readonly) TargetInfo targetNavigatorList[] = 0;
@@ -2498,7 +2498,7 @@ server cluster TestCluster = 1295 {
 
   struct TestListStructOctet {
     INT64U fabricIndex = 1;
-    OCTET_STRING operationalCert = 2;
+    OCTET_STRING<32> operationalCert = 2;
   }
 
   struct NullablesAndOptionalsStruct {

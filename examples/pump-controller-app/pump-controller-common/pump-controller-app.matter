@@ -2,8 +2,8 @@
 // It is for view/code review purposes only.
 
 struct LabelStruct {
-    CHAR_STRING label = 1;
-    CHAR_STRING value = 2;
+    CHAR_STRING<16> label = 1;
+    CHAR_STRING<16> value = 2;
 }
 
 server cluster AdministratorCommissioning = 60 {
@@ -264,11 +264,11 @@ server cluster GeneralDiagnostics = 51 {
   }
 
   struct NetworkInterfaceType {
-    CHAR_STRING name = 1;
+    CHAR_STRING<32> name = 1;
     BOOLEAN fabricConnected = 2;
     BOOLEAN offPremiseServicesReachableIPv4 = 3;
     BOOLEAN offPremiseServicesReachableIPv6 = 4;
-    OCTET_STRING hardwareAddress = 5;
+    OCTET_STRING<8> hardwareAddress = 5;
     InterfaceType type = 6;
   }
 
@@ -533,11 +533,11 @@ server cluster OperationalCredentials = 62 {
 
   struct FabricDescriptor {
     INT8U fabricIndex = 1;
-    OCTET_STRING rootPublicKey = 2;
+    OCTET_STRING<65> rootPublicKey = 2;
     INT16U vendorId = 3;
     FABRIC_ID fabricId = 4;
     NODE_ID nodeId = 5;
-    CHAR_STRING label = 6;
+    CHAR_STRING<32> label = 6;
   }
 
   attribute(readonly) FabricDescriptor fabricsList[] = 1;
@@ -707,7 +707,7 @@ client cluster PumpConfigurationAndControl = 512 {
 server cluster SoftwareDiagnostics = 52 {
   struct ThreadMetrics {
     INT64U id = 1;
-    CHAR_STRING name = 2;
+    CHAR_STRING<8> name = 2;
     INT32U stackFreeCurrent = 3;
     INT32U stackFreeMinimum = 4;
     INT32U stackSize = 5;
