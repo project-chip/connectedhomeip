@@ -114,6 +114,18 @@ public:
     uint16_t GetPeerSessionId() const { return mPeerSessionId; }
     FabricIndex GetFabricIndex() const { return mFabric; }
 
+    // Should only be called for PASE sessions, which start with undefined fabric,
+    // to place on a newly commissioned fabric after successful
+    // OperationalCredentialsCluster::AddNOC
+    CHIP_ERROR NewFabric(FabricIndex fabricIndex)
+    {
+        // TODO: should check that secure session type is PASE and current value is undefined
+        // (i.e. that it's called exactly once in proper circumstances)
+        // but that's difficult until issue #13711 is addressed
+        mPaseFabric = fabricIndex;
+        return CHIP_NO_ERROR;
+    }
+
     System::Clock::Timestamp GetLastActivityTime() const { return mLastActivityTime; }
     void MarkActive() { mLastActivityTime = System::SystemClock().GetMonotonicTimestamp(); }
 
@@ -140,6 +152,10 @@ private:
     const uint16_t mLocalSessionId;
     const uint16_t mPeerSessionId;
     const FabricIndex mFabric;
+
+    // PASE sessions start with undefined fabric, but can be placed on a newly
+    // commissioned fabric after successful OperationalCredentialsCluster::AddNOC
+    FabricIndex mPaseFabric = kUndefinedFabricIndex;
 
     PeerAddress mPeerAddress;
     System::Clock::Timestamp mLastActivityTime;
