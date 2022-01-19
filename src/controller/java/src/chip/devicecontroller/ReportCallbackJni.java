@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2020-2021 Project CHIP Authors
+ *   Copyright (c) 2022 Project CHIP Authors
  *   All rights reserved.
  *
  *   Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,21 +17,28 @@
  */
 package chip.devicecontroller;
 
-/** JNI wrapper callback class for getting a connected device. */
-public class GetConnectedDeviceCallbackJni {
-  private GetConnectedDeviceCallback wrappedCallback;
+import androidx.annotation.Nullable;
+import chip.devicecontroller.model.ChipAttributePath;
+import java.util.Map;
+
+/** JNI wrapper callback class for {@link ReportCallback}. */
+public class ReportCallbackJni {
+  @Nullable
+  private SubscriptionEstablishedCallback wrappedSubscriptionEstablishedCallback;
+  private ReportCallback wrappedReportCallback;
   private long callbackHandle;
 
-  public GetConnectedDeviceCallbackJni(GetConnectedDeviceCallback wrappedCallback) {
-    this.wrappedCallback = wrappedCallback;
-    this.callbackHandle = newCallback(wrappedCallback);
+  public ReportCallbackJni(@Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback, ReportCallback reportCallback) {
+    this.wrappedSubscriptionEstablishedCallback = subscriptionEstablishedCallback;
+    this.wrappedReportCallback = reportCallback;
+    this.callbackHandle = newCallback(subscriptionEstablishedCallback, reportCallback);
   }
 
   long getCallbackHandle() {
     return callbackHandle;
   }
 
-  private native long newCallback(GetConnectedDeviceCallback wrappedCallback);
+  private native long newCallback(@Nullable SubscriptionEstablishedCallback subscriptionEstablishedCallback, ReportCallback wrappedCallback);
 
   private native void deleteCallback(long callbackHandle);
 
@@ -39,17 +46,10 @@ public class GetConnectedDeviceCallbackJni {
   @SuppressWarnings("deprecation")
   protected void finalize() throws Throwable {
     super.finalize();
-    
+
     if (callbackHandle != 0) {
       deleteCallback(callbackHandle);
       callbackHandle = 0;
     }
-  }
-
-  /** Callbacks for getting a device connected with PASE or CASE, depending on the context. */
-  public interface GetConnectedDeviceCallback {
-    void onDeviceConnected(long devicePointer);
-
-    void onConnectionFailure(long nodeId, Exception error);
   }
 }
