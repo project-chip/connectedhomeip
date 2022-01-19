@@ -135,7 +135,7 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverSoftAP()
 
 void SetUpCodePairer::OnDeviceDiscovered(RendezvousParameters & params)
 {
-    LogErrorOnFailure(mCommissioner->EstablishPASEConnection(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
+    LogErrorOnFailure(mCommissioner->pairDevice(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
 }
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -146,7 +146,7 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj)
 
     Transport::PeerAddress peerAddress = Transport::PeerAddress::BLE();
     RendezvousParameters params        = RendezvousParameters().SetPeerAddress(peerAddress).SetConnectionObject(connObj);
-    OnDeviceDiscovered(params);
+    LogErrorOnFailure(mCommissioner->EstablishPASEConnection(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
 }
 
 void SetUpCodePairer::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj)

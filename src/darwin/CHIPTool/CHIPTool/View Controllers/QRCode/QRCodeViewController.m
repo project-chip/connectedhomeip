@@ -628,62 +628,32 @@
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
 
-                                                 [strongSelf addOrUpdateWiFiNetwork:networkSSID.text password:networkPassword.text];
+                                                 [strongSelf commissionWithSSID:networkSSID.text password:networkPassword.text];
                                              }
                                          }]];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (void)addOrUpdateWiFiNetwork:(NSString *)ssid password:(NSString *)password
+- (void)commissionWithSSID:(NSString *)ssid password:(NSString *)password
 {
-    CHIPDevice * chipDevice = CHIPGetDeviceBeingCommissioned();
-    if (chipDevice) {
-        self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-        __auto_type * params = [[CHIPNetworkCommissioningClusterAddOrUpdateWiFiNetworkParams alloc] init];
-        params.ssid = [ssid dataUsingEncoding:NSUTF8StringEncoding];
-        params.credentials = [password dataUsingEncoding:NSUTF8StringEncoding];
-        params.breadcrumb = @(0);
 
-        __weak typeof(self) weakSelf = self;
-        [self->_cluster
-            addOrUpdateWiFiNetworkWithParams:params
-                           completionHandler:^(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable response,
-                               NSError * _Nullable error) {
-                               // TODO: addWiFiNetworkWithParams
-                               // returns status in its response,
-                               // not via the NSError!
-                               [weakSelf onAddNetworkResponse:error isWiFi:YES];
-                           }];
-    } else {
-        NSLog(@"Status: Failed to find a device being commissioned");
+    NSError *error;
+    CHIPDeviceController * controller = [CHIPDeviceController sharedController];
+    // create commissioning params in ObjC. Pass those in here with network credentials.
+    // maybe this just becomes the new norm
+    CHIPCommissioningParameters * params = [[CHIPCommissioningParameters alloc] init];
+    params.wifiSSID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
+    params.wifiCredentials = [password dataUsingEncoding:NSUTF8StringEncoding];
+
+    uint64_t deviceId = CHIPGetNextAvailableDeviceID() - 1;
+
+    if (![controller commissionDevice:deviceId commissioningParams:params error:&error])
+    {
+        NSLog(@"Failed to commission Device %llu, with error %@", deviceId, error);
     }
 }
 
-- (void)addOrUpdateThreadNetwork:(NSData *)threadDataSet
-{
-    CHIPDevice * chipDevice = CHIPGetDeviceBeingCommissioned();
-    if (chipDevice) {
-        self.cluster = [[CHIPNetworkCommissioning alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-        __auto_type * params = [[CHIPNetworkCommissioningClusterAddOrUpdateThreadNetworkParams alloc] init];
-        params.operationalDataset = threadDataSet;
-        params.breadcrumb = @(0);
-
-        __weak typeof(self) weakSelf = self;
-        [self->_cluster
-            addOrUpdateThreadNetworkWithParams:params
-                             completionHandler:^(CHIPNetworkCommissioningClusterNetworkConfigResponseParams * _Nullable response,
-                                 NSError * _Nullable error) {
-                                 // TODO: addThreadNetworkWithParams
-                                 // returns status in its response,
-                                 // not via the NSError!
-                                 [weakSelf onAddNetworkResponse:error isWiFi:NO];
-                             }];
-    } else {
-        NSLog(@"Status: Failed to find a device being  commissioned");
-    }
-}
-
-- (void)onAddNetworkResponse:(NSError *)error isWiFi:(BOOL)isWiFi
+- (void)onAddNetworkResponse:(NSError *)error
 {
     if (error != nil) {
         NSLog(@"Error adding network: %@", error);
@@ -691,13 +661,9 @@
     }
 
     __auto_type * params = [[CHIPNetworkCommissioningClusterConnectNetworkParams alloc] init];
-    if (isWiFi) {
-        NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
-        params.networkID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
-    } else {
-        uint8_t tempThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
-        params.networkID = [NSData dataWithBytes:tempThreadNetworkId length:sizeof(tempThreadNetworkId)];
-    }
+
+    NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
+    params.networkID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     params.breadcrumb = @(0);
 
     __weak typeof(self) weakSelf = self;
@@ -721,7 +687,7 @@
     [controller updateDevice:deviceId fabricId:0];
 }
 
-- (void)onAddressUpdated:(NSError * _Nullable)error
+- (void)onCommissioningComplete:(NSError * _Nullable)error
 {
     if (error != nil) {
         NSLog(@"Error retrieving device informations over Mdns: %@", error);

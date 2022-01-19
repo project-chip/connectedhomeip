@@ -16,6 +16,7 @@
  */
 #import "CHIPDeviceController.h"
 
+#import "CHIPCommissioningParameters.h"
 #import "CHIPDevicePairingDelegateBridge.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
@@ -346,6 +347,45 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         if ([self isRunning]) {
             _operationalCredentialsDelegate->SetDeviceID(deviceID);
             errorCode = self.cppCommissioner->PairDevice(deviceID, [onboardingPayload UTF8String]);
+        }
+        success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
+    });
+    return success;
+}
+
+- (BOOL)commissionDevice:(uint64_t)deviceId commissioningParams:(CHIPCommissioningParameters *)commissioningParams error:(NSError * __autoreleasing *)error
+{
+    __block CHIP_ERROR errorCode = CHIP_ERROR_INCORRECT_STATE;
+    __block BOOL success = NO;
+    if (![self isRunning]) {
+        success = ![self checkForError:errorCode logMsg:kErrorNotRunning error:error];
+        return success;
+    }
+    dispatch_sync(_chipWorkQueue, ^{
+        if ([self isRunning]) {
+            chip::Controller::CommissioningParameters params;
+            if (commissioningParams.CSRNonce)
+            {
+                params.SetCSRNonce(chip::ByteSpan ((uint8_t *) commissioningParams.CSRNonce.bytes, commissioningParams.CSRNonce.length));
+            }
+            if (commissioningParams.attestationNonce)
+            {
+                params.SetAttestationNonce(chip::ByteSpan ((uint8_t *) commissioningParams.attestationNonce.bytes, commissioningParams.attestationNonce.length));
+            }
+            if (commissioningParams.threadOperationalDataset)
+            {
+                params.SetThreadOperationalDataset(chip::ByteSpan ((uint8_t *) commissioningParams.threadOperationalDataset.bytes, commissioningParams.threadOperationalDataset.length));
+            }
+            if (commissioningParams.wifiSSID && commissioningParams.wifiCredentials)
+            {
+                chip::ByteSpan ssid((uint8_t *) commissioningParams.wifiSSID.bytes, commissioningParams.wifiSSID.length);
+                chip::ByteSpan credentials((uint8_t *) commissioningParams.wifiCredentials.bytes, commissioningParams.wifiCredentials.length);
+                chip::Controller::WiFiCredentials wifiCreds(ssid, credentials);
+                params.SetWiFiCredentials(wifiCreds);
+            }
+
+            _operationalCredentialsDelegate->SetDeviceID(deviceId);
+            errorCode = self.cppCommissioner->Commission(deviceId, params);
         }
         success = ![self checkForError:errorCode logMsg:kErrorPairDevice error:error];
     });
