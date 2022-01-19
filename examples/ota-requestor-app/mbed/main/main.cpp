@@ -23,6 +23,10 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mbed/Logging.h>
 
+#ifdef CAPSENSE_ENABLED
+#include "capsense.h"
+#endif
+
 #ifdef BOOT_ENABLED
 #include <bootutil/bootutil.h>
 #endif
@@ -38,6 +42,10 @@ int main()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mbed_logging_init();
+
+#ifdef CAPSENSE_ENABLED
+    Capsense::getInstance().init();
+#endif
 
     ChipLogProgress(SoftwareUpdate, "Mbed OTA Requestor example application start");
 

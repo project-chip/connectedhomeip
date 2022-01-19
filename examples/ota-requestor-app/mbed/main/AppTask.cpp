@@ -28,6 +28,7 @@
 #include <platform/CHIPDeviceLayer.h>
 
 // mbed-os headers
+#include "drivers/Timeout.h"
 #include "events/EventQueue.h"
 
 #ifdef CAPSENSE_ENABLED
@@ -60,16 +61,23 @@ using namespace ::chip::DeviceLayer;
 
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
 
-#define CONFIRM_BUTTON (MBED_CONF_APP_CONFIRM_BUTTON)
-#define REJECT_BUTTON (MBED_CONF_APP_REJECT_BUTTON)
+#define FACTORY_RESET_TRIGGER_TIMEOUT (MBED_CONF_APP_FACTORY_RESET_TRIGGER_TIMEOUT)
+#define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT (MBED_CONF_APP_FACTORY_RESET_CANCEL_WINDOW_TIMEOUT)
+
+#define FUNCTION_BUTTON (MBED_CONF_APP_FUNCTION_BUTTON)
+#define BLE_BUTTON (MBED_CONF_APP_BLE_BUTTON)
+#define BUTTON_PUSH_EVENT 1
+#define BUTTON_RELEASE_EVENT 0
 
 #ifdef CAPSENSE_ENABLED
-static mbed::CapsenseButton CapConfirmButton(Capsense::getInstance(), 0);
-static mbed::CapsenseButton CapRejectButton(Capsense::getInstance(), 1);
+static mbed::CapsenseButton CapFunctionButton(Capsense::getInstance(), 0);
+static mbed::CapsenseButton CapBleButton(Capsense::getInstance(), 1);
 #else
-static mbed::InterruptIn sConfirmButton(CONFIRM_BUTTON);
-static mbed::InterruptIn sRejectButton(REJECT_BUTTON);
+static mbed::InterruptIn sFunctionButton(FUNCTION_BUTTON);
+static mbed::InterruptIn sBleButton(BLE_BUTTON);
 #endif
+
+static mbed::Timeout sFunctionTimer;
 
 AppTask AppTask::sAppTask;
 
@@ -91,13 +99,15 @@ int AppTask::Init()
         },
         0);
 
+    // Initialize buttons
 #ifdef CAPSENSE_ENABLED
-    Capsense::getInstance().init();
-    CapConfirmButton.fall(mbed::callback(this, &AppTask::OnConfirmButtonPressEventHandler));
-    CapRejectButton.fall(mbed::callback(this, &AppTask::OnRejectButtonPressEventHandler));
+    CapFunctionButton.fall(mbed::callback(this, &AppTask::FunctionButtonPressEventHandler));
+    CapFunctionButton.rise(mbed::callback(this, &AppTask::FunctionButtonReleaseEventHandler));
+    CapBleButton.fall(mbed::callback(this, &AppTask::BleButtonPressEventHandler));
 #else
-    sConfirmButton.fall(mbed::callback(this, &AppTask::OnConfirmButtonPressEventHandler));
-    sRejectButton.fall(mbed::callback(this, &AppTask::OnRejectButtonPressEventHandler));
+    sFunctionButton.fall(mbed::callback(this, &AppTask::FunctionButtonPressEventHandler));
+    sFunctionButton.rise(mbed::callback(this, &AppTask::FunctionButtonReleaseEventHandler));
+    sBleButton.fall(mbed::callback(this, &AppTask::BleButtonPressEventHandler));
 #endif
 
     ConnectivityMgrImpl().StartWiFiManagement();
@@ -240,37 +250,167 @@ void AppTask::DispatchEvent(const AppEvent * aEvent)
     }
 }
 
-void AppTask::OnConfirmButtonPressEventHandler()
+void AppTask::BleButtonPressEventHandler()
 {
-    ChipLogProgress(NotSpecified, "Confirm button pressed");
-    mButtonEventFlag.set(AppTask::kUserResponseType_confirm);
+    AppEvent button_event;
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Pin    = BLE_BUTTON;
+    button_event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
+    button_event.Handler            = BleHandler;
+    sAppTask.PostEvent(&button_event);
 }
 
-void AppTask::OnRejectButtonPressEventHandler()
+void AppTask::FunctionButtonPressEventHandler()
 {
-    ChipLogProgress(NotSpecified, "Reject button pressed");
-    mButtonEventFlag.set(AppTask::kUserResponseType_reject);
+    AppEvent button_event;
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Pin    = FUNCTION_BUTTON;
+    button_event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
+    button_event.Handler            = FunctionHandler;
+    sAppTask.PostEvent(&button_event);
 }
 
-AppTask::AppUserResponse AppTask::GetUserResponse(AppEvent::AppEventTypes event)
+void AppTask::FunctionButtonReleaseEventHandler()
 {
-    switch (event)
+    AppEvent button_event;
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Pin    = FUNCTION_BUTTON;
+    button_event.ButtonEvent.Action = BUTTON_RELEASE_EVENT;
+    button_event.Handler            = FunctionHandler;
+    sAppTask.PostEvent(&button_event);
+}
+
+void AppTask::ButtonEventHandler(uint32_t id, bool pushed)
+{
+    if (id > 1)
     {
-    case AppEvent::kEventType_ota_update_available: {
-        ChipLogProgress(NotSpecified, "OTA update available");
-        ChipLogProgress(NotSpecified, "Press BUTTON 0 to confirm or BUTTON 1 to reject update image downloading");
-        break;
-    }
-    case AppEvent::kEventType_ota_apply_download: {
-        ChipLogProgress(NotSpecified, "OTA apply download");
-        ChipLogProgress(NotSpecified, "Press BUTTON 0 to confirm or BUTTON 1 to reject update image applying");
-        break;
-    }
-    default:
-        ChipLogError(NotSpecified, "OTA event unknown");
-        return AppTask::kUserResponseType_none;
+        ChipLogError(NotSpecified, "Wrong button ID");
+        return;
     }
 
-    return (AppTask::AppUserResponse) mButtonEventFlag.wait_any(AppTask::kUserResponseType_confirm |
-                                                                AppTask::kUserResponseType_reject);
+    AppEvent button_event;
+    button_event.Type               = AppEvent::kEventType_Button;
+    button_event.ButtonEvent.Pin    = id == 0 ? BLE_BUTTON : FUNCTION_BUTTON;
+    button_event.ButtonEvent.Action = pushed ? BUTTON_PUSH_EVENT : BUTTON_RELEASE_EVENT;
+
+    if (id == 0)
+    {
+        button_event.Handler = BleHandler;
+    }
+    else
+    {
+        button_event.Handler = FunctionHandler;
+    }
+
+    sAppTask.PostEvent(&button_event);
+}
+
+void AppTask::StartTimer(uint32_t aTimeoutInMs)
+{
+    auto chronoTimeoutMs = std::chrono::duration<uint32_t, std::milli>(aTimeoutInMs);
+    sFunctionTimer.attach(mbed::callback(this, &AppTask::TimerEventHandler), chronoTimeoutMs);
+    mFunctionTimerActive = true;
+}
+
+void AppTask::CancelTimer()
+{
+    sFunctionTimer.detach();
+    mFunctionTimerActive = false;
+}
+
+void AppTask::TimerEventHandler()
+{
+    AppEvent event;
+    event.Type    = AppEvent::kEventType_Timer;
+    event.Handler = FunctionTimerEventHandler;
+    sAppTask.PostEvent(&event);
+}
+
+void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type != AppEvent::kEventType_Timer)
+        return;
+
+    // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT, initiate factory reset
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+    {
+        ChipLogProgress(NotSpecified, "Factory Reset Triggered. Release button within %ums to cancel.",
+                        FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+
+        // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
+        // cancel, if required.
+        sAppTask.StartTimer(FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
+        sAppTask.mFunction = kFunction_FactoryReset;
+
+        // Turn off all LEDs before starting blink to make sure blink is co-ordinated.
+        sStatusLED.Set(false);
+
+        sStatusLED.Blink(500);
+    }
+    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
+    {
+        // Actually trigger Factory Reset
+        ChipLogProgress(NotSpecified, "Factory Reset initiated");
+        sAppTask.mFunction = kFunction_NoneSelected;
+        ConfigurationMgr().InitiateFactoryReset();
+    }
+}
+
+void AppTask::FunctionHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.Pin != FUNCTION_BUTTON)
+        return;
+
+    // To trigger software update: press the FUNCTION_BUTTON button briefly (< FACTORY_RESET_TRIGGER_TIMEOUT)
+    // To initiate factory reset: press the FUNCTION_BUTTON for FACTORY_RESET_TRIGGER_TIMEOUT + FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
+    // All LEDs start blinking after FACTORY_RESET_TRIGGER_TIMEOUT to signal factory reset has been initiated.
+    // To cancel factory reset: release the FUNCTION_BUTTON once all LEDs start blinking within the
+    // FACTORY_RESET_CANCEL_WINDOW_TIMEOUT
+    if (aEvent->ButtonEvent.Action == BUTTON_PUSH_EVENT)
+    {
+        if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
+        {
+            sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
+
+            sAppTask.mFunction = kFunction_SoftwareUpdate;
+        }
+    }
+    else
+    {
+        // If the button was released before factory reset got initiated, trigger a software update.
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+        {
+            sAppTask.CancelTimer();
+            sAppTask.mFunction = kFunction_NoneSelected;
+            ChipLogError(NotSpecified, "Software Update not supported.");
+        }
+        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
+        {
+            sAppTask.CancelTimer();
+
+            // Change the function to none selected since factory reset has been canceled.
+            sAppTask.mFunction = kFunction_NoneSelected;
+
+            ChipLogProgress(NotSpecified, "Factory Reset has been Canceled");
+        }
+    }
+}
+
+void AppTask::BleHandler(AppEvent * aEvent)
+{
+    if (aEvent->Type == AppEvent::kEventType_Button)
+    {
+        chip::Server::GetInstance().GetFabricTable().DeleteAllFabrics();
+
+        if (ConnectivityMgr().IsBLEAdvertisingEnabled())
+        {
+            ChipLogProgress(NotSpecified, "BLE advertising is already enabled");
+            return;
+        }
+
+        if (chip::Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow() != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(NotSpecified, "OpenBasicCommissioningWindow() failed");
+        }
+    }
 }

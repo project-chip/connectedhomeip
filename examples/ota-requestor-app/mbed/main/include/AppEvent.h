@@ -28,11 +28,20 @@ struct AppEvent
 {
     enum AppEventTypes
     {
-        kEventType_ota_update_available = 0,
-        kEventType_ota_apply_download
+        kEventType_Button = 0,
+        kEventType_Timer
     };
 
     uint16_t Type;
+
+    union
+    {
+        struct
+        {
+            int Pin;
+            uint8_t Action;
+        } ButtonEvent;
+    };
 
     EventHandler Handler;
 };

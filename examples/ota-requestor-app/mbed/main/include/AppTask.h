@@ -27,32 +27,41 @@ class AppTask
 public:
     int StartApp();
 
-    enum AppUserResponse
-    {
-        kUserResponseType_none    = 0,
-        kUserResponseType_confirm = 0x01,
-        kUserResponseType_reject  = 0x02
-    };
+    void PostEvent(AppEvent * aEvent);
 
-    AppUserResponse GetUserResponse(AppEvent::AppEventTypes event);
+    void ButtonEventHandler(uint32_t id, bool pushed);
 
 private:
     friend AppTask & GetAppTask(void);
 
     int Init();
 
-    static AppTask sAppTask;
-
-    AppUserResponse mUserResponse;
-
-    rtos::EventFlags mButtonEventFlag;
-
-public:
-    void PostEvent(AppEvent * aEvent);
     void DispatchEvent(const AppEvent * event);
 
-    void OnConfirmButtonPressEventHandler(void);
-    void OnRejectButtonPressEventHandler(void);
+    static void FunctionTimerEventHandler(AppEvent * aEvent);
+    static void FunctionHandler(AppEvent * aEvent);
+    static void BleHandler(AppEvent * aEvent);
+
+    void BleButtonPressEventHandler(void);
+    void FunctionButtonPressEventHandler(void);
+    void FunctionButtonReleaseEventHandler(void);
+
+    void StartTimer(uint32_t aTimeoutInMs);
+    void CancelTimer(void);
+    void TimerEventHandler(void);
+
+    enum Function_t
+    {
+        kFunction_NoneSelected   = 0,
+        kFunction_SoftwareUpdate = 0,
+        kFunction_FactoryReset,
+
+        kFunction_Invalid
+    };
+
+    Function_t mFunction;
+    bool mFunctionTimerActive;
+    static AppTask sAppTask;
 };
 
 inline AppTask & GetAppTask(void)
