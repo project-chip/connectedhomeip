@@ -78,6 +78,10 @@ See `examples/lighting-app/efr32/README.md`
            scripts/examples/gn_build_example.sh examples/chip-tool out/
            scripts/examples/gn_build_example.sh examples/ota-provider-app/linux out/debug chip_config_network_layer_ble=false
 
+-   Build or download the Gecko Bootloader binary. Bootloader should be built with the Gecko SDK version 3.2.1 or earlier,
+    type "external SPI" configured with a single slot of at least 1000 KB. Using the commander tool upload the bootloader to
+    the device running the requestor application.
+
 -   Create a bootable image file:
 
            commander gbl create chip-efr32-ota-requestor-example.gbl --app chip-efr32-ota-requestor-example.s37
