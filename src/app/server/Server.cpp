@@ -80,7 +80,7 @@ static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BU
 #endif // CHIP_CONFIG_ENABLE_SERVER_IM_EVENT
 
 Server::Server() :
-    mCASESessionManager(CASESessionManagerConfig {
+    mOperationalDeviceManager(OperationalDeviceManagerConfig {
         .sessionInitParams =  {
             .sessionManager = &mSessions,
             .exchangeMgr    = &mExchangeMgr,
@@ -236,7 +236,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
                                                     &mSessions, &mFabrics, &mSessionIDAllocator);
     SuccessOrExit(err);
 
-    err = mCASESessionManager.Init();
+    err = mOperationalDeviceManager.Init();
 
 exit:
     if (err != CHIP_NO_ERROR)

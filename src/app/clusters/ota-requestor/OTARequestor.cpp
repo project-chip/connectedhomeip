@@ -278,13 +278,13 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 
     ChipLogDetail(SoftwareUpdate, "Establishing session to provider node ID 0x" ChipLogFormatX64 " on fabric index %d",
                   ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
-    CHIP_ERROR err = mCASESessionManager->FindOrEstablishSession(fabricInfo->GetPeerIdForNode(mProviderNodeId),
-                                                                 &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    CHIP_ERROR err = mOperationalDeviceManager->AcquireDevice(fabricInfo->GetPeerIdForNode(mProviderNodeId), &mOnConnectedCallback,
+                                                              &mOnConnectionFailureCallback);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
-// Called whenever FindOrEstablishSession is successful
+// Called whenever AcquireDevice is successful
 void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * deviceProxy)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
@@ -353,14 +353,15 @@ void OTARequestor::OnConnected(void * context, OperationalDeviceProxy * devicePr
     }
 }
 
-// Called whenever FindOrEstablishSession fails
-void OTARequestor::OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error)
+// Called whenever AcquireDevice fails
+void OTARequestor::OnConnectionFailure(void * context, OperationalDeviceProxy * deviceProxy, PeerId peerId, CHIP_ERROR error)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
     ChipLogError(SoftwareUpdate, "Failed to connect to node 0x" ChipLogFormatX64 ": %" CHIP_ERROR_FORMAT,
                  ChipLogValueX64(peerId.GetNodeId()), error.Format());
+    requestorCore->mOperationalDeviceManager->ReleaseDevice(deviceProxy);
 
     switch (requestorCore->mOnConnectedAction)
     {

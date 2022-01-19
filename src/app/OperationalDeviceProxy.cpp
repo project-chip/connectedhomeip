@@ -58,6 +58,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
         VerifyOrReturnError(resolver != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
         err = resolver->ResolveNodeId(mPeerId, chip::Inet::IPAddressType::kAny);
         EnqueueConnectionCallbacks(onConnection, onFailure);
+        mState = State::ResolvingAddress;
         break;
 
     case State::Initialized:
@@ -84,7 +85,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
 
     if (err != CHIP_NO_ERROR && onFailure != nullptr)
     {
-        onFailure->mCall(onFailure->mContext, mPeerId, err);
+        onFailure->mCall(onFailure->mContext, this, mPeerId, err);
     }
 
     return err;
@@ -107,7 +108,7 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
         mCASEClient->SetMRPIntervals(mMRPConfig);
     }
 
-    if (mState == State::NeedsAddress)
+    if (mState == State::ResolvingAddress)
     {
         mState = State::Initialized;
         err    = EstablishConnection();
@@ -115,6 +116,10 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
         {
             OnSessionEstablishmentError(err);
         }
+    }
+    else if (mState == State::NeedsAddress)
+    {
+        mState = State::Initialized;
     }
     else
     {
@@ -201,7 +206,7 @@ void OperationalDeviceProxy::DequeueConnectionFailureCallbacks(CHIP_ERROR error,
         cb->Cancel();
         if (executeCallback)
         {
-            cb->mCall(cb->mContext, mPeerId, error);
+            cb->mCall(cb->mContext, this, mPeerId, error);
         }
     }
 }
@@ -262,6 +267,8 @@ void OperationalDeviceProxy::SetConnectedSession(const SessionHandle & handle)
 {
     mSecureSession.Grab(handle);
     mState = State::SecureConnected;
+    DequeueConnectionFailureCallbacks(CHIP_NO_ERROR, /* executeCallback */ false);
+    DequeueConnectionSuccessCallbacks(/* executeCallback */ true);
 }
 
 void OperationalDeviceProxy::Clear()

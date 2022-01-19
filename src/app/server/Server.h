@@ -18,8 +18,8 @@
 #pragma once
 
 #include <app/CASEClientPool.h>
-#include <app/CASESessionManager.h>
 #include <app/DefaultAttributePersistenceProvider.h>
+#include <app/OperationalDeviceManager.h>
 #include <app/OperationalDeviceProxyPool.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
@@ -71,7 +71,7 @@ public:
 
     FabricTable & GetFabricTable() { return mFabrics; }
 
-    CASESessionManager * GetCASESessionManager() { return &mCASESessionManager; }
+    OperationalDeviceManager * GetOperationalDeviceManager() { return &mOperationalDeviceManager; }
 
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeMgr; }
 
@@ -147,7 +147,7 @@ private:
     SessionManager mSessions;
     CASEServer mCASEServer;
 
-    CASESessionManager mCASESessionManager;
+    OperationalDeviceManager mOperationalDeviceManager;
     CASEClientPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
     OperationalDeviceProxyPool<CHIP_CONFIG_DEVICE_MAX_ACTIVE_DEVICES> mDevicePool;
 

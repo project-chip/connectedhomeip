@@ -32,7 +32,7 @@
 
 namespace chip {
 
-struct CASESessionManagerConfig
+struct OperationalDeviceManagerConfig
 {
     DeviceProxyInitParams sessionInitParams;
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> * dnsCache = nullptr;
@@ -48,12 +48,13 @@ struct CASESessionManagerConfig
  * 4. During session establishment, trigger node ID resolution (if needed), and update the DNS-SD cache (if resolution is
  * successful)
  */
-class CASESessionManager : public Dnssd::ResolverDelegate
+class OperationalDeviceManager : public Dnssd::ResolverDelegate
 {
 public:
-    CASESessionManager() = delete;
+    OperationalDeviceManager() = delete;
 
-    CASESessionManager(const CASESessionManagerConfig & params)
+    OperationalDeviceManager(const OperationalDeviceManagerConfig & params) :
+        mOnConnectedCallback(HandleDeviceConnected, this), mOnConnectionFailureCallback(HandleDeviceConnectionFailure, this)
     {
         VerifyOrDie(params.sessionInitParams.Validate() == CHIP_NO_ERROR);
 
@@ -71,35 +72,38 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    virtual ~CASESessionManager() { mDNSResolver.Shutdown(); }
+    virtual ~OperationalDeviceManager() { mDNSResolver.Shutdown(); }
 
     /**
      * Find an existing session for the given node ID, or trigger a new session request.
      * The caller can optionally provide `onConnection` and `onFailure` callback objects. If provided,
      * these will be used to inform the caller about successful or failed connection establishment.
+     *
+     * The user shall call ReleaseDevice to free the device in the failure callback.
+     *
      * If the connection is already established, the `onConnection` callback will be immediately called.
      */
-    CHIP_ERROR FindOrEstablishSession(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
-                                      Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+    CHIP_ERROR AcquireDevice(PeerId peerId, Callback::Callback<OnDeviceConnected> * onConnection,
+                             Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
-    OperationalDeviceProxy * FindExistingSession(PeerId peerId);
+    void ReleaseDevice(OperationalDeviceProxy * device);
 
-    void ReleaseSession(PeerId peerId);
+    OperationalDeviceProxy * FindActiveDevice(PeerId peerId);
 
     /**
      * This API triggers the DNS-SD resolution for the given node ID. The node ID will be looked up
-     * on the fabric that was configured for the CASESessionManager object.
+     * on the fabric that was configured for the OperationalDeviceManager object.
      *
      * The results of the DNS-SD resolution request is provided to the class via `ResolverDelegate`
-     * implementation of CASESessionManager.
+     * implementation of OperationalDeviceManager.
      */
     CHIP_ERROR ResolveDeviceAddress(FabricInfo * fabric, NodeId nodeId);
 
     /**
      * This API returns the address for the given node ID.
-     * If the CASESessionManager is configured with a DNS-SD cache, the cache is looked up
+     * If the OperationalDeviceManager is configured with a DNS-SD cache, the cache is looked up
      * for the node ID.
-     * If the DNS-SD cache is not available, the CASESessionManager looks up the list for
+     * If the DNS-SD cache is not available, the OperationalDeviceManager looks up the list for
      * an ongoing session with the peer node. If the session doesn't exist, the API will return
      * `CHIP_ERROR_NOT_CONNECTED` error.
      */
@@ -111,11 +115,14 @@ public:
     void OnNodeDiscoveryComplete(const Dnssd::DiscoveredNodeData & nodeData) override {}
 
 private:
-    OperationalDeviceProxy * FindSession(const SessionHandle & session);
-    void ReleaseSession(OperationalDeviceProxy * device);
+    static void HandleDeviceConnected(void * context, OperationalDeviceProxy * device);
+    static void HandleDeviceConnectionFailure(void * context, OperationalDeviceProxy * device, PeerId peerId, CHIP_ERROR error);
 
-    CASESessionManagerConfig mConfig;
+    Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+    OperationalDeviceManagerConfig mConfig;
     Dnssd::ResolverProxy mDNSResolver;
+    bool mNotifyingConnectionSucess = false;
 };
 
 } // namespace chip

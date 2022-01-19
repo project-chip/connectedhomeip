@@ -29,9 +29,9 @@
 #pragma once
 
 #include <app/CASEClientPool.h>
-#include <app/CASESessionManager.h>
 #include <app/DeviceControllerInteractionModelDelegate.h>
 #include <app/InteractionModelDelegate.h>
+#include <app/OperationalDeviceManager.h>
 #include <app/OperationalDeviceProxy.h>
 #include <app/OperationalDeviceProxyPool.h>
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
@@ -220,7 +220,7 @@ public:
                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->FindOrEstablishSession(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
+        return mOperationalDeviceManager->AcquireDevice(mFabricInfo->GetPeerIdForNode(deviceId), onConnection, onFailure);
     }
 
     /**
@@ -234,7 +234,7 @@ public:
     CHIP_ERROR UpdateDevice(NodeId deviceId)
     {
         VerifyOrReturnError(mState == State::Initialized, CHIP_ERROR_INCORRECT_STATE);
-        return mCASESessionManager->ResolveDeviceAddress(mFabricInfo, deviceId);
+        return mOperationalDeviceManager->ResolveDeviceAddress(mFabricInfo, deviceId);
     }
 
     /**
@@ -325,7 +325,7 @@ public:
      */
     uint64_t GetFabricId() const { return mFabricId; }
 
-    void ReleaseOperationalDevice(NodeId remoteDeviceId);
+    void ReleaseOperationalDevice(OperationalDeviceProxy * device);
 
 protected:
     enum class State
@@ -336,7 +336,7 @@ protected:
 
     State mState;
 
-    CASESessionManager * mCASESessionManager = nullptr;
+    OperationalDeviceManager * mOperationalDeviceManager = nullptr;
 
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> mDNSCache;
     CASEClientPool<CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_CASE_CLIENTS> mCASEClientPool;
@@ -387,8 +387,6 @@ protected:
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
 
 private:
-    void ReleaseOperationalDevice(OperationalDeviceProxy * device);
-
     Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
     Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
 
@@ -744,7 +742,7 @@ private:
     static void OnRootCertFailureResponse(void * context, uint8_t status);
 
     static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
-    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureFn(void * context, OperationalDeviceProxy * device, PeerId peerId, CHIP_ERROR error);
 
     static void OnDeviceAttestationInformationVerification(void * context, Credentials::AttestationVerificationResult result);
 

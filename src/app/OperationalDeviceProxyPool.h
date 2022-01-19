@@ -26,6 +26,8 @@ namespace chip {
 class OperationalDeviceProxyPoolDelegate
 {
 public:
+    using DeviceFunct = Loop (*)(const void * context, OperationalDeviceProxy * device);
+
     virtual OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId) = 0;
 
     virtual OperationalDeviceProxy * Allocate(DeviceProxyInitParams & params, PeerId peerId,
@@ -33,9 +35,9 @@ public:
 
     virtual void Release(OperationalDeviceProxy * device) = 0;
 
-    virtual OperationalDeviceProxy * FindDevice(const SessionHandle & session) = 0;
+    virtual Loop ForEachDevice(const void * context, DeviceFunct func) = 0;
 
-    virtual OperationalDeviceProxy * FindDevice(PeerId peerId) = 0;
+    virtual OperationalDeviceProxy * FindFirstActiveDevice(PeerId peerId) = 0;
 
     virtual ~OperationalDeviceProxyPoolDelegate() {}
 };
@@ -59,33 +61,22 @@ public:
 
     void Release(OperationalDeviceProxy * device) override { mDevicePool.ReleaseObject(device); }
 
-    OperationalDeviceProxy * FindDevice(const SessionHandle & session) override
+    Loop ForEachDevice(const void * context, DeviceFunct func) override
     {
-        OperationalDeviceProxy * foundDevice = nullptr;
-        mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
-            if (activeDevice->MatchesSession(session))
-            {
-                foundDevice = activeDevice;
-                return Loop::Break;
-            }
-            return Loop::Continue;
-        });
-
-        return foundDevice;
+        return mDevicePool.ForEachActiveObject([&](OperationalDeviceProxy * device) { return func(context, device); });
     }
 
-    OperationalDeviceProxy * FindDevice(PeerId peerId) override
+    OperationalDeviceProxy * FindFirstActiveDevice(PeerId peerId) override
     {
         OperationalDeviceProxy * foundDevice = nullptr;
-        mDevicePool.ForEachActiveObject([&](auto * activeDevice) {
-            if (activeDevice->GetPeerId() == peerId)
+        mDevicePool.ForEachActiveObject([&](OperationalDeviceProxy * device) {
+            if (device->IsActive() && device->GetPeerId() == peerId)
             {
-                foundDevice = activeDevice;
+                foundDevice = device;
                 return Loop::Break;
             }
             return Loop::Continue;
         });
-
         return foundDevice;
     }
 

@@ -36,7 +36,7 @@ void ModelCommand::OnDeviceConnectedFn(void * context, ChipDevice * device)
     command->SendCommand(device, command->mEndPointId);
 }
 
-void ModelCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+void ModelCommand::OnDeviceConnectionFailureFn(void * context, ChipDevice * device, PeerId peerId, CHIP_ERROR err)
 {
     LogErrorOnFailure(err);
 

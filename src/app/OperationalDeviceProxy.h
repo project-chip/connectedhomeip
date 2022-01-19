@@ -74,7 +74,7 @@ struct DeviceProxyInitParams
 class OperationalDeviceProxy;
 
 typedef void (*OnDeviceConnected)(void * context, OperationalDeviceProxy * device);
-typedef void (*OnDeviceConnectionFailure)(void * context, PeerId peerId, CHIP_ERROR error);
+typedef void (*OnDeviceConnectionFailure)(void * context, OperationalDeviceProxy * device, PeerId peerId, CHIP_ERROR error);
 
 class DLL_EXPORT OperationalDeviceProxy : public DeviceProxy, SessionReleaseDelegate, public SessionEstablishmentDelegate
 {
@@ -115,6 +115,9 @@ public:
      */
     CHIP_ERROR Connect(Callback::Callback<OnDeviceConnected> * onConnection,
                        Callback::Callback<OnDeviceConnectionFailure> * onFailure, Dnssd::ResolverProxy * resolver);
+
+    void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
+                                    Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
     bool IsConnected() const { return mState == State::SecureConnected; }
 
@@ -178,6 +181,11 @@ public:
 
     bool GetAddress(Inet::IPAddress & addr, uint16_t & port) const override;
 
+    bool IsActive() const override
+    {
+        return mState == State::ResolvingAddress || mState == State::Connecting || mState == State::SecureConnected;
+    }
+
     Transport::PeerAddress GetPeerAddress() const { return mDeviceAddress; }
 
     static Transport::PeerAddress ToPeerAddress(const Dnssd::ResolvedNodeData & nodeData)
@@ -197,11 +205,18 @@ public:
         return Transport::PeerAddress::UDP(nodeData.mAddress[0], nodeData.mPort, interfaceId);
     }
 
+    void NotifyConnectionFailure(CHIP_ERROR error)
+    {
+        DequeueConnectionFailureCallbacks(error, true);
+        DequeueConnectionSuccessCallbacks(false);
+    }
+
 private:
     enum class State
     {
         Uninitialized,
         NeedsAddress,
+        ResolvingAddress,
         Initialized,
         Connecting,
         SecureConnected,
@@ -236,9 +251,6 @@ private:
     static void CloseCASESessionTask(System::Layer * layer, void * context);
 
     void CloseCASESession();
-
-    void EnqueueConnectionCallbacks(Callback::Callback<OnDeviceConnected> * onConnection,
-                                    Callback::Callback<OnDeviceConnectionFailure> * onFailure);
 
     void DequeueConnectionSuccessCallbacks(bool executeCallback);
     void DequeueConnectionFailureCallbacks(CHIP_ERROR error, bool executeCallback);

@@ -22,7 +22,7 @@
 
 #pragma once
 
-#include <app/CASESessionManager.h>
+#include <app/OperationalDeviceManager.h>
 #include <app/clusters/ota-requestor/ota-requestor-server.h>
 #include <app/server/Server.h>
 #include <platform/OTARequestorDriver.h>
@@ -79,10 +79,10 @@ public:
      */
     void Init(Server * server, OTARequestorDriver * driver, BDXDownloader * downloader)
     {
-        mServer             = server;
-        mCASESessionManager = server->GetCASESessionManager();
-        mOtaRequestorDriver = driver;
-        mBdxDownloader      = downloader;
+        mServer                   = server;
+        mOperationalDeviceManager = server->GetOperationalDeviceManager();
+        mOtaRequestorDriver       = driver;
+        mBdxDownloader            = downloader;
 
         OtaRequestorServerSetUpdateState(app::Clusters::OtaSoftwareUpdateRequestor::OTAUpdateStateEnum::kIdle);
         OtaRequestorServerSetUpdateStateProgress(0);
@@ -226,7 +226,7 @@ private:
      * Session connection callbacks
      */
     static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
-    static void OnConnectionFailure(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnConnectionFailure(void * context, OperationalDeviceProxy * deviceProxy, PeerId peerId, CHIP_ERROR error);
     Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
     Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
 
@@ -248,16 +248,16 @@ private:
     static void OnNotifyUpdateAppliedResponse(void * context, const app::DataModel::NullObjectType & response);
     static void OnNotifyUpdateAppliedFailure(void * context, EmberAfStatus);
 
-    OTARequestorDriver * mOtaRequestorDriver  = nullptr;
-    NodeId mProviderNodeId                    = kUndefinedNodeId;
-    FabricIndex mProviderFabricIndex          = kUndefinedFabricIndex;
-    EndpointId mProviderEndpointId            = kRootEndpointId;
-    uint32_t mOtaStartDelayMs                 = 0;
-    CASESessionManager * mCASESessionManager  = nullptr;
-    OnConnectedAction mOnConnectedAction      = kQueryImage;
-    Messaging::ExchangeContext * mExchangeCtx = nullptr;
-    BDXDownloader * mBdxDownloader            = nullptr; // TODO: this should be OTADownloader
-    BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
+    OTARequestorDriver * mOtaRequestorDriver             = nullptr;
+    NodeId mProviderNodeId                               = kUndefinedNodeId;
+    FabricIndex mProviderFabricIndex                     = kUndefinedFabricIndex;
+    EndpointId mProviderEndpointId                       = kRootEndpointId;
+    uint32_t mOtaStartDelayMs                            = 0;
+    OperationalDeviceManager * mOperationalDeviceManager = nullptr;
+    OnConnectedAction mOnConnectedAction                 = kQueryImage;
+    Messaging::ExchangeContext * mExchangeCtx            = nullptr;
+    BDXDownloader * mBdxDownloader                       = nullptr; // TODO: this should be OTADownloader
+    BDXMessenger mBdxMessenger;                                     // TODO: ideally this is held by the application
     uint8_t mUpdateTokenBuffer[kMaxUpdateTokenLen];
     ByteSpan mUpdateToken;
     uint32_t mUpdateVersion = 0;

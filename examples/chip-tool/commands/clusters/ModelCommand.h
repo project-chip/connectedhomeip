@@ -54,7 +54,7 @@ private:
     uint8_t mEndPointId;
 
     static void OnDeviceConnectedFn(void * context, ChipDevice * device);
-    static void OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR error);
+    static void OnDeviceConnectionFailureFn(void * context, ChipDevice * device, PeerId peerId, CHIP_ERROR error);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
     chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;

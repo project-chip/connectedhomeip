@@ -31,7 +31,8 @@ void OpenCommissioningWindowCommand::OnDeviceConnectedFn(void * context, chip::O
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "OnDeviceConnectedFn: context is null"));
     command->OpenCommissioningWindow();
 }
-void OpenCommissioningWindowCommand::OnDeviceConnectionFailureFn(void * context, PeerId peerId, CHIP_ERROR err)
+void OpenCommissioningWindowCommand::OnDeviceConnectionFailureFn(void * context, chip::OperationalDeviceProxy * device,
+                                                                 PeerId peerId, CHIP_ERROR err)
 {
     LogErrorOnFailure(err);
 

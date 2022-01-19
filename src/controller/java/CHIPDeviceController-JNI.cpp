@@ -393,13 +393,14 @@ JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong ha
     wrapper->Controller()->GetConnectedDevice(nodeId, &connectedDeviceCallback->mOnSuccess, &connectedDeviceCallback->mOnFailure);
 }
 
-JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlong deviceId)
+JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlong devicePtr)
 {
     chip::DeviceLayer::StackLock lock;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    OperationalDeviceProxy * device          = reinterpret_cast<OperationalDeviceProxy *>(devicePtr);
 
     ChipLogProgress(Controller, "disconnectDevice() called with deviceId");
-    wrapper->Controller()->ReleaseOperationalDevice(deviceId);
+    wrapper->Controller()->ReleaseOperationalDevice(device);
 }
 
 JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
