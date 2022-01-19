@@ -1298,5 +1298,28 @@ enum class MatterOid
  **/
 CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id);
 
+class AesCtrKeyContext
+{
+public:
+    virtual ~AesCtrKeyContext()                                                      = default;
+    virtual CHIP_ERROR Encrypt(MutableByteSpan & plaintext, const ByteSpan & nonce)  = 0;
+    virtual CHIP_ERROR Decrypt(MutableByteSpan & ciphertext, const ByteSpan & nonce) = 0;
+};
+
+class AesCcmKeyContext
+{
+public:
+    virtual ~AesCcmKeyContext()                                  = default;
+    virtual CHIP_ERROR Encrypt(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
+                               MutableByteSpan & out_mic)        = 0;
+    virtual CHIP_ERROR Decrypt(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
+                               const ByteSpan & mic)             = 0;
+    virtual CHIP_ERROR DerivePrivacyKey(AesCtrKeyContext *& out) = 0;
+};
+
+CHIP_ERROR DeriveGroupOperationalKey(const ByteSpan & epoch_key, MutableByteSpan & out_key);
+
+CHIP_ERROR DeriveGroupSessionId(const ByteSpan & operational_key, uint16_t & session_id);
+
 } // namespace Crypto
 } // namespace chip
