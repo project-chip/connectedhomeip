@@ -338,16 +338,26 @@ void WindowAppImpl::UpdateLEDs()
         else { mStatusLED.Blink(50, 950); }
 
         // Action LED
+        NPercent100ths current;
+        LimitStatus liftLimit = LimitStatus::Intermediate;
+
+        Attributes::CurrentPositionLiftPercent100ths::Get(cover.mEndpoint, current);
+
+        if (!current.IsNull())
+        {
+            AbsoluteLimits limits = { .open = WC_PERCENT100THS_MIN_OPEN, .closed = WC_PERCENT100THS_MAX_CLOSED };
+            liftLimit = CheckLimitState(current.Value(), limits);
+        }
 
         if (EventId::None != cover.mLiftAction || EventId::None != cover.mTiltAction)
         {
             mActionLED.Blink(100);
         }
-        else if (IsLiftOpen(cover.mEndpoint))
+        else if (LimitStatus::IsUpOrOpen == liftLimit)
         {
             mActionLED.Set(true);
         }
-        else if (IsLiftClosed(cover.mEndpoint))
+        else if (LimitStatus::IsDownOrClose == liftLimit)
         {
             mActionLED.Set(false);
         }
