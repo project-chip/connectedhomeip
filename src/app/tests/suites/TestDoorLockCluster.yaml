@@ -1212,6 +1212,31 @@ tests:
         - name: "nextCredentialIndex"
           value: 4
 
+  - label: "Create new PIN with Programming user type fails"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 3 }
+        - name: "credentialData"
+          value: "123456"
+        - name: "userIndex"
+          value: 0
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: 3
+    response:
+      values:
+        - name: "status"
+          value: 0x85
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: 4
+
   - label: "Create new RFID with too short data"
     command: "SetCredential"
     arguments:
@@ -1802,7 +1827,7 @@ tests:
         - name: "nextUserIndex"
           value: 4
 
-  - label: "Create new Programming PIN credential with user"
+  - label: "Create new Programming PIN credential with invalid index"
     command: "SetCredential"
     arguments:
       values:
@@ -1810,6 +1835,31 @@ tests:
           value: 0
         - name: "credential"
           value: { CredentialType: 0, CredentialIndex: 1 }
+        - name: "credentialData"
+          value: "123456"
+        - name: "userIndex"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x85
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: null
+
+  - label: "Create new Programming PIN credential with valid index"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 0, CredentialIndex: 0 }
         - name: "credentialData"
           value: "123456"
         - name: "userIndex"
@@ -1848,7 +1898,7 @@ tests:
         - name: "credentialRule"
           value: 0
         - name: "credentials"
-          value: [ { CredentialType: 0, CredentialIndex: 1 } ]
+          value: [ { CredentialType: 0, CredentialIndex: 0 } ]
         - name: "creatorFabricIndex"
           value: 1
         - name: "lastModifiedFabricIndex"
@@ -1856,7 +1906,56 @@ tests:
         - name: "nextUserIndex"
           value: 2
 
+  - label: "Verify created programming PIN credential"
+    command: "GetCredentialStatus"
+    arguments:
+      values:
+        - name: "credential"
+          value: { CredentialType: 0, CredentialIndex: 0 }
+    response:
+      values:
+        - name: "credentialExists"
+          value: true
+        - name: "userIndex"
+          value: 1
+        - name: "nextCredentialIndex"
+          value: null
+
+  - label: "Modify the Programming PIN credential"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 2
+        - name: "credential"
+          value: { CredentialType: 0, CredentialIndex: 0 }
+        - name: "credentialData"
+          value: "654321"
+        - name: "userIndex"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x00
+        - name: "userIndex"
+          value: null
+        - name: "nextCredentialIndex"
+          value: null
+
   - label: "Clearing Programming PIN fails"
+    command: "ClearCredential"
+    arguments:
+      values:
+        - name: "credential"
+          value: { CredentialType: 0, CredentialIndex: 0 }
+    response:
+      error: INVALID_COMMAND
+
+  - label: "Clearing Programming PIN with invalid index fails"
     command: "ClearCredential"
     arguments:
       values:
@@ -1900,3 +1999,94 @@ tests:
           value: { CredentialType: 2, CredentialIndex: NumberOfRFIDUsersSupported + 1 }
     response:
       error: INVALID_COMMAND
+
+#
+# Door Lock/Unlock operations
+#
+  - label: "Create new PIN credential and user to lock/unlock door"
+    command: "SetCredential"
+    arguments:
+      values:
+        - name: "operationType"
+          value: 0
+        - name: "credential"
+          value: { CredentialType: 1, CredentialIndex: 1 }
+        - name: "credentialData"
+          value: "123456"
+        - name: "userIndex"
+          value: null
+        - name: "userStatus"
+          value: null
+        - name: "userType"
+          value: null
+    response:
+      values:
+        - name: "status"
+          value: 0x00
+        - name: "userIndex"
+          value: 2 # User index of 1 is associated with programming PIN
+        - name: "nextCredentialIndex"
+          value: 2
+
+  - label: "Try to unlock the door with invalid PIN"
+    command: "UnlockDoor"
+    arguments:
+      values:
+        - name: "pinCode"
+          value: "000000"
+    response:
+      error: FAILURE
+
+  - label: "Verify that lock state attribute value is set to Locked"
+    command: "readAttribute"
+    attribute: "LockState"
+    response:
+      value: 1
+
+  - label: "Try to unlock the door with valid PIN"
+    command: "UnlockDoor"
+    arguments:
+      values:
+        - name: "pinCode"
+          value: "123456"
+
+  - label: "Verify that lock state attribute value is set to Unlocked"
+    command: "readAttribute"
+    attribute: "LockState"
+    response:
+      value: 2
+
+  - label: "Try to lock the door with invalid PIN"
+    command: "LockDoor"
+    arguments:
+      values:
+        - name: "pinCode"
+          value: "000000"
+    response:
+      error: FAILURE
+
+  - label: "Verify that lock state attribute value is set to Unlocked"
+    command: "readAttribute"
+    attribute: "LockState"
+    response:
+      value: 2
+
+  - label: "Try to unlock the door with valid PIN"
+    command: "LockDoor"
+    arguments:
+      values:
+        - name: "pinCode"
+          value: "123456"
+
+  - label: "Verify that lock state attribute value is set to Locked"
+    command: "readAttribute"
+    attribute: "LockState"
+    response:
+      value: 1
+
+  - label: "Clean the created credential"
+    command: "ClearCredential"
+    arguments:
+      values:
+        - name: "credential"
+          value: { CredentialType: 2, CredentialIndex: 3 }
