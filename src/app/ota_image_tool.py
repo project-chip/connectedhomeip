@@ -99,7 +99,7 @@ def validate_header_attributes(args: object):
         error('Product ID is zero')
 
     if not 1 <= len(args.version_str) <= 64:
-        error('Software version is not of length 1-64')
+        error('Software version string is not of length 1-64')
 
     if args.min_version is not None and args.min_version >= args.version:
         error('Minimum applicable version is greater or equal to software version')
@@ -126,7 +126,7 @@ def generate_payload_summary(args: object):
     total_size = 0
     digest = hashlib.new(args.digest_algorithm)
 
-    if digest.digest_size < 32:
+    if digest.digest_size < (256 // 8):
         warn('Using digest length below 256 bits is not recommended')
 
     for path in args.input_files:
