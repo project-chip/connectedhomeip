@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -3495,7 +3495,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _data = @"";
 
-        _application = [CHIPApplicationLauncherClusterApplication new];
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
     }
     return self;
 }
@@ -3506,7 +3506,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplication new];
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
     }
     return self;
 }
@@ -3517,7 +3517,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _application = [CHIPApplicationLauncherClusterApplication new];
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApplication new];
     }
     return self;
 }

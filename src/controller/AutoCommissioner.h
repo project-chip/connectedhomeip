@@ -39,7 +39,7 @@ public:
     CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningDelegate::CommissioningReport report) override;
 
 private:
-    CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage);
+    CommissioningStage GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR lastErr);
     void ReleaseDAC();
     void ReleasePAI();
 

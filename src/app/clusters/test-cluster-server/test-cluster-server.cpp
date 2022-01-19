@@ -411,6 +411,43 @@ CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder
 bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
                                            const Test::DecodableType & commandData)
 {
+    // Setup the test variables
+    emAfLoadAttributeDefaults(commandPath.mEndpointId, true, MakeOptional(commandPath.mClusterId));
+    for (int i = 0; i < kAttributeListLength; ++i)
+    {
+        gListUint8Data[i] = 0;
+        gListOctetStringData[i].SetLength(0);
+        gListOperationalCert[i].SetLength(0);
+        listStructOctetStringData[i].fabricIndex     = 0;
+        listStructOctetStringData[i].operationalCert = ByteSpan();
+        gSimpleEnums[i]                              = SimpleEnum::kUnspecified;
+    }
+    gSimpleEnumCount = 0;
+
+    gStructAttributeValue.a = 0;
+    gStructAttributeValue.b = false;
+    gStructAttributeValue.c = SimpleEnum::kValueA;
+    gStructAttributeValue.d = ByteSpan();
+    gStructAttributeValue.e = CharSpan();
+    gStructAttributeValue.f = BitFlags<SimpleBitmap>();
+    gStructAttributeValue.g = 0;
+    gStructAttributeValue.h = 0;
+
+    gNullableStructAttributeValue.SetNull();
+
+    gNullablesAndOptionalsStruct.nullableInt.SetNull();
+    gNullablesAndOptionalsStruct.optionalInt         = NullOptional;
+    gNullablesAndOptionalsStruct.nullableOptionalInt = NullOptional;
+    gNullablesAndOptionalsStruct.nullableString.SetNull();
+    gNullablesAndOptionalsStruct.optionalString         = NullOptional;
+    gNullablesAndOptionalsStruct.nullableOptionalString = NullOptional;
+    gNullablesAndOptionalsStruct.nullableStruct.SetNull();
+    gNullablesAndOptionalsStruct.optionalStruct         = NullOptional;
+    gNullablesAndOptionalsStruct.nullableOptionalStruct = NullOptional;
+    gNullablesAndOptionalsStruct.nullableList.SetNull();
+    gNullablesAndOptionalsStruct.optionalList         = NullOptional;
+    gNullablesAndOptionalsStruct.nullableOptionalList = NullOptional;
+
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }

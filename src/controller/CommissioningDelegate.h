@@ -85,6 +85,7 @@ public:
     bool HasAttestationSignature() const { return mAttestationSignature.HasValue(); }
     bool HasPAI() const { return mPAI.HasValue(); }
     bool HasDAC() const { return mDAC.HasValue(); }
+    uint16_t GetFailsafeTimerSeconds() const { return mFailsafeTimerSeconds; }
     const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
     const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
     const Optional<WiFiCredentials> GetWiFiCredentials() const { return mWiFiCreds; }
@@ -96,6 +97,13 @@ public:
     const Optional<ByteSpan> GetAttestationSignature() const { return mAttestationSignature; }
     const Optional<ByteSpan> GetPAI() const { return mPAI; }
     const Optional<ByteSpan> GetDAC() const { return mDAC; }
+    CHIP_ERROR GetCompletionStatus() { return completionStatus; }
+
+    CommissioningParameters & SetFailsafeTimerSeconds(uint16_t seconds)
+    {
+        mFailsafeTimerSeconds = seconds;
+        return *this;
+    }
 
     // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
     CommissioningParameters & SetCSRNonce(ByteSpan csrNonce)
@@ -161,8 +169,10 @@ public:
         mDAC = MakeOptional(dac);
         return *this;
     }
+    void SetCompletionStatus(CHIP_ERROR err) { completionStatus = err; }
 
 private:
+    uint16_t mFailsafeTimerSeconds = 60;
     Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
     Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
     Optional<WiFiCredentials> mWiFiCreds;
@@ -174,6 +184,7 @@ private:
     Optional<ByteSpan> mAttestationSignature;
     Optional<ByteSpan> mPAI;
     Optional<ByteSpan> mDAC;
+    CHIP_ERROR completionStatus = CHIP_NO_ERROR;
 };
 
 class CommissioningDelegate

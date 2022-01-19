@@ -212,6 +212,7 @@ public:
     // TODO: implements group sessions
     Optional<SessionHandle> CreateGroupSession(GroupId group) { return mGroupSessions.AllocEntry(group, kUndefinedFabricIndex); }
     Optional<SessionHandle> FindGroupSession(GroupId group) { return mGroupSessions.FindEntry(group, kUndefinedFabricIndex); }
+    void RemoveGroupSession(Transport::GroupSession * session) { mGroupSessions.DeleteEntry(session); }
 
     // TODO: this is a temporary solution for legacy tests which use nodeId to send packets
     // and tv-casting-app that uses the TV's node ID to find the associated secure session

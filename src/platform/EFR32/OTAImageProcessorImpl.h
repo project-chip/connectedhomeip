@@ -55,7 +55,8 @@ private:
      */
     CHIP_ERROR ReleaseBlock();
 
-    std::ofstream mOfs;
+    static uint32_t mWriteOffset; // End of last written block
+    static uint8_t mSlotId;       // Bootloader storage slot
     MutableByteSpan mBlock;
     OTADownloader * mDownloader;
 };

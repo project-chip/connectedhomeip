@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ public:
         AddArgument("cluster", &mCluster);
         AddArgument("endpoint", 0, UINT16_MAX, &mEndpoint);
     }
+
+    ~Test_TC_DM_1_3_Simulated() {}
 
     /////////// TestCommand Interface /////////
     void NextTest() override
@@ -394,4 +396,10 @@ std::unique_ptr<TestCommand> GetTestCommand(std::string testName)
     }
 
     return nullptr;
+}
+
+void PrintTestCommands()
+{
+    ChipLogError(chipTool, "Supported commands:");
+    ChipLogError(chipTool, "\t* Test_TC_DM_1_3_Simulated");
 }

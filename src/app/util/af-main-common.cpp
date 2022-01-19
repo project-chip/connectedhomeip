@@ -576,14 +576,7 @@ void emAfMessageSentHandler(const MessageSendDestination & destination, EmberAps
 
     if (messageContents != NULL && messageContents[0] & ZCL_CLUSTER_SPECIFIC_COMMAND)
     {
-        emberAfClusterMessageSentWithMfgCodeCallback(
-            destination, apsFrame, messageLength, messageContents, status,
-            // If the manufacturer specific flag is set
-            // get read it as next part of message
-            // else use null code.
-            (((messageContents[0] & ZCL_MANUFACTURER_SPECIFIC_MASK) == ZCL_MANUFACTURER_SPECIFIC_MASK)
-                 ? emberAfGetInt16u(messageContents, 1, messageLength)
-                 : EMBER_AF_NULL_MANUFACTURER_CODE));
+        emberAfClusterMessageSentCallback(destination, apsFrame, messageLength, messageContents, status);
     }
 
     if (callback != NULL)

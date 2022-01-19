@@ -97,8 +97,12 @@ CHIP_ERROR AutoCommissioner::SetCommissioningParameters(const CommissioningParam
     return CHIP_NO_ERROR;
 }
 
-CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage)
+CommissioningStage AutoCommissioner::GetNextCommissioningStage(CommissioningStage currentStage, CHIP_ERROR lastErr)
 {
+    if (lastErr != CHIP_NO_ERROR)
+    {
+        return CommissioningStage::kCleanup;
+    }
     switch (currentStage)
     {
     case CommissioningStage::kSecurePairing:
@@ -273,10 +277,11 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         break;
     }
 
-    CommissioningStage nextStage = GetNextCommissioningStage(report.stageCompleted);
+    CommissioningStage nextStage = GetNextCommissioningStage(report.stageCompleted, err);
 
     DeviceProxy * proxy = mCommissioneeDeviceProxy;
-    if (nextStage == CommissioningStage::kSendComplete || nextStage == CommissioningStage::kCleanup)
+    if (nextStage == CommissioningStage::kSendComplete ||
+        (nextStage == CommissioningStage::kCleanup && mOperationalDeviceProxy != nullptr))
     {
         proxy = mOperationalDeviceProxy;
     }
@@ -286,6 +291,7 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         ChipLogError(Controller, "Invalid device for commissioning");
         return CHIP_ERROR_INCORRECT_STATE;
     }
+    mParams.SetCompletionStatus(err);
     mCommissioner->PerformCommissioningStep(proxy, nextStage, mParams, this);
     return CHIP_NO_ERROR;
 }

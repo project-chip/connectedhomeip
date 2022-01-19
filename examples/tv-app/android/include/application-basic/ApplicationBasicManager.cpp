@@ -41,9 +41,9 @@ uint16_t ApplicationBasicManager::HandleGetProductId()
     return 1;
 }
 
-chip::app::Clusters::ApplicationBasic::Structs::Application::Type ApplicationBasicManager::HandleGetApplication()
+chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type ApplicationBasicManager::HandleGetApplication()
 {
-    chip::app::Clusters::ApplicationBasic::Structs::Application::Type application;
+    chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApplication::Type application;
     application.catalogVendorId = 123;
     application.applicationId   = chip::CharSpan("applicationId", strlen("applicationId"));
     return application;
