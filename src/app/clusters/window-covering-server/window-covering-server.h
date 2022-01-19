@@ -18,6 +18,7 @@
 #pragma once
 
 #include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/enums.h>
 #include <app/util/af-types.h>
 
@@ -108,6 +109,7 @@ struct AbsoluteLimits
     uint16_t closed;
 };
 
+bool HasFeature(chip::EndpointId endpoint, WcFeature feature);
 
 void TypeSet(chip::EndpointId endpoint, EmberAfWcType type);
 EmberAfWcType TypeGet(chip::EndpointId endpoint);
