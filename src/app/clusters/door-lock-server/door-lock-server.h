@@ -50,6 +50,8 @@ static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
 
 static constexpr size_t DOOR_LOCK_MAX_CREDENTIALS_PER_USER = 5; /**< Maximum number of supported credentials by a single user. */
 
+struct EmberAfPluginDoorLockCredentialInfo;
+
 /**
  * @brief Door Lock Server Plugin class.
  */
@@ -158,6 +160,20 @@ private:
                                  const DlCredential & credential);
     DlStatus modifyCredentialForUser(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIdx, uint16_t userIndex,
                                      const DlCredential & credential);
+
+    DlStatus createCredential(chip::EndpointId endpointId, chip::FabricIndex creatorFabricIdx, chip::NodeId sourceNodeId,
+                              uint16_t credentialIndex, DlCredentialType credentialType,
+                              const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
+                              Nullable<uint16_t> userIndex, Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType,
+                              uint16_t & createdUserIndex);
+    DlStatus modifyProgrammingPIN(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
+                                  uint16_t credentialIndex, DlCredentialType credentialType,
+                                  const EmberAfPluginDoorLockCredentialInfo & existingCredential,
+                                  const chip::ByteSpan & credentialData);
+    DlStatus modifyCredential(chip::EndpointId endpointId, chip::FabricIndex modifierFabricIndex, chip::NodeId sourceNodeId,
+                              uint16_t credentialIndex, DlCredentialType credentialType,
+                              const EmberAfPluginDoorLockCredentialInfo & existingCredential, const chip::ByteSpan & credentialData,
+                              uint16_t userIndex, Nullable<DlUserStatus> userStatus, Nullable<DlUserType> userType);
 
     EmberAfStatus clearCredential(chip::EndpointId endpointId, chip::FabricIndex modifier, chip::NodeId sourceNodeId,
                                   DlCredentialType credentialType, uint16_t credentialIndex, bool sendUserChangeEvent);
