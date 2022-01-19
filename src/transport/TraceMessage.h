@@ -19,20 +19,37 @@
 #pragma once
 
 #include <core/CHIPBuildConfig.h>
+#include <transport/Session.h>
 #include <transport/raw/MessageHeader.h>
+#include <transport/raw/PeerAddress.h>
 
 #if CHIP_CONFIG_TRANSPORT_TRACE_ENABLED
 #include "pw_trace/trace.h"
 
-#define CHIP_TRACE_MESSAGE(payloadHeader, packetHeader, data, dataLen)                                                             \
+#define CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, data, dataLen)                                                        \
     do                                                                                                                             \
     {                                                                                                                              \
-        ::chip::trace::TraceSecureMessageData _trace_data{ &payloadHeader, &packetHeader, data, dataLen };                         \
-        PW_TRACE_INSTANT_DATA("SecureMsg", ::chip::trace::kTraceSecureMessageDataFormat,                                           \
-                              reinterpret_cast<const char *>(&_trace_data), sizeof(_trace_data));                                  \
+        const ::chip::trace::TraceSecureMessageSentData _trace_data{ &payloadHeader, &packetHeader, data, dataLen };               \
+        PW_TRACE_INSTANT_DATA("SecureMsg", ::chip::trace::kTraceMessageSentDataFormat,                                             \
+                              reinterpret_cast<const void *>(&_trace_data), sizeof(_trace_data));                                  \
     } while (0)
+
+#define CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, session, peerAddress, data, dataLen)                              \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        const ::chip::trace::TraceSecureMessageReceivedData _trace_data{ &payloadHeader, &packetHeader, session,                   \
+                                                                         &peerAddress,   data,          dataLen };                 \
+        PW_TRACE_INSTANT_DATA("SecureMsg", ::chip::trace::kTraceMessageReceivedDataFormat,                                         \
+                              reinterpret_cast<const void *>(&_trace_data), sizeof(_trace_data));                                  \
+    } while (0)
+
 #else
-#define CHIP_TRACE_MESSAGE(payloadHeader, packetHeader, data, dataLen)                                                             \
+#define CHIP_TRACE_MESSAGE_SENT(payloadHeader, packetHeader, data, dataLen)                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+    } while (0)
+
+#define CHIP_TRACE_MESSAGE_RECEIVED(payloadHeader, packetHeader, session, peerAddress, data, dataLen)                              \
     do                                                                                                                             \
     {                                                                                                                              \
     } while (0)
@@ -42,13 +59,25 @@
 namespace chip {
 namespace trace {
 
-constexpr const char * kTraceSecureMessageDataFormat = "SecMsg";
+constexpr const char * kTraceMessageEvent              = "SecureMsg";
+constexpr const char * kTraceMessageSentDataFormat     = "SecMsgSent";
+constexpr const char * kTraceMessageReceivedDataFormat = "SecMsgReceived";
 
-struct TraceSecureMessageData
+struct TraceSecureMessageSentData
 {
-    PayloadHeader * payloadHeader;
-    PacketHeader * packetHeader;
-    uint8_t * packetPayload;
+    const PayloadHeader * payloadHeader;
+    const PacketHeader * packetHeader;
+    const uint8_t * packetPayload;
+    size_t packetSize;
+};
+
+struct TraceSecureMessageReceivedData
+{
+    const PayloadHeader * payloadHeader;
+    const PacketHeader * packetHeader;
+    const Transport::Session * session;
+    const Transport::PeerAddress * peerAddress;
+    const uint8_t * packetPayload;
     size_t packetSize;
 };
 
