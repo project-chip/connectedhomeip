@@ -595,7 +595,8 @@ limitations under the License.
         <command source="client" code="38" name="ClearCredential" optional="true">
             <description>Clear one, one type, or all credentials except ProgrammingPIN credential.</description>
             <access op="invoke" role="administer" />
-            <arg name="credential" type="DlCredential" isNullable="true" />
+            <!-- NOTE: Should be nullable, but ZAP generators for Android are not generating valid code for such a case.  -->
+            <arg name="credential" type="DlCredential" />
         </command>
 
 
