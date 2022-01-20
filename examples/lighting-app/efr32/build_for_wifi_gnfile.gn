@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Project CHIP Authors
+# Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# add this gni as import in your build args to use pigweed in the example
-# 'import("//with_pw_rpc.gni")'
+import("//build_overrides/build.gni")
 
-import("//build_overrides/chip.gni")
-import("${chip_root}/config/efr32/lib/pw_rpc/pw_rpc.gni")
-import("${chip_root}/examples/platform/efr32/args.gni")
+# The location of the build configuration file.
+buildconfig = "${build_root}/config/BUILDCONFIG.gn"
 
-efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-chip_enable_pw_rpc = true
-chip_enable_openthread = true
-
-cpp_standard = "gnu++17"
+default_args = {
+  target_cpu = "arm"
+  target_os = "freertos"
+  use_thread = false
+  import("//build_for_wifi_args.gni")
+}

@@ -1,8 +1,6 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2019 Google LLC.
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,30 +15,11 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-// ---- Lock Example App Config ----
-
-#define APP_TASK_NAME "Lck"
-
-// Time it takes in ms for the simulated actuator to move from one
-// state to another.
-#define ACTUATOR_MOVEMENT_PERIOS_MS 2000
-
-// EFR Logging
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void efr32LogInit(void);
-
-void efr32Log(const char * aFormat, ...);
-#define EFR32_LOG(...) efr32Log(__VA_ARGS__);
-void appError(int err);
-
-#ifdef __cplusplus
-}
+#ifndef _SERVICE_PROVISIONING_H
+#define _SERVICE_PROVISIONING_H
 
 #include <lib/core/CHIPError.h>
-void appError(CHIP_ERROR error);
-#endif
+
+CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key);
+
+#endif // _SERVICE_PROVISIONING_H
