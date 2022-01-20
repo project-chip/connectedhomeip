@@ -19,6 +19,7 @@
 #pragma once
 #include <app/OperationalDeviceProxy.h>
 #include <controller/CommissioneeDeviceProxy.h>
+#include <lib/support/Variant.h>
 
 namespace chip {
 namespace Controller {
@@ -187,37 +188,44 @@ private:
     CHIP_ERROR completionStatus = CHIP_NO_ERROR;
 };
 
+struct RequestedCertificate
+{
+    RequestedCertificate(ByteSpan newCertificate) : certificate(newCertificate) {}
+    ByteSpan certificate;
+};
+
+struct AttestationResponse
+{
+    AttestationResponse(ByteSpan newAttestationElements, ByteSpan newSignature) :
+        attestationElements(newAttestationElements), signature(newSignature)
+    {}
+    ByteSpan attestationElements;
+    ByteSpan signature;
+};
+
+struct NocChain
+{
+    NocChain(ByteSpan newNoc, ByteSpan newIcac, ByteSpan newRcac) : noc(newNoc), icac(newIcac), rcac(newRcac) {}
+    ByteSpan noc;
+    ByteSpan icac;
+    ByteSpan rcac;
+};
+
+struct OperationalNodeFoundData
+{
+    OperationalNodeFoundData(OperationalDeviceProxy * proxy) : operationalProxy(proxy) {}
+    OperationalDeviceProxy * operationalProxy;
+};
 class CommissioningDelegate
 {
 public:
     virtual ~CommissioningDelegate(){};
-    struct CommissioningReport
+
+    struct CommissioningReport : Variant<RequestedCertificate, AttestationResponse, NocChain, OperationalNodeFoundData>
     {
         CommissioningReport(CommissioningStage stage) : stageCompleted(stage) {}
         CommissioningStage stageCompleted;
         // TODO: Add other things the delegate needs to know.
-        union
-        {
-            struct
-            {
-                ByteSpan certificate;
-            } requestedCertificate;
-            struct
-            {
-                ByteSpan attestationElements;
-                ByteSpan signature;
-            } attestationResponse;
-            struct
-            {
-                ByteSpan noc;
-                ByteSpan icac;
-                ByteSpan rcac;
-            } nocChain;
-            struct
-            {
-                OperationalDeviceProxy * operationalProxy;
-            } OperationalNodeFoundData;
-        };
     };
     virtual CHIP_ERROR CommissioningStepFinished(CHIP_ERROR err, CommissioningReport report) = 0;
 };

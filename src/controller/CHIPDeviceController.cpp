@@ -1013,7 +1013,7 @@ void DeviceCommissioner::OnCertificateChainResponse(void * context, ByteSpan cer
     commissioner->mOnCertificateChainFailureCallback.Cancel();
 
     CommissioningDelegate::CommissioningReport report(commissioner->mCommissioningStage);
-    report.requestedCertificate.certificate = certificate;
+    report.Set<RequestedCertificate>(RequestedCertificate(certificate));
 
     commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
 }
@@ -1052,8 +1052,7 @@ void DeviceCommissioner::OnAttestationResponse(void * context, chip::ByteSpan at
     commissioner->mOnAttestationFailureCallback.Cancel();
 
     CommissioningDelegate::CommissioningReport report(CommissioningStage::kSendAttestationRequest);
-    report.attestationResponse.attestationElements = attestationElements;
-    report.attestationResponse.signature           = signature;
+    report.Set<AttestationResponse>(AttestationResponse(attestationElements, signature));
     commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
 }
 
@@ -1144,8 +1143,7 @@ void DeviceCommissioner::OnOperationalCertificateSigningRequest(void * context, 
     commissioner->mOnCSRFailureCallback.Cancel();
 
     CommissioningDelegate::CommissioningReport report(CommissioningStage::kSendOpCertSigningRequest);
-    report.attestationResponse.attestationElements = NOCSRElements;
-    report.attestationResponse.signature           = AttestationSignature;
+    report.Set<AttestationResponse>(AttestationResponse(NOCSRElements, AttestationSignature));
     commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
 }
 
@@ -1162,10 +1160,8 @@ void DeviceCommissioner::OnDeviceNOCChainGeneration(void * context, CHIP_ERROR s
 
     // TODO - Verify that the generated root cert matches with commissioner's root cert
 
-    report.nocChain.noc  = noc;
-    report.nocChain.icac = icac;
-    report.nocChain.rcac = rcac;
-    err                  = commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
+    report.Set<NocChain>(NocChain(noc, icac, rcac));
+    err = commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -1516,7 +1512,7 @@ void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDevicePr
         if (commissioner->mCommissioningDelegate != nullptr)
         {
             CommissioningDelegate::CommissioningReport report(CommissioningStage::kFindOperational);
-            report.OperationalNodeFoundData.operationalProxy = device;
+            report.Set<OperationalNodeFoundData>(OperationalNodeFoundData(device));
             commissioner->mCommissioningDelegate->CommissioningStepFinished(CHIP_NO_ERROR, report);
         }
     }

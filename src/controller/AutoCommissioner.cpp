@@ -234,15 +234,15 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
     switch (report.stageCompleted)
     {
     case CommissioningStage::kSendPAICertificateRequest:
-        SetPAI(report.requestedCertificate.certificate);
+        SetPAI(report.Get<RequestedCertificate>().certificate);
         break;
     case CommissioningStage::kSendDACCertificateRequest:
-        SetDAC(report.requestedCertificate.certificate);
+        SetDAC(report.Get<RequestedCertificate>().certificate);
         break;
     case CommissioningStage::kSendAttestationRequest:
         // These don't need to be deep copied to local memory because they are used in this one step then never again.
-        mParams.SetAttestationElements(report.attestationResponse.attestationElements)
-            .SetAttestationSignature(report.attestationResponse.signature);
+        mParams.SetAttestationElements(report.Get<AttestationResponse>().attestationElements)
+            .SetAttestationSignature(report.Get<AttestationResponse>().signature);
         // TODO: Does this need to be done at runtime? Seems like this could be done earlier and we woouldn't need to hold a
         // reference to the operational credential delegate here
         if (mOperationalCredentialsDelegate != nullptr)
@@ -254,17 +254,17 @@ CHIP_ERROR AutoCommissioner::CommissioningStepFinished(CHIP_ERROR err, Commissio
         break;
     case CommissioningStage::kSendOpCertSigningRequest: {
         NOCChainGenerationParameters nocParams;
-        nocParams.nocsrElements = report.attestationResponse.attestationElements;
-        nocParams.signature     = report.attestationResponse.signature;
+        nocParams.nocsrElements = report.Get<AttestationResponse>().attestationElements;
+        nocParams.signature     = report.Get<AttestationResponse>().signature;
         mParams.SetNOCChainGenerationParameters(nocParams);
     }
     break;
     case CommissioningStage::kGenerateNOCChain:
         // For NOC chain generation, we re-use the buffers. NOCChainGenerated triggers the next stage before
         // storing the returned certs, so just return here without triggering the next stage.
-        return NOCChainGenerated(report.nocChain.noc, report.nocChain.icac, report.nocChain.rcac);
+        return NOCChainGenerated(report.Get<NocChain>().noc, report.Get<NocChain>().icac, report.Get<NocChain>().rcac);
     case CommissioningStage::kFindOperational:
-        mOperationalDeviceProxy = report.OperationalNodeFoundData.operationalProxy;
+        mOperationalDeviceProxy = report.Get<OperationalNodeFoundData>().operationalProxy;
         break;
     case CommissioningStage::kCleanup:
         ReleasePAI();
