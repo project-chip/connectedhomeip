@@ -108,9 +108,6 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
 {
     LogQueryImageResponse(response);
 
-    uint32_t currentSoftwareVersion;
-    VerifyOrReturn(Basic::Attributes::SoftwareVersion::Get(kRootEndpointId, &currentSoftwareVersion) == EMBER_ZCL_STATUS_SUCCESS);
-
     OTARequestor * requestorCore = static_cast<OTARequestor *>(context);
     VerifyOrDie(requestorCore != nullptr);
 
@@ -126,32 +123,24 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             return;
         }
 
-        if (response.softwareVersion.HasValue())
+        if (update.softwareVersion > requestorCore->mCurrentVersion)
         {
+            ChipLogDetail(SoftwareUpdate, "Update available from %" PRIu32 " to %" PRIu32 " version",
+                          requestorCore->mCurrentVersion, update.softwareVersion);
+            MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
+            CopySpanToMutableSpan(update.updateToken, updateToken);
+            requestorCore->mTargetVersion = update.softwareVersion;
+            requestorCore->mUpdateToken   = updateToken;
 
-            if (update.softwareVersion > currentSoftwareVersion)
-            {
-                ChipLogProgress(SoftwareUpdate, "Updating To Newer Version...");
-	        MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
-       	        CopySpanToMutableSpan(update.updateToken, updateToken);
- 	        requestorCore->mTargetVersion = update.softwareVersion;
-	        requestorCore->mUpdateToken   = updateToken;
-
-                requestorCore->mOtaRequestorDriver->UpdateAvailable(
-                    update, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-            }
-            else
-            {
-                ChipLogDetail(SoftwareUpdate, "Already up to date");
-
-                requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
-                                                                   System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-            }
+            requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
+                                                                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
         else
         {
-            ChipLogDetail(SoftwareUpdate, "Update Not Found!!");
-            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::NotAvailable,
+            ChipLogDetail(SoftwareUpdate, "Version %" PRIu32 " is older or same than current version %" PRIu32 ", not updating",
+                          update.softwareVersion, requestorCore->mCurrentVersion);
+
+            requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
                                                                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
 
@@ -561,6 +550,8 @@ CHIP_ERROR OTARequestor::ExtractUpdateDescription(const QueryImageResponseDecoda
     update.softwareVersion = response.softwareVersion.Value();
 
     VerifyOrReturnError(response.updateToken.HasValue(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(response.updateToken.Value().size() >= 8 && response.updateToken.Value().size() <= 32,
+                        CHIP_ERROR_INVALID_ARGUMENT);
     update.updateToken = response.updateToken.Value();
 
     update.userConsentNeeded    = response.userConsentNeeded.ValueOr(false);
