@@ -34,6 +34,398 @@ namespace Controller {
 // TODO(#4503): length should be passed to commands when byte string is in argument list.
 // TODO(#4503): Commands should take group id as an argument.
 
+// OperationalCredentials Cluster Commands
+CHIP_ERROR OperationalCredentialsCluster::AddNOC(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 chip::ByteSpan NOCValue, chip::ByteSpan ICACValue, chip::ByteSpan IPKValue,
+                                                 chip::NodeId caseAdminNode, uint16_t adminVendorId)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OperationalCredentials::Commands::AddNOC::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // NOCValue: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), NOCValue));
+    // ICACValue: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), ICACValue));
+    // IPKValue: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), IPKValue));
+    // caseAdminNode: nodeId
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), caseAdminNode));
+    // adminVendorId: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), adminVendorId));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::AddTrustedRootCertificate(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback,
+                                                                    chip::ByteSpan rootCertificate)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OperationalCredentials::Commands::AddTrustedRootCertificate::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // rootCertificate: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), rootCertificate));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::AttestationRequest(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback,
+                                                             chip::ByteSpan attestationNonce)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OperationalCredentials::Commands::AttestationRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // attestationNonce: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), attestationNonce));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::CertificateChainRequest(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint8_t certificateType)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OperationalCredentials::Commands::CertificateChainRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // certificateType: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), certificateType));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::OpCSRRequest(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback, chip::ByteSpan CSRNonce)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OperationalCredentials::Commands::OpCSRRequest::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // CSRNonce: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), CSRNonce));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::RemoveFabric(Callback::Cancelable * onSuccessCallback,
+                                                       Callback::Cancelable * onFailureCallback, uint8_t fabricIndex)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OperationalCredentials::Commands::RemoveFabric::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // fabricIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), fabricIndex));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::RemoveTrustedRootCertificate(Callback::Cancelable * onSuccessCallback,
+                                                                       Callback::Cancelable * onFailureCallback,
+                                                                       chip::ByteSpan trustedRootIdentifier)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OperationalCredentials::Commands::RemoveTrustedRootCertificate::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // trustedRootIdentifier: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), trustedRootIdentifier));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::UpdateFabricLabel(Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback, chip::CharSpan label)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId,
+                                         OperationalCredentials::Commands::UpdateFabricLabel::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // label: charString
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), label));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
+CHIP_ERROR OperationalCredentialsCluster::UpdateNOC(Callback::Cancelable * onSuccessCallback,
+                                                    Callback::Cancelable * onFailureCallback, chip::ByteSpan NOCValue,
+                                                    chip::ByteSpan ICACValue)
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    TLV::TLVWriter * writer = nullptr;
+    uint8_t argSeqNumber    = 0;
+
+    // Used when encoding non-empty command. Suppress error message when encoding empty commands.
+    (void) writer;
+    (void) argSeqNumber;
+
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, OperationalCredentials::Commands::UpdateNOC::Id,
+                                         (app::CommandPathFlags::kEndpointIdValid) };
+
+    CommandSenderHandle sender(
+        Platform::New<app::CommandSender>(mDevice->GetInteractionModelDelegate(), mDevice->GetExchangeManager()));
+
+    VerifyOrReturnError(sender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+    SuccessOrExit(err = sender->PrepareCommand(cmdParams));
+
+    VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    // NOCValue: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), NOCValue));
+    // ICACValue: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), ICACValue));
+
+    SuccessOrExit(err = sender->FinishCommand());
+
+    // #6308: This is a temporary solution before we fully support IM on application side and should be replaced by IMDelegate.
+    mDevice->AddIMResponseHandler(sender.get(), onSuccessCallback, onFailureCallback);
+
+    SuccessOrExit(err = mDevice->SendCommands(sender.get()));
+
+    // We have successfully sent the command, and the callback handler will be responsible to free the object, release the object
+    // now.
+    sender.release();
+exit:
+    return err;
+}
+
 // TemperatureMeasurement Cluster Commands
 
 } // namespace Controller

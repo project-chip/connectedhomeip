@@ -492,6 +492,88 @@ server cluster OnOff = 6 {
   command Toggle(): DefaultSuccess = 2;
 }
 
+client cluster OperationalCredentials = 62 {
+  enum NodeOperationalCertStatus : ENUM8 {
+    kSuccess = 0;
+    kInvalidPublicKey = 1;
+    kInvalidNodeOpId = 2;
+    kInvalidNOC = 3;
+    kMissingCsr = 4;
+    kTableFull = 5;
+    kInsufficientPrivilege = 8;
+    kFabricConflict = 9;
+    kLabelConflict = 10;
+    kInvalidFabricIndex = 11;
+  }
+
+  struct FabricDescriptor {
+    fabric_idx fabricIndex = 0;
+    OCTET_STRING<65> rootPublicKey = 1;
+    INT16U vendorId = 2;
+    FABRIC_ID fabricId = 3;
+    NODE_ID nodeId = 4;
+    CHAR_STRING<32> label = 5;
+  }
+
+  readonly attribute FabricDescriptor fabricsList[] = 1;
+  readonly attribute int8u supportedFabrics = 2;
+  readonly attribute int8u commissionedFabrics = 3;
+  readonly attribute OCTET_STRING trustedRootCertificates[] = 4;
+  readonly attribute fabric_idx currentFabricIndex = 5;
+  readonly global attribute int16u clusterRevision = 65533;
+
+  request struct AddNOCRequest {
+    OCTET_STRING NOCValue = 0;
+    optional OCTET_STRING ICACValue = 1;
+    OCTET_STRING IPKValue = 2;
+    NODE_ID caseAdminNode = 3;
+    INT16U adminVendorId = 4;
+  }
+
+  request struct AddTrustedRootCertificateRequest {
+    OCTET_STRING rootCertificate = 0;
+  }
+
+  request struct AttestationRequestRequest {
+    OCTET_STRING attestationNonce = 0;
+  }
+
+  request struct CertificateChainRequestRequest {
+    INT8U certificateType = 0;
+  }
+
+  request struct OpCSRRequestRequest {
+    OCTET_STRING CSRNonce = 0;
+  }
+
+  request struct RemoveFabricRequest {
+    INT8U fabricIndex = 0;
+  }
+
+  request struct RemoveTrustedRootCertificateRequest {
+    OCTET_STRING trustedRootIdentifier = 0;
+  }
+
+  request struct UpdateFabricLabelRequest {
+    CHAR_STRING label = 0;
+  }
+
+  request struct UpdateNOCRequest {
+    OCTET_STRING NOCValue = 0;
+    optional OCTET_STRING ICACValue = 1;
+  }
+
+  command AddNOC(AddNOCRequest): NOCResponse = 6;
+  command AddTrustedRootCertificate(AddTrustedRootCertificateRequest): DefaultSuccess = 11;
+  command AttestationRequest(AttestationRequestRequest): AttestationResponse = 0;
+  command CertificateChainRequest(CertificateChainRequestRequest): CertificateChainResponse = 2;
+  command OpCSRRequest(OpCSRRequestRequest): OpCSRResponse = 4;
+  command RemoveFabric(RemoveFabricRequest): NOCResponse = 10;
+  command RemoveTrustedRootCertificate(RemoveTrustedRootCertificateRequest): DefaultSuccess = 12;
+  command UpdateFabricLabel(UpdateFabricLabelRequest): NOCResponse = 9;
+  command UpdateNOC(UpdateNOCRequest): NOCResponse = 7;
+}
+
 server cluster OperationalCredentials = 62 {
   enum NodeOperationalCertStatus : ENUM8 {
     kSuccess = 0;
@@ -714,6 +796,7 @@ endpoint 0 {
   server  cluster Descriptor;
   server  cluster GeneralCommissioning;
   server  cluster NetworkCommissioning;
+  binding cluster OperationalCredentials;
   server  cluster OperationalCredentials;
   binding cluster TemperatureMeasurement;
   server  cluster TemperatureMeasurement;
