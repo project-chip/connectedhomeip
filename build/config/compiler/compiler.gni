@@ -41,4 +41,7 @@ declare_args() {
 
   # C++ standard level (value for -std flag).
   cpp_standard = "gnu++14"
+
+  # enable libfuzzer
+  is_libfuzzer = false
 }
