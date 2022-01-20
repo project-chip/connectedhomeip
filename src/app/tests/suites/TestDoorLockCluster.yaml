@@ -73,7 +73,8 @@ tests:
     arguments:
       values:
         - name: "userIndex"
-          value: NumberOfTotalUsersSupported + 1
+          # This ugly hack is required to silence compiler warnings about type promotions
+          value: static_cast<uint16_t>(NumberOfTotalUsersSupported + 1)
     response:
       error: INVALID_COMMAND
 
@@ -559,7 +560,8 @@ tests:
         - name: "operationType"
           value: 0
         - name: "userIndex"
-          value: NumberOfTotalUsersSupported + 1
+          # This ugly hack is required to silence compiler warnings about type promotions
+          value: static_cast<uint16_t>(NumberOfTotalUsersSupported + 1)
         - name: "userName"
           value: null
         - name: "userUniqueId"
@@ -671,7 +673,8 @@ tests:
     arguments:
       values:
         - name: "userIndex"
-          value: NumberOfTotalUsersSupported + 1
+          # This ugly hack is required to silence compiler warnings about type promotions
+          value: static_cast<uint16_t>(NumberOfTotalUsersSupported + 1)
     response:
       error: INVALID_COMMAND
 
@@ -783,7 +786,8 @@ tests:
           value:
             {
               CredentialType: 1,
-              CredentialIndex: NumberOfPINUsersSupported + 1,
+              # This ugly hack is required to silence compiler warnings about type promotions
+              CredentialIndex: static_cast<uint16_t>(NumberOfPINUsersSupported + 1),
             }
     response:
       error: INVALID_COMMAND
@@ -892,7 +896,8 @@ tests:
           value:
             {
               CredentialType: 1,
-              CredentialIndex: NumberOfPINUsersSupported + 1,
+              # This ugly hack is required to silence compiler warnings about type promotions
+              CredentialIndex: static_cast<uint16_t>(NumberOfPINUsersSupported + 1),
             }
         - name: "credentialData"
           value: "123456"
@@ -935,7 +940,8 @@ tests:
           value:
             {
               CredentialType: 2,
-              CredentialIndex: NumberOfRFIDUsersSupported + 1,
+              # This ugly hack is required to silence compiler warnings about type promotions
+              CredentialIndex: static_cast<uint16_t>(NumberOfRFIDUsersSupported + 1),
             }
     response:
       error: INVALID_COMMAND
@@ -1063,7 +1069,8 @@ tests:
           value:
             {
               CredentialType: 2,
-              CredentialIndex: NumberOfRFIDUsersSupported + 1,
+              # This ugly hack is required to silence compiler warnings about type promotions
+              CredentialIndex: static_cast<uint16_t>(NumberOfRFIDUsersSupported + 1),
             }
         - name: "credentialData"
           value: "new_rfid_data_field"
@@ -1143,7 +1150,8 @@ tests:
         - name: "credentialData"
           value: "123465"
         - name: "userIndex"
-          value: NumberOfTotalUsersSupported + 1
+          # This ugly hack is required to silence compiler warnings about type promotions
+          value: static_cast<uint16_t>(NumberOfTotalUsersSupported + 1)
         - name: "userStatus"
           value: null
         - name: "userType"
@@ -2017,7 +2025,8 @@ tests:
           value:
             {
               CredentialType: 1,
-              CredentialIndex: NumberOfPINUsersSupported + 1,
+              # This ugly hack is required to silence compiler warnings about type promotions
+              CredentialIndex: static_cast<uint16_t>(NumberOfPINUsersSupported + 1),
             }
     response:
       error: INVALID_COMMAND
@@ -2039,7 +2048,8 @@ tests:
           value:
             {
               CredentialType: 2,
-              CredentialIndex: NumberOfRFIDUsersSupported + 1,
+              # This ugly hack is required to silence compiler warnings about type promotions
+              CredentialIndex: static_cast<uint16_t>(NumberOfRFIDUsersSupported + 1),
             }
     response:
       error: INVALID_COMMAND
