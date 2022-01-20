@@ -146,7 +146,9 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBle(BLE_CONNECTION_OBJECT connObj)
 
     Transport::PeerAddress peerAddress = Transport::PeerAddress::BLE();
     RendezvousParameters params        = RendezvousParameters().SetPeerAddress(peerAddress).SetConnectionObject(connObj);
-    OnDeviceDiscovered(params);
+    // We don't have network credentials, so can't do the entire pairing flow.  Just establish a PASE session to the
+    //  device and let our consumer deal with the rest.
+    LogErrorOnFailure(mCommissioner->EstablishPASEConnection(mRemoteId, params.SetSetupPINCode(mSetUpPINCode)));
 }
 
 void SetUpCodePairer::OnDiscoveredDeviceOverBleSuccess(void * appState, BLE_CONNECTION_OBJECT connObj)
