@@ -24,7 +24,7 @@
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
-#include <transport/raw/MessageHeader.h>
+// #include <transport/raw/MessageHeader.h>
 
 namespace chip {
 namespace Credentials {
@@ -104,12 +104,12 @@ public:
         }
     };
 
-    struct SessionKey
+    struct GroupSession
     {
-        SessionKey()     = default;
+        GroupSession()   = default;
         GroupId group_id = kUndefinedGroupId;
         FabricIndex fabric_index;
-        Crypto::AesCcmKeyContext * key = nullptr;
+        Crypto::SymmetricKeyContext * key = nullptr;
     };
 
     // An EpochKey is a single key usable to determine an operational group key
@@ -150,22 +150,9 @@ public:
 
         ByteSpan GetCurrentKey()
         {
-            auto now                                = System::SystemClock().GetMonotonicTimestamp();
-            GroupDataProvider::EpochKey * epoch_key = nullptr;
-            GroupDataProvider::EpochKey * found     = nullptr;
-
-            for (size_t i = 0; i < this->num_keys_used && i < kEpochKeysMax; i++)
+            if (this->num_keys_used > 0)
             {
-                epoch_key       = &epoch_keys[i];
-                auto epoch_time = System::Clock::Microseconds64(epoch_key->start_time);
-                if ((now > epoch_time) && ((nullptr == found) || (epoch_key->start_time > found->start_time)))
-                {
-                    found = epoch_key;
-                }
-            }
-            if (found)
-            {
-                return ByteSpan(found->key, EpochKey::kLengthBytes);
+                return ByteSpan(epoch_keys[0].key, EpochKey::kLengthBytes);
             }
             else
             {
@@ -223,11 +210,11 @@ public:
         Iterator() = default;
     };
 
-    using GroupInfoIterator  = Iterator<GroupInfo>;
-    using GroupKeyIterator   = Iterator<GroupKey>;
-    using EndpointIterator   = Iterator<GroupEndpoint>;
-    using KeySetIterator     = Iterator<KeySet>;
-    using SessionKeyIterator = Iterator<SessionKey>;
+    using GroupInfoIterator    = Iterator<GroupInfo>;
+    using GroupKeyIterator     = Iterator<GroupKey>;
+    using EndpointIterator     = Iterator<GroupEndpoint>;
+    using KeySetIterator       = Iterator<KeySet>;
+    using GroupSessionIterator = Iterator<GroupSession>;
 
     GroupDataProvider(uint16_t maxGroupsPerFabric    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC,
                       uint16_t maxGroupKeysPerFabric = CHIP_CONFIG_MAX_GROUP_KEYS_PER_FABRIC) :
@@ -327,7 +314,7 @@ public:
     virtual CHIP_ERROR RemoveFabric(FabricIndex fabric_index) = 0;
 
     // Decryption
-    virtual SessionKeyIterator * IterateSessionKeys(uint16_t session_id) = 0;
+    virtual GroupSessionIterator * IterateGroupSessions(uint16_t session_id) = 0;
 
     // Listener
     void SetListener(GroupListener * listener) { mListener = listener; };

@@ -83,7 +83,7 @@ public:
     CHIP_ERROR RemoveFabric(FabricIndex fabric_index) override;
 
     // Decryption
-    SessionKeyIterator * IterateSessionKeys(uint16_t session_id) override;
+    GroupSessionIterator * IterateGroupSessions(uint16_t session_id) override;
 
 private:
     class GroupInfoIteratorImpl : public GroupInfoIterator
@@ -139,18 +139,19 @@ private:
         bool mFirstEndpoint   = true;
     };
 
-    class GroupAesCcmKey : public Crypto::AesCcmKeyContext
+    class GroupKeyContext : public Crypto::SymmetricKeyContext
     {
     public:
-        GroupAesCcmKey() = default;
+        GroupKeyContext() = default;
         CHIP_ERROR SetKey(const ByteSpan & value);
         void Clear();
 
-        CHIP_ERROR Encrypt(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
-                           MutableByteSpan & out_mic) override;
-        CHIP_ERROR Decrypt(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
-                           const ByteSpan & mic) override;
-        CHIP_ERROR DerivePrivacyKey(Crypto::AesCtrKeyContext *& out) override;
+        CHIP_ERROR EncryptMessage(MutableByteSpan & plaintext, const ByteSpan & aad, const ByteSpan & nonce,
+                                  MutableByteSpan & out_mic) const override;
+        CHIP_ERROR DecryptMessage(MutableByteSpan & ciphertext, const ByteSpan & aad, const ByteSpan & nonce,
+                                  const ByteSpan & mic) const override;
+        CHIP_ERROR EncryptPrivacy(MutableByteSpan & plaintext, const ByteSpan & nonce) const override;
+        CHIP_ERROR DecryptPrivacy(MutableByteSpan & ciphertext, const ByteSpan & nonce) const override;
 
     protected:
         uint8_t mKey[Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES];
@@ -172,12 +173,12 @@ private:
         size_t mTotal       = 0;
     };
 
-    class SessionKeyIteratorImpl : public SessionKeyIterator
+    class GroupSessionIteratorImpl : public GroupSessionIterator
     {
     public:
-        SessionKeyIteratorImpl(GroupDataProviderImpl & provider, uint16_t session_id);
+        GroupSessionIteratorImpl(GroupDataProviderImpl & provider, uint16_t session_id);
         size_t Count() override;
-        bool Next(SessionKey & output) override;
+        bool Next(GroupSession & output) override;
         void Release() override;
 
     private:
@@ -190,7 +191,7 @@ private:
         uint16_t mMapping        = 0;
         uint16_t mMapCount       = 0;
         bool mFirstMap           = true;
-        GroupAesCcmKey mKey;
+        GroupKeyContext mKey;
     };
     CHIP_ERROR RemoveEndpoints(FabricIndex fabric_index, GroupId group_id);
 
@@ -200,7 +201,7 @@ private:
     BitMapObjectPool<GroupKeyIteratorImpl, kIteratorsMax> mGroupKeyIterators;
     BitMapObjectPool<EndpointIteratorImpl, kIteratorsMax> mEndpointIterators;
     BitMapObjectPool<KeySetIteratorImpl, kIteratorsMax> mKeySetIterators;
-    BitMapObjectPool<SessionKeyIteratorImpl, kIteratorsMax> mSessionKeysIterator;
+    BitMapObjectPool<GroupSessionIteratorImpl, kIteratorsMax> mGroupSessionsIterator;
 };
 
 } // namespace Credentials
