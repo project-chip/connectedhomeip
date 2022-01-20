@@ -45,7 +45,7 @@ chip-tool. On receiving this command OTA requestor will query for OTA image.
 
 ## Apply update
 
-Once the transfer is complete OTA requestor sends ApplyUpdateRequest command to
+Once the transfer is complete, OTA requestor sends ApplyUpdateRequest command to
 OTA provider for applying the image. Device will restart on successful
 application of OTA image.
 
