@@ -144,15 +144,15 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
             requestorCore->mUpdateVersion = update.softwareVersion;
             requestorCore->mUpdateToken   = updateToken;
 
-            requestorCore->mOtaRequestorDriver->UpdateAvailable(
-                    update, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+            requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
+                                                                System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
         else
         {
             ChipLogDetail(SoftwareUpdate, "Already up to date");
 
             requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate,
-                                                                   System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
+                                                               System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
         }
 
         break;
