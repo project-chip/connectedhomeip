@@ -166,6 +166,10 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR
 
 bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData)
 {
+    if (nodeData.commissioningMode == 0) {
+        return false;
+    }
+
     switch (currentFilter.type)
     {
     case Dnssd::DiscoveryFilterType::kShortDiscriminator:
