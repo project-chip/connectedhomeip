@@ -8919,7 +8919,7 @@ public:
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
     uint64_t bytesDownloaded = static_cast<uint64_t>(0);
-    uint8_t progressPercent  = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint8_t> progressPercent;
     DataModel::Nullable<int64_t> platformCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -8934,7 +8934,7 @@ public:
 
     uint32_t softwareVersion = static_cast<uint32_t>(0);
     uint64_t bytesDownloaded = static_cast<uint64_t>(0);
-    uint8_t progressPercent  = static_cast<uint8_t>(0);
+    DataModel::Nullable<uint8_t> progressPercent;
     DataModel::Nullable<int64_t> platformCode;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);

@@ -150,7 +150,7 @@ limitations under the License.
           <description>This event SHALL be generated whenever an error occurs during OTA Requestor download operation.</description>
           <field id="0" name="SoftwareVersion" type="INT32U"/> 
           <field id="1" name="BytesDownloaded" type="INT64U"/>
-          <field id="2" name="ProgressPercent" type="INT8U" min="0" max="100"/>
+          <field id="2" name="ProgressPercent" type="INT8U" min="0" max="100" isNullable="true"/>
           <field id="3" name="PlatformCode" type="INT64S" isNullable="true"/>
         </event>                     
     </cluster>

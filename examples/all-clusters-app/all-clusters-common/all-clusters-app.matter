@@ -1993,7 +1993,7 @@ server cluster OtaSoftwareUpdateRequestor = 42 {
   info event DownloadError = 2 {
     INT32U softwareVersion = 0;
     INT64U bytesDownloaded = 1;
-    INT8U progressPercent = 2;
+    nullable INT8U progressPercent = 2;
     nullable INT64S platformCode = 3;
   }
 

@@ -7031,13 +7031,13 @@ class OtaSoftwareUpdateRequestor(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="softwareVersion", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="bytesDownloaded", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="progressPercent", Tag=2, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="progressPercent", Tag=2, Type=typing.Union[Nullable, uint]),
                             ClusterObjectFieldDescriptor(Label="platformCode", Tag=3, Type=typing.Union[Nullable, int]),
                     ])
 
             softwareVersion: 'uint' = 0
             bytesDownloaded: 'uint' = 0
-            progressPercent: 'uint' = 0
+            progressPercent: 'typing.Union[Nullable, uint]' = NullValue
             platformCode: 'typing.Union[Nullable, int]' = NullValue
 
 
