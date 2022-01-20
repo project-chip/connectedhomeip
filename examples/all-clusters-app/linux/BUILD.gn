@@ -68,6 +68,9 @@ if (is_libfuzzer) {
 
     cflags = [ "-Wconversion" ]
 
+    include_dirs =
+        [ "${chip_root}/examples/all-clusters-app/all-clusters-common/include" ]
+
     output_dir = root_out_dir
   }
 }

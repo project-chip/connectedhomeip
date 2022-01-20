@@ -21,6 +21,15 @@
 using namespace chip;
 using namespace chip::DeviceLayer;
 
+void CleanShutdown()
+{
+    Server::GetInstance().Shutdown();
+    PlatformMgr().Shutdown();
+    // TODO: We don't Platform::MemoryShutdown because ~CASESessionManager calls
+    // Dnssd::ResolverProxy::Shutdown, which starts doing Platform::Delete.
+    // Platform::MemoryShutdown();
+}
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
 {
     static bool matterStackInitialized = false;
@@ -40,6 +49,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t * aData, size_t aSize)
         // data on a separate thread.
 
         matterStackInitialized = true;
+
+        // The fuzzer does not have a way to tell us when it's done, so just
+        // shut down things on exit.
+        atexit(CleanShutdown);
     }
 
     // For now, just dump the data as a UDP payload into the session manager.
