@@ -1649,7 +1649,6 @@ void DeviceCommissioner::OnNodeIdResolved(const chip::Dnssd::ResolvedNodeData & 
 
     if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == nodeData.mPeerId.GetNodeId())
     {
-        RendezvousCleanup(CHIP_NO_ERROR);
         // Let's release the device that's being paired, if pairing was successful,
         // and the device is available on the operational network.
         ReleaseCommissioneeDevice(mDeviceBeingCommissioned);
