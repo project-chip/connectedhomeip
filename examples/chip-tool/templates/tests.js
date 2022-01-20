@@ -237,7 +237,6 @@ function getTests()
     'TestOperationalCredentialsCluster',
     'TestModeSelectCluster',
     'TestGroupMessaging',
-    'TestDoorLockCluster',
   ];
 
   const SoftwareDiagnostics = [
@@ -249,6 +248,11 @@ function getTests()
   const Subscriptions = [
     'TestSubscribe_OnOff',
   ];
+
+  const DoorLock = [
+    'DL_UsersAndCredentials',
+    'DL_LockUnlock',
+  ]
 
   const tests = [
     BinaryInput, //
@@ -280,6 +284,7 @@ function getTests()
     Others, //
     SoftwareDiagnostics, //
     Subscriptions, //
+    DoorLock, //
   ];
   return tests.flat(1);
 }
