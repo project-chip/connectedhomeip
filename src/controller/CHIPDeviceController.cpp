@@ -1629,8 +1629,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             !params.HasDAC() || !params.HasPAI())
         {
             ChipLogError(Controller, "Missing attestation information");
-            CommissioningDelegate::CommissioningReport report(step);
-            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         if (ValidateAttestationInfo(params.GetAttestationElements().Value(), params.GetAttestationSignature().Value(),
@@ -1638,8 +1637,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
                                     proxy) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Error validating attestation information");
-            CommissioningDelegate::CommissioningReport report(step);
-            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         break;
@@ -1647,37 +1645,36 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         if (!params.HasCSRNonce())
         {
             ChipLogError(Controller, "No CSR nonce found");
-            CommissioningDelegate::CommissioningReport report(step);
-            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         SendOperationalCertificateSigningRequestCommand(proxy, params.GetCSRNonce().Value());
         break;
-    case CommissioningStage::kGenerateNOCChain:
+    case CommissioningStage::kGenerateNOCChain: {
         if (!params.HasNOCChainGenerationaParameters() || !params.HasDAC() || !params.HasCSRNonce())
         {
             ChipLogError(Controller, "Unable to generate NOC chain parameters");
-            CommissioningDelegate::CommissioningReport report(step);
-            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
-            return;
+            return CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
         }
-        if (ProcessOpCSR(proxy, params.GetNOCChainGenerationParameters().Value().nocsrElements,
-                         params.GetNOCChainGenerationParameters().Value().signature, params.GetDAC().Value(),
-                         params.GetCSRNonce().Value()) != CHIP_NO_ERROR)
+        CHIP_ERROR err = ProcessOpCSR(proxy, params.GetNOCChainGenerationParameters().Value().nocsrElements,
+                                      params.GetNOCChainGenerationParameters().Value().signature, params.GetDAC().Value(),
+                                      params.GetCSRNonce().Value());
+        if (err != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to process Op CSR");
             // Handle error, and notify session failure to the commissioner application.
             ChipLogError(Controller, "Failed to process the certificate signing request");
             // TODO: Map error status to correct error code
-            OnSessionEstablishmentError(CHIP_ERROR_INTERNAL);
+            CommissioningStageComplete(err);
+            return;
         }
-        break;
+    }
+    break;
     case CommissioningStage::kSendTrustedRootCert:
         if (!params.HasRootCert())
         {
             ChipLogError(Controller, "No trusted root cert specified");
-            CommissioningDelegate::CommissioningReport report(step);
-            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         SendTrustedRootCertificate(proxy, params.GetRootCert().Value());
@@ -1686,8 +1683,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
         if (!params.HasNOCerts())
         {
             ChipLogError(Controller, "No node operational certs specified");
-            CommissioningDelegate::CommissioningReport report(step);
-            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         ChipLogProgress(Controller, "Sending operational certificate chain to the device");
@@ -1699,8 +1695,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kWiFiNetworkSetup: {
         if (!params.HasWiFiCredentials())
         {
-            CommissioningDelegate::CommissioningReport report(step);
-            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            ChipLogError(Controller, "No wifi credentials specified");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         ChipLogProgress(Controller, "Adding wifi network");
@@ -1713,8 +1709,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kThreadNetworkSetup: {
         if (!params.HasThreadOperationalDataset())
         {
-            CommissioningDelegate::CommissioningReport report(step);
-            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            ChipLogError(Controller, "No thread credentials specified");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         ChipLogProgress(Controller, "Adding thread network");
@@ -1727,8 +1723,8 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     case CommissioningStage::kWiFiNetworkEnable: {
         if (!params.HasWiFiCredentials())
         {
-            CommissioningDelegate::CommissioningReport report(step);
-            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            ChipLogError(Controller, "No wifi credentials specified");
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         ChipLogProgress(Controller, "Enabling wifi network");
@@ -1745,8 +1741,7 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
             operationalDataset.GetExtendedPanIdAsByteSpan(extendedPanId) != CHIP_NO_ERROR)
         {
             ChipLogError(Controller, "Unable to get extended pan ID for thread operational dataset\n");
-            CommissioningDelegate::CommissioningReport report(step);
-            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+            CommissioningStageComplete(CHIP_ERROR_INVALID_ARGUMENT);
             return;
         }
         ChipLogProgress(Controller, "Enabling thread network");
