@@ -162,3 +162,6 @@
 [submodule "p6/lwip"]
 	path = third_party/p6/p6_sdk/libs/lwip
 	url = https://github.com/lwip-tcpip/lwip.git
+[submodule "third_party/jsoncpp/repo"]
+	path = third_party/jsoncpp/repo
+	url = https://github.com/open-source-parsers/jsoncpp.git

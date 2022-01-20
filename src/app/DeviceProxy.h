@@ -53,9 +53,6 @@ public:
 
     virtual CHIP_ERROR ShutdownSubscriptions() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
-    virtual CHIP_ERROR SendWriteAttributeRequest(app::WriteClientHandle aHandle, Callback::Cancelable * onSuccessCallback,
-                                                 Callback::Cancelable * onFailureCallback);
-
     virtual CHIP_ERROR SendCommands(app::CommandSender * commandObj);
 
     // Interaction model uses the object and callback interface instead of sequence number to mark different transactions.

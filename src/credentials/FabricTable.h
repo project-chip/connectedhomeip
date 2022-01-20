@@ -213,18 +213,14 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    Credentials::CertificateKeyId GetTrustedRootId() const
+    CHIP_ERROR GetTrustedRootId(Credentials::CertificateKeyId & skid) const
     {
-        Credentials::CertificateKeyId skid;
-        Credentials::ExtractSKIDFromChipCert(mRootCert, skid);
-        return skid;
+        return Credentials::ExtractSKIDFromChipCert(mRootCert, skid);
     }
 
-    Credentials::P256PublicKeySpan GetRootPubkey() const
+    CHIP_ERROR GetRootPubkey(Credentials::P256PublicKeySpan & publicKey) const
     {
-        Credentials::P256PublicKeySpan publicKey;
-        Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKey);
-        return publicKey;
+        return Credentials::ExtractPublicKeyFromChipCert(mRootCert, publicKey);
     }
 
     CHIP_ERROR VerifyCredentials(const ByteSpan & noc, const ByteSpan & icac, Credentials::ValidationContext & context,

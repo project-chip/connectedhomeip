@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2022 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16065,7 +16065,7 @@ private:
             VerifyOrReturn(CheckValueAsString("fabricsList[0].label", iter_0.GetValue().label, chip::CharSpan("", 0)));
             VerifyOrReturn(CheckNoMoreListItems<decltype(fabricsList)>("fabricsList", iter_0, 1));
         }
-
+        VerifyOrReturn(CheckConstraintType("fabricsList", "", "list"));
         NextTest();
     }
 
@@ -16086,7 +16086,7 @@ private:
     void OnSuccessResponse_2(uint8_t supportedFabrics)
     {
         VerifyOrReturn(CheckValue("supportedFabrics", supportedFabrics, 16));
-
+        VerifyOrReturn(CheckConstraintType("supportedFabrics", "", "uint8"));
         NextTest();
     }
 
@@ -16107,7 +16107,7 @@ private:
     void OnSuccessResponse_3(uint8_t commissionedFabrics)
     {
         VerifyOrReturn(CheckValue("commissionedFabrics", commissionedFabrics, 1));
-
+        VerifyOrReturn(CheckConstraintType("commissionedFabrics", "", "uint8"));
         NextTest();
     }
 
@@ -17893,7 +17893,7 @@ private:
     void OnSuccessResponse_3(uint8_t currentLevel)
     {
         VerifyOrReturn(CheckValue("currentLevel", currentLevel, 254));
-
+        VerifyOrReturn(CheckConstraintType("currentLevel", "", "uint8"));
         NextTest();
     }
 
@@ -17913,7 +17913,7 @@ private:
     void OnSuccessResponse_4(uint16_t remainingTime)
     {
         VerifyOrReturn(CheckValue("remainingTime", remainingTime, 0U));
-
+        VerifyOrReturn(CheckConstraintType("remainingTime", "", "uint16"));
         NextTest();
     }
 
@@ -17933,7 +17933,7 @@ private:
     void OnSuccessResponse_5(uint8_t minLevel)
     {
         VerifyOrReturn(CheckValue("minLevel", minLevel, 0));
-
+        VerifyOrReturn(CheckConstraintType("minLevel", "", "uint8"));
         NextTest();
     }
 
@@ -17972,7 +17972,7 @@ private:
     void OnSuccessResponse_7(uint16_t currentFrequency)
     {
         VerifyOrReturn(CheckValue("currentFrequency", currentFrequency, 0U));
-
+        VerifyOrReturn(CheckConstraintType("currentFrequency", "", "uint16"));
         NextTest();
     }
 
@@ -17992,7 +17992,7 @@ private:
     void OnSuccessResponse_8(uint16_t minFrequency)
     {
         VerifyOrReturn(CheckValue("minFrequency", minFrequency, 0U));
-
+        VerifyOrReturn(CheckConstraintType("minFrequency", "", "uint16"));
         NextTest();
     }
 
@@ -18012,7 +18012,7 @@ private:
     void OnSuccessResponse_9(uint16_t maxFrequency)
     {
         VerifyOrReturn(CheckValue("maxFrequency", maxFrequency, 0U));
-
+        VerifyOrReturn(CheckConstraintType("maxFrequency", "", "uint16"));
         NextTest();
     }
 
@@ -18032,7 +18032,7 @@ private:
     void OnSuccessResponse_10(uint16_t onOffTransitionTime)
     {
         VerifyOrReturn(CheckValue("onOffTransitionTime", onOffTransitionTime, 0U));
-
+        VerifyOrReturn(CheckConstraintType("onOffTransitionTime", "", "uint16"));
         NextTest();
     }
 
@@ -18128,7 +18128,7 @@ private:
     void OnSuccessResponse_15(uint8_t options)
     {
         VerifyOrReturn(CheckValue("options", options, 0));
-
+        VerifyOrReturn(CheckConstraintType("options", "", "map8"));
         NextTest();
     }
 };
@@ -18404,7 +18404,7 @@ private:
     void OnSuccessResponse_1(uint16_t onOffTransitionTime)
     {
         VerifyOrReturn(CheckValue("onOffTransitionTime", onOffTransitionTime, 0U));
-
+        VerifyOrReturn(CheckConstraintType("onOffTransitionTime", "", "uint16"));
         NextTest();
     }
 
@@ -18442,7 +18442,7 @@ private:
     void OnSuccessResponse_3(uint16_t onOffTransitionTime)
     {
         VerifyOrReturn(CheckValue("onOffTransitionTime", onOffTransitionTime, 10U));
-
+        VerifyOrReturn(CheckConstraintType("onOffTransitionTime", "", "uint16"));
         NextTest();
     }
 
@@ -18500,7 +18500,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("onLevel", onLevel));
         VerifyOrReturn(CheckValue("onLevel.Value()", onLevel.Value(), 254));
-
+        VerifyOrReturn(CheckConstraintType("onLevel", "", "uint8"));
         NextTest();
     }
 
@@ -18540,7 +18540,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("onTransitionTime", onTransitionTime));
         VerifyOrReturn(CheckValue("onTransitionTime.Value()", onTransitionTime.Value(), 100U));
-
+        VerifyOrReturn(CheckConstraintType("onTransitionTime", "", "uint16"));
         NextTest();
     }
 
@@ -18580,7 +18580,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("offTransitionTime", offTransitionTime));
         VerifyOrReturn(CheckValue("offTransitionTime.Value()", offTransitionTime.Value(), 100U));
-
+        VerifyOrReturn(CheckConstraintType("offTransitionTime", "", "uint16"));
         NextTest();
     }
 
@@ -18601,7 +18601,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("defaultMoveRate", defaultMoveRate));
         VerifyOrReturn(CheckValue("defaultMoveRate.Value()", defaultMoveRate.Value(), 0));
-
+        VerifyOrReturn(CheckConstraintType("defaultMoveRate", "", "uint8"));
         NextTest();
     }
 
@@ -18641,7 +18641,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("defaultMoveRate", defaultMoveRate));
         VerifyOrReturn(CheckValue("defaultMoveRate.Value()", defaultMoveRate.Value(), 100));
-
+        VerifyOrReturn(CheckConstraintType("defaultMoveRate", "", "uint8"));
         NextTest();
     }
 
@@ -18681,7 +18681,7 @@ private:
     {
         VerifyOrReturn(CheckValueNonNull("startUpCurrentLevel", startUpCurrentLevel));
         VerifyOrReturn(CheckValue("startUpCurrentLevel.Value()", startUpCurrentLevel.Value(), 254));
-
+        VerifyOrReturn(CheckConstraintType("startUpCurrentLevel", "", "uint8"));
         NextTest();
     }
 };
@@ -22717,7 +22717,7 @@ private:
     void OnSuccessResponse_3(uint16_t vendorId)
     {
         VerifyOrReturn(CheckValue("vendorId", vendorId, 0U));
-
+        VerifyOrReturn(CheckConstraintType("vendorId", "", "vendor-id"));
         NextTest();
     }
 
@@ -33957,7 +33957,9 @@ private:
     void OnSuccessResponse_1(int16_t occupiedCoolingSetpoint)
     {
         VerifyOrReturn(CheckValue("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 2600));
-
+        VerifyOrReturn(CheckConstraintType("occupiedCoolingSetpoint", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("occupiedCoolingSetpoint", occupiedCoolingSetpoint, 2600));
         NextTest();
     }
 
@@ -34051,7 +34053,9 @@ private:
     void OnSuccessResponse_6(int16_t occupiedHeatingSetpoint)
     {
         VerifyOrReturn(CheckValue("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 2000));
-
+        VerifyOrReturn(CheckConstraintType("occupiedHeatingSetpoint", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 700));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("occupiedHeatingSetpoint", occupiedHeatingSetpoint, 3000));
         NextTest();
     }
 
@@ -34145,7 +34149,9 @@ private:
     void OnSuccessResponse_11(int16_t minHeatSetpointLimit)
     {
         VerifyOrReturn(CheckValue("minHeatSetpointLimit", minHeatSetpointLimit, 700));
-
+        VerifyOrReturn(CheckConstraintType("minHeatSetpointLimit", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minHeatSetpointLimit", minHeatSetpointLimit, 700));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minHeatSetpointLimit", minHeatSetpointLimit, 3000));
         NextTest();
     }
 
@@ -34239,7 +34245,9 @@ private:
     void OnSuccessResponse_16(int16_t maxHeatSetpointLimit)
     {
         VerifyOrReturn(CheckValue("maxHeatSetpointLimit", maxHeatSetpointLimit, 3000));
-
+        VerifyOrReturn(CheckConstraintType("maxHeatSetpointLimit", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxHeatSetpointLimit", maxHeatSetpointLimit, 700));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxHeatSetpointLimit", maxHeatSetpointLimit, 3000));
         NextTest();
     }
 
@@ -34333,7 +34341,9 @@ private:
     void OnSuccessResponse_21(int16_t minCoolSetpointLimit)
     {
         VerifyOrReturn(CheckValue("minCoolSetpointLimit", minCoolSetpointLimit, 1600));
-
+        VerifyOrReturn(CheckConstraintType("minCoolSetpointLimit", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("minCoolSetpointLimit", minCoolSetpointLimit, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("minCoolSetpointLimit", minCoolSetpointLimit, 3200));
         NextTest();
     }
 
@@ -34427,7 +34437,9 @@ private:
     void OnSuccessResponse_26(int16_t maxCoolSetpointLimit)
     {
         VerifyOrReturn(CheckValue("maxCoolSetpointLimit", maxCoolSetpointLimit, 3200));
-
+        VerifyOrReturn(CheckConstraintType("maxCoolSetpointLimit", "", "int16"));
+        VerifyOrReturn(CheckConstraintMinValue<int16_t>("maxCoolSetpointLimit", maxCoolSetpointLimit, 1600));
+        VerifyOrReturn(CheckConstraintMaxValue<int16_t>("maxCoolSetpointLimit", maxCoolSetpointLimit, 3200));
         NextTest();
     }
 
@@ -34666,7 +34678,9 @@ private:
     void OnSuccessResponse_39(uint8_t controlSequenceOfOperation)
     {
         VerifyOrReturn(CheckValue("controlSequenceOfOperation", controlSequenceOfOperation, 4));
-
+        VerifyOrReturn(CheckConstraintType("controlSequenceOfOperation", "", "enum8"));
+        VerifyOrReturn(CheckConstraintMinValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 0));
+        VerifyOrReturn(CheckConstraintMaxValue<uint8_t>("controlSequenceOfOperation", controlSequenceOfOperation, 5));
         NextTest();
     }
 
@@ -63300,6 +63314,7 @@ private:
     void OnSuccessResponse_97(chip::CharSpan charString)
     {
         VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("NotDefault", 10)));
+        VerifyOrReturn(CheckConstraintNotValue("charString", charString, readAttributeCharStringDefaultValue));
 
         if (readAttributeCharStringNotDefaultValueBuffer != nullptr)
         {
@@ -63327,6 +63342,7 @@ private:
     void OnSuccessResponse_98(chip::CharSpan charString)
     {
         VerifyOrReturn(CheckValueAsString("charString", charString, readAttributeCharStringNotDefaultValue));
+        VerifyOrReturn(CheckConstraintNotValue("charString", charString, readAttributeCharStringDefaultValue));
 
         NextTest();
     }
@@ -63469,6 +63485,7 @@ private:
     {
         VerifyOrReturn(
             CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("NotDefault"), 10)));
+        VerifyOrReturn(CheckConstraintNotValue("octetString", octetString, readAttributeOctetStringDefaultValue));
 
         if (readAttributeOctetStringNotDefaultValueBuffer != nullptr)
         {
@@ -63496,6 +63513,7 @@ private:
     void OnSuccessResponse_106(chip::ByteSpan octetString)
     {
         VerifyOrReturn(CheckValueAsString("octetString", octetString, readAttributeOctetStringNotDefaultValue));
+        VerifyOrReturn(CheckConstraintNotValue("octetString", octetString, readAttributeOctetStringDefaultValue));
 
         NextTest();
     }

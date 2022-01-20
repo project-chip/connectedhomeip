@@ -534,7 +534,7 @@ CHIP_ERROR CASESession::SendSigma2()
     ByteSpan nocCert;
     ReturnErrorOnFailure(mFabricInfo->GetNOCCert(nocCert));
 
-    mTrustedRootId = mFabricInfo->GetTrustedRootId();
+    ReturnErrorOnFailure(mFabricInfo->GetTrustedRootId(mTrustedRootId));
     VerifyOrReturnError(!mTrustedRootId.empty(), CHIP_ERROR_INTERNAL);
 
     // Fill in the random value
@@ -915,7 +915,7 @@ CHIP_ERROR CASESession::SendSigma3()
     SuccessOrExit(err = mFabricInfo->GetICACert(icaCert));
     SuccessOrExit(err = mFabricInfo->GetNOCCert(nocCert));
 
-    mTrustedRootId = mFabricInfo->GetTrustedRootId();
+    SuccessOrExit(err = mFabricInfo->GetTrustedRootId(mTrustedRootId));
     VerifyOrExit(!mTrustedRootId.empty(), err = CHIP_ERROR_INTERNAL);
 
     // Prepare Sigma3 TBS Data Blob

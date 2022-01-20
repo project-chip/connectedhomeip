@@ -1335,7 +1335,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_WriteThreadNetw
             ThreadNetworkDiagnostics::Structs::SecurityPolicy::Type securityPolicy;
             static_assert(sizeof(securityPolicy) == sizeof(activeDataset.mSecurityPolicy),
                           "securityPolicy Struct do not match otSecurityPolicy");
-            memcpy(&securityPolicy, &activeDataset.mSecurityPolicy, sizeof(securityPolicy));
+            uint16_t policyAsInts[2];
+            static_assert(sizeof(policyAsInts) == sizeof(activeDataset.mSecurityPolicy),
+                          "We're missing some members of otSecurityPolicy?");
+            memcpy(&policyAsInts, &activeDataset.mSecurityPolicy, sizeof(policyAsInts));
+            securityPolicy.rotationTime = policyAsInts[0];
+            securityPolicy.flags        = policyAsInts[1];
 
             err = encoder.EncodeList([securityPolicy](const auto & aEncoder) -> CHIP_ERROR {
                 ReturnErrorOnFailure(aEncoder.Encode(securityPolicy));

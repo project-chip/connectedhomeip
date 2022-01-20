@@ -192,7 +192,14 @@ CHIP_ERROR FabricInfo::GetCompressedId(FabricId fabricId, NodeId nodeId, PeerId 
     ReturnErrorCodeIf(compressedPeerId == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     uint8_t compressedFabricIdBuf[sizeof(uint64_t)];
     MutableByteSpan compressedFabricIdSpan(compressedFabricIdBuf);
-    P256PublicKey rootPubkey(GetRootPubkey());
+    P256PublicKey rootPubkey;
+
+    {
+        P256PublicKeySpan rootPubkeySpan;
+        ReturnErrorOnFailure(GetRootPubkey(rootPubkeySpan));
+        rootPubkey = rootPubkeySpan;
+    }
+
     ChipLogDetail(Inet, "Generating compressed fabric ID using uncompressed fabric ID 0x" ChipLogFormatX64 " and root pubkey",
                   ChipLogValueX64(fabricId));
     ChipLogByteSpan(Inet, ByteSpan(rootPubkey.ConstBytes(), rootPubkey.Length()));
@@ -332,7 +339,9 @@ CHIP_ERROR FabricInfo::GenerateDestinationID(const ByteSpan & ipk, const ByteSpa
         kSigmaParamRandomNumberSize + kP256_PublicKey_Length + sizeof(FabricId) + sizeof(NodeId);
     HMAC_sha hmac;
     uint8_t destinationMessage[kDestinationMessageLen];
-    P256PublicKeySpan rootPubkeySpan = GetRootPubkey();
+    P256PublicKeySpan rootPubkeySpan;
+
+    ReturnErrorOnFailure(GetRootPubkey(rootPubkeySpan));
 
     Encoding::LittleEndian::BufferWriter bbuf(destinationMessage, sizeof(destinationMessage));
 

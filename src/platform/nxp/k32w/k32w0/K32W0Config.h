@@ -89,8 +89,6 @@ public:
     static constexpr Key kConfigKey_CountryCode        = K32WConfigKey(kPDMId_ChipConfig, 0x08);
     static constexpr Key kConfigKey_Breadcrumb         = K32WConfigKey(kPDMId_ChipConfig, 0x09);
     static constexpr Key kConfigKey_ActiveLocale       = K32WConfigKey(kPDMId_ChipConfig, 0x0A);
-    static constexpr Key kConfigKey_HourFormat         = K32WConfigKey(kPDMId_ChipConfig, 0x0B);
-    static constexpr Key kConfigKey_CalendarType       = K32WConfigKey(kPDMId_ChipConfig, 0x0C);
 
     // CHIP Counter Keys
     static constexpr Key kCounterKey_RebootCount           = K32WConfigKey(kPDMId_ChipCounter, 0x00);

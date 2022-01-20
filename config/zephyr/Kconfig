@@ -151,6 +151,20 @@ config CHIP_ROTATING_DEVICE_ID
 	  Enables rotating device identifier that provides a non-trackable identifier
 	  which is unique per device and rotates at pre-defined moments.
 
+config CHIP_COMMISSIONABLE_DEVICE_TYPE
+	bool "Enable the device type subtype in commissionable node discovery record"
+	depends on CHIP_ENABLE_DNSSD_SRP
+	help
+	  Enables including device type subtype in the commissionable node discovery record,
+	  which allows filtering of the results to find the nodes that match the device type.
+
+config CHIP_DEVICE_TYPE
+	int "Device type"
+	default 65535
+	range 0 65535
+	help
+	  Type of device that uses the CHIP Device Type Identifier. The default value means invalid device type.
+
 config CHIP_OPERATIONAL_TIME_SAVE_INTERVAL
 	int "Interval of saving node operation time to flash in hours unit"
 	default 10

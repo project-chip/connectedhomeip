@@ -31,16 +31,14 @@
 
   {{/zcl_events}}
   {{#chip_server_cluster_attributes}}
-  attribute(
-    {{~#if isWritableAttribute~}}
-      writable
-    {{~else~}}
-      readonly
-    {{~/if~}}
-    {{~#unless isReportableAttribute~}}
-      , nosubscribe
-    {{~/unless~}}
-    ) {{type}} {{asLowerCamelCase name~}}
+  {{! ensure indent }}{{#unless isWritableAttribute~}}
+    readonly {{!marker to place a space even with whitespace removal~}}
+  {{~/unless~}}
+  {{~!TODO: write only attributes should also be supported~}}
+  {{~#unless isReportableAttribute~}}
+    nosubscribe {{!marker to place a space even with whitespace removal~}}
+  {{~/unless~}}
+  {{~!Removes spaces~}} attribute {{type}} {{asLowerCamelCase name~}}
     {{~#if isList~}}
       [{{maxLength}}]
     {{~/if}} = {{code}};
