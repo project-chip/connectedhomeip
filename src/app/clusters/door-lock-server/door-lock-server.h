@@ -44,6 +44,10 @@ using chip::app::Clusters::DoorLock::DlUserType;
 using chip::app::Clusters::DoorLock::DoorLockFeature;
 using chip::app::DataModel::Nullable;
 
+#ifndef DOOR_LOCK_SERVER_ENDPOINT
+#define DOOR_LOCK_SERVER_ENDPOINT 1
+#endif
+
 static constexpr size_t DOOR_LOCK_MAX_USER_NAME_SIZE = 10; /**< Maximum size of the user name (in characters). */
 static constexpr size_t DOOR_LOCK_USER_NAME_BUFFER_SIZE =
     DOOR_LOCK_MAX_USER_NAME_SIZE + 1; /**< Maximum size of the user name string (in bytes). */
