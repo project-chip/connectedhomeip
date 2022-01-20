@@ -139,25 +139,25 @@ void OTARequestor::OnQueryImageResponse(void * context, const QueryImageResponse
 	if(response.softwareVersion.HasValue())
 	{
 	    if(update.softwareVersion > currentSoftwareVersion)
-	    {	
+	    {
 		printf("we need to update to newer version %u\n",update .softwareVersion);
 		MutableByteSpan updateToken(requestorCore->mUpdateTokenBuffer);
 	        CopySpanToMutableSpan(update.updateToken, updateToken);
                 requestorCore->mUpdateVersion = update.softwareVersion;
                 requestorCore->mUpdateToken   = updateToken;
-		
+
 		requestorCore->mOtaRequestorDriver->UpdateAvailable(update,
                                                         System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-           
+
 	     }else
 	      {
 		printf("no updates available!!!\n");
-                
+
                 requestorCore->mOtaRequestorDriver->UpdateNotFound(UpdateNotFoundReason::UpToDate, System::Clock::Seconds32(response.delayedActionTime.ValueOr(0)));
-	      }	
+	      }
 	}else
 	{
-	     printf("NO updates\n");	
+	     printf("NO updates\n");
 	}
 
         break;
