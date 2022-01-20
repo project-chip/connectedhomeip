@@ -7,7 +7,7 @@ struct LabelStruct {
 }
 
 server cluster FixedLabel = 64 {
-  attribute(readonly) LabelStruct labelList[] = 0;
+  attribute(readonly) LabelStruct labelList[254] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
@@ -30,7 +30,7 @@ server cluster GeneralCommissioning = 48 {
   }
 
   attribute(writable) int64u breadcrumb = 0;
-  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[254] = 1;
   attribute(readonly) enum8 regulatoryConfig = 2;
   attribute(readonly) enum8 locationCapability = 3;
   attribute(readonly) bitmap32 featureMap = 65532;
@@ -71,7 +71,7 @@ server cluster GeneralCommissioning = 48 {
 
 server cluster LocalizationConfiguration = 43 {
   attribute(writable) char_string activeLocale = 1;
-  attribute(readonly) CHAR_STRING supportedLocales[] = 2;
+  attribute(readonly) CHAR_STRING supportedLocales[254] = 2;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -281,10 +281,10 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING<32> label = 6;
   }
 
-  attribute(readonly) FabricDescriptor fabricsList[] = 1;
+  attribute(readonly) FabricDescriptor fabricsList[320] = 1;
   attribute(readonly) int8u supportedFabrics = 2;
   attribute(readonly) int8u commissionedFabrics = 3;
-  attribute(readonly) OCTET_STRING trustedRootCertificates[] = 4;
+  attribute(readonly) OCTET_STRING trustedRootCertificates[400] = 4;
   attribute(readonly) fabric_idx currentFabricIndex = 5;
   attribute(readonly) int16u clusterRevision = 65533;
 
@@ -350,7 +350,7 @@ server cluster OperationalCredentials = 62 {
 }
 
 server cluster UserLabel = 65 {
-  attribute(writable) LabelStruct labelList[] = 0;
+  attribute(writable) LabelStruct labelList[254] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 

@@ -88,7 +88,7 @@ client cluster ApplicationLauncher = 1292 {
     CHAR_STRING applicationId = 2;
   }
 
-  attribute(readonly) INT16U applicationLauncherList[] = 0;
+  attribute(readonly) INT16U applicationLauncherList[254] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 
   request struct HideAppRequestRequest {
@@ -125,7 +125,7 @@ client cluster AudioOutput = 1291 {
     CHAR_STRING<32> name = 3;
   }
 
-  attribute(readonly) OutputInfo audioOutputList[] = 0;
+  attribute(readonly) OutputInfo audioOutputList[254] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 
   request struct RenameOutputRequestRequest {
@@ -271,7 +271,7 @@ client cluster Channel = 1284 {
     LineupInfoTypeEnum lineupInfoType = 4;
   }
 
-  attribute(readonly) ChannelInfo channelList[] = 0;
+  attribute(readonly) ChannelInfo channelList[254] = 0;
   attribute(writable) LineupInfo channelLineup = 1;
   attribute(writable) ChannelInfo currentChannel = 2;
   attribute(readonly) int16u clusterRevision = 65533;
@@ -580,7 +580,7 @@ client cluster ContentLauncher = 1290 {
     MetricTypeEnum metric = 3;
   }
 
-  attribute(readonly) CHAR_STRING acceptHeaderList[] = 0;
+  attribute(readonly) CHAR_STRING acceptHeaderList[254] = 0;
   attribute(writable) bitmap32 supportedStreamingProtocols = 1;
   attribute(readonly) int16u clusterRevision = 65533;
 
@@ -606,10 +606,10 @@ server cluster Descriptor = 29 {
     INT16U revision = 2;
   }
 
-  attribute(readonly) DeviceType deviceList[] = 0;
-  attribute(readonly) CLUSTER_ID serverList[] = 1;
-  attribute(readonly) CLUSTER_ID clientList[] = 2;
-  attribute(readonly) ENDPOINT_NO partsList[] = 3;
+  attribute(readonly) DeviceType deviceList[254] = 0;
+  attribute(readonly) CLUSTER_ID serverList[254] = 1;
+  attribute(readonly) CLUSTER_ID clientList[254] = 2;
+  attribute(readonly) ENDPOINT_NO partsList[254] = 3;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
@@ -1013,7 +1013,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster FixedLabel = 64 {
-  attribute(readonly) LabelStruct labelList[] = 0;
+  attribute(readonly) LabelStruct labelList[254] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
@@ -1043,7 +1043,7 @@ server cluster GeneralCommissioning = 48 {
   }
 
   attribute(writable) int64u breadcrumb = 0;
-  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[254] = 1;
   attribute(readonly) enum8 regulatoryConfig = 2;
   attribute(readonly) enum8 locationCapability = 3;
   attribute(readonly) bitmap32 featureMap = 65532;
@@ -1160,14 +1160,14 @@ server cluster GeneralDiagnostics = 51 {
     BootReasonType bootReason = 0;
   }
 
-  attribute(readonly) NetworkInterfaceType networkInterfaces[] = 0;
+  attribute(readonly) NetworkInterfaceType networkInterfaces[254] = 0;
   attribute(readonly) int16u rebootCount = 1;
   attribute(readonly) int64u upTime = 2;
   attribute(readonly) int32u totalOperationalHours = 3;
   attribute(readonly) enum8 bootReasons = 4;
-  attribute(readonly) ENUM8 activeHardwareFaults[] = 5;
-  attribute(readonly) ENUM8 activeRadioFaults[] = 6;
-  attribute(readonly) ENUM8 activeNetworkFaults[] = 7;
+  attribute(readonly) ENUM8 activeHardwareFaults[254] = 5;
+  attribute(readonly) ENUM8 activeRadioFaults[254] = 6;
+  attribute(readonly) ENUM8 activeNetworkFaults[254] = 7;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
@@ -1190,8 +1190,8 @@ server cluster GroupKeyManagement = 63 {
     CHAR_STRING<16> groupName = 3;
   }
 
-  attribute(readonly) GroupKey groupKeyMap[] = 0;
-  attribute(readonly) GroupInfo groupTable[] = 1;
+  attribute(readonly) GroupKey groupKeyMap[254] = 0;
+  attribute(readonly) GroupInfo groupTable[254] = 1;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
@@ -1530,7 +1530,7 @@ server cluster LevelControl = 8 {
 
 server cluster LocalizationConfiguration = 43 {
   attribute(writable) char_string activeLocale = 1;
-  attribute(readonly) CHAR_STRING supportedLocales[] = 2;
+  attribute(readonly) CHAR_STRING supportedLocales[254] = 2;
 }
 
 client cluster MediaInput = 1287 {
@@ -1556,7 +1556,7 @@ client cluster MediaInput = 1287 {
     CHAR_STRING<32> description = 4;
   }
 
-  attribute(readonly) InputInfo mediaInputList[] = 0;
+  attribute(readonly) InputInfo mediaInputList[254] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 
   request struct RenameInputRequestRequest {
@@ -1861,10 +1861,10 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING<32> label = 6;
   }
 
-  attribute(readonly) FabricDescriptor fabricsList[] = 1;
+  attribute(readonly) FabricDescriptor fabricsList[320] = 1;
   attribute(readonly) int8u supportedFabrics = 2;
   attribute(readonly) int8u commissionedFabrics = 3;
-  attribute(readonly) OCTET_STRING trustedRootCertificates[] = 4;
+  attribute(readonly) OCTET_STRING trustedRootCertificates[400] = 4;
   attribute(readonly) fabric_idx currentFabricIndex = 5;
   attribute(readonly) int16u clusterRevision = 65533;
 
@@ -2067,7 +2067,7 @@ server cluster SoftwareDiagnostics = 52 {
     SoftwareFault softwareFault = 0;
   }
 
-  attribute(readonly) ThreadMetrics threadMetrics[] = 0;
+  attribute(readonly) ThreadMetrics threadMetrics[254] = 0;
   attribute(readonly) int64u currentHeapFree = 1;
   attribute(readonly) int64u currentHeapUsed = 2;
   attribute(readonly) int64u currentHeapHighWatermark = 3;
@@ -2123,7 +2123,7 @@ client cluster TargetNavigator = 1285 {
     CHAR_STRING<32> name = 2;
   }
 
-  attribute(readonly) TargetInfo targetNavigatorList[] = 0;
+  attribute(readonly) TargetInfo targetNavigatorList[254] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 
   request struct NavigateTargetRequestRequest {
@@ -2180,8 +2180,8 @@ server cluster TestCluster = 1295 {
   attribute(writable) enum16 enum16 = 22;
   attribute(writable) octet_string octetString = 25;
   attribute(writable) INT8U listInt8u[10] = 26;
-  attribute(writable) OCTET_STRING listOctetString[] = 27;
-  attribute(writable) TestListStructOctet listStructOctetString[] = 28;
+  attribute(writable) OCTET_STRING listOctetString[254] = 27;
+  attribute(writable) TestListStructOctet listStructOctetString[254] = 28;
   attribute(writable) long_octet_string longOctetString = 29;
   attribute(readonly) int16u clusterRevision = 65533;
 
@@ -2304,8 +2304,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   attribute(readonly) int64u extendedPanId = 4;
   attribute(readonly) octet_string meshLocalPrefix = 5;
   attribute(readonly) int64u overrunCount = 6;
-  attribute(readonly) NeighborTable neighborTableList[] = 7;
-  attribute(readonly) RouteTable routeTableList[] = 8;
+  attribute(readonly) NeighborTable neighborTableList[254] = 7;
+  attribute(readonly) RouteTable routeTableList[254] = 8;
   attribute(readonly) int32u partitionId = 9;
   attribute(readonly) int8u weighting = 10;
   attribute(readonly) int8u dataVersion = 11;
@@ -2365,7 +2365,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
 }
 
 server cluster UserLabel = 65 {
-  attribute(writable) LabelStruct labelList[] = 0;
+  attribute(writable) LabelStruct labelList[254] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 

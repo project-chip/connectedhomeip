@@ -77,10 +77,10 @@ server cluster Descriptor = 29 {
     INT16U revision = 2;
   }
 
-  attribute(readonly) DeviceType deviceList[] = 0;
-  attribute(readonly) CLUSTER_ID serverList[] = 1;
-  attribute(readonly) CLUSTER_ID clientList[] = 2;
-  attribute(readonly) ENDPOINT_NO partsList[] = 3;
+  attribute(readonly) DeviceType deviceList[254] = 0;
+  attribute(readonly) CLUSTER_ID serverList[254] = 1;
+  attribute(readonly) CLUSTER_ID clientList[254] = 2;
+  attribute(readonly) ENDPOINT_NO partsList[254] = 3;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
@@ -475,7 +475,7 @@ server cluster EthernetNetworkDiagnostics = 55 {
 }
 
 server cluster FixedLabel = 64 {
-  attribute(readonly) LabelStruct labelList[] = 0;
+  attribute(readonly) LabelStruct labelList[254] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
@@ -498,7 +498,7 @@ server cluster GeneralCommissioning = 48 {
   }
 
   attribute(writable) int64u breadcrumb = 0;
-  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[] = 1;
+  attribute(readonly) BasicCommissioningInfoType basicCommissioningInfoList[254] = 1;
   attribute(readonly) enum8 regulatoryConfig = 2;
   attribute(readonly) enum8 locationCapability = 3;
   attribute(readonly) bitmap32 featureMap = 65532;
@@ -615,20 +615,20 @@ server cluster GeneralDiagnostics = 51 {
     BootReasonType bootReason = 0;
   }
 
-  attribute(readonly) NetworkInterfaceType networkInterfaces[] = 0;
+  attribute(readonly) NetworkInterfaceType networkInterfaces[254] = 0;
   attribute(readonly) int16u rebootCount = 1;
   attribute(readonly) int64u upTime = 2;
   attribute(readonly) int32u totalOperationalHours = 3;
   attribute(readonly) enum8 bootReasons = 4;
-  attribute(readonly) ENUM8 activeHardwareFaults[] = 5;
-  attribute(readonly) ENUM8 activeRadioFaults[] = 6;
-  attribute(readonly) ENUM8 activeNetworkFaults[] = 7;
+  attribute(readonly) ENUM8 activeHardwareFaults[254] = 5;
+  attribute(readonly) ENUM8 activeRadioFaults[254] = 6;
+  attribute(readonly) ENUM8 activeNetworkFaults[254] = 7;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
 server cluster LocalizationConfiguration = 43 {
   attribute(writable) char_string activeLocale = 1;
-  attribute(readonly) CHAR_STRING supportedLocales[] = 2;
+  attribute(readonly) CHAR_STRING supportedLocales[254] = 2;
 }
 
 server cluster NetworkCommissioning = 49 {
@@ -773,10 +773,10 @@ server cluster OperationalCredentials = 62 {
     CHAR_STRING<32> label = 6;
   }
 
-  attribute(readonly) FabricDescriptor fabricsList[] = 1;
+  attribute(readonly) FabricDescriptor fabricsList[320] = 1;
   attribute(readonly) int8u supportedFabrics = 2;
   attribute(readonly) int8u commissionedFabrics = 3;
-  attribute(readonly) OCTET_STRING trustedRootCertificates[] = 4;
+  attribute(readonly) OCTET_STRING trustedRootCertificates[400] = 4;
   attribute(readonly) fabric_idx currentFabricIndex = 5;
   attribute(readonly) int16u clusterRevision = 65533;
 
@@ -883,7 +883,7 @@ server cluster SoftwareDiagnostics = 52 {
     SoftwareFault softwareFault = 0;
   }
 
-  attribute(readonly) ThreadMetrics threadMetrics[] = 0;
+  attribute(readonly) ThreadMetrics threadMetrics[254] = 0;
   attribute(readonly) int64u currentHeapFree = 1;
   attribute(readonly) int64u currentHeapUsed = 2;
   attribute(readonly) int64u currentHeapHighWatermark = 3;
@@ -975,8 +975,8 @@ server cluster ThreadNetworkDiagnostics = 53 {
   attribute(readonly) int64u extendedPanId = 4;
   attribute(readonly) octet_string meshLocalPrefix = 5;
   attribute(readonly) int64u overrunCount = 6;
-  attribute(readonly) NeighborTable neighborTableList[] = 7;
-  attribute(readonly) RouteTable routeTableList[] = 8;
+  attribute(readonly) NeighborTable neighborTableList[254] = 7;
+  attribute(readonly) RouteTable routeTableList[254] = 8;
   attribute(readonly) int32u partitionId = 9;
   attribute(readonly) int8u weighting = 10;
   attribute(readonly) int8u dataVersion = 11;
@@ -1036,7 +1036,7 @@ server cluster ThreadNetworkDiagnostics = 53 {
 }
 
 server cluster UserLabel = 65 {
-  attribute(writable) LabelStruct labelList[] = 0;
+  attribute(writable) LabelStruct labelList[254] = 0;
   attribute(readonly) int16u clusterRevision = 65533;
 }
 
