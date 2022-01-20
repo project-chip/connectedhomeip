@@ -122,8 +122,8 @@ server cluster ColorControl = 768 {
 
 server cluster Descriptor = 29 {
   struct DeviceType {
-    DEVTYPE_ID type = 1;
-    INT16U revision = 2;
+    DEVTYPE_ID type = 0;
+    INT16U revision = 1;
   }
 
   readonly attribute DeviceType deviceList[] = 0;
@@ -148,7 +148,7 @@ server cluster GeneralCommissioning = 48 {
   }
 
   struct BasicCommissioningInfoType {
-    INT32U failSafeExpiryLengthMs = 1;
+    INT32U failSafeExpiryLengthMs = 0;
   }
 
   attribute int64u breadcrumb = 0;
@@ -375,28 +375,28 @@ server cluster NetworkCommissioning = 49 {
   }
 
   struct NetworkInfo {
-    OCTET_STRING networkID = 1;
-    BOOLEAN connected = 2;
+    OCTET_STRING networkID = 0;
+    BOOLEAN connected = 1;
   }
 
   struct WiFiInterfaceScanResult {
-    BITMAP8 security = 1;
-    OCTET_STRING ssid = 2;
-    OCTET_STRING bssid = 3;
-    INT16U channel = 4;
-    WiFiBand wiFiBand = 5;
-    INT8S rssi = 6;
+    BITMAP8 security = 0;
+    OCTET_STRING ssid = 1;
+    OCTET_STRING bssid = 2;
+    INT16U channel = 3;
+    WiFiBand wiFiBand = 4;
+    INT8S rssi = 5;
   }
 
   struct ThreadInterfaceScanResult {
-    INT64U panId = 1;
-    INT64U extendedPanId = 2;
-    CHAR_STRING networkName = 3;
-    INT16U channel = 4;
-    INT8U version = 5;
-    INT64U extendedAddress = 6;
-    INT8S rssi = 7;
-    INT8U lqi = 8;
+    INT64U panId = 0;
+    INT64U extendedPanId = 1;
+    CHAR_STRING networkName = 2;
+    INT16U channel = 3;
+    INT8U version = 4;
+    INT64U extendedAddress = 5;
+    INT8S rssi = 6;
+    INT8U lqi = 7;
   }
 
   readonly attribute int8u maxNetworks = 0;
@@ -507,12 +507,12 @@ server cluster OperationalCredentials = 62 {
   }
 
   struct FabricDescriptor {
-    INT8U fabricIndex = 1;
-    OCTET_STRING rootPublicKey = 2;
-    INT16U vendorId = 3;
-    FABRIC_ID fabricId = 4;
-    NODE_ID nodeId = 5;
-    CHAR_STRING label = 6;
+    INT8U fabricIndex = 0;
+    OCTET_STRING rootPublicKey = 1;
+    INT16U vendorId = 2;
+    FABRIC_ID fabricId = 3;
+    NODE_ID nodeId = 4;
+    CHAR_STRING label = 5;
   }
 
   readonly attribute FabricDescriptor fabricsList[] = 1;
@@ -596,9 +596,9 @@ server cluster OperationalCredentials = 62 {
 
 server cluster Scenes = 5 {
   struct SceneExtensionFieldSet {
-    CLUSTER_ID clusterId = 1;
-    INT8U length = 2;
-    INT8U value = 3;
+    CLUSTER_ID clusterId = 0;
+    INT8U length = 1;
+    INT8U value = 2;
   }
 
   readonly attribute int8u sceneCount = 0;
