@@ -99,7 +99,7 @@ EmberAfStatus OTAProviderExample::HandleQueryImage(chip::app::CommandHandler * c
 
     OTAQueryStatus queryStatus  = OTAQueryStatus::kNotAvailable;
     uint32_t newSoftwareVersion = commandData.softwareVersion; // This implementation will always indicate that an update is
-                                                                   // available (if the user provides a file).
+                                                               // available (if the user provides a file).
     constexpr char kExampleSoftwareString[] = "Example-Image-V0.1";
     bool userConsentNeeded                  = false;
     uint8_t updateToken[kUpdateTokenLen]    = { 0 };
