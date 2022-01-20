@@ -255,6 +255,7 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
 {
     VerifyOrReturn(mOtaRequestorDriver != nullptr, ChipLogError(SoftwareUpdate, "OTA requestor driver not set"));
     VerifyOrReturn(mServer != nullptr, ChipLogError(SoftwareUpdate, "Server not set"));
+    VerifyOrReturn(mProviderNodeId != kUndefinedNodeId, ChipLogError(SoftwareUpdate, "Provider Node ID not set"));
 
     FabricInfo * fabricInfo = mServer->GetFabricTable().FindFabricWithIndex(mProviderFabricIndex);
     VerifyOrReturn(fabricInfo != nullptr, ChipLogError(SoftwareUpdate, "Cannot find fabric"));
@@ -268,6 +269,20 @@ void OTARequestor::ConnectToProvider(OnConnectedAction onConnectedAction)
                                                                  &mOnConnectedCallback, &mOnConnectionFailureCallback);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    ChipLogError(SoftwareUpdate, "Cannot establish connection to provider: %" CHIP_ERROR_FORMAT, err.Format()));
+}
+
+// Application directs the Requestor to cancel image update in progress. All the Requestor state is
+// cleared, UpdateState is reset to Idle
+void OTARequestor::CancelImageUpdate()
+{
+    mBdxDownloader->EndDownload(CHIP_ERROR_CONNECTION_ABORTED);
+
+    // All Provider info should be invalidated
+    mProviderNodeId = kUndefinedNodeId;
+    mProviderFabricIndex = kUndefinedFabricIndex;
+    mProviderEndpointId = kRootEndpointId;
+
+    RecordNewUpdateState(OTAUpdateStateEnum::kIdle, OTAChangeReasonEnum::kUnknown);
 }
 
 // Called whenever FindOrEstablishSession is successful
