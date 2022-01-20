@@ -10838,16 +10838,46 @@ using namespace chip::app::Clusters;
 {
     ListFreer listFreer;
     GroupKeyManagement::Commands::KeySetWrite::Type request;
-    request.groupKeySetStruct.groupKeySetID = params.groupKeySetStruct.groupKeySetID.unsignedShortValue;
-    request.groupKeySetStruct.groupKeySecurityPolicy
-        = static_cast<std::remove_reference_t<decltype(request.groupKeySetStruct.groupKeySecurityPolicy)>>(
-            params.groupKeySetStruct.groupKeySecurityPolicy.unsignedCharValue);
-    request.groupKeySetStruct.epochKey0 = [self asByteSpan:params.groupKeySetStruct.epochKey0];
-    request.groupKeySetStruct.epochStartTime0 = params.groupKeySetStruct.epochStartTime0.unsignedLongLongValue;
-    request.groupKeySetStruct.epochKey1 = [self asByteSpan:params.groupKeySetStruct.epochKey1];
-    request.groupKeySetStruct.epochStartTime1 = params.groupKeySetStruct.epochStartTime1.unsignedLongLongValue;
-    request.groupKeySetStruct.epochKey2 = [self asByteSpan:params.groupKeySetStruct.epochKey2];
-    request.groupKeySetStruct.epochStartTime2 = params.groupKeySetStruct.epochStartTime2.unsignedLongLongValue;
+    request.groupKeySet.groupKeySetID = params.groupKeySet.groupKeySetID.unsignedShortValue;
+    request.groupKeySet.groupKeySecurityPolicy
+        = static_cast<std::remove_reference_t<decltype(request.groupKeySet.groupKeySecurityPolicy)>>(
+            params.groupKeySet.groupKeySecurityPolicy.unsignedCharValue);
+    if (params.groupKeySet.epochKey0 == nil) {
+        request.groupKeySet.epochKey0.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochKey0.SetNonNull();
+        nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey0];
+    }
+    if (params.groupKeySet.epochStartTime0 == nil) {
+        request.groupKeySet.epochStartTime0.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochStartTime0.SetNonNull();
+        nonNullValue_1 = params.groupKeySet.epochStartTime0.unsignedLongLongValue;
+    }
+    if (params.groupKeySet.epochKey1 == nil) {
+        request.groupKeySet.epochKey1.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochKey1.SetNonNull();
+        nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey1];
+    }
+    if (params.groupKeySet.epochStartTime1 == nil) {
+        request.groupKeySet.epochStartTime1.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochStartTime1.SetNonNull();
+        nonNullValue_1 = params.groupKeySet.epochStartTime1.unsignedLongLongValue;
+    }
+    if (params.groupKeySet.epochKey2 == nil) {
+        request.groupKeySet.epochKey2.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochKey2.SetNonNull();
+        nonNullValue_1 = [self asByteSpan:params.groupKeySet.epochKey2];
+    }
+    if (params.groupKeySet.epochStartTime2 == nil) {
+        request.groupKeySet.epochStartTime2.SetNull();
+    } else {
+        auto & nonNullValue_1 = request.groupKeySet.epochStartTime2.SetNonNull();
+        nonNullValue_1 = params.groupKeySet.epochStartTime2.unsignedLongLongValue;
+    }
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -13163,24 +13193,6 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
     });
-}
-
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt16uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = LocalizationConfiguration::Attributes::ClusterRevision::TypeInfo;
-            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
 }
 
 @end
@@ -16366,24 +16378,6 @@ using namespace chip::app::Clusters;
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
-}
-
-- (void)subscribeAttributeNOCsWithMinInterval:(uint16_t)minInterval
-                                  maxInterval:(uint16_t)maxInterval
-                      subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                reportHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPOperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = OperationalCredentials::Attributes::NOCs::TypeInfo;
-            auto successFn = Callback<OperationalCredentialsNOCsListAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval,
-                CHIPOperationalCredentialsNOCsListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
 }
 
 - (void)readAttributeFabricsListWithCompletionHandler:(void (^)(
@@ -28043,24 +28037,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)subscribeAttributeHourFormatWithMinInterval:(uint16_t)minInterval
-                                        maxInterval:(uint16_t)maxInterval
-                            subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                      reportHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TimeFormatLocalization::Attributes::HourFormat::TypeInfo;
-            auto successFn = Callback<TimeFormatLocalizationClusterHourFormatAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval,
-                CHIPTimeFormatLocalizationClusterHourFormatAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
 - (void)readAttributeActiveCalendarTypeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                  NSError * _Nullable error))completionHandler
 {
@@ -28155,30 +28131,8 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)subscribeAttributeServerGeneratedCommandListWithMinInterval:(uint16_t)minInterval
-                                                        maxInterval:(uint16_t)maxInterval
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
-{
-    new CHIPTimeFormatLocalizationServerGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TimeFormatLocalization::Attributes::ServerGeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<TimeFormatLocalizationServerGeneratedCommandListListAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval,
-                CHIPTimeFormatLocalizationServerGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
-- (void)readAttributeClientGeneratedCommandListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
-                                                                         NSError * _Nullable error))completionHandler
+- (void)readAttributeSupportedCalendarTypesWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                     NSError * _Nullable error))completionHandler
 {
     new CHIPTimeFormatLocalizationClientGeneratedCommandListListAttributeCallbackBridge(
         self.callbackQueue, completionHandler, ^(Cancelable * success, Cancelable * failure) {
@@ -28190,28 +28144,6 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)subscribeAttributeClientGeneratedCommandListWithMinInterval:(uint16_t)minInterval
-                                                        maxInterval:(uint16_t)maxInterval
-                                            subscriptionEstablished:
-                                                (SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                                      reportHandler:(void (^)(NSArray * _Nullable value,
-                                                                        NSError * _Nullable error))reportHandler
-{
-    new CHIPTimeFormatLocalizationClientGeneratedCommandListListAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TimeFormatLocalization::Attributes::ClientGeneratedCommandList::TypeInfo;
-            auto successFn
-                = Callback<TimeFormatLocalizationClientGeneratedCommandListListAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval,
-                CHIPTimeFormatLocalizationClientGeneratedCommandListListAttributeCallbackSubscriptionBridge::
-                    OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
-}
-
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler
 {
@@ -28221,24 +28153,6 @@ using namespace chip::app::Clusters;
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
         return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
     });
-}
-
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                 subscriptionEstablished:(SubscriptionEstablishedHandler _Nullable)subscriptionEstablishedHandler
-                                           reportHandler:
-                                               (void (^)(NSNumber * _Nullable value, NSError * _Nullable error))reportHandler
-{
-    new CHIPInt16uAttributeCallbackSubscriptionBridge(
-        self.callbackQueue, reportHandler,
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = TimeFormatLocalization::Attributes::ClusterRevision::TypeInfo;
-            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.SubscribeAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall,
-                minInterval, maxInterval, CHIPInt16uAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished);
-        },
-        subscriptionEstablishedHandler);
 }
 
 @end

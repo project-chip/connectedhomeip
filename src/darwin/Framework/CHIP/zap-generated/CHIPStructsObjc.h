@@ -260,7 +260,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull groupId;
 @property (strong, nonatomic) NSArray * _Nonnull endpoints;
-@property (strong, nonatomic) NSString * _Nonnull groupName;
+@property (strong, nonatomic) NSString * _Nullable groupName;
 - (instancetype)init;
 @end
 
@@ -274,12 +274,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPGroupKeyManagementClusterGroupKeySetStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
 @property (strong, nonatomic) NSNumber * _Nonnull groupKeySecurityPolicy;
-@property (strong, nonatomic) NSData * _Nonnull epochKey0;
-@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime0;
-@property (strong, nonatomic) NSData * _Nonnull epochKey1;
-@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime1;
-@property (strong, nonatomic) NSData * _Nonnull epochKey2;
-@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime2;
+@property (strong, nonatomic) NSData * _Nullable epochKey0;
+@property (strong, nonatomic) NSNumber * _Nullable epochStartTime0;
+@property (strong, nonatomic) NSData * _Nullable epochKey1;
+@property (strong, nonatomic) NSNumber * _Nullable epochStartTime1;
+@property (strong, nonatomic) NSData * _Nullable epochKey2;
+@property (strong, nonatomic) NSNumber * _Nullable epochStartTime2;
 - (instancetype)init;
 @end
 

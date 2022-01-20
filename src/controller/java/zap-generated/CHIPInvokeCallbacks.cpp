@@ -1307,11 +1307,11 @@ void CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CallbackFn(
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject GroupKeySetStruct;
+    jobject GroupKeySet;
 
-    GroupKeySetStruct = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
+    GroupKeySet = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySetStruct);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, GroupKeySet);
 }
 CHIPGroupsClusterAddGroupResponseCallback::CHIPGroupsClusterAddGroupResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPGroupsClusterAddGroupResponseCallbackType>(CallbackFn, this)

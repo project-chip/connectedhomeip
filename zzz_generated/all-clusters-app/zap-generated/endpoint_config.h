@@ -48,17 +48,12 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: Unit Localization (server), big-endian */                                                     \
-                                                                                                                                   \
-            /* 260 - FeatureMap, */                                                                                                \
-            0x00, 0x00, 0x00, 0x01,                                                                                                \
-                                                                                                                                   \
             /* Endpoint: 0, Cluster: General Commissioning (server), big-endian */                                                 \
                                                                                                                                    \
-            /* 264 - Breadcrumb, */                                                                                                \
+            /* 284 - Breadcrumb, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 272 - BasicCommissioningInfoList, */                                                                                \
+            /* 292 - BasicCommissioningInfoList, */                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -74,258 +69,258 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 526 - FeatureMap, */                                                                                                \
+            /* 546 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x06,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server), big-endian */                                                 \
                                                                                                                                    \
-            /* 530 - Networks, */                                                                                                  \
+            /* 550 - Networks, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
                                                                                                                                    \
-            /* 542 - LastConnectErrorValue, */                                                                                     \
+            /* 562 - LastConnectErrorValue, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 546 - FeatureMap, */                                                                                                \
+            /* 566 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x01,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), big-endian */                                                   \
                                                                                                                                    \
-            /* 550 - UpTime, */                                                                                                    \
+            /* 570 - UpTime, */                                                                                                    \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 558 - TotalOperationalHours, */                                                                                     \
+            /* 578 - TotalOperationalHours, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Software Diagnostics (server), big-endian */                                                  \
                                                                                                                                    \
-            /* 562 - CurrentHeapFree, */                                                                                           \
+            /* 582 - CurrentHeapFree, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 570 - CurrentHeapUsed, */                                                                                           \
+            /* 590 - CurrentHeapUsed, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 578 - CurrentHeapHighWatermark, */                                                                                  \
+            /* 598 - CurrentHeapHighWatermark, */                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 586 - FeatureMap, */                                                                                                \
+            /* 606 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x01,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server), big-endian */                                            \
                                                                                                                                    \
-            /* 590 - NetworkName, */                                                                                               \
+            /* 610 - NetworkName, */                                                                                               \
             0x00, 0x00,                                                                                                            \
                                                                                                                                    \
-            /* 592 - ExtendedPanId, */                                                                                             \
+            /* 612 - ExtendedPanId, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 600 - OverrunCount, */                                                                                              \
+            /* 620 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 608 - PartitionId, */                                                                                               \
+            /* 628 - PartitionId, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 612 - TxTotalCount, */                                                                                              \
+            /* 632 - TxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 616 - TxUnicastCount, */                                                                                            \
+            /* 636 - TxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 620 - TxBroadcastCount, */                                                                                          \
+            /* 640 - TxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 624 - TxAckRequestedCount, */                                                                                       \
+            /* 644 - TxAckRequestedCount, */                                                                                       \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 628 - TxAckedCount, */                                                                                              \
+            /* 648 - TxAckedCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 632 - TxNoAckRequestedCount, */                                                                                     \
+            /* 652 - TxNoAckRequestedCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 636 - TxDataCount, */                                                                                               \
+            /* 656 - TxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 640 - TxDataPollCount, */                                                                                           \
+            /* 660 - TxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 644 - TxBeaconCount, */                                                                                             \
+            /* 664 - TxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 648 - TxBeaconRequestCount, */                                                                                      \
+            /* 668 - TxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 652 - TxOtherCount, */                                                                                              \
+            /* 672 - TxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 656 - TxRetryCount, */                                                                                              \
+            /* 676 - TxRetryCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 660 - TxDirectMaxRetryExpiryCount, */                                                                               \
+            /* 680 - TxDirectMaxRetryExpiryCount, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 664 - TxIndirectMaxRetryExpiryCount, */                                                                             \
+            /* 684 - TxIndirectMaxRetryExpiryCount, */                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 668 - TxErrCcaCount, */                                                                                             \
+            /* 688 - TxErrCcaCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 672 - TxErrAbortCount, */                                                                                           \
+            /* 692 - TxErrAbortCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 676 - TxErrBusyChannelCount, */                                                                                     \
+            /* 696 - TxErrBusyChannelCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 680 - RxTotalCount, */                                                                                              \
+            /* 700 - RxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 684 - RxUnicastCount, */                                                                                            \
+            /* 704 - RxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 688 - RxBroadcastCount, */                                                                                          \
+            /* 708 - RxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 692 - RxDataCount, */                                                                                               \
+            /* 712 - RxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 696 - RxDataPollCount, */                                                                                           \
+            /* 716 - RxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 700 - RxBeaconCount, */                                                                                             \
+            /* 720 - RxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 704 - RxBeaconRequestCount, */                                                                                      \
+            /* 724 - RxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 708 - RxOtherCount, */                                                                                              \
+            /* 728 - RxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 712 - RxAddressFilteredCount, */                                                                                    \
+            /* 732 - RxAddressFilteredCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 716 - RxDestAddrFilteredCount, */                                                                                   \
+            /* 736 - RxDestAddrFilteredCount, */                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 720 - RxDuplicatedCount, */                                                                                         \
+            /* 740 - RxDuplicatedCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 724 - RxErrNoFrameCount, */                                                                                         \
+            /* 744 - RxErrNoFrameCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 728 - RxErrUnknownNeighborCount, */                                                                                 \
+            /* 748 - RxErrUnknownNeighborCount, */                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 732 - RxErrInvalidSrcAddrCount, */                                                                                  \
+            /* 752 - RxErrInvalidSrcAddrCount, */                                                                                  \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 736 - RxErrSecCount, */                                                                                             \
+            /* 756 - RxErrSecCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 740 - RxErrFcsCount, */                                                                                             \
+            /* 760 - RxErrFcsCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 744 - RxErrOtherCount, */                                                                                           \
+            /* 764 - RxErrOtherCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 748 - ActiveTimestamp, */                                                                                           \
+            /* 768 - ActiveTimestamp, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 756 - PendingTimestamp, */                                                                                          \
+            /* 776 - PendingTimestamp, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 764 - delay, */                                                                                                     \
+            /* 784 - delay, */                                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 768 - ChannelMask, */                                                                                               \
+            /* 788 - ChannelMask, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 775 - FeatureMap, */                                                                                                \
+            /* 795 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x0F,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server), big-endian */                                              \
                                                                                                                                    \
-            /* 779 - BeaconLostCount, */                                                                                           \
+            /* 799 - BeaconLostCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 783 - BeaconRxCount, */                                                                                             \
+            /* 803 - BeaconRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 787 - PacketMulticastRxCount, */                                                                                    \
+            /* 807 - PacketMulticastRxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 791 - PacketMulticastTxCount, */                                                                                    \
+            /* 811 - PacketMulticastTxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 795 - PacketUnicastRxCount, */                                                                                      \
+            /* 815 - PacketUnicastRxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 799 - PacketUnicastTxCount, */                                                                                      \
+            /* 819 - PacketUnicastTxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 803 - CurrentMaxRate, */                                                                                            \
+            /* 823 - CurrentMaxRate, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 811 - OverrunCount, */                                                                                              \
+            /* 831 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 819 - FeatureMap, */                                                                                                \
+            /* 839 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x03,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server), big-endian */                                          \
                                                                                                                                    \
-            /* 823 - PacketRxCount, */                                                                                             \
+            /* 843 - PacketRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 831 - PacketTxCount, */                                                                                             \
+            /* 851 - PacketTxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 839 - TxErrCount, */                                                                                                \
+            /* 859 - TxErrCount, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 847 - CollisionCount, */                                                                                            \
+            /* 867 - CollisionCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 855 - OverrunCount, */                                                                                              \
+            /* 875 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 863 - TimeSinceReset, */                                                                                            \
+            /* 883 - TimeSinceReset, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 871 - FeatureMap, */                                                                                                \
+            /* 891 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x03,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: On/Off (server), big-endian */                                                                \
                                                                                                                                    \
-            /* 875 - FeatureMap, */                                                                                                \
+            /* 895 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Level Control (server), big-endian */                                                         \
                                                                                                                                    \
-            /* 879 - FeatureMap, */                                                                                                \
+            /* 899 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x03,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Power Source (server), big-endian */                                                          \
                                                                                                                                    \
-            /* 883 - BatteryVoltage, */                                                                                            \
+            /* 903 - BatteryVoltage, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 887 - BatteryTimeRemaining, */                                                                                      \
+            /* 907 - BatteryTimeRemaining, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 891 - ActiveBatteryFaults, */                                                                                       \
+            /* 911 - ActiveBatteryFaults, */                                                                                       \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 899 - FeatureMap, */                                                                                                \
+            /* 919 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Network Commissioning (server), big-endian */                                                 \
                                                                                                                                    \
-            /* 903 - Networks, */                                                                                                  \
+            /* 923 - Networks, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
                                                                                                                                    \
-            /* 915 - LastConnectErrorValue, */                                                                                     \
+            /* 935 - LastConnectErrorValue, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 919 - FeatureMap, */                                                                                                \
+            /* 939 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Bridged Device Basic (server), big-endian */                                                  \
@@ -335,12 +330,12 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Switch (server), big-endian */                                                                \
                                                                                                                                    \
-            /* 927 - FeatureMap, */                                                                                                \
+            /* 943 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Fixed Label (server), big-endian */                                                           \
                                                                                                                                    \
-            /* 931 - label list, */                                                                                                \
+            /* 947 - label list, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -358,21 +353,21 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Mode Select (server), big-endian */                                                           \
                                                                                                                                    \
-            /* 1185 - Description, */                                                                                              \
+            /* 1201 - Description, */                                                                                              \
             6, 'C', 'o', 'f', 'f', 'e', 'e',                                                                                       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Door Lock (server), big-endian */                                                             \
                                                                                                                                    \
-            /* 1192 - DoorOpenEvents, */                                                                                           \
+            /* 1208 - DoorOpenEvents, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 1196 - DoorClosedEvents, */                                                                                         \
+            /* 1212 - DoorClosedEvents, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 1200 - Language, */                                                                                                 \
+            /* 1216 - Language, */                                                                                                 \
             2, 'e', 'n',                                                                                                           \
                                                                                                                                    \
-            /* 1203 - AutoRelockTime, */                                                                                           \
+            /* 1219 - AutoRelockTime, */                                                                                           \
             0x00, 0x00, 0x00, 0x60,                                                                                                \
                                                                                                                                    \
             /* 1207 - FeatureMap, */                                                                                               \
@@ -380,36 +375,36 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Window Covering (server), big-endian */                                                       \
                                                                                                                                    \
-            /* 1211 - FeatureMap, */                                                                                               \
+            /* 1223 - FeatureMap, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Pump Configuration and Control (server), big-endian */                                        \
                                                                                                                                    \
-            /* 1215 - LifetimeRunningHours, */                                                                                     \
+            /* 1227 - LifetimeRunningHours, */                                                                                     \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 1218 - Power, */                                                                                                    \
+            /* 1230 - Power, */                                                                                                    \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 1221 - LifetimeEnergyConsumed, */                                                                                   \
+            /* 1233 - LifetimeEnergyConsumed, */                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 1225 - FeatureMap, */                                                                                               \
+            /* 1237 - FeatureMap, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Thermostat (server), big-endian */                                                            \
                                                                                                                                    \
-            /* 1229 - FeatureMap, */                                                                                               \
+            /* 1241 - FeatureMap, */                                                                                               \
             0x00, 0x00, 0x00, 0x0B,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: IAS Zone (server), big-endian */                                                              \
                                                                                                                                    \
-            /* 1233 - IAS CIE address, */                                                                                          \
+            /* 1245 - IAS CIE address, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Channel (server), big-endian */                                                               \
                                                                                                                                    \
-            /* 1241 - channel list, */                                                                                             \
+            /* 1253 - channel list, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -427,7 +422,7 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Target Navigator (server), big-endian */                                                      \
                                                                                                                                    \
-            /* 1495 - target navigator list, */                                                                                    \
+            /* 1507 - target navigator list, */                                                                                    \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -445,24 +440,24 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Media Playback (server), big-endian */                                                        \
                                                                                                                                    \
-            /* 1749 - start time, */                                                                                               \
+            /* 1761 - start time, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF,                                                                        \
                                                                                                                                    \
-            /* 1757 - duration, */                                                                                                 \
+            /* 1769 - duration, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 1765 - playback speed, */                                                                                           \
+            /* 1777 - playback speed, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 1769 - seek range end, */                                                                                           \
+            /* 1781 - seek range end, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 1777 - seek range start, */                                                                                         \
+            /* 1789 - seek range start, */                                                                                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Media Input (server), big-endian */                                                           \
                                                                                                                                    \
-            /* 1785 - media input list, */                                                                                         \
+            /* 1797 - media input list, */                                                                                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -480,7 +475,7 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Content Launcher (server), big-endian */                                                      \
                                                                                                                                    \
-            /* 2039 - accept header list, */                                                                                       \
+            /* 2051 - accept header list, */                                                                                       \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -496,12 +491,12 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 2293 - supported streaming protocols, */                                                                            \
+            /* 2305 - supported streaming protocols, */                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Audio Output (server), big-endian */                                                          \
                                                                                                                                    \
-            /* 2297 - audio output list, */                                                                                        \
+            /* 2309 - audio output list, */                                                                                        \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -519,7 +514,7 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Application Launcher (server), big-endian */                                                  \
                                                                                                                                    \
-            /* 2551 - application launcher list, */                                                                                \
+            /* 2563 - application launcher list, */                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -537,67 +532,67 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Application Basic (server), big-endian */                                                     \
                                                                                                                                    \
-            /* 2805 - allowed vendor list, */                                                                                      \
+            /* 2817 - allowed vendor list, */                                                                                      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Test Cluster (server), big-endian */                                                          \
                                                                                                                                    \
-            /* 2837 - bitmap32, */                                                                                                 \
+            /* 2849 - bitmap32, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 2841 - bitmap64, */                                                                                                 \
+            /* 2853 - bitmap64, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 2849 - int24u, */                                                                                                   \
+            /* 2861 - int24u, */                                                                                                   \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 2852 - int32u, */                                                                                                   \
+            /* 2864 - int32u, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 2856 - int40u, */                                                                                                   \
+            /* 2868 - int40u, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00,                                                                                          \
                                                                                                                                    \
-            /* 2861 - int48u, */                                                                                                   \
+            /* 2873 - int48u, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                    \
                                                                                                                                    \
-            /* 2867 - int56u, */                                                                                                   \
+            /* 2879 - int56u, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 2874 - int64u, */                                                                                                   \
+            /* 2886 - int64u, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 2882 - int24s, */                                                                                                   \
+            /* 2894 - int24s, */                                                                                                   \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 2885 - int32s, */                                                                                                   \
+            /* 2897 - int32s, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 2889 - int40s, */                                                                                                   \
+            /* 2901 - int40s, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00,                                                                                          \
                                                                                                                                    \
-            /* 2894 - int48s, */                                                                                                   \
+            /* 2906 - int48s, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                    \
                                                                                                                                    \
-            /* 2900 - int56s, */                                                                                                   \
+            /* 2912 - int56s, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 2907 - int64s, */                                                                                                   \
+            /* 2919 - int64s, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 2915 - float_single, */                                                                                             \
+            /* 2927 - float_single, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 2919 - float_double, */                                                                                             \
+            /* 2931 - float_double, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 2927 - epoch_us, */                                                                                                 \
+            /* 2939 - epoch_us, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 2935 - epoch_s, */                                                                                                  \
+            /* 2947 - epoch_s, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 2939 - list_long_octet_string, */                                                                                   \
+            /* 2951 - list_long_octet_string, */                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -652,65 +647,65 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
                                                                                                                                    \
-            /* 3939 - nullable_bitmap32, */                                                                                        \
+            /* 3951 - nullable_bitmap32, */                                                                                        \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 3943 - nullable_bitmap64, */                                                                                        \
+            /* 3955 - nullable_bitmap64, */                                                                                        \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 3951 - nullable_int24u, */                                                                                          \
+            /* 3963 - nullable_int24u, */                                                                                          \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 3954 - nullable_int32u, */                                                                                          \
+            /* 3966 - nullable_int32u, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 3958 - nullable_int40u, */                                                                                          \
+            /* 3970 - nullable_int40u, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00,                                                                                          \
                                                                                                                                    \
-            /* 3963 - nullable_int48u, */                                                                                          \
+            /* 3975 - nullable_int48u, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                    \
                                                                                                                                    \
-            /* 3969 - nullable_int56u, */                                                                                          \
+            /* 3981 - nullable_int56u, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 3976 - nullable_int64u, */                                                                                          \
+            /* 3988 - nullable_int64u, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 3984 - nullable_int24s, */                                                                                          \
+            /* 3996 - nullable_int24s, */                                                                                          \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 3987 - nullable_int32s, */                                                                                          \
+            /* 3999 - nullable_int32s, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 3991 - nullable_int40s, */                                                                                          \
+            /* 4003 - nullable_int40s, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00,                                                                                          \
                                                                                                                                    \
-            /* 3996 - nullable_int48s, */                                                                                          \
+            /* 4008 - nullable_int48s, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                    \
                                                                                                                                    \
-            /* 4002 - nullable_int56s, */                                                                                          \
+            /* 4014 - nullable_int56s, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 4009 - nullable_int64s, */                                                                                          \
+            /* 4021 - nullable_int64s, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 4017 - nullable_float_single, */                                                                                    \
+            /* 4029 - nullable_float_single, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 4021 - nullable_float_double, */                                                                                    \
+            /* 4033 - nullable_float_double, */                                                                                    \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Electrical Measurement (server), big-endian */                                                \
                                                                                                                                    \
-            /* 4029 - measurement type, */                                                                                         \
+            /* 4041 - measurement type, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 4033 - total active power, */                                                                                       \
+            /* 4045 - total active power, */                                                                                       \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: On/Off (server), big-endian */                                                                \
                                                                                                                                    \
-            /* 4037 - FeatureMap, */                                                                                               \
+            /* 4049 - FeatureMap, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
@@ -739,17 +734,12 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: Unit Localization (server), little-endian */                                                  \
-                                                                                                                                   \
-            /* 260 - FeatureMap, */                                                                                                \
-            0x01, 0x00, 0x00, 0x00,                                                                                                \
-                                                                                                                                   \
             /* Endpoint: 0, Cluster: General Commissioning (server), little-endian */                                              \
                                                                                                                                    \
-            /* 264 - Breadcrumb, */                                                                                                \
+            /* 284 - Breadcrumb, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 272 - BasicCommissioningInfoList, */                                                                                \
+            /* 292 - BasicCommissioningInfoList, */                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -765,258 +755,258 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 526 - FeatureMap, */                                                                                                \
+            /* 546 - FeatureMap, */                                                                                                \
             0x06, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server), little-endian */                                              \
                                                                                                                                    \
-            /* 530 - Networks, */                                                                                                  \
+            /* 550 - Networks, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
                                                                                                                                    \
-            /* 542 - LastConnectErrorValue, */                                                                                     \
+            /* 562 - LastConnectErrorValue, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 546 - FeatureMap, */                                                                                                \
+            /* 566 - FeatureMap, */                                                                                                \
             0x01, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), little-endian */                                                \
                                                                                                                                    \
-            /* 550 - UpTime, */                                                                                                    \
+            /* 570 - UpTime, */                                                                                                    \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 558 - TotalOperationalHours, */                                                                                     \
+            /* 578 - TotalOperationalHours, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Software Diagnostics (server), little-endian */                                               \
                                                                                                                                    \
-            /* 562 - CurrentHeapFree, */                                                                                           \
+            /* 582 - CurrentHeapFree, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 570 - CurrentHeapUsed, */                                                                                           \
+            /* 590 - CurrentHeapUsed, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 578 - CurrentHeapHighWatermark, */                                                                                  \
+            /* 598 - CurrentHeapHighWatermark, */                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 586 - FeatureMap, */                                                                                                \
+            /* 606 - FeatureMap, */                                                                                                \
             0x01, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server), little-endian */                                         \
                                                                                                                                    \
-            /* 590 - NetworkName, */                                                                                               \
+            /* 610 - NetworkName, */                                                                                               \
             0x00, 0x00,                                                                                                            \
                                                                                                                                    \
-            /* 592 - ExtendedPanId, */                                                                                             \
+            /* 612 - ExtendedPanId, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 600 - OverrunCount, */                                                                                              \
+            /* 620 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 608 - PartitionId, */                                                                                               \
+            /* 628 - PartitionId, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 612 - TxTotalCount, */                                                                                              \
+            /* 632 - TxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 616 - TxUnicastCount, */                                                                                            \
+            /* 636 - TxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 620 - TxBroadcastCount, */                                                                                          \
+            /* 640 - TxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 624 - TxAckRequestedCount, */                                                                                       \
+            /* 644 - TxAckRequestedCount, */                                                                                       \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 628 - TxAckedCount, */                                                                                              \
+            /* 648 - TxAckedCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 632 - TxNoAckRequestedCount, */                                                                                     \
+            /* 652 - TxNoAckRequestedCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 636 - TxDataCount, */                                                                                               \
+            /* 656 - TxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 640 - TxDataPollCount, */                                                                                           \
+            /* 660 - TxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 644 - TxBeaconCount, */                                                                                             \
+            /* 664 - TxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 648 - TxBeaconRequestCount, */                                                                                      \
+            /* 668 - TxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 652 - TxOtherCount, */                                                                                              \
+            /* 672 - TxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 656 - TxRetryCount, */                                                                                              \
+            /* 676 - TxRetryCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 660 - TxDirectMaxRetryExpiryCount, */                                                                               \
+            /* 680 - TxDirectMaxRetryExpiryCount, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 664 - TxIndirectMaxRetryExpiryCount, */                                                                             \
+            /* 684 - TxIndirectMaxRetryExpiryCount, */                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 668 - TxErrCcaCount, */                                                                                             \
+            /* 688 - TxErrCcaCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 672 - TxErrAbortCount, */                                                                                           \
+            /* 692 - TxErrAbortCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 676 - TxErrBusyChannelCount, */                                                                                     \
+            /* 696 - TxErrBusyChannelCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 680 - RxTotalCount, */                                                                                              \
+            /* 700 - RxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 684 - RxUnicastCount, */                                                                                            \
+            /* 704 - RxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 688 - RxBroadcastCount, */                                                                                          \
+            /* 708 - RxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 692 - RxDataCount, */                                                                                               \
+            /* 712 - RxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 696 - RxDataPollCount, */                                                                                           \
+            /* 716 - RxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 700 - RxBeaconCount, */                                                                                             \
+            /* 720 - RxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 704 - RxBeaconRequestCount, */                                                                                      \
+            /* 724 - RxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 708 - RxOtherCount, */                                                                                              \
+            /* 728 - RxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 712 - RxAddressFilteredCount, */                                                                                    \
+            /* 732 - RxAddressFilteredCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 716 - RxDestAddrFilteredCount, */                                                                                   \
+            /* 736 - RxDestAddrFilteredCount, */                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 720 - RxDuplicatedCount, */                                                                                         \
+            /* 740 - RxDuplicatedCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 724 - RxErrNoFrameCount, */                                                                                         \
+            /* 744 - RxErrNoFrameCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 728 - RxErrUnknownNeighborCount, */                                                                                 \
+            /* 748 - RxErrUnknownNeighborCount, */                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 732 - RxErrInvalidSrcAddrCount, */                                                                                  \
+            /* 752 - RxErrInvalidSrcAddrCount, */                                                                                  \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 736 - RxErrSecCount, */                                                                                             \
+            /* 756 - RxErrSecCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 740 - RxErrFcsCount, */                                                                                             \
+            /* 760 - RxErrFcsCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 744 - RxErrOtherCount, */                                                                                           \
+            /* 764 - RxErrOtherCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 748 - ActiveTimestamp, */                                                                                           \
+            /* 768 - ActiveTimestamp, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 756 - PendingTimestamp, */                                                                                          \
+            /* 776 - PendingTimestamp, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 764 - delay, */                                                                                                     \
+            /* 784 - delay, */                                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 768 - ChannelMask, */                                                                                               \
+            /* 788 - ChannelMask, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 775 - FeatureMap, */                                                                                                \
+            /* 795 - FeatureMap, */                                                                                                \
             0x0F, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server), little-endian */                                           \
                                                                                                                                    \
-            /* 779 - BeaconLostCount, */                                                                                           \
+            /* 799 - BeaconLostCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 783 - BeaconRxCount, */                                                                                             \
+            /* 803 - BeaconRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 787 - PacketMulticastRxCount, */                                                                                    \
+            /* 807 - PacketMulticastRxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 791 - PacketMulticastTxCount, */                                                                                    \
+            /* 811 - PacketMulticastTxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 795 - PacketUnicastRxCount, */                                                                                      \
+            /* 815 - PacketUnicastRxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 799 - PacketUnicastTxCount, */                                                                                      \
+            /* 819 - PacketUnicastTxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 803 - CurrentMaxRate, */                                                                                            \
+            /* 823 - CurrentMaxRate, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 811 - OverrunCount, */                                                                                              \
+            /* 831 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 819 - FeatureMap, */                                                                                                \
+            /* 839 - FeatureMap, */                                                                                                \
             0x03, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server), little-endian */                                       \
                                                                                                                                    \
-            /* 823 - PacketRxCount, */                                                                                             \
+            /* 843 - PacketRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 831 - PacketTxCount, */                                                                                             \
+            /* 851 - PacketTxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 839 - TxErrCount, */                                                                                                \
+            /* 859 - TxErrCount, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 847 - CollisionCount, */                                                                                            \
+            /* 867 - CollisionCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 855 - OverrunCount, */                                                                                              \
+            /* 875 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 863 - TimeSinceReset, */                                                                                            \
+            /* 883 - TimeSinceReset, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 871 - FeatureMap, */                                                                                                \
+            /* 891 - FeatureMap, */                                                                                                \
             0x03, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: On/Off (server), little-endian */                                                             \
                                                                                                                                    \
-            /* 875 - FeatureMap, */                                                                                                \
+            /* 895 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Level Control (server), little-endian */                                                      \
                                                                                                                                    \
-            /* 879 - FeatureMap, */                                                                                                \
+            /* 899 - FeatureMap, */                                                                                                \
             0x03, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Power Source (server), little-endian */                                                       \
                                                                                                                                    \
-            /* 883 - BatteryVoltage, */                                                                                            \
+            /* 903 - BatteryVoltage, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 887 - BatteryTimeRemaining, */                                                                                      \
+            /* 907 - BatteryTimeRemaining, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 891 - ActiveBatteryFaults, */                                                                                       \
+            /* 911 - ActiveBatteryFaults, */                                                                                       \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 899 - FeatureMap, */                                                                                                \
+            /* 919 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Network Commissioning (server), little-endian */                                              \
                                                                                                                                    \
-            /* 903 - Networks, */                                                                                                  \
+            /* 923 - Networks, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
                                                                                                                                    \
-            /* 915 - LastConnectErrorValue, */                                                                                     \
+            /* 935 - LastConnectErrorValue, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 919 - FeatureMap, */                                                                                                \
+            /* 939 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Bridged Device Basic (server), little-endian */                                               \
@@ -1026,12 +1016,12 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Switch (server), little-endian */                                                             \
                                                                                                                                    \
-            /* 927 - FeatureMap, */                                                                                                \
+            /* 943 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Fixed Label (server), little-endian */                                                        \
                                                                                                                                    \
-            /* 931 - label list, */                                                                                                \
+            /* 947 - label list, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1049,21 +1039,21 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Mode Select (server), little-endian */                                                        \
                                                                                                                                    \
-            /* 1185 - Description, */                                                                                              \
+            /* 1201 - Description, */                                                                                              \
             6, 'C', 'o', 'f', 'f', 'e', 'e',                                                                                       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Door Lock (server), little-endian */                                                          \
                                                                                                                                    \
-            /* 1192 - DoorOpenEvents, */                                                                                           \
+            /* 1208 - DoorOpenEvents, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 1196 - DoorClosedEvents, */                                                                                         \
+            /* 1212 - DoorClosedEvents, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 1200 - Language, */                                                                                                 \
+            /* 1216 - Language, */                                                                                                 \
             2, 'e', 'n',                                                                                                           \
                                                                                                                                    \
-            /* 1203 - AutoRelockTime, */                                                                                           \
+            /* 1219 - AutoRelockTime, */                                                                                           \
             0x60, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* 1207 - FeatureMap, */                                                                                               \
@@ -1071,36 +1061,36 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Window Covering (server), little-endian */                                                    \
                                                                                                                                    \
-            /* 1211 - FeatureMap, */                                                                                               \
+            /* 1223 - FeatureMap, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Pump Configuration and Control (server), little-endian */                                     \
                                                                                                                                    \
-            /* 1215 - LifetimeRunningHours, */                                                                                     \
+            /* 1227 - LifetimeRunningHours, */                                                                                     \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 1218 - Power, */                                                                                                    \
+            /* 1230 - Power, */                                                                                                    \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 1221 - LifetimeEnergyConsumed, */                                                                                   \
+            /* 1233 - LifetimeEnergyConsumed, */                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 1225 - FeatureMap, */                                                                                               \
+            /* 1237 - FeatureMap, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Thermostat (server), little-endian */                                                         \
                                                                                                                                    \
-            /* 1229 - FeatureMap, */                                                                                               \
+            /* 1241 - FeatureMap, */                                                                                               \
             0x0B, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: IAS Zone (server), little-endian */                                                           \
                                                                                                                                    \
-            /* 1233 - IAS CIE address, */                                                                                          \
+            /* 1245 - IAS CIE address, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Channel (server), little-endian */                                                            \
                                                                                                                                    \
-            /* 1241 - channel list, */                                                                                             \
+            /* 1253 - channel list, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1118,7 +1108,7 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Target Navigator (server), little-endian */                                                   \
                                                                                                                                    \
-            /* 1495 - target navigator list, */                                                                                    \
+            /* 1507 - target navigator list, */                                                                                    \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1136,24 +1126,24 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Media Playback (server), little-endian */                                                     \
                                                                                                                                    \
-            /* 1749 - start time, */                                                                                               \
+            /* 1761 - start time, */                                                                                               \
             0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 1757 - duration, */                                                                                                 \
+            /* 1769 - duration, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 1765 - playback speed, */                                                                                           \
+            /* 1777 - playback speed, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 1769 - seek range end, */                                                                                           \
+            /* 1781 - seek range end, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 1777 - seek range start, */                                                                                         \
+            /* 1789 - seek range start, */                                                                                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Media Input (server), little-endian */                                                        \
                                                                                                                                    \
-            /* 1785 - media input list, */                                                                                         \
+            /* 1797 - media input list, */                                                                                         \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1171,7 +1161,7 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Content Launcher (server), little-endian */                                                   \
                                                                                                                                    \
-            /* 2039 - accept header list, */                                                                                       \
+            /* 2051 - accept header list, */                                                                                       \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1187,12 +1177,12 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 2293 - supported streaming protocols, */                                                                            \
+            /* 2305 - supported streaming protocols, */                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Audio Output (server), little-endian */                                                       \
                                                                                                                                    \
-            /* 2297 - audio output list, */                                                                                        \
+            /* 2309 - audio output list, */                                                                                        \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1210,7 +1200,7 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Application Launcher (server), little-endian */                                               \
                                                                                                                                    \
-            /* 2551 - application launcher list, */                                                                                \
+            /* 2563 - application launcher list, */                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1228,67 +1218,67 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Application Basic (server), little-endian */                                                  \
                                                                                                                                    \
-            /* 2805 - allowed vendor list, */                                                                                      \
+            /* 2817 - allowed vendor list, */                                                                                      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Test Cluster (server), little-endian */                                                       \
                                                                                                                                    \
-            /* 2837 - bitmap32, */                                                                                                 \
+            /* 2849 - bitmap32, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 2841 - bitmap64, */                                                                                                 \
+            /* 2853 - bitmap64, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 2849 - int24u, */                                                                                                   \
+            /* 2861 - int24u, */                                                                                                   \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 2852 - int32u, */                                                                                                   \
+            /* 2864 - int32u, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 2856 - int40u, */                                                                                                   \
+            /* 2868 - int40u, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00,                                                                                          \
                                                                                                                                    \
-            /* 2861 - int48u, */                                                                                                   \
+            /* 2873 - int48u, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                    \
                                                                                                                                    \
-            /* 2867 - int56u, */                                                                                                   \
+            /* 2879 - int56u, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 2874 - int64u, */                                                                                                   \
+            /* 2886 - int64u, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 2882 - int24s, */                                                                                                   \
+            /* 2894 - int24s, */                                                                                                   \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 2885 - int32s, */                                                                                                   \
+            /* 2897 - int32s, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 2889 - int40s, */                                                                                                   \
+            /* 2901 - int40s, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00,                                                                                          \
                                                                                                                                    \
-            /* 2894 - int48s, */                                                                                                   \
+            /* 2906 - int48s, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                    \
                                                                                                                                    \
-            /* 2900 - int56s, */                                                                                                   \
+            /* 2912 - int56s, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 2907 - int64s, */                                                                                                   \
+            /* 2919 - int64s, */                                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 2915 - float_single, */                                                                                             \
+            /* 2927 - float_single, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 2919 - float_double, */                                                                                             \
+            /* 2931 - float_double, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 2927 - epoch_us, */                                                                                                 \
+            /* 2939 - epoch_us, */                                                                                                 \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 2935 - epoch_s, */                                                                                                  \
+            /* 2947 - epoch_s, */                                                                                                  \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 2939 - list_long_octet_string, */                                                                                   \
+            /* 2951 - list_long_octet_string, */                                                                                   \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
@@ -1343,65 +1333,65 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                \
                                                                                                                                    \
-            /* 3939 - nullable_bitmap32, */                                                                                        \
+            /* 3951 - nullable_bitmap32, */                                                                                        \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 3943 - nullable_bitmap64, */                                                                                        \
+            /* 3955 - nullable_bitmap64, */                                                                                        \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 3951 - nullable_int24u, */                                                                                          \
+            /* 3963 - nullable_int24u, */                                                                                          \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 3954 - nullable_int32u, */                                                                                          \
+            /* 3966 - nullable_int32u, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 3958 - nullable_int40u, */                                                                                          \
+            /* 3970 - nullable_int40u, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00,                                                                                          \
                                                                                                                                    \
-            /* 3963 - nullable_int48u, */                                                                                          \
+            /* 3975 - nullable_int48u, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                    \
                                                                                                                                    \
-            /* 3969 - nullable_int56u, */                                                                                          \
+            /* 3981 - nullable_int56u, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 3976 - nullable_int64u, */                                                                                          \
+            /* 3988 - nullable_int64u, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 3984 - nullable_int24s, */                                                                                          \
+            /* 3996 - nullable_int24s, */                                                                                          \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 3987 - nullable_int32s, */                                                                                          \
+            /* 3999 - nullable_int32s, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 3991 - nullable_int40s, */                                                                                          \
+            /* 4003 - nullable_int40s, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00,                                                                                          \
                                                                                                                                    \
-            /* 3996 - nullable_int48s, */                                                                                          \
+            /* 4008 - nullable_int48s, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                                    \
                                                                                                                                    \
-            /* 4002 - nullable_int56s, */                                                                                          \
+            /* 4014 - nullable_int56s, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
-            /* 4009 - nullable_int64s, */                                                                                          \
+            /* 4021 - nullable_int64s, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 4017 - nullable_float_single, */                                                                                    \
+            /* 4029 - nullable_float_single, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 4021 - nullable_float_double, */                                                                                    \
+            /* 4033 - nullable_float_double, */                                                                                    \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Electrical Measurement (server), little-endian */                                             \
                                                                                                                                    \
-            /* 4029 - measurement type, */                                                                                         \
+            /* 4041 - measurement type, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 4033 - total active power, */                                                                                       \
+            /* 4045 - total active power, */                                                                                       \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: On/Off (server), little-endian */                                                             \
                                                                                                                                    \
-            /* 4037 - FeatureMap, */                                                                                               \
+            /* 4049 - FeatureMap, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
@@ -1518,11 +1508,12 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */                                   \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Descriptor (server) */                                                                        \
-            { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* device list */      \
-            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* server list */      \
-            { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* client list */      \
-            { 0x00000003, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* parts list */       \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ClusterRevision */  \
+            { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* device list */       \
+            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* server list */       \
+            { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* client list */       \
+            { 0x00000003, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* parts list */        \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                                                                  \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Binding (server) */                                                                           \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
@@ -1531,8 +1522,9 @@
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
               ZAP_EMPTY_DEFAULT() }, /* ACL */                                                                                     \
             { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
-              ZAP_EMPTY_DEFAULT() },                                                                        /* Extension */        \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ClusterRevision */  \
+              ZAP_EMPTY_DEFAULT() }, /* Extension */                                                                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
+              ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                                                       \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Basic (server) */                                                                             \
             { 0x00000000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_SIMPLE_DEFAULT(10) }, /* DataModelRevision */    \
@@ -1581,7 +1573,7 @@
                                                                                                                                    \
             /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */                                                     \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
-              ZAP_EMPTY_DEFAULT() },                                                                 /* DefaultOtaProviders */     \
+              ZAP_SIMPLE_DEFAULT(0) },                                                               /* DefaultOtaProviders */     \
             { 0x00000001, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(1) },                          /* UpdatePossible */          \
             { 0x00000002, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },                            /* UpdateState */             \
             { 0x00000003, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_SIMPLE_DEFAULT(0) }, /* UpdateStateProgress */     \
@@ -1614,30 +1606,30 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Commissioning (server) */                                                             \
-            { 0x00000000, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(264) }, /* Breadcrumb */      \
-            { 0x00000001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(272) },  /* BasicCommissioningInfoList */               \
+            { 0x00000000, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(284) }, /* Breadcrumb */      \
+            { 0x00000001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(292) },  /* BasicCommissioningInfoList */               \
             { 0x00000002, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },           /* RegulatoryConfig */                         \
             { 0x00000003, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },           /* LocationCapability */                       \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(526) }, /* FeatureMap */                               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(546) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                             \
             { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* MaxNetworks */             \
-            { 0x00000001, ZAP_TYPE(ARRAY), 12, 0, ZAP_LONG_DEFAULTS_INDEX(530) },                    /* Networks */                \
+            { 0x00000001, ZAP_TYPE(ARRAY), 12, 0, ZAP_LONG_DEFAULTS_INDEX(550) },                    /* Networks */                \
             { 0x00000002, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* ScanMaxTimeSeconds */      \
             { 0x00000003, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* ConnectMaxTimeSeconds */   \
             { 0x00000004, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* InterfaceEnabled */        \
             { 0x00000005, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* LastNetworkingStatus */    \
             { 0x00000006, ZAP_TYPE(OCTET_STRING), 33, 0, ZAP_EMPTY_DEFAULT() },                      /* LastNetworkID */           \
-            { 0x00000007, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(542) },                    /* LastConnectErrorValue */   \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(546) },                  /* FeatureMap */              \
+            { 0x00000007, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(562) },                    /* LastConnectErrorValue */   \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(566) },                  /* FeatureMap */              \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                      /* ClusterRevision */         \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                               \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* NetworkInterfaces */ \
             { 0x00000001, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                            /* RebootCount */       \
-            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(550) },                          /* UpTime */            \
-            { 0x00000003, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(558) }, /* TotalOperationalHours */                      \
+            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(570) },                          /* UpTime */            \
+            { 0x00000003, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(578) }, /* TotalOperationalHours */                      \
             { 0x00000004, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },           /* BootReasons */                                \
             { 0x00000005, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
               ZAP_EMPTY_DEFAULT() }, /* ActiveHardwareFaults */                                                                    \
@@ -1648,23 +1640,23 @@
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                              \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ThreadMetrics */     \
-            { 0x00000001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(562) },                          /* CurrentHeapFree */   \
-            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(570) },                          /* CurrentHeapUsed */   \
-            { 0x00000003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(578) },   /* CurrentHeapHighWatermark */                 \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(586) }, /* FeatureMap */                               \
+            { 0x00000001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(582) },                          /* CurrentHeapFree */   \
+            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(590) },                          /* CurrentHeapUsed */   \
+            { 0x00000003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(598) },   /* CurrentHeapHighWatermark */                 \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(606) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                        \
             { 0x00000000, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                                   /* channel */           \
             { 0x00000001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* RoutingRole */       \
-            { 0x00000002, ZAP_TYPE(CHAR_STRING), 17, 0, ZAP_LONG_DEFAULTS_INDEX(590) },                    /* NetworkName */       \
+            { 0x00000002, ZAP_TYPE(OCTET_STRING), 17, 0, ZAP_LONG_DEFAULTS_INDEX(610) },                   /* NetworkName */       \
             { 0x00000003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                            /* PanId */             \
-            { 0x00000004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(592) },                          /* ExtendedPanId */     \
+            { 0x00000004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(612) },                          /* ExtendedPanId */     \
             { 0x00000005, ZAP_TYPE(OCTET_STRING), 18, 0, ZAP_EMPTY_DEFAULT() },                            /* MeshLocalPrefix */   \
-            { 0x00000006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(600) },                          /* OverrunCount */      \
+            { 0x00000006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(620) },                          /* OverrunCount */      \
             { 0x00000007, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* NeighborTableList */ \
             { 0x00000008, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* RouteTableList */    \
-            { 0x00000009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(608) },                          /* PartitionId */       \
+            { 0x00000009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(628) },                          /* PartitionId */       \
             { 0x0000000A, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* weighting */         \
             { 0x0000000B, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* DataVersion */       \
             { 0x0000000C, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* StableDataVersion */ \
@@ -1677,50 +1669,50 @@
             { 0x00000013, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },   /* PartitionIdChangeCount */                     \
             { 0x00000014, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },   /* BetterPartitionAttachAttemptCount */          \
             { 0x00000015, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },   /* ParentChangeCount */                          \
-            { 0x00000016, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(612) }, /* TxTotalCount */                               \
-            { 0x00000017, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(616) }, /* TxUnicastCount */                             \
-            { 0x00000018, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(620) }, /* TxBroadcastCount */                           \
-            { 0x00000019, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(624) }, /* TxAckRequestedCount */                        \
-            { 0x0000001A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(628) }, /* TxAckedCount */                               \
-            { 0x0000001B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(632) }, /* TxNoAckRequestedCount */                      \
-            { 0x0000001C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(636) }, /* TxDataCount */                                \
-            { 0x0000001D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(640) }, /* TxDataPollCount */                            \
-            { 0x0000001E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(644) }, /* TxBeaconCount */                              \
-            { 0x0000001F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(648) }, /* TxBeaconRequestCount */                       \
-            { 0x00000020, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(652) }, /* TxOtherCount */                               \
-            { 0x00000021, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(656) }, /* TxRetryCount */                               \
-            { 0x00000022, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(660) }, /* TxDirectMaxRetryExpiryCount */                \
-            { 0x00000023, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(664) }, /* TxIndirectMaxRetryExpiryCount */              \
-            { 0x00000024, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(668) }, /* TxErrCcaCount */                              \
-            { 0x00000025, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(672) }, /* TxErrAbortCount */                            \
-            { 0x00000026, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(676) }, /* TxErrBusyChannelCount */                      \
-            { 0x00000027, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(680) }, /* RxTotalCount */                               \
-            { 0x00000028, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(684) }, /* RxUnicastCount */                             \
-            { 0x00000029, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(688) }, /* RxBroadcastCount */                           \
-            { 0x0000002A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(692) }, /* RxDataCount */                                \
-            { 0x0000002B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(696) }, /* RxDataPollCount */                            \
-            { 0x0000002C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(700) }, /* RxBeaconCount */                              \
-            { 0x0000002D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(704) }, /* RxBeaconRequestCount */                       \
-            { 0x0000002E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(708) }, /* RxOtherCount */                               \
-            { 0x0000002F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(712) }, /* RxAddressFilteredCount */                     \
-            { 0x00000030, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(716) }, /* RxDestAddrFilteredCount */                    \
-            { 0x00000031, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(720) }, /* RxDuplicatedCount */                          \
-            { 0x00000032, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(724) }, /* RxErrNoFrameCount */                          \
-            { 0x00000033, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(728) }, /* RxErrUnknownNeighborCount */                  \
-            { 0x00000034, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(732) }, /* RxErrInvalidSrcAddrCount */                   \
-            { 0x00000035, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(736) }, /* RxErrSecCount */                              \
-            { 0x00000036, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(740) }, /* RxErrFcsCount */                              \
-            { 0x00000037, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(744) }, /* RxErrOtherCount */                            \
-            { 0x00000038, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(748) }, /* ActiveTimestamp */                            \
-            { 0x00000039, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(756) }, /* PendingTimestamp */                           \
-            { 0x0000003A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(764) }, /* delay */                                      \
+            { 0x00000016, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(632) }, /* TxTotalCount */                               \
+            { 0x00000017, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(636) }, /* TxUnicastCount */                             \
+            { 0x00000018, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(640) }, /* TxBroadcastCount */                           \
+            { 0x00000019, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(644) }, /* TxAckRequestedCount */                        \
+            { 0x0000001A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(648) }, /* TxAckedCount */                               \
+            { 0x0000001B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(652) }, /* TxNoAckRequestedCount */                      \
+            { 0x0000001C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(656) }, /* TxDataCount */                                \
+            { 0x0000001D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(660) }, /* TxDataPollCount */                            \
+            { 0x0000001E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(664) }, /* TxBeaconCount */                              \
+            { 0x0000001F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(668) }, /* TxBeaconRequestCount */                       \
+            { 0x00000020, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(672) }, /* TxOtherCount */                               \
+            { 0x00000021, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(676) }, /* TxRetryCount */                               \
+            { 0x00000022, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(680) }, /* TxDirectMaxRetryExpiryCount */                \
+            { 0x00000023, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(684) }, /* TxIndirectMaxRetryExpiryCount */              \
+            { 0x00000024, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(688) }, /* TxErrCcaCount */                              \
+            { 0x00000025, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(692) }, /* TxErrAbortCount */                            \
+            { 0x00000026, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(696) }, /* TxErrBusyChannelCount */                      \
+            { 0x00000027, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(700) }, /* RxTotalCount */                               \
+            { 0x00000028, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(704) }, /* RxUnicastCount */                             \
+            { 0x00000029, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(708) }, /* RxBroadcastCount */                           \
+            { 0x0000002A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(712) }, /* RxDataCount */                                \
+            { 0x0000002B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(716) }, /* RxDataPollCount */                            \
+            { 0x0000002C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(720) }, /* RxBeaconCount */                              \
+            { 0x0000002D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(724) }, /* RxBeaconRequestCount */                       \
+            { 0x0000002E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(728) }, /* RxOtherCount */                               \
+            { 0x0000002F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(732) }, /* RxAddressFilteredCount */                     \
+            { 0x00000030, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(736) }, /* RxDestAddrFilteredCount */                    \
+            { 0x00000031, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(740) }, /* RxDuplicatedCount */                          \
+            { 0x00000032, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(744) }, /* RxErrNoFrameCount */                          \
+            { 0x00000033, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(748) }, /* RxErrUnknownNeighborCount */                  \
+            { 0x00000034, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(752) }, /* RxErrInvalidSrcAddrCount */                   \
+            { 0x00000035, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(756) }, /* RxErrSecCount */                              \
+            { 0x00000036, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(760) }, /* RxErrFcsCount */                              \
+            { 0x00000037, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(764) }, /* RxErrOtherCount */                            \
+            { 0x00000038, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(768) }, /* ActiveTimestamp */                            \
+            { 0x00000039, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(776) }, /* PendingTimestamp */                           \
+            { 0x0000003A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(784) }, /* delay */                                      \
             { 0x0000003B, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* SecurityPolicy */    \
-            { 0x0000003C, ZAP_TYPE(OCTET_STRING), 5, 0, ZAP_LONG_DEFAULTS_INDEX(768) },                    /* ChannelMask */       \
+            { 0x0000003C, ZAP_TYPE(OCTET_STRING), 5, 0, ZAP_LONG_DEFAULTS_INDEX(788) },                    /* ChannelMask */       \
             { 0x0000003D, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
               ZAP_EMPTY_DEFAULT() }, /* OperationalDatasetComponents */                                                            \
             { 0x0000003E, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
               ZAP_EMPTY_DEFAULT() },                                                /* ActiveNetworkFaultsList */                  \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(775) }, /* FeatureMap */                               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(795) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                          \
@@ -1729,36 +1721,36 @@
             { 0x00000002, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },             /* WiFiVersion */                              \
             { 0x00000003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },     /* ChannelNumber */                            \
             { 0x00000004, ZAP_TYPE(INT8S), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* Rssi */                                     \
-            { 0x00000005, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(779) },   /* BeaconLostCount */                          \
-            { 0x00000006, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(783) },   /* BeaconRxCount */                            \
-            { 0x00000007, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(787) },   /* PacketMulticastRxCount */                   \
-            { 0x00000008, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(791) },   /* PacketMulticastTxCount */                   \
-            { 0x00000009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(795) },   /* PacketUnicastRxCount */                     \
-            { 0x0000000A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(799) },   /* PacketUnicastTxCount */                     \
-            { 0x0000000B, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(803) },   /* CurrentMaxRate */                           \
-            { 0x0000000C, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(811) },   /* OverrunCount */                             \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(819) }, /* FeatureMap */                               \
+            { 0x00000005, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(799) },   /* BeaconLostCount */                          \
+            { 0x00000006, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(803) },   /* BeaconRxCount */                            \
+            { 0x00000007, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(807) },   /* PacketMulticastRxCount */                   \
+            { 0x00000008, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(811) },   /* PacketMulticastTxCount */                   \
+            { 0x00000009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(815) },   /* PacketUnicastRxCount */                     \
+            { 0x0000000A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(819) },   /* PacketUnicastTxCount */                     \
+            { 0x0000000B, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(823) },   /* CurrentMaxRate */                           \
+            { 0x0000000C, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(831) },   /* OverrunCount */                             \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(839) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                      \
             { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },             /* PHYRate */                                  \
             { 0x00000001, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* FullDuplex */                               \
-            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(823) },   /* PacketRxCount */                            \
-            { 0x00000003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(831) },   /* PacketTxCount */                            \
-            { 0x00000004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(839) },   /* TxErrCount */                               \
-            { 0x00000005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(847) },   /* CollisionCount */                           \
-            { 0x00000006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(855) },   /* OverrunCount */                             \
+            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(843) },   /* PacketRxCount */                            \
+            { 0x00000003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(851) },   /* PacketTxCount */                            \
+            { 0x00000004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(859) },   /* TxErrCount */                               \
+            { 0x00000005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(867) },   /* CollisionCount */                           \
+            { 0x00000006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(875) },   /* OverrunCount */                             \
             { 0x00000007, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* CarrierDetect */                            \
-            { 0x00000008, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(863) },   /* TimeSinceReset */                           \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(871) }, /* FeatureMap */                               \
+            { 0x00000008, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(883) },   /* TimeSinceReset */                           \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(891) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                        \
-            { 0x00000000, ZAP_TYPE(INT8U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* WindowStatus */      \
+            { 0x00000000, ZAP_TYPE(INT8U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_SIMPLE_DEFAULT(0) }, /* WindowStatus */    \
             { 0x00000001, ZAP_TYPE(FABRIC_IDX), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                           \
-              ZAP_EMPTY_DEFAULT() },                                                                        /* AdminFabricIndex */ \
-            { 0x00000002, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* AdminVendorId */    \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                             /* ClusterRevision */  \
+              ZAP_SIMPLE_DEFAULT(1) }, /* AdminFabricIndex */                                                                      \
+            { 0x00000002, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_SIMPLE_DEFAULT(0) }, /* AdminVendorId */  \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                           \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* NOCs */              \
@@ -1772,13 +1764,14 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Group Key Management (server) */                                                              \
-            { 0x0000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                     \
-              ZAP_EMPTY_DEFAULT() },                                                                    /* GroupKeyMap */          \
-            { 0x0001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* GroupTable */           \
-            { 0x0002, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* MaxGroupsPerFabric */   \
-            { 0x0003, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                   \
-              ZAP_EMPTY_DEFAULT() },                                        /* MaxGroupKeysPerFabric */                            \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                                  \
+            { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
+              ZAP_EMPTY_DEFAULT() },                                                                       /* GroupKeyMap */       \
+            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* GroupTable */        \
+            { 0x00000002, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
+              ZAP_EMPTY_DEFAULT() }, /* MaxGroupsPerFabric */                                                                      \
+            { 0x00000003, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
+              ZAP_EMPTY_DEFAULT() },                                            /* MaxGroupKeysPerFabric */                        \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                       \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* label list */        \
@@ -1819,7 +1812,7 @@
             { 0x00004001, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x0000) }, /* OnTime */            \
             { 0x00004002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x0000) }, /* OffWaitTime */       \
             { 0x00004003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },         /* StartUpOnOff */      \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(875) },                        /* FeatureMap */        \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(895) },                        /* FeatureMap */        \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },                                 /* ClusterRevision */   \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: On/off Switch Configuration (server) */                                                       \
@@ -1851,7 +1844,7 @@
             { 0x00004000, ZAP_TYPE(INT8U), 1,                                                                                      \
               ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                          \
               ZAP_SIMPLE_DEFAULT(255) },                                            /* start up current level */                   \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(879) }, /* FeatureMap */                               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(899) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(5) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Binary Input (Basic) (server) */                                                              \
@@ -1862,11 +1855,12 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                      /* ClusterRevision */         \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Descriptor (server) */                                                                        \
-            { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* device list */      \
-            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* server list */      \
-            { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* client list */      \
-            { 0x00000003, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* parts list */       \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ClusterRevision */  \
+            { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* device list */       \
+            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* server list */       \
+            { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* client list */       \
+            { 0x00000003, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* parts list */        \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
+              ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                                                                  \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Binding (server) */                                                                           \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
@@ -1875,32 +1869,33 @@
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* action list */       \
             { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* endpoint list */     \
             { 0x00000002, ZAP_TYPE(LONG_CHAR_STRING), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                     \
-              ZAP_EMPTY_DEFAULT() },                                                                        /* setup url */        \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ClusterRevision */  \
+              ZAP_EMPTY_DEFAULT() }, /* setup url */                                                                               \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
+              ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                                                       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Power Source (server) */                                                                      \
             { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },             /* Status */                                   \
             { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },             /* Order */                                    \
             { 0x00000002, ZAP_TYPE(CHAR_STRING), 61, 0, ZAP_EMPTY_DEFAULT() },      /* Description */                              \
-            { 0x0000000B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(883) },   /* BatteryVoltage */                           \
+            { 0x0000000B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(903) },   /* BatteryVoltage */                           \
             { 0x0000000C, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },             /* BatteryPercentRemaining */                  \
-            { 0x0000000D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(887) },   /* BatteryTimeRemaining */                     \
+            { 0x0000000D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(907) },   /* BatteryTimeRemaining */                     \
             { 0x0000000E, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },             /* BatteryChargeLevel */                       \
-            { 0x00000012, ZAP_TYPE(ARRAY), 8, 0, ZAP_LONG_DEFAULTS_INDEX(891) },    /* ActiveBatteryFaults */                      \
+            { 0x00000012, ZAP_TYPE(ARRAY), 8, 0, ZAP_LONG_DEFAULTS_INDEX(911) },    /* ActiveBatteryFaults */                      \
             { 0x0000001A, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },             /* BatteryChargeState */                       \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(899) }, /* FeatureMap */                               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(919) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },          /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Network Commissioning (server) */                                                             \
             { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* MaxNetworks */             \
-            { 0x00000001, ZAP_TYPE(ARRAY), 12, 0, ZAP_LONG_DEFAULTS_INDEX(903) },                    /* Networks */                \
+            { 0x00000001, ZAP_TYPE(ARRAY), 12, 0, ZAP_LONG_DEFAULTS_INDEX(923) },                    /* Networks */                \
             { 0x00000002, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* ScanMaxTimeSeconds */      \
             { 0x00000003, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* ConnectMaxTimeSeconds */   \
             { 0x00000004, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* InterfaceEnabled */        \
             { 0x00000005, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* LastNetworkingStatus */    \
             { 0x00000006, ZAP_TYPE(OCTET_STRING), 33, 0, ZAP_EMPTY_DEFAULT() },                      /* LastNetworkID */           \
-            { 0x00000007, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(915) },                    /* LastConnectErrorValue */   \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(919) },                  /* FeatureMap */              \
+            { 0x00000007, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(935) },                    /* LastConnectErrorValue */   \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(939) },                  /* FeatureMap */              \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                      /* ClusterRevision */         \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Bridged Device Basic (server) */                                                              \
@@ -1929,11 +1924,11 @@
             { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(2) },           /* number of positions */                      \
             { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },             /* current position */                         \
             { 0x00000002, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(2) },           /* multi press max */                          \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(927) }, /* FeatureMap */                               \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(943) }, /* FeatureMap */                               \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Fixed Label (server) */                                                                       \
-            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(931) }, /* label list */                                \
+            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(947) }, /* label list */                                \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* ClusterRevision */                           \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: User Label (server) */                                                                        \
@@ -1946,21 +1941,21 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },  /* ClusterRevision */                                  \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Mode Select (server) */                                                                       \
-            { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0) },                                  /* CurrentMode */       \
-            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* SupportedModes */    \
-            { 0x00000002, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },       /* OnMode */            \
-            { 0x00000003, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0) },                                  /* StartUpMode */       \
-            { 0x00000004, ZAP_TYPE(CHAR_STRING), 33, 0, ZAP_LONG_DEFAULTS_INDEX(1185) },                   /* Description */       \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
+            { 0x00000000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0) },                                    /* CurrentMode */     \
+            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_SIMPLE_DEFAULT(0) }, /* SupportedModes */  \
+            { 0x00000002, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },         /* OnMode */          \
+            { 0x00000003, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0) },                                    /* StartUpMode */     \
+            { 0x00000004, ZAP_TYPE(CHAR_STRING), 33, 0, ZAP_LONG_DEFAULTS_INDEX(1201) },                     /* Description */     \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                   /* ClusterRevision */ \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Door Lock (server) */                                                                         \
             { 0x00000000, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_SIMPLE_DEFAULT(2) }, /* LockState */               \
             { 0x00000001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                              /* LockType */                \
             { 0x00000002, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_EMPTY_DEFAULT() },                            /* ActuatorEnabled */         \
             { 0x00000003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_EMPTY_DEFAULT() },   /* DoorState */               \
-            { 0x00000004, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(1192) }, /* DoorOpenEvents */ \
+            { 0x00000004, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(1208) }, /* DoorOpenEvents */ \
             { 0x00000005, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                       \
-              ZAP_LONG_DEFAULTS_INDEX(1196) },                                                      /* DoorClosedEvents */         \
+              ZAP_LONG_DEFAULTS_INDEX(1212) },                                                      /* DoorClosedEvents */         \
             { 0x00000006, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* OpenPeriod */               \
             { 0x00000011, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(10) }, /* NumberOfTotalUsersSupported */                      \
             { 0x00000012, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(10) }, /* NumberOfPINUsersSupported */                        \
@@ -1973,8 +1968,8 @@
             { 0x00000019, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(20) },  /* MaxRFIDCodeLength */                                \
             { 0x0000001A, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(10) },  /* MinRFIDCodeLength */                                \
             { 0x0000001B, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(1) }, /* CredentialRulesSupport */                           \
-            { 0x00000021, ZAP_TYPE(CHAR_STRING), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(1200) }, /* Language */  \
-            { 0x00000023, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(1203) }, /* AutoRelockTime */ \
+            { 0x00000021, ZAP_TYPE(CHAR_STRING), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(1216) }, /* Language */  \
+            { 0x00000023, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(1219) }, /* AutoRelockTime */ \
             { 0x00000024, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
               ZAP_MIN_MAX_DEFAULTS_INDEX(6) }, /* SoundVolume */                                                                   \
             { 0x00000025, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
@@ -2014,21 +2009,16 @@
             { 0x0000000D, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* EndProductType */                                  \
             { 0x0000000E, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
               ZAP_SIMPLE_DEFAULT(500) }, /* CurrentPositionLiftPercent100ths */                                                    \
-            { 0x0000000F, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
-              ZAP_SIMPLE_DEFAULT(500) }, /* CurrentPositionTiltPercent100ths */                                                    \
-            { 0x00000010, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
-              ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitLift */                                                           \
-            { 0x00000011, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
-              ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitLift */                                                         \
-            { 0x00000012, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
-              ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitTilt */                                                           \
-            { 0x00000013, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(TOKENIZE),                                                       \
-              ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitTilt */                                                         \
-            { 0x00000017, ZAP_TYPE(BITMAP8), 1,                                                                                    \
-              ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                           \
+            { 0x0000000F, ZAP_TYPE(PERCENT100THS), 2, ZAP_ATTRIBUTE_MASK(NULLABLE),                                                \
+              ZAP_SIMPLE_DEFAULT(500) },                                        /* CurrentPositionTiltPercent100ths */             \
+            { 0x00000010, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitLift */                       \
+            { 0x00000011, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitLift */                     \
+            { 0x00000012, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitTilt */                       \
+            { 0x00000013, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitTilt */                     \
+            { 0x00000017, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                        \
               ZAP_MIN_MAX_DEFAULTS_INDEX(10) },                                      /* Mode */                                    \
             { 0x0000001A, ZAP_TYPE(BITMAP16), 2, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* SafetyStatus */                            \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(1211) }, /* FeatureMap */                              \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(1223) }, /* FeatureMap */                              \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(5) },           /* ClusterRevision */                         \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Barrier Control (server) */                                                                   \
@@ -2058,16 +2048,16 @@
             { 0x00000013, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },   /* Capacity */                                          \
             { 0x00000014, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },   /* Speed */                                             \
             { 0x00000015, ZAP_TYPE(INT24U), 3, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(1215) },                                     /* LifetimeRunningHours */                      \
-            { 0x00000016, ZAP_TYPE(INT24U), 3, 0, ZAP_LONG_DEFAULTS_INDEX(1218) }, /* Power */                                     \
+              ZAP_LONG_DEFAULTS_INDEX(1227) },                                     /* LifetimeRunningHours */                      \
+            { 0x00000016, ZAP_TYPE(INT24U), 3, 0, ZAP_LONG_DEFAULTS_INDEX(1230) }, /* Power */                                     \
             { 0x00000017, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(1221) }, /* LifetimeEnergyConsumed */                                                        \
+              ZAP_LONG_DEFAULTS_INDEX(1233) }, /* LifetimeEnergyConsumed */                                                        \
             { 0x00000020, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
               ZAP_MIN_MAX_DEFAULTS_INDEX(11) }, /* OperationMode */                                                                \
             { 0x00000021, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                          \
               ZAP_MIN_MAX_DEFAULTS_INDEX(12) },                                      /* ControlMode */                             \
             { 0x00000022, ZAP_TYPE(BITMAP16), 2, 0, ZAP_EMPTY_DEFAULT() },           /* AlarmMask */                               \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(1225) }, /* FeatureMap */                              \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(1237) }, /* FeatureMap */                              \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },      /* ClusterRevision */                         \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Thermostat (server) */                                                                        \
@@ -2097,7 +2087,7 @@
             { 0x00000020, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },            /* start of week */                           \
             { 0x00000021, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(7) },            /* number of weekly transitions */            \
             { 0x00000022, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(4) },            /* number of daily transitions */             \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(1229) }, /* FeatureMap */                              \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(1241) }, /* FeatureMap */                              \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },           /* ClusterRevision */                         \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Thermostat User Interface Configuration (server) */                                           \
@@ -2220,7 +2210,7 @@
             { 0x00000001, ZAP_TYPE(ENUM16), 2, 0, ZAP_EMPTY_DEFAULT() },          /* zone type */                                  \
             { 0x00000002, ZAP_TYPE(BITMAP16), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* zone status */                                \
             { 0x00000010, ZAP_TYPE(NODE_ID), 8, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                      \
-              ZAP_LONG_DEFAULTS_INDEX(1233) },                               /* IAS CIE address */                                 \
+              ZAP_LONG_DEFAULTS_INDEX(1245) },                               /* IAS CIE address */                                 \
             { 0x00000011, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0xff) }, /* Zone ID */                                         \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },   /* ClusterRevision */                                 \
                                                                                                                                    \
@@ -2229,25 +2219,25 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Channel (server) */                                                                           \
-            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1241) }, /* channel list */                             \
+            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1253) }, /* channel list */                             \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Target Navigator (server) */                                                                  \
-            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1495) }, /* target navigator list */                    \
+            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1507) }, /* target navigator list */                    \
             { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* current navigator target */                 \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Media Playback (server) */                                                                    \
             { 0x00000000, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },         /* playback state */                          \
-            { 0x00000001, ZAP_TYPE(EPOCH_US), 8, 0, ZAP_LONG_DEFAULTS_INDEX(1749) }, /* start time */                              \
-            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(1757) },   /* duration */                                \
-            { 0x00000004, ZAP_TYPE(SINGLE), 4, 0, ZAP_LONG_DEFAULTS_INDEX(1765) },   /* playback speed */                          \
-            { 0x00000005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(1769) },   /* seek range end */                          \
-            { 0x00000006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(1777) },   /* seek range start */                        \
+            { 0x00000001, ZAP_TYPE(EPOCH_US), 8, 0, ZAP_LONG_DEFAULTS_INDEX(1761) }, /* start time */                              \
+            { 0x00000002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(1769) },   /* duration */                                \
+            { 0x00000004, ZAP_TYPE(SINGLE), 4, 0, ZAP_LONG_DEFAULTS_INDEX(1777) },   /* playback speed */                          \
+            { 0x00000005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(1781) },   /* seek range end */                          \
+            { 0x00000006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(1789) },   /* seek range start */                        \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },      /* ClusterRevision */                         \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Media Input (server) */                                                                       \
-            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1785) }, /* media input list */                         \
+            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(1797) }, /* media input list */                         \
             { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* current media input */                      \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
@@ -2258,18 +2248,18 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Content Launcher (server) */                                                                  \
-            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(2039) }, /* accept header list */                       \
+            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(2051) }, /* accept header list */                       \
             { 0x00000001, ZAP_TYPE(BITMAP32), 4, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                     \
-              ZAP_LONG_DEFAULTS_INDEX(2293) },                                  /* supported streaming protocols */                \
+              ZAP_LONG_DEFAULTS_INDEX(2305) },                                  /* supported streaming protocols */                \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Audio Output (server) */                                                                      \
-            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(2297) }, /* audio output list */                        \
+            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(2309) }, /* audio output list */                        \
             { 0x00000001, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* current audio output */                     \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Application Launcher (server) */                                                              \
-            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(2551) }, /* application launcher list */                \
+            { 0x00000000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(2563) }, /* application launcher list */                \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                          \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Application Basic (server) */                                                                 \
@@ -2279,7 +2269,7 @@
             { 0x00000003, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },           /* product id */                                \
             { 0x00000005, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },            /* application status */                        \
             { 0x00000006, ZAP_TYPE(CHAR_STRING), 33, 0, ZAP_EMPTY_DEFAULT() },     /* application version */                       \
-            { 0x00000007, ZAP_TYPE(ARRAY), 32, 0, ZAP_LONG_DEFAULTS_INDEX(2805) }, /* allowed vendor list */                       \
+            { 0x00000007, ZAP_TYPE(ARRAY), 32, 0, ZAP_LONG_DEFAULTS_INDEX(2817) }, /* allowed vendor list */                       \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* ClusterRevision */                           \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Account Login (server) */                                                                     \
@@ -2289,28 +2279,28 @@
             { 0x00000000, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(false) },      /* boolean */      \
             { 0x00000001, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },          /* bitmap8 */      \
             { 0x00000002, ZAP_TYPE(BITMAP16), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },         /* bitmap16 */     \
-            { 0x00000003, ZAP_TYPE(BITMAP32), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2837) }, /* bitmap32 */     \
-            { 0x00000004, ZAP_TYPE(BITMAP64), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2841) }, /* bitmap64 */     \
+            { 0x00000003, ZAP_TYPE(BITMAP32), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2849) }, /* bitmap32 */     \
+            { 0x00000004, ZAP_TYPE(BITMAP64), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2853) }, /* bitmap64 */     \
             { 0x00000005, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },            /* int8u */        \
             { 0x00000006, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },           /* int16u */       \
-            { 0x00000007, ZAP_TYPE(INT24U), 3, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2849) },   /* int24u */       \
-            { 0x00000008, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2852) },   /* int32u */       \
-            { 0x00000009, ZAP_TYPE(INT40U), 5, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2856) },   /* int40u */       \
-            { 0x0000000A, ZAP_TYPE(INT48U), 6, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2861) },   /* int48u */       \
-            { 0x0000000B, ZAP_TYPE(INT56U), 7, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2867) },   /* int56u */       \
-            { 0x0000000C, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2874) },   /* int64u */       \
+            { 0x00000007, ZAP_TYPE(INT24U), 3, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2861) },   /* int24u */       \
+            { 0x00000008, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2864) },   /* int32u */       \
+            { 0x00000009, ZAP_TYPE(INT40U), 5, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2868) },   /* int40u */       \
+            { 0x0000000A, ZAP_TYPE(INT48U), 6, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2873) },   /* int48u */       \
+            { 0x0000000B, ZAP_TYPE(INT56U), 7, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2879) },   /* int56u */       \
+            { 0x0000000C, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2886) },   /* int64u */       \
             { 0x0000000D, ZAP_TYPE(INT8S), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },            /* int8s */        \
             { 0x0000000E, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },           /* int16s */       \
-            { 0x0000000F, ZAP_TYPE(INT24S), 3, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2882) },   /* int24s */       \
-            { 0x00000010, ZAP_TYPE(INT32S), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2885) },   /* int32s */       \
-            { 0x00000011, ZAP_TYPE(INT40S), 5, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2889) },   /* int40s */       \
-            { 0x00000012, ZAP_TYPE(INT48S), 6, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2894) },   /* int48s */       \
-            { 0x00000013, ZAP_TYPE(INT56S), 7, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2900) },   /* int56s */       \
-            { 0x00000014, ZAP_TYPE(INT64S), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2907) },   /* int64s */       \
+            { 0x0000000F, ZAP_TYPE(INT24S), 3, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2894) },   /* int24s */       \
+            { 0x00000010, ZAP_TYPE(INT32S), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2897) },   /* int32s */       \
+            { 0x00000011, ZAP_TYPE(INT40S), 5, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2901) },   /* int40s */       \
+            { 0x00000012, ZAP_TYPE(INT48S), 6, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2906) },   /* int48s */       \
+            { 0x00000013, ZAP_TYPE(INT56S), 7, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2912) },   /* int56s */       \
+            { 0x00000014, ZAP_TYPE(INT64S), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2919) },   /* int64s */       \
             { 0x00000015, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },            /* enum8 */        \
             { 0x00000016, ZAP_TYPE(ENUM16), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) },           /* enum16 */       \
-            { 0x00000017, ZAP_TYPE(SINGLE), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2915) },   /* float_single */ \
-            { 0x00000018, ZAP_TYPE(DOUBLE), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2919) },   /* float_double */ \
+            { 0x00000017, ZAP_TYPE(SINGLE), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2927) },   /* float_single */ \
+            { 0x00000018, ZAP_TYPE(DOUBLE), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2931) },   /* float_double */ \
             { 0x00000019, ZAP_TYPE(OCTET_STRING), 11, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },      /* octet_string */ \
             { 0x0000001A, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
               ZAP_EMPTY_DEFAULT() }, /* list_int8u */                                                                              \
@@ -2323,8 +2313,8 @@
             { 0x0000001E, ZAP_TYPE(CHAR_STRING), 11, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* char_string */        \
             { 0x0000001F, ZAP_TYPE(LONG_CHAR_STRING), 1002, ZAP_ATTRIBUTE_MASK(WRITABLE),                                          \
               ZAP_EMPTY_DEFAULT() }, /* long_char_string */                                                                        \
-            { 0x00000020, ZAP_TYPE(EPOCH_US), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2927) }, /* epoch_us */     \
-            { 0x00000021, ZAP_TYPE(EPOCH_S), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2935) },  /* epoch_s */      \
+            { 0x00000020, ZAP_TYPE(EPOCH_US), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2939) }, /* epoch_us */     \
+            { 0x00000021, ZAP_TYPE(EPOCH_S), 4, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(2947) },  /* epoch_s */      \
             { 0x00000022, ZAP_TYPE(VENDOR_ID), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },          /* vendor_id */    \
             { 0x00000023, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
               ZAP_EMPTY_DEFAULT() }, /* list_nullables_and_optionals_struct */                                                     \
@@ -2339,7 +2329,7 @@
               ZAP_MIN_MAX_DEFAULTS_INDEX(34) }, /* range_restricted_int16u */                                                      \
             { 0x00000029, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                         \
               ZAP_MIN_MAX_DEFAULTS_INDEX(35) },                                      /* range_restricted_int16s */                 \
-            { 0x0000002A, ZAP_TYPE(ARRAY), 1000, 0, ZAP_LONG_DEFAULTS_INDEX(2939) }, /* list_long_octet_string */                  \
+            { 0x0000002A, ZAP_TYPE(ARRAY), 1000, 0, ZAP_LONG_DEFAULTS_INDEX(2951) }, /* list_long_octet_string */                  \
             { 0x0000002B, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
               ZAP_EMPTY_DEFAULT() }, /* list_fabric_scoped */                                                                      \
             { 0x00000030, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(MUST_USE_TIMED_WRITE),           \
@@ -2355,49 +2345,49 @@
             { 0x00008002, ZAP_TYPE(BITMAP16), 2, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                      \
               ZAP_SIMPLE_DEFAULT(0) }, /* nullable_bitmap16 */                                                                     \
             { 0x00008003, ZAP_TYPE(BITMAP32), 4, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                      \
-              ZAP_LONG_DEFAULTS_INDEX(3939) }, /* nullable_bitmap32 */                                                             \
+              ZAP_LONG_DEFAULTS_INDEX(3951) }, /* nullable_bitmap32 */                                                             \
             { 0x00008004, ZAP_TYPE(BITMAP64), 8, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                      \
-              ZAP_LONG_DEFAULTS_INDEX(3943) }, /* nullable_bitmap64 */                                                             \
+              ZAP_LONG_DEFAULTS_INDEX(3955) }, /* nullable_bitmap64 */                                                             \
             { 0x00008005, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                         \
               ZAP_SIMPLE_DEFAULT(0) }, /* nullable_int8u */                                                                        \
             { 0x00008006, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
               ZAP_SIMPLE_DEFAULT(0) }, /* nullable_int16u */                                                                       \
             { 0x00008007, ZAP_TYPE(INT24U), 3, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(3951) }, /* nullable_int24u */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(3963) }, /* nullable_int24u */                                                               \
             { 0x00008008, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(3954) }, /* nullable_int32u */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(3966) }, /* nullable_int32u */                                                               \
             { 0x00008009, ZAP_TYPE(INT40U), 5, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(3958) }, /* nullable_int40u */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(3970) }, /* nullable_int40u */                                                               \
             { 0x0000800A, ZAP_TYPE(INT48U), 6, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(3963) }, /* nullable_int48u */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(3975) }, /* nullable_int48u */                                                               \
             { 0x0000800B, ZAP_TYPE(INT56U), 7, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(3969) }, /* nullable_int56u */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(3981) }, /* nullable_int56u */                                                               \
             { 0x0000800C, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(3976) }, /* nullable_int64u */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(3988) }, /* nullable_int64u */                                                               \
             { 0x0000800D, ZAP_TYPE(INT8S), 1, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                         \
               ZAP_SIMPLE_DEFAULT(0) }, /* nullable_int8s */                                                                        \
             { 0x0000800E, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
               ZAP_SIMPLE_DEFAULT(0) }, /* nullable_int16s */                                                                       \
             { 0x0000800F, ZAP_TYPE(INT24S), 3, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(3984) }, /* nullable_int24s */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(3996) }, /* nullable_int24s */                                                               \
             { 0x00008010, ZAP_TYPE(INT32S), 4, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(3987) }, /* nullable_int32s */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(3999) }, /* nullable_int32s */                                                               \
             { 0x00008011, ZAP_TYPE(INT40S), 5, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(3991) }, /* nullable_int40s */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(4003) }, /* nullable_int40s */                                                               \
             { 0x00008012, ZAP_TYPE(INT48S), 6, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(3996) }, /* nullable_int48s */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(4008) }, /* nullable_int48s */                                                               \
             { 0x00008013, ZAP_TYPE(INT56S), 7, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(4002) }, /* nullable_int56s */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(4014) }, /* nullable_int56s */                                                               \
             { 0x00008014, ZAP_TYPE(INT64S), 8, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(4009) }, /* nullable_int64s */                                                               \
+              ZAP_LONG_DEFAULTS_INDEX(4021) }, /* nullable_int64s */                                                               \
             { 0x00008015, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                         \
               ZAP_SIMPLE_DEFAULT(0) }, /* nullable_enum8 */                                                                        \
             { 0x00008016, ZAP_TYPE(ENUM16), 2, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
               ZAP_SIMPLE_DEFAULT(0) }, /* nullable_enum16 */                                                                       \
             { 0x00008017, ZAP_TYPE(SINGLE), 4, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(4017) }, /* nullable_float_single */                                                         \
+              ZAP_LONG_DEFAULTS_INDEX(4029) }, /* nullable_float_single */                                                         \
             { 0x00008018, ZAP_TYPE(DOUBLE), 8, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                        \
-              ZAP_LONG_DEFAULTS_INDEX(4021) }, /* nullable_float_double */                                                         \
+              ZAP_LONG_DEFAULTS_INDEX(4033) }, /* nullable_float_double */                                                         \
             { 0x00008019, ZAP_TYPE(OCTET_STRING), 11, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                 \
               ZAP_EMPTY_DEFAULT() }, /* nullable_octet_string */                                                                   \
             { 0x0000801E, ZAP_TYPE(CHAR_STRING), 11, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                  \
@@ -2422,8 +2412,8 @@
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Electrical Measurement (server) */                                                            \
-            { 0x00000000, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(4029) }, /* measurement type */                        \
-            { 0x00000304, ZAP_TYPE(INT32S), 4, 0, ZAP_LONG_DEFAULTS_INDEX(4033) },   /* total active power */                      \
+            { 0x00000000, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(4041) }, /* measurement type */                        \
+            { 0x00000304, ZAP_TYPE(INT32S), 4, 0, ZAP_LONG_DEFAULTS_INDEX(4045) },   /* total active power */                      \
             { 0x00000505, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xffff) },      /* rms voltage */                             \
             { 0x00000506, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x8000) },      /* rms voltage min */                         \
             { 0x00000507, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x8000) },      /* rms voltage max */                         \
@@ -2445,15 +2435,16 @@
             { 0x00004001, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) }, /* OnTime */                 \
             { 0x00004002, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0) }, /* OffWaitTime */            \
             { 0x00004003, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },    /* StartUpOnOff */           \
-            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(4037) },                  /* FeatureMap */             \
+            { 0x0000FFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(4049) },                  /* FeatureMap */             \
             { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },                            /* ClusterRevision */        \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Descriptor (server) */                                                                        \
-            { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* device list */      \
-            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* server list */      \
-            { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* client list */      \
-            { 0x00000003, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() },  /* parts list */       \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ClusterRevision */  \
+            { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* device list */       \
+            { 0x00000001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* server list */       \
+            { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* client list */       \
+            { 0x00000003, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* parts list */        \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                               \
+              ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                                                       \
                                                                                                                                    \
             /* Endpoint: 2, Cluster: Occupancy Sensing (server) */                                                                 \
             { 0x00000000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },  /* occupancy */                                         \
@@ -2902,848 +2893,306 @@
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
 #define GENERATED_CLUSTER_COUNT 76
-
-// clang-format off
-#define GENERATED_CLUSTERS { \
-  { \
-      /* Endpoint: 0, Cluster: Identify (server) */ \
-      .clusterId = 0x00000003,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(0), \
-      .attributeCount = 3, \
-      .clusterSize = 5, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
-      .functions = chipFuncArrayIdentifyServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 0 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 4 ) ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Groups (server) */ \
-      .clusterId = 0x00000004,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(3), \
-      .attributeCount = 2, \
-      .clusterSize = 3, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayGroupsServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 6 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 13 ) ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Descriptor (server) */ \
-      .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(5), \
-      .attributeCount = 5, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Binding (server) */ \
-      .clusterId = 0x0000001E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(10), \
-      .attributeCount = 1, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 18 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Access Control (server) */ \
-      .clusterId = 0x0000001F,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(11), \
-      .attributeCount = 3, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Basic (server) */ \
-      .clusterId = 0x00000028,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(14), \
-      .attributeCount = 20, \
-      .clusterSize = 39, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayBasicServer, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: OTA Software Update Provider (client) */ \
-      .clusterId = 0x00000029,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(34), \
-      .attributeCount = 1, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(CLIENT), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 21 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 25 ) ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */ \
-      .clusterId = 0x0000002A,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(35), \
-      .attributeCount = 5, \
-      .clusterSize = 5, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 28 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Localization Configuration (server) */ \
-      .clusterId = 0x0000002B,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(40), \
-      .attributeCount = 3, \
-      .clusterSize = 292, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
-      .functions = chipFuncArrayLocalizationConfigurationServer, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Time Format Localization (server) */ \
-      .clusterId = 0x0000002C,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(43), \
-      .attributeCount = 4, \
-      .clusterSize = 4, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
-      .functions = chipFuncArrayTimeFormatLocalizationServer, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Unit Localization (server) */ \
-      .clusterId = 0x0000002D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(47), \
-      .attributeCount = 3, \
-      .clusterSize = 7, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Power Source Configuration (server) */ \
-      .clusterId = 0x0000002E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(50), \
-      .attributeCount = 2, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: General Commissioning (server) */ \
-      .clusterId = 0x00000030,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(52), \
-      .attributeCount = 6, \
-      .clusterSize = 270, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 30 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 35 ) ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Network Commissioning (server) */ \
-      .clusterId = 0x00000031,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(58), \
-      .attributeCount = 10, \
-      .clusterSize = 60, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 38 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 46 ) ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Diagnostic Logs (server) */ \
-      .clusterId = 0x00000032,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(68), \
-      .attributeCount = 0, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 49 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: General Diagnostics (server) */ \
-      .clusterId = 0x00000033,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(68), \
-      .attributeCount = 9, \
-      .clusterSize = 17, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Software Diagnostics (server) */ \
-      .clusterId = 0x00000034,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(77), \
-      .attributeCount = 6, \
-      .clusterSize = 30, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 51 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */ \
-      .clusterId = 0x00000035,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(83), \
-      .attributeCount = 65, \
-      .clusterSize = 247, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 53 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */ \
-      .clusterId = 0x00000036,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(148), \
-      .attributeCount = 15, \
-      .clusterSize = 58, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 55 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */ \
-      .clusterId = 0x00000037,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(163), \
-      .attributeCount = 11, \
-      .clusterSize = 57, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 57 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */ \
-      .clusterId = 0x0000003C,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(174), \
-      .attributeCount = 4, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 59 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Operational Credentials (server) */ \
-      .clusterId = 0x0000003E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(178), \
-      .attributeCount = 7, \
-      .clusterSize = 4, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 63 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 73 ) ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Group Key Management (server) */ \
-      .clusterId = 0x0000003F,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(185), \
-      .attributeCount = 5, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 78 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 83 ) ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Fixed Label (server) */ \
-      .clusterId = 0x00000040,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(190), \
-      .attributeCount = 2, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: User Label (server) */ \
-      .clusterId = 0x00000041,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(192), \
-      .attributeCount = 2, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 0, Cluster: Relative Humidity Measurement (server) */ \
-      .clusterId = 0x00000405,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(194), \
-      .attributeCount = 4, \
-      .clusterSize = 8, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Identify (server) */ \
-      .clusterId = 0x00000003,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(198), \
-      .attributeCount = 3, \
-      .clusterSize = 5, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
-      .functions = chipFuncArrayIdentifyServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 86 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 90 ) ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Groups (server) */ \
-      .clusterId = 0x00000004,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(201), \
-      .attributeCount = 2, \
-      .clusterSize = 3, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayGroupsServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 92 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 99 ) ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Scenes (server) */ \
-      .clusterId = 0x00000005,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(203), \
-      .attributeCount = 6, \
-      .clusterSize = 8, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayScenesServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 104 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 112 ) ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: On/Off (server) */ \
-      .clusterId = 0x00000006,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(209), \
-      .attributeCount = 7, \
-      .clusterSize = 13, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayOnOffServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 119 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: On/off Switch Configuration (server) */ \
-      .clusterId = 0x00000007,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(216), \
-      .attributeCount = 3, \
-      .clusterSize = 4, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Level Control (server) */ \
-      .clusterId = 0x00000008,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(219), \
-      .attributeCount = 16, \
-      .clusterSize = 27, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayLevelControlServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 126 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Binary Input (Basic) (server) */ \
-      .clusterId = 0x0000000F,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(235), \
-      .attributeCount = 4, \
-      .clusterSize = 5, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Descriptor (server) */ \
-      .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(239), \
-      .attributeCount = 5, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Binding (server) */ \
-      .clusterId = 0x0000001E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(244), \
-      .attributeCount = 1, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 135 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Bridged Actions (server) */ \
-      .clusterId = 0x00000025,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(245), \
-      .attributeCount = 4, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Power Source (server) */ \
-      .clusterId = 0x0000002F,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(249), \
-      .attributeCount = 11, \
-      .clusterSize = 88, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Network Commissioning (server) */ \
-      .clusterId = 0x00000031,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(260), \
-      .attributeCount = 10, \
-      .clusterSize = 60, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 138 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 145 ) ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Bridged Device Basic (server) */ \
-      .clusterId = 0x00000039,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(270), \
-      .attributeCount = 16, \
-      .clusterSize = 679, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Switch (server) */ \
-      .clusterId = 0x0000003B,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(286), \
-      .attributeCount = 5, \
-      .clusterSize = 9, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Fixed Label (server) */ \
-      .clusterId = 0x00000040,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(291), \
-      .attributeCount = 2, \
-      .clusterSize = 256, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: User Label (server) */ \
-      .clusterId = 0x00000041,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(293), \
-      .attributeCount = 2, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Boolean State (server) */ \
-      .clusterId = 0x00000045,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(295), \
-      .attributeCount = 2, \
-      .clusterSize = 3, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Mode Select (server) */ \
-      .clusterId = 0x00000050,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(297), \
-      .attributeCount = 6, \
-      .clusterSize = 38, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 148 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Door Lock (server) */ \
-      .clusterId = 0x00000101,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(303), \
-      .attributeCount = 32, \
-      .clusterSize = 54, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
-      .functions = chipFuncArrayDoorLockServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 150 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Window Covering (server) */ \
-      .clusterId = 0x00000102,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(335), \
-      .attributeCount = 20, \
-      .clusterSize = 35, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 159 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Barrier Control (server) */ \
-      .clusterId = 0x00000103,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(355), \
-      .attributeCount = 5, \
-      .clusterSize = 7, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 163 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */ \
-      .clusterId = 0x00000200,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(360), \
-      .attributeCount = 26, \
-      .clusterSize = 54, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION), \
-      .functions = chipFuncArrayPumpConfigurationAndControlServer, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Thermostat (server) */ \
-      .clusterId = 0x00000201,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(386), \
-      .attributeCount = 19, \
-      .clusterSize = 34, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayThermostatServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 166 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Thermostat User Interface Configuration (server) */ \
-      .clusterId = 0x00000204,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(405), \
-      .attributeCount = 4, \
-      .clusterSize = 5, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION), \
-      .functions = chipFuncArrayThermostatUserInterfaceConfigurationServer, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Color Control (server) */ \
-      .clusterId = 0x00000300,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(409), \
-      .attributeCount = 53, \
-      .clusterSize = 341, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayColorControlServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 170 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Illuminance Measurement (server) */ \
-      .clusterId = 0x00000400,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(462), \
-      .attributeCount = 6, \
-      .clusterSize = 11, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Temperature Measurement (server) */ \
-      .clusterId = 0x00000402,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(468), \
-      .attributeCount = 5, \
-      .clusterSize = 10, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Pressure Measurement (server) */ \
-      .clusterId = 0x00000403,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(473), \
-      .attributeCount = 4, \
-      .clusterSize = 8, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Flow Measurement (server) */ \
-      .clusterId = 0x00000404,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(477), \
-      .attributeCount = 5, \
-      .clusterSize = 10, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Relative Humidity Measurement (server) */ \
-      .clusterId = 0x00000405,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(482), \
-      .attributeCount = 5, \
-      .clusterSize = 10, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Occupancy Sensing (server) */ \
-      .clusterId = 0x00000406,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(487), \
-      .attributeCount = 4, \
-      .clusterSize = 5, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayOccupancySensingServer, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: IAS Zone (server) */ \
-      .clusterId = 0x00000500,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(491), \
-      .attributeCount = 6, \
-      .clusterSize = 16, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION) | ZAP_CLUSTER_MASK(MESSAGE_SENT_FUNCTION), \
-      .functions = chipFuncArrayIasZoneServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 190 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 192 ) ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Wake on LAN (server) */ \
-      .clusterId = 0x00000503,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(497), \
-      .attributeCount = 2, \
-      .clusterSize = 35, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Channel (server) */ \
-      .clusterId = 0x00000504,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(499), \
-      .attributeCount = 2, \
-      .clusterSize = 256, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 195 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Target Navigator (server) */ \
-      .clusterId = 0x00000505,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(501), \
-      .attributeCount = 3, \
-      .clusterSize = 257, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 198 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Media Playback (server) */ \
-      .clusterId = 0x00000506,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(504), \
-      .attributeCount = 7, \
-      .clusterSize = 39, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 200 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Media Input (server) */ \
-      .clusterId = 0x00000507,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(511), \
-      .attributeCount = 3, \
-      .clusterSize = 257, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 211 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Low Power (server) */ \
-      .clusterId = 0x00000508,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(514), \
-      .attributeCount = 1, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 216 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Keypad Input (server) */ \
-      .clusterId = 0x00000509,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(515), \
-      .attributeCount = 1, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 218 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Content Launcher (server) */ \
-      .clusterId = 0x0000050A,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(516), \
-      .attributeCount = 3, \
-      .clusterSize = 260, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 220 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Audio Output (server) */ \
-      .clusterId = 0x0000050B,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(519), \
-      .attributeCount = 3, \
-      .clusterSize = 257, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 223 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Application Launcher (server) */ \
-      .clusterId = 0x0000050C,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(522), \
-      .attributeCount = 2, \
-      .clusterSize = 256, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 226 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Application Basic (server) */ \
-      .clusterId = 0x0000050D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(524), \
-      .attributeCount = 8, \
-      .clusterSize = 138, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Account Login (server) */ \
-      .clusterId = 0x0000050E,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(532), \
-      .attributeCount = 1, \
-      .clusterSize = 2, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 228 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Test Cluster (server) */ \
-      .clusterId = 0x0000050F,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(533), \
-      .attributeCount = 81, \
-      .clusterSize = 3285, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 230 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 249 ) ,\
-    },\
-  { \
-      /* Endpoint: 1, Cluster: Electrical Measurement (server) */ \
-      .clusterId = 0x00000B04,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(614), \
-      .attributeCount = 12, \
-      .clusterSize = 28, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 2, Cluster: Groups (server) */ \
-      .clusterId = 0x00000004,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(626), \
-      .attributeCount = 2, \
-      .clusterSize = 3, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayGroupsServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 258 ) ,\
-      .serverGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 265 ) ,\
-    },\
-  { \
-      /* Endpoint: 2, Cluster: On/Off (server) */ \
-      .clusterId = 0x00000006,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(628), \
-      .attributeCount = 7, \
-      .clusterSize = 13, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayOnOffServer, \
-      .clientGeneratedCommandList = ZAP_GENERATED_COMMANDS_INDEX( 270 ) ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 2, Cluster: Descriptor (server) */ \
-      .clusterId = 0x0000001D,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(635), \
-      .attributeCount = 5, \
-      .clusterSize = 0, \
-      .mask = ZAP_CLUSTER_MASK(SERVER), \
-      .functions = NULL, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-  { \
-      /* Endpoint: 2, Cluster: Occupancy Sensing (server) */ \
-      .clusterId = 0x00000406,  \
-      .attributes = ZAP_ATTRIBUTE_INDEX(640), \
-      .attributeCount = 4, \
-      .clusterSize = 5, \
-      .mask = ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION), \
-      .functions = chipFuncArrayOccupancySensingServer, \
-      .clientGeneratedCommandList = nullptr ,\
-      .serverGeneratedCommandList = nullptr ,\
-    },\
-}
-
-// clang-format on
+#define GENERATED_CLUSTERS                                                                                                         \
+    {                                                                                                                              \
+        { 0x00000003,                                                                                                              \
+          ZAP_ATTRIBUTE_INDEX(0),                                                                                                  \
+          3,                                                                                                                       \
+          5,                                                                                                                       \
+          ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),               \
+          chipFuncArrayIdentifyServer }, /* Endpoint: 0, Cluster: Identify (server) */                                             \
+            { 0x00000004,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(3),                                                                                              \
+              2,                                                                                                                   \
+              3,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayGroupsServer }, /* Endpoint: 0, Cluster: Groups (server) */                                             \
+            {                                                                                                                      \
+                0x0000001D, ZAP_ATTRIBUTE_INDEX(5), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+            }, /* Endpoint: 0, Cluster: Descriptor (server) */                                                                     \
+            {                                                                                                                      \
+                0x0000001E, ZAP_ATTRIBUTE_INDEX(10), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
+            }, /* Endpoint: 0, Cluster: Binding (server) */                                                                        \
+            {                                                                                                                      \
+                0x0000001F, ZAP_ATTRIBUTE_INDEX(11), 3, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
+            }, /* Endpoint: 0, Cluster: Access Control (server) */                                                                 \
+            { 0x00000028,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(14),                                                                                             \
+              20,                                                                                                                  \
+              39,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayBasicServer }, /* Endpoint: 0, Cluster: Basic (server) */                                               \
+            {                                                                                                                      \
+                0x00000029, ZAP_ATTRIBUTE_INDEX(34), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                          \
+            }, /* Endpoint: 0, Cluster: OTA Software Update Provider (client) */                                                   \
+            {                                                                                                                      \
+                0x0000002A, ZAP_ATTRIBUTE_INDEX(35), 5, 5, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
+            }, /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */                                                  \
+            { 0x0000002B,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(40),                                                                                             \
+              3,                                                                                                                   \
+              292,                                                                                                                 \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),       \
+              chipFuncArrayLocalizationConfigurationServer }, /* Endpoint: 0, Cluster: Localization Configuration (server) */      \
+            { 0x0000002C,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(43),                                                                                             \
+              4,                                                                                                                   \
+              4,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),       \
+              chipFuncArrayTimeFormatLocalizationServer }, /* Endpoint: 0, Cluster: Time Format Localization (server) */           \
+            { 0x0000002D,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(47),                                                                                             \
+              3,                                                                                                                   \
+              7,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayUnitLocalizationServer }, /* Endpoint: 0, Cluster: Unit Localization (server) */                        \
+            {                                                                                                                      \
+                0x0000002E, ZAP_ATTRIBUTE_INDEX(50), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
+            }, /* Endpoint: 0, Cluster: Power Source Configuration (server) */                                                     \
+            {                                                                                                                      \
+                0x00000030, ZAP_ATTRIBUTE_INDEX(49), 6, 270, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
+            }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x00000031, ZAP_ATTRIBUTE_INDEX(55), 10, 60, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
+            }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x00000032, ZAP_ATTRIBUTE_INDEX(68), 0, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                          \
+            }, /* Endpoint: 0, Cluster: Diagnostic Logs (server) */                                                                \
+            {                                                                                                                      \
+                0x00000033, ZAP_ATTRIBUTE_INDEX(68), 9, 17, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                            \
+            {                                                                                                                      \
+                0x00000034, ZAP_ATTRIBUTE_INDEX(77), 6, 30, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                           \
+            {                                                                                                                      \
+                0x00000035, ZAP_ATTRIBUTE_INDEX(83), 65, 247, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                     \
+            {                                                                                                                      \
+                0x00000036, ZAP_ATTRIBUTE_INDEX(148), 15, 58, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                       \
+            {                                                                                                                      \
+                0x00000037, ZAP_ATTRIBUTE_INDEX(163), 11, 57, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                   \
+            {                                                                                                                      \
+                0x0000003C, ZAP_ATTRIBUTE_INDEX(174), 4, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                     \
+            {                                                                                                                      \
+                0x0000003E, ZAP_ATTRIBUTE_INDEX(178), 7, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
+            {                                                                                                                      \
+                0x0000003F, ZAP_ATTRIBUTE_INDEX(185), 5, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 0, Cluster: Group Key Management (server) */                                                           \
+            {                                                                                                                      \
+                0x00000040, ZAP_ATTRIBUTE_INDEX(190), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 0, Cluster: Fixed Label (server) */                                                                    \
+            {                                                                                                                      \
+                0x00000041, ZAP_ATTRIBUTE_INDEX(192), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 0, Cluster: User Label (server) */                                                                     \
+            {                                                                                                                      \
+                0x00000405, ZAP_ATTRIBUTE_INDEX(194), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 0, Cluster: Relative Humidity Measurement (server) */                                                  \
+            { 0x00000003,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(198),                                                                                            \
+              3,                                                                                                                   \
+              5,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),           \
+              chipFuncArrayIdentifyServer }, /* Endpoint: 1, Cluster: Identify (server) */                                         \
+            { 0x00000004,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(201),                                                                                            \
+              2,                                                                                                                   \
+              3,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayGroupsServer }, /* Endpoint: 1, Cluster: Groups (server) */                                             \
+            { 0x00000005,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(203),                                                                                            \
+              6,                                                                                                                   \
+              8,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayScenesServer }, /* Endpoint: 1, Cluster: Scenes (server) */                                             \
+            { 0x00000006,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(209),                                                                                            \
+              7,                                                                                                                   \
+              13,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/Off (server) */                                              \
+            {                                                                                                                      \
+                0x00000007, ZAP_ATTRIBUTE_INDEX(216), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: On/off Switch Configuration (server) */                                                    \
+            { 0x00000008,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(219),                                                                                            \
+              16,                                                                                                                  \
+              27,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayLevelControlServer }, /* Endpoint: 1, Cluster: Level Control (server) */                                \
+            {                                                                                                                      \
+                0x0000000F, ZAP_ATTRIBUTE_INDEX(235), 4, 5, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Binary Input (Basic) (server) */                                                           \
+            {                                                                                                                      \
+                0x0000001D, ZAP_ATTRIBUTE_INDEX(239), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Descriptor (server) */                                                                     \
+            {                                                                                                                      \
+                0x0000001E, ZAP_ATTRIBUTE_INDEX(244), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Binding (server) */                                                                        \
+            {                                                                                                                      \
+                0x00000025, ZAP_ATTRIBUTE_INDEX(245), 4, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Bridged Actions (server) */                                                                \
+            {                                                                                                                      \
+                0x0000002F, ZAP_ATTRIBUTE_INDEX(246), 11, 88, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Power Source (server) */                                                                   \
+            {                                                                                                                      \
+                0x00000031, ZAP_ATTRIBUTE_INDEX(257), 10, 60, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Network Commissioning (server) */                                                          \
+            {                                                                                                                      \
+                0x00000039, ZAP_ATTRIBUTE_INDEX(270), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Bridged Device Basic (server) */                                                           \
+            {                                                                                                                      \
+                0x0000003B, ZAP_ATTRIBUTE_INDEX(271), 5, 9, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Switch (server) */                                                                         \
+            {                                                                                                                      \
+                0x00000040, ZAP_ATTRIBUTE_INDEX(273), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Fixed Label (server) */                                                                    \
+            {                                                                                                                      \
+                0x00000041, ZAP_ATTRIBUTE_INDEX(278), 2, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: User Label (server) */                                                                     \
+            {                                                                                                                      \
+                0x00000045, ZAP_ATTRIBUTE_INDEX(280), 2, 3, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Boolean State (server) */                                                                  \
+            {                                                                                                                      \
+                0x00000050, ZAP_ATTRIBUTE_INDEX(282), 6, 38, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
+            }, /* Endpoint: 1, Cluster: Mode Select (server) */                                                                    \
+            { 0x00000101,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(288),                                                                                            \
+              32,                                                                                                                  \
+              54,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION) |                                            \
+                  ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),                                                                \
+              chipFuncArrayDoorLockServer }, /* Endpoint: 1, Cluster: Door Lock (server) */                                        \
+            {                                                                                                                      \
+                0x00000102, ZAP_ATTRIBUTE_INDEX(320), 20, 35, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Window Covering (server) */                                                                \
+            {                                                                                                                      \
+                0x00000103, ZAP_ATTRIBUTE_INDEX(340), 5, 7, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Barrier Control (server) */                                                                \
+            {                                                                                                                      \
+                0x00000200,                                                                                                        \
+                ZAP_ATTRIBUTE_INDEX(345),                                                                                          \
+                26,                                                                                                                \
+                54,                                                                                                                \
+                ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),         \
+                chipFuncArrayPumpConfigurationAndControlServer                                                                     \
+            }, /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                 \
+            { 0x00000201,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(371),                                                                                            \
+              19,                                                                                                                  \
+              34,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayThermostatServer }, /* Endpoint: 1, Cluster: Thermostat (server) */                                     \
+            {                                                                                                                      \
+                0x00000204,                                                                                                        \
+                ZAP_ATTRIBUTE_INDEX(390),                                                                                          \
+                4,                                                                                                                 \
+                5,                                                                                                                 \
+                ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION),                                       \
+                chipFuncArrayThermostatUserInterfaceConfigurationServer                                                            \
+            }, /* Endpoint: 1, Cluster: Thermostat User Interface Configuration (server) */                                        \
+            { 0x00000300,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(394),                                                                                            \
+              53,                                                                                                                  \
+              341,                                                                                                                 \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayColorControlServer }, /* Endpoint: 1, Cluster: Color Control (server) */                                \
+            {                                                                                                                      \
+                0x00000400, ZAP_ATTRIBUTE_INDEX(447), 6, 11, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
+            }, /* Endpoint: 1, Cluster: Illuminance Measurement (server) */                                                        \
+            {                                                                                                                      \
+                0x00000402, ZAP_ATTRIBUTE_INDEX(453), 5, 10, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
+            }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                        \
+            {                                                                                                                      \
+                0x00000403, ZAP_ATTRIBUTE_INDEX(458), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Pressure Measurement (server) */                                                           \
+            {                                                                                                                      \
+                0x00000404, ZAP_ATTRIBUTE_INDEX(462), 5, 10, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
+            }, /* Endpoint: 1, Cluster: Flow Measurement (server) */                                                               \
+            {                                                                                                                      \
+                0x00000405, ZAP_ATTRIBUTE_INDEX(467), 5, 10, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
+            }, /* Endpoint: 1, Cluster: Relative Humidity Measurement (server) */                                                  \
+            { 0x00000406,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(472),                                                                                            \
+              4,                                                                                                                   \
+              5,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayOccupancySensingServer }, /* Endpoint: 1, Cluster: Occupancy Sensing (server) */                        \
+            { 0x00000500,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(476),                                                                                            \
+              6,                                                                                                                   \
+              16,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION) |      \
+                  ZAP_CLUSTER_MASK(MESSAGE_SENT_FUNCTION),                                                                         \
+              chipFuncArrayIasZoneServer }, /* Endpoint: 1, Cluster: IAS Zone (server) */                                          \
+            {                                                                                                                      \
+                0x00000503, ZAP_ATTRIBUTE_INDEX(482), 2, 35, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
+            }, /* Endpoint: 1, Cluster: Wake on LAN (server) */                                                                    \
+            {                                                                                                                      \
+                0x00000504, ZAP_ATTRIBUTE_INDEX(477), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Channel (server) */                                                                        \
+            {                                                                                                                      \
+                0x00000505, ZAP_ATTRIBUTE_INDEX(479), 3, 257, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Target Navigator (server) */                                                               \
+            {                                                                                                                      \
+                0x00000506, ZAP_ATTRIBUTE_INDEX(489), 7, 39, ZAP_CLUSTER_MASK(SERVER), NULL                                        \
+            }, /* Endpoint: 1, Cluster: Media Playback (server) */                                                                 \
+            {                                                                                                                      \
+                0x00000507, ZAP_ATTRIBUTE_INDEX(489), 3, 257, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Media Input (server) */                                                                    \
+            {                                                                                                                      \
+                0x00000508, ZAP_ATTRIBUTE_INDEX(499), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Low Power (server) */                                                                      \
+            {                                                                                                                      \
+                0x00000509, ZAP_ATTRIBUTE_INDEX(500), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Keypad Input (server) */                                                                   \
+            {                                                                                                                      \
+                0x0000050A, ZAP_ATTRIBUTE_INDEX(494), 3, 260, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Content Launcher (server) */                                                               \
+            {                                                                                                                      \
+                0x0000050B, ZAP_ATTRIBUTE_INDEX(497), 3, 257, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Audio Output (server) */                                                                   \
+            {                                                                                                                      \
+                0x0000050C, ZAP_ATTRIBUTE_INDEX(500), 2, 256, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Application Launcher (server) */                                                           \
+            {                                                                                                                      \
+                0x0000050D, ZAP_ATTRIBUTE_INDEX(502), 8, 138, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Application Basic (server) */                                                              \
+            {                                                                                                                      \
+                0x0000050E, ZAP_ATTRIBUTE_INDEX(517), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 1, Cluster: Account Login (server) */                                                                  \
+            {                                                                                                                      \
+                0x0000050F, ZAP_ATTRIBUTE_INDEX(511), 79, 3285, ZAP_CLUSTER_MASK(SERVER), NULL                                     \
+            }, /* Endpoint: 1, Cluster: Test Cluster (server) */                                                                   \
+            {                                                                                                                      \
+                0x00000B04, ZAP_ATTRIBUTE_INDEX(599), 12, 28, ZAP_CLUSTER_MASK(SERVER), NULL                                       \
+            }, /* Endpoint: 1, Cluster: Electrical Measurement (server) */                                                         \
+            { 0x00000004,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(611),                                                                                            \
+              2,                                                                                                                   \
+              3,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayGroupsServer }, /* Endpoint: 2, Cluster: Groups (server) */                                             \
+            { 0x00000006,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(613),                                                                                            \
+              7,                                                                                                                   \
+              13,                                                                                                                  \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayOnOffServer }, /* Endpoint: 2, Cluster: On/Off (server) */                                              \
+            {                                                                                                                      \
+                0x0000001D, ZAP_ATTRIBUTE_INDEX(620), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                         \
+            }, /* Endpoint: 2, Cluster: Descriptor (server) */                                                                     \
+            { 0x00000406,                                                                                                          \
+              ZAP_ATTRIBUTE_INDEX(625),                                                                                            \
+              4,                                                                                                                   \
+              5,                                                                                                                   \
+              ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
+              chipFuncArrayOccupancySensingServer }, /* Endpoint: 2, Cluster: Occupancy Sensing (server) */                        \
+    }
 
 #define ZAP_CLUSTER_INDEX(index) (&generatedClusters[index])
 
@@ -3752,7 +3201,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 26, 1120 }, { ZAP_CLUSTER_INDEX(26), 46, 6876 }, { ZAP_CLUSTER_INDEX(72), 4, 21 },                 \
+        { ZAP_CLUSTER_INDEX(0), 25, 1761 }, { ZAP_CLUSTER_INDEX(25), 46, 6194 }, { ZAP_CLUSTER_INDEX(71), 4, 21 },                 \
     }
 
 // Largest attribute size is needed for various buffers
@@ -3762,7 +3211,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (718)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (8017)
+#define ATTRIBUTE_MAX_SIZE (7976)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)

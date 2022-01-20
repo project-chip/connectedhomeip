@@ -2630,9 +2630,13 @@ void CHIPGroupKeyManagementGroupTableListAttributeCallbackBridge::OnSuccessFn(vo
             }
         }
         newElement_0.endpoints = array_2;
-        newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.data()
-                                                          length:entry_0.groupName.size()
-                                                        encoding:NSUTF8StringEncoding];
+        if (entry_0.groupName.HasValue()) {
+            newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.Value().data()
+                                                              length:entry_0.groupName.Value().size()
+                                                            encoding:NSUTF8StringEncoding];
+        } else {
+            newElement_0.groupName = nil;
+        }
         [array_0 addObject:newElement_0];
     }
     { // Scope for the error so we will know what it's named
@@ -10146,19 +10150,43 @@ void CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPGroupKeyManagementClusterKeySetReadResponseParams new];
     {
-        response.groupKeySetStruct = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
-        response.groupKeySetStruct.groupKeySetID = [NSNumber numberWithUnsignedShort:data.groupKeySetStruct.groupKeySetID];
-        response.groupKeySetStruct.groupKeySecurityPolicy =
-            [NSNumber numberWithUnsignedChar:chip::to_underlying(data.groupKeySetStruct.groupKeySecurityPolicy)];
-        response.groupKeySetStruct.epochKey0 = [NSData dataWithBytes:data.groupKeySetStruct.epochKey0.data()
-                                                              length:data.groupKeySetStruct.epochKey0.size()];
-        response.groupKeySetStruct.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:data.groupKeySetStruct.epochStartTime0];
-        response.groupKeySetStruct.epochKey1 = [NSData dataWithBytes:data.groupKeySetStruct.epochKey1.data()
-                                                              length:data.groupKeySetStruct.epochKey1.size()];
-        response.groupKeySetStruct.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:data.groupKeySetStruct.epochStartTime1];
-        response.groupKeySetStruct.epochKey2 = [NSData dataWithBytes:data.groupKeySetStruct.epochKey2.data()
-                                                              length:data.groupKeySetStruct.epochKey2.size()];
-        response.groupKeySetStruct.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:data.groupKeySetStruct.epochStartTime2];
+        response.groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySetStruct new];
+        response.groupKeySet.groupKeySetID = [NSNumber numberWithUnsignedShort:data.groupKeySet.groupKeySetID];
+        response.groupKeySet.groupKeySecurityPolicy =
+            [NSNumber numberWithUnsignedChar:chip::to_underlying(data.groupKeySet.groupKeySecurityPolicy)];
+        if (data.groupKeySet.epochKey0.IsNull()) {
+            response.groupKeySet.epochKey0 = nil;
+        } else {
+            response.groupKeySet.epochKey0 = [NSData dataWithBytes:data.groupKeySet.epochKey0.Value().data()
+                                                            length:data.groupKeySet.epochKey0.Value().size()];
+        }
+        if (data.groupKeySet.epochStartTime0.IsNull()) {
+            response.groupKeySet.epochStartTime0 = nil;
+        } else {
+            response.groupKeySet.epochStartTime0 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime0.Value()];
+        }
+        if (data.groupKeySet.epochKey1.IsNull()) {
+            response.groupKeySet.epochKey1 = nil;
+        } else {
+            response.groupKeySet.epochKey1 = [NSData dataWithBytes:data.groupKeySet.epochKey1.Value().data()
+                                                            length:data.groupKeySet.epochKey1.Value().size()];
+        }
+        if (data.groupKeySet.epochStartTime1.IsNull()) {
+            response.groupKeySet.epochStartTime1 = nil;
+        } else {
+            response.groupKeySet.epochStartTime1 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime1.Value()];
+        }
+        if (data.groupKeySet.epochKey2.IsNull()) {
+            response.groupKeySet.epochKey2 = nil;
+        } else {
+            response.groupKeySet.epochKey2 = [NSData dataWithBytes:data.groupKeySet.epochKey2.Value().data()
+                                                            length:data.groupKeySet.epochKey2.Value().size()];
+        }
+        if (data.groupKeySet.epochStartTime2.IsNull()) {
+            response.groupKeySet.epochStartTime2 = nil;
+        } else {
+            response.groupKeySet.epochStartTime2 = [NSNumber numberWithUnsignedLongLong:data.groupKeySet.epochStartTime2.Value()];
+        }
     }
     DispatchSuccess(context, response);
 };

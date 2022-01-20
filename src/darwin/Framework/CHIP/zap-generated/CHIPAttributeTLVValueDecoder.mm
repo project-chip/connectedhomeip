@@ -4915,9 +4915,13 @@ id CHIPDecodeAttributeValue(const ConcreteAttributePath & aPath, TLV::TLVReader 
                     }
                 }
                 newElement_0.endpoints = array_2;
-                newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.data()
-                                                                  length:entry_0.groupName.size()
-                                                                encoding:NSUTF8StringEncoding];
+                if (entry_0.groupName.HasValue()) {
+                    newElement_0.groupName = [[NSString alloc] initWithBytes:entry_0.groupName.Value().data()
+                                                                      length:entry_0.groupName.Value().size()
+                                                                    encoding:NSUTF8StringEncoding];
+                } else {
+                    newElement_0.groupName = nil;
+                }
                 [array_0 addObject:newElement_0];
             }
             { // Scope for the error so we will know what it's named

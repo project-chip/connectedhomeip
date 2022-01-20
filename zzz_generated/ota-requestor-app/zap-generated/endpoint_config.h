@@ -199,7 +199,7 @@
                                                                                                                                    \
             /* Endpoint: 0, Cluster: OTA Software Update Requestor (server) */                                                     \
             { 0x00000000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                 \
-              ZAP_EMPTY_DEFAULT() },                                                                 /* DefaultOtaProviders */     \
+              ZAP_SIMPLE_DEFAULT(0) },                                                               /* DefaultOtaProviders */     \
             { 0x00000001, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(1) },                          /* UpdatePossible */          \
             { 0x00000002, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },                            /* UpdateState */             \
             { 0x00000003, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(NULLABLE), ZAP_SIMPLE_DEFAULT(0) }, /* UpdateStateProgress */     \
@@ -207,9 +207,10 @@
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Localization Configuration (server) */                                                        \
             { 0x00000001, ZAP_TYPE(CHAR_STRING), 36, ZAP_ATTRIBUTE_MASK(TOKENIZE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                  \
-              ZAP_LONG_DEFAULTS_INDEX(0) },                                                                /* ActiveLocale */      \
-            { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* SupportedLocales */  \
-            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) },                                 /* ClusterRevision */   \
+              ZAP_LONG_DEFAULTS_INDEX(24) }, /* ActiveLocale */                                                                    \
+            { 0x00000002, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                \
+              ZAP_SIMPLE_DEFAULT(0) },                                     /* SupportedLocales */                                  \
+            { 0x0000FFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                   \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Time Format Localization (server) */                                                          \
             { 0x00000000, ZAP_TYPE(ENUM8), 1,                                                                                      \

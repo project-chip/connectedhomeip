@@ -4418,7 +4418,7 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
         ChipLogError(Zcl, "Could not find class chip/devicecontroller/ChipClusters$GroupKeyManagementCluster$GroupTableAttribute"));
     chip::JniClass attributeJniClass(attributeClass);
     jmethodID attributeCtor =
-        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/lang/String;)V");
+        env->GetMethodID(attributeClass, "<init>", "(Ljava/lang/Integer;Ljava/lang/Integer;Ljava/util/Optional;)V");
     VerifyOrReturn(attributeCtor != nullptr, ChipLogError(Zcl, "Could not find GroupTableAttribute constructor"));
 
     auto iter = list.begin();
@@ -4459,7 +4459,12 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
         bool groupNameNull     = false;
         bool groupNameHasValue = true;
 
-        chip::CharSpan groupNameValue = entry.groupName;
+        chip::CharSpan groupNameValue;
+        groupNameHasValue = entry.groupName.HasValue();
+        if (groupNameHasValue)
+        {
+            groupNameValue = entry.groupName.Value();
+        }
 
         jstring groupName = nullptr;
         chip::UtfString groupNameStr(env, groupNameValue);
@@ -4468,7 +4473,10 @@ void CHIPChannelChannelListAttributeCallback::CallbackFn(
             groupName = jstring(groupNameStr.jniValue());
         }
 
-        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, groupId, groupName);
+        jobject groupNameOptional = nullptr;
+        chip::JniReferences::GetInstance().CreateOptional(groupName, groupNameOptional);
+
+        jobject attributeObj = env->NewObject(attributeClass, attributeCtor, fabricIndex, groupId, groupNameOptional);
         VerifyOrReturn(attributeObj != nullptr, ChipLogError(Zcl, "Could not create GroupTableAttribute object"));
 
         env->CallBooleanMethod(arrayListObj, arrayListAddMethod, attributeObj);
