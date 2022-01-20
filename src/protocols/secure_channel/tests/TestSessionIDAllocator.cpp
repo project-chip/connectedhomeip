@@ -24,23 +24,6 @@
 
 using namespace chip;
 
-void TestSessionIDAllocator_Allocate(nlTestSuite * inSuite, void * inContext)
-{
-    SessionIDAllocator allocator;
-
-    NL_TEST_ASSERT(inSuite, allocator.Peek() == 1);
-
-    uint16_t id;
-
-    for (uint16_t i = 1; i < 16; i++)
-    {
-        CHIP_ERROR err = allocator.Allocate(id);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, id == i);
-        NL_TEST_ASSERT(inSuite, allocator.Peek() == static_cast<uint16_t>(i + 1));
-    }
-}
-
 void TestSessionIDAllocator_Free(nlTestSuite * inSuite, void * inContext)
 {
     SessionIDAllocator allocator;
@@ -106,7 +89,6 @@ void TestSessionIDAllocator_ReserveUpTo(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 static const nlTest sTests[] =
 {
-    NL_TEST_DEF("SessionIDAllocator_Allocate", TestSessionIDAllocator_Allocate),
     NL_TEST_DEF("SessionIDAllocator_Free", TestSessionIDAllocator_Free),
     NL_TEST_DEF("SessionIDAllocator_Reserve", TestSessionIDAllocator_Reserve),
     NL_TEST_DEF("SessionIDAllocator_ReserveUpTo", TestSessionIDAllocator_ReserveUpTo),
