@@ -17,8 +17,8 @@
 
 #include "DeviceNetworkProvisioningDelegateImpl.h"
 #include "ServiceProvisioning.h"
-#include <support/ErrorStr.h>
-#include <support/logging/CHIPLogging.h>
+#include <lib/support/ErrorStr.h>
+#include <lib/support/logging/CHIPLogging.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
