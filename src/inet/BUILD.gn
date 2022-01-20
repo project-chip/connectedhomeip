@@ -56,7 +56,7 @@ buildconfig_header("inet_buildconfig") {
 
   defines += [
     "INET_INTERFACE_IMPL_CONFIG_FILE=<inet/InetInterfaceImpl${chip_system_config_inet_interface}.h>",
-    "INET_TCP_END_POINT_IMPL_CONFIG_FILE=<inet/TCPEndPointImpl${chip_system_config_inet}.h>"
+    "INET_TCP_END_POINT_IMPL_CONFIG_FILE=<inet/TCPEndPointImpl${chip_system_config_inet}.h>",
   ]
   if (chip_system_config_use_open_thread_udp) {
     defines += [
