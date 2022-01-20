@@ -273,8 +273,9 @@ exit:
             ChipLogDetail(DataManagement, "Closing on group Communication ");
 
             // Tell the application to release the object.
-            // TODO: The typical user would release it reference to the write client after SendWriteRequest is returned with
-            // success. Destruct the WriteClient before releasing that reference is weird, need to refactor the code to avoid this.
+            // TODO: Consumers expect to hand off ownership of the WriteClient and wait for OnDone
+            // after SendWriteRequest returns success.  Calling OnDone before returning is weird.
+            // Need to refactor the code to avoid this.
             Close();
         }
     }
