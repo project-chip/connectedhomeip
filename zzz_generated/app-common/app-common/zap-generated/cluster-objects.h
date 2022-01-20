@@ -6605,10 +6605,10 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
 
     chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
-    chip::NodeId adminNodeID           = static_cast<chip::NodeId>(0);
-    uint16_t adminPasscodeID           = static_cast<uint16_t>(0);
-    ChangeTypeEnum changeType          = static_cast<ChangeTypeEnum>(0);
-    Structs::AccessControlEntry::Type latestValue;
+    DataModel::Nullable<chip::NodeId> adminNodeID;
+    DataModel::Nullable<uint16_t> adminPasscodeID;
+    ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
+    DataModel::Nullable<Structs::AccessControlEntry::Type> latestValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6621,10 +6621,10 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
 
     chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
-    chip::NodeId adminNodeID           = static_cast<chip::NodeId>(0);
-    uint16_t adminPasscodeID           = static_cast<uint16_t>(0);
-    ChangeTypeEnum changeType          = static_cast<ChangeTypeEnum>(0);
-    Structs::AccessControlEntry::DecodableType latestValue;
+    DataModel::Nullable<chip::NodeId> adminNodeID;
+    DataModel::Nullable<uint16_t> adminPasscodeID;
+    ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
+    DataModel::Nullable<Structs::AccessControlEntry::DecodableType> latestValue;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6650,10 +6650,10 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
 
     chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
-    chip::NodeId adminNodeID           = static_cast<chip::NodeId>(0);
-    uint16_t adminPasscodeID           = static_cast<uint16_t>(0);
-    ChangeTypeEnum changeType          = static_cast<ChangeTypeEnum>(0);
-    Structs::ExtensionEntry::Type latestValue;
+    DataModel::Nullable<chip::NodeId> adminNodeID;
+    DataModel::Nullable<uint16_t> adminPasscodeID;
+    ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
+    DataModel::Nullable<Structs::ExtensionEntry::Type> latestValue;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6666,10 +6666,10 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
 
     chip::FabricIndex adminFabricIndex = static_cast<chip::FabricIndex>(0);
-    chip::NodeId adminNodeID           = static_cast<chip::NodeId>(0);
-    uint16_t adminPasscodeID           = static_cast<uint16_t>(0);
-    ChangeTypeEnum changeType          = static_cast<ChangeTypeEnum>(0);
-    Structs::ExtensionEntry::DecodableType latestValue;
+    DataModel::Nullable<chip::NodeId> adminNodeID;
+    DataModel::Nullable<uint16_t> adminPasscodeID;
+    ChangeTypeEnum changeType = static_cast<ChangeTypeEnum>(0);
+    DataModel::Nullable<Structs::ExtensionEntry::DecodableType> latestValue;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
