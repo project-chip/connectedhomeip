@@ -176,7 +176,7 @@ struct TypeInfo
 {{#zcl_attributes_server}}
         {{! isOptional=false because optional attributes don't get represented
             as Optional types here. }}
-        Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType {{asLowerCamelCase label}}{{> cluster_objects_field_init isOptional=false}};
+        Attributes::{{asUpperCamelCase label}}::TypeInfo::DecodableType {{asLowerCamelCase label}}{{> cluster_objects_field_init ns=parent.name isOptional=false}};
 {{/zcl_attributes_server}}
     };
 };
